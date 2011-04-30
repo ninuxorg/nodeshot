@@ -1,0 +1,111 @@
+<div class="dialog-form ui-widget" >
+    <form id="node-form" class="ui-corner-all ui-widget-content" method="post" action="">
+        <h1>Informazioni sul nodo</h1>
+        <fieldset>
+        {% csrf_token %} 
+        <p class="validateTips">
+            {{ form.non_field_errors }}
+        </p>
+
+        <div class="fieldWrapper">
+            {% if form.name.errors %}
+                <div class="ui-state-error">
+                    {{ form.name.errors }}
+                </div>
+            {% endif %}
+            <label for="id_name">Nome del nodo:<label>
+            {{ form.name }}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.description.errors %}
+                <div class="ui-state-error">
+                    {{ form.description.errors }}
+                </div>
+            {% endif %}
+            {{ form.description.errors }}
+            <label for="id_sender">Descrizione:</label>
+            {{ form.description}}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.owner.errors %}
+                <div class="ui-state-error">
+                    {{ form.owner.errors }}
+                </div>
+            {% endif %}
+            <label for="id_message">Responsable:</label>
+            {{ form.owner }}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.cap.errors %}
+                <div class="ui-state-error">
+                    {{ form.cap.errors }}
+                </div>
+            {% endif %}
+            <label for="id_cap">CAP:</label>
+            {{ form.cap}}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.email.errors %}
+                <div class="ui-state-error">
+                    {{ form.email.errors }}
+                </div>
+            {% endif %}
+            <label for="id_cc_myself">Indirizzo E-Mail:</label>
+            {{ form.email}}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.password.errors %}
+                <div class="ui-state-error">
+                    {{ form.password.errors }}
+                </div>
+            {% endif %}
+            <label for="id_cc_myself">Password per modificare questa configurazione:</label>
+            {{ form.password}}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.lng.errors %}
+                <div class="ui-state-error">
+                    {{ form.lng.errors }}
+                </div>
+            {% endif %}
+            <label for="id_cc_myself">Logitudine:</label>
+            {{ form.lng}}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.lat.errors %}
+                <div class="ui-state-error">
+                    {{ form.lat.errors }}
+                </div>
+            {% endif %}
+            <label for="id_cc_myself">Latitudine:</label>
+            {{ form.lat}}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.alt.errors %}
+                <div class="ui-state-error">
+                    {{ form.alt.errors }}
+                </div>
+            {% endif %}
+            <label for="id_cc_myself">Altitudine:</label>
+            {{ form.alt}}
+        </div>
+        <p ><input id="node-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Salva Nodo" /></p>
+        <fieldset>
+    </form>
+</div>
+<script>
+     $('#node-form-submit').button();
+    var inputs = $("#node-form").find("input , select ,textarea");
+    $.each(inputs,function(){
+        $(this).bind({
+              focusin: function() {
+               $(this).toggleClass('ui-state-focus');
+                 },
+               focusout: function() {
+                $(this).toggleClass('ui-state-focus');
+                 }
+              });
+         });
+</script>
+
+

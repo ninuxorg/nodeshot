@@ -1,0 +1,44 @@
+<table id="myTable" class="tablesorter"> 
+<thead> 
+<tr> 
+    <th>Status</th> 
+    <th>Nome Nodo</th> 
+    <th>Apparato</th> 
+    <th>IP</th> 
+    <th>MAC</th> 
+    <th>Segnale</th> 
+</tr> 
+</thead> 
+<tbody> 
+{% for device in devices %}
+<tr> 
+    <td><div class="status-{{ device.status }}"></div></td> 
+    <td>{{ device.node_name }}</td> 
+    <td>{{ device.device_type }}</td> 
+    <td>{{ device.ip }}</td> 
+    <td>{{ device.mac }}</td> 
+    <td><div id="pb_{{forloop.counter}}"></div></td> 
+</tr> 
+<script>
+    $("#pb_{{forloop.counter}}").progressBar({{ device.signal }} );
+</script>
+{% endfor %}
+</tbody> 
+</table> 
+<!-- div id="pager" class="pager">
+    <form>
+        <img src="{{MEDIA_URL}}images/pager/icons/first.png" class="first"/>
+        <img src="{{MEDIA_URL}}images/pager/icons/prev.png" class="prev"/>
+        <input type="text" class="pagedisplay"/>
+        <img src="{{MEDIA_URL}}images/pager/icons/next.png" class="next"/>
+        <img src="{{MEDIA_URL}}images/pager/icons/last.png" class="last"/>
+        <select class="pagesize">
+            <option selected="selected"  value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option  value="40">40</option>
+        </select>
+    </form>
+</div -->
+
+

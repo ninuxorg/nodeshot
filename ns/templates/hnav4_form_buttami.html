@@ -1,0 +1,17 @@
+<div class="dialog-form" >
+    <div class="device-id">{{device_id}}</div>
+    <div class="configuration-type">{{configuration_type}}</div>
+    <h1>HNA</h1>
+    <form id="hnav4-form" class="ui-corner-all ui-widget-content" method="post" action="">
+            {{ formset.management_form }}
+            <table>
+            {% for form in formset.forms %}
+            <tr class="h4-formset-form-container">
+                {{ form }}
+            </tr>
+            {% endfor %}
+            </table>
+    </form>
+</div>
+
+

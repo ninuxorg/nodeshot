@@ -1,0 +1,99 @@
+<div class="dialog-form ui-widget" >
+    <form id="device-form" class="ui-corner-all ui-widget-content" method="post" action="">
+        <h1>Informazioni sui dispositivi</h1>
+        <fieldset>
+            {{ formset.management_form }}
+            {% csrf_token %} 
+            {% for form in formset.forms %}
+            <div class="formset-form-container">
+                <p class="validateTips">
+                    {{ form.non_field_errors }}
+                </p>
+
+                <div class="fieldWrapper">
+                    {% if form.device_type.errors %}
+                        <div class="ui-state-error">
+                            {{ form.device_type.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_device_type">Tipo di dispositivo:<label>
+                    {{ form.device_type }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.note.errors %}
+                        <div class="ui-state-error">
+                            {{ form.note.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_note">Breve descrizione (es. "alix sul tetto"):<label>
+                    {{ form.note }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.olsr_version.errors %}
+                        <div class="ui-state-error">
+                            {{ form.olsr_version.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_olsr_version">Versione di OLSR:<label>
+                    {{ form.olsr_version }}
+                </div>
+            </div>
+            {% endfor %}
+        </fieldset>
+        <input type="submit" id="device-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />
+    </form>
+</div>
+
+<script>
+
+    function apply_jquery_ui(inputs) {
+        $.each(inputs.find("input , select ,textarea") ,function(){
+            $(this).addClass("text ui-widget-content ui-corner-all");
+            if ($(this).is("input[type='text']")||$(this).is("textarea")||$(this).is("input[type='password']") ) {
+                $(this).bind({
+                      focusin: function() {
+                       $(this).toggleClass('ui-state-focus');
+                         },
+                       focusout: function() {
+                        $(this).toggleClass('ui-state-focus');
+                         }
+                      });
+            }
+         });
+    }
+
+    $('#device-form-submit').button();
+    $(".formset-form-container").formset({
+            prefix: '{{ formset.prefix }}',
+            added: apply_jquery_ui
+    });
+    var inputs = $("#device-form");
+    apply_jquery_ui(inputs);
+/*
+        //if (($this).is("select")) {
+        if (False) {
+                 $(this).wrap("<label />");
+                 var parent = $(this).parent();
+                 parent.css({"display":"block",width:140,height:21}).addClass("ui-state-default ui-corner-all");
+                 $(this).addClass("ui-helper-hidden");
+                 parent.append("<span id='labeltext' style='float:left;'></span><span style='float:right;display:inline-block' class='ui-icon ui-icon-triangle-1-s' ></span>");
+                 parent.after("<ul class=' ui-helper-reset ui-widget-content ui-helper-hidden' style='position:absolute;z-index:50;width:140px;' ></ul>");
+                 $.each($(this).find("option"),function(){
+                            $(parent).next("ul").append("<li class='hover'>"+$(this).html()+"</li>");
+                         });
+                 $(parent).next("ul").find("li").click(function(){ $("#labeltext").html($(this).html());
+                            $(this).val($(this).html());
+                         });
+
+                 $(parent).click(function(event){ $(this).next().slideToggle('fast');
+                             event.preventDefault();
+                         });
+ 
+
+        }
+*/
+</script>
+
+

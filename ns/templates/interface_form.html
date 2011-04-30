@@ -1,0 +1,127 @@
+<div class="dialog-form ui-widget" >
+    <form id="interface-form" class="ui-corner-all ui-widget-content" method="post" action="">
+        <h1>Informazioni sulle Interfacce {{description}}</h1>
+         <div class="device-id">{{device_id}}</div>
+         <div class="configuration-type">{{configuration_type}}</div>
+        <fieldset>
+            {{ formset.management_form }}
+            {% csrf_token %} 
+            {% for form in formset.forms %}
+            <div class="if-formset-form-container formset-form-container">
+                <p class="validateTips">
+                    {{ form.non_field_errors }}
+                </p>
+
+                <div class="fieldWrapper">
+                    {% if form.ipv4_address.errors %}
+                        <div class="ui-state-error">
+                            {{ form.ipv4_address.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_ipv4_address">Indirizzo IPv4:<label>
+                    {{ form.ipv4_address }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.ipv6_address.errors %}
+                        <div class="ui-state-error">
+                            {{ form.ipv6_address.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_ipv6_address">Indirizzo IPv6:<label>
+                    {{ form.ipv4_address }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.type.errors %}
+                        <div class="ui-state-error">
+                            {{ form.type.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_type">Tipo di interfaccia:<label>
+                    {{ form.type }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.wireless_mode.errors %}
+                        <div class="ui-state-error">
+                            {{ form.wireless_mode.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_wireless_mode">Wireless mode:<label>
+                    {{ form.wireless_mode }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.wireless_channel.errors %}
+                        <div class="ui-state-error">
+                            {{ form.wireless_channel.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_wireless_channel">Canale:<label>
+                    {{ form.wireless_channel }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.wireless_polarization.errors %}
+                        <div class="ui-state-error">
+                            {{ form.wireless_polarization.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_wireless_polarization">Polarizzazione:<label>
+                    {{ form.wireless_polarization }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.mac_address.errors %}
+                        <div class="ui-state-error">
+                            {{ form.mac_address.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_mac_address">Indirizzo MAC:<label>
+                    {{ form.mac_address }}
+                </div>
+
+                <div class="fieldWrapper">
+                    {% if form.ssid.errors %}
+                        <div class="ui-state-error">
+                            {{ form.ssid.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_ssid">SSID:<label>
+                    {{ form.ssid }}
+                </div>
+
+            </div>
+            {% endfor %}
+        </fieldset>
+    </form>
+</div>
+
+<script>
+
+    function apply_jquery_ui(inputs) {
+        $.each(inputs.find("input , select ,textarea"),function(){
+            $(this).addClass("text ui-widget-content ui-corner-all");
+            if ($(this).is("input[type='text']")||$(this).is("textarea")||$(this).is("input[type='password']") ) {
+                $(this).bind({
+                      focusin: function() {
+                       $(this).toggleClass('ui-state-focus');
+                         },
+                       focusout: function() {
+                        $(this).toggleClass('ui-state-focus');
+                         }
+                      });
+            }
+         });
+    }
+    $(".if-formset-form-container").formset({
+            prefix: '{{ formset.prefix }}',
+            added: apply_jquery_ui
+    });
+    var inputs = $("#interface-form");
+    apply_jquery_ui(inputs);
+
+</script>
+
+

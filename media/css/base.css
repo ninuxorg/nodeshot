@@ -1,0 +1,220 @@
+html { height: 100% }
+body { height: 100%; margin: 0px; padding: 0px }
+
+
+#container
+{
+    margin: 0 auto;
+    width: 100%;
+    background: #fff;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #000;
+}
+
+#header
+{
+    background: #000;
+    color: #fff;
+}
+
+#header h1 
+{ 
+    margin: 0; 
+    display: inline; 
+    color: #FFA500;
+}
+/*
+#navigation
+{
+    float: right;
+    width: 100%;
+    background: #000;
+}
+
+#navigation ul
+{
+    margin: 0;
+    padding: 0;
+}
+
+#navigation ul li
+{
+    list-style-type: none;
+    display: inline;
+}
+
+#navigation li a
+{
+    display: block;
+    float: left;
+    padding: 5px 10px;
+    color: #fff;
+    text-decoration: none;
+    border-right: 1px solid #fff;
+}
+
+#navigation li a:hover { background: #383; }
+*/
+
+
+
+#content-container
+{
+    float: left;
+    width: 100%;
+    background: #FFF; 
+}
+
+#content
+{
+    clear: left;
+    float: left;
+    width: 74%;
+    padding: 0px 0;
+    margin: 0 0 0 0%;
+    display: inline;
+}
+
+#content h2 { margin: 0; }
+
+#aside
+{
+    float: right;
+    width: 24%;
+    padding: 2px 2px;
+    margin: 0 0 0 0;
+    display: inline;
+    color: #000;
+}
+
+#aside h3 { margin: 0; }
+/*
+#footer
+{
+    clear: left;
+    background: #ccc;
+    text-align: right;
+    padding: 20px;
+    height: 1%;
+}
+*/
+
+#map_canvas { height: 100% }
+
+
+
+
+#network-stat
+{
+    width: 80%;
+    margin-left:100px;
+}
+
+#network-stat ul
+{
+    padding: 0;
+    display: inline;
+}
+
+#network-stat ul li
+{
+    list-style-type: none;
+    display: inline;
+}
+
+#search-span
+{
+    float: right;
+
+}
+
+#view-radio
+{
+    margin: auto;
+    width: 300px;
+}
+
+#node-tree-container
+{
+    width: 280px;
+    height: 350px;
+    overflow: auto;
+    margin-top: 5px;
+}
+
+
+/* DLG */
+.dialog-form {
+    width: 40%; 
+    margin-top: 20px;
+    margin-left: 20px;
+}
+.dialog-form label, .dialog-form input { display:block; }
+.dialog-form input.text { margin-bottom:12px; width:95%; padding: .4em; }
+.dialog-form fieldset { padding:0; border:0; margin-top:25px; }
+.dialog-form .form-tips {font-size: 0.7em;}
+
+.dialog-form h1 { text-align: center; font-size: 1.2em; margin: .6em 0; }
+.dialog-form div#users-contain { width: 350px; margin: 20px 0; }
+.dialog-form div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+.dialog-form div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+.dialog-form .ui-dialog .ui-state-error { padding: .3em; }
+.dialog-form .validateTips { border: 1px solid transparent; padding: 0.3em; }
+.dialog-form .errorlist {
+    list-style-type: none;
+    display: inline;
+}
+
+.dialog-form .submit-button { margin-top: 50px;  }
+
+.submit-button { margin-top: 20px; margin-left: 20px;  }
+
+.formset-form-container {
+    padding: 1em;
+    border:1px dashed orange;
+    margin: 1em;
+}
+.device-id , .configuration-type {
+    display: none;
+}
+
+.if-configuration {
+
+}
+
+
+
+
+.defaultText { width: 300px; }
+.defaultTextActive { color: #a1a1a1; font-style: italic; }
+
+#search-address {
+    width:218px;
+    display: block;
+    margin: 10px 10px 10px 2px;
+}
+
+h3 {
+    color: #FFA500;
+    padding-top: 10px;
+    display: block;
+    font-size: 14px;
+}
+
+#addhelper {
+    display: block;
+    font-style: italic;
+}
+
+.status-on {
+    width: 20px;    
+    height: 20px;    
+    background : transparent url('../images/onoff.gif') no-repeat -20px 0px scroll;
+}
+
+.status-off {
+    width: 20px;    
+    height: 20px;    
+    background : transparent url('../images/onoff.gif') no-repeat 0px 0px scroll;
+}
