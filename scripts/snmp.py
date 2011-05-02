@@ -1,5 +1,5 @@
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-import sys, os, struct
+import sys, os, struct, threading
 sys.path.append("/home/ninux/nodeshot")
 
 from django.core.management import setup_environ
@@ -11,6 +11,9 @@ from ns.models import *
 
 community = cmdgen.CommunityData('my-agent', 'public', 0)
 pingcmd = "ping -c 1 "
+MAX_THREAD_N = 100
+interface_list = []
+mutex = threading.Lock()
 
 def get_mac(ip):
     'return the wifi mac of the device, else None'
@@ -69,55 +72,70 @@ def get_device_type(ip):
     except:
         return None
 
+class SNMPBugger(threading.Thread):
+    def __init__(self, id):
+        threading.Thread.__init__(self, name="ComputeThread-%d" % (id,))
+    def run(self):
+        while len(interface_list) > 0:
+            mutex.acquire()
+            i = interface_list.pop() 
+            mutex.release()
+            ip = i.ipv4_address
+            # check via ping if device is up
+            ping_status = os.system(pingcmd + ip) # 0-> up , >1 down
+            try:
+                node = i.device.node
+            except:
+                node = None 
+
+            try:
+                device = i.device
+            except:
+                device = None
+
+            if ping_status == 0:
+                if node:
+                    node.status = 'a'
+                mac = get_mac(ip)
+                if device:
+                    signals = [s[1] for s in get_signal(ip)] 
+                    m_max = max(signals) if len(signals) else 0  #get max signals
+                    print "-------- Max signal is %d" % m_max
+                    device.max_signal = m_max 
+                    device_name = get_name(ip) #get device name
+                    device_type = get_device_type(ip) #get device name
+                    if device_name:
+                        device.name = device_name
+                        print "Device name: " + device_name
+                    if device_type:
+                        device.type = device_type
+                    device.save() #save
+                if mac:
+                    i.mac_address = mac 
+                    print mac
+                    print "Nodo %s up con mac %s" % ( ip, mac )
+                else:
+                    i.mac_address = ''
+                    print "Nodo %s up ma niente mac via snmp" % ip
+                i.save() #save
+            else:
+                print "Nodo %s down" % ip
+            if node:
+                node.save() #save
 
 
 
-for node in Node.objects.all():
-    #reset status of all the node to potential
-    node.status = 'p'
-    node.save()
+def main():
+    for node in Node.objects.all():
+        #reset status of all the node to potential
+        node.status = 'p'
+        node.save()
 
-for i in Interface.objects.all():
-    ip = i.ipv4_address
-    # check via ping if device is up
-    ping_status = os.system(pingcmd + ip) # 0-> up , >1 down
-    try:
-        node = i.device.node
-    except:
-        node = None 
+    for i in Interface.objects.all():
+        interface_list.append(i)
 
-    try:
-        device = i.device
-    except:
-        device = None
+    for i in range(0, MAX_THREAD_N):
+            SNMPBugger(i, ).start()
 
-    if ping_status == 0:
-        if node:
-            node.status = 'a'
-        mac = get_mac(ip)
-        if device:
-            signals = [s[1] for s in get_signal(ip)] 
-            m_max = max(signals) if len(signals) else 0  #get max signals
-            print "-------- Max signal is %d" % m_max
-            device.max_signal = m_max 
-            device_name = get_name(ip) #get device name
-            device_type = get_device_type(ip) #get device name
-            if device_name:
-                device.name = device_name
-                print "Device name: " + device_name
-            if device_type:
-                device.type = device_type
-            device.save() #save
-        if mac:
-            i.mac_address = mac 
-            print mac
-            print "Nodo %s up con mac %s" % ( ip, mac )
-        else:
-            i.mac_address = ''
-            print "Nodo %s up ma niente mac via snmp" % ip
-        i.save() #save
-    else:
-        print "Nodo %s down" % ip
-    node.save() #save
-
-
+if __name__ == "__main__":
+        main()
