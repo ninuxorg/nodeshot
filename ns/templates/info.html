@@ -2,7 +2,8 @@
 <thead> 
 <tr> 
     <th>Status</th> 
-    <th>Nome Nodo</th> 
+    <th>Nome Device (Nodo)</th> 
+    <th>SSID</th> 
     <th>Apparato</th> 
     <th>IP</th> 
     <th>MAC</th> 
@@ -12,16 +13,26 @@
 <tbody> 
 {% for device in devices %}
 <tr> 
-    <td><div class="status-{{ device.status }}"></div></td> 
-    <td>{{ device.node_name }}</td> 
+    <td><a name="{{device.node.id}}"></a><div class="status-{{ device.status }}"></div><span style="display: none">{{ device.status }}</span></td> 
+    <td>{{ device.name }} ({{ device.node_name }}) </td> 
+    <td>{{ device.ssid }}</td> 
     <td>{{ device.device_type }}</td> 
     <td>{{ device.ip }}</td> 
     <td>{{ device.mac }}</td> 
-    <td><div id="pb_{{forloop.counter}}"></div></td> 
+    <!-- td> {% if device.signal != 0 %}  <div id="pb_{{forloop.counter}}"></div>{{ device.signal }} dBm {% endif %} <br/> {{device.signals}}</td --> 
+    <td>{%for signal in device.links %} <div id="pb_{{device.id}}_{{signal.id}}"></div> {{signal.dbm}} dbm (<a href="#{{signal.to_node.id}}">{{signal.to_node.name}}</a>)<br/> {% endfor %}</td>
 </tr> 
+{% if device.signal != 0 %}
 <script>
-    $("#pb_{{forloop.counter}}").progressBar({{ device.signal }} );
+    $("#pb_{{forloop.counter}}").progressBar({{ device.signal_bar }} );
 </script>
+{% endif %}
+{%for signal in device.links %}
+<script>                                                                                                                                                                           
+    $("#pb_{{device.id}}_{{signal.id}}").progressBar({{ signal.signal_bar }} ); 
+</script> 
+{% endfor %}
+
 {% endfor %}
 </tbody> 
 </table> 

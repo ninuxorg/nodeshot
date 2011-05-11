@@ -2,7 +2,8 @@ from django.db import models
 
 NODE_STATUS = (
     ('a', 'active'),
-    ('p', 'potential')
+    ('p', 'potential'),
+    ('d', 'down')
 )
 
 INTERFACE_TYPE = (
@@ -16,10 +17,11 @@ WIRELESS_MODE = (
     ('adhoc', 'adhoc'),    
 )
 
-WIRELESS_POLARIZATION = (
+WIRELESS_POLARITY = (
         ('h', 'horizontal'),
         ('v', 'vertical'),
         ('c', 'circular'),
+        ('a', 'auto'),
 )
 
 WIRELESS_CHANNEL = (
@@ -83,11 +85,11 @@ WIRELESS_CHANNEL = (
 
 
 
-class DeviceType(models.Model):
-    name = models.CharField(max_length=50)
-    img = models.ImageField(upload_to='devicePics/',  blank=True, null=True) 
-    def __unicode__(self):
-        return u'%s' % (self.name)
+#class DeviceType(models.Model):
+#    name = models.CharField(max_length=50)
+#    img = models.ImageField(upload_to='devicePics/',  blank=True, null=True) 
+#    def __unicode__(self):
+#        return u'%s' % (self.name)
 
 class Node(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -106,14 +108,15 @@ class Node(models.Model):
         return u'%s' % (self.name)
 
 class Device(models.Model):
-    device_type = models.ForeignKey(DeviceType)
+    type = models.CharField(max_length=50, blank=True, null=True ) 
     node = models.ForeignKey(Node)
-    note = models.CharField(max_length=200)
+    name = models.CharField(max_length=50)
+    max_signal = models.IntegerField(default = 0)
     olsr_version = models.CharField(max_length=20, blank=True, null=True)
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     def __unicode__(self):
-        return u'%s' % (self.device_type.name)
+        return u'%s (%s)' % (self.type, self.node.name )
 
 class HNAv4(models.Model):
     device = models.ForeignKey(Device)
@@ -127,7 +130,7 @@ class Interface(models.Model):
     type = models.CharField(max_length=1, choices=INTERFACE_TYPE)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
     wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
-    wireless_polarization = models.CharField(max_length=1, choices=WIRELESS_POLARIZATION, blank=True, null=True)
+    wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
     mac_address = models.CharField(max_length=17, blank=True, null=True)
     device = models.ForeignKey(Device)
     ssid = models.CharField(max_length=50, null=True, blank=True)
@@ -136,8 +139,17 @@ class Interface(models.Model):
     def __unicode__(self):
         return u'IP: %s' % (self.ipv4_address)
 
+class IPAlias(models.Model):
+    ipv4_address = models.CharField(max_length=15, unique=True)
+    interface = models.ForeignKey(Interface)
+    def __unicode__(self):
+        return u'IP: %s' % (self.ipv4_address)
+
 class Link(models.Model):
-    nodeA = models.ForeignKey(Node, related_name='nodeA')
-    nodeB = models.ForeignKey(Node, related_name='nodeB')
-    quality = models.IntegerField()
+    from_interface = models.ForeignKey(Interface, related_name='from_interface')
+    to_interface = models.ForeignKey(Interface, related_name='to_interface')
+    etx = models.FloatField(default=0)
+    dbm = models.IntegerField(default=0)
+    sync_tx = models.IntegerField(default=0)
+    sync_rx = models.IntegerField(default=0)
 

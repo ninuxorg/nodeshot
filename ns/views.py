@@ -36,7 +36,7 @@ def index(request):
     max_radios = range(1,10)
     km = 0
     for l in Link.objects.all():
-        km += distance((l.nodeA.lat,l.nodeA.lng), (l.nodeB.lat, l.nodeB.lng))
+        km += distance((l.from_interface.device.node.lat,l.from_interface.device.node.lng), (l.to_interface.device.node.lat, l.to_interface.device.node.lng))
     km = '%0.3f' % km
     return render_to_response('index.html', {'max_radios': max_radios , 'active_n': Node.objects.filter(status = 'a').count() , 'potential_n': Node.objects.filter(status = 'p').count() , 'links_n': Link.objects.count(), 'km_n': km },context_instance=RequestContext(request))
 
@@ -46,7 +46,14 @@ def nodes(request):
    potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat') 
    links = []
    for l in Link.objects.all():
-       entry = {'from_lng': l.nodeA.lng , 'from_lat': l.nodeA.lat, 'to_lng': l.nodeB.lng, 'to_lat': l.nodeB.lat, 'quality': l.quality}
+       etx = 0
+       if 0 < l.etx < 1.5:
+           etx = 1
+       elif l.etx < 3:
+           etx = 2
+       else:
+           etx = 3
+       entry = {'from_lng': l.from_interface.device.node.lng , 'from_lat': l.from_interface.device.node.lat, 'to_lng': l.to_interface.device.node.lng, 'to_lat': l.to_interface.device.node.lat, 'quality': etx}
        links.append(entry)
    data = {'active': list(active), 'potential': list(potential) , 'links': links} 
    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
@@ -114,18 +121,34 @@ def info_window(request, nodeName):
     info = {'node' : n}
     return render_to_response('info_window.html', info ,context_instance=RequestContext(request))
 
+
+def signal_to_bar(signal):
+    if signal < 0:
+        return min(100, max(0, int( 100-( (-signal -50) * 10/4 ) ) ) ) 
+    else:
+        return 0
+
 def info(request):
     devices = []
     entry = {}
-    debug_signal = 40
     for d in Device.objects.all():
-        entry['status'] = "on"
-        entry['device_type'] = d.device_type.name 
-        entry['node_name'] = d.node.name 
-        entry['ip'] = d.interface_set.all()[0].ipv4_address if d.interface_set.count() > 0 else ""
-        entry['mac'] = d.interface_set.all()[0].mac_address if d.interface_set.count() > 0 else ""
-        entry['signal'] = debug_signal   
-        debug_signal += 1
-        devices.append(entry)
+        try:
+            entry['status'] = "on" if d.node.status == 'a' else "off"
+            entry['device_type'] = d.type
+            entry['node_name'] = d.node.name 
+            entry['name'] = d.name 
+            entry['ip'] = d.interface_set.values('ipv4_address') if d.interface_set.count() > 0 else ""
+            entry['mac'] = d.interface_set.values('mac_address') if d.interface_set.count() > 0 else ""
+            # heuristic count for good representation of the signal bar (from 0 to 100)
+            entry['signal_bar'] = signal_to_bar(d.max_signal)  if d.max_signal < 0 else 0
+            entry['signal'] = d.max_signal  
+            links = Link.objects.filter(from_interface__device = d) 
+            for l in links:
+                l.signal_bar = signal_to_bar(l.dbm)
+            entry['links'] = links 
+            entry['ssid'] = d.interface_set.values('ssid')
+            devices.append(entry)
+        except:
+            pass
         entry = {}
     return render_to_response('info.html',{'devices': devices} ,context_instance=RequestContext(request))
