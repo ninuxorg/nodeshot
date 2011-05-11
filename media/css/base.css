@@ -208,13 +208,13 @@ h3 {
 }
 
 .status-on {
-    width: 20px;    
-    height: 20px;    
-    background : transparent url('../images/onoff.gif') no-repeat -20px 0px scroll;
+    width: 15px;    
+    height: 15px;    
+    background : transparent url('../images/onoffstatus.gif') no-repeat -15px 0px scroll;
 }
 
 .status-off {
-    width: 20px;    
-    height: 20px;    
-    background : transparent url('../images/onoff.gif') no-repeat 0px 0px scroll;
+    width: 15px;    
+    height: 15px;    
+    background : transparent url('../images/onoffstatus.gif') no-repeat 0px 0px scroll;
 }
