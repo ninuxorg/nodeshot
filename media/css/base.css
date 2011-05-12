@@ -211,10 +211,16 @@ h3 {
     width: 15px;    
     height: 15px;    
     background : transparent url('../images/onoffstatus.gif') no-repeat -15px 0px scroll;
+    margin: auto;
 }
 
 .status-off {
     width: 15px;    
     height: 15px;    
     background : transparent url('../images/onoffstatus.gif') no-repeat 0px 0px scroll;
+    margin: auto;
+}
+
+.signalbar{
+    display: inline;
 }
