@@ -1,13 +1,13 @@
 <table id="myTable" class="tablesorter"> 
 <thead> 
 <tr> 
-    <th>Status</th> 
-    <th>Nome Device (Nodo)</th> 
-    <th>SSID</th> 
-    <th>Apparato</th> 
-    <th>IP</th> 
-    <th>MAC</th> 
-    <th>Segnale</th> 
+    <th style="width: 10%">Status</th> 
+    <th style="width: 15%">Nome Device (Nodo)</th> 
+    <th style="width: 10%">SSID</th> 
+    <th style="width: 10%">Apparato</th> 
+    <th style="width: 10%">IP</th> 
+    <th style="width: 10%">MAC</th> 
+    <th style="width: 35%">Segnale</th> 
 </tr> 
 </thead> 
 <tbody> 
@@ -15,18 +15,12 @@
 <tr> 
     <td><a name="{{device.node.id}}"></a><div class="status-{{ device.status }}"></div><span style="display: none">{{ device.status }}</span></td> 
     <td>{{ device.name }} ({{ device.node_name }}) </td> 
-    <td>{{ device.ssid }}</td> 
+    <td>{% for ssid in device.ssids %}{{ ssid }}<br />{% endfor %}</td> 
     <td>{{ device.device_type }}</td> 
-    <td>{{ device.ip }}</td> 
-    <td>{{ device.mac }}</td> 
-    <!-- td> {% if device.signal != 0 %}  <div id="pb_{{forloop.counter}}"></div>{{ device.signal }} dBm {% endif %} <br/> {{device.signals}}</td --> 
-    <td>{%for signal in device.links %} <div id="pb_{{device.id}}_{{signal.id}}"></div> {{signal.dbm}} dbm (<a href="#{{signal.to_node.id}}">{{signal.to_node.name}}</a>)<br/> {% endfor %}</td>
+    <td>{% for ip in device.ips %} {{ ip }}<br /> {% endfor %}</td> 
+    <td>{% for mac in device.macs %}{{ mac }}<br />{% endfor %}</td> 
+    <td>{%for signal in device.links %}<div class="signalbar" id="pb_{{device.id}}_{{signal.id}}"></div> {{signal.dbm}} dbm -> <a href="#{{signal.to_interface.device.node.id}}">{{signal.to_interface.device.node.name}}</a> <br/> {% endfor %}</td>
 </tr> 
-{% if device.signal != 0 %}
-<script>
-    $("#pb_{{forloop.counter}}").progressBar({{ device.signal_bar }} );
-</script>
-{% endif %}
 {%for signal in device.links %}
 <script>                                                                                                                                                                           
     $("#pb_{{device.id}}_{{signal.id}}").progressBar({{ signal.signal_bar }} ); 

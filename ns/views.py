@@ -137,8 +137,8 @@ def info(request):
             entry['device_type'] = d.type
             entry['node_name'] = d.node.name 
             entry['name'] = d.name 
-            entry['ip'] = d.interface_set.values('ipv4_address') if d.interface_set.count() > 0 else ""
-            entry['mac'] = d.interface_set.values('mac_address') if d.interface_set.count() > 0 else ""
+            entry['ips'] = [ip['ipv4_address'] for ip in d.interface_set.values('ipv4_address')] if d.interface_set.count() > 0 else ""
+            entry['macs'] = [mac['mac_address'] if mac['mac_address'] != None else '' for mac in d.interface_set.values('mac_address')] if d.interface_set.count() > 0 else ""
             # heuristic count for good representation of the signal bar (from 0 to 100)
             entry['signal_bar'] = signal_to_bar(d.max_signal)  if d.max_signal < 0 else 0
             entry['signal'] = d.max_signal  
@@ -146,7 +146,7 @@ def info(request):
             for l in links:
                 l.signal_bar = signal_to_bar(l.dbm)
             entry['links'] = links 
-            entry['ssid'] = d.interface_set.values('ssid')
+            entry['ssids'] = [ssid['ssid'] for ssid in d.interface_set.values('ssid')] if d.interface_set.count() > 0 else ""
             devices.append(entry)
         except:
             pass
