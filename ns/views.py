@@ -11,8 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.forms import ModelForm
 from django.core.exceptions import *
-import time
-import math
+import time,re,os,math
 #from forms import *
 
 
@@ -128,10 +127,19 @@ def signal_to_bar(signal):
     else:
         return 0
 
+def generate_rrd(request):
+    ip = request.GET.get('ip', None)
+    pattern = r"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
+    if re.match(pattern, ip):
+        os.system("/home/ninux/nodeshot/scripts/ninuxstats/create_rrd_image.sh " + ip + " > /dev/null")
+        return  render_to_response('rrd.html', {'filename' : ip + '.png' } ,context_instance=RequestContext(request))
+    else:
+        return HttpResponse('Error')
+
 def info(request):
     devices = []
     entry = {}
-    for d in Device.objects.all():
+    for d in Device.objects.all().order_by('node__status'):
         try:
             entry['status'] = "on" if d.node.status == 'a' else "off"
             entry['device_type'] = d.type
@@ -147,6 +155,7 @@ def info(request):
                 l.signal_bar = signal_to_bar(l.dbm)
             entry['links'] = links 
             entry['ssids'] = [ssid['ssid'] for ssid in d.interface_set.values('ssid')] if d.interface_set.count() > 0 else ""
+            entry['nodeid'] = d.node.id
             devices.append(entry)
         except:
             pass

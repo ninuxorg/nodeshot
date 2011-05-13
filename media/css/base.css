@@ -224,3 +224,24 @@ h3 {
 .signalbar{
     display: inline;
 }
+
+#node-info-box {
+    display: none; 
+    width: 400px;
+    height: 340px;
+    background-color: #FF0000;
+    /*
+     * left:0px; 
+    bottom:0px; 
+    position: relative;*/
+    /* margin-top: -300px;*/ /* negative value of footer height */
+    /*clear:both;*/
+}
+
+#table-wrapper{
+    overflow:auto;
+    height: 440px;
+    /* padding-bottom: 300px; */
+}
+
+

@@ -402,3 +402,8 @@ function initialize() {
 
 };
 
+function load_rrd(ip) {
+        $('#node-info-box').css('display', 'block');
+        $('#node-info-box').load('http://nodeshot.peertoport.com/generate_rrd?ip=' + ip );
+        //$('#node-info-box').html('<img src="http://10.162.0.6/graphs/' + ip + '.png"' );
+}
