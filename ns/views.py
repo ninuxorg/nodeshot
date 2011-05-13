@@ -152,7 +152,7 @@ def info(request):
             entry['signal'] = d.max_signal  
             links = Link.objects.filter(from_interface__device = d) 
             for l in links:
-                l.signal_bar = signal_to_bar(l.dbm)
+                l.signal_bar = signal_to_bar(l.dbm) if l.to_interface.mac_address not in  entry['macs'] else links.remove(l)
             entry['links'] = links 
             entry['ssids'] = [ssid['ssid'] for ssid in d.interface_set.values('ssid')] if d.interface_set.count() > 0 else ""
             entry['nodeid'] = d.node.id
