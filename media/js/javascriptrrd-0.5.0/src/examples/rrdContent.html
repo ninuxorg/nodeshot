@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Example HTML/javascript file that display the
+ content of a RRD archive file
+ Part of the javascriptRRD package
+ Copyright (c) 2009 Frank Wuerthwein, fkw@ucsd.edu
+
+ Original repository: http://javascriptrrd.sourceforge.net/
+ 
+ MIT License [http://www.opensource.org/licenses/mit-license.php]
+
+-->
+
+<!--
+ This example will print out RRD content in integer format.
+ Make sure all RRD values can fit in an integer
+-->
+
+<html>
+  
+    <script type="text/javascript" src="../lib/binaryXHR.js"></script>
+    <script type="text/javascript" src="../lib/rrdFile.js"></script>
+  <head>
+    <title>RRD Content</title>
+  </head>
+
+  <body>
+    <h1 id="title">RRD Raw Content</h1>
+
+    RRD URL:
+    <input type="text" id="input_fname" value="example1.rrd"
+           onchange="fname_update()">
+     <button onclick="fname_update()">Update</button>
+    <hr>
+     <table border=0>
+        <tr>
+	  <td>DS: <select id="select_ds"></select></td>
+	  <td>RRA: <select id="select_rra"></select></td>
+	  <td>Columns: <select id="select_columns">
+                          <option value="1"/>1</option>
+                          <option value="2"/>2</option>
+                          <option value="4"/>4</option>
+                          <option value="5"/>5</option>
+                          <option value="10"/>10</option>
+                          <option value="20" selected/>20</option>
+                       </select></td>
+	  <td><button id="dsrra_button" onclick="element_update()" disabled=1>Update</button></td>
+	</tr>
+    </table>
+   
+    <hr>
+
+    <table id="infotable" border=1>
+        <tr><td colspan="21"><b>Javascript needed for this page to work</b></td></tr>
+	<tr><td><b>RRD file</b></td><td id="fname" colspan="20">None</td></tr>
+	<tr>
+	  <td><b>DS</b></td><td id="ds_el" colspan="9">None</td>
+	  <td colspan="3"><b>RRA</b></td><td id="rra_el" colspan="8">None</td>
+	</tr>
+	<tr><th>Offset</th><th colspan="20">Data</th></tr>
+    </table>
+
+    <script type="text/javascript">
+      // Remove the Javascript warning
+      document.getElementById("infotable").deleteRow(0);
+
+      // fname and rrd_data are the global variable used by all the functions below
+      fname=document.getElementById("input_fname").value;
+      rrd_data=undefined;
+
+      // This function updates the Web Page with the data from the RRD archive header
+      // when a new file is selected
+      function update_fname() {
+        // Update DS info
+        var nrDSs=rrd_data.getNrDSs()
+
+        // But first cleanup anything that may be there from before
+        document.getElementById("ds_el").firstChild.data="None";
+        var oSelect=document.getElementById("select_ds");
+        while (oSelect.options.length>=1) {
+          oSelect.remove(0);
+        }         
+
+        for (var i=0; i<nrDSs; i++) {
+          var ds_name=rrd_data.getDS(i).getName();
+          oSelect.options.add(new Option(ds_name,i,false,false));
+        }
+
+        // Update RRA info
+        var nrRRAs=rrd_data.getNrRRAs()
+
+        // But first cleanup anything that may be there from before
+        document.getElementById("rra_el").firstChild.data="None";
+        var oSelect=document.getElementById("select_rra");
+        while (oSelect.options.length>=1) {
+          oSelect.remove(0);
+        }         
+
+        for (var i=0; i<nrRRAs; i++) {
+          oSelect.options.add(new Option(i,i,false,false));
+        }
+
+        // cleanup
+        // rows may have been added during previous updates
+        var oTable=document.getElementById("infotable");
+        while (oTable.rows.length>=4) {
+          oTable.deleteRow(3);
+        } 
+
+        // Finally, update the file name and enable the update button
+        document.getElementById("fname").firstChild.data=fname;
+        document.getElementById("dsrra_button").disabled=0;
+      }
+
+      // This function updates the Web Page with the data from the RRD archive
+      function element_update() {
+        oSelDS=document.getElementById("select_ds");
+        ds_idx=Math.round(oSelDS.options[oSelDS.selectedIndex].value);
+        oSelRRA=document.getElementById("select_rra");
+        rra_idx=oSelRRA.options[oSelRRA.selectedIndex].value;
+        oSelClm=document.getElementById("select_columns");
+        clm_nr=Math.round(oSelClm.options[oSelClm.selectedIndex].value);
+
+        // cleanup
+        // rows may have been added during previous updates
+        var oTable=document.getElementById("infotable");
+        while (oTable.rows.length>=4) {
+          oTable.deleteRow(3);
+        } 
+
+        // Generic header info
+        document.getElementById("ds_el").firstChild.data=rrd_data.getDS(ds_idx).getName();;
+        document.getElementById("rra_el").firstChild.data=rra_idx;
+
+        // get RRA info
+        var rra=rrd_data.getRRA(rra_idx);
+        var rows=rra.getNrRows();
+
+        var oRow=undefined;
+        for (var i=0; i<rows;i++) {
+          if ((i%clm_nr)==0) {
+            // One new row every clm_nr
+            oRow=oTable.insertRow(-1);
+            var oCell=oRow.insertCell(-1);
+            oCell.innerHTML=i;
+          }
+          var oCell=oRow.insertCell(-1);
+          oCell.colSpan=20/clm_nr;
+          var el=rra.getElFast(i,ds_idx);
+          if (el!=undefined) {
+           oCell.innerHTML=Math.round(rra.getElFast(i,ds_idx));
+          } else {
+           oCell.innerHTML="-";
+          }
+        }
+      }      
+
+      // This is the callback function that,
+      // given a binary file object,
+      // verifies that it is a valid RRD archive
+      // and performs the update of the Web page
+      function update_fname_handler(bf) {
+          var i_rrd_data=undefined;
+          try {
+            var i_rrd_data=new RRDFile(bf);            
+          } catch(err) {
+            alert("File "+fname+" is not a valid RRD archive!");
+          }
+          if (i_rrd_data!=undefined) {
+            rrd_data=i_rrd_data;
+            update_fname()
+          }
+      }
+
+      // this function is invoked when the RRD file name changes
+      function fname_update() {
+        fname=document.getElementById("input_fname").value;
+        try {
+          FetchBinaryURLAsync(fname,update_fname_handler);
+        } catch (err) {
+           alert("Failed loading "+fname+"\n"+err);
+        }
+      }
+
+      // Uncomment this part if you want the Web page to load the
+      // default RRD file at load time
+      //
+      //try {
+      //  FetchBinaryURLAsync(fname,update_fname_handler);
+      //} catch (err) {
+      //  alert("Failed loading "+fname+"\n"+err);
+      //}
+      
+    </script>
+  </body>
+</html>

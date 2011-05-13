@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>rrdFile module</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.1  (Unix)">
+	<META NAME="CREATED" CONTENT="20090209;18445600">
+	<META NAME="CHANGEDBY" CONTENT="Igor Sfiligoi">
+	<META NAME="CHANGED" CONTENT="20100225;18333500">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		TD P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Liberation Sans", sans-serif; font-size: 22pt }
+		P { margin-bottom: 0.08in }
+		H2.heading-2-western { font-family: "Liberation Serif", serif; font-size: 16pt }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">rrdMultiFile module</H1>
+<TABLE WIDTH=50% CELLPADDING=2 CELLSPACING=2>
+	<TR>
+		<TD>
+			<HR>
+			<P>The <A HREF="../../src/lib/rrdMultiFile.js">rrdMultiFile
+			Javascript module</A> implements a set of classes that can be used
+			to combine several <A HREF="rrdFile_js.html#RRDFile">RRDFile</A>
+			objects into one. They all implement the same interface as
+			<A HREF="rrdFile_js.html#RRDFile">RRDFile</A>.</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+<H2 CLASS="heading-2-western">Overview</H2>
+<P>The main class in this module is <A HREF="#RRDFileSum">RRDFileSum</A>.
+Given a list of similar <A HREF="rrdFile_js.html#RRDFile">RRDFile</A>
+objects, it creates a new object that behaves like a  <A HREF="rrdFile_js.html#RRDFile">RRDFile</A>
+object where the input shave been summed up.</P>
+<H2 CLASS="heading-2-western"><A NAME="RRDFileSum"></A>Class RRDFileSum</H2>
+<P>This is the main class of the package. It is also the only class
+the user ever needs to explicitly instantiate.</P>
+<P>The RRDFileSum constructor has two argument:</P>
+<UL>
+	<LI><P>A list of similar <A HREF="rrdFile_js.html#RRDFile">RRDFile</A>
+	objects.<BR>They must all have the same DSes and the same RRAs.</P>
+	<LI><P>A boolean (default=true) – This value defines how to treat
+	undefined values. If true, they are counted as zeros and the sum
+	will always succeed. If it is false, any undefined value in one of
+	the input objects will result in the sum being marked as undefined.</P>
+</UL>
+<P>This class implements the same interface as <A HREF="rrdFile_js.html#RRDFile">RRDFile</A>.</P>
+<H2 CLASS="heading-2-western"><A NAME="RRDRRASum"></A>Class RRDRRASum</H2>
+<P>This class implements the same interface as <A HREF="rrdFile_js.html#RRDRRA">RRDRRA.</A></P>
+<TABLE WIDTH=50% CELLPADDING=2 CELLSPACING=2>
+	<TR>
+		<TD>
+			<HR>
+			<P>This module is part of the <A HREF="index.html">javascriptRRD
+			package</A> hosted at <A HREF="http://javascript.sourceforge.net/">http://javascript.sourceforge.net</A>.
+			<BR>It is licensed under the <A HREF="http://www.opensource.org/licenses/mit-license.php">MIT
+			license</A>. 
+			</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><BR>
+</P>
+</BODY>
+</HTML>

@@ -1,0 +1,402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>rrdFile module</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Linux)">
+	<META NAME="CREATED" CONTENT="20090209;18445600">
+	<META NAME="CHANGED" CONTENT="20090209;19214700">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		TD P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Liberation Sans", sans-serif; font-size: 22pt }
+		P { margin-bottom: 0.08in }
+		H2.heading-2-western { font-family: "Liberation Serif", serif; font-size: 16pt }
+		TH P { margin-bottom: 0.08in }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">rrdFile module</H1>
+<TABLE WIDTH=50% CELLPADDING=2 CELLSPACING=2>
+	<TR>
+		<TD>
+			<HR>
+			<P>The <A HREF="../../src/lib/rrdFile.js">rrdFile Javascript
+			module</A> implements a set of classes that can be used to extract
+			information from <A HREF="http://oss.oetiker.ch/rrdtool/">RRD
+			archives</A> loaded as binary file objects.</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+<H2 CLASS="heading-2-western">Overview</H2>
+<P>The main class in this module is <A HREF="#RRDFile">RRDFile</A>.
+It interprets the given the binary file object and provides methods
+to decode the <A HREF="http://oss.oetiker.ch/rrdtool/">RRD</A>
+information.</P>
+<H2 CLASS="heading-2-western"><A NAME="RRDFile"></A>Class RRDFile</H2>
+<P>This is the main class of the package. It is also the only class
+the user ever needs to explicitly instantiate.</P>
+<P>The RRDFile constructor has a single argument:</P>
+<UL>
+	<LI><P>A binary file object.</P>
+	<P>Any object implementing an interface providing the following
+	methods can be used:</P>
+	<UL>
+		<LI><P>getByteAt(idx) - Return a 8 bit unsigned integer at offset
+		idx.</P>
+		<LI><P>getLongAt(idx) - Return a 32 bit unsigned integer at offset
+		idx.</P>
+		<LI><P>getDoubleAt(idx) - Return a double float at offset idx.</P>
+		<LI><P>getFastDoubleAt(idx) - Similar to getDoubleAt but with less
+		precision.</P>
+		<LI><P>getCStringAt(idx,maxsize) - Return a string of at most
+		maxsize characters that was 0-terminated in the source.</P>
+	</UL>
+	<P>The <A HREF="binaryXHR_js.html">binaryXHR module</A>, provided
+	with this package, provides the class <A HREF="binaryXHR_js.html#BinaryFile">BinaryFile</A>
+	that implements this interface.</P>
+</UL>
+<P>If the binary file is not a proper <A HREF="http://oss.oetiker.ch/rrdtool/">RRD
+file</A>, an <A HREF="#InvalidRRD">InvalidRRD</A> exception will be
+thrown.</P>
+<P>This class also implements the following methods:</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Method</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getMinStep()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the base <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#I__step__s_step__default__300_seconds_">interval
+					in seconds</A> that was used to feed the RRD file.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getLastUpdate()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the timestamp of the <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdlastupdate.en.html">last
+					update</A>.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getNrDSs()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the number of <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IDS_ds_name_DST_dst_arguments">Data
+					Sources</A> present in the RRD file. 
+					</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getDSNames()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the names of the <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IDS_ds_name_DST_dst_arguments">Data
+					Sources</A> present in the RRD file. 
+					</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getDS(id)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>If id is a number, return an object of type <A HREF="#RRDDS">RRDDS</A> holding
+					the information about the id-th <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IDS_ds_name_DST_dst_arguments">Data
+					Source</A>.</P>
+					<P>If id is a string, return an object of type <A HREF="#RRDDS">RRDDS</A> holding
+					the information about the <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IDS_ds_name_DST_dst_arguments">Data
+					Source</A> with the requested name.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getNrRRAs()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the number of <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IRRA_CF_cf_arguments">Round
+					Robin Archives</A> present in the RRD file.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getRRAInfo(n)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return an object of type <A HREF="#RRDRRAInfo">RRDRRAInfo</A>
+					holding the information about the n-th <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IRRA_CF_cf_arguments">Round
+					Robin Archive</A>.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getRRA(n)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return an object of type <A HREF="#RRDRRA">RRDRRA</A> that
+					can be used to access the values stored in the n-th <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IRRA_CF_cf_arguments">Round
+					Robin Archive</A>.</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<H2 CLASS="heading-2-western"><A NAME="RRDDS"></A>Class RRDDS</H2>
+<P>This class implements the methods needed to access the information
+about a <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IDS_ds_name_DST_dst_arguments">RRD
+Data Source</A>.</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Method</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getIdx()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return which DS it is in the RRD file.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getName()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the name of the data source.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getType()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IDS_ds_name_DST_dst_arguments">type</A>
+					of the data source.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getMin()</P>
+				</TD>
+				<TD ROWSPAN=2 WIDTH=80%>
+					<P>Return the minimum and maximum value the data source can
+					contain. 
+					</P>
+					<P>If either is not defined, <I>undefined</I> is returned.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getMax()</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<H2 CLASS="heading-2-western"><A NAME="RRDRRAInfo"></A>Class
+RRDRRAInfo</H2>
+<P>This class implements the methods needed to access the information
+about a <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IRRA_CF_cf_arguments">Round
+Robin Archive</A>.</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=52*>
+		<COL WIDTH=204*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Method</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getIdx()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return which RRA it is in the RRD file.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getNrRows()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the number of rows in the RRA.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getStep()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the number of seconds between rows.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getCFName()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IRRA_CF_cf_arguments">Consolidation
+					Function</A> used by the RRA.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getPdpPerRow()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return number of slots used for consolidation.</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<H2 CLASS="heading-2-western"><A NAME="RRDRRA"></A>Class RRDRRA</H2>
+<P>This class implements the methods needed to access the content of
+a <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IRRA_CF_cf_arguments">Round
+Robin Archive</A>.</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=52*>
+		<COL WIDTH=204*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Method</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getIdx()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return which RRA it is in the RRD file.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getCFName()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IRRA_CF_cf_arguments">Consolidation
+					Function</A> used by the RRA.</P>
+					<P>The current implementation only supports
+					AVERAGE,MAXIMUM,MINIMUM and LAST.<BR>Access to elements of any
+					other CF is currently undefined. 
+					</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getNrRows()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the number of rows in the RRA.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getNrDSs()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the number of <A HREF="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#IDS_ds_name_DST_dst_arguments">Data
+					Sources</A> present in the RRA.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getStep()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the number of seconds between rows.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getEl(r,d)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the value for the d-th DS in the r-th row.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getElFast(row,ds)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return the low-precision value for the d-th DS in the r-th
+					row.</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<H2 CLASS="heading-2-western"><A NAME="InvalidRRD"></A>Exception
+class InvalidRRD</H2>
+<P>This is a helper exception class that can be thrown while
+interpreting the binary file object.</P>
+<P><BR><BR>
+</P>
+<TABLE WIDTH=50% CELLPADDING=2 CELLSPACING=2>
+	<TR>
+		<TD>
+			<HR>
+			<P>This module is part of the <A HREF="index.html">javascriptRRD
+			package</A> hosted at <A HREF="http://javascript.sourceforge.net/">http://javascript.sourceforge.net</A>.
+			<BR>It is licensed under the <A HREF="http://www.opensource.org/licenses/mit-license.php">MIT
+			license</A>. 
+			</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+</BODY>
+</HTML>

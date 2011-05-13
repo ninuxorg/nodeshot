@@ -225,11 +225,17 @@ h3 {
     display: inline;
 }
 
+#info-wrapper {
+     height: 600px;
+     width: 100%;
+     background-color: #000000;
+
+}
+
+
 #node-info-box {
     display: none; 
-    width: 400px;
-    height: 340px;
-    background-color: #FF0000;
+    background-color: #FFFFFF;
     /*
      * left:0px; 
     bottom:0px; 
@@ -238,10 +244,13 @@ h3 {
     /*clear:both;*/
 }
 
-#table-wrapper{
+#table-wrapper {
     overflow:auto;
-    height: 440px;
+    height: 100%;
     /* padding-bottom: 300px; */
 }
 
+#rrd-graph_ds_cb {
+    color: #000000;
 
+}

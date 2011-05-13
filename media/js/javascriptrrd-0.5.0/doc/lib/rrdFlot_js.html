@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>rrdFlot module</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Linux)">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		TD P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Liberation Sans", sans-serif; font-size: 22pt }
+		P { margin-bottom: 0.08in }
+		H2.heading-2-western { font-family: "Liberation Serif", serif; font-size: 16pt }
+		TH P { margin-bottom: 0.08in }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">rrdFlot module</H1>
+<TABLE WIDTH=50% CELLPADDING=2 CELLSPACING=2>
+	<TR>
+		<TD>
+			<HR>
+			<P>The <A HREF="../../src/lib/rrdFlot.js">rrdFlot Javascript
+			module</A> implements a class used to represents a
+			<A HREF="http://oss.oetiker.ch/rrdtool/">RDD archive</A> 
+	                as a <A HREF="http://code.google.com/p/flot/">Flot</A> plot.</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+<H2 CLASS="heading-2-western">Overview</H2>
+<P>This module provide a single class: <A HREF="#rrdFlot">rrdFlot</A>.</P>
+<P>Given a 
+<A HREF="rrdFile_js.html#RRDFile">RRDFile</A> object, this class
+creates an interactive
+<A HREF="http://code.google.com/p/flot/">Flot</A> plot.</P>
+
+<P>In order to use this module, you also need to include:
+<UL>
+ <LI><A HREF="rrdFlotSupport_js.html">rrdFlotSupport.js</A>
+ <LI><A HREF="http://code.google.com/p/flot/">jquery.flot.js</A>
+ <LI><A HREF="http://jquery.com/">jquery.js</A>
+</UL></P>
+
+<H2 CLASS="heading-2-western"><A NAME="rrdFlot"></A>Class rrdFlot</H2>
+<P>The rrdFlot constructor has two to four arguments:</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Argument</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>html_id</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>ID of a HTML element, possibly a DIV.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rrd_file</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>An object of type <A HREF="rrdFile_js.html#RRDFile">RRDFile</A>, or equivalent.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>graph_options (optional)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Global graphing options. See
+				           <A HREF="http://code.google.com/p/flot/">Flot documentation</A>
+				           for more details.</P>
+                                        <P>The recognized elements and the default values are:
+<PRE>
+  graph_options = {
+    legend: {position:"nw",noColumns:3},
+    lines: { show:true },
+    yaxis: { autoscaleMargin: 0.20},
+  };
+</PRE></P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>ds_graph_options (optional)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Dictionary of graphing options. This must be a dictionary of DS_id.
+				           Each element of the dictionary contains graphing options. See
+				           <A HREF="http://code.google.com/p/flot/">Flot documentation</A>
+				           for more details.</P>
+                                        <P>The recognized elements and the default values are:
+<PRE>
+   {
+     title: label  or ds_name     // this is what is displayed in the checkboxes
+     checked: first_ds_in_list?   // boolean
+     label: title or ds_name      // this is what is displayed in the legend
+     color: ds_index              // see Flot docs for details
+     lines: { show:true }         // see Flot docs for details
+     yaxis: 1                     // can be 1 or 2
+     stack: 'none'                // other options are 'positive' and 'negative'
+   }
+</PRE></P>
+				</TD>
+			</TR>
+      </TABLE>
+</DIV>
+<P>Once instatiated, the object will automatically draw the plot and handle user interaction.</P>
+</BODY>
+</HTML>

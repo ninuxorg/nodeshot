@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Example HTML/javascript file that display the
+ content of a RRD archive file in a graph
+ using the Flot libraries
+ Part of the javascriptRRD package
+ Copyright (c) 2010 Frank Wuerthwein, fkw@ucsd.edu
+                    Igor Sfiligoi, isfiligoi@ucsd.edu
+
+ Original repository: http://javascriptrrd.sourceforge.net/
+ 
+ MIT License [http://www.opensource.org/licenses/mit-license.php]
+
+-->
+
+<!--
+ This page requires Flot.
+
+ Repository: http://code.google.com/p/flot/
+
+-->
+
+<html>
+  
+    <script type="text/javascript" src="../lib/binaryXHR.js"></script>
+    <script type="text/javascript" src="../lib/rrdFile.js"></script>
+
+    <!-- rrdFlotMatrix class needs the following four include files !-->
+    <script type="text/javascript" src="../lib/rrdFlotSupport.js"></script>
+    <script type="text/javascript" src="../lib/rrdFlotMatrix.js"></script>
+    <script type="text/javascript" src="../../flot/jquery.js"></script>
+    <script type="text/javascript" src="../../flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="../../flot/jquery.flot.selection.js"></script>
+  <head>
+    <title>Graph multiple RRDs with Flot</title>
+  </head>
+
+  <body>
+     <h1 id="title">Graph multiple RRDs with Flot</h1>
+
+     RRD group: <select id="input_fname" onchange="fname_update()"></select>
+     <button onclick="fname_update()">Update</button>
+    <hr>
+
+    <table id="infotable" border=1>
+        <tr><td colspan="21"><b>Javascript needed for this page to work</b></td></tr>
+	<tr><td><b>RRD file</b></td><td id="fname" colspan="5">None</td></tr>
+    </table>
+
+    <div id="mygraph"></div>
+
+    <script type="text/javascript">
+
+      // Remove the Javascript warning
+      document.getElementById("infotable").deleteRow(0);
+
+      {
+        var form_el=document.getElementById('input_fname');
+        form_el.appendChild(new Option("example4","example4"));
+       }
+    
+      // fname_group and rrd_data are the global variable used by all the functions below
+      fname_group=null;
+      rrd_data=[];
+
+      // This function updates the Web Page with the data from the RRD archive header
+      // when a new file is selected
+      function update_fname() {
+        // Finally, update the file name and enable the update button
+        document.getElementById("fname").firstChild.data="Group "+fname_group;
+
+        // the rrdFlot object creates and handles the graph
+        var f=new rrdFlotMatrix("mygraph",[['s1',rrd_data[0]],['s2',rrd_data[1]],['s3',rrd_data[2]]],null,{legend:{position:'ne'}},{'s2':{checked:false},'s1':{title:'First rrd'}});
+      }
+
+      // This is the callback function that,
+      // given a binary file object,
+      // verifies that it is a valid RRD archive
+      // and performs the update of the Web page
+      function update_fname_handler(bf,idx) {
+          var i_rrd_data=undefined;
+          try {
+            var i_rrd_data=new RRDFile(bf);            
+          } catch(err) {
+            alert("File at idx "+idx+" is not a valid RRD archive!");
+          }
+          if (i_rrd_data!=undefined) {
+            rrd_data[idx]=i_rrd_data;
+          }
+          if ((rrd_data[0]!=undefined) && (rrd_data[1]!=undefined) && (rrd_data[2]!=undefined)) {
+            update_fname()
+          }
+      }
+
+      // this function is invoked when the RRD file name changes
+      function fname_update() {
+        var base_el=document.getElementById("mygraph");
+        // First clean up anything in the element
+        while (base_el.lastChild!=null) base_el.removeChild(base_el.lastChild);
+
+        rrd_data[0]=rrd_data[1]=rrd_data[2]=undefined;
+    
+        fname_group=document.getElementById("input_fname").value;
+
+        fname1=fname_group+"_s1.rrd";
+        fname2=fname_group+"_s2.rrd";
+        fname3=fname_group+"_s3.rrd";
+
+        document.getElementById("fname").firstChild.data="Loading group "+fname_group;
+        try {
+          FetchBinaryURLAsync(fname1,update_fname_handler,0);
+        } catch (err) {
+           alert("Failed loading "+fname1+"\n"+err);
+        }
+        try {
+          FetchBinaryURLAsync(fname2,update_fname_handler,1);
+        } catch (err) {
+           alert("Failed loading "+fname2+"\n"+err);
+        }
+        try {
+          FetchBinaryURLAsync(fname3,update_fname_handler,2);
+        } catch (err) {
+           alert("Failed loading "+fname3+"\n"+err);
+        }
+      }
+    </script>
+  </body>
+</html>

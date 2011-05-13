@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Example HTML/javascript file that display the
+ content of a RRD archive file in a graph
+ using the Flot libraries
+ Part of the javascriptRRD package
+ Copyright (c) 2010 Frank Wuerthwein, fkw@ucsd.edu
+                    Igor Sfiligoi, isfiligoi@ucsd.edu
+
+ Original repository: http://javascriptrrd.sourceforge.net/
+ 
+ MIT License [http://www.opensource.org/licenses/mit-license.php]
+
+-->
+
+<!--
+ This page requires Flot.
+
+ Repository: http://code.google.com/p/flot/
+
+-->
+
+<html>
+  
+    <script type="text/javascript" src="../lib/binaryXHR.js"></script>
+    <script type="text/javascript" src="../lib/rrdFile.js"></script>
+
+    <!-- rrdFlot class needs the following four include files !-->
+    <script type="text/javascript" src="../lib/rrdFlotSupport.js"></script>
+    <script type="text/javascript" src="../lib/rrdFlot.js"></script>
+    <script type="text/javascript" src="../../flot/jquery.js"></script>
+    <script type="text/javascript" src="../../flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="../../flot/jquery.flot.selection.js"></script>
+  <head>
+    <title>RRD Graphs with Flot</title>
+  </head>
+
+  <body>
+    <h1 id="title">RRD Graphs with Flot</h1>
+
+    RRD URL:
+    <input type="text" id="input_fname" value="example1.rrd"
+           onchange="fname_update()">
+     <button onclick="fname_update()">Update</button>
+    <hr>
+
+    <table id="infotable" border=1>
+        <tr><td colspan="21"><b>Javascript needed for this page to work</b></td></tr>
+	<tr><td><b>RRD file</b></td><td id="fname" colspan="5">None</td></tr>
+    </table>
+
+    <div id="mygraph"></div>
+
+    <script type="text/javascript">
+
+      // Remove the Javascript warning
+      document.getElementById("infotable").deleteRow(0);
+
+      // fname and rrd_data are the global variable used by all the functions below
+      fname=document.getElementById("input_fname").value;
+      rrd_data=undefined;
+
+      // This function updates the Web Page with the data from the RRD archive header
+      // when a new file is selected
+      function update_fname() {
+        // Finally, update the file name and enable the update button
+        document.getElementById("fname").firstChild.data=fname;
+
+        var graph_opts={legend: { noColumns:4}};
+        var ds_graph_opts={'Oscilator':{ color: "#ff8000", 
+                                         lines: { show: true, fill: true, fillColor:"#ffff80"} },
+                           'Idle':{ label: 'IdleJobs', color: "#00c0c0", 
+                                    lines: { show: true, fill: true} },
+                           'Running':{color: "#000000",yaxis:2}};
+
+        // the rrdFlot object creates and handles the graph
+        var f=new rrdFlot("mygraph",rrd_data,graph_opts,ds_graph_opts);
+      }
+
+      // This is the callback function that,
+      // given a binary file object,
+      // verifies that it is a valid RRD archive
+      // and performs the update of the Web page
+      function update_fname_handler(bf) {
+          var i_rrd_data=undefined;
+          try {
+            var i_rrd_data=new RRDFile(bf);            
+          } catch(err) {
+            alert("File "+fname+" is not a valid RRD archive!");
+          }
+          if (i_rrd_data!=undefined) {
+            rrd_data=i_rrd_data;
+            update_fname()
+          }
+      }
+
+      // this function is invoked when the RRD file name changes
+      function fname_update() {
+        fname=document.getElementById("input_fname").value;
+        try {
+          FetchBinaryURLAsync(fname,update_fname_handler);
+        } catch (err) {
+           alert("Failed loading "+fname+"\n"+err);
+        }
+      }
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,650 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>rrdFlotSupport module</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Linux)">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		TD P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Liberation Sans", sans-serif; font-size: 22pt }
+		P { margin-bottom: 0.08in }
+		H2.heading-2-western { font-family: "Liberation Serif", serif; font-size: 16pt }
+		TH P { margin-bottom: 0.08in }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">rrdFlotSupport module</H1>
+<TABLE WIDTH=50% CELLPADDING=2 CELLSPACING=2>
+	<TR>
+		<TD>
+			<HR>
+			<P>The <A HREF="../../src/lib/rrdFlotSupport.js">rrdFlotSupport Javascript module</A> 
+                        implements a set of commonly used functions an classes that may be used while plotting 
+                        <A HREF="http://oss.oetiker.ch/rrdtool/">RRD files</A> with 
+                        <A HREF="http://code.google.com/p/flot/">Flot</A>.</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+<H2 CLASS="heading-2-western">Overview</H2>
+<P>This module provides two types of support:
+<UL>
+ <LI>Functions providing support in converting raw data into Flot-friendly format:
+    <A HREF="#rrdDS2FlotSeries">rrdDS2FlotSeries</A>,
+    <A HREF="#rrdRRA2FlotObj">rrdRRA2FlotObj</A>,
+     <A HREF="#rrdRRAStackFlotObj">rrdRRAStackFlotObj</A> and
+     <A HREF="#rrdRRAMultiStackFlotObj">rrdRRAMultiStackFlotObj</A>.
+ <LI>A class providing support for handling the plotting:
+     <A HREF="#rrdFlotSelection">rrdFlotSelection</A>.
+</UL>
+</P>
+<H2 CLASS="heading-2-western"><A NAME="rrdDS2FlotSeries"></A>Function rrdDS2FlotSeries</H2>
+<P>This function extracts a specific DS from a specific RRA and returns an object that 
+contains the data in format flot expects.</P>
+<P>
+Input parameters:
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Parameter</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rrd_file</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>An object of type <A HREF="rrdFile_js.html#RRDFile">RRDFile</A> or equivalent.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>ds_id</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Identifier of the desired DS (as accepted by
+                                            <A HREF="rrdFile_js.html#RRDFile">RRDFile.getDS()</A>).</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rra_idx</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Index of the desired RRA.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>want_rounding</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>If not false, all timestamps will be truncated to the RRA step.</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<P>
+The output is an object containing:
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Attribute</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>data</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>A list of datapoints suitable to be fed to <A HREF="http://code.google.com/p/flot/">Flot</A>. Each element is a (Timestamp in ms, value) pair.<P>
+                                        <P>An example of use with Flot:<BR>
+<PRE>
+var fd=rrdDS2FlotSeries(...);
+var plot = $.plot("#myplot", [{data:fd.data}], options);
+</PRE>
+                                        </P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>label</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>The DS name.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>min</P>
+				</TD>
+				<TD WIDTH=80% ROWSPAN=2>
+					<P>Min and max timestamp in ms.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>max</P>
+				</TD>
+                        </TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<H2 CLASS="heading-2-western"><A NAME="rrdRRA2FlotObj"></A>Function rrdRRA2FlotObj</H2>
+<P>This function extracts a list of DSs from a specific RRA and returns an object that 
+contains the data in format flot expects.</P>
+<P>
+Input parameters:
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Parameter</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rrd_file</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>An object of type <A HREF="rrdFile_js.html#RRDFile">RRDFile</A> or equivalent.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rra_idx</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Index of the desired RRA.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>ds_list</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>List of DS identifiers (as accepted by
+                                            <A HREF="rrdFile_js.html#RRDFile">RRDFile.getDS()</A>).</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>want_ds_labels</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Should the DS names be included as labels in the output? 
+                                           (If false, only the order distinguishes the requested DSs)</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>want_rounding</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>If not false, all timestamps will be truncated to the RRA step.</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<P>
+The output is an object containing:
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Attribute</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>data</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>A list of objects suitable to be fed to <A HREF="http://code.google.com/p/flot/">Flot</A>. Each element is an object composed of two attributes:<UL>
+                                         <LI>data - A list of (Timestamp in ms, value) pairs.</LI>
+                                         <LI>label - The (optional) DS name.</LI></UL></P>
+                                        <P>An example of use with Flot:<BR>
+<PRE>
+var fd=rrdDS2FlotObj(...);
+var plot = $.plot("#myplot", fd.data, options);
+</PRE>
+                                        </P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>min</P>
+				</TD>
+				<TD WIDTH=80% ROWSPAN=2>
+					<P>Min and max timestamp in ms.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>max</P>
+				</TD>
+                        </TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<H2 CLASS="heading-2-western"><A NAME="rrdRRAStackFlotObj"></A>Function rrdRRAStackFlotObj</H2>
+<P>This function extracts a list of DSs from a specific RRA, stacks them as requested and
+returns an object that contains the data in format flot expects.</P>
+<P>
+Input parameters:
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Parameter</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rrd_file</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>An object of type <A HREF="rrdFile_js.html#RRDFile">RRDFile</A> or equivalent.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rra_idx</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Index of the desired RRA.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>ds_positive_stack_list</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>List of DS identifiers (as accepted by
+                                            <A HREF="rrdFile_js.html#RRDFile">RRDFile.getDS()</A>)
+				           to be stacked. All values must be positive if
+				           ds_negative_stack_list is not empty.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>ds_negative_stack_list</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>List of DS identifiers (as accepted by
+                                            <A HREF="rrdFile_js.html#RRDFile">RRDFile.getDS()</A>)
+				           to be stacked. All values must be negative if
+				           ds_positive_stack_list is not empty.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>ds_single_list</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>List of DS identifiers (as accepted by
+                                            <A HREF="rrdFile_js.html#RRDFile">RRDFile.getDS()</A>).
+				           No stacking for these ones.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>want_ds_labels</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Should the DS names be included as labels in the output? 
+                                           (If false, only the order distinguishes the requested DSs)</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>want_rounding</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>If not false, all timestamps will be truncated to the RRA step.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>one_undefined_enough</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>If true, a whole stack is invalidated if a
+				           single element of the stack is invalid.</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<P>
+The output is an object containing:
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Attribute</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>data</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>A list of objects suitable to be fed to <A HREF="http://code.google.com/p/flot/">Flot</A>. Each element is an object composed of two attributes:<UL>
+                                         <LI>data - A list of (Timestamp in ms, value) pairs.</LI>
+                                         <LI>label - The (optional) DS name.</LI></UL></P>
+                                        <P>An example of use with Flot:<BR>
+<PRE>
+var fd=rrdDS2FlotObj(...);
+var plot = $.plot("#myplot", fd.data, options);
+</PRE>
+                                        </P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>min</P>
+				</TD>
+				<TD WIDTH=80% ROWSPAN=2>
+					<P>Min and max timestamp in ms.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>max</P>
+				</TD>
+                        </TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<H2 CLASS="heading-2-western"><A NAME="rrdRRAMultiStackFlotObj"></A>Function rrdRRAMultiStackFlotObj</H2>
+<P>This function extracts a DS from a list of RRDs, using a specific RRA index, then stacks them and
+returns an object that contains the data in format flot expects.</P>
+<P>
+Input parameters:
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Parameter</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rrd_files</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>A list of RRDs. Each element of the list contains a [rrd_id,rrd_file] pair.
+				           <ul>
+					    <li>rrd_id - Logical name for the RRD.
+				            <li>rrd_file -An object of type <A HREF="rrdFile_js.html#RRDFile">RRDFile</A> or equivalent.
+					   </ul>
+					</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rra_idx</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Index of the desired RRA.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>ds_id</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>DS indentifier  (as accepted by
+                                            <A HREF="rrdFile_js.html#RRDFile">RRDFile.getDS()</A>)</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>want_rrd_labels</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Should the RRD names be included as labels in the output? 
+                                           (If false, only the order distinguishes the requested RRDs)</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>want_rounding</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>If not false, all timestamps will be truncated to the RRA step.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>one_undefined_enough</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>If true, a whole stack is invalidated if a
+				           single element of the stack is invalid.</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<P>
+The output is an object containing:
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Attribute</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>data</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>A list of objects suitable to be fed to <A HREF="http://code.google.com/p/flot/">Flot</A>. Each element is an object composed of two attributes:<UL>
+                                         <LI>data - A list of (Timestamp in ms, value) pairs.</LI>
+                                         <LI>label - The (optional) DS name.</LI></UL></P>
+                                        <P>An example of use with Flot:<BR>
+<PRE>
+var fd=rrdDS2FlotObj(...);
+var plot = $.plot("#myplot", fd.data, options);
+</PRE>
+                                        </P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>min</P>
+				</TD>
+				<TD WIDTH=80% ROWSPAN=2>
+					<P>Min and max timestamp in ms.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>max</P>
+				</TD>
+                        </TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<H2 CLASS="heading-2-western"><A NAME="rrdFlotSelection"></A>Class rrdFlotSelection</H2>
+<P>Helper class to handle <A HREF="http://code.google.com/p/flot/">Flot</A> selections.
+</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=52*>
+		<COL WIDTH=204*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Method</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>reset()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Clear the selection. (isSet() will return False)</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>isSet()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Was a selection set?</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>setFromFlotRanges(ranges)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Set the selection to ranges.xaxis. See plotselected 
+                                           <A HREF="http://code.google.com/p/flot/">Flot</A>
+                                           event for more info on ranges. (isSet() will return True, and getFlotRanges() can now be called.)</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>getFlotRanges()</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Return a ranges object. See plotselected 
+                                           <A HREF="http://code.google.com/p/flot/">Flot</A>
+                                           event for more info on ranges.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>trim_flot_data(flot_data)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Create a new Flot data object by selecting only the data points within the current selection.</P>
+                                        <P>An example Flot data object is 
+<PRE>
+rrdDS2FlotObj(...).data
+</PRE></P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>trim_data(data_list)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Create a new data list by selecting only the data points within the current selection.</P>
+                                        <P>An example data list is 
+<PRE>
+rrdDS2FlotSeries(...).data
+</PRE></P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<P>Pseudo-example of use:
+<PRE>
+  myplotplot.bind("plotselected", function (event, ranges) {
+      // do the zooming
+      selection_range.setFromFlotRanges(ranges);
+      graph_options.xaxis.min=ranges.xaxis.from;
+      graph_options.xaxis.max=ranges.xaxis.to;
+      mygraph = $.plot("#mygraph", selection_range.trim_flot_data(flot_data), graph_options);
+  });
+</PRE>
+</P>
+</BODY>
+</HTML>

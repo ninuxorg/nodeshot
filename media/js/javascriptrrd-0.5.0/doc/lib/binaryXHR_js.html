@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>binaryXHR module</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Linux)">
+	<META NAME="CREATED" CONTENT="20090207;18445600">
+	<META NAME="CHANGED" CONTENT="20090208;21102900">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		TD P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Liberation Sans", sans-serif; font-size: 22pt }
+		P { margin-bottom: 0.08in }
+		TH P { margin-bottom: 0.08in }
+		H2.heading-2-western { font-family: "Liberation Serif", serif; font-size: 16pt; font-weight: bold }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">binaryXHR module</H1>
+<TABLE WIDTH=50% CELLPADDING=2 CELLSPACING=2>
+	<TR>
+		<TD>
+			<HR>
+			<P>The <A HREF="../../src/lib/binaryXHR.js">binaryXHR Javascript
+			module</A> implements a set of functions and classes that can be
+			used to retrieve binary files using the <A HREF="http://en.wikipedia.org/wiki/XMLHttpRequest">XMLHttpRequest</A>
+			API.</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+<H2 CLASS="heading-2-western">Overview</H2>
+<P>This module provides two functions, 
+<A HREF="#FetchBinaryURL">FetchBinaryURL</A> and
+<A HREF="#FetchBinaryURLAsync">FetchBinaryURLAsync</a>, 
+that are wrappers around the 
+<A HREF="http://en.wikipedia.org/wiki/XMLHttpRequest">XMLHttpRequest</A> API
+and return an object of type 
+<A HREF="#BinaryFile">BinaryFile</A>. 
+The first one implements a
+straight load, while the second one initiates an asynchronous
+operation handled by a callback function.</P>
+<P>The <A HREF="#BinaryFile">BinaryFile</A> class implements the methods needed to access the
+elements of the binary files, such as strings, integers and real
+numbers. 
+</P>
+<P>Both the functions and the class internally handle the differences
+between different Web Browsers, so the user of this module does not
+need to worry about them.</P>
+<A NAME="FetchBinaryURL">
+<H2 CLASS="heading-2-western">Function FetchBinaryURL</H2>
+</A>
+<P>Load a binary file.</P>
+<P>Arguments:</P>
+<UL>
+	<LI><P>url:string - URL from where to load the binary file.</P>
+</UL>
+<P>Output:</P>
+<UL>
+	<LI><P>An object of type BinaryFile.</P>
+</UL>
+<A NAME="FetchBinaryURLAsync">
+<H2 CLASS="heading-2-western">Function FetchBinaryURLAsync</H2>
+</A>
+<P>Initiate an asynchronous binary load.</P>
+<P>Arguments:</P>
+<UL>
+	<LI><P>url:string - URL from where to load the binary file.</P>
+	<LI><P>callback:function(obj[,arg]) - Pointer to the function that will
+	be called when the binary file has been loaded. <br>
+        The function will be
+	given one or two arguments; the first one is an object of type <A HREF="#BinaryFile">BinaryFile</A>.
+        The second one is the argument described below, if available.</P>
+	<LI><P>callback_arg:any (optional) - If present, it will be given as argument to the callback function.</P>
+</UL>
+<P>Output:</P>
+<UL>
+	<LI><P>A reference to the <A HREF="http://www.w3.org/TR/XMLHttpRequest/">XMLHttpRequest</A> object.
+	       It may be used to verify the status of the load or to implement timeouts.<BR>
+               The callback function will receive the loaded binary file.</P>
+</UL>
+<A NAME="BinaryFile">
+<H2 CLASS="heading-2-western">Class BinaryFile</H2>
+</A>
+<P>This class implements the methods needed to access the content of
+the binary file.</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1>
+		<COL WIDTH=25%>
+		<COL WIDTH=75%>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=25%>
+					<P ALIGN=LEFT>Method</P>
+				</TH>
+				<TH WIDTH=75%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getLength()</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return the number of bytes held by the object.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getByteAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return an 8 bit unsigned integer from offset <I>idx</I>.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getShortAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return a 16 bit little endian unsigned integer from offset
+					idx. 
+					</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getLongAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return a 32 bit little endian unsigned integer from offset
+					idx.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getSByteAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return an 8 bit signed integer from offset <I>idx</I>.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getSShortAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return a 16 bit little endian signed integer from offset
+					idx. 
+					</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getSLongAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return a 32 bit little endian signed integer from offset
+					idx.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getDoubleAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return a double float (64 bit little endian) from offset idx.</P>
+					<P>Return <i>undefined</i> if the value is not a float or is infinity.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getFastDoubleAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Return a low resolution (20 bit mantissa) double flat
+					obtained from the high 32 bits of the original little endian
+					double float from offset idx.</P>
+					<P>Return <i>undefined</i> if the value is not a float or is infinity.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getCharAt(idx)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Get a character from offset idx.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getCStringAt(idx,maxlen)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Get a zero terminated string of limited size from offset idx.
+					 
+					</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=25%>
+					<P>getStringAt(idx,len)</P>
+				</TD>
+				<TD WIDTH=75%>
+					<P>Get a fixed length string from offset idx.</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</DIV>
+<A NAME="InvalidBinaryFile">
+<H2 CLASS="heading-2-western">Exception class InvalidBinaryFile</H2>
+</A>
+<P>This is a helper exception class that can be thrown while loading the binary file.</P>
+<P><BR></P>
+<TABLE WIDTH=50%>
+	<TR>
+		<TD>
+			<HR>
+			<P>This module is part of the <A HREF="index.html">javascriptRRD
+			package</A> hosted at <A HREF="http://javascript.sourceforge.net/">http://javascript.sourceforge.net</A>.
+			<BR>It is licensed under the <A HREF="http://www.opensource.org/licenses/mit-license.php">MIT
+			license</A>. 
+		</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+</BODY>
+</HTML>

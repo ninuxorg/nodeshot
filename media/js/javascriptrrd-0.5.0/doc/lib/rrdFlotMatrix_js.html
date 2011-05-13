@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>rrdFlotMatrix module</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Linux)">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		TD P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Liberation Sans", sans-serif; font-size: 22pt }
+		P { margin-bottom: 0.08in }
+		H2.heading-2-western { font-family: "Liberation Serif", serif; font-size: 16pt }
+		TH P { margin-bottom: 0.08in }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">rrdFlotMatrix module</H1>
+<TABLE WIDTH=50% CELLPADDING=2 CELLSPACING=2>
+	<TR>
+		<TD>
+			<HR>
+			<P>The <A HREF="../../src/lib/rrdFlotMatrix.js">rrdFlotMatrix Javascript
+			module</A> implements a class used to represents a DS from a list of similar 
+			<A HREF="http://oss.oetiker.ch/rrdtool/">RDD archives</A> 
+	                as a <A HREF="http://code.google.com/p/flot/">Flot</A> plot.</P>
+		        <P>All RRDs must have the same step, the same DS names and the same number of RRAs.</P>
+			<HR>
+		</TD>
+	</TR>
+</TABLE>
+<H2 CLASS="heading-2-western">Overview</H2>
+<P>This module provide a single class: <A HREF="#rrdFlotMatrix">rrdFlotMatrix</A>.</P>
+<P>Given a 
+<A HREF="rrdFile_js.html#RRDFile">RRDFile</A> object, this class
+creates an interactive
+<A HREF="http://code.google.com/p/flot/">Flot</A> plot.</P>
+
+<P>In order to use this module, you also need to include:
+<UL>
+ <LI><A HREF="rrdFlotSupport_js.html">rrdFlotSupport.js</A>
+ <LI><A HREF="http://code.google.com/p/flot/">jquery.flot.js</A>
+ <LI><A HREF="http://jquery.com/">jquery.js</A>
+</UL></P>
+
+<H2 CLASS="heading-2-western"><A NAME="rrdFlotMatrix"></A>Class rrdFlotMatrix</H2>
+<P>The rrdFlotMatrix constructor has two to five arguments:</P>
+<DIV ALIGN=RIGHT>
+	<TABLE WIDTH=90% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+		<COL WIDTH=51*>
+		<COL WIDTH=205*>
+		<THEAD>
+			<TR VALIGN=TOP>
+				<TH WIDTH=20%>
+					<P ALIGN=LEFT>Argument</P>
+				</TH>
+				<TH WIDTH=80%>
+					<P ALIGN=LEFT>Description</P>
+				</TH>
+			</TR>
+		</THEAD>
+		<TBODY>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>html_id</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>ID of a HTML element, possibly a DIV.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rrd_files</P>
+				</TD>
+				<TD WIDTH=80%>
+				        <P>A list of RRDs. Each element of the list contains a [rrd_id,rrd_file] pair.
+				           <ul>
+					    <li>rrd_id - Logical name for the RRD.
+				            <li>rrd_file -An object of type <A HREF="rrdFile_js.html#RRDFile">RRDFile</A> or equivalent.
+					   </ul>
+					</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>ds_list (optional)</P>
+				</TD>
+				<TD WIDTH=80%>
+				        <P>A list of DSes. Each element of the list contains a [ds_id,ds_title] pair.
+				           <ul>
+					    <li>ds_id - Logical name for the DS (as accepted by
+                                                        <A HREF="rrdFile_js.html#RRDFile">RRDFile.getDS()</A>).
+				            <li>ds_title - Name to display to the user.
+					   </ul>
+					</P>
+				        <P>If undefined, all the DS's of the RRD will be used.</P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>graph_options (optional)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Global graphing options. See
+				           <A HREF="http://code.google.com/p/flot/">Flot documentation</A>
+				           for more details.</P>
+                                        <P>The recognized elements and the default values are:
+<PRE>
+  graph_options = {
+    legend: {position:"nw",noColumns:3},
+    lines: { show:true },
+    yaxis: { autoscaleMargin: 0.20},
+  };
+</PRE></P>
+				</TD>
+			</TR>
+			<TR VALIGN=TOP>
+				<TD WIDTH=20%>
+					<P>rrd_graph_options (optional)</P>
+				</TD>
+				<TD WIDTH=80%>
+					<P>Dictionary of graphing options. This must be a dictionary of rrd_id.
+				           Each element of the dictionary contains graphing options. See
+				           <A HREF="http://code.google.com/p/flot/">Flot documentation</A>
+				           for more details.</P>
+                                        <P>The recognized elements and the default values are:
+<PRE>
+   {
+     title: label  or rrd_name                          // this is what is displayed in the checkboxes
+     checked: true                                      // boolean
+     label: title or rrd_name                           // this is what is displayed in the legend
+     color: rrd_index                                   // see Flot docs for details
+     lines: { show:true, fill: true, fillColor:color }  // see Flot docs for details
+   }
+</PRE></P>
+				</TD>
+			</TR>
+      </TABLE>
+</DIV>
+<P>Once instatiated, the object will automatically draw the plot and handle user interaction.</P>
+</BODY>
+</HTML>
