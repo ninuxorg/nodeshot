@@ -338,7 +338,7 @@ function initialize() {
             if ($('#potential').is(':checked') )
                 draw_nodes('p');
         } else if (choice == 'info') {
-            $('#content').load('info.html' , function() {
+            $('#content').load('info_tab' , function() {
                 $("#myTable").tablesorter(); 
                 //$("#myTable").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")}); 
               });
