@@ -117,7 +117,7 @@ function initialize_map() {
 
 function handleMarkerClick(marker, name) {
   return function() {
-    $.get('/info_window/' + name, function(data) {
+    $.get(__project_home__+'info_window/' + name, function(data) {
                 infoWindow.setContent(data);
                 infoWindow.open(map, marker);
                 setTimeout(function(){ $(".tabs").tabs(); }, 100);
@@ -158,12 +158,12 @@ function draw_nodes(type) {
         data = nodes.active;
         marray = markersArray.active;
         larray = markersArray.activeListeners;
-        image = 'media/images/marker_active.png';
+        image = __project_home__+'media/images/marker_active.png';
     } else if (type == 'p') {
         data = nodes.potential;
         marray = markersArray.potential;
         larray = markersArray.potentialListeners;
-        image = 'media/images/marker_potential.png';
+        image = __project_home__+'media/images/marker_potential.png';
     }
     for (var i = 0; i < data.length; i++) { 
         var latlng = new google.maps.LatLng(data[i].lat, data[i].lng);
@@ -338,7 +338,7 @@ function initialize() {
             if ($('#potential').is(':checked') )
                 draw_nodes('p');
         } else if (choice == 'info') {
-            $('#content').load('info_tab' , function() {
+            $('#content').load(__project_home__+'info_tab' , function() {
                 $("#myTable").tablesorter(); 
                 //$("#myTable").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")}); 
               });
@@ -356,7 +356,8 @@ function initialize() {
         }).jstree({ 
         "json_data" : {
             "ajax" : {
-                "url" : "/node_list.json",
+		// 04/06/2011 added __project_home__ to avoid errors when the project root doesn't coincide with the webserver root
+                "url" : __project_home__+"node_list.json",
                 "data" : function (n) { 
                     return { id : n.attr ? n.attr("id") : 0 }; 
                 }
@@ -365,8 +366,9 @@ function initialize() {
         'themes' : {'theme' : 'apple'},
         "plugins" : [ "themes", "json_data"  ]
     });
-
-    $.getJSON("/nodes.json", function(data) {
+    console.log(__project_home__);
+    // 04/06/2011 - added __project_home__
+    $.getJSON(__project_home__+"nodes.json", function(data) {
         nodes = data;
         if ( $('#active').is(':checked') )
             draw_nodes('a');
@@ -445,7 +447,7 @@ function update_fname_handler(bf, fname) {
 
 // this function is invoked when the RRD file name changes
 function fname_update(ip) {
-    fname = '/media/graphs/rrds/' + ip + '.rrd';
+    fname = __project_home__+'/media/graphs/rrds/' + ip + '.rrd';
     try {
       FetchBinaryURLAsync(fname,update_fname_handler);
       return true;
@@ -455,8 +457,6 @@ function fname_update(ip) {
     }
 }
 
-
-
 function load_rrd(ip) {
         // $('#table-wrapper').css('height', '10%');
         // $('#node-info-box').css('height', '90%');
@@ -465,5 +465,3 @@ function load_rrd(ip) {
         fname_update(ip);
         $( "#node-info-box" ).attr('title', ip).dialog({ width: 650 , height: 550});
 }
-
-

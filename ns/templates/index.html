@@ -16,10 +16,8 @@
         <script type="text/javascript" src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
         <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.formset.js"></script>
         <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script> 
-        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script> 
-        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.progressbar/js/jquery.progressbar.js"></script> 
+        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script>
         <script type="text/javascript" src="{{MEDIA_URL}}js/addnode.js"></script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/gmap.js"></script>
         <!-- for rrd -->
         <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/binaryXHR.js"></script>
         <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFile.js"></script>
@@ -85,5 +83,11 @@
                
             </div>
         </div>
+	<script type="text/javascript">
+	// 04/06/2011 added __project_home__ to avoid errors when the project root doesn't coincide with the webserver root	
+	var __project_home__ = '{% url ns.views.index %}'
+	</script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery.progressbar/js/jquery.progressbar.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/gmap.js"></script>
     </body>
 </html>

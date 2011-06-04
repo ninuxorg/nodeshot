@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 from django.contrib import admin
 admin.autodiscover()
@@ -13,6 +14,13 @@ urlpatterns = patterns('',
      (r'^device_form', 'ns.forms.device_form'), 
      (r'^configuration_form', 'ns.forms.configuration_form'),
 
-
      (r'^admin/', include(admin.site.urls)),
 )
+
+# serve static files only if DEBUG and DEVELOPMENT_SERVER are True (in settings.py)
+from settings import DEBUG, DEVELOPMENT_SERVER, MEDIA_ROOT
+if DEBUG and DEVELOPMENT_SERVER:
+  # you might need to change "media" to suit your settings.MEDIA_URL
+  urlpatterns += patterns('',
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': MEDIA_ROOT}),
+  )
