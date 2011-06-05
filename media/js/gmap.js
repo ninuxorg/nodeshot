@@ -462,6 +462,15 @@ function load_rrd(ip) {
         // $('#node-info-box').css('height', '90%');
         // $('#node-info-box').css('display', 'block');
         // $('#node-info-box').load('http://nodeshot.peertoport.com/generate_rrd?ip=' + ip );
+        $( "#rrd-graph" ).empty();
+        $( "#node-info-box" ).attr('title', ip);
+        $( "#node-info-box" ).dialog({ width: 650 , height: 550});
         fname_update(ip);
+<<<<<<< HEAD
         $( "#node-info-box" ).attr('title', ip).dialog({ width: 650 , height: 550});
 }
+=======
+}
+
+
+>>>>>>> dce1752cea0ca8c8569c77bd397a7ff42a8a5229
