@@ -447,7 +447,7 @@ function update_fname_handler(bf, fname) {
 
 // this function is invoked when the RRD file name changes
 function fname_update(ip) {
-    fname = __project_home__+'/media/graphs/rrds/' + ip + '.rrd';
+    fname = __project_home__+'media/graphs/rrds/' + ip + '.rrd';
     try {
       FetchBinaryURLAsync(fname,update_fname_handler);
       return true;
@@ -466,11 +466,5 @@ function load_rrd(ip) {
         $( "#node-info-box" ).attr('title', ip);
         $( "#node-info-box" ).dialog({ width: 650 , height: 550});
         fname_update(ip);
-<<<<<<< HEAD
         $( "#node-info-box" ).attr('title', ip).dialog({ width: 650 , height: 550});
 }
-=======
-}
-
-
->>>>>>> dce1752cea0ca8c8569c77bd397a7ff42a8a5229

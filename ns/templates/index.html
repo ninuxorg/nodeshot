@@ -2,32 +2,6 @@
 <html>
     <head>
         <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-        <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-        <script type="text/javascript">
-             google.load("jquery", "1.5.1");
-             google.load("jqueryui", "1.8.11");
-             google.load('maps','3',{other_params:'sensor=false'});
-             google.load('search','1');
-             google.setOnLoadCallback(function() {
-                     // Place init code here instead of $(document).ready()
-                     initialize();
-             });
-        </script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.formset.js"></script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script> 
-        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/addnode.js"></script>
-        <!-- for rrd -->
-        <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/binaryXHR.js"></script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFile.js"></script>
-
-        <!-- rrdFlot class needs the following four include files !-->
-        <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlotSupport.js"></script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlot.js"></script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.js"></script>
-        <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.selection.js"></script>
-        <!-- -->
 
         <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />
         <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/tablesorter/style.css" />
@@ -84,10 +58,37 @@
             </div>
         </div>
 	<script type="text/javascript">
-	// 04/06/2011 added __project_home__ to avoid errors when the project root doesn't coincide with the webserver root	
-	var __project_home__ = '{% url ns.views.index %}'
+	// 04/06/2011 added __project_home__ to avoid errors when the project root doesn't coincide with the webserver root
+
 	</script>
-	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery.progressbar/js/jquery.progressbar.js"></script>
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        var __project_home__ = '{% url ns.views.index %}'
+         google.load("jquery", "1.5.1");
+         google.load("jqueryui", "1.8.11");
+         google.load('maps','3',{other_params:'sensor=false'});
+         google.load('search','1');
+         google.setOnLoadCallback(function() {
+                 // Place init code here instead of $(document).ready()
+                 initialize();
+         });
+    </script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.formset.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/addnode.js"></script>
+    <!-- for rrd -->
+    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/binaryXHR.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFile.js"></script>
+
+    <!-- rrdFlot class needs the following four include files !-->
+    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlotSupport.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlot.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.selection.js"></script>
+    <!-- -->
+ 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery.progressbar/js/jquery.progressbar.js"></script>
 	<script type="text/javascript" src="{{MEDIA_URL}}js/gmap.js"></script>
     </body>
 </html>
