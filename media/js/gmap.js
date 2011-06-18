@@ -240,8 +240,25 @@ function initialize() {
             "Scala",
             "Scheme"
         ];
+
+        //source: availableTags,
+        // Implements the search function 
         $( "#search" ).autocomplete({
-            source: availableTags
+            source: function(req, add) {
+                $.getJSON("search/" + req.term , function(data) {
+                    if (data != null && data.length > 0) 
+                        add(data);
+                    else
+                        add("");
+                });
+            },
+            select: function(event, ui) { 
+                var choice = $("input[name='view-radio']:checked").val();
+                if (choice == 'map')
+                    mapGoTo(ui.item.value); 
+                else
+                    alert('Not (yet) implemented');
+            }
         });
     });
 

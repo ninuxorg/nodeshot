@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.forms import ModelForm
 from django.core.exceptions import *
+from django.db.models import Q
 import time,re,os,math
 #from forms import *
 
@@ -126,6 +127,18 @@ def signal_to_bar(signal):
         return min(100, max(0, int( 100-( (-signal -50) * 10/4 ) ) ) ) 
     else:
         return 0
+
+def search(request, what):
+    data = []
+    data = data + [{'label': d.name, 'value': d.name }  for d in Node.objects.filter(Q(name__icontains=what))]
+    data = data + [{'label': d.ipv4_address , 'value': d.device.node.name }  for d in Interface.objects.filter(ipv4_address__icontains=what)]
+    data = data + [{'label': d.mac_address , 'value': d.device.node.name }  for d in Interface.objects.filter(mac_address__icontains=what)]
+    data = data + [{'label': d.ssid , 'value': d.device.node.name }  for d in Interface.objects.filter(ssid__icontains=what)]
+    if len(data) > 0:
+        #data = [{'label': d['name'], 'value': d['name']}  for d in data]
+        return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    else:
+        return HttpResponse("", mimetype='application/json')
 
 def generate_rrd(request):
     ip = request.GET.get('ip', None)
