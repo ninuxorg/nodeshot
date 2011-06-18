@@ -288,6 +288,12 @@ function initialize() {
 
 
     $( "#view-radio" ).buttonset();
+    document.getElementById('radio1').checked=true;
+    document.getElementById('radio2').checked=false;
+    document.getElementById('radio3').checked=false;
+    document.getElementById('radio4').checked=false;
+    $("#view-radio").buttonset("refresh");
+
 
     /* Type an address and go to that address on the map */
     $('#search-address').bind('keypress', function(e) {
