@@ -211,37 +211,6 @@ function initialize() {
     initialize_map();
     // Jquery autocomplete
     $(function() {
-        var availableTags = [
-            "08:00:0A:05:12:5F",
-            "172.16.177.1",
-            "172.16.177.2",
-            "172.16.177.3",
-            "172.16.177.4",
-            "ActionScript",
-            "AppleScript",
-            "Asp",
-            "BASIC",
-            "C",
-            "C++",
-            "Clojure",
-            "COBOL",
-            "ColdFusion",
-            "Erlang",
-            "Fortran",
-            "Groovy",
-            "Haskell",
-            "Java",
-            "JavaScript",
-            "Lisp",
-            "Perl",
-            "PHP",
-            "Python",
-            "Ruby",
-            "Scala",
-            "Scheme"
-        ];
-
-        //source: availableTags,
         // Implements the search function 
         $( "#search" ).autocomplete({
             source: function(req, add) {
