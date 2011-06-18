@@ -1,3 +1,6 @@
+/*  This file contains all the functions to add/modify information about a new/existing node
+ */
+
 function insertNodeInfo(){
     $.get('/node_form', function(data) {
         $('#content').html(data);
