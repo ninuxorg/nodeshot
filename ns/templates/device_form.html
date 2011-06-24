@@ -1,33 +1,39 @@
 <div class="dialog-form ui-widget" >
     <form id="device-form" class="ui-corner-all ui-widget-content" method="post" action="">
         <h1>Informazioni sui dispositivi</h1>
+        {% csrf_token %} 
         <fieldset>
             {{ formset.management_form }}
-            {% csrf_token %} 
             {% for form in formset.forms %}
             <div class="formset-form-container">
+                {% if form.non_field_errors %}
                 <p class="validateTips">
                     {{ form.non_field_errors }}
                 </p>
-
+            {% endif %}
+            
+                {% if form.id.value %}
+                {{ form.id }}
+                {% endif %}
+            
                 <div class="fieldWrapper">
-                    {% if form.device_type.errors %}
+                    {% if form.name.errors %}
                         <div class="ui-state-error">
-                            {{ form.device_type.errors }}
+                            {{ form.name.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_device_type">Tipo di dispositivo:<label>
-                    {{ form.device_type }}
+                    <label for="id_devices-{{ forloop.counter0 }}-name">Nome (es. "M5RusticaSalcito"):<label>
+                    {{ form.name }}
                 </div>
 
                 <div class="fieldWrapper">
-                    {% if form.note.errors %}
+                    {% if form.type.errors %}
                         <div class="ui-state-error">
-                            {{ form.note.errors }}
+                            {{ form.type.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_note">Breve descrizione (es. "alix sul tetto"):<label>
-                    {{ form.note }}
+                    <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo (es. NanoStationM5):<label>
+                    {{ form.type }}
                 </div>
 
                 <div class="fieldWrapper">
@@ -36,8 +42,18 @@
                             {{ form.olsr_version.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_olsr_version">Versione di OLSR:<label>
+                    <label for="id_devices-{{ forloop.counter0 }}-olsr_version">Versione di OLSR:<label>
                     {{ form.olsr_version }}
+                </div>
+                
+                <div class="fieldWrapper">
+                    {% if form.max_signal.errors %}
+                        <div class="ui-state-error">
+                            {{ form.max_signal.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_devices-{{ forloop.counter0 }}-max_signal">Max Signal<label>
+                    {{ form.max_signal }}
                 </div>
             </div>
             {% endfor %}

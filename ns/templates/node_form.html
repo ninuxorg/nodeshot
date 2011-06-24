@@ -1,11 +1,14 @@
 <div class="dialog-form ui-widget" >
     <form id="node-form" class="ui-corner-all ui-widget-content" method="post" action="">
         <h1>Informazioni sul nodo</h1>
+        <p>I campi contrassegnati con un asterisco sono obbligatori.</p>
         <fieldset>
-        {% csrf_token %} 
+        {% csrf_token %}
+        {% if form.non_field_errors %}
         <p class="validateTips">
             {{ form.non_field_errors }}
         </p>
+        {% endif %}
 
         <div class="fieldWrapper">
             {% if form.name.errors %}
@@ -13,7 +16,7 @@
                     {{ form.name.errors }}
                 </div>
             {% endif %}
-            <label for="id_name">Nome del nodo:<label>
+            <label for="id_name">Nome del nodo: <big>*</big><label>
             {{ form.name }}
         </div>
         <div class="fieldWrapper">
@@ -41,8 +44,8 @@
                     {{ form.cap.errors }}
                 </div>
             {% endif %}
-            <label for="id_cap">CAP:</label>
-            {{ form.cap}}
+            <label for="id_cap">CAP: <big>*</big></label>
+            {{ form.cap }}
         </div>
         <div class="fieldWrapper">
             {% if form.email.errors %}
@@ -50,8 +53,8 @@
                     {{ form.email.errors }}
                 </div>
             {% endif %}
-            <label for="id_cc_myself">Indirizzo E-Mail:</label>
-            {{ form.email}}
+            <label for="id_cc_myself">Indirizzo E-Mail: <big>*</big></label>
+            {{ form.email }}
         </div>
         <div class="fieldWrapper">
             {% if form.password.errors %}
@@ -59,8 +62,8 @@
                     {{ form.password.errors }}
                 </div>
             {% endif %}
-            <label for="id_cc_myself">Password per modificare questa configurazione:</label>
-            {{ form.password}}
+            <label for="id_cc_myself">Password per modificare questa configurazione: <big>*</big></label>
+            {{ form.password }}
         </div>
         <div class="fieldWrapper">
             {% if form.lng.errors %}
@@ -94,18 +97,18 @@
     </form>
 </div>
 <script>
-     $('#node-form-submit').button();
+    $('#node-form-submit').button();
     var inputs = $("#node-form").find("input , select ,textarea");
     $.each(inputs,function(){
         $(this).bind({
-              focusin: function() {
+            focusin: function() {
                $(this).toggleClass('ui-state-focus');
-                 },
-               focusout: function() {
+            },
+            focusout: function() {
                 $(this).toggleClass('ui-state-focus');
-                 }
-              });
-         });
+            }
+        });
+    });
 </script>
 
 

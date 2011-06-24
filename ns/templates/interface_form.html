@@ -1,8 +1,8 @@
 <div class="dialog-form ui-widget" >
     <form id="interface-form" class="ui-corner-all ui-widget-content" method="post" action="">
         <h1>Informazioni sulle Interfacce {{description}}</h1>
-         <div class="device-id">{{device_id}}</div>
-         <div class="configuration-type">{{configuration_type}}</div>
+        <div class="device-id">Device id: {{device_id}}</div>
+        <div class="configuration-type">Configuration type: {{configuration_type}}</div>
         <fieldset>
             {{ formset.management_form }}
             {% csrf_token %} 

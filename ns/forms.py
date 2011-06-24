@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, HttpRequest
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
 from django.core.context_processors import csrf
 from ns.models import *
@@ -12,8 +12,8 @@ from django.utils import simplejson
 from django.db import models
 from django import forms
 
-
 def node_form(request):
+    # add css classes
     class NodeForm(ModelForm):
         class Meta:
             model = Node 
@@ -22,35 +22,79 @@ def node_form(request):
             for v in self.fields:
                 self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
 
+    # retrieve node ID
+    node_id = request.GET.get('id', None)
+
+    # if form has been submitted
     if request.method == 'POST':
-        # return json: either errors or the redirect url
-        form = NodeForm(request.POST)
-        if form.is_valid():
-            node = form.save()
-            return HttpResponse(node.id)
-    else: 
+        # if a new node has been submitted
+        if node_id == None:
+            # return json: either errors or the redirect url
+            form = NodeForm(request.POST)
+            # if form is valid
+            if form.is_valid():
+                # save
+                node = form.save()
+                # return a blank page with node id
+                return HttpResponse(node.id)
+        # if changes to an existing node have been submitted
+        else:
+            # get object or return a 404
+            node = get_object_or_404(Node, pk=node_id)
+            # init the modelform object with the changes submitted
+            form = NodeForm(request.POST, instance=node)
+            # save changes
+            form.save()
+            
+    # if form hasn't been submitted and we are going to edit an existing node
+    elif node_id != None:
+        # get object or return a 404
+        node = get_object_or_404(Node, pk=node_id)
+        # populate the form with the current node info
+        form = NodeForm(instance=node)
+    # if inserting a new node
+    else:
+        # blank form
         form = NodeForm()
+
     return render_to_response('node_form.html', { 'form' : form }, context_instance=RequestContext(request))
 
 def device_form(request):
+    # retrieve node ID
     node_id = request.GET.get('node_id', None)
-    try:
-        node = Node.objects.get(id=node_id)
-    except:
-        return HttpResponseNotFound('No such node id')
+    
+    # get object or return a 404
+    node = get_object_or_404(Node, pk=node_id)
+    
+    # init inlineformset_factory
     DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)#, formfield_callback = my_formfield_cb)
+    # init first formset
+    formset = DeviceInlineFormSet(instance=node, prefix='devices')
+    
+    # if form has been submitted
     if request.method == "POST":
+        # populate
         formset = DeviceInlineFormSet(request.POST, instance=node, prefix='devices')
+        # if form is valid
         if formset.is_valid():
+            # init list that will contain devices
             device_list = []
-            #formset.save()
+            # loop through devices
             for f in formset.forms:
+                # save every device
                 d = f.save()
+                # append id to device_list
                 device_list.append(str(d.id))
-            return HttpResponse( ','.join(device_list) )
+            # set response as a blank page with just the IDs of the devices separated by commas
+            response = HttpResponse( ','.join(device_list))
+            
+    # else if form hasn't been submitted yet
     else:
-        formset = DeviceInlineFormSet(instance=node, prefix='devices')
-    return render_to_response("device_form.html", { "formset": formset })
+        # set response with an empty form
+        response = render_to_response("device_form.html", { "formset": formset }, context_instance=RequestContext(request))
+    
+    # return the response we've got in one of the previous cases
+    return response
 
 def configuration_form(request):
     device_id = request.GET.get('device_id', None)
@@ -83,5 +127,5 @@ def configuration_form(request):
             return HttpResponse('ok')
     else:
         formset = mInlineFormSet(instance=device, prefix=prefix_name)
-    return render_to_response(template_form, { "formset": formset , 'device_id': device_id , 'configuration_type': entry_type , 'description': device.note } )
+    return render_to_response(template_form, { "formset": formset , 'device_id': device_id , 'configuration_type': entry_type , 'description': device.name } )
 
