@@ -88,9 +88,9 @@ function newNodeMarker(location) {
                   position: location,
                   map: map,
                   });
-        var contentString = '<div id="info-content">Mi hai posizionato bene? </div> '+
-            '<ul><li><a href="javascript:insertNodeInfo()">Si</a></li>'+
-            '<li><a href="javascript:removeNewMarker()">No</a></li></ul>'
+        var contentString = '<div id="confirm-new"><h2>Mi hai posizionato bene?</h2>'+
+            '<a href="javascript:insertNodeInfo()" class="green">Si</a>'+
+            '<a href="javascript:removeNewMarker()" class="red">No</a></div>'
 
         var infowindow = new google.maps.InfoWindow({
             content: contentString
@@ -359,7 +359,7 @@ function initialize() {
         'themes' : {'theme' : 'apple'},
         "plugins" : [ "themes", "json_data"  ]
     });
-    console.log(__project_home__);
+
     // 04/06/2011 - added __project_home__
     $.getJSON(__project_home__+"nodes.json", function(data) {
         nodes = data;

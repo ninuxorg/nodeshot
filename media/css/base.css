@@ -1,4 +1,4 @@
-html { height: 100% }
+﻿html { height: 100% }
 body { height: 100%; margin: 0px; padding: 0px }
 
 
@@ -146,7 +146,7 @@ body { height: 100%; margin: 0px; padding: 0px }
 
 /* DLG */
 .dialog-form {
-    width: 40%; 
+    width: 50%;
     margin-top: 20px;
     margin-left: 20px;
 }
@@ -252,5 +252,33 @@ h3 {
 
 #rrd-graph_ds_cb {
     color: #000000;
+}
 
+#confirm-new h2{
+	font-size: 14px;
+	margin-bottom: 15px;
+}
+
+#confirm-new a{
+	float: left;
+	margin-right: 10px;
+	background: #000;
+	color: #fff;
+	padding: 5px 14px;
+	border-radius:3px;
+	-moz-border-radius:3px;
+	text-decoration: none;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+#confirm-new a.green{ background: green }
+#confirm-new a.red{ background: red }
+
+#node-form{
+	padding: 0 20px;
+}
+
+#node-form .fieldWrapper big{
+	font-weight: bold
 }
