@@ -5,9 +5,9 @@
         <fieldset>
         {% csrf_token %}
         {% if form.non_field_errors %}
-        <p class="validateTips">
-            {{ form.non_field_errors }}
-        </p>
+            <p class="validateTips">
+                {{ form.non_field_errors }}
+            </p>
         {% endif %}
 
         <div class="fieldWrapper">
@@ -26,7 +26,7 @@
                 </div>
             {% endif %}
             {{ form.description.errors }}
-            <label for="id_sender">Descrizione:</label>
+            <label for="id_description">Descrizione:</label>
             {{ form.description}}
         </div>
         <div class="fieldWrapper">
@@ -35,7 +35,7 @@
                     {{ form.owner.errors }}
                 </div>
             {% endif %}
-            <label for="id_message">Responsable:</label>
+            <label for="id_owner">Responsable:</label>
             {{ form.owner }}
         </div>
         <div class="fieldWrapper">
@@ -44,8 +44,8 @@
                     {{ form.cap.errors }}
                 </div>
             {% endif %}
-            <label for="id_cap">CAP: <big>*</big></label>
-            {{ form.cap }}
+            <label for="id_postal_code">CAP: <big>*</big></label>
+            {{ form.postal_code }}
         </div>
         <div class="fieldWrapper">
             {% if form.email.errors %}
@@ -53,8 +53,26 @@
                     {{ form.email.errors }}
                 </div>
             {% endif %}
-            <label for="id_cc_myself">Indirizzo E-Mail: <big>*</big></label>
+            <label for="id_email">Indirizzo E-Mail principale: <big>*</big></label>
             {{ form.email }}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.email2.errors %}
+                <div class="ui-state-error">
+                    {{ form.email2.errors }}
+                </div>
+            {% endif %}
+            <label for="id_email2">Indirizzo E-Mail 2:</label>
+            {{ form.email2 }}
+        </div>
+        <div class="fieldWrapper">
+            {% if form.email3.errors %}
+                <div class="ui-state-error">
+                    {{ form.email3.errors }}
+                </div>
+            {% endif %}
+            <label for="id_email3">Indirizzo E-Mail 3: </label>
+            {{ form.email3 }}
         </div>
         <div class="fieldWrapper">
             {% if form.password.errors %}
@@ -62,7 +80,8 @@
                     {{ form.password.errors }}
                 </div>
             {% endif %}
-            <label for="id_cc_myself">Password per modificare questa configurazione: <big>*</big></label>
+            <label for="id_password">Password per modificare questa configurazione: <big>*</big>
+            <br />(la password non verrà criptata)</label>
             {{ form.password }}
         </div>
         <div class="fieldWrapper">
@@ -71,7 +90,7 @@
                     {{ form.lng.errors }}
                 </div>
             {% endif %}
-            <label for="id_cc_myself">Logitudine:</label>
+            <label for="id_lng">Logitudine: <big>*</big></label>
             {{ form.lng}}
         </div>
         <div class="fieldWrapper">
@@ -80,7 +99,7 @@
                     {{ form.lat.errors }}
                 </div>
             {% endif %}
-            <label for="id_cc_myself">Latitudine:</label>
+            <label for="id_lat">Latitudine: <big>*</big></label>
             {{ form.lat}}
         </div>
         <div class="fieldWrapper">
@@ -89,10 +108,11 @@
                     {{ form.alt.errors }}
                 </div>
             {% endif %}
-            <label for="id_cc_myself">Altitudine:</label>
+            <label for="id_alt">Altitudine:</label>
             {{ form.alt}}
         </div>
-        <p ><input id="node-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Salva Nodo" /></p>
+        <input type="hidden" name="status" value="p" /> 
+        <p><input id="node-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Salva Nodo" /></p>
         <fieldset>
     </form>
 </div>

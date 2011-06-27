@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
 from django.core.context_processors import csrf
-from ns.models import *
+from nodeshot.models import *
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.forms import ModelForm
@@ -47,7 +47,7 @@ def node_form(request):
             form.save()
             
     # if form hasn't been submitted and we are going to edit an existing node
-    elif node_id != None:
+    elif request.method != 'POST' and node_id != None:
         # get object or return a 404
         node = get_object_or_404(Node, pk=node_id)
         # populate the form with the current node info

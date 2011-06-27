@@ -1,10 +1,24 @@
-﻿html { height: 100% }
-body { height: 100%; margin: 0px; padding: 0px }
+﻿html, body, div, span, applet, object, iframe,
+p, blockquote, pre,
+a, abbr, acronym, address,
+del, dfn, font, img, ins, kbd, q, s, samp,
+strike, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, textarea, input,
+table, tbody, tfoot, thead, tr, td, h1, h2, h3, h4, h5, h6,
+th, caption {
+	margin:	 0;
+	padding: 0;
+	border:	 0;
+}
+article, aside, figure, footer, header, hgroup, menu, nav, section { display:block;margin:0;padding:0 }
 
+html, body { height: 100% }
 
 #container
 {
     margin: 0 auto;
+    height: 100%;
     width: 100%;
     background: #fff;
     font-family: sans-serif;
@@ -63,29 +77,31 @@ body { height: 100%; margin: 0px; padding: 0px }
 {
     float: left;
     width: 100%;
-    background: #FFF; 
+    background: #FFF;
 }
 
 #content
 {
-    clear: left;
     float: left;
     width: 74%;
-    padding: 0px 0;
-    margin: 0 0 0 0%;
-    display: inline;
+    min-height:500px;
+    padding: 0;
+    margin: 0;
 }
 
 #content h2 { margin: 0; }
 
 #aside
 {
-    float: right;
+    float: left;
     width: 24%;
-    padding: 2px 2px;
-    margin: 0 0 0 0;
-    display: inline;
+    padding: 0;
+    margin: 0;
     color: #000;
+}
+
+#aside .wrapper{
+	padding: 8px 0 0 8px
 }
 
 #aside h3 { margin: 0; }
@@ -100,10 +116,7 @@ body { height: 100%; margin: 0px; padding: 0px }
 }
 */
 
-#map_canvas { height: 100% }
-
-
-
+#map_canvas { height:700px }
 
 #network-stat
 {
@@ -129,11 +142,7 @@ body { height: 100%; margin: 0px; padding: 0px }
 
 }
 
-#view-radio
-{
-    margin: auto;
-    width: 300px;
-}
+#view-radio{ margin: auto }
 
 #node-tree-container
 {

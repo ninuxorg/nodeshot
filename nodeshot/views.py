@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django import forms
 from django.utils import simplejson
 from django.core.context_processors import csrf
-from ns.models import *
+from nodeshot.models import *
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.forms import ModelForm

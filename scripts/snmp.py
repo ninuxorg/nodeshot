@@ -2,14 +2,18 @@
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 import sys, os, struct, threading
-sys.path.append("/home/ninux/nodeshot")
+
+# determine directory automatically
+directory = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.abspath(os.path.join(directory, os.path.pardir))
+sys.path.append(parent)
 
 from django.core.management import setup_environ
 import settings
 setup_environ(settings)
 
 from django.db import IntegrityError, DatabaseError
-from ns.models import *
+from nodeshot.models import *
 
 community = cmdgen.CommunityData('my-agent', 'public', 0)
 pingcmd = "ping -c 1 %s > /dev/null"
@@ -174,8 +178,6 @@ class SNMPBugger(threading.Thread):
                 node.status = 'd'
             if node:
                 node.save() #save
-
-
 
 def main():
     for i in Interface.objects.all():

@@ -1,10 +1,12 @@
 # Django settings for nodeshot project.
 
+import os
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-     ('OrazioPirataDelloSpazio', 'ziducaixao@autistici.org'),
+     ('admin', 'admin@yourdomain.org'),
 )
 
 MANAGERS = ADMINS
@@ -45,17 +47,25 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/ninux/nodeshot/media/'
+MEDIA_ROOT = '%s/media/' % os.path.dirname(os.path.realpath(__file__))
+
+# If you use the django development server set this to true if you want django to serve static files (check urls.py)
+DEVELOPMENT_SERVER = True
+
+if DEVELOPMENT_SERVER:
+	PROJECT_URL = "http://localhost:8000/"
+else:
+	PROJECT_URL = "http://nodeshot.peertoport.com/"
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://nodeshot.peertoport.com/media/'
+MEDIA_URL = '%smedia/' % PROJECT_URL
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/admin/'
+ADMIN_MEDIA_PREFIX = '%sadmin/' % MEDIA_URL
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '(i+!)&s9crw*eg^!)(uudsdr%+*+g)(d$fs32eh7a3*z-dd3'
@@ -81,7 +91,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/ninux/nodeshot/ns/templates/'
+    '%s/nodeshot/templates/' % os.path.dirname(os.path.realpath(__file__))
 )
 
 INSTALLED_APPS = (
@@ -91,7 +101,23 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
-    'ns'
+    'nodeshot',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+# routing protocols used in nodeshot.models
+NODESHOT_ROUTING_PROTOCOLS = (
+    ('aodv','AODV'),
+    ('batman','B.A.T.M.A.N.'),
+    ('dsdv','DSDV'),
+    ('dsr','DSR'),
+    ('hsls','HSLS'),
+    ('iwmp','IWMP'),
+    ('olsr','OLSR'),
+    ('oorp','OORP'),
+    ('ospf','OSPF'),
+    ('tora','TORA'),
+)
+# set your default routing protocol
+NODESHOT_DEFAULT_ROUTING_PROTOCOL = 'olsr'

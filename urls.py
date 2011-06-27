@@ -4,19 +4,20 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-     (r'^$', 'ns.views.index'),
-     (r'^node_list.json', 'ns.views.node_list'),
-     (r'^nodes.json', 'ns.views.nodes'),
-     (r'^search/(?P<what>.*)$', 'ns.views.search'),
-     (r'^generate_rrd', 'ns.views.generate_rrd'),
- #    (r'^info_window/(?P<nodeName>\w+)$', 'ns.views.info_window'),
-     (r'^info_window/(?P<nodeName>.*)$', 'ns.views.info_window'),
-     (r'^info_tab', 'ns.views.info'),
-     (r'^node_form', 'ns.forms.node_form'),
-     (r'^device_form', 'ns.forms.device_form'), 
-     (r'^configuration_form', 'ns.forms.configuration_form'),
+    (r'^', include('nodeshot.urls')),
+#    (r'^$', 'nodeshot.views.index'),
+#    (r'^node_list.json', 'nodeshot.views.node_list'),
+#    (r'^nodes.json', 'nodeshot.views.nodes'),
+#    (r'^search/(?P<what>.*)$', 'nodeshot.views.search'),
+#    (r'^generate_rrd', 'nodeshot.views.generate_rrd'),
+##    (r'^info_window/(?P<nodeName>\w+)$', 'nodeshot.views.info_window'),
+#    (r'^info_window/(?P<nodeName>.*)$', 'nodeshot.views.info_window'),
+#    (r'^info_tab', 'nodeshot.views.info'),
+#    (r'^node_form', 'nodeshot.forms.node_form'),
+#    (r'^device_form', 'nodeshot.forms.device_form'), 
+#    (r'^configuration_form', 'nodeshot.forms.configuration_form'),
 
-     (r'^admin/', include(admin.site.urls)),
+    (r'^admin/', include(admin.site.urls)),
 )
 
 # serve static files only if DEBUG and DEVELOPMENT_SERVER are True (in settings.py)

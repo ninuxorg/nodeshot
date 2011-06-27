@@ -39,22 +39,23 @@
                 <div class="fieldWrapper">
                     {% if form.olsr_version.errors %}
                         <div class="ui-state-error">
-                            {{ form.olsr_version.errors }}
+                            {{ form.routing_protocol.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-olsr_version">Versione di OLSR:<label>
-                    {{ form.olsr_version }}
+                    <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">Routing protocol:<label>
+                    {{ form.routing_protocol }}
                 </div>
                 
                 <div class="fieldWrapper">
-                    {% if form.max_signal.errors %}
+                    {% if form.olsr_version.errors %}
                         <div class="ui-state-error">
-                            {{ form.max_signal.errors }}
+                            {{ form.routing_protocol_versopm.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-max_signal">Max Signal<label>
-                    {{ form.max_signal }}
+                    <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Routing protocol version:<label>
+                    {{ form.routing_protocol_version }}
                 </div>
+                
             </div>
             {% endfor %}
         </fieldset>

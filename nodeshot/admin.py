@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ns.models import * 
+from nodeshot.models import * 
 
 class NodeAdmin(admin.ModelAdmin):
     list_display  = ('name', 'owner', 'status', 'added', 'updated')

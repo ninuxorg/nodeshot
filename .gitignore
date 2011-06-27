@@ -1,0 +1,6 @@
+*.pyc
+settings.py
+import_wnmap.py
+media/admin
+debug_toolbar
+django.wsgi

@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 
-import urllib2, sys
-sys.path.append( '/home/ninux/nodeshot/')
+import urllib2, sys, os
+
+# determine directory automatically
+directory = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.abspath(os.path.join(directory, os.path.pardir))
+sys.path.append(parent)
+
 import settings
 from django.core.management import setup_environ 
 setup_environ(settings)
-from ns.models import *
+from nodeshot.models import *
 from django.db.models import Q
 
 

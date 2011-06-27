@@ -1,4 +1,5 @@
 from django.db import models
+from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
 
 NODE_STATUS = (
     ('a', 'active'),
@@ -83,36 +84,30 @@ WIRELESS_CHANNEL = (
     ('5825', '5Ghz Ch 165 (5825 Mhz)')
 )
 
-
-
-#class DeviceType(models.Model):
-#    name = models.CharField(max_length=50)
-#    img = models.ImageField(upload_to='devicePics/',  blank=True, null=True) 
-#    def __unicode__(self):
-#        return u'%s' % (self.name)
-
 class Node(models.Model):
     name = models.CharField(max_length=50, unique=True)
     owner = models.CharField(max_length=50, blank=True, null=True)
     description = models.CharField(max_length=200, blank=True, null=True)
-    cap = models.IntegerField()
+    postal_code = models.CharField(max_length=10)
     email = models.EmailField()
+    email2 = models.EmailField(blank=True, null=True)
+    email3 = models.EmailField(blank=True, null=True)
     password =  models.CharField(max_length=20)
     lat = models.FloatField()
     lng = models.FloatField() 
     alt = models.FloatField(blank=True, null=True)
-    status= models.CharField(max_length=1, choices=NODE_STATUS, editable=False, default='p')
+    status= models.CharField(max_length=1, choices=NODE_STATUS, default='p')
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     def __unicode__(self):
         return u'%s' % (self.name)
 
 class Device(models.Model):
+    name = models.CharField(max_length=50)
     type = models.CharField(max_length=50, blank=True, null=True ) 
     node = models.ForeignKey(Node)
-    name = models.CharField(max_length=50)
-    max_signal = models.IntegerField(default = 0)
-    olsr_version = models.CharField(max_length=20, blank=True, null=True)
+    routing_protocol = models.CharField(max_length=20, choices=ROUTING_PROTOCOLS, default=DEFAULT_ROUTING_PROTOCOL)
+    routing_protocol_version = models.CharField(max_length=10, blank=True, null=True)
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     def __unicode__(self):

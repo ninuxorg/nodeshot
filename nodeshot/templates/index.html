@@ -2,16 +2,17 @@
 <html>
     <head>
         <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-
+        <title>Nodeshot Open Source Map Server</title>
         <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />
         <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/tablesorter/style.css" />
         <link type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" rel="stylesheet" />
+        <!--[if lte IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     </head>
     <body>
         <div id="container">
-            <div id="header">
+            <header id="header">
                 <h1>
-                    Ninux.org 
+                    Nodeshot
                 </h1>
                 <span id='network-stat'>
                     <ul>
@@ -28,51 +29,75 @@
                         <button></button>
                     </div>
                 </span>
-            </div>
-            <div id="content-container">
-                <div id="content">
-                    <div id="map_canvas" style="width:100%; height:630px"></div>
-                </div>
-                <div id="aside">
-                    <div id="view-radio">
-                        <input type="radio" id="radio1" name="view-radio" value="map" checked="checked" /><label for="radio1">Mappa</label>
-                        <input type="radio" id="radio2" name="view-radio" value="info" /><label for="radio2">Info</label>
-                        <input type="radio" id="radio3" name="view-radio" value="olsr" /><label for="radio3">OLSR</label>
-                        <input type="radio" id="radio4" name="view-radio" value="vpn" /><label for="radio4">VPN</label>
-                    </div>
-                    <div id="aside-content">
-                        <p>Benvenut* nella mappa della rete <span style="color:#FFA500">N</span>inux!</p>
-                        <p>Ti serve aiuto? <a href="javascript:alert('prrrrrrrr')">Cikka qui!</a></p>
-                        <button id="addnode">Aggiungi un nuovo nodo</button>
-                        <span id="addhelper"></span>
-                        <input id="search-address" class="defaultText text ui-corner-all" title="Cerca un indirizzo"  /> 
-                        <input type="checkbox" id="active" checked="yes" /><label for="active">Visualizza nodi attivi</label><br />
-                        <input type="checkbox" id="potential" checked="yes" /><label for="potential">Visualizza nodi potenziali</label>
-                        <h3>Lista dei nodi</h3>
-                         <div id="node-tree-container" class="widget-content text ui-corner-all">
-                            <div id="node-tree"></div>
+            </header>
+            <section id="content-container">
+                <article id="content">
+                    <div id="map_canvas"></div>
+                </article>
+                <aside id="aside">
+                    <div class="wrapper">
+                        <menu id="view-radio">
+                            <input type="radio" id="radio1" name="view-radio" value="map" checked="checked" /><label for="radio1">Mappa</label>
+                            <input type="radio" id="radio2" name="view-radio" value="info" /><label for="radio2">Info</label>
+                            <input type="radio" id="radio3" name="view-radio" value="olsr" /><label for="radio3">OLSR</label>
+                            <input type="radio" id="radio4" name="view-radio" value="vpn" /><label for="radio4">VPN</label>
+                        </menu>
+                        <div id="aside-content">
+                            <p>Benvenut* nella mappa della rete <span style="color:#FFA500">N</span>inux!</p>
+                            <p>Ti serve aiuto? <a href="javascript:alert('prrrrrrrr')">Cikka qui!</a></p>
+                            <button id="addnode">Aggiungi un nuovo nodo</button>
+                            <span id="addhelper"></span>
+                            <input id="search-address" class="defaultText text ui-corner-all" title="Cerca un indirizzo"  /> 
+                            <input type="checkbox" id="active" checked="yes" /><label for="active">Visualizza nodi attivi</label><br />
+                            <input type="checkbox" id="potential" checked="yes" /><label for="potential">Visualizza nodi potenziali</label>
+                            <h3>Lista dei nodi</h3>
+                             <div id="node-tree-container" class="widget-content text ui-corner-all">
+                                <div id="node-tree"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </aside>
+                
                
-            </div>
+            </section>
         </div>
-	<script type="text/javascript">
-	// 04/06/2011 added __project_home__ to avoid errors when the project root doesn't coincide with the webserver root
-
-	</script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-ui.js"></script>
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
-        var __project_home__ = '{% url ns.views.index %}'
-         google.load("jquery", "1.5.1");
-         google.load("jqueryui", "1.8.11");
-         google.load('maps','3',{other_params:'sensor=false'});
-         google.load('search','1');
-         google.setOnLoadCallback(function() {
-                 // Place init code here instead of $(document).ready()
-                 initialize();
-         });
+        var __project_home__ = '{% url nodeshot.views.index %}'
+        //google.load("jquery", "1.5.1");
+        //google.load("jqueryui", "1.8.11");
+        google.load('maps','3',{other_params:'sensor=false'});
+        google.load('search','1');
+        google.setOnLoadCallback(function() {
+                // Place init code here instead of $(document).ready()
+                initialize();
+        });
+        
+        setDimensions = function(){
+            $("#content").width($(window).width()-295);
+            $("#aside").width('295');
+            $("#container").width($(window).width());
+            $("#map_canvas").height($(window).height()-$("#header").height());
+        }
+        
+        $(window).load(function(){
+            setDimensions();
+            $("#content").css({
+                position:"absolute",
+                top: $("#header").height(),
+                left: 0
+            });
+            $("#aside").css({
+                position:"absolute",
+                top: $("#header").height(),
+                right: 0
+            });
+        }).resize(setDimensions);
+         
     </script>
+    
     <script type="text/javascript" src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.formset.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script>
