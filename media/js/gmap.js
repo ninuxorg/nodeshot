@@ -85,9 +85,10 @@ function removeNewMarker(){
 function newNodeMarker(location) {
         removeNewMarker();   
         marker = new google.maps.Marker({
-                  position: location,
-                  map: map,
-                  });
+            position: location,
+            map: map,
+            icon: __project_home__+'media/images/marker_new.png'
+        });
         var contentString = '<div id="confirm-new"><h2>Mi hai posizionato bene?</h2>'+
             '<a href="javascript:insertNodeInfo()" class="green">Si</a>'+
             '<a href="javascript:removeNewMarker()" class="red">No</a></div>'
@@ -95,7 +96,7 @@ function newNodeMarker(location) {
         var infowindow = new google.maps.InfoWindow({
             content: contentString
         });
-        map.setCenter(location);
+        //map.setCenter(location);
         infowindow.open(map,marker); 
         newMarkerListenerHandle = google.maps.event.addListener(marker, 'click', function() {
             infowindow.open(map,marker);
@@ -264,25 +265,57 @@ function initialize() {
             primary: "ui-icon-plusthick"
         }   
     });
+    
+    var nodeshotModal = function(message){
+        nodeshotMask();
+        $('body').after('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
+        $('#nodeshot-modal').css({
+            opacity: 0,
+            display: 'block'
+        }).animate({
+            opacity: 1
+        }, 500);
+        $('#nodeshot-modal-close').click(function(){
+            var dialog = $(this).parent();
+            var mask = $('#nodeshot-modal-mask');
+            dialog.fadeOut(500, function(){
+                dialog.remove();
+            })
+            mask.fadeOut(500, function(){
+                mask.remove();
+            });
+        });
+    }
+    
+    var nodeshotMask = function(){
+        $('body').after('<div id="nodeshot-modal-mask"></div>');
+        $('#nodeshot-modal-mask').css({
+            opacity: 0,
+            display: 'block'
+        }).animate({
+            opacity: 0.5
+        }, 500);
+    }
 
     $('#addnode').click(function() {
-           var me = $('#addnode');
-           if (me.hasClass('insert-mode')) {
-               $('#addhelper').html(''); 
-               $(this).button('option', 'label', 'Aggiungi un nuovo nodo');
-               removeNewMarker();
-               if (clickListenerHandle) {
-                    google.maps.event.removeListener(clickListenerHandle);
-                    clickListenerHandle = null;
-               }
-           } else {
-               $('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
-               $(this).button('option', 'label', 'Annulla inserimento');
-               clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
-                      newNodeMarker(event.latLng);
-               });
-           }
-           me.toggleClass('insert-mode');
+            var me = $('#addnode');
+            if (me.hasClass('insert-mode')) {
+                //$('#addhelper').html(''); 
+                $(this).button('option', 'label', 'Aggiungi un nuovo nodo');
+                removeNewMarker();
+                if (clickListenerHandle) {
+                     google.maps.event.removeListener(clickListenerHandle);
+                     clickListenerHandle = null;
+                }
+            } else {
+                nodeshotModal('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
+                //$('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
+                $(this).button('option', 'label', 'Annulla inserimento');
+                clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
+                       newNodeMarker(event.latLng);
+                });
+            }
+            me.toggleClass('insert-mode');
     });
 
 

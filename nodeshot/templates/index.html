@@ -61,6 +61,13 @@
                
             </section>
         </div>
+        
+<!--<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;opacity:0.5"></div>
+<div id="nodeshot-modal">
+    <div id="nodeshot-modal-message">Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)</div>
+    <a class="button green" id="nodeshot-modal-close">ok</a>
+</div>-->
+        
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-ui.js"></script>
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
@@ -94,7 +101,10 @@
                 top: $("#header").height(),
                 right: 0
             });
-        }).resize(setDimensions);
+        }).resize(function(){
+            setDimensions();
+            $("body").css("overflow-x", "hidden");
+        });
          
     </script>
     
