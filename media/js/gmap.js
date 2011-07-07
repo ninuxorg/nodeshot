@@ -144,13 +144,12 @@ function draw_link(flat, flng, tlat, tlng, quality) {
         path: linkCoordinates,
         strokeColor: qualityColor,
         strokeOpacity: 0.4,
-        strokeWeight: 8 
+        strokeWeight: 5 
     });
     link.setMap(map);
     markersArray.links.push(link);
 
 }
-
 
 function draw_nodes(type) {
     var marray;
@@ -204,8 +203,58 @@ function remove_markers(type) {
         google.maps.event.removeListener(larray[i]);
         marray[i].setMap(null);
     }
+}
 
+var nodeshotModal = function(message){
+    nodeshotMask();
+    $('body').append('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
+    var modal = $('#nodeshot-modal');
+    modal.css({
+        opacity: 0,
+        display: 'block',
+        left: ($(window).width() - modal.width()) / 2,
+        top: ($(window).height() - modal.height()) / 3
+    }).animate({
+        opacity: 1
+    }, 500);
+    
+    $('#nodeshot-modal-close').click(function(){
+        var dialog = $(this).parent();
+        dialog.fadeOut(500, function(){
+            dialog.remove();
+        })
+        nodeshotRemoveMask();
+    });
+}
 
+var nodeshotShowLoading = function(){
+    img = $('#nodeshot-ajaxloader');
+    img.css({
+        left: ($(window).width()-img.width()) / 2,
+        top: ($(window).height()-img.height()) / 2
+    });
+}
+
+var nodeshotHideLoading = function(){
+    $('#nodeshot-ajaxloader').css('top', '-9999');
+}
+
+var nodeshotMask = function(opacity){
+    if(!opacity){ opacity = 0.5 }
+    $('body').append('<div id="nodeshot-modal-mask"></div>');
+    $('#nodeshot-modal-mask').css({
+        opacity: 0,
+        display: 'block'
+    }).animate({
+        opacity: opacity
+    }, 500);
+}
+
+var nodeshotRemoveMask = function(){
+    var mask = $('#nodeshot-modal-mask');
+    mask.fadeOut(500, function(){
+        mask.remove();
+    });
 }
 
 function initialize() {
@@ -265,37 +314,6 @@ function initialize() {
             primary: "ui-icon-plusthick"
         }   
     });
-    
-    var nodeshotModal = function(message){
-        nodeshotMask();
-        $('body').after('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
-        $('#nodeshot-modal').css({
-            opacity: 0,
-            display: 'block'
-        }).animate({
-            opacity: 1
-        }, 500);
-        $('#nodeshot-modal-close').click(function(){
-            var dialog = $(this).parent();
-            var mask = $('#nodeshot-modal-mask');
-            dialog.fadeOut(500, function(){
-                dialog.remove();
-            })
-            mask.fadeOut(500, function(){
-                mask.remove();
-            });
-        });
-    }
-    
-    var nodeshotMask = function(){
-        $('body').after('<div id="nodeshot-modal-mask"></div>');
-        $('#nodeshot-modal-mask').css({
-            opacity: 0,
-            display: 'block'
-        }).animate({
-            opacity: 0.5
-        }, 500);
-    }
 
     $('#addnode').click(function() {
             var me = $('#addnode');
@@ -317,8 +335,6 @@ function initialize() {
             }
             me.toggleClass('insert-mode');
     });
-
-
 
     $( "#view-radio" ).buttonset();
     document.getElementById('radio1').checked=true;

@@ -62,11 +62,8 @@
             </section>
         </div>
         
-<!--<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;opacity:0.5"></div>
-<div id="nodeshot-modal">
-    <div id="nodeshot-modal-message">Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)</div>
-    <a class="button green" id="nodeshot-modal-close">ok</a>
-</div>-->
+    <!--<div id="nodeshot-overlay" style="">
+    </div>-->
         
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-ui.js"></script>
@@ -82,6 +79,7 @@
                 initialize();
         });
         
+        // calculate dimensions of html elements in pixel
         setDimensions = function(){
             $("#content").width($(window).width()-295);
             $("#aside").width('295');
@@ -89,6 +87,7 @@
             $("#map_canvas").height($(window).height()-$("#header").height());
         }
         
+        // when content has been loaded
         $(window).load(function(){
             setDimensions();
             $("#content").css({
@@ -101,8 +100,15 @@
                 top: $("#header").height(),
                 right: 0
             });
+            
+            // preload ajax-loader.gif
+            $('body').append('<img src="'+__project_home__+'media/images/ajax-loader.gif" alt="" id="nodeshot-ajaxloader" />');
+            //nodeshotMask();
+            
+        // update dimensions on resize
         }).resize(function(){
             setDimensions();
+            // hide orizontal scrollbar
             $("body").css("overflow-x", "hidden");
         });
          

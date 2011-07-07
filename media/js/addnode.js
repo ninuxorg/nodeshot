@@ -2,8 +2,12 @@
  */
 
 function insertNodeInfo(){
+    nodeshotMask();
+    nodeshotShowLoading();
     $.get(__project_home__+'node_form', function(data) {
-        $('#content').html(data);
+        nodeshotHideLoading();
+        $('body').append('<div id="nodeshot-overlay"></div>');
+        $('#nodeshot-overlay').html(data);
         if (newMarker) {
             $("#id_lat").val(newMarker.getPosition().lat());
             $("#id_lng").val(newMarker.getPosition().lng());
