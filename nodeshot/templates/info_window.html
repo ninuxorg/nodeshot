@@ -1,22 +1,42 @@
 <div id="info-window" class="tabs">
     <ul>
         <li><a href="#tab-info"><span>Info</span></a></li>
+        <li><a href="#tab-dev"><span>Devices</span></a></li>
         <li><a href="#tab-dist"><span>Distanza</span></a></li>
+        
     </ul>
+
     <div id="tab-info">
         <table>
             <tr>
                 <td>Nome:</td><td>{{node.name}}</td>
             </tr>
             <tr>
+                <td>Descrizione:</td><td>{{node.description}}</td>
+            </tr>
+            <tr>
                 <td>Responsabile:</td><td>{{node.owner}} (<a href="">contatta</a>)</td>
             </tr>
 
             <tr>
-                <td>Latitudine:</td><td>{{node.lat}} (<a href="">contatta</a>)</td>
+                <td>Latitudine:</td><td>{{node.lat}}</td>
+            </tr>
+            <tr>
+                <td>Longitudine:</td><td>{{node.lng}}</td>
             </tr>
         </table>
     </div>
+
+    <div id="tab-dev">
+        {% for device in devices %}
+        <table>
+            <tr>
+                <td>Nome:</td><td>{{device.name}}</td>
+            </tr>
+        </table>
+        {% endfor %}
+    </div>
+
     <div id="tab-dist">
         <p>Tab Dist</p>
     </div>
