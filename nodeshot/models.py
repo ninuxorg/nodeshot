@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
 
@@ -123,11 +124,12 @@ class Interface(models.Model):
     ipv4_address = models.CharField(max_length=15, unique=True)
     ipv6_address = models.CharField(max_length=50, blank=True, null=True)
     type = models.CharField(max_length=1, choices=INTERFACE_TYPE)
+    device = models.ForeignKey(Device)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
     wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
     wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
     mac_address = models.CharField(max_length=17, blank=True, null=True)
-    device = models.ForeignKey(Device)
+    
     ssid = models.CharField(max_length=50, null=True, blank=True)
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

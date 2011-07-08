@@ -42,7 +42,11 @@
             <tr>
                 <td>Data di creazione:</td><td>{{device.added}}</td>
             </tr>
-            
+            {% for interface in device.interface_set.all %}
+            <tr>
+                <td>IPv4:</td><td>{{interface.ipv4_address}}</td>
+            </tr>
+            {% endfor %}
         </table>
         {% endfor %}
     </div>
