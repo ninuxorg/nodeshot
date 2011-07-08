@@ -106,8 +106,13 @@ def info_window(request, nodeName):
     n = Node.objects.get(name = nodeName)
     # https://docs.djangoproject.com/en/dev/topics/db/queries/#following-relationships-backward
     d = n.device_set.all()
-    info = {'node' : n, 'devices' : d}
-    return render_to_response('info_window.html', info ,context_instance=RequestContext(request))
+    i=[]
+    for device in d:
+        i.append(device.interface_set.all())
+        
+    # i= Interface.objects.get(device = d)
+    info = {'node' : n, 'devices' : d, 'interfaces' : i}
+    return render_to_response('info_window.html', info, context_instance=RequestContext(request))
 
 def search(request, what):
     data = []
