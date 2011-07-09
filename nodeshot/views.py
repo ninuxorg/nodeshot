@@ -139,24 +139,23 @@ def info(request):
     devices = []
     entry = {}
     for d in Device.objects.all().order_by('node__status'):
-        try:
-            entry['status'] = "on" if d.node.status == 'a' else "off"
-            entry['device_type'] = d.type
-            entry['node_name'] = d.node.name 
-            entry['name'] = d.name 
-            entry['ips'] = [ip['ipv4_address'] for ip in d.interface_set.values('ipv4_address')] if d.interface_set.count() > 0 else ""
-            entry['macs'] = [mac['mac_address'] if mac['mac_address'] != None else '' for mac in d.interface_set.values('mac_address')] if d.interface_set.count() > 0 else ""
-            # heuristic count for good representation of the signal bar (from 0 to 100)
-            entry['signal_bar'] = signal_to_bar(d.max_signal)  if d.max_signal < 0 else 0
-            entry['signal'] = d.max_signal  
-            links = Link.objects.filter(from_interface__device = d) 
-            for l in links:
-                l.signal_bar = signal_to_bar(l.dbm) if l.to_interface.mac_address not in  entry['macs'] else links.remove(l)
-            entry['links'] = links 
-            entry['ssids'] = [ssid['ssid'] for ssid in d.interface_set.values('ssid')] if d.interface_set.count() > 0 else ""
-            entry['nodeid'] = d.node.id
-            devices.append(entry)
-        except:
-            pass
+        entry['status'] = "on" if d.node.status == 'a' else "off"
+        entry['device_type'] = d.type
+        entry['node_name'] = d.node.name 
+        entry['name'] = d.name 
+        entry['ips'] = [ip['ipv4_address'] for ip in d.interface_set.values('ipv4_address')] if d.interface_set.count() > 0 else ""
+        entry['macs'] = [mac['mac_address'] if mac['mac_address'] != None else '' for mac in d.interface_set.values('mac_address')] if d.interface_set.count() > 0 else ""
+        # heuristic count for good representation of the signal bar (from 0 to 100)
+        #entry['signal_bar'] = signal_to_bar(d.max_signal)  if d.max_signal < 0 else 0
+        #entry['signal'] = d.max_signal  
+        links = Link.objects.filter(from_interface__device = d)
+        # convert QuerySet in list
+        links = list(links)
+        for l in links:
+            l.signal_bar = signal_to_bar(l.dbm) if l.to_interface.mac_address not in  entry['macs'] else links.remove(l)
+        entry['links'] = links 
+        entry['ssids'] = [ssid['ssid'] for ssid in d.interface_set.values('ssid')] if d.interface_set.count() > 0 else ""
+        entry['nodeid'] = d.node.id
+        devices.append(entry)
         entry = {}
     return render_to_response('info.html',{'devices': devices} ,context_instance=RequestContext(request))
