@@ -172,7 +172,7 @@ html, body { height: 100% }
 	width: auto;
 	padding:0;
 }
-.dialog-form fieldset { padding:0; border:0; margin-top:25px; }
+.dialog-form fieldset { padding:0; border:0; margin-top:25px }
 .dialog-form .form-tips {font-size: 13px;}
 
 .dialog-form h1 { text-align: center; font-size: 1.2em; margin: .6em 0; }
