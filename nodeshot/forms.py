@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, HttpRequest
+from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpRequest
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
 from django.core.context_processors import csrf
@@ -11,6 +11,8 @@ from django.forms.models import inlineformset_factory
 from django.utils import simplejson
 from django.db import models
 from django import forms
+from settings import DEBUG
+from django.core.urlresolvers import reverse
 
 def node_form(request):
     # add css classes
@@ -35,16 +37,27 @@ def node_form(request):
             if form.is_valid():
                 # save
                 node = form.save()
-                # return a blank page with node id
-                return HttpResponse(node.id)
+                # if request is sent with ajax
+                if request.is_ajax():
+                    # return a blank page with node id
+                    return HttpResponse(node.id)
+                # otherwise if request is sent normally and DEBUG is true
+                elif DEBUG:
+                    # redirect to device form
+                    return HttpResponseRedirect(reverse('nodeshot_device_form', args=[node.id]))
+                # if in production return 404 as this should not happen
+                else:
+                    raise Http404
         # if changes to an existing node have been submitted
         else:
             # get object or return a 404
             node = get_object_or_404(Node, pk=node_id)
             # init the modelform object with the changes submitted
             form = NodeForm(request.POST, instance=node)
-            # save changes
-            form.save()
+            # if form is valid
+            if form.is_valid():
+                # save
+                form.save()
             
     # if form hasn't been submitted and we are going to edit an existing node
     elif request.method != 'POST' and node_id != None:
@@ -56,13 +69,20 @@ def node_form(request):
     else:
         # blank form
         form = NodeForm()
-
-    return render_to_response('node_form.html', { 'form' : form }, context_instance=RequestContext(request))
-
-def device_form(request):
-    # retrieve node ID
-    node_id = request.GET.get('node_id', None)
     
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/node_form.html';
+    else:
+        # alternative mode available just for testing
+        if DEBUG:
+            template = 'node_form.html';
+        else:
+            raise Http404
+
+    return render_to_response(template, { 'form' : form }, context_instance=RequestContext(request))
+
+def device_form(request, node_id):    
     # get object or return a 404
     node = get_object_or_404(Node, pk=node_id)
     
@@ -91,7 +111,7 @@ def device_form(request):
     # else if form hasn't been submitted yet
     else:
         # set response with an empty form
-        response = render_to_response("device_form.html", { "formset": formset }, context_instance=RequestContext(request))
+        response = render_to_response("device_form.html", { "formset": formset, 'node_id': node_id }, context_instance=RequestContext(request))
     
     # return the response we've got in one of the previous cases
     return response

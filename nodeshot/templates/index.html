@@ -61,6 +61,10 @@
                
             </section>
         </div>
+        
+    <!--<div id="nodeshot-overlay" style="">
+    </div>-->
+        
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-ui.js"></script>
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
@@ -75,6 +79,7 @@
                 initialize();
         });
         
+        // calculate dimensions of html elements in pixel
         setDimensions = function(){
             $("#content").width($(window).width()-295);
             $("#aside").width('295');
@@ -82,6 +87,7 @@
             $("#map_canvas").height($(window).height()-$("#header").height());
         }
         
+        // when content has been loaded
         $(window).load(function(){
             setDimensions();
             $("#content").css({
@@ -94,7 +100,17 @@
                 top: $("#header").height(),
                 right: 0
             });
-        }).resize(setDimensions);
+            
+            // preload ajax-loader.gif
+            $('body').append('<img src="'+__project_home__+'media/images/ajax-loader.gif" alt="" id="nodeshot-ajaxloader" />');
+            //nodeshotMask();
+            
+        // update dimensions on resize
+        }).resize(function(){
+            setDimensions();
+            // hide orizontal scrollbar
+            $("body").css("overflow-x", "hidden");
+        });
          
     </script>
     

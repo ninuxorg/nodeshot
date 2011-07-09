@@ -2,36 +2,45 @@
  */
 
 function insertNodeInfo(){
+    nodeshotMask();
+    nodeshotShowLoading();
     $.get(__project_home__+'node_form', function(data) {
-        $('#content').html(data);
+        nodeshotHideLoading();
+        $('body').append('<div id="nodeshot-overlay"></div>');
+        $('#nodeshot-overlay').html(data);
+        setDimensions();
         if (newMarker) {
             $("#id_lat").val(newMarker.getPosition().lat());
             $("#id_lng").val(newMarker.getPosition().lng());
+            removeNewMarker();
         }
+        $('#node-form-cancel').click(function(){
+            nodeshotRemoveMask();
+            $('#nodeshot-overlay').remove();
+            $('#addnode').button('option', 'label', 'Aggiungi un nuovo nodo');
+            if (clickListenerHandle) {
+                 google.maps.event.removeListener(clickListenerHandle);
+                 clickListenerHandle = null;
+            }
+        });
     });
 }
-
-var new_node_id = '';
 
 $("#node-form").live("submit", function() { 
     var form_data = $(this).serialize();
 
     $.post(__project_home__+'node_form', form_data, function(data) {
-        if (data.length >= 5) {
-            $('#content').html(data); //form errors
+        if (data.length >= 10) {
+            $('#nodeshot-overlay').html(data); //form errors
         } else {
-            new_node_id = data;
-            $.get(__project_home__+'device_form?node_id=' + data,  function(data) {
-                $('#content').html(data); //all fine, go to device form    
+            $.get(__project_home__+'device_form/'+data+'/',  function(data) {
+                $('#nodeshot-overlay').html(data); //all fine, go to device form    
             }); 
         }
     });
 
     return false; 
 });
-
-
-
 
 var conf_html_data = [];
 
@@ -49,11 +58,11 @@ function is_last(conf_html_data) {
 }
 
 function append_configuration(conf_html_data) {
-    var c = $('#content'); 
+    var c = $('#nodeshot-overlay'); 
   for(var index in conf_html_data) {
       c.append("<div class='if-configuration'>" + conf_html_data[index].hnav4 + conf_html_data[index].interfaces + "</div>");
     }
-    $('#content').append('<input type="submit" id="configuration-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />');
+    $('#nodeshot-overlay').append('<input type="submit" id="configuration-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />');
     $('#configuration-form-submit').button();
 
 
@@ -62,12 +71,14 @@ function append_configuration(conf_html_data) {
 
 $("#device-form").live("submit", function() { 
         var form_data = $(this).serialize();
-        $.post(__project_home__+'device_form?node_id=' + new_node_id, form_data, function(data) {
+        var node_id = $('#node_id').val()
+        
+        $.post(__project_home__+'device_form/'+node_id+'/', form_data, function(data) {
             if (data.length >= 10) {
-                $('#content').html(data); //form errors
+                $('#nodeshot-overlay').html(data); //form errors
             } else {
                 var device_ids = data.split(',');
-                $('#content').empty();
+                $('#nodeshot-overlay').empty();
                 
                 $.each( device_ids, function(index, value) {
                     conf_html_data[String(value)] = [];

@@ -89,7 +89,7 @@ html, body { height: 100% }
     margin: 0;
 }
 
-#content h2 { margin: 0; }
+#content h2, #overlay h2 { margin: 0; }
 
 #aside
 {
@@ -98,6 +98,7 @@ html, body { height: 100% }
     padding: 0;
     margin: 0;
     color: #000;
+    line-height:24px;
 }
 
 #aside .wrapper{
@@ -142,7 +143,7 @@ html, body { height: 100% }
 
 }
 
-#view-radio{ margin: auto }
+#view-radio{ margin: 0 auto 10px }
 
 #node-tree-container
 {
@@ -156,13 +157,23 @@ html, body { height: 100% }
 /* DLG */
 .dialog-form {
     width: 50%;
-    margin-top: 20px;
-    margin-left: 20px;
+    margin: 20px auto;
+    font-size:15px !important;
 }
+.dialog-form form{ overflow: hidden }
 .dialog-form label, .dialog-form input { display:block; }
-.dialog-form input.text { margin-bottom:12px; width:95%; padding: .4em; }
+.dialog-form .text {
+	margin: 5px 0 12px;
+	width:95%;
+	font: normal 13px "Arial", sans-serif;
+	padding: .4em .7em;
+}
+.dialog-form select.text{
+	width: auto;
+	padding:0;
+}
 .dialog-form fieldset { padding:0; border:0; margin-top:25px; }
-.dialog-form .form-tips {font-size: 0.7em;}
+.dialog-form .form-tips {font-size: 13px;}
 
 .dialog-form h1 { text-align: center; font-size: 1.2em; margin: .6em 0; }
 .dialog-form div#users-contain { width: 350px; margin: 20px 0; }
@@ -175,9 +186,10 @@ html, body { height: 100% }
     display: inline;
 }
 
-.dialog-form .submit-button { margin-top: 50px;  }
-
-.submit-button { margin-top: 20px; margin-left: 20px;  }
+.submit-button, .cancel-button { float: left; margin: 20px 15px 20px 0 }
+.cancel-button{ float: right; margin-left: 30px }
+a.add-row{ margin-left: 1em }
+#device-form-submit{ width: 100px; margin: 30px 1em 1em }
 
 .formset-form-container {
     padding: 1em;
@@ -268,21 +280,24 @@ h3 {
 	margin-bottom: 15px;
 }
 
-#confirm-new a{
+#confirm-new a, .button{
 	float: left;
 	margin-right: 10px;
 	background: #000;
 	color: #fff;
-	padding: 5px 14px;
+	padding: 3px 14px;
 	border-radius:3px;
 	-moz-border-radius:3px;
 	text-decoration: none;
 	font-size: 12px;
 	font-weight: bold;
+	cursor: pointer;
 }
 
-#confirm-new a.green{ background: green }
-#confirm-new a.red{ background: red }
+.button{ margin-top: 10px }
+
+.green{ background: green !important }
+.red{ background: red !important }
 
 #node-form{
 	padding: 0 20px;
@@ -291,3 +306,37 @@ h3 {
 #node-form .fieldWrapper big{
 	font-weight: bold
 }
+
+#nodeshot-modal-mask{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:#000;
+	z-index:10;
+	display:none
+}
+
+#nodeshot-modal{
+	position: absolute;
+	padding: 15px 25px;
+	top:30%;
+	left:30%;
+	width:400px;
+	background:#000;
+	color:#fff;
+	font:normal 13px/25px Arial, sans-serif;
+	border:1px solid #fff;
+	border-radius:3px;
+	-moz-border-radius:3px;
+	z-index:11;
+	display:none
+}
+#nodeshot-ajaxloader{ position: absolute; top: -9999px; z-index: 12 }
+#nodeshot-overlay{
+	position:absolute;top:0;left:0;width:100%;height:100%;z-index:13
+}
+
+#active,#potential{	position:relative; bottom:-1px; margin-right:5px }
+#addnode{ margin-top: 10px }

@@ -85,9 +85,10 @@ function removeNewMarker(){
 function newNodeMarker(location) {
         removeNewMarker();   
         marker = new google.maps.Marker({
-                  position: location,
-                  map: map,
-                  });
+            position: location,
+            map: map,
+            icon: __project_home__+'media/images/marker_new.png'
+        });
         var contentString = '<div id="confirm-new"><h2>Mi hai posizionato bene?</h2>'+
             '<a href="javascript:insertNodeInfo()" class="green">Si</a>'+
             '<a href="javascript:removeNewMarker()" class="red">No</a></div>'
@@ -95,7 +96,7 @@ function newNodeMarker(location) {
         var infowindow = new google.maps.InfoWindow({
             content: contentString
         });
-        map.setCenter(location);
+        //map.setCenter(location);
         infowindow.open(map,marker); 
         newMarkerListenerHandle = google.maps.event.addListener(marker, 'click', function() {
             infowindow.open(map,marker);
@@ -143,13 +144,12 @@ function draw_link(flat, flng, tlat, tlng, quality) {
         path: linkCoordinates,
         strokeColor: qualityColor,
         strokeOpacity: 0.4,
-        strokeWeight: 8 
+        strokeWeight: 5 
     });
     link.setMap(map);
     markersArray.links.push(link);
 
 }
-
 
 function draw_nodes(type) {
     var marray;
@@ -203,8 +203,58 @@ function remove_markers(type) {
         google.maps.event.removeListener(larray[i]);
         marray[i].setMap(null);
     }
+}
 
+var nodeshotModal = function(message){
+    nodeshotMask();
+    $('body').append('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
+    var modal = $('#nodeshot-modal');
+    modal.css({
+        opacity: 0,
+        display: 'block',
+        left: ($(window).width() - modal.width()) / 2,
+        top: ($(window).height() - modal.height()) / 3
+    }).animate({
+        opacity: 1
+    }, 500);
+    
+    $('#nodeshot-modal-close').click(function(){
+        var dialog = $(this).parent();
+        dialog.fadeOut(500, function(){
+            dialog.remove();
+        })
+        nodeshotRemoveMask();
+    });
+}
 
+var nodeshotShowLoading = function(){
+    img = $('#nodeshot-ajaxloader');
+    img.css({
+        left: ($(window).width()-img.width()) / 2,
+        top: ($(window).height()-img.height()) / 2
+    });
+}
+
+var nodeshotHideLoading = function(){
+    $('#nodeshot-ajaxloader').css('top', '-9999px');
+}
+
+var nodeshotMask = function(opacity){
+    if(!opacity){ opacity = 0.5 }
+    $('body').append('<div id="nodeshot-modal-mask"></div>');
+    $('#nodeshot-modal-mask').css({
+        opacity: 0,
+        display: 'block'
+    }).animate({
+        opacity: opacity
+    }, 500);
+}
+
+var nodeshotRemoveMask = function(){
+    var mask = $('#nodeshot-modal-mask');
+    mask.fadeOut(500, function(){
+        mask.remove();
+    });
 }
 
 function initialize() {
@@ -266,26 +316,20 @@ function initialize() {
     });
 
     $('#addnode').click(function() {
-           var me = $('#addnode');
-           if (me.hasClass('insert-mode')) {
-               $('#addhelper').html(''); 
-               $(this).button('option', 'label', 'Aggiungi un nuovo nodo');
-               removeNewMarker();
-               if (clickListenerHandle) {
-                    google.maps.event.removeListener(clickListenerHandle);
-                    clickListenerHandle = null;
-               }
-           } else {
-               $('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
-               $(this).button('option', 'label', 'Annulla inserimento');
-               clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
-                      newNodeMarker(event.latLng);
-               });
-           }
-           me.toggleClass('insert-mode');
+            //var me = $('#addnode');
+            //if (me.hasClass('insert-mode')) {
+                //$('#addhelper').html(''); 
+                
+            //} else {
+                nodeshotModal('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
+                //$('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
+                $(this).button('option', 'label', 'Annulla inserimento');
+                clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
+                       newNodeMarker(event.latLng);
+                });
+            //}
+            //me.toggleClass('insert-mode');
     });
-
-
 
     $( "#view-radio" ).buttonset();
     document.getElementById('radio1').checked=true;

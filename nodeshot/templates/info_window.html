@@ -1,22 +1,56 @@
 <div id="info-window" class="tabs">
     <ul>
         <li><a href="#tab-info"><span>Info</span></a></li>
+        <li><a href="#tab-dev"><span>Devices</span></a></li>
         <li><a href="#tab-dist"><span>Distanza</span></a></li>
+        
     </ul>
+
     <div id="tab-info">
         <table>
             <tr>
                 <td>Nome:</td><td>{{node.name}}</td>
             </tr>
             <tr>
+                <td>Descrizione:</td><td>{{node.description}}</td>
+            </tr>
+            <tr>
                 <td>Responsabile:</td><td>{{node.owner}} (<a href="">contatta</a>)</td>
             </tr>
 
             <tr>
-                <td>Latitudine:</td><td>{{node.lat}} (<a href="">contatta</a>)</td>
+                <td>Latitudine:</td><td>{{node.lat}}</td>
+            </tr>
+            <tr>
+                <td>Longitudine:</td><td>{{node.lng}}</td>
             </tr>
         </table>
     </div>
+
+    <div id="tab-dev">
+        {% for device in devices %}
+        <table>
+            <tr>
+                <td>Nome:</td><td>{{device.name}}</td>
+            </tr>
+            <tr>
+                <td>Modello:</td><td>{{device.type}}</td>
+            </tr>
+            <tr>
+                <td>Protocollo di routing:</td><td>{{device.routing_protocol}}</td>
+            </tr>
+            <tr>
+                <td>Data di creazione:</td><td>{{device.added}}</td>
+            </tr>
+            {% for interface in device.interface_set.all %}
+            <tr>
+                <td>IPv4:</td><td>{{interface.ipv4_address}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endfor %}
+    </div>
+
     <div id="tab-dist">
         <p>Tab Dist</p>
     </div>
