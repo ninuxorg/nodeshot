@@ -87,7 +87,7 @@ def node_list(request):
     active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat') 
     potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat') 
     data = []
-    active_list, potential_list = [] ,[] 
+    active_list, potential_list = [] ,[]
 
     for a in active:
         active_list.append({ 'data' : {'title' : a['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + a['name'] + '\')'} } })
@@ -112,6 +112,8 @@ def info_window(request, nodeName):
         
     # i= Interface.objects.get(device = d)
     info = {'node' : n, 'devices' : devices}
+    
+    
     return render_to_response('info_window.html', info, context_instance=RequestContext(request))
 
 def search(request, what):

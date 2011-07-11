@@ -137,8 +137,10 @@ function draw_link(flat, flng, tlat, tlng, quality) {
         qualityColor =  '#00ff00' //Good
     else if (quality==2) 
         qualityColor =  '#ffff00' //Medium
-    else if (quality==2) 
+    else if (quality==3) 
         qualityColor =  '#ee0000' //Bad
+    else if (quality==4) 
+        qualityColor =  '#000000' //used for tested link
 
     var link = new google.maps.Polyline({
         path: linkCoordinates,
@@ -446,6 +448,20 @@ function initialize() {
             }
         }
     });
+
+
+/*
+    var nodelist = $.map(nodes.active function(n) { return n.name } );
+    
+    $('.distance-nodeto').live('keyup.autocomplete', function(){
+        $(this).autocomplete({
+            source : nodelist
+        });
+    });
+*/
+
+
+
 
 };
 

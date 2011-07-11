@@ -129,7 +129,6 @@ class Interface(models.Model):
     wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
     wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
     mac_address = models.CharField(max_length=17, blank=True, null=True)
-    
     ssid = models.CharField(max_length=50, null=True, blank=True)
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
