@@ -238,7 +238,7 @@ var nodeshotShowLoading = function(){
 }
 
 var nodeshotHideLoading = function(){
-    $('#nodeshot-ajaxloader').css('top', '-9999');
+    $('#nodeshot-ajaxloader').css('top', '-9999px');
 }
 
 var nodeshotMask = function(opacity){
@@ -318,24 +318,19 @@ function initialize() {
     });
 
     $('#addnode').click(function() {
-            var me = $('#addnode');
-            if (me.hasClass('insert-mode')) {
+            //var me = $('#addnode');
+            //if (me.hasClass('insert-mode')) {
                 //$('#addhelper').html(''); 
-                $(this).button('option', 'label', 'Aggiungi un nuovo nodo');
-                removeNewMarker();
-                if (clickListenerHandle) {
-                     google.maps.event.removeListener(clickListenerHandle);
-                     clickListenerHandle = null;
-                }
-            } else {
+                
+            //} else {
                 nodeshotModal('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
                 //$('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
                 $(this).button('option', 'label', 'Annulla inserimento');
                 clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
                        newNodeMarker(event.latLng);
                 });
-            }
-            me.toggleClass('insert-mode');
+            //}
+            //me.toggleClass('insert-mode');
     });
 
     $( "#view-radio" ).buttonset();

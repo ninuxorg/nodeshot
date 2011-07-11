@@ -4,7 +4,7 @@ from nodeshot.models import *
 class NodeAdmin(admin.ModelAdmin):
     list_display  = ('name', 'owner', 'status', 'added', 'updated')
     list_filter   = ('status', 'added', 'updated')
-    search_fields = ('name', 'owner', 'email', 'cap')
+    search_fields = ('name', 'owner', 'email', 'postal_code')
     save_on_top = True
 admin.site.register(Node, NodeAdmin)
 

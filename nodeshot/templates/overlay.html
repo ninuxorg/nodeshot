@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <title>{% block title %}Nodeshot overlay{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />
+        <link type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" rel="stylesheet" />
+        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-ui.js"></script>
+        <script type="text/javascript" src="{{MEDIA_URL}}js/addnode.js"></script>
+    </head>
+    <body>
+        
+    <div id="nodeshot-modal-mask" style="display:block;opacity:0.5"></div>
+    <div id="nodeshot-overlay">
+        {% block content %}{% endblock %}
+    </div>
+    </body>
+</html>
