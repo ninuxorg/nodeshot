@@ -62,6 +62,9 @@ else:
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = '%smedia/' % PROJECT_URL
 
+# for django 1.4
+STATIC_URL = MEDIA_URL
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".

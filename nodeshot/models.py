@@ -86,31 +86,37 @@ WIRELESS_CHANNEL = (
 )
 
 class Node(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    owner = models.CharField(max_length=50, blank=True, null=True)
-    description = models.CharField(max_length=200, blank=True, null=True)
-    postal_code = models.CharField(max_length=10)
+    name = models.CharField('nome', max_length=50, unique=True)
+    owner = models.CharField('proprietario', max_length=50, blank=True, null=True)
+    description = models.CharField('descrizione', max_length=200, blank=True, null=True)
+    postal_code = models.CharField('CAP', max_length=10)
     email = models.EmailField()
     email2 = models.EmailField(blank=True, null=True)
     email3 = models.EmailField(blank=True, null=True)
     password =  models.CharField(max_length=20)
-    lat = models.FloatField()
-    lng = models.FloatField() 
-    alt = models.FloatField(blank=True, null=True)
-    status= models.CharField(max_length=1, choices=NODE_STATUS, default='p')
-    added = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    lat = models.FloatField('latitudine')
+    lng = models.FloatField('longitudine') 
+    alt = models.FloatField('altitudine', blank=True, null=True)
+    status= models.CharField('stato', max_length=1, choices=NODE_STATUS, default='p')
+    added = models.DateTimeField('aggiunto il', auto_now_add=True)
+    updated = models.DateTimeField('aggiornato il', auto_now=True)
+    
     def __unicode__(self):
         return u'%s' % (self.name)
+        
+    class Meta:
+        verbose_name = 'nodo'
+        verbose_name_plural = 'nodi'
 
 class Device(models.Model):
-    name = models.CharField(max_length=50)
-    type = models.CharField(max_length=50, blank=True, null=True ) 
-    node = models.ForeignKey(Node)
-    routing_protocol = models.CharField(max_length=20, choices=ROUTING_PROTOCOLS, default=DEFAULT_ROUTING_PROTOCOL)
-    routing_protocol_version = models.CharField(max_length=10, blank=True, null=True)
-    added = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    name = models.CharField('nome', max_length=50)
+    type = models.CharField('tipo', max_length=50, blank=True, null=True ) 
+    node = models.ForeignKey(Node, verbose_name='nodo')
+    routing_protocol = models.CharField('protocollo di routing', max_length=20, choices=ROUTING_PROTOCOLS, default=DEFAULT_ROUTING_PROTOCOL)
+    routing_protocol_version = models.CharField('versione protocollo di routing', max_length=10, blank=True, null=True)
+    added = models.DateTimeField('aggiunto il', auto_now_add=True)
+    updated = models.DateTimeField('aggiornato il', auto_now=True)
+    
     def __unicode__(self):
         return u'%s (%s)' % (self.type, self.node.name )
 

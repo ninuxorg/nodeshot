@@ -158,11 +158,22 @@ html, body { height: 100% }
 .dialog-form {
     width: 50%;
     margin: 20px auto;
+    font-size:15px !important;
 }
+.dialog-form form{ overflow: hidden }
 .dialog-form label, .dialog-form input { display:block; }
-.dialog-form input.text { margin-bottom:12px; width:95%; padding: .4em; }
-.dialog-form fieldset { padding:0; border:0; margin-top:25px; }
-.dialog-form .form-tips {font-size: 0.7em;}
+.dialog-form .text {
+	margin: 5px 0 12px;
+	width:95%;
+	font: normal 13px "Arial", sans-serif;
+	padding: .4em .7em;
+}
+.dialog-form select.text{
+	width: auto;
+	padding:0;
+}
+.dialog-form fieldset { padding:0; border:0; margin-top:25px }
+.dialog-form .form-tips {font-size: 13px;}
 
 .dialog-form h1 { text-align: center; font-size: 1.2em; margin: .6em 0; }
 .dialog-form div#users-contain { width: 350px; margin: 20px 0; }
@@ -175,9 +186,10 @@ html, body { height: 100% }
     display: inline;
 }
 
-.dialog-form .submit-button { margin-top: 50px;  }
-
-.submit-button { margin-top: 20px; margin-left: 20px;  }
+.submit-button, .cancel-button { float: left; margin: 20px 15px 20px 0 }
+.cancel-button{ float: right; margin-left: 30px }
+a.add-row{ margin-left: 1em }
+#device-form-submit{ width: 100px; margin: 30px 1em 1em }
 
 .formset-form-container {
     padding: 1em;
