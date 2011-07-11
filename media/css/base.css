@@ -242,6 +242,14 @@ h3 {
 }
 
 
+#info-window {
+     height: 600px;
+     width: 400px;
+     
+
+}
+
+
 #node-info-box {
     display: none; 
     background-color: #FFFFFF;
