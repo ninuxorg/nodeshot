@@ -50,6 +50,11 @@
                             <input id="search-address" class="defaultText text ui-corner-all" title="Cerca un indirizzo"  /> 
                             <input type="checkbox" id="active" checked="yes" /><label for="active">Visualizza nodi attivi</label><br />
                             <input type="checkbox" id="potential" checked="yes" /><label for="potential">Visualizza nodi potenziali</label>
+                            <menu id="link-quality-selector">
+                                    Qualita' links:
+                                    <input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /><label for="etx">ETX</label>
+                                    <input type="radio" id="dbm" name="link-quality-selector" value="dbm" /><label for="dbm">DBm</label>
+                            </menu>
                             <h3>Lista dei nodi</h3>
                              <div id="node-tree-container" class="widget-content text ui-corner-all">
                                 <div id="node-tree"></div>

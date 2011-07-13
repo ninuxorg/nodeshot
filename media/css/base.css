@@ -348,3 +348,5 @@ h3 {
 
 #active,#potential{	position:relative; bottom:-1px; margin-right:5px }
 #addnode{ margin-top: 10px }
+
+#link-quality-selector {display: block; }
