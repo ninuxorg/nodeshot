@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 from datetime import timedelta
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django import forms
@@ -15,6 +15,7 @@ from django.core.exceptions import *
 from django.db.models import Q
 from utils import *
 import time,re,os
+from settings import DEBUG
 #from forms import *
 
 def index(request):
@@ -168,4 +169,16 @@ def info(request):
         entry['nodeid'] = d.node.id
         devices.append(entry)
         entry = {}
+    
+    # if request is sent with ajax
+    if request.is_ajax():
+        # just load the fragment
+        template = 'ajax/info.html'
+    # otherwise if request is sent normally and DEBUG is true
+    elif DEBUG:
+        # debuggin template
+        template = 'info.html'
+    else:
+        raise Http404
+    
     return render_to_response('info.html',{'devices': devices} ,context_instance=RequestContext(request))
