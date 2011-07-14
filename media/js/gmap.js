@@ -185,7 +185,10 @@ function draw_nodes(type) {
     // draw links if type is active
     if (type == 'a') {
         for (var i = 0; i < nodes.links.length; i++) {
-            draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].quality);
+            if ($("input[name='link-quality-selector']:checked").val() == 'etx')
+                draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].etx);
+            else
+                draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].dbm);
         }
     }
 }
@@ -369,13 +372,8 @@ function initialize() {
 
     /* visualize ETX values or dbm values */
     $("input[name='link-quality-selector']").change(function(){
-        var choice = $("input[name='link-quality-selector']:checked").val();
-        if (choice == 'etx') {
-            alert('etx');
-        }
-        else if (choice == 'dbm') {
-            alert('dbm');
-        }
+             remove_markers('a'); 
+             draw_nodes('a'); 
     });
 
     /* dynamically load map,info,olsr and vpn when the radio button is pressed */

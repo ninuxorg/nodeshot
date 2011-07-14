@@ -38,7 +38,15 @@ def nodes(request):
            etx = 2
        else:
            etx = 3
-       entry = {'from_lng': l.from_interface.device.node.lng , 'from_lat': l.from_interface.device.node.lat, 'to_lng': l.to_interface.device.node.lng, 'to_lat': l.to_interface.device.node.lat, 'quality': etx}
+
+       if -60 < l.dbm < 0:
+            dbm = 1
+       elif l.dbm > -75:
+            dbm = 2
+       else:
+            dbm = 3
+
+       entry = {'from_lng': l.from_interface.device.node.lng , 'from_lat': l.from_interface.device.node.lat, 'to_lng': l.to_interface.device.node.lng, 'to_lat': l.to_interface.device.node.lat, 'etx': etx , 'dbm': dbm }
        links.append(entry)
    data = {'active': list(active), 'potential': list(potential) , 'links': links} 
    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
