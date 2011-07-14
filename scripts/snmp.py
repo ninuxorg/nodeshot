@@ -183,8 +183,6 @@ def main():
     for i in Interface.objects.all():
         interface_list.append(i)
 
-    for d in Device.objects.all():
-        d.max_signal = 0
 
     for i in range(0, MAX_THREAD_N):
             SNMPBugger(i, ).start()

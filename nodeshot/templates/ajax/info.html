@@ -1,0 +1,41 @@
+<div id="info-wrapper">
+    <div id="table-wrapper" class="ui-corner-all">
+        <table id="myTable" class="tablesorter"> 
+        <thead> 
+            <tr> 
+                <th style="width: 10%">Status</th> 
+                <th style="width: 15%">Nome Device (Nodo)</th> 
+                <th style="width: 10%">SSID</th> 
+                <th style="width: 10%">Apparato</th> 
+                <th style="width: 10%">IP</th> 
+                <th style="width: 10%">MAC</th> 
+                <th style="width: 35%">Segnale</th> 
+            </tr> 
+        </thead> 
+        <tbody> 
+            {% for device in devices %}
+            <tr> 
+                <td><a name="{{device.nodeid}}"></a><div class="status-{{ device.status }}"></div><span style="display: none">{{ device.status }}</span></td> 
+                <td>{{ device.name }} ({{ device.node_name }}) </td> 
+                <td>{% for ssid in device.ssids %}{{ ssid }}<br />{% endfor %}</td> 
+                <td>{{ device.device_type }}</td> 
+                <td>{% for ip in device.ips %} <a href="javascript:load_rrd('{{ip}}')">{{ip}}</a> <br /> {% endfor %}</td> 
+                <td>{% for mac in device.macs %}{{ mac }}<br />{% endfor %}</td> 
+                <td>{%for signal in device.links %}<div class="signalbar" id="pb_{{device.id}}_{{signal.id}}"></div> {{signal.dbm}} dBm -> <a href="#{{signal.to_interface.device.node.id}}">{{signal.to_interface.device.node.name}}</a> <br/> {% endfor %}</td>
+            </tr> 
+            {%for signal in device.links %}
+            <script>                                                                                                                                                                           
+                $("#pb_{{device.id}}_{{signal.id}}").progressBar({{ signal.signal_bar }} ); 
+            </script> 
+            {% endfor %}
+
+            {% endfor %}
+        </tbody> 
+        </table> 
+    </div>
+
+    <div id="node-info-box" class="ui-corner-all" title="RRD Traffico uscente ed entrante">
+        <div id="rrd-graph"></div>
+    </div>
+</div>
+

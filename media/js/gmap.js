@@ -185,7 +185,10 @@ function draw_nodes(type) {
     // draw links if type is active
     if (type == 'a') {
         for (var i = 0; i < nodes.links.length; i++) {
-            draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].quality);
+            if ($("input[name='link-quality-selector']:checked").val() == 'etx')
+                draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].etx);
+            else
+                draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].dbm);
         }
     }
 }
@@ -334,11 +337,15 @@ function initialize() {
     });
 
     $( "#view-radio" ).buttonset();
+    $( "#link-quality-selector" ).buttonset();
+    document.getElementById('etx').checked=true;
+    document.getElementById('dbm').checked=false;
     document.getElementById('radio1').checked=true;
     document.getElementById('radio2').checked=false;
     document.getElementById('radio3').checked=false;
     document.getElementById('radio4').checked=false;
     $("#view-radio").buttonset("refresh");
+    $("#link-quality-selector").buttonset("refresh");
 
 
     /* Type an address and go to that address on the map */
@@ -363,7 +370,11 @@ function initialize() {
         }
     });
 
-
+    /* visualize ETX values or dbm values */
+    $("input[name='link-quality-selector']").change(function(){
+             remove_markers('a'); 
+             draw_nodes('a'); 
+    });
 
     /* dynamically load map,info,olsr and vpn when the radio button is pressed */
     $("input[name='view-radio']").change(function(){
