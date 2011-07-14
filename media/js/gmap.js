@@ -370,6 +370,17 @@ function initialize() {
         }
     });
 
+    $('select.distance-nodeto').live('change',function(){
+        var latlng = $(this).val();
+        //alert(latlng);
+        var latlng_array = latlng.split(';');       
+        var slat = $('td.selected-node-lat').text().replace(",",".");
+        var slng = $('td.selected-node-lng').text().replace(",",".");
+        
+        draw_link(parseFloat(slat), parseFloat(slng), parseFloat(((latlng_array[0]).replace(",","."))), parseFloat(((latlng_array[1]).replace(",","."))), 4);
+        
+    });
+    
     /* visualize ETX values or dbm values */
     $("input[name='link-quality-selector']").change(function(){
              remove_markers('a'); 

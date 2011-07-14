@@ -5,7 +5,8 @@ from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_D
 NODE_STATUS = (
     ('a', 'active'),
     ('p', 'potential'),
-    ('d', 'down')
+    ('h', 'hotspot'),
+    ('o', 'offline')
 )
 
 INTERFACE_TYPE = (

@@ -120,7 +120,7 @@ def info_window(request, nodeName):
     #    interfaces.append(device.interface_set.all())
         
     # i= Interface.objects.get(device = d)
-    info = {'node' : n, 'devices' : devices}
+    info = {'node' : n, 'devices' : devices, 'nodes' : Node.objects.all().order_by('name')}
     
     
     return render_to_response('info_window.html', info, context_instance=RequestContext(request))

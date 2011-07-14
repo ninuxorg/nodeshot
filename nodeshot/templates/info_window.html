@@ -19,10 +19,10 @@
             </tr>
 
             <tr>
-                <td>Latitudine:</td><td>{{node.lat}}</td>
+                <td>Latitudine:</td><td class="selected-node-lat">{{node.lat}}</td>
             </tr>
             <tr>
-                <td>Longitudine:</td><td>{{node.lng}}</td>
+                <td>Longitudine:</td><td class="selected-node-lng">{{node.lng}}</td>
             </tr>
         </table>
     </div>
@@ -58,13 +58,40 @@
                 
         <DIV class="demo">
 
-        <DIV class="ui-widget">
-                <LABEL for="distance-nodeto">Distanza nodeTO: </LABEL>
-                <INPUT class="distance-nodeto">
-        </DIV>
+            <DIV class="ui-widget">
+                    <LABEL for="distance-nodeto">Distanza nodeTO: </LABEL>
+                    <select class="distance-nodeto">
+                        <option>Selezionare un nodo</option>
+                        <option> ----------------- </option>
+                        <optgroup label="Nodi Attivi">
+                            {% for node in nodes %}
+                                {% if node.status == 'a' %}<option value="{{node.lat}};{{node.lng}}">{{node.name}}</option>{% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Hotspot">
+                            {% for node in nodes %}
+                                {% if node.status == 'h' %}<option value="{{node.lat}};{{node.lng}}">{{node.name}}</option>{% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        
+                        <optgroup label="Nodi Potenziali">
+                            {% for node in nodes %}
+                                {% if node.status == 'p' %}<option value="{{node.lat}};{{node.lng}}">{{node.name}}</option>{% endif %}
+                            {% endfor %}
+                        </optgroup>
+                                                
+                        <optgroup label="Nodi Offline">
+                            {% for node in nodes %}
+                                {% if node.status == 'o' %}<option value="{{node.lat}};{{node.lng}}">{{node.name}}</option>{% endif %}
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+
+            </DIV>
 
         </DIV>
-    <p></p>
+   
     </div>
 
  </div>
