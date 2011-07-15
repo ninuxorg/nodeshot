@@ -6,6 +6,7 @@ var newMarker;
 var newMarkerListenerHandle;
 var clickListenerHandle;
 var infoWindow = new google.maps.InfoWindow;
+var distanceL;
 
 function getget(name) {
   var q = document.location.search;
@@ -125,6 +126,23 @@ function handleMarkerClick(marker, name) {
             } );
   };
 } 
+
+function calc_distance(lat1, lon1, lat2, lon2, unit) {
+    var radlat1 = Math.PI * lat1/180;
+    var radlat2 = Math.PI * lat2/180;
+    var radlon1 = Math.PI * lon1/180;
+    var radlon2 = Math.PI * lon2/180;
+    var theta = lon1-lon2;
+    var radtheta = Math.PI * theta/180;
+    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    dist = Math.acos(dist);
+    dist = dist * 180/Math.PI;
+    dist = dist * 60 * 1.1515;
+    if (unit=="K") { dist = dist * 1.609344 };
+    if (unit=="N") { dist = dist * 0.8684 };
+    return dist;
+    
+}
 
 function draw_link(flat, flng, tlat, tlng, quality) {
 
@@ -370,15 +388,21 @@ function initialize() {
         }
     });
 
+    /* -------------------------- */
+    /* visualize tested-link made */
     $('select.distance-nodeto').live('change',function(){
         var latlng = $(this).val();
         //alert(latlng);
         var latlng_array = latlng.split(';');       
         var slat = $('td.selected-node-lat').text().replace(",",".");
         var slng = $('td.selected-node-lng').text().replace(",",".");
-        
-        draw_link(parseFloat(slat), parseFloat(slng), parseFloat(((latlng_array[0]).replace(",","."))), parseFloat(((latlng_array[1]).replace(",","."))), 4);
-        
+        var flat = parseFloat(slat);
+        var flng = parseFloat(slng);
+        var tlat = parseFloat(((latlng_array[0]).replace(",",".")));
+        var tlng = parseFloat(((latlng_array[1]).replace(",",".")));
+        draw_link(flat, flng, tlat, tlng, 4);
+        distanceL = calc_distance(flat, flng, tlat, tlng, "K");
+        $('#distance').html(distanceL);
     });
     
     /* visualize ETX values or dbm values */
@@ -465,17 +489,6 @@ function initialize() {
             }
         }
     });
-
-
-/*
-    var nodelist = $.map(nodes.active function(n) { return n.name } );
-    
-    $('.distance-nodeto').live('keyup.autocomplete', function(){
-        $(this).autocomplete({
-            source : nodelist
-        });
-    });
-*/
 
 
 
