@@ -26,7 +26,6 @@ def index(request):
     km = '%0.3f' % km
     return render_to_response('index.html', {'max_radios': max_radios , 'active_n': Node.objects.filter(status = 'a').count() , 'potential_n': Node.objects.filter(status = 'p').count() , 'links_n': Link.objects.count(), 'km_n': km },context_instance=RequestContext(request))
 
-
 def nodes(request):
    active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat') 
    potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat')
@@ -186,3 +185,6 @@ def info(request):
         raise Http404
     
     return render_to_response('info.html',{'devices': devices} ,context_instance=RequestContext(request))
+    
+def confirm_node(request, activation_key):
+    return HttpResponse('TODO')

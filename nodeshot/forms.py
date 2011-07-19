@@ -35,8 +35,11 @@ def node_form(request):
             form = NodeForm(request.POST)
             # if form is valid
             if form.is_valid():
-                # save
-                node = form.save()
+                # prepare the node model object but don't save in the database yet
+                node = form.save(commit=False)
+                # save new node in the database (password encryption, activation_key and email notification is done in models.py)
+                node.save()
+                
                 # if request is sent with ajax
                 if request.is_ajax():
                     # return a blank page with node id

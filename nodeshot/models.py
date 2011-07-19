@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+import random
+from django.contrib.auth.utils import make_password
+from django.utils.hashcompat import sha_constructor
+from django.core.mail import send_mail
+from django.core.exceptions import ImproperlyConfigured
+from django.template.loader import render_to_string
+
 try:
     from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
-except:
+except ImportError:
     ROUTING_PROTOCOLS = (
         ('aodv','AODV'),
         ('batman','B.A.T.M.A.N.'),
@@ -18,11 +25,27 @@ except:
     )
     DEFAULT_ROUTING_PROTOCOL = 'olsr'
 
+try:
+    from settings import NODESHOT_ACTIVATION_DAYS as ACTIVATION_DAYS
+except ImportError:
+    ACTIVATION_DAYS = 7
+    
+try:
+    from settings import DEFAULT_FROM_EMAIL
+except ImportError:
+    raise ImproperlyConfigured('DEFAULT_FROM_EMAIL is not defined in your settings.py. See settings.example.py for reference.')
+    
+try:
+    from settings import SITE_URL, SITE_NAME
+except ImportError:
+    raise ImproperlyConfigured('SITE_URL and/or SITE_NAME are not defined in your settings.py. See settings.example.py for reference.')
+
 NODE_STATUS = (
     ('a', 'active'),
     ('p', 'potential'),
     ('h', 'hotspot'),
-    ('o', 'offline')
+    ('o', 'offline'),
+    ('u', 'unconfirmed') # nodes that have not been confirmed via email yet
 )
 
 INTERFACE_TYPE = (
@@ -110,16 +133,59 @@ class Node(models.Model):
     email = models.EmailField()
     email2 = models.EmailField(blank=True, null=True)
     email3 = models.EmailField(blank=True, null=True)
-    password =  models.CharField(max_length=20)
+    password =  models.CharField(max_length=255)
     lat = models.FloatField('latitudine')
     lng = models.FloatField('longitudine') 
     alt = models.FloatField('altitudine', blank=True, null=True)
-    status= models.CharField('stato', max_length=1, choices=NODE_STATUS, default='p')
+    status = models.CharField('stato', max_length=1, choices=NODE_STATUS, default='p')
+    activation_key = models.CharField('activation key', max_length=40, blank=True, null=True)
     added = models.DateTimeField('aggiunto il', auto_now_add=True)
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
+    def set_password(self, raw_password):
+        ''' Set the password like django does, raw password is the unencrypted password '''
+        self.password = make_password('sha1', raw_password)
+        return self.password
+    
+    def set_activation_key(self):
+        ''' Set the activation key, generate it from a combinatin of the ''Node''s name and a random salt '''
+        salt = sha_constructor(str(random.random())).hexdigest()[:5]
+        self.activation_key = sha_constructor(salt+self.name).hexdigest()
+        return self.activation_key
+    
+    def send_activation_mail(self, raw_password):
+        ''' send activation link to owners '''
+        context = {
+            'node': self,
+            'password': raw_password,
+            'expiration_days': ACTIVATION_DAYS,
+            'site': {'name': SITE_NAME, 'url': SITE_URL}
+        }
+        subject = render_to_string('activation_email/subject.txt',context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        
+        message = render_to_string('activation_email/email.txt',context)
+        
+        recipient_list = [self.email]
+        if self.email2 != '' and self.email2 != None:
+            recipient_list += [self.email2]
+        if self.email3 != '' and self.email3 != None:
+            recipient_list += [self.email3]
+        
+        send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+    
     def __unicode__(self):
         return u'%s' % (self.name)
+        
+    def save(self):
+        ''' Override the save method in order to encrypt the password and to generate the activation key '''
+        if self.pk is None:
+            raw_password = self.password
+            self.set_password(raw_password)
+            self.set_activation_key()
+            self.send_activation_mail(raw_password)
+        super(Node, self).save()
         
     class Meta:
         verbose_name = 'nodo'

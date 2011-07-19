@@ -57,6 +57,15 @@
                 {{ form.email }}
             </div>
             <div class="fieldWrapper">
+                <label for="id_password">Password per modificare questa configurazione: <big>*</big></label>
+                {% if form.password.errors %}
+                    <div class="ui-state-error">
+                        {{ form.password.errors }}
+                    </div>
+                {% endif %}
+                <input id="id_password" type="password" class="text ui-widget-content ui-corner-all" name="password" maxlength="20" />
+            </div>
+            <div class="fieldWrapper">
                 <label for="id_email2">Indirizzo E-Mail 2:</label>
                 {% if form.email2.errors %}
                     <div class="ui-state-error">
@@ -73,15 +82,6 @@
                     </div>
                 {% endif %}
                 {{ form.email3 }}
-            </div>
-            <div class="fieldWrapper">
-                <label for="id_password">Password per modificare questa configurazione: <big>*</big></label>
-                {% if form.password.errors %}
-                    <div class="ui-state-error">
-                        {{ form.password.errors }}
-                    </div>
-                {% endif %}
-                {{ form.password }}
             </div>
             <div class="fieldWrapper">
                 <label for="id_lng">Logitudine: <big>*</big></label>
@@ -110,7 +110,7 @@
                 {% endif %}
                 {{ form.alt}}
             </div>
-            <input type="hidden" name="status" value="p" /> 
+            <input type="hidden" name="status" value="u" /> 
             <p style="overflow:hidden">
                 <input id="node-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Salva Nodo" />
                 <input id="node-form-cancel" class="cancel-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="button" value="Annulla" />

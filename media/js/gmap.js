@@ -269,7 +269,7 @@ function remove_markers(type) {
     }
 }
 
-var nodeshotModal = function(message){
+var nodeshotModal = function(message, callback){
     nodeshotMask();
     $('body').append('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
     var modal = $('#nodeshot-modal');
@@ -288,6 +288,9 @@ var nodeshotModal = function(message){
             dialog.remove();
         })
         nodeshotRemoveMask();
+        if(callback){
+            callback();
+        }
     });
 }
 
@@ -304,6 +307,9 @@ var nodeshotHideLoading = function(){
 }
 
 var nodeshotMask = function(opacity){
+    if(document.getElementById("nodeshot-modal-mask") != null){
+        return false;
+    }
     if(!opacity){ opacity = 0.5 }
     $('body').append('<div id="nodeshot-modal-mask"></div>');
     $('#nodeshot-modal-mask').css({
@@ -316,9 +322,22 @@ var nodeshotMask = function(opacity){
 
 var nodeshotRemoveMask = function(){
     var mask = $('#nodeshot-modal-mask');
+    if(mask.length < 1){
+        return false;
+    }
     mask.fadeOut(500, function(){
         mask.remove();
     });
+}
+
+var nodeshotCloseForm = function(){
+    nodeshotRemoveMask();
+    $('#nodeshot-overlay').remove();
+    $('#addnode').button('option', 'label', 'Aggiungi un nuovo nodo');
+    if (clickListenerHandle) {
+        google.maps.event.removeListener(clickListenerHandle);
+        clickListenerHandle = null;
+    }
 }
 
 
@@ -395,7 +414,7 @@ function initialize() {
     $('#addnode').click(function() {
         nodeshotModal('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
         //$('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
-        $(this).button('option', 'label', 'Annulla inserimento');
+        //$(this).button('option', 'label', 'Annulla inserimento');
         clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
                newNodeMarker(event.latLng);
         });

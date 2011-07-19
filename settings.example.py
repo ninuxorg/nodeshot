@@ -53,14 +53,14 @@ MEDIA_ROOT = '%s/media/' % os.path.dirname(os.path.realpath(__file__))
 DEVELOPMENT_SERVER = True
 
 if DEVELOPMENT_SERVER:
-	PROJECT_URL = "http://localhost:8000/"
+	SITE_URL = "http://localhost:8000/"
 else:
-	PROJECT_URL = "http://nodeshot.peertoport.com/"
+	SITE_URL = "http://nodeshot.peertoport.com/"
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '%smedia/' % PROJECT_URL
+MEDIA_URL = '%smedia/' % SITE_URL
 
 # for django 1.4
 STATIC_URL = MEDIA_URL
@@ -109,6 +109,9 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
+# site name, will be used in emails
+SITE_NAME = 'Nodeshot'
+
 # routing protocols used in nodeshot.models
 NODESHOT_ROUTING_PROTOCOLS = (
     ('aodv','AODV'),
@@ -124,3 +127,11 @@ NODESHOT_ROUTING_PROTOCOLS = (
 )
 # set your default routing protocol
 NODESHOT_DEFAULT_ROUTING_PROTOCOL = 'olsr'
+NODESHOT_ACTIVATION_DAYS = 7
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'youremail@gmail.com'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = 'youremail@gmail.com'

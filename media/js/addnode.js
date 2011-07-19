@@ -15,27 +15,31 @@ function insertNodeInfo(){
             removeNewMarker();
         }
         $('#node-form-cancel').click(function(){
-            nodeshotRemoveMask();
-            $('#nodeshot-overlay').remove();
-            $('#addnode').button('option', 'label', 'Aggiungi un nuovo nodo');
-            if (clickListenerHandle) {
-                 google.maps.event.removeListener(clickListenerHandle);
-                 clickListenerHandle = null;
-            }
+            nodeshotCloseForm();
         });
     });
 }
 
-$("#node-form").live("submit", function() { 
+$("#node-form").live("submit", function() {
+    
+    nodeshotShowLoading();
+    
     var form_data = $(this).serialize();
 
     $.post(__project_home__+'node_form', form_data, function(data) {
+        
+        nodeshotHideLoading();
+        
         if (data.length >= 10) {
             $('#nodeshot-overlay').html(data); //form errors
         } else {
+            $('#node-form').fadeOut(500, function(){
+                nodeshotModal('Grazie per aver inserito un nuovo nodo potenziale, ti abbiamo inviato un\'email con il link di conferma.', nodeshotCloseForm);
+            });
+            /* do not redirect because is not needed
             $.get(__project_home__+'device_form/'+data+'/',  function(data) {
                 $('#nodeshot-overlay').html(data); //all fine, go to device form    
-            }); 
+            });*/
         }
     });
 
@@ -64,9 +68,6 @@ function append_configuration(conf_html_data) {
     }
     $('#nodeshot-overlay').append('<input type="submit" id="configuration-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />');
     $('#configuration-form-submit').button();
-
-
-
 }
 
 $("#device-form").live("submit", function() { 
