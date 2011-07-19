@@ -29,7 +29,10 @@ def index(request):
 
 def nodes(request):
    active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat') 
-   potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat') 
+   potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat')
+   hotspot = Node.objects.filter(status = 'h').values('name', 'lng', 'lat')
+   offline = Node.objects.filter(status = 'o').values('name', 'lng', 'lat')
+   
    links = []
    for l in Link.objects.all():
        etx = 0
@@ -49,7 +52,8 @@ def nodes(request):
 
        entry = {'from_lng': l.from_interface.device.node.lng , 'from_lat': l.from_interface.device.node.lat, 'to_lng': l.to_interface.device.node.lng, 'to_lat': l.to_interface.device.node.lat, 'etx': etx , 'dbm': dbm }
        links.append(entry)
-   data = {'active': list(active), 'potential': list(potential) , 'links': links} 
+
+   data = {'hotspot': list(hotspot), 'active': list(active), 'potential': list(potential), 'offline': list(offline), 'links': links} 
    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 

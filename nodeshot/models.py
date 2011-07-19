@@ -1,6 +1,22 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
+
+try:
+    from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
+except:
+    ROUTING_PROTOCOLS = (
+        ('aodv','AODV'),
+        ('batman','B.A.T.M.A.N.'),
+        ('dsdv','DSDV'),
+        ('dsr','DSR'),
+        ('hsls','HSLS'),
+        ('iwmp','IWMP'),
+        ('olsr','OLSR'),
+        ('oorp','OORP'),
+        ('ospf','OSPF'),
+        ('tora','TORA'),
+    )
+    DEFAULT_ROUTING_PROTOCOL = 'olsr'
 
 NODE_STATUS = (
     ('a', 'active'),

@@ -347,7 +347,7 @@ h3 {
 	position:absolute;top:0;left:0;width:100%;height:100%;z-index:13
 }
 
-#active,#potential{	position:relative; bottom:-1px; margin-right:5px }
+#view-nodes input{ position:relative; bottom:-1px; margin-right:5px }
 #addnode{ margin-top: 10px }
 
-#link-quality-selector {display: block; }
+#link-quality-selector { display: block; margin: 20px 0 10px }

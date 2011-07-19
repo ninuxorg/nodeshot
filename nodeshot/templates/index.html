@@ -47,9 +47,13 @@
                             <p>Ti serve aiuto? <a href="javascript:alert('prrrrrrrr')">Cikka qui!</a></p>
                             <button id="addnode">Aggiungi un nuovo nodo</button>
                             <span id="addhelper"></span>
-                            <input id="search-address" class="defaultText text ui-corner-all" title="Cerca un indirizzo"  /> 
-                            <input type="checkbox" id="active" checked="yes" /><label for="active">Visualizza nodi attivi</label><br />
-                            <input type="checkbox" id="potential" checked="yes" /><label for="potential">Visualizza nodi potenziali</label>
+                            <input id="search-address" class="defaultText text ui-corner-all" title="Cerca un indirizzo"  />
+                            <menu id="view-nodes">
+                                <input type="checkbox" id="active" checked="checked" /><label for="active">Visualizza nodi attivi</label><br />
+                                <input type="checkbox" id="hotspot" checked="checked" /><label for="hotspot">Visualizza hotspots</label><br />
+                                <input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label><br />
+                                <input type="checkbox" id="offline" checked="checked" /><label for="offline">Visualizza nodi offline</label>
+                            </menu>
                             <menu id="link-quality-selector">
                                     Qualita' links:
                                     <input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /><label for="etx">ETX</label>

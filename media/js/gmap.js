@@ -1,7 +1,17 @@
 var nodes = [];
 var map;
 var geocoder;
-var markersArray = {'active' : [], 'potential': [], 'activeListeners': [], 'potentialListeners': [], 'links': [] };
+var markersArray = {
+    'active' : [],
+    'potential': [],
+    'activeListeners': [],
+    'potentialListeners': [],
+    'hotspot': [],
+    'hotspotListeners': [],
+    'offline': [],
+    'offlineListeners': [],
+    'links': []
+};
 var newMarker;
 var newMarkerListenerHandle;
 var clickListenerHandle;
@@ -27,32 +37,45 @@ function getget(name) {
   return r.replace(/\+/g, ' ');
 }
 
-
 function getNodeState(nodeName) {
    for (var i = 0; i < nodes.active.length; i++) 
         if (nodes.active[i].name == nodeName)
             return 'a';
+    for (var i = 0; i < nodes.hotspot.length; i++) 
+        if (nodes.hotspot[i].name == nodeName)
+            return 'h';
    for (var i = 0; i < nodes.potential.length; i++) 
         if (nodes.potential[i].name == nodeName)
             return 'p';
-   return 'n'
-
+    for (var i = 0; i < nodes.offline.length; i++) 
+        if (nodes.offline[i].name == nodeName)
+            return 'p';
+    return 'n'
 }
-
 
 function findMarker(nodeName) {
     var nodeStatus = getNodeState(nodeName);
     if (nodeStatus == 'a' &&  ! $('#active').is(':checked') ) {
         $('#active').attr('checked', true);
         draw_nodes('a');
+    } else if (nodeStatus == 'h' &&  ! $('#hotspot').is(':checked') ) {
+        $('#hotspot').attr('checked', true);
+        draw_nodes('h');
     } else if (nodeStatus == 'p' &&  ! $('#potential').is(':checked') ) {
         $('#potential').attr('checked', true);
         draw_nodes('p');
+    } else if (nodeStatus == 'o' &&  ! $('#offline').is(':checked') ) {
+        $('#offline').attr('checked', true);
+        draw_nodes('o');
     }
     if (nodeStatus == 'a')
         marray = markersArray.active;
+    else if (nodeStatus == 'h')
+        marray= markersArray.hotspot;
     else if (nodeStatus == 'p')
         marray= markersArray.potential;
+    else if (nodeStatus == 'o')
+        marray= markersArray.offline;
     else 
         return;
     for (var i = 0; i <  marray.length; i++) {
@@ -120,10 +143,10 @@ function initialize_map() {
 function handleMarkerClick(marker, name) {
   return function() {
     $.get(__project_home__+'info_window/' + name, function(data) {
-                infoWindow.setContent(data);
-                infoWindow.open(map, marker);
-                setTimeout(function(){ $(".tabs").tabs(); }, 100);
-            } );
+        infoWindow.setContent(data);
+        infoWindow.open(map, marker);
+        setTimeout(function(){ $(".tabs").tabs(); }, 100);
+    } );
   };
 } 
 
@@ -174,6 +197,7 @@ function draw_link(flat, flng, tlat, tlng, quality) {
 function draw_nodes(type) {
     var marray;
     var image = '';
+    
     if (type == 'a') {
         data = nodes.active;
         marray = markersArray.active;
@@ -184,15 +208,26 @@ function draw_nodes(type) {
         marray = markersArray.potential;
         larray = markersArray.potentialListeners;
         image = __project_home__+'media/images/marker_potential.png';
+    } else if (type == 'h') {
+        data = nodes.hotspot;
+        marray = markersArray.hotspot;
+        larray = markersArray.hotspotListeners;
+        image = __project_home__+'media/images/marker_hotspot.png';
+    } else if (type == 'o') {
+        data = nodes.offline;
+        marray = markersArray.offline;
+        larray = markersArray.offlineListeners;
+        image = __project_home__+'media/images/marker_offline.png';
     }
+    
     for (var i = 0; i < data.length; i++) { 
         var latlng = new google.maps.LatLng(data[i].lat, data[i].lng);
         marker = new google.maps.Marker({
-                  position: latlng,
-                  map: map,
-                  title: data[i].name,
-                  icon: image
-                  });
+            position: latlng,
+            map: map,
+            title: data[i].name,
+            icon: image
+        });
         marray.push(marker);
         marker.setMap(map);  
         
@@ -218,9 +253,15 @@ function remove_markers(type) {
         larray = markersArray.activeListeners;
         for (i in markersArray.links)
             markersArray.links[i].setMap(null);
+    } else if (type == 'h') {
+        marray = markersArray.hotspot;
+        larray = markersArray.hotspotListeners;
     } else if (type == 'p') {
         marray = markersArray.potential;
         larray = markersArray.potentialListeners;
+    } else if (type == 'o') {
+        marray = markersArray.offline;
+        larray = markersArray.offlineListeners;
     }
     for (i in marray) {
         google.maps.event.removeListener(larray[i]);
@@ -338,7 +379,6 @@ function initialize() {
     
     $(".defaultText").blur();    
 
-
     $('#search-span button').button({
         icons: {
             primary: "ui-icon-search"
@@ -353,19 +393,12 @@ function initialize() {
     });
 
     $('#addnode').click(function() {
-            //var me = $('#addnode');
-            //if (me.hasClass('insert-mode')) {
-                //$('#addhelper').html(''); 
-                
-            //} else {
-                nodeshotModal('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
-                //$('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
-                $(this).button('option', 'label', 'Annulla inserimento');
-                clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
-                       newNodeMarker(event.latLng);
-                });
-            //}
-            //me.toggleClass('insert-mode');
+        nodeshotModal('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
+        //$('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
+        $(this).button('option', 'label', 'Annulla inserimento');
+        clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
+               newNodeMarker(event.latLng);
+        });
     });
 
     $( "#view-radio" ).buttonset();
@@ -421,8 +454,8 @@ function initialize() {
     
     /* visualize ETX values or dbm values */
     $("input[name='link-quality-selector']").change(function(){
-             remove_markers('a'); 
-             draw_nodes('a'); 
+        remove_markers('a'); 
+        draw_nodes('a'); 
     });
 
     /* dynamically load map,info,olsr and vpn when the radio button is pressed */
@@ -433,8 +466,12 @@ function initialize() {
             initialize_map();
             if ($('#active').is(':checked') ) 
                 draw_nodes('a');
+            if ($('#hotspot').is(':checked') )
+                draw_nodes('h');
             if ($('#potential').is(':checked') )
                 draw_nodes('p');
+            if ($('#offline').is(':checked') )
+                draw_nodes('o');
         } else if (choice == 'info') {
             $('#content').load(__project_home__+'info_tab' , function() {
                 $("#myTable").tablesorter(); 
@@ -447,7 +484,6 @@ function initialize() {
         }
     });
 
-
     /* populate the list of nodes */
     $("#node-tree")
         .bind("open_node.jstree close_node.jstree", function (e) {
@@ -455,7 +491,6 @@ function initialize() {
         }).jstree({ 
         "json_data" : {
             "ajax" : {
-		// 04/06/2011 added __project_home__ to avoid errors when the project root doesn't coincide with the webserver root
                 "url" : __project_home__+"node_list.json",
                 "data" : function (n) { 
                     return { id : n.attr ? n.attr("id") : 0 }; 
@@ -466,13 +501,16 @@ function initialize() {
         "plugins" : [ "themes", "json_data"  ]
     });
 
-    // 04/06/2011 - added __project_home__
     $.getJSON(__project_home__+"nodes.json", function(data) {
         nodes = data;
+        if ( $('#hotspot').is(':checked') )
+            draw_nodes('h');
         if ( $('#active').is(':checked') )
             draw_nodes('a');
         if ( $('#potential').is(':checked') )
             draw_nodes('p');
+        if ( $('#offline').is(':checked') )
+            draw_nodes('o');
     });
 
     /* view active nodes */
@@ -503,8 +541,34 @@ function initialize() {
             }
         }
     });
+    
+    /* view hotspot nodes */
+    $('#hotspot').change(function() {
+        if ($(this).is(':checked')) {
+            if (markersArray.hotspot.length == 0)
+                draw_nodes('h');
+        } else {
+            if (markersArray.hotspot.length > 0) {
+                remove_markers('h');
+                markersArray.hotspot = [];
+                markersArray.hotspotListeners  = [];
+            }
+        }
+    });
 
-
+    /* view hotspot nodes */
+    $('#offline').change(function() {
+        if ($(this).is(':checked')) {
+            if (markersArray.offline.length == 0)
+                draw_nodes('o');
+        } else {
+            if (markersArray.offline.length > 0) {
+                remove_markers('o');
+                markersArray.offline = [];
+                markersArray.offlineListeners  = [];
+            }
+        }
+    });
 
 
 };
