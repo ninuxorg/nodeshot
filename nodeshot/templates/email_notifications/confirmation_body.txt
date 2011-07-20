@@ -3,9 +3,6 @@ Grazie per il tuo interesse in {{ site.name }}!
 
 Conferma il tuo nuovo nodo potenziale cliccando sul link seguente {% blocktrans %}(il link è valido per {{ expiration_days }} giorni){% endblocktrans %}:
 
-{{ site.url }}{% url nodeshot_confirm_node node.activation_key %}
-
-La password da te scelta per le modifiche al nodo è: {{ password }}
-
+http://{{ site.domain }}{% url nodeshot_confirm_node node.id node.activation_key %}
 
 Se non hai richiesto l'inserimento di un nuovo nodo potenziale su {{ site.name }} ignora semplicemente questa email, i dati verranno cancellati automaticamente dopo {{ expiration_days }} giorni.

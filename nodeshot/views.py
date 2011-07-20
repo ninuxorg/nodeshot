@@ -186,5 +186,21 @@ def info(request):
     
     return render_to_response('info.html',{'devices': devices} ,context_instance=RequestContext(request))
     
-def confirm_node(request, activation_key):
-    return HttpResponse('TODO')
+def confirm_node(request, node_id, activation_key):
+    node = Node.objects.get(pk=node_id)
+    raw_password = node.password
+    
+    if(node.activation_key != '' and node.activation_key != None):
+        if(node.activation_key == activation_key):
+            # confirm node
+            node.confirm()
+            response = 'confirmed'
+        else:
+            # wrong activation key
+            response = 'wrong activation key'
+            pass
+    else:
+        # node has been already confirmed
+        response = 'node has been already confirmed'
+        pass
+    return HttpResponse(response)

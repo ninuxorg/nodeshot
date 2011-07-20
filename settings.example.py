@@ -49,6 +49,9 @@ USE_L10N = True
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = '%s/media/' % os.path.dirname(os.path.realpath(__file__))
 
+# for django 1.4
+STATIC_ROOT = MEDIA_ROOT
+
 # If you use the django development server set this to true if you want django to serve static files (check urls.py)
 DEVELOPMENT_SERVER = True
 
@@ -109,8 +112,8 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
-# site name, will be used in emails
-SITE_NAME = 'Nodeshot'
+# site id for django.contrib.sites
+SITE_ID = 1
 
 # routing protocols used in nodeshot.models
 NODESHOT_ROUTING_PROTOCOLS = (

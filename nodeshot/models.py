@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.contrib.sites.models import Site
 
 import random
 from django.contrib.auth.utils import make_password
@@ -36,9 +37,9 @@ except ImportError:
     raise ImproperlyConfigured('DEFAULT_FROM_EMAIL is not defined in your settings.py. See settings.example.py for reference.')
     
 try:
-    from settings import SITE_URL, SITE_NAME
+    from settings import SITE_ID
 except ImportError:
-    raise ImproperlyConfigured('SITE_URL and/or SITE_NAME are not defined in your settings.py. See settings.example.py for reference.')
+    raise ImproperlyConfigured('SITE_ID is not defined in your settings.py. See settings.example.py for reference.')
 
 NODE_STATUS = (
     ('a', 'active'),
@@ -142,9 +143,9 @@ class Node(models.Model):
     added = models.DateTimeField('aggiunto il', auto_now_add=True)
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
-    def set_password(self, raw_password):
-        ''' Set the password like django does, raw password is the unencrypted password '''
-        self.password = make_password('sha1', raw_password)
+    def set_password(self):
+        ''' Set the password like django does '''
+        self.password = make_password('sha1', self.password)
         return self.password
     
     def set_activation_key(self):
@@ -153,19 +154,39 @@ class Node(models.Model):
         self.activation_key = sha_constructor(salt+self.name).hexdigest()
         return self.activation_key
     
-    def send_activation_mail(self, raw_password):
-        ''' send activation link to owners '''
+    def send_confirmation_mail(self):
+        ''' send activation link to main email and notify the other 2 emails if specified '''
         context = {
             'node': self,
-            'password': raw_password,
             'expiration_days': ACTIVATION_DAYS,
-            'site': {'name': SITE_NAME, 'url': SITE_URL}
+            'site': Site.objects.get(pk=SITE_ID)
         }
-        subject = render_to_string('activation_email/subject.txt',context)
+        subject = render_to_string('email_notifications/confirmation_subject.txt',context)
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
         
-        message = render_to_string('activation_email/email.txt',context)
+        message = render_to_string('email_notifications/confirmation_body.txt',context)
+        
+        #recipient_list = [self.email]
+        #if self.email2 != '' and self.email2 != None:
+        #    recipient_list += [self.email2]
+        #if self.email3 != '' and self.email3 != None:
+        #    recipient_list += [self.email3]
+        
+        send_mail(subject, message, DEFAULT_FROM_EMAIL, [self.email])
+        
+    def send_success_mail(self, raw_password):
+        ''' send success emails '''
+        context = {
+            'node': self,
+            'password': raw_password,
+            'site': Site.objects.get(pk=SITE_ID)
+        }
+        subject = render_to_string('email_notifications/success_subject.txt',context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        
+        message = render_to_string('email_notifications/success_body.txt',context)
         
         recipient_list = [self.email]
         if self.email2 != '' and self.email2 != None:
@@ -174,18 +195,34 @@ class Node(models.Model):
             recipient_list += [self.email3]
         
         send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+        
+    def confirm(self):
+        '''
+            * change status from ''unconfirmed'' to ''potential''
+            * clear the ''activation_key'' field
+            * encrypt password
+            * send email with details of the node to owners
+        '''
+        self.status = 'p'
+        self.activation_key = ''
+        raw_password = self.password
+        self.set_password()
+        self.save()
+        self.send_success_mail(raw_password)
     
     def __unicode__(self):
         return u'%s' % (self.name)
         
     def save(self):
-        ''' Override the save method in order to encrypt the password and to generate the activation key '''
+        ''' Override the save method in order to generate the activation key for new nodes. '''
         if self.pk is None:
-            raw_password = self.password
-            self.set_password(raw_password)
             self.set_activation_key()
-            self.send_activation_mail(raw_password)
-        super(Node, self).save()
+            super(Node, self).save()
+            # confirmation email is sent afterwards so we can send the ID
+            self.send_confirmation_mail()
+                
+        else:
+            super(Node, self).save()
         
     class Meta:
         verbose_name = 'nodo'
