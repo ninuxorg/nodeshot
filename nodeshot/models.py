@@ -8,6 +8,7 @@ from django.utils.hashcompat import sha_constructor
 from django.core.mail import send_mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
+from settings import MANAGERS
 
 try:
     from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
@@ -156,45 +157,87 @@ class Node(models.Model):
     
     def send_confirmation_mail(self):
         ''' send activation link to main email and notify the other 2 emails if specified '''
+        # retrieve site name and domain
+        site = Site.objects.get(pk=SITE_ID)
+        # prepare context for email template
         context = {
             'node': self,
             'expiration_days': ACTIVATION_DAYS,
-            'site': Site.objects.get(pk=SITE_ID)
+            'site': site
         }
+        # parse subjects
         subject = render_to_string('email_notifications/confirmation_subject.txt',context)
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        
+        # parse message
         message = render_to_string('email_notifications/confirmation_body.txt',context)
-        
-        #recipient_list = [self.email]
-        #if self.email2 != '' and self.email2 != None:
-        #    recipient_list += [self.email2]
-        #if self.email3 != '' and self.email3 != None:
-        #    recipient_list += [self.email3]
-        
+        # send email to main email
         send_mail(subject, message, DEFAULT_FROM_EMAIL, [self.email])
+        
+        # if specified, send notifications to the other two email addresses 
+        if(self.email2 != '' and self.email2 != None) or (self.email3 != '' and self.email3 != None):
+            # prepare context for email template
+            context = {
+                'node': self,
+                'site': site
+            }
+            # parse subject
+            subject = render_to_string('email_notifications/notify-added-emals_subject.txt',context)
+            # Email subject *must not* contain newlines
+            subject = ''.join(subject.splitlines())
+            # parse message
+            message = render_to_string('email_notifications/notify-added-emals_body.txt',context)
+            # initialize a list
+            recipient_list = []
+            # add email2 to the list
+            if self.email2 != '' and self.email2 != None:
+                recipient_list += [self.email2]
+            # add email3 to the list
+            if self.email3 != '' and self.email3 != None:
+                recipient_list += [self.email3]
+            # send mails
+            send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
         
     def send_success_mail(self, raw_password):
         ''' send success emails '''
+        # prepare context
         context = {
             'node': self,
             'password': raw_password,
             'site': Site.objects.get(pk=SITE_ID)
         }
+        # parse subject
         subject = render_to_string('email_notifications/success_subject.txt',context)
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        
+        # parse message
         message = render_to_string('email_notifications/success_body.txt',context)
-        
+        # send email to all the owners        
         recipient_list = [self.email]
         if self.email2 != '' and self.email2 != None:
             recipient_list += [self.email2]
         if self.email3 != '' and self.email3 != None:
             recipient_list += [self.email3]
-        
+        # send mail
         send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+        # notify all managers that a new node has been added
+        if(len(MANAGERS)>0):
+            # prepare list
+            recipient_list = []
+            # loop over MANAGERS
+            for manager in MANAGERS:
+                # if manager is not one of the owners (avoid emailing twice)
+                if manager[1] != self.email and manager[1] != self.email2 and manager[1] != self.email3:
+                    # add email of manager to recipient_list
+                    recipient_list += [manager[1]]
+            # parse subject
+            subject = render_to_string('email_notifications/new-node-managers_subject.txt',context)
+            # Email subject *must not* contain newlines
+            subject = ''.join(subject.splitlines())
+            # parse message
+            message = render_to_string('email_notifications/new-node-managers_body.txt',context)
+            # send email
+            send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
         
     def confirm(self):
         '''
@@ -215,12 +258,12 @@ class Node(models.Model):
         
     def save(self):
         ''' Override the save method in order to generate the activation key for new nodes. '''
+        # if saving a new object
         if self.pk is None:
             self.set_activation_key()
             super(Node, self).save()
             # confirmation email is sent afterwards so we can send the ID
             self.send_confirmation_mail()
-                
         else:
             super(Node, self).save()
         

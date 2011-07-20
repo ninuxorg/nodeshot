@@ -1,8 +1,8 @@
-{% load i18n %}
-Grazie per il tuo interesse in {{ site.name }}!
+{% load i18n %}Grazie per il tuo interesse in {{ site.name }}!
 
 Conferma il tuo nuovo nodo potenziale cliccando sul link seguente {% blocktrans %}(il link è valido per {{ expiration_days }} giorni){% endblocktrans %}:
 
 http://{{ site.domain }}{% url nodeshot_confirm_node node.id node.activation_key %}
 
-Se non hai richiesto l'inserimento di un nuovo nodo potenziale su {{ site.name }} ignora semplicemente questa email, i dati verranno cancellati automaticamente dopo {{ expiration_days }} giorni.
+Se non hai richiesto l'inserimento di un nuovo nodo potenziale su {{ site.name }} segnala un'abuso cliccando sul link seguente:
+http://{{ site.domain }} TODO

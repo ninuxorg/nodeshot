@@ -1,8 +1,4 @@
-{% load i18n %}Il tuo nodo su {{ site.name }} è stato confermato con successo.
-
-La password per effettuare modifiche è: {{ password }}
-
-Di seguito i dettagli del nodo:
+{% load i18n %}Un nuovo nodo è stato appena aggiunto su {{ site.name }}.
 
 Nome: {{ node.name }}
 Descrizione: {{ node.description }}
@@ -18,4 +14,4 @@ Altitudine: {{ node.lat }}
 Puoi vedere il nodo sulla mappa cliccando su questo link:
 http://{{ site.domain }} TODO
 
-Grazie per la tua partecipazione nella nostra community.
+Ricevi questa email perchè sei tra gli amministratori del sito {{ site.name }}.
