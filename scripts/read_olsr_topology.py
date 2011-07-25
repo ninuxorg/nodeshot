@@ -47,9 +47,12 @@ class AliasManager(object):
                 return 666
         def getAliasesFromIP(self, ipaddr):
             id = self.getIdFromIP(ipaddr)
-            return [ip for ip in self.aliasdict.keys() if self.aliasdict[ip] == id]
-            def __str__(self):
-                return str(self.aliasdict)
+            r = [ip for ip in self.aliasdict.keys() if self.aliasdict[ip] == id]
+            if not ipaddr in r:
+                r.append(ipaddr)
+            return r
+        def __str__(self):
+            return str(self.aliasdict)
 
 
 class TopologyParser(object):
@@ -75,7 +78,7 @@ class TopologyParser(object):
                 try:
                         ipaddr1, ipaddr2, lq, nlq, etx = line.split()
                         self.linklist.append((ipaddr1, ipaddr2, float(etx)))
-                except Exception:
+                except ValueError:
                         pass
                 i+=1
                 line = self.topologylines[i]
@@ -92,10 +95,13 @@ class TopologyParser(object):
                 try:
                         ipaddr, alias = line.split()
                         self.aliasmanager.addalias(ipaddr, alias)
-                except Exception:
-                        pass
+                except ValueError:
+                        pass 
                 i+=1
                 line = self.topologylines[i]
+
+            #debug
+            print self.linklist
 
         def process(self):
             "should be called after calling parse()"
@@ -109,18 +115,21 @@ class TopologyParser(object):
                     k = (id1, id2)
                 else:
                     k = (id2, id1)
-            # swap
-            iplistmp = iplist1
-            iplist1 = iplist2
-            iplist2 = iplistmp
+                    # swap
+                    iplistmp = iplist1
+                    iplist1 = iplist2
+                    iplist2 = iplistmp
 
-            if self.linkdict.has_key(k):
-                etx0 = self.linkdict[k][2]
-                etxx = (etx0 + etx) * 0.5 # average
-                self.linkdict.update({k: (iplist1, iplist2, etxx)} ) 
-            else:
-                self.linkdict.update({k: (iplist1, iplist2, etx)} )
-                
+                #debug
+                if len(iplist1) == 0 or len(iplist2) == 0:
+                    print "DDDDD", ipaddr1,ipaddr2,etx
+
+                if self.linkdict.has_key(k):
+                    etx0 = self.linkdict[k][2]
+                    etxx = (etx0 + etx) * 0.5 # average
+                    self.linkdict.update({k: (iplist1, iplist2, etxx)} ) 
+                else:
+                    self.linkdict.update({k: (iplist1, iplist2, etx)} )
 
 
 if __name__ == "__main__":
@@ -131,24 +140,31 @@ if __name__ == "__main__":
         print tp.linkdict
         for v in tp.linkdict.values():
             ipsA, ipsB, etx = v
-            saved_links =  Link.objects.filter(Q(from_interface__ipv4_address__in=ipsA , to_interface__ipv4_address__in=ipsB ) |  Q(from_interface__ipv4_address__in=ipsB , to_interface__ipv4_address__in=ipsA ))
-            if saved_links.count() > 0:
-                l = saved_links[0]
-                l.etx = etx
-                l.save()
-            else:
-                try:
-                    fi = Interface.objects.filter(ipv4_address__in = ipsA).get()
-                    to = Interface.objects.filter(ipv4_address__in = ipsB).get()
-                    Link(from_interface = fi, to_interface = to, etx = etx).save()	
-                except:
-                    pass
-                try:
-                    to = Interface.objects.filter(ipv4_address__in = ipsA).get()
-                    fi  = Interface.objects.filter(ipv4_address__in = ipsB).get()
-                    Link(from_interface = fi, to_interface = to, etx = etx).save()	
-                except:
-                    pass
+            found = False
+            if len(ipsA) <= 0 and len(ipsB) <=0:
+                continue
+            for a in range(0,len(ipsA)):
+                for b in range(0,len(ipsB)):
+                    if not found:
+                        ipA, ipB = ipsA[a], ipsB[b]
 
+                        saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
+                        if saved_links.count() > 0:
+                            l = saved_links[0]
+                            l.etx = etx
+                            l.save()
+                            found = True
+                        else:
+                            fi = Interface.objects.filter(ipv4_address = ipA)
+                            to = Interface.objects.filter(ipv4_address = ipB)
+                            if fi.count() == 1 and to.count() == 1:
+                                Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
+                                found = True
+                            else:
+                                to = Interface.objects.filter(ipv4_address = ipA)
+                                fi  = Interface.objects.filter(ipv4_address = ipB)
+                                if fi.count() == 1 and to.count() == 1:
+                                    Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
+                                    found = True
 
 
