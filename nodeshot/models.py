@@ -117,7 +117,7 @@ WIRELESS_CHANNEL = (
     ('5600', '5Ghz Ch 120 (5600 Mhz)'),
     ('5620', '5Ghz Ch 124 (5620 Mhz)'),
     ('5640', '5Ghz Ch 128 (5640 Mhz)'),
-    ('5660','5Ghz Ch 132 (5660 Mhz)'),
+    ('5660', '5Ghz Ch 132 (5660 Mhz)'),
     ('5680', '5Ghz Ch 136 (5680 Mhz)'),
     ('5700', '5Ghz Ch 140 (5700 Mhz)'),
     ('5745', '5Ghz Ch 149 (5745 Mhz)'),
@@ -301,12 +301,6 @@ class Interface(models.Model):
     ssid = models.CharField(max_length=50, null=True, blank=True)
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    def __unicode__(self):
-        return u'IP: %s' % (self.ipv4_address)
-
-class IPAlias(models.Model):
-    ipv4_address = models.CharField(max_length=15, unique=True)
-    interface = models.ForeignKey(Interface)
     def __unicode__(self):
         return u'IP: %s' % (self.ipv4_address)
 
