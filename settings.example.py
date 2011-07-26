@@ -127,6 +127,12 @@ NODESHOT_SITE = {
     'domain': '10.40.0.56'
 }
 
+# site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
+NODESHOT_SITE = {
+    'name': 'Nodeshot',
+    'domain': '10.40.0.56'
+}
+
 # routing protocols used in nodeshot.models
 NODESHOT_ROUTING_PROTOCOLS = (
     ('aodv','AODV'),

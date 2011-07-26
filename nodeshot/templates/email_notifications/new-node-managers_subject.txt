@@ -1,1 +1,0 @@
-{% load i18n %}{% trans "Dettagli nuovo nodo su " %} {{ site.name }}

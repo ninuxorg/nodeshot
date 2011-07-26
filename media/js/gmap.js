@@ -430,15 +430,15 @@ function initialize() {
     });
 
     $( "#view-radio" ).buttonset();
-    $( "#link-quality-selector" ).buttonset();
-    document.getElementById('etx').checked=true;
-    document.getElementById('dbm').checked=false;
+    //$( "#link-quality-selector" ).buttonset();
+    //document.getElementById('etx').checked=true;
+    //document.getElementById('dbm').checked=false;
     document.getElementById('radio1').checked=true;
     document.getElementById('radio2').checked=false;
     document.getElementById('radio3').checked=false;
     document.getElementById('radio4').checked=false;
     $("#view-radio").buttonset("refresh");
-    $("#link-quality-selector").buttonset("refresh");
+    //$("#link-quality-selector").buttonset("refresh");
 
 
     /* Type an address and go to that address on the map */
