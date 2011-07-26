@@ -140,6 +140,12 @@ html, body { height: 100% }
 #search-span
 {
     float: right;
+}
+
+#search {
+    text-align: center;
+    vertical-align: top;
+    width: 320px;
 
 }
 
@@ -204,13 +210,11 @@ a.add-row{ margin-left: 1em }
 
 }
 
-
-
-
 .defaultText { width: 300px; }
 .defaultTextActive { color: #a1a1a1; font-style: italic; }
 
 #search-address {
+    border: thin solid #AAAAAA;
     width:218px;
     display: block;
     margin: 10px 10px 10px 2px;
@@ -352,3 +356,8 @@ h3 {
 #addnode{ margin-top: 10px }
 
 #link-quality-selector { display: block; margin: 20px 0 10px }
+
+.top-icon {
+    width: 25px;
+    height: 25px;
+}
