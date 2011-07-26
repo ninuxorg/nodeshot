@@ -115,6 +115,12 @@ INSTALLED_APPS = (
 # site id for django.contrib.sites
 SITE_ID = 1
 
+# site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
+NODESHOT_SITE = {
+    'name': 'Nodeshot',
+    'domain': '10.40.0.56'
+}
+
 # routing protocols used in nodeshot.models
 NODESHOT_ROUTING_PROTOCOLS = (
     ('aodv','AODV'),
@@ -128,6 +134,7 @@ NODESHOT_ROUTING_PROTOCOLS = (
     ('ospf','OSPF'),
     ('tora','TORA'),
 )
+
 # set your default routing protocol
 NODESHOT_DEFAULT_ROUTING_PROTOCOL = 'olsr'
 NODESHOT_ACTIVATION_DAYS = 7

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.contrib.sites.models import Site
 
 import random
 from django.contrib.auth.utils import make_password
@@ -38,9 +37,15 @@ except ImportError:
     raise ImproperlyConfigured('DEFAULT_FROM_EMAIL is not defined in your settings.py. See settings.example.py for reference.')
     
 try:
-    from settings import SITE_ID
+    from settings import NODESHOT_SITE as SITE
 except ImportError:
-    raise ImproperlyConfigured('SITE_ID is not defined in your settings.py. See settings.example.py for reference.')
+    raise ImproperlyConfigured('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.')
+
+# IMPORTING is a variable that must be inserted dinamically in scripts that might import this file in order to perform automatic imports from other map servers (for example WNMAP)
+try:
+    from settings import IMPORTING
+except ImportError:
+    IMPORTING = False
 
 NODE_STATUS = (
     ('a', 'active'),
@@ -157,13 +162,11 @@ class Node(models.Model):
     
     def send_confirmation_mail(self):
         ''' send activation link to main email and notify the other 2 emails if specified '''
-        # retrieve site name and domain
-        site = Site.objects.get(pk=SITE_ID)
         # prepare context for email template
         context = {
             'node': self,
             'expiration_days': ACTIVATION_DAYS,
-            'site': site
+            'site': SITE
         }
         # parse subjects
         subject = render_to_string('email_notifications/confirmation_subject.txt',context)
@@ -179,7 +182,7 @@ class Node(models.Model):
             # prepare context for email template
             context = {
                 'node': self,
-                'site': site
+                'site': SITE
             }
             # parse subject
             subject = render_to_string('email_notifications/notify-added-emals_subject.txt',context)
@@ -204,7 +207,7 @@ class Node(models.Model):
         context = {
             'node': self,
             'password': raw_password,
-            'site': Site.objects.get(pk=SITE_ID)
+            'site': SITE
         }
         # parse subject
         subject = render_to_string('email_notifications/success_subject.txt',context)
@@ -252,21 +255,21 @@ class Node(models.Model):
         self.set_password()
         self.save()
         self.send_success_mail(raw_password)
-    
-    def __unicode__(self):
-        return u'%s' % (self.name)
         
     def save(self):
         ''' Override the save method in order to generate the activation key for new nodes. '''
         # if saving a new object
-        if self.pk is None:
+        if self.pk is None and not IMPORTING:
             self.set_activation_key()
             super(Node, self).save()
             # confirmation email is sent afterwards so we can send the ID
             self.send_confirmation_mail()
         else:
             super(Node, self).save()
-        
+    
+    def __unicode__(self):
+        return u'%s' % (self.name)
+    
     class Meta:
         verbose_name = 'nodo'
         verbose_name_plural = 'nodi'
