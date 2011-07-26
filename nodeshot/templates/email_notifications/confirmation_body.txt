@@ -5,4 +5,4 @@ Conferma il tuo nuovo nodo potenziale cliccando sul link seguente {% blocktrans 
 http://{{ site.domain }}{% url nodeshot_confirm_node node.id node.activation_key %}
 
 Se non hai richiesto l'inserimento di un nuovo nodo potenziale su {{ site.name }} segnala un'abuso cliccando sul link seguente:
-http://{{ site.domain }} TODO
+http://{{ site.domain }}{% url nodeshot_report_abuse node.id node.email %}

@@ -4,18 +4,6 @@ La password per effettuare modifiche è: {{ password }}
 
 Di seguito i dettagli del nodo:
 
-Nome: {{ node.name }}
-Descrizione: {{ node.description }}
-Responsabile/i: {{ node.owner }}
-CAP: {{ node.postal_code }}
-Email: {{ node.email }}{% if node.email2 and node.email2 != '' %}
-Email2: {{ node.email2 }}{% endif %}{% if node.email3 and node.email3 != '' %}
-Email3: {{ node.email3 }}{% endif %}
-Longitudine: {{ node.lng }}
-Latitudine: {{ node.lat }}
-Altitudine: {{ node.lat }}
-
-Puoi vedere il nodo sulla mappa cliccando su questo link:
-http://{{ site.domain }} TODO
+{% include 'email_notifications/node_details_fragment.txt' %}
 
 Grazie per la tua partecipazione nella nostra community.

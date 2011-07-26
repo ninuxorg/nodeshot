@@ -12,5 +12,6 @@ urlpatterns = patterns('',
     url(r'^node_form', 'nodeshot.forms.node_form', name='nodeshot_node_form'),
     url(r'^device_form/(?P<node_id>\d+)/$', 'nodeshot.forms.device_form', name='nodeshot_device_form'), 
     url(r'^configuration_form', 'nodeshot.forms.configuration_form', name='nodeshot_configuration_form'),
-    url(r'^confirm/(?P<node_id>\d+)/(?P<activation_key>\w+)/$', 'nodeshot.views.confirm_node', name='nodeshot_confirm_node'), 
+    url(r'^confirm/(?P<node_id>\d+)/(?P<activation_key>\w+)/$', 'nodeshot.views.confirm_node', name='nodeshot_confirm_node'),
+    url(r'^report_abuse/(?P<node_id>\d+)/(?P<email>.*)/$', 'nodeshot.views.report_abuse', name='nodeshot_report_abuse'),
 )

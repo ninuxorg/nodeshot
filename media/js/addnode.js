@@ -23,6 +23,11 @@ function insertNodeInfo(){
 $("#node-form").live("submit", function() {
     
     nodeshotShowLoading();
+    $('#nodeshot-modal-mask').css({
+        zIndex: 11,
+        opacity: 0.7
+    });
+    $('#nodeshot-overlay').css('z-index', '10');
     
     var form_data = $(this).serialize();
 

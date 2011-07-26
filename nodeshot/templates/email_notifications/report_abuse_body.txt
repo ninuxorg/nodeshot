@@ -1,0 +1,13 @@
+{% load i18n %}Ciao {% if admin.first_name != '' %}{{ admin.first_name }}{% else %}{{ admin.username }}{% endif %},
+    
+Uno dei responsabili del nodo {{ node.name }} ha segnalato un abuso,
+La sua email {{ email }} è stata aggiunta in uno dei campi email senza il suo consenso.
+
+Sarebbe opportuno cancellare la sua email ed eventualmente ricontattarlo per confermargli la risoluzione del problema.
+La sua email può essere cancellata dal seguente link
+http://{{ site.domain }}{% url admin:nodeshot_node_change node.id %}
+
+
+Ricevi questa email perchè sei tra gli amministratori del sito {{ site.name }} ed hai scelto di ricevere notifiche riguardanti la gestione dei nodi.
+Se non vuoi più ricevere notifiche modifica il tuo profilo in:
+http://{{ site.domain }}{% url admin:auth_user_change admin.id %}

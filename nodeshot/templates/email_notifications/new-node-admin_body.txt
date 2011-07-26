@@ -1,0 +1,12 @@
+{% load i18n %}Ciao {% if admin.first_name != '' %}{{ admin.first_name }}{% else %}{{ admin.username }}{% endif %},
+    
+Un nuovo nodo è stato appena aggiunto su {{ site.name }}.
+
+{% include 'email_notifications/node_details_fragment.txt' %}
+
+Puoi moderare i dettagli del nodo nel backend:
+http://{{ site.domain }}{% url admin:nodeshot_node_change node.id %}
+
+Ricevi questa email perchè sei tra gli amministratori del sito {{ site.name }} ed hai scelto di ricevere notifiche riguardanti la gestione dei nodi.
+Se non vuoi più ricevere notifiche modifica il tuo profilo in:
+http://{{ site.domain }}{% url admin:auth_user_change admin.id %}

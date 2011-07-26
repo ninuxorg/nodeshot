@@ -76,6 +76,12 @@
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
         var __project_home__ = '{% url nodeshot.views.index %}'
+        var __center__ = {
+            is_default: {{ gmap_center.is_default }},
+            {% if gmap_center.is_default == 'false' %}node: '{{ gmap_center.node }}',{% endif %}
+            lat: '{{ gmap_center.lat }}',
+            lng: '{{ gmap_center.lng }}'
+        };
         //google.load("jquery", "1.5.1");
         //google.load("jqueryui", "1.8.11");
         google.load('maps','3',{other_params:'sensor=false'});

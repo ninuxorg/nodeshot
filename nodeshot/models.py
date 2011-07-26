@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.contrib.sites.models import Site
 
 import random
 from django.contrib.auth.utils import make_password
@@ -9,6 +8,10 @@ from django.core.mail import send_mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
 from settings import MANAGERS
+
+# for UserProfile
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 try:
     from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
@@ -38,9 +41,15 @@ except ImportError:
     raise ImproperlyConfigured('DEFAULT_FROM_EMAIL is not defined in your settings.py. See settings.example.py for reference.')
     
 try:
-    from settings import SITE_ID
+    from settings import NODESHOT_SITE as SITE
 except ImportError:
-    raise ImproperlyConfigured('SITE_ID is not defined in your settings.py. See settings.example.py for reference.')
+    raise ImproperlyConfigured('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.')
+
+# IMPORTING is a variable that must be inserted dinamically in scripts that might import this file in order to perform automatic imports from other map servers (for example WNMAP)
+try:
+    from settings import IMPORTING
+except ImportError:
+    IMPORTING = False
 
 NODE_STATUS = (
     ('a', 'active'),
@@ -157,13 +166,11 @@ class Node(models.Model):
     
     def send_confirmation_mail(self):
         ''' send activation link to main email and notify the other 2 emails if specified '''
-        # retrieve site name and domain
-        site = Site.objects.get(pk=SITE_ID)
         # prepare context for email template
         context = {
             'node': self,
             'expiration_days': ACTIVATION_DAYS,
-            'site': site
+            'site': SITE,
         }
         # parse subjects
         subject = render_to_string('email_notifications/confirmation_subject.txt',context)
@@ -179,15 +186,13 @@ class Node(models.Model):
             # prepare context for email template
             context = {
                 'node': self,
-                'site': site
+                'site': SITE
             }
-            # parse subject
+            # parse subject (same for both)
             subject = render_to_string('email_notifications/notify-added-emals_subject.txt',context)
             # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())
-            # parse message
-            message = render_to_string('email_notifications/notify-added-emals_body.txt',context)
-            # initialize a list
+            subject = ''.join(subject.splitlines())            
+            # initialize an empty list
             recipient_list = []
             # add email2 to the list
             if self.email2 != '' and self.email2 != None:
@@ -195,8 +200,13 @@ class Node(models.Model):
             # add email3 to the list
             if self.email3 != '' and self.email3 != None:
                 recipient_list += [self.email3]
-            # send mails
-            send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+            # loop over recipient_list
+            for recipient in recipient_list:
+                # insert current email in the body text
+                context['email'] = recipient
+                message = render_to_string('email_notifications/notify-added-emals_body.txt',context)
+                # send mail
+                send_mail(subject, message, DEFAULT_FROM_EMAIL, (recipient,))
         
     def send_success_mail(self, raw_password):
         ''' send success emails '''
@@ -204,7 +214,7 @@ class Node(models.Model):
         context = {
             'node': self,
             'password': raw_password,
-            'site': Site.objects.get(pk=SITE_ID)
+            'site': SITE
         }
         # parse subject
         subject = render_to_string('email_notifications/success_subject.txt',context)
@@ -220,24 +230,9 @@ class Node(models.Model):
             recipient_list += [self.email3]
         # send mail
         send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
-        # notify all managers that a new node has been added
-        if(len(MANAGERS)>0):
-            # prepare list
-            recipient_list = []
-            # loop over MANAGERS
-            for manager in MANAGERS:
-                # if manager is not one of the owners (avoid emailing twice)
-                if manager[1] != self.email and manager[1] != self.email2 and manager[1] != self.email3:
-                    # add email of manager to recipient_list
-                    recipient_list += [manager[1]]
-            # parse subject
-            subject = render_to_string('email_notifications/new-node-managers_subject.txt',context)
-            # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())
-            # parse message
-            message = render_to_string('email_notifications/new-node-managers_body.txt',context)
-            # send email
-            send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+        # notify admins that want to receive notifications
+        from nodeshot.utils import notify_admins
+        notify_admins(self, 'email_notifications/new-node-admin_subject.txt', 'email_notifications/new-node-admin_body.txt', context, skip=True)
         
     def confirm(self):
         '''
@@ -252,21 +247,21 @@ class Node(models.Model):
         self.set_password()
         self.save()
         self.send_success_mail(raw_password)
-    
-    def __unicode__(self):
-        return u'%s' % (self.name)
         
     def save(self):
         ''' Override the save method in order to generate the activation key for new nodes. '''
         # if saving a new object
-        if self.pk is None:
+        if self.pk is None and not IMPORTING:
             self.set_activation_key()
             super(Node, self).save()
             # confirmation email is sent afterwards so we can send the ID
             self.send_confirmation_mail()
         else:
             super(Node, self).save()
-        
+    
+    def __unicode__(self):
+        return u'%s' % (self.name)
+    
     class Meta:
         verbose_name = 'nodo'
         verbose_name_plural = 'nodi'
@@ -311,4 +306,13 @@ class Link(models.Model):
     dbm = models.IntegerField(default=0)
     sync_tx = models.IntegerField(default=0)
     sync_rx = models.IntegerField(default=0)
-
+    
+class UserProfile(models.Model):
+    '''
+    Extending django's user model so we can have an additional field
+    where we can specify if admins should receive notifications or not
+    
+    https://docs.djangoproject.com/en/dev/topics/auth/#storing-additional-information-about-users
+    '''
+    user = models.OneToOneField(User)
+    receive_notifications = models.BooleanField('Notifiche via email', help_text='Attiva/disattiva le notifiche email riguardanti la gestione dei nodi (aggiunta, cancellazione, abusi, ecc).')
