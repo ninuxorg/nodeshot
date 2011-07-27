@@ -2,13 +2,6 @@
 from django.db import models
 
 import random
-# django > 1.4
-try:
-    from django.contrib.auth.utils import make_password
-# django < 1.3
-except ImportError:
-    from nodeshot.utils import make_password
-
 from django.utils.hashcompat import sha_constructor
 from django.core.mail import send_mail
 from django.core.exceptions import ImproperlyConfigured
@@ -18,6 +11,13 @@ from nodeshot.utils import notify_admins
 # for UserProfile
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+
+# django > 1.4
+try:
+    from django.contrib.auth.utils import make_password
+# django < 1.3
+except ImportError:
+    from nodeshot.utils import make_password
 
 try:
     from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL

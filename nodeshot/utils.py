@@ -8,8 +8,6 @@ from django.template.loader import render_to_string
 from django.utils.encoding import smart_str
 from django.utils.crypto import constant_time_compare
 
-UNUSABLE_PASSWORD = '!' # This will never be a valid hash
-
 def distance(origin, destination):
     'Haversine formula'
     lat1, lon1 = origin
@@ -50,7 +48,13 @@ def notify_admins(node, subject_template, body_template, context, skip=False):
             message = render_to_string(body_template,context)
             # send email
             admin.email_user(subject, message)
-            
+
+#
+# the following functions are needed for versions < than django 1.4 (in django 1.4 these functions are wrapped in django.contrib.auth.utils)
+#
+
+UNUSABLE_PASSWORD = '!' # This will never be a valid hash
+
 def get_hexdigest(algorithm, salt, raw_password):
     """
     Returns a string of the hexdigest of the given plaintext password and salt
