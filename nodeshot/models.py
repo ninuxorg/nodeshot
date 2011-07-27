@@ -2,7 +2,13 @@
 from django.db import models
 
 import random
-from django.contrib.auth.utils import make_password
+# django > 1.4
+try:
+    from django.contrib.auth.utils import make_password
+# django < 1.3
+except ImportError:
+    from nodeshot.utils import make_password
+
 from django.utils.hashcompat import sha_constructor
 from django.core.mail import send_mail
 from django.core.exceptions import ImproperlyConfigured
