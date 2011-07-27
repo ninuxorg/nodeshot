@@ -13,6 +13,7 @@ from django.db import models
 from django import forms
 from settings import DEBUG
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
 
 def node_form(request):
     # add css classes
@@ -152,3 +153,31 @@ def configuration_form(request):
         formset = mInlineFormSet(instance=device, prefix=prefix_name)
     return render_to_response(template_form, { "formset": formset , 'device_id': device_id , 'configuration_type': entry_type , 'description': device.name } )
 
+class AdminPasswordChangeForm(forms.Form):
+    """
+    A form used to change the password of a node in the admin interface.
+    """
+    password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("Password (again)"), widget=forms.PasswordInput)
+
+    def __init__(self, node, *args, **kwargs):
+        self.node = node
+        super(AdminPasswordChangeForm, self).__init__(*args, **kwargs)
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError(_("The two password fields didn't match."))
+        return password2
+
+    def save(self, commit=True):
+        """
+        Saves the new password.
+        """
+        self.node.password = self.cleaned_data["password1"]
+        self.node.set_password()
+        if commit:
+            self.node.save()
+        return self.node

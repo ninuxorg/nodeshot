@@ -17,7 +17,7 @@ from utils import *
 import time,re,os
 from settings import DEBUG
 from django.core.exceptions import ObjectDoesNotExist
-#from forms import *
+from datetime import datetime, timedelta
 
 # retrieve map center or set default if not specified
 try:
@@ -29,6 +29,11 @@ except ImportError:
         'lng': '12.509307861328125'
     }
 NODESHOT_GMAP_CENTER['is_default'] = 'true'
+
+try:
+    from settings import NODESHOT_ACTIVATION_DAYS
+except ImportError:
+    NODESHOT_ACTIVATION_DAYS = 7
 
 def index(request):
     max_radios = range(1,10)
@@ -235,9 +240,12 @@ def confirm_node(request, node_id, activation_key):
     
     if(node.activation_key != '' and node.activation_key != None):
         if(node.activation_key == activation_key):
-            # confirm node
-            node.confirm()
-            response = 'confirmed'
+            if(node.added + timedelta(days=NODESHOT_ACTIVATION_DAYS) > datetime.now()):
+                # confirm node
+                node.confirm()
+                response = 'confirmed'
+            else:
+                response = 'expired'
         else:
             # wrong activation key
             response = 'wrong activation key'
@@ -258,15 +266,36 @@ def report_abuse(request, node_id, email):
         raise Http404
     
     try:
-        from settings import NODESHOT_SITE as SITE
+        from settings import NODESHOT_SITE
     except ImportError:
         raise ImproperlyConfigured('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.')
     
     context = {
         'email': email,
         'node': node,
-        'site': SITE
+        'site': NODESHOT_SITE
     }
     notify_admins(node, 'email_notifications/report_abuse_subject.txt', 'email_notifications/report_abuse_body.txt', context)
     
     return HttpResponse('reported')
+    
+def purge_expired(request):
+    '''
+    Purge all the nodes that have not been confirmed older than settings.NODESHOT_ACTIVATION_DAYS.
+    This view might be called with a cron so the purging would be done automatically.
+    '''
+    # select unconfirmed nodes which are older than NODESHOT_ACTIVATION_DAYS
+    nodes = Node.objects.filter(status='u', added__lt=datetime.now() - timedelta(days=NODESHOT_ACTIVATION_DAYS))
+    # if any old unconfirmed node is found
+    if len(nodes)>0:
+        # prepare empty list that will contain the purged nodes
+        response = ''
+        # loop over nodes
+        for node in nodes:
+            response += '%s<br />' % node.name
+            node.delete()
+        response = 'The following nodes have been purged:<br /><br />' + response
+    else:
+        response = 'There are no old nodes to purge.'
+        
+    return HttpResponse(response)

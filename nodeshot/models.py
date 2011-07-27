@@ -7,7 +7,7 @@ from django.utils.hashcompat import sha_constructor
 from django.core.mail import send_mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
-from settings import MANAGERS
+from nodeshot.utils import notify_admins
 
 # for UserProfile
 from django.contrib.auth.models import User
@@ -144,12 +144,12 @@ class Node(models.Model):
     email = models.EmailField()
     email2 = models.EmailField(blank=True, null=True)
     email3 = models.EmailField(blank=True, null=True)
-    password =  models.CharField(max_length=255)
+    password =  models.CharField(max_length=255, help_text='Per cambiare la password usa il <a href=\"password/\">form di cambio password</a>.')
     lat = models.FloatField('latitudine')
     lng = models.FloatField('longitudine') 
     alt = models.FloatField('altitudine', blank=True, null=True)
     status = models.CharField('stato', max_length=1, choices=NODE_STATUS, default='p')
-    activation_key = models.CharField('activation key', max_length=40, blank=True, null=True)
+    activation_key = models.CharField('activation key', max_length=40, blank=True, null=True, help_text='Chiave per la conferma via mail del nodo. Viene cancellata una volta che il nodo è stato attivato.')
     added = models.DateTimeField('aggiunto il', auto_now_add=True)
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
@@ -231,7 +231,6 @@ class Node(models.Model):
         # send mail
         send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
         # notify admins that want to receive notifications
-        from nodeshot.utils import notify_admins
         notify_admins(self, 'email_notifications/new-node-admin_subject.txt', 'email_notifications/new-node-admin_body.txt', context, skip=True)
         
     def confirm(self):
@@ -316,3 +315,26 @@ class UserProfile(models.Model):
     '''
     user = models.OneToOneField(User)
     receive_notifications = models.BooleanField('Notifiche via email', help_text='Attiva/disattiva le notifiche email riguardanti la gestione dei nodi (aggiunta, cancellazione, abusi, ecc).')
+
+# signal to notify admins when nodes are deleted
+from django.db.models.signals import post_delete
+from settings import DEBUG
+from datetime import datetime, timedelta
+
+def notify_on_delete(sender, instance, using, **kwargs):
+    ''' Notify admins when nodes are deleted. Only for production use '''
+    # if in testing modedon't send emails
+    if DEBUG:
+        pass #return False
+    # if purging old unconfirmed nodes don't send emails
+    if instance.status == 'u' and instance.added + timedelta(days=ACTIVATION_DAYS) < datetime.now():
+        return False
+    # prepare context
+    context = {
+        'node': instance,
+        'site': SITE
+    }
+    # notify admins that want to receive notifications
+    notify_admins(instance, 'email_notifications/node-deleted-admin_subject.txt', 'email_notifications/node-deleted-admin_body.txt', context, skip=False)
+
+post_delete.connect(notify_on_delete, sender=Node)
