@@ -9,6 +9,8 @@ ADMINS = (
      ('admin', 'admin@yourdomain.org'),
 )
 
+ORGANIZATION = 'Ninux.org'
+
 MANAGERS = ADMINS
 
 DATABASES = {
@@ -114,6 +116,8 @@ INSTALLED_APPS = (
 
 # site id for django.contrib.sites
 SITE_ID = 1
+
+
 
 # site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
 NODESHOT_SITE = {

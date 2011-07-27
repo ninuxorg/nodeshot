@@ -15,6 +15,7 @@ from django.core.exceptions import *
 from django.db.models import Q
 from utils import *
 import time,re,os
+import settings
 from settings import DEBUG
 #from forms import *
 
@@ -204,3 +205,84 @@ def confirm_node(request, node_id, activation_key):
         response = 'node has been already confirmed'
         pass
     return HttpResponse(response)
+
+def generate_kml(request):
+    bbox = request.GET.get('BBOX', None)
+    data = ''
+    if not bbox:
+        data = '''<kml xmlns="http://earth.google.com/kml/2.0">
+            <NetworkLink>
+                <name>%s Nodes</name>
+                <description>%s Wireless Community Network</description>
+                <Url>
+                    <href>%skml-feed</href>
+                    <viewRefreshMode>onRequest</viewRefreshMode>
+                </Url>
+            </NetworkLink>
+        </kml>''' %(settings.ORGANIZATION, settings.ORGANIZATION, settings.SITE_URL)
+    else:
+        data = '''<Document>
+    <name>%s</name>
+    <description>%s Wireless Community</description>
+    <LookAt>
+        <longitude>12.48</longitude>
+        <latitude>41.89</latitude>
+        <range>100000</range>
+        <tilt>0</tilt>
+        <heading>0</heading>
+    </LookAt>
+    <Style id="activeNodeStyle">
+        <IconStyle id="activeNodeIconStyle">
+            <Icon>
+                <href>%simages/marker_active.png</href>
+            </Icon>
+        </IconStyle>
+    </Style>
+    <Style id="potentialNodeStyle">
+        <IconStyle id="potentialNodeIconStyle">
+            <Icon>
+                <href>%simages/marker_potential.png</href>
+            </Icon>
+        </IconStyle>
+    </Style>
+    <Style id="Link1Style">
+        <LineStyle>
+            <color>7f00ff00</color>
+            <width>4</width>
+        </LineStyle>
+    </Style>
+    <Style id="Link2Style">
+        <LineStyle>
+            <color>7f00ffff</color>
+            <width>4</width>
+        </LineStyle>
+    </Style>
+    <Style id="Link3Style">
+        <LineStyle>
+            <color>7f0000ff</color>
+            <width>4</width>
+        </LineStyle>
+    </Style>
+
+    <Folder>
+        <name>Active Nodes</name>
+        <description>Nodes that are up and running</description>'''% (settings.ORGANIZATION, settings.ORGANIZATION, settings.MEDIA_URL, settings.MEDIA_URL)
+        for n in Node.objects.filter(status = 'a'):
+            data = data + ''' 
+                <Placemark>
+                    <description></description>
+                    <name>''' + n.name + '''</name>
+                            <styleUrl>#activeNodeStyle</styleUrl>
+                    <LookAt>
+                        <longitude>''' + n.lng +  '''</longitude>
+                        <latitude>''' + n.lat + '''</latitude>
+                        <range>540.68</range>
+                        <tilt>0</tilt>
+                        <heading>3</heading>
+                    </LookAt>
+                    <Point>
+                        <coordinates>''' + n.lng + ',' + n.lat + '''</coordinates>
+                    </Point>
+                </Placemark>  
+            ''' 
+    return HttpResponse(data)
