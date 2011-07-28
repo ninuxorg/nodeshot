@@ -129,15 +129,24 @@ function newNodeMarker(location) {
 }
 
 function initialize_map() {
-    var latlng = new google.maps.LatLng(41.90636538970964, 12.509307861328125);
+    var latlng = new google.maps.LatLng(__center__.lat, __center__.lng);
+
     var myOptions = {
         zoom: 12,
         center: latlng,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    map = new google.maps.Map(document.getElementById("map_canvas"),
-        myOptions);
+    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
     geocoder = new google.maps.Geocoder();
+    
+    if(!__center__.is_default){
+        intervalId = setInterval(function(){
+            if(nodes.active!=undefined){
+                clearInterval(intervalId);
+                mapGoTo(__center__.node);
+            }
+        }, 500);
+    }
 }
 
 function handleMarkerClick(marker, name) {

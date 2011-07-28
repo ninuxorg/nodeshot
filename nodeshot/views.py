@@ -2,7 +2,7 @@
 import datetime
 from datetime import timedelta
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django import forms
 from django.utils import simplejson
@@ -17,7 +17,19 @@ from utils import *
 import time,re,os
 import settings
 from settings import DEBUG
+from django.core.exceptions import ObjectDoesNotExist
 #from forms import *
+
+# retrieve map center or set default if not specified
+try:
+    from settings import NODESHOT_GMAP_CENTER
+except ImportError:
+    # default value is Rome - why? Because the developers of Nodeshot are based in Rome ;-)
+    NODESHOT_GMAP_CENTER = {
+        'lat': '41.90636538970964',
+        'lng': '12.509307861328125'
+    }
+NODESHOT_GMAP_CENTER['is_default'] = 'true'
 
 def index(request):
     max_radios = range(1,10)
@@ -25,7 +37,37 @@ def index(request):
     for l in Link.objects.all():
         km += distance((l.from_interface.device.node.lat,l.from_interface.device.node.lng), (l.to_interface.device.node.lat, l.to_interface.device.node.lng))
     km = '%0.3f' % km
-    return render_to_response('index.html', {'max_radios': max_radios , 'active_n': Node.objects.filter(status = 'a').count() , 'potential_n': Node.objects.filter(status = 'p').count() , 'links_n': Link.objects.count(), 'km_n': km },context_instance=RequestContext(request))
+    
+    # retrieve node in querystring, set False otherwise
+    node = request.GET.get('node', False)
+    # default case for next code block
+    gmap_center = NODESHOT_GMAP_CENTER
+    # if node is in querystring we want to center the map somewhere else
+    if node:
+        try:
+            node = Node.objects.get(name=node)
+            gmap_center = {
+                # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
+                'is_default': 'false',
+                'node': node.name,
+                'lat': str(node.lat),
+                'lng': str(node.lng)
+            }
+        except ObjectDoesNotExist:
+            # if node requested doesn't exist fail silently and fall back on default NODESHOT_GMAP_CENTER value
+            pass
+    
+    # prepare context
+    context = {
+        'max_radios': max_radios ,
+        'active_n': Node.objects.filter(status = 'a').count(),
+        'potential_n': Node.objects.filter(status = 'p').count(),
+        'links_n': Link.objects.count(),
+        'km_n': km,
+        'gmap_center': gmap_center
+    }
+    
+    return render_to_response('index.html', context, context_instance=RequestContext(request))
 
 def nodes(request):
    active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat') 
@@ -188,8 +230,9 @@ def info(request):
     return render_to_response('info.html',{'devices': devices} ,context_instance=RequestContext(request))
     
 def confirm_node(request, node_id, activation_key):
-    node = Node.objects.get(pk=node_id)
-    raw_password = node.password
+    ''' Confirm node view '''
+    # retrieve object or return 404 error
+    node = get_object_or_404(Node, pk=node_id)
     
     if(node.activation_key != '' and node.activation_key != None):
         if(node.activation_key == activation_key):
@@ -199,11 +242,9 @@ def confirm_node(request, node_id, activation_key):
         else:
             # wrong activation key
             response = 'wrong activation key'
-            pass
     else:
         # node has been already confirmed
         response = 'node has been already confirmed'
-        pass
     return HttpResponse(response)
 
 def generate_kml(request):
@@ -286,3 +327,28 @@ def generate_kml(request):
                 </Placemark>  
             ''' 
     return HttpResponse(data)
+
+def report_abuse(request, node_id, email):
+    '''
+    Checks if a node with specified id and email exist
+    if yes sends an email to the administrators to report the abuse
+    if not it returns a 404 http status code
+    '''
+    # retrieve object or return 404 error
+    node = get_object_or_404(Node, pk=node_id)
+    if(node.email != email and node.email2 != email and node.email3 != email):
+        raise Http404
+    
+    try:
+        from settings import NODESHOT_SITE as SITE
+    except ImportError:
+        raise ImproperlyConfigured('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.')
+    
+    context = {
+        'email': email,
+        'node': node,
+        'site': SITE
+    }
+    notify_admins(node, 'email_notifications/report_abuse_subject.txt', 'email_notifications/report_abuse_body.txt', context)
+    
+    return HttpResponse('reported')
