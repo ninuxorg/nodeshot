@@ -258,21 +258,8 @@ def confirm_node(request, node_id, activation_key):
     return HttpResponse(response)
 
 def generate_kml(request):
-    bbox = request.GET.get('BBOX', None)
-    data = ''
-    if not bbox:
-        data = '''<kml xmlns="http://earth.google.com/kml/2.0">
-            <NetworkLink>
-                <name>%s Nodes</name>
-                <description>%s Wireless Community Network</description>
-                <Url>
-                    <href>%skml-feed</href>
-                    <viewRefreshMode>onRequest</viewRefreshMode>
-                </Url>
-            </NetworkLink>
-        </kml>''' %(settings.ORGANIZATION, settings.ORGANIZATION, settings.SITE_URL)
-    else:
-        data = '''<Document>
+    data = '''<kml xmlns="http://earth.google.com/kml/2.0">
+    <Document>
     <name>%s</name>
     <description>%s Wireless Community</description>
     <LookAt>
@@ -296,6 +283,14 @@ def generate_kml(request):
             </Icon>
         </IconStyle>
     </Style>
+    <Style id="hotspotNodeStyle">
+        <IconStyle id="hotspotNodeIconStyle">
+            <Icon>
+                <href>%simages/marker_hotspot.png</href>
+            </Icon>
+        </IconStyle>
+    </Style>
+
     <Style id="Link1Style">
         <LineStyle>
             <color>7f00ff00</color>
@@ -313,29 +308,77 @@ def generate_kml(request):
             <color>7f0000ff</color>
             <width>4</width>
         </LineStyle>
-    </Style>
+    </Style>''' % (settings.ORGANIZATION, settings.ORGANIZATION, settings.MEDIA_URL, settings.MEDIA_URL, settings.MEDIA_URL )
 
-    <Folder>
+    data += '''<Folder>
         <name>Active Nodes</name>
-        <description>Nodes that are up and running</description>'''% (settings.ORGANIZATION, settings.ORGANIZATION, settings.MEDIA_URL, settings.MEDIA_URL)
-        for n in Node.objects.filter(status = 'a'):
-            data = data + ''' 
-                <Placemark>
-                    <description></description>
-                    <name>''' + n.name + '''</name>
-                            <styleUrl>#activeNodeStyle</styleUrl>
-                    <LookAt>
-                        <longitude>''' + n.lng +  '''</longitude>
-                        <latitude>''' + n.lat + '''</latitude>
-                        <range>540.68</range>
-                        <tilt>0</tilt>
-                        <heading>3</heading>
-                    </LookAt>
-                    <Point>
-                        <coordinates>''' + n.lng + ',' + n.lat + '''</coordinates>
-                    </Point>
-                </Placemark>  
-            ''' 
+        <description>Nodes that are up and running</description>'''
+    # active nodes
+    for n in Node.objects.filter(status = 'a'):
+        data = data + '''
+            <Placemark>
+                <name>''' + n.name + '''</name>
+                <styleUrl>#activeNodeStyle</styleUrl>
+                <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
+            </Placemark>  
+        ''' 
+    data += '</Folder>'
+
+    data += '''<Folder>
+        <name>Potential Nodes</name>
+        <description>Potential node locations</description>'''
+    # potential node
+    for n in Node.objects.filter(status = 'p'):
+        data = data + '''
+            <Placemark>
+                <name>''' + n.name + '''</name>
+                <styleUrl>#potentialNodeStyle</styleUrl>
+                <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
+            </Placemark>  
+        ''' 
+    data += '</Folder>'
+
+    data += '''<Folder>
+        <name>Potential Nodes</name>
+        <description>Potential node locations</description>'''
+    # hotspot node
+    for n in Node.objects.filter(status = 'h'):
+        data = data + '''
+            <Placemark>
+                <name>''' + n.name + '''</name>
+                <styleUrl>#hotspotNodeStyle</styleUrl>
+                <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
+            </Placemark>  
+        ''' 
+    data += '</Folder>'
+
+    data += '''<Folder>
+        <name>Links</name>
+        <description>Radio Wireless Links and their quality</description>'''
+    # links 
+    for l in Link.objects.all():
+        quality = 0
+        if 0 < l.etx < 1.5:
+           quality = 1
+        elif l.etx < 3:
+           quality = 2
+        else:
+           quality = 3
+
+        data = data + '''
+        <Placemark>
+        <name>''' + l.from_interface.device.node.name + '-' + l.to_interface.device.node.name + ' ETX ' + str(l.etx) + '''</name>
+        <styleUrl>#Link''' + str(quality) + '''Style</styleUrl>
+            <LineString>
+              <coordinates>''' + str(l.from_interface.device.node.lng) + ',' + str(l.from_interface.device.node.lat) + ' ' + str(l.to_interface.device.node.lng) + ',' + str(l.to_interface.device.node.lat) + '''</coordinates> 
+            </LineString>
+        </Placemark>
+        '''
+    data += '</Folder>'
+
+    data += '''
+        </Document>
+    </kml>'''
     return HttpResponse(data)
 
 def report_abuse(request, node_id, email):
