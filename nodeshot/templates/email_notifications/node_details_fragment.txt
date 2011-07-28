@@ -1,0 +1,13 @@
+Nome: {{ node.name }}
+Descrizione: {{ node.description }}
+Responsabile/i: {{ node.owner }}
+CAP: {{ node.postal_code }}
+Email: {{ node.email }}{% if node.email2 and node.email2 != '' %}
+Email2: {{ node.email2 }}{% endif %}{% if node.email3 and node.email3 != '' %}
+Email3: {{ node.email3 }}{% endif %}
+Longitudine: {{ node.lng }}
+Latitudine: {{ node.lat }}
+Altitudine: {{ node.alt }}
+
+Puoi vedere il nodo sulla mappa cliccando su questo link:
+http://{{ site.domain }}{% url nodeshot.views.index %}?node={{ node.name }}

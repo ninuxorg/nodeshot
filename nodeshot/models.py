@@ -2,12 +2,22 @@
 from django.db import models
 
 import random
-from django.contrib.auth.utils import make_password
 from django.utils.hashcompat import sha_constructor
 from django.core.mail import send_mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
-from settings import MANAGERS
+from nodeshot.utils import notify_admins
+
+# for UserProfile
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+
+# django > 1.4
+try:
+    from django.contrib.auth.utils import make_password
+# django < 1.3
+except ImportError:
+    from nodeshot.utils import make_password
 
 try:
     from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
@@ -140,12 +150,12 @@ class Node(models.Model):
     email = models.EmailField()
     email2 = models.EmailField(blank=True, null=True)
     email3 = models.EmailField(blank=True, null=True)
-    password =  models.CharField(max_length=255)
+    password =  models.CharField(max_length=255, help_text='Per cambiare la password usa il <a href=\"password/\">form di cambio password</a>.')
     lat = models.FloatField('latitudine')
     lng = models.FloatField('longitudine') 
     alt = models.FloatField('altitudine', blank=True, null=True)
     status = models.CharField('stato', max_length=1, choices=NODE_STATUS, default='p')
-    activation_key = models.CharField('activation key', max_length=40, blank=True, null=True)
+    activation_key = models.CharField('activation key', max_length=40, blank=True, null=True, help_text='Chiave per la conferma via mail del nodo. Viene cancellata una volta che il nodo è stato attivato.')
     added = models.DateTimeField('aggiunto il', auto_now_add=True)
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
@@ -166,7 +176,7 @@ class Node(models.Model):
         context = {
             'node': self,
             'expiration_days': ACTIVATION_DAYS,
-            'site': SITE
+            'site': SITE,
         }
         # parse subjects
         subject = render_to_string('email_notifications/confirmation_subject.txt',context)
@@ -184,13 +194,11 @@ class Node(models.Model):
                 'node': self,
                 'site': SITE
             }
-            # parse subject
+            # parse subject (same for both)
             subject = render_to_string('email_notifications/notify-added-emals_subject.txt',context)
             # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())
-            # parse message
-            message = render_to_string('email_notifications/notify-added-emals_body.txt',context)
-            # initialize a list
+            subject = ''.join(subject.splitlines())            
+            # initialize an empty list
             recipient_list = []
             # add email2 to the list
             if self.email2 != '' and self.email2 != None:
@@ -198,8 +206,13 @@ class Node(models.Model):
             # add email3 to the list
             if self.email3 != '' and self.email3 != None:
                 recipient_list += [self.email3]
-            # send mails
-            send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+            # loop over recipient_list
+            for recipient in recipient_list:
+                # insert current email in the body text
+                context['email'] = recipient
+                message = render_to_string('email_notifications/notify-added-emals_body.txt',context)
+                # send mail
+                send_mail(subject, message, DEFAULT_FROM_EMAIL, (recipient,))
         
     def send_success_mail(self, raw_password):
         ''' send success emails '''
@@ -223,24 +236,8 @@ class Node(models.Model):
             recipient_list += [self.email3]
         # send mail
         send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
-        # notify all managers that a new node has been added
-        if(len(MANAGERS)>0):
-            # prepare list
-            recipient_list = []
-            # loop over MANAGERS
-            for manager in MANAGERS:
-                # if manager is not one of the owners (avoid emailing twice)
-                if manager[1] != self.email and manager[1] != self.email2 and manager[1] != self.email3:
-                    # add email of manager to recipient_list
-                    recipient_list += [manager[1]]
-            # parse subject
-            subject = render_to_string('email_notifications/new-node-managers_subject.txt',context)
-            # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())
-            # parse message
-            message = render_to_string('email_notifications/new-node-managers_body.txt',context)
-            # send email
-            send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+        # notify admins that want to receive notifications
+        notify_admins(self, 'email_notifications/new-node-admin_subject.txt', 'email_notifications/new-node-admin_body.txt', context, skip=True)
         
     def confirm(self):
         '''
@@ -314,4 +311,36 @@ class Link(models.Model):
     dbm = models.IntegerField(default=0)
     sync_tx = models.IntegerField(default=0)
     sync_rx = models.IntegerField(default=0)
+    
+class UserProfile(models.Model):
+    '''
+    Extending django's user model so we can have an additional field
+    where we can specify if admins should receive notifications or not
+    
+    https://docs.djangoproject.com/en/dev/topics/auth/#storing-additional-information-about-users
+    '''
+    user = models.OneToOneField(User)
+    receive_notifications = models.BooleanField('Notifiche via email', help_text='Attiva/disattiva le notifiche email riguardanti la gestione dei nodi (aggiunta, cancellazione, abusi, ecc).')
 
+# signal to notify admins when nodes are deleted
+from django.db.models.signals import post_delete
+from settings import DEBUG
+from datetime import datetime, timedelta
+
+def notify_on_delete(sender, instance, using, **kwargs):
+    ''' Notify admins when nodes are deleted. Only for production use '''
+    # if in testing modedon't send emails
+    if DEBUG:
+        pass #return False
+    # if purging old unconfirmed nodes don't send emails
+    if instance.status == 'u' and instance.added + timedelta(days=ACTIVATION_DAYS) < datetime.now():
+        return False
+    # prepare context
+    context = {
+        'node': instance,
+        'site': SITE
+    }
+    # notify admins that want to receive notifications
+    notify_admins(instance, 'email_notifications/node-deleted-admin_subject.txt', 'email_notifications/node-deleted-admin_body.txt', context, skip=False)
+
+post_delete.connect(notify_on_delete, sender=Node)

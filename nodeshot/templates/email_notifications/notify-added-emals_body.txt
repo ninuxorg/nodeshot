@@ -5,4 +5,4 @@ ricevi questa notifica perchè il tuo indirizzo email è stato specificato come 
 Il nodo è in attesa di essere confermato, l'email di conferma è stata inviata all'indirizzo email principale "{{ node.email }}".
 
 Se non approvi che il tuo indirizzo email venga inserito nel nostro database segnala un abuso cliccando sul link seguente:
-http://{{ site.domain }} TODO
+http://{{ site.domain }}{% url nodeshot_report_abuse node.id email %}

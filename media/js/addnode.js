@@ -23,6 +23,11 @@ function insertNodeInfo(){
 $("#node-form").live("submit", function() {
     
     nodeshotShowLoading();
+    $('#nodeshot-modal-mask').css({
+        zIndex: 11,
+        opacity: 0.7
+    });
+    $('#nodeshot-overlay').css('z-index', '10');
     
     var form_data = $(this).serialize();
 
@@ -31,8 +36,15 @@ $("#node-form").live("submit", function() {
         nodeshotHideLoading();
         
         if (data.length >= 10) {
-            $('#nodeshot-overlay').html(data); //form errors
-        } else {
+            // switch back mask and overlay
+            $('#nodeshot-modal-mask').css({
+                zIndex: 10,
+                opacity: 0.5
+            });
+            $('#nodeshot-overlay').css('z-index', '11');
+            //form errors
+            $('#nodeshot-overlay').html(data);
+        } else {            
             $('#node-form').fadeOut(500, function(){
                 nodeshotModal('Grazie per aver inserito un nuovo nodo potenziale, ti abbiamo inviato un\'email con il link di conferma.', nodeshotCloseForm);
             });

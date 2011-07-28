@@ -114,8 +114,20 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
-# site id for django.contrib.sites
-SITE_ID = 1
+# additional information about administrators
+AUTH_PROFILE_MODULE = 'nodeshot.UserProfile'
+
+# google map center for nodeshot
+NODESHOT_GMAP_CENTER = {
+    'lat': '41.90636538970964',
+    'lng': '12.509307861328125'
+}
+
+# site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
+NODESHOT_SITE = {
+    'name': 'Nodeshot',
+    'domain': '10.40.0.56'
+}
 
 
 

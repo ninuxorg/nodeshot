@@ -9,7 +9,7 @@
     <div id="tab-info">
         <table>
             <tr>
-                <td>Nome:</td><td>{{node.name}}</td>
+                <td>Nome:</td><td>{{node.name}} - <a href="{% url nodeshot.views.index %}?node={{ node.name }}">Permalink</a></td>
             </tr>
             <tr>
                 <td>Descrizione:</td><td>{{node.description}}</td>

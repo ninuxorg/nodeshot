@@ -90,7 +90,7 @@ function mapGoTo(nodeName) {
     if (marker) {
         google.maps.event.trigger(marker, "click");
         map.panTo(marker.getPosition());
-        map.setZoom(15);
+        map.setZoom(13);
     } else {
         alert('il nodo non esiste!')
     }
