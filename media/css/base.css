@@ -13,7 +13,7 @@ th, caption {
 }
 article, aside, figure, footer, header, hgroup, menu, nav, section { display:block;margin:0;padding:0 }
 
-html, body { height: 100% }
+html, body { height: 100%; min-width:1000px }
 
 #container
 {
@@ -28,15 +28,21 @@ html, body { height: 100% }
 
 #header
 {
+	min-width:1000px;
     background: #000;
     color: #fff;
+    overflow: hidden;
+    height: 35px;
 }
 
 #header h1 
 { 
-    margin: 0; 
-    display: inline; 
+    float: left;
+    width:11.7%;
+    padding-left:0.3%;
     color: #FFA500;
+    font: bold 28px "Arial", sans-serif;
+    letter-spacing:-1px;
 }
 /*
 #navigation
@@ -70,8 +76,6 @@ html, body { height: 100% }
 
 #navigation li a:hover { background: #383; }
 */
-
-
 
 #content-container
 {
@@ -121,32 +125,32 @@ html, body { height: 100% }
 
 #network-stat
 {
-    width: 80%;
-    margin-left:100px;
+	float: left;
+	width:50%;
+    line-height: 35px;
+    font-size: 12px;
+    text-align: center;
 }
 
-#network-stat ul
+#network-stat span
 {
-    padding: 0;
-    display: inline;
+    margin: 0 3px
 }
 
-#network-stat ul li
+#head-controls
 {
-    list-style-type: none;
-    display: inline;
-}
-
-#search-span
-{
+	width: 37.5%;
+	padding: 5px 0.5% 0 0;
     float: right;
+    text-align: right;
 }
 
 #search {
+	position: relative;
+	bottom:-2px;
     text-align: center;
     vertical-align: top;
-    width: 320px;
-
+    width: 300px;
 }
 
 #view-radio{ margin: 0 auto 10px }

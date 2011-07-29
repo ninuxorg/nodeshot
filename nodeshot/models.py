@@ -322,6 +322,14 @@ class Link(models.Model):
     sync_tx = models.IntegerField(default=0)
     sync_rx = models.IntegerField(default=0)
     
+class Statistic(models.Model):
+    active_nodes = models.IntegerField('nodi attivi')
+    potential_nodes = models.IntegerField('nodi potenziali')
+    hotspots = models.IntegerField('hotspots')
+    links = models.FloatField('Link attivi')
+    km = models.FloatField('Km')
+    date = models.DateField(auto_now_add=True)
+    
 class UserProfile(models.Model):
     '''
     Extending django's user model so we can have an additional field
@@ -332,8 +340,8 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     receive_notifications = models.BooleanField('Notifiche via email', help_text='Attiva/disattiva le notifiche email riguardanti la gestione dei nodi (aggiunta, cancellazione, abusi, ecc).')
 
-# signal to notify admins when nodes are deleted
-from django.db.models.signals import post_delete
+# signals
+from django.db.models.signals import post_delete, post_save
 from settings import DEBUG
 from datetime import datetime, timedelta
 
@@ -352,5 +360,16 @@ def notify_on_delete(sender, instance, using, **kwargs):
     }
     # notify admins that want to receive notifications
     notify_admins(instance, 'email_notifications/node-deleted-admin_subject.txt', 'email_notifications/node-deleted-admin_body.txt', context, skip=False)
+
+post_delete.connect(notify_on_delete, sender=Node)
+
+from utils import distance
+
+def update_statistics(sender, instance, using, **kwargs):
+    ''' Update statistics '''
+    active_nodes = Node.objects.filter(status='a').count()
+    potential_nodes = Node.objects.filter(status='p').count()
+    hotspots = Node.objects.filter(status='h').count()
+    links = Link.objects.count()
 
 post_delete.connect(notify_on_delete, sender=Node)

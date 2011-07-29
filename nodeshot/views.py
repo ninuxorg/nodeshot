@@ -37,11 +37,14 @@ try:
 except ImportError:
     NODESHOT_ACTIVATION_DAYS = 7
 
-
 def index(request):
-    max_radios = range(1,10)
+    # retrieve links, select_related() reduces the number of queries, only() selects only the fields we need
+    links = Link.objects.all().select_related().only(
+        'from_interface__device__node__lat', 'from_interface__device__node__lng',
+        'to_interface__device__node__lat', 'to_interface__device__node__lng'
+    )
     km = 0
-    for l in Link.objects.all():
+    for l in links:
         km += distance((l.from_interface.device.node.lat,l.from_interface.device.node.lng), (l.to_interface.device.node.lat, l.to_interface.device.node.lng))
     km = '%0.3f' % km
     
@@ -66,9 +69,9 @@ def index(request):
     
     # prepare context
     context = {
-        'max_radios': max_radios ,
-        'active_n': Node.objects.filter(status = 'a').count(),
-        'potential_n': Node.objects.filter(status = 'p').count(),
+        'active_n': Node.objects.filter(status='a').count(),
+        'potential_n': Node.objects.filter(status='p').count(),
+        'hotspot_n': Node.objects.filter(status='h').count(),
         'links_n': Link.objects.count(),
         'km_n': km,
         'gmap_center': gmap_center
