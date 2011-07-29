@@ -5,9 +5,9 @@
         <fieldset>
             {% csrf_token %}
             {% if form.non_field_errors %}
-                <p class="validateTips">
-                    {{ form.non_field_errors }}
-                </p>
+                <div class="ui-state-error">
+                {{ form.non_field_errors }}
+                </div><br />
             {% endif %}
     
             <div class="fieldWrapper">
@@ -64,6 +64,15 @@
                     </div>
                 {% endif %}
                 <input id="id_password" type="password" class="text ui-widget-content ui-corner-all" name="password" maxlength="20" />
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_password2">Verifica password: <big>*</big></label>
+                {% if form.password2.errors %}
+                    <div class="ui-state-error">
+                        {{ form.password2.errors }}
+                    </div>
+                {% endif %}
+                <input id="id_password2" type="password" class="text ui-widget-content ui-corner-all" name="password2" maxlength="20" />
             </div>
             <div class="fieldWrapper">
                 <label for="id_email2">Indirizzo E-Mail 2:</label>

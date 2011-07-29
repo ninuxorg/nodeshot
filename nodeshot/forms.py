@@ -5,7 +5,6 @@ from django.core.context_processors import csrf
 from nodeshot.models import *
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.forms import ModelForm
 from django.core.exceptions import *
 from django.forms.models import inlineformset_factory
 from django.utils import simplejson
@@ -15,15 +14,31 @@ from settings import DEBUG
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
+class NodeForm(forms.ModelForm):
+    password2 = forms.CharField(max_length=20, required=True, widget=forms.PasswordInput())
+    
+    class Meta:
+        model = Node
+    
+    def __init__(self, *args, **kwargs):
+        super(NodeForm, self).__init__(*args, **kwargs)
+        # css classes for fields
+        for v in self.fields:
+            self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
+            
+    def clean(self):
+        ''' Calls parent clean() and performs additional validation for the password field '''
+        super(NodeForm, self).clean()
+        password = self.cleaned_data.get('password')
+        password2 = self.cleaned_data.get('password2')
+        # password and password2 must be the same
+        if password != password2:
+            raise forms.ValidationError('I due campi password non corrispondono.')
+        else:
+            return self.cleaned_data
+
 def node_form(request):
-    # add css classes
-    class NodeForm(ModelForm):
-        class Meta:
-            model = Node 
-        def __init__(self, *args, **kwargs):
-            super(NodeForm, self).__init__(*args, **kwargs)
-            for v in self.fields:
-                self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
+    ''' View for add/edit node '''
 
     # retrieve node ID
     node_id = request.GET.get('id', None)
@@ -60,7 +75,7 @@ def node_form(request):
             form = NodeForm(request.POST, instance=node)
             # if form is valid
             if form.is_valid():
-                # save
+                # save in the database
                 form.save()
             
     # if form hasn't been submitted and we are going to edit an existing node
