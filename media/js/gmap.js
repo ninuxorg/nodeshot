@@ -8,8 +8,6 @@ var markersArray = {
     'potentialListeners': [],
     'hotspot': [],
     'hotspotListeners': [],
-    'offline': [],
-    'offlineListeners': [],
     'links': []
 };
 var newMarker;
@@ -47,9 +45,6 @@ function getNodeState(nodeName) {
    for (var i = 0; i < nodes.potential.length; i++) 
         if (nodes.potential[i].name == nodeName)
             return 'p';
-    for (var i = 0; i < nodes.offline.length; i++) 
-        if (nodes.offline[i].name == nodeName)
-            return 'p';
     return 'n'
 }
 
@@ -64,9 +59,6 @@ function findMarker(nodeName) {
     } else if (nodeStatus == 'p' &&  ! $('#potential').is(':checked') ) {
         $('#potential').attr('checked', true);
         draw_nodes('p');
-    } else if (nodeStatus == 'o' &&  ! $('#offline').is(':checked') ) {
-        $('#offline').attr('checked', true);
-        draw_nodes('o');
     }
     if (nodeStatus == 'a')
         marray = markersArray.active;
@@ -74,8 +66,6 @@ function findMarker(nodeName) {
         marray= markersArray.hotspot;
     else if (nodeStatus == 'p')
         marray= markersArray.potential;
-    else if (nodeStatus == 'o')
-        marray= markersArray.offline;
     else 
         return;
     for (var i = 0; i <  marray.length; i++) {
@@ -222,11 +212,6 @@ function draw_nodes(type) {
         marray = markersArray.hotspot;
         larray = markersArray.hotspotListeners;
         image = __project_home__+'media/images/marker_hotspot.png';
-    } else if (type == 'o') {
-        data = nodes.offline;
-        marray = markersArray.offline;
-        larray = markersArray.offlineListeners;
-        image = __project_home__+'media/images/marker_offline.png';
     }
     
     for (var i = 0; i < data.length; i++) { 
@@ -268,9 +253,6 @@ function remove_markers(type) {
     } else if (type == 'p') {
         marray = markersArray.potential;
         larray = markersArray.potentialListeners;
-    } else if (type == 'o') {
-        marray = markersArray.offline;
-        larray = markersArray.offlineListeners;
     }
     for (i in marray) {
         google.maps.event.removeListener(larray[i]);
@@ -498,8 +480,6 @@ function initialize() {
                 draw_nodes('h');
             if ($('#potential').is(':checked') )
                 draw_nodes('p');
-            if ($('#offline').is(':checked') )
-                draw_nodes('o');
         } else if (choice == 'info') {
             $('#content').load(__project_home__+'info_tab' , function() {
                 $("#myTable").tablesorter(); 
@@ -537,8 +517,6 @@ function initialize() {
             draw_nodes('a');
         if ( $('#potential').is(':checked') )
             draw_nodes('p');
-        if ( $('#offline').is(':checked') )
-            draw_nodes('o');
     });
 
     /* view active nodes */
@@ -583,21 +561,6 @@ function initialize() {
             }
         }
     });
-
-    /* view hotspot nodes */
-    $('#offline').change(function() {
-        if ($(this).is(':checked')) {
-            if (markersArray.offline.length == 0)
-                draw_nodes('o');
-        } else {
-            if (markersArray.offline.length > 0) {
-                remove_markers('o');
-                markersArray.offline = [];
-                markersArray.offlineListeners  = [];
-            }
-        }
-    });
-
 
 };
 

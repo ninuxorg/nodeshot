@@ -61,7 +61,6 @@ NODE_STATUS = (
     ('a', 'active'),
     ('p', 'potential'),
     ('h', 'hotspot'),
-    ('o', 'offline'),
     ('u', 'unconfirmed') # nodes that have not been confirmed via email yet
 )
 
