@@ -16,6 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class NodeForm(forms.ModelForm):
     password2 = forms.CharField(max_length=20, required=True, widget=forms.PasswordInput())
+    cap = forms.CharField(max_length=10, required=True, widget=forms.TextInput())
     
     class Meta:
         model = Node
@@ -25,10 +26,16 @@ class NodeForm(forms.ModelForm):
         # css classes for fields
         for v in self.fields:
             self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
-            
+
     def clean(self):
         ''' Calls parent clean() and performs additional validation for the password field '''
         super(NodeForm, self).clean()
+        
+        # strip() values
+        for field in self.cleaned_data: 
+            if isinstance(self.cleaned_data[field], basestring): 
+                self.cleaned_data[field] = self.cleaned_data[field].strip() 
+        
         password = self.cleaned_data.get('password')
         password2 = self.cleaned_data.get('password2')
         # password and password2 must be the same
