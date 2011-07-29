@@ -22,6 +22,7 @@ class NodeAdmin(admin.ModelAdmin):
     
     fieldsets = (
         (None, {'fields': ('status', 'name', 'owner', 'description', 'postal_code', 'email', 'email2', 'email3', 'password', 'lat', 'lng', 'alt' )}),
+        (_('Altro'), {'fields': ('notes',)}),
         (_('Avanzate'), {'classes': ('collapse',), 'fields': ('activation_key',)}),
     )
     

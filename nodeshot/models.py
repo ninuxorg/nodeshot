@@ -12,10 +12,10 @@ from nodeshot.utils import notify_admins
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
-# django > 1.4
+# django >= 1.4
 try:
     from django.contrib.auth.utils import make_password
-# django < 1.3
+# django <= 1.3
 except ImportError:
     from nodeshot.utils import make_password
 
@@ -67,7 +67,13 @@ NODE_STATUS = (
 
 INTERFACE_TYPE = (
     ('w', 'wifi'),
-    ('e', 'ethernet')
+    ('e', 'ethernet'),
+    ('v', 'vpn')
+)
+
+INTERFACE_STATUS = (
+    ('r', 'reachable'),
+    ('u', 'unreachable')
 )
 
 WIRELESS_MODE = (
@@ -155,7 +161,8 @@ class Node(models.Model):
     lng = models.FloatField('longitudine') 
     alt = models.FloatField('altitudine', blank=True, null=True)
     status = models.CharField('stato', max_length=1, choices=NODE_STATUS, default='p')
-    activation_key = models.CharField('activation key', max_length=40, blank=True, null=True, help_text='Chiave per la conferma via mail del nodo. Viene cancellata una volta che il nodo è stato attivato.')
+    activation_key = models.CharField('chiave di attivazione', max_length=40, blank=True, null=True, help_text='Chiave per la conferma via mail del nodo. Viene cancellata una volta che il nodo è stato attivato.')
+    notes = models.TextField('note', blank=True, null=True)
     added = models.DateTimeField('aggiunto il', auto_now_add=True)
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
@@ -273,7 +280,8 @@ class Node(models.Model):
 
 class Device(models.Model):
     name = models.CharField('nome', max_length=50)
-    type = models.CharField('tipo', max_length=50, blank=True, null=True ) 
+    description = models.CharField('descrizione', max_length=255, blank=True, null=True)
+    type = models.CharField('tipo', max_length=50, blank=True, null=True) 
     node = models.ForeignKey(Node, verbose_name='nodo')
     routing_protocol = models.CharField('protocollo di routing', max_length=20, choices=ROUTING_PROTOCOLS, default=DEFAULT_ROUTING_PROTOCOL)
     routing_protocol_version = models.CharField('versione protocollo di routing', max_length=10, blank=True, null=True)
@@ -286,6 +294,7 @@ class Device(models.Model):
 class HNAv4(models.Model):
     device = models.ForeignKey(Device)
     route = models.CharField(max_length=20)
+    
     def __unicode__(self):
         return u'%s' % (self.route)
 
@@ -299,8 +308,10 @@ class Interface(models.Model):
     wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
     mac_address = models.CharField(max_length=17, blank=True, null=True)
     ssid = models.CharField(max_length=50, null=True, blank=True)
+    status = models.CharField('stato', max_length=1, choices=INTERFACE_STATUS, default='r')
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    
     def __unicode__(self):
         return u'IP: %s' % (self.ipv4_address)
 
@@ -331,7 +342,7 @@ def notify_on_delete(sender, instance, using, **kwargs):
     ''' Notify admins when nodes are deleted. Only for production use '''
     # if in testing modedon't send emails
     if DEBUG:
-        pass #return False
+        return False
     # if purging old unconfirmed nodes don't send emails
     if instance.status == 'u' and instance.added + timedelta(days=ACTIVATION_DAYS) < datetime.now():
         return False
