@@ -1,0 +1,73 @@
+<div class="dialog-form ui-widget" >
+    <form id="node-form" class="ui-corner-all ui-widget-content" method="post" action="">
+        <h1>Contatta il nodo {{ node.name }}</h1>
+        <p>I campi contrassegnati con un asterisco sono obbligatori.</p>
+        <fieldset>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="ui-state-error">
+                {{ form.non_field_errors }}
+                </div><br />
+            {% endif %}
+    
+            <div class="fieldWrapper">
+                <label for="id_name">Tuo nome: <big>*</big><label>
+                {% if form.name.errors %}
+                    <div class="ui-state-error">
+                        {{ form.name.errors }}
+                    </div>
+                {% endif %}
+                {{ form.name }}
+            </div>
+            
+            <div class="fieldWrapper">
+                <label for="id_email">Email: <big>*</big><label>
+                {% if form.email.errors %}
+                    <div class="ui-state-error">
+                        {{ form.email.errors }}
+                    </div>
+                {% endif %}
+                {{ form.email }}
+            </div>
+            
+            <div class="fieldWrapper">
+                <label for="id_text">Testo: <big>*</big><label>
+                {% if form.text.errors %}
+                    <div class="ui-state-error">
+                        {{ form.text.errors }}
+                    </div>
+                {% endif %}
+                {{ form.text }}
+            </div>
+            
+            <div class="fieldWrapper">
+                {% if form.math_captcha_field.errors %}
+                    <div class="ui-state-error">
+                        {{ form.math_captcha_field.errors }}
+                    </div>
+                {% endif %}
+                {% autoescape off %}{{ form.math_captcha_field }}{% endautoescape %}
+            </div>
+            
+            <p style="overflow:hidden">
+                <input id="contact-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Invia" />
+                <input id="contact-form-cancel" class="cancel-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="button" value="Annulla" />
+            </p>
+        </fieldset>
+    </form>
+</div>
+
+<script>
+    $('#contact-form-submit, #contact-form-cancel').button();
+    var inputs = $("#node-form").find("input , select ,textarea");
+    $.each(inputs,function(){
+        $(this).bind({
+            focusin: function() {
+               $(this).toggleClass('ui-state-focus');
+            },
+            focusout: function() {
+                $(this).toggleClass('ui-state-focus');
+            }
+        });
+    });
+</script>

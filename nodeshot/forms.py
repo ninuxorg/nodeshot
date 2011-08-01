@@ -203,3 +203,31 @@ class AdminPasswordChangeForm(forms.Form):
         if commit:
             self.node.save()
         return self.node
+    
+from math_captcha import MathCaptchaForm
+
+class ContactForm(MathCaptchaForm):
+    """
+    A form used to contact node owners
+    """
+    
+    name = forms.CharField(max_length=50, min_length=4, widget=forms.TextInput)
+    email = forms.EmailField(max_length=500, min_length=8, widget=forms.TextInput)
+    text = forms.CharField(max_length=2000, widget=forms.Textarea)
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactForm, self).__init__(*args, **kwargs)
+        # css classes for fields
+        for v in self.fields:
+            self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
+    
+    def clean(self):
+        ''' Strip values '''
+        super(ContactForm, self).clean()
+        
+        # strip() values
+        for field in self.cleaned_data: 
+            if isinstance(self.cleaned_data[field], basestring): 
+                self.cleaned_data[field] = self.cleaned_data[field].strip() 
+        
+        return self.cleaned_data

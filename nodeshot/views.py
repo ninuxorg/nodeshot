@@ -17,7 +17,7 @@ import time,re,os
 import settings
 from settings import DEBUG
 from django.core.exceptions import ObjectDoesNotExist
-#from forms import *
+from forms import ContactForm
 from datetime import datetime, timedelta
 
 # retrieve map center or set default if not specified
@@ -237,7 +237,46 @@ def info(request):
         raise Http404
     
     return render_to_response(template,{'devices': devices} ,context_instance=RequestContext(request))
+
+def contact(request, node_id):
+    ''' Form to contact node owners '''
+    # retrieve object or return 404 error
+    node = get_object_or_404(Node, pk=node_id)
+    if node.status == 'u':
+        raise Http404
     
+    # if request is sent with ajax
+    if request.is_ajax():
+        # just load the fragment
+        template = 'ajax/contact.html'
+    # otherwise if request is sent normally and DEBUG is true
+    elif DEBUG:
+        # debuggin template
+        template = 'contact.html'
+    else:
+        raise Http404
+    
+    # if form has been submitted
+    if request.method == 'POST':
+        # instance form with POST data
+        form = ContactForm(request.POST)
+        # proceed in sending email only if form is valid
+        if form.is_valid():
+            pass
+        
+        ### TODO: Captcha ###        
+        
+    # if form has NOT been submitted
+    else:
+        form = ContactForm()
+    
+    context = {
+        'node': node,
+        'form': form
+    }
+    
+    return render_to_response(template, context ,context_instance=RequestContext(request))
+
 def confirm_node(request, node_id, activation_key):
     ''' Confirm node view '''
     # retrieve object or return 404 error
@@ -387,7 +426,7 @@ def report_abuse(request, node_id, email):
     '''
     Checks if a node with specified id and email exist
     if yes sends an email to the administrators to report the abuse
-    if not it returns a 404 http status code
+    if not returns a 404 http status code
     '''
     # retrieve object or return 404 error
     node = get_object_or_404(Node, pk=node_id)
@@ -411,7 +450,7 @@ def report_abuse(request, node_id, email):
 def purge_expired(request):
     '''
     Purge all the nodes that have not been confirmed older than settings.NODESHOT_ACTIVATION_DAYS.
-    This view might be called with a cron so the purging would be done automatically.
+    This view might be called with a cron so the purging can be done automatically.
     '''
     # select unconfirmed nodes which are older than NODESHOT_ACTIVATION_DAYS
     nodes = Node.objects.filter(status='u', added__lt=datetime.now() - timedelta(days=NODESHOT_ACTIVATION_DAYS))
