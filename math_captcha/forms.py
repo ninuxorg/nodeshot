@@ -65,6 +65,6 @@ class MathCaptchaForm(forms.Form):
     math_captcha_field = MathField(label=settings.QUESTION)
     math_captcha_question = forms.fields.CharField(widget=NullWidget())
 
-    def clean(self):
+    def clean_math_captcha_field(self):
         super(MathCaptchaForm, self).clean()
         math_clean(self)    

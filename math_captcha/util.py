@@ -12,7 +12,7 @@ def question():
         # avoid negative answers
         n1, n2 = n2, n1
 
-    return "%s %s %s %s ?" % (settings.QUESTION, n1, choice(settings.OPERATORS), n2)
+    return "%s %s %s" % (n1, choice(settings.OPERATORS), n2)
     
 def encode(question):
     """

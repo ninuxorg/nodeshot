@@ -264,7 +264,7 @@ def contact(request, node_id):
         if form.is_valid():
             pass
         
-        ### TODO: Captcha ###        
+        ### TODO: need to be stored in the database ###        
         
     # if form has NOT been submitted
     else:

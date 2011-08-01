@@ -1,7 +1,7 @@
 from django.forms.fields import IntegerField
 from django.forms.widgets import TextInput
 from util import question, encode
-
+import settings
 
 class MathWidget(TextInput):
     """
@@ -9,9 +9,10 @@ class MathWidget(TextInput):
     """
     def render(self, name, value, attrs):
         aquestion = question()
+        label = '%s %s ?' % (settings.QUESTION, aquestion)
         value = super(MathWidget, self).render(name, value, attrs)
         hidden = '<input type="hidden" value="%s" name="math_captcha_question"/>' %  encode(aquestion)
-        return value.replace('<input', '%s %s = <input' % (hidden, aquestion))
+        return value.replace('<input', '%s %s = <input' % (hidden, label))
         
 class MathField(IntegerField):
     widget = MathWidget()

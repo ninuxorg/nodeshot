@@ -1,7 +1,7 @@
 <div class="dialog-form ui-widget" >
     <form id="node-form" class="ui-corner-all ui-widget-content" method="post" action="">
         <h1>Contatta il nodo {{ node.name }}</h1>
-        <p>I campi contrassegnati con un asterisco sono obbligatori.</p>
+        <p>Tutti i campi sono obbligatori.</p>
         <fieldset>
             {% csrf_token %}
             {% if form.non_field_errors %}
@@ -11,7 +11,7 @@
             {% endif %}
     
             <div class="fieldWrapper">
-                <label for="id_name">Tuo nome: <big>*</big><label>
+                <label for="id_name">Tuo nome:<label>
                 {% if form.name.errors %}
                     <div class="ui-state-error">
                         {{ form.name.errors }}
@@ -21,7 +21,7 @@
             </div>
             
             <div class="fieldWrapper">
-                <label for="id_email">Email: <big>*</big><label>
+                <label for="id_email">Email:<label>
                 {% if form.email.errors %}
                     <div class="ui-state-error">
                         {{ form.email.errors }}
@@ -31,7 +31,7 @@
             </div>
             
             <div class="fieldWrapper">
-                <label for="id_text">Testo: <big>*</big><label>
+                <label for="id_text">Testo:<label>
                 {% if form.text.errors %}
                     <div class="ui-state-error">
                         {{ form.text.errors }}
