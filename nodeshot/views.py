@@ -13,6 +13,7 @@ from django.conf import settings
 from django.forms import ModelForm
 from django.core.exceptions import *
 from django.db.models import Q
+from django.db.models import Count
 from utils import *
 import time,re,os
 import settings
@@ -38,16 +39,10 @@ except ImportError:
     NODESHOT_ACTIVATION_DAYS = 7
 
 def index(request):
-    # retrieve links, select_related() reduces the number of queries, only() selects only the fields we need
-    links = Link.objects.all().select_related().only(
-        'from_interface__device__node__lat', 'from_interface__device__node__lng',
-        'to_interface__device__node__lat', 'to_interface__device__node__lng'
-    )
-    km = 0
-    for l in links:
-        km += distance((l.from_interface.device.node.lat,l.from_interface.device.node.lng), (l.to_interface.device.node.lat, l.to_interface.device.node.lng))
-    km = '%0.3f' % km
-    
+    # retrieve statistics
+    stat = Statistic.objects.latest('date')
+    # round km
+    stat.km = int(stat.km)
     # retrieve node in querystring, set False otherwise
     node = request.GET.get('node', False)
     # default case for next code block
@@ -69,11 +64,7 @@ def index(request):
     
     # prepare context
     context = {
-        'active_n': Node.objects.filter(status='a').count(),
-        'potential_n': Node.objects.filter(status='p').count(),
-        'hotspot_n': Node.objects.filter(status='h').count(),
-        'links_n': Link.objects.count(),
-        'km_n': km,
+        'stat': stat,
         'gmap_center': gmap_center
     }
     

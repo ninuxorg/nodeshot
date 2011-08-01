@@ -15,10 +15,10 @@
                     Nodeshot
                 </h1>
                 <p id="network-stat">
-                    <span><strong>Nodi Attivi:</strong> {{ active_n }}</span>
-                    <span><strong>Hotspots:</strong> {{ hotspot_n }}</span>
-                    <span><strong>Nodi Potenziali:</strong> {{ potential_n }}</span>
-                    <span><strong>Link attivi:</strong> {{ links_n }} ({{ km_n }} km)</span>
+                    <span><strong>Nodi Attivi:</strong> {{ stat.active_nodes }}</span>
+                    <span><strong>Hotspots:</strong> {{ stat.hotspots }}</span>
+                    <span><strong>Nodi Potenziali:</strong> {{ stat.potential_nodes }}</span>
+                    <span><strong>Link attivi:</strong> {{ stat.links }} ({{ stat.km }} km)</span>
                 </p>
                 <div id="head-controls" class="ui-widget">
                     <a href="/admin"><img src="{{MEDIA_URL}}images/icons/Config.png" class="top-icon" alt="Admin" /></a>

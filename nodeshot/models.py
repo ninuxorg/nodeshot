@@ -326,9 +326,16 @@ class Statistic(models.Model):
     active_nodes = models.IntegerField('nodi attivi')
     potential_nodes = models.IntegerField('nodi potenziali')
     hotspots = models.IntegerField('hotspots')
-    links = models.FloatField('Link attivi')
+    links = models.IntegerField('Link attivi')
     km = models.FloatField('Km')
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
+    
+    def __unicode__(self):
+        return u'%s' % (self.date)
+    
+    class Meta:
+        verbose_name = 'Statistica'
+        verbose_name_plural = 'Statistiche'
     
 class UserProfile(models.Model):
     '''
@@ -364,12 +371,63 @@ def notify_on_delete(sender, instance, using, **kwargs):
 post_delete.connect(notify_on_delete, sender=Node)
 
 from utils import distance
+from django.db.models import Q, Count
 
 def update_statistics(sender, instance, using, **kwargs):
-    ''' Update statistics '''
-    active_nodes = Node.objects.filter(status='a').count()
-    potential_nodes = Node.objects.filter(status='p').count()
-    hotspots = Node.objects.filter(status='h').count()
-    links = Link.objects.count()
+    ''' Adds a new record in the statistic table if needed. Called by signals '''
+    # retrieve links, select_related() reduces the number of queries, only() selects only the fields we need
+    links = Link.objects.all().select_related().only(
+        'from_interface__device__node__lat', 'from_interface__device__node__lng',
+        'to_interface__device__node__lat', 'to_interface__device__node__lng'
+    )
+    
+    # get counts of the active nodes, potential nodes, hotspots and group the results
+    # Count() is a function provided by django.db.models
+    nodes = Node.objects.values('status').annotate(count=Count('status')).filter(Q(status='a') | Q(status='h') | Q(status='p')).order_by('status')
+    # evaluate queryset to avoid repeating the same query
+    nodes = list(nodes)
+    
+    # active nodes
+    active_nodes = nodes[0].get('count')
+    # hotspots
+    hotspots = nodes[1].get('count')
+    # potential nodes
+    potential_nodes = nodes[2].get('count')
+    # number of links
+    link_count = Link.objects.count()
+    
+    # calculate total km of the links
+    km = 0
+    for l in links:
+        km += distance((l.from_interface.device.node.lat,l.from_interface.device.node.lng), (l.to_interface.device.node.lat, l.to_interface.device.node.lng))
+    km = '%0.3f' % km
+    
+    # retrieve last statistic
+    try:
+        last = Statistic.objects.all().order_by('-pk')[:1][0]
+    # no statistics in the database yet
+    except IndexError:
+        last = False
+    
+    # compare last statistic with data we have now (km are converted to string in order to avoid django to mess the comparation caused by float field)
+    if last and last.active_nodes == active_nodes and last.hotspots == hotspots and last.potential_nodes == potential_nodes and last.links == link_count and str(last.km) == str(km):
+        # if data is the same there's no need to add a new record
+        return False
+    else:
+        # if we got different numbers it means something has changed and we need to insert a new record in the statistics
+        new = Statistic(active_nodes=active_nodes, potential_nodes=potential_nodes, hotspots=hotspots, links=link_count, km=km)
+        new.save()
 
-post_delete.connect(notify_on_delete, sender=Node)
+# signals to update statistics every time something is modified or deleted
+post_delete.connect(update_statistics, sender=Node)
+post_delete.connect(update_statistics, sender=Device)
+post_delete.connect(update_statistics, sender=Interface)
+post_delete.connect(update_statistics, sender=Link)
+post_delete.connect(update_statistics, sender=HNAv4)
+
+post_save.connect(update_statistics, sender=Node)
+post_save.connect(update_statistics, sender=Device)
+post_save.connect(update_statistics, sender=Interface)
+post_save.connect(update_statistics, sender=Link)
+post_save.connect(update_statistics, sender=HNAv4)
+
