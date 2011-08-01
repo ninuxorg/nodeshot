@@ -21,7 +21,7 @@
                 <td>{{ device.device_type }}</td> 
                 <td>{% for ip in device.ips %} <a href="javascript:load_rrd('{{ip}}')">{{ip}}</a> <br /> {% endfor %}</td> 
                 <td>{% for mac in device.macs %}{{ mac }}<br />{% endfor %}</td> 
-                <td>{%for signal in device.links %}<div class="signalbar" id="pb_{{device.id}}_{{signal.id}}"></div> {{signal.dbm}} dBm -> <a href="#{{signal.to_interface.device.node.id}}">{{signal.to_interface.device.node.name}}</a> <br/> {% endfor %}</td>
+                <td>{% for signal in device.links %}<div class="signalbar" id="pb_{{device.id}}_{{signal.id}}"></div> {{signal.dbm}} dBm -> <a href="#{{signal.to_interface.device.node.id}}">{{signal.to_interface.device.node.name}}</a> <br/> {% endfor %}</td>
             </tr> 
             {%for signal in device.links %}
             <script>                                                                                                                                                                           

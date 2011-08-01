@@ -144,16 +144,21 @@ def node_list(request):
 #            },
 #            ]
     
-    active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat') 
-    potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat') 
-    data = []
-    active_list, potential_list = [] ,[]
+    active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat')
+    hotspot = Node.objects.filter(status = 'h').values('name', 'lng', 'lat') 
+    potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat')
+    data, active_list, hotspot_list, potential_list = [], [], [], []
 
     for a in active:
         active_list.append({ 'data' : {'title' : a['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + a['name'] + '\')'} } })
     if len(active_list) > 0:
         data.append( { "data" : "Attivi", "state" : "open", "children" : list(active_list) } )
-
+        
+    for h in hotspot:
+        hotspot_list.append({'data' :{'title' : h['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + h['name'] + '\')'} } })
+    if len(hotspot_list) > 0:
+        data.append( { "data" : "Hotspots", "state" : "open", "children" : list(hotspot_list) } )
+        
     for p in potential:
         potential_list.append({'data' :{'title' : p['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + p['name'] + '\')'} } })
     if len(potential_list) > 0:
@@ -178,12 +183,11 @@ def info_window(request, nodeName):
 
 def search(request, what):
     data = []
-    data = data + [{'label': d.name, 'value': d.name }  for d in Node.objects.filter(Q(name__icontains=what))]
-    data = data + [{'label': d.ipv4_address , 'value': d.device.node.name }  for d in Interface.objects.filter(ipv4_address__icontains=what)]
-    data = data + [{'label': d.mac_address , 'value': d.device.node.name }  for d in Interface.objects.filter(mac_address__icontains=what)]
-    data = data + [{'label': d.ssid , 'value': d.device.node.name }  for d in Interface.objects.filter(ssid__icontains=what)]
+    data = data + [{'label': d.name, 'value': d.name }  for d in Node.objects.filter(name__icontains=what).only('name')]
+    data = data + [{'label': d.ipv4_address , 'value': d.device.node.name }  for d in Interface.objects.filter(ipv4_address__icontains=what).only('device__node__name')]
+    data = data + [{'label': d.mac_address , 'value': d.device.node.name }  for d in Interface.objects.filter(mac_address__icontains=what).only('device__node__name')]
+    data = data + [{'label': d.ssid , 'value': d.device.node.name }  for d in Interface.objects.filter(ssid__icontains=what).only('device__node__name')]
     if len(data) > 0:
-        #data = [{'label': d['name'], 'value': d['name']}  for d in data]
         return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     else:
         return HttpResponse("", mimetype='application/json')
@@ -200,7 +204,7 @@ def generate_rrd(request):
 def info(request):
     devices = []
     entry = {}
-    for d in Device.objects.all().order_by('node__status'):
+    for d in Device.objects.all().order_by('node__status').select_related().only('name', 'type', 'node__name', 'node__status'):
         entry['status'] = "on" if d.node.status == 'a' else "off"
         entry['device_type'] = d.type
         entry['node_name'] = d.node.name 
@@ -210,7 +214,7 @@ def info(request):
         # heuristic count for good representation of the signal bar (from 0 to 100)
         #entry['signal_bar'] = signal_to_bar(d.max_signal)  if d.max_signal < 0 else 0
         #entry['signal'] = d.max_signal  
-        links = Link.objects.filter(from_interface__device = d)
+        links = Link.objects.filter(from_interface__device = d).select_related().only('dbm', 'to_interface__mac_address', 'to_interface__device__node__name')
         # convert QuerySet in list
         links = list(links)
         for l in links:
