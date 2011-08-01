@@ -236,7 +236,7 @@ def info(request):
     else:
         raise Http404
     
-    return render_to_response('info.html',{'devices': devices} ,context_instance=RequestContext(request))
+    return render_to_response(template,{'devices': devices} ,context_instance=RequestContext(request))
     
 def confirm_node(request, node_id, activation_key):
     ''' Confirm node view '''

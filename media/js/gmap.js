@@ -481,7 +481,11 @@ function initialize() {
             if ($('#potential').is(':checked') )
                 draw_nodes('p');
         } else if (choice == 'info') {
+            nodeshotMask();
+            nodeshotShowLoading();
             $('#content').load(__project_home__+'info_tab' , function() {
+                nodeshotRemoveMask();
+                nodeshotHideLoading();
                 $("#myTable").tablesorter(); 
                 //$("#myTable").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")}); 
               });
