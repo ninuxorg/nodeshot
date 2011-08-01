@@ -12,8 +12,6 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.forms import ModelForm
 from django.core.exceptions import *
-from django.db.models import Q
-from django.db.models import Count
 from utils import *
 import time,re,os
 import settings
@@ -71,13 +69,20 @@ def index(request):
     return render_to_response('index.html', context, context_instance=RequestContext(request))
 
 def nodes(request):
-   active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat') 
-   potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat')
-   hotspot = Node.objects.filter(status = 'h').values('name', 'lng', 'lat')
-   offline = Node.objects.filter(status = 'o').values('name', 'lng', 'lat')
-   
-   links = []
-   for l in Link.objects.all():
+    active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat') 
+    potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat')
+    hotspot = Node.objects.filter(status = 'h').values('name', 'lng', 'lat')
+    
+    # retrieve links, select_related() reduces the number of queries, only() selects only the fields we need
+    link_query = Link.objects.all().select_related().only(
+        'from_interface__device__node__lat', 'from_interface__device__node__lng',
+        'to_interface__device__node__lat', 'to_interface__device__node__lng',
+        'to_interface__device__node__name', 'to_interface__device__node__name',
+        'etx', 'dbm'
+    )
+    
+    links = []
+    for l in link_query:
        etx = 0
        if 0 < l.etx < 1.5:
            etx = 1
@@ -96,9 +101,8 @@ def nodes(request):
        entry = {'from_lng': l.from_interface.device.node.lng , 'from_lat': l.from_interface.device.node.lat, 'to_lng': l.to_interface.device.node.lng, 'to_lat': l.to_interface.device.node.lat, 'etx': etx , 'dbm': dbm }
        links.append(entry)
 
-   data = {'hotspot': list(hotspot), 'active': list(active), 'potential': list(potential), 'offline': list(offline), 'links': links} 
-   return HttpResponse(simplejson.dumps(data), mimetype='application/json')
-
+    data = {'hotspot': list(hotspot), 'active': list(active), 'potential': list(potential), 'links': links} 
+    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def node_list(request):
 #    data = [
