@@ -38,9 +38,13 @@ except ImportError:
 
 def index(request):
     # retrieve statistics
-    stat = Statistic.objects.latest('date')
-    # round km
-    stat.km = int(stat.km)
+    try:
+        stat = Statistic.objects.latest('date')
+        # round km
+        stat.km = int(stat.km)
+    except ObjectDoesNotExist:
+        stat = False
+    
     # retrieve node in querystring, set False otherwise
     node = request.GET.get('node', False)
     # default case for next code block

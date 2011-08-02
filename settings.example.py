@@ -161,3 +161,8 @@ EMAIL_HOST_USER = 'youremail@gmail.com'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = 'youremail@gmail.com'
+
+# captcha settings
+MATH_CAPTCHA_NUMBERS = range(1,9)
+MATH_CAPTCHA_OPERATORS = '+'
+MATH_CAPTCHA_QUESTION = 'Domanda antispam: quanto fa'
