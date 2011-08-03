@@ -1,0 +1,10 @@
+{% load i18n %}Un utente di "{{ site.name }}" vuole entrare in contatto con i responsabili del nodo "{{ node.name }}".
+
+Nome: {{ sender.from_name }}
+Email: {{ sender.from_email }}
+
+Messaggio:
+{{ sender.message }}
+
+Quest'email è stata spedita a {{ node.email }}{% if node.email2 != '' and node.email2 != None %}, {{ node.email2 }}{% endif %}{% if node.email3 != '' and node.email3 != None %} e {{ node.email3 }}{% endif %}.
+{% if node.email2 != '' and node.email2 != None %}Se risponderai a questa email ti consigliamo di includere anche gli altri responsabili del nodo nel campo CC.{% endif %}

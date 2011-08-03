@@ -19,9 +19,12 @@ class NodeAdmin(admin.ModelAdmin):
     list_filter   = ('status', 'added', 'updated')
     search_fields = ('name', 'owner', 'email', 'postal_code')
     save_on_top = True
+    date_hierarchy = 'added'
+    ordering = ('-id',)
+    prepopulated_fields = {'slug': ('name',)}
     
     fieldsets = (
-        (None, {'fields': ('status', 'name', 'owner', 'description', 'postal_code', 'email', 'email2', 'email3', 'password', 'lat', 'lng', 'alt' )}),
+        (None, {'fields': ('status', 'name', 'slug', 'owner', 'description', 'postal_code', 'email', 'email2', 'email3', 'password', 'lat', 'lng', 'alt' )}),
         (_('Altro'), {'fields': ('notes',)}),
         (_('Avanzate'), {'classes': ('collapse',), 'fields': ('activation_key',)}),
     )
@@ -76,10 +79,22 @@ class DeviceAdmin(admin.ModelAdmin):
     list_filter   = ('added', 'updated', 'node')
     search_fields = ('name', 'type')
     save_on_top = True
+    date_hierarchy = 'added'
     
 class StatisticAdmin(admin.ModelAdmin):
     list_display  = ('date', 'active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
-    ordering = ('-id',) 
+    ordering = ('-id',)
+    date_hierarchy = 'date'
+    readonly_fields = ('active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
+    actions = None
+    
+class ContactAdmin(admin.ModelAdmin):
+    list_display  = ('from_name', 'from_email', 'node', 'date')
+    ordering = ('-id',)
+    actions = ('test',)
+    date_hierarchy = 'date'
+    readonly_fields = ('from_name', 'from_email', 'message', 'ip', 'user_agent', 'http_referer', 'accept_language')
+    actions = None
 
 admin.site.register(Node, NodeAdmin)
 admin.site.register(Device, DeviceAdmin)
@@ -87,6 +102,7 @@ admin.site.register(Interface)
 admin.site.register(HNAv4)
 admin.site.register(Link)
 admin.site.register(Statistic, StatisticAdmin)
+admin.site.register(Contact, ContactAdmin)
 
 # UserProfile
 

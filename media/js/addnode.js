@@ -20,6 +20,59 @@ function insertNodeInfo(){
     });
 }
 
+function contactNode(node_id){
+    nodeshotMask(0.7);
+    nodeshotShowLoading();
+    $.get(__project_home__+'contact/'+node_id+'/', function(data) {
+        nodeshotHideLoading();
+        $('body').append('<div id="nodeshot-overlay"></div>');
+        $('#nodeshot-overlay').html(data);
+        form = $('#contact-form');
+        form.css('margin-top', ($(window).height()-form.height()) / 2);
+        setDimensions();
+        $('#contact-form-cancel').click(function(){
+            nodeshotCloseForm();
+        });
+        $('#contact-form').submit(function(e){
+            e.preventDefault();
+            submitContactNode(node_id, $(this))
+        });
+    });
+}
+
+function submitContactNode(node_id, $this){
+    nodeshotShowLoading();
+    $('#nodeshot-modal-mask').css({
+        zIndex: 11,
+        opacity: 0.7
+    });
+    $('#nodeshot-overlay').css('z-index', '10');
+    
+    var form_data = $this.serialize();
+
+    $.post(__project_home__+'contact/'+node_id+'/', form_data, function(data) {
+        
+        nodeshotHideLoading();
+        
+        if ($(data).find('#success').length < 1) {
+            // switch back mask and overlay
+            $('#nodeshot-modal-mask').css({
+                zIndex: 10,
+                opacity: 0.5
+            });
+            $('#nodeshot-overlay').css('z-index', '11');
+            //form errors
+            $('#nodeshot-overlay').html(data);
+        } else {            
+            $('#contact-form').fadeOut(500, function(){
+                nodeshotModal('Messaggio inviato con successo.', nodeshotCloseForm);
+            });
+        }
+    });
+
+    return false; 
+}
+
 $("#node-form").live("submit", function() {
     
     nodeshotShowLoading();

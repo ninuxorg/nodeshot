@@ -11,14 +11,14 @@ from nodeshot.models import *
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.forms import ModelForm
-from django.core.exceptions import *
 from utils import *
 import time,re,os
 import settings
-from settings import DEBUG
+from settings import DEBUG, NODESHOT_SITE as SITE
 from django.core.exceptions import ObjectDoesNotExist
 from forms import ContactForm
 from datetime import datetime, timedelta
+from django.core.mail import EmailMessage
 
 # retrieve map center or set default if not specified
 try:
@@ -36,7 +36,12 @@ try:
 except ImportError:
     NODESHOT_ACTIVATION_DAYS = 7
 
-def index(request):
+try:
+    from settings import NODESHOT_LOG_CONTACTS as LOG_CONTACTS
+except ImportError:
+    LOG_CONTACTS = True
+
+def index(request, slug=False):
     # retrieve statistics
     try:
         stat = Statistic.objects.latest('date')
@@ -44,39 +49,37 @@ def index(request):
         stat.km = int(stat.km)
     except ObjectDoesNotExist:
         stat = False
-    
-    # retrieve node in querystring, set False otherwise
-    node = request.GET.get('node', False)
+
     # default case for next code block
     gmap_center = NODESHOT_GMAP_CENTER
     # if node is in querystring we want to center the map somewhere else
-    if node:
+    if slug:
         try:
-            node = Node.objects.get(name=node)
+            node = Node.objects.only('lat', 'lng').get(slug=slug)
             gmap_center = {
                 # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
                 'is_default': 'false',
-                'node': node.name,
+                'node': node.slug,
                 'lat': str(node.lat),
                 'lng': str(node.lng)
             }
         except ObjectDoesNotExist:
-            # if node requested doesn't exist fail silently and fall back on default NODESHOT_GMAP_CENTER value
-            pass
-    
+            # if node requested doesn't exist return 404
+            raise Http404
+
     # prepare context
     context = {
         'stat': stat,
         'gmap_center': gmap_center
     }
-    
+
     return render_to_response('index.html', context, context_instance=RequestContext(request))
 
 def nodes(request):
-    active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat') 
-    potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat')
-    hotspot = Node.objects.filter(status = 'h').values('name', 'lng', 'lat')
-    
+    active = Node.objects.filter(status = 'a').values('name', 'slug', 'id', 'lng', 'lat')
+    potential = Node.objects.filter(status = 'p').values('name', 'slug', 'id', 'lng', 'lat')
+    hotspot = Node.objects.filter(status = 'h').values('name', 'slug', 'id', 'lng', 'lat')
+
     # retrieve links, select_related() reduces the number of queries, only() selects only the fields we need
     link_query = Link.objects.all().select_related().only(
         'from_interface__device__node__lat', 'from_interface__device__node__lng',
@@ -84,7 +87,7 @@ def nodes(request):
         'to_interface__device__node__name', 'to_interface__device__node__name',
         'etx', 'dbm'
     )
-    
+
     links = []
     for l in link_query:
        etx = 0
@@ -105,92 +108,52 @@ def nodes(request):
        entry = {'from_lng': l.from_interface.device.node.lng , 'from_lat': l.from_interface.device.node.lat, 'to_lng': l.to_interface.device.node.lng, 'to_lat': l.to_interface.device.node.lat, 'etx': etx , 'dbm': dbm }
        links.append(entry)
 
-    data = {'hotspot': list(hotspot), 'active': list(active), 'potential': list(potential), 'links': links} 
+    data = {'hotspot': list(hotspot), 'active': list(active), 'potential': list(potential), 'links': links}
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def node_list(request):
-#    data = [
-#            { 
-#                "data" : "Roma", 
-#                "state" : "open",
-#                "children" : [ 
-#                    {'data' : {"title" : "Fusolab", "attr" : { "href" : "http://wiki.ninux.org" } } }, 
-#                    {'data' : {"title" : "Talamo", "attr" : { "href" : "http://wiki.ninux.org" } } }, 
-#                    {'data' : {"title" : "Kiddy", "attr" : { "href" : "http://wiki.ninux.org" } } }, 
-#                    {'data' : {"title" : "Lux", "attr" : { "href" : "http://wiki.ninux.org" } } }, 
-#                    {'data' : {"title" : "Rustica-Salcito", "attr" : { "href" : "http://wiki.ninux.org" } } }, 
-#                    {'data' : {"title" : "Nino", "attr" : { "href" : "http://wiki.ninux.org" } } }, 
-#                    {'data' : {"title" : "Asello", "attr" : { "href" : "http://wiki.ninux.org" } } }, 
-#                    {'data' : {"title" : "Clauz", "attr" : { "href" : "http://wiki.ninux.org" } } }, 
-#                    {'data' : {"title" : "Fish", "attr" : { "href" : "http://wiki.ninux.org" } } }
-#                    ]
-#            },
-#            { 
-#                "data" : "Pisa", 
-#                "state" : "open",
-#                "children" : [ 
-#                    {'data' : {"title" : "Eigenlab", "attr" : { "href" : "http://wiki.ninux.org" } } }
-#                    ]
-#            },
-#            { 
-#                "data" : "Mistretta", 
-#                "state" : "open",
-#                "children" : [ 
-#                    {'data' : {"title" : "Boh", "attr" : { "href" : "http://wiki.ninux.org" } } }
-#                    ]
-#            },
-#            { 
-#                "data" : "Potenziali", 
-#                "state" : "open",
-#                "children" : [ 
-#                    {'data' : {"title" : "Io", "attr" : { "href" : "http://wiki.ninux.org" } } }
-#                    ]
-#            },
-#            ]
-    
-    active = Node.objects.filter(status = 'a').values('name', 'lng', 'lat')
-    hotspot = Node.objects.filter(status = 'h').values('name', 'lng', 'lat') 
-    potential = Node.objects.filter(status = 'p').values('name', 'lng', 'lat')
+    active = Node.objects.filter(status = 'a').values('name', 'slug', 'lng', 'lat').order_by('name')
+    hotspot = Node.objects.filter(status = 'h').values('name', 'slug', 'lng', 'lat').order_by('name')
+    potential = Node.objects.filter(status = 'p').values('name', 'slug', 'lng', 'lat').order_by('name')
     data, active_list, hotspot_list, potential_list = [], [], [], []
 
     for a in active:
-        active_list.append({ 'data' : {'title' : a['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + a['name'] + '\')'} } })
+        active_list.append({ 'data' : {'title' : a['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + a['slug'] + '\')'} } })
     if len(active_list) > 0:
         data.append( { "data" : "Attivi", "state" : "open", "children" : list(active_list) } )
-        
+
     for h in hotspot:
-        hotspot_list.append({'data' :{'title' : h['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + h['name'] + '\')'} } })
+        hotspot_list.append({'data' :{'title' : h['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + h['slug'] + '\')'} } })
     if len(hotspot_list) > 0:
         data.append( { "data" : "Hotspots", "state" : "open", "children" : list(hotspot_list) } )
-        
+
     for p in potential:
-        potential_list.append({'data' :{'title' : p['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + p['name'] + '\')'} } })
+        potential_list.append({'data' :{'title' : p['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + p['slug'] + '\')'} } })
     if len(potential_list) > 0:
         data.append( { "data" : "Potenziali", "state" : "open", "children" : list(potential_list) } )
 
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
-def info_window(request, nodeName):
+def info_window(request, node_id):
     # vedere la class in models.py
-    n = Node.objects.get(name = nodeName)
+    n = Node.objects.get(pk=node_id)
     # https://docs.djangoproject.com/en/dev/topics/db/queries/#following-relationships-backward
     devices = n.device_set.select_related().all()
     # interfaces=[]
     # for device in devices:
     #    interfaces.append(device.interface_set.all())
-        
+
     # i= Interface.objects.get(device = d)
     info = {'node' : n, 'devices' : devices, 'nodes' : Node.objects.all().order_by('name')}
-    
-    
+
     return render_to_response('info_window.html', info, context_instance=RequestContext(request))
 
 def search(request, what):
     data = []
-    data = data + [{'label': d.name, 'value': d.name }  for d in Node.objects.filter(name__icontains=what).only('name')]
-    data = data + [{'label': d.ipv4_address , 'value': d.device.node.name }  for d in Interface.objects.filter(ipv4_address__icontains=what).only('device__node__name')]
-    data = data + [{'label': d.mac_address , 'value': d.device.node.name }  for d in Interface.objects.filter(mac_address__icontains=what).only('device__node__name')]
-    data = data + [{'label': d.ssid , 'value': d.device.node.name }  for d in Interface.objects.filter(ssid__icontains=what).only('device__node__name')]
+    data = data + [{'label': d.name, 'value': d.slug }  for d in Node.objects.filter(name__icontains=what).only('name','slug')]
+    data = data + [{'label': d.ipv4_address , 'value': d.device.node.slug }  for d in Interface.objects.filter(ipv4_address__icontains=what).only('device__node__name')]
+    data = data + [{'label': d.mac_address , 'value': d.device.node.slug }  for d in Interface.objects.filter(mac_address__icontains=what).only('device__node__name')]
+    data = data + [{'label': d.ssid , 'value': d.device.node.slug }  for d in Interface.objects.filter(ssid__icontains=what).only('device__node__name')]
     if len(data) > 0:
         return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     else:
@@ -211,24 +174,24 @@ def info(request):
     for d in Device.objects.all().order_by('node__status').select_related().only('name', 'type', 'node__name', 'node__status'):
         entry['status'] = "on" if d.node.status == 'a' else "off"
         entry['device_type'] = d.type
-        entry['node_name'] = d.node.name 
-        entry['name'] = d.name 
+        entry['node_name'] = d.node.name
+        entry['name'] = d.name
         entry['ips'] = [ip['ipv4_address'] for ip in d.interface_set.values('ipv4_address')] if d.interface_set.count() > 0 else ""
         entry['macs'] = [mac['mac_address'] if mac['mac_address'] != None else '' for mac in d.interface_set.values('mac_address')] if d.interface_set.count() > 0 else ""
         # heuristic count for good representation of the signal bar (from 0 to 100)
         #entry['signal_bar'] = signal_to_bar(d.max_signal)  if d.max_signal < 0 else 0
-        #entry['signal'] = d.max_signal  
+        #entry['signal'] = d.max_signal
         links = Link.objects.filter(from_interface__device = d).select_related().only('dbm', 'to_interface__mac_address', 'to_interface__device__node__name')
         # convert QuerySet in list
         links = list(links)
         for l in links:
             l.signal_bar = signal_to_bar(l.dbm) if l.to_interface.mac_address not in  entry['macs'] else links.remove(l)
-        entry['links'] = links 
+        entry['links'] = links
         entry['ssids'] = [ssid['ssid'] for ssid in d.interface_set.values('ssid')] if d.interface_set.count() > 0 else ""
         entry['nodeid'] = d.node.id
         devices.append(entry)
         entry = {}
-    
+
     # if request is sent with ajax
     if request.is_ajax():
         # just load the fragment
@@ -239,16 +202,20 @@ def info(request):
         template = 'info.html'
     else:
         raise Http404
-    
-    return render_to_response(template,{'devices': devices} ,context_instance=RequestContext(request))
+
+    return render_to_response(template,{'devices': devices}, context_instance=RequestContext(request))
 
 def contact(request, node_id):
     ''' Form to contact node owners '''
     # retrieve object or return 404 error
-    node = get_object_or_404(Node, pk=node_id)
+    try:
+        node = Node.objects.only('name', 'email', 'email2', 'email3', 'status').get(pk=node_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    # if node is unconfirmed return 404 error
     if node.status == 'u':
         raise Http404
-    
+
     # if request is sent with ajax
     if request.is_ajax():
         # just load the fragment
@@ -259,33 +226,85 @@ def contact(request, node_id):
         template = 'contact.html'
     else:
         raise Http404
-    
+
+    # message has not been sent yet
+    sent = False
+
     # if form has been submitted
     if request.method == 'POST':
-        # instance form with POST data
-        form = ContactForm(request.POST)
+        # http referer
+        http_referer = request.POST.get('HTTP_REFERER')
+        # retrieve POST values in a new dictionary
+        values = {
+            'from_name': request.POST.get('from_name'),
+            'from_email': request.POST.get('from_email'),
+            'message': request.POST.get('message'),
+            'math_captcha_field': request.POST.get('math_captcha_field'),
+            'math_captcha_question': request.POST.get('math_captcha_question'),
+            'honeypot': request.POST.get('honeypot', False),
+            'http_referer': http_referer,
+            # add node we are contacting
+            'node': node_id,
+            # add extra info about the sender
+            'ip': request.META.get('REMOTE_ADDR'),
+            'user_agent': request.META.get('HTTP_USER_AGENT'),
+            'accept_language': request.META.get('HTTP_ACCEPT_LANGUAGE')
+        }
+
+        import logging
+        logging.log(1, values['honeypot'])
+
+        # init form
+        form = ContactForm(values)
         # proceed in sending email only if form is valid
         if form.is_valid():
-            pass
-        
-        ### TODO: need to be stored in the database ###        
-        
+            # prepare to list
+            to = [node.email]
+            # if node has an second email address specified include it in the cc
+            if node.email2 != '' and node.email2 != None:
+                to += [node.email2]
+            # if node has a third email address specified include it in the cc
+            if node.email3 != '' and node.email3 != None:
+                to += [node.email3]
+            # prepare context
+            context = {
+                'node': node,
+                'sender': values,
+                'site': SITE
+            }
+            # parse subject
+            subject = render_to_string('email_notifications/contact_node_subject.txt',context)
+            # Email subject *must not* contain newlines
+            subject = ''.join(subject.splitlines())
+            # parse message
+            message = render_to_string('email_notifications/contact_node_body.txt',context)
+            # prepare EmailMessage object, we are using this one because we want to send one mail only with other eventual owners in CC so they can hit reply to all button easily
+            email = EmailMessage(subject, message, to=to, headers = {'Reply-To': values.get('from_email')})
+            email.send()
+            sent = True
+            if LOG_CONTACTS:
+                # log in the database
+                new_log = form.save()
+
     # if form has NOT been submitted
     else:
         form = ContactForm()
-    
+        http_referer = request.META.get('HTTP_REFERER')
+
     context = {
+        'sent': sent,
         'node': node,
-        'form': form
+        'form': form,
+        'http_referer': http_referer
     }
-    
-    return render_to_response(template, context ,context_instance=RequestContext(request))
+
+    return render_to_response(template, context, context_instance=RequestContext(request))
 
 def confirm_node(request, node_id, activation_key):
     ''' Confirm node view '''
     # retrieve object or return 404 error
     node = get_object_or_404(Node, pk=node_id)
-    
+
     if(node.activation_key != '' and node.activation_key != None):
         if(node.activation_key == activation_key):
             if(node.added + timedelta(days=NODESHOT_ACTIVATION_DAYS) > datetime.now()):
@@ -365,8 +384,8 @@ def generate_kml(request):
                 <name>''' + n.name + '''</name>
                 <styleUrl>#activeNodeStyle</styleUrl>
                 <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
-            </Placemark>  
-        ''' 
+            </Placemark>
+        '''
     data += '</Folder>'
 
     data += '''<Folder>
@@ -379,8 +398,8 @@ def generate_kml(request):
                 <name>''' + n.name + '''</name>
                 <styleUrl>#potentialNodeStyle</styleUrl>
                 <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
-            </Placemark>  
-        ''' 
+            </Placemark>
+        '''
     data += '</Folder>'
 
     data += '''<Folder>
@@ -393,14 +412,14 @@ def generate_kml(request):
                 <name>''' + n.name + '''</name>
                 <styleUrl>#hotspotNodeStyle</styleUrl>
                 <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
-            </Placemark>  
-        ''' 
+            </Placemark>
+        '''
     data += '</Folder>'
 
     data += '''<Folder>
         <name>Links</name>
         <description>Radio Wireless Links and their quality</description>'''
-    # links 
+    # links
     for l in Link.objects.all():
         quality = 0
         if 0 < l.etx < 1.5:
@@ -415,7 +434,7 @@ def generate_kml(request):
         <name>''' + l.from_interface.device.node.name + '-' + l.to_interface.device.node.name + ' ETX ' + str(l.etx) + '''</name>
         <styleUrl>#Link''' + str(quality) + '''Style</styleUrl>
             <LineString>
-              <coordinates>''' + str(l.from_interface.device.node.lng) + ',' + str(l.from_interface.device.node.lat) + ' ' + str(l.to_interface.device.node.lng) + ',' + str(l.to_interface.device.node.lat) + '''</coordinates> 
+              <coordinates>''' + str(l.from_interface.device.node.lng) + ',' + str(l.from_interface.device.node.lat) + ' ' + str(l.to_interface.device.node.lng) + ',' + str(l.to_interface.device.node.lat) + '''</coordinates>
             </LineString>
         </Placemark>
         '''
@@ -436,21 +455,21 @@ def report_abuse(request, node_id, email):
     node = get_object_or_404(Node, pk=node_id)
     if(node.email != email and node.email2 != email and node.email3 != email):
         raise Http404
-    
+
     try:
         from settings import NODESHOT_SITE
     except ImportError:
         raise ImproperlyConfigured('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.')
-    
+
     context = {
         'email': email,
         'node': node,
         'site': NODESHOT_SITE
     }
     notify_admins(node, 'email_notifications/report_abuse_subject.txt', 'email_notifications/report_abuse_body.txt', context)
-    
+
     return HttpResponse('reported')
-    
+
 def purge_expired(request):
     '''
     Purge all the nodes that have not been confirmed older than settings.NODESHOT_ACTIVATION_DAYS.
@@ -469,5 +488,5 @@ def purge_expired(request):
         response = 'The following nodes have been purged:<br /><br />' + response
     else:
         response = 'There are no old nodes to purge.'
-        
+
     return HttpResponse(response)

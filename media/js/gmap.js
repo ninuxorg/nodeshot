@@ -35,21 +35,27 @@ function getget(name) {
   return r.replace(/\+/g, ' ');
 }
 
-function getNodeState(nodeName) {
-   for (var i = 0; i < nodes.active.length; i++) 
-        if (nodes.active[i].name == nodeName)
+function getNodeState(nodeSlug) {
+    for (var i = 0; i < nodes.active.length; i++){
+        if (nodes.active[i].slug == nodeSlug){
             return 'a';
-    for (var i = 0; i < nodes.hotspot.length; i++) 
-        if (nodes.hotspot[i].name == nodeName)
+        }
+    }
+    for (var i = 0; i < nodes.hotspot.length; i++){ 
+        if (nodes.hotspot[i].slug == nodeSlug){
             return 'h';
-   for (var i = 0; i < nodes.potential.length; i++) 
-        if (nodes.potential[i].name == nodeName)
+        }
+    }
+    for (var i = 0; i < nodes.potential.length; i++){
+        if (nodes.potential[i].slug == nodeSlug){
             return 'p';
-    return 'n'
+        }
+    }
+    return 'n';
 }
 
-function findMarker(nodeName) {
-    var nodeStatus = getNodeState(nodeName);
+function findMarker(nodeSlug) {
+    var nodeStatus = getNodeState(nodeSlug);
     if (nodeStatus == 'a' &&  ! $('#active').is(':checked') ) {
         $('#active').attr('checked', true);
         draw_nodes('a');
@@ -69,14 +75,15 @@ function findMarker(nodeName) {
     else 
         return;
     for (var i = 0; i <  marray.length; i++) {
-        if (marray[i].getTitle() == nodeName)
-            return marray[i]
+        if (marray[i].slug == nodeSlug){
+            return marray[i];
+        }
     }
     return null;
 }
 
-function mapGoTo(nodeName) {
-    var marker = findMarker(nodeName);
+function mapGoTo(nodeSlug) {
+    var marker = findMarker(nodeSlug);
     if (marker) {
         google.maps.event.trigger(marker, "click");
         map.panTo(marker.getPosition());
@@ -139,9 +146,9 @@ function initialize_map() {
     }
 }
 
-function handleMarkerClick(marker, name) {
+function handleMarkerClick(marker, node_id) {
   return function() {
-    $.get(__project_home__+'info_window/' + name, function(data) {
+    $.get(__project_home__+'info_window/'+node_id+'/', function(data) {
         infoWindow.setContent(data);
         infoWindow.open(map, marker);
         setTimeout(function(){ $(".tabs").tabs(); }, 100);
@@ -222,10 +229,11 @@ function draw_nodes(type) {
             title: data[i].name,
             icon: image
         });
+        marker.slug = data[i].slug;
         marray.push(marker);
         marker.setMap(map);  
         
-        var listenerHandle = google.maps.event.addListener(marker, 'click',  handleMarkerClick(marker, data[i].name) );
+        var listenerHandle = google.maps.event.addListener(marker, 'click',  handleMarkerClick(marker, data[i].id) );
                 
         larray.push(listenerHandle);
     }
@@ -350,21 +358,26 @@ function initialize() {
     // Jquery autocomplete
     $(function() {
         // Implements the search function 
-        $( "#search" ).autocomplete({
+        $("#search").autocomplete({
             source: function(req, add) {
-                $.getJSON("search/" + req.term , function(data) {
+                $.getJSON("search/"+req.term+'/', function(data) {
                     if (data != null && data.length > 0) 
                         add(data);
                     else
                         add("");
                 });
             },
-            select: function(event, ui) { 
+            select: function(event, ui) {
                 var choice = $("input[name='view-radio']:checked").val();
-                if (choice == 'map')
-                    mapGoTo(ui.item.value); 
-                else
+                if (choice == 'map'){
+                    mapGoTo(ui.item.value);
+                }
+                else{
                     alert('Not (yet) implemented');
+                }
+            },
+            close: function(event, ui){
+                $('#search').val('')
             }
         });
     });
@@ -498,9 +511,9 @@ function initialize() {
 
     /* populate the list of nodes */
     $("#node-tree")
-        .bind("open_node.jstree close_node.jstree", function (e) {
+        /*.bind("open_node.jstree close_node.jstree", function (e) {
                 alert("Last operation: " + e.type);
-        }).jstree({ 
+        })*/.jstree({ 
         "json_data" : {
             "ajax" : {
                 "url" : __project_home__+"node_list.json",

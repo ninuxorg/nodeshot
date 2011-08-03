@@ -1,5 +1,6 @@
 <div class="dialog-form ui-widget" >
-    <form id="node-form" class="ui-corner-all ui-widget-content" method="post" action="">
+    {% if not sent %}
+    <form id="contact-form" class="ui-corner-all ui-widget-content" method="post" action="">
         <h1>Contatta il nodo {{ node.name }}</h1>
         <p>Tutti i campi sono obbligatori.</p>
         <fieldset>
@@ -12,32 +13,32 @@
     
             <div class="fieldWrapper">
                 <label for="id_name">Tuo nome:<label>
-                {% if form.name.errors %}
+                {% if form.from_name.errors %}
                     <div class="ui-state-error">
-                        {{ form.name.errors }}
+                        {{ form.from_name.errors }}
                     </div>
                 {% endif %}
-                {{ form.name }}
+                {{ form.from_name }}
             </div>
             
             <div class="fieldWrapper">
                 <label for="id_email">Email:<label>
-                {% if form.email.errors %}
+                {% if form.from_email.errors %}
                     <div class="ui-state-error">
-                        {{ form.email.errors }}
+                        {{ form.from_email.errors }}
                     </div>
                 {% endif %}
-                {{ form.email }}
+                {{ form.from_email }}
             </div>
             
             <div class="fieldWrapper">
                 <label for="id_text">Testo:<label>
-                {% if form.text.errors %}
+                {% if form.message.errors %}
                     <div class="ui-state-error">
-                        {{ form.text.errors }}
+                        {{ form.message.errors }}
                     </div>
                 {% endif %}
-                {{ form.text }}
+                {{ form.message }}
             </div>
             
             <div class="fieldWrapper">
@@ -48,6 +49,9 @@
                 {% endif %}
                 {% autoescape off %}{{ form.math_captcha_field }}{% endautoescape %}
             </div>
+            <input type="hidden" name="http_referer" value="{{ http_referer }}" />
+            
+            <input type="checkbox" name="honeypot" class="accessibility" />
             
             <p style="overflow:hidden">
                 <input id="contact-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Invia" />
@@ -55,6 +59,15 @@
             </p>
         </fieldset>
     </form>
+    {% else %}
+    <div id="contact-form" class="ui-corner-all ui-widget-content">
+        <div id="success">
+            <h1>Messaggio inviato</h1>
+            <p>Richiesta di contatto inviata con successo.</p>
+            <br />
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <script>

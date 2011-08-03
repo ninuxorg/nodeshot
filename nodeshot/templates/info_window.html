@@ -9,13 +9,13 @@
     <div id="tab-info">
         <table>
             <tr>
-                <td>Nome:</td><td>{{node.name}} - <a href="{% url nodeshot.views.index %}?node={{ node.name }}">Permalink</a></td>
+                <td>Nome:</td><td>{{node.name}} - <a href="{% url nodeshot_select node.slug %}">Permalink</a></td>
             </tr>
             <tr>
                 <td>Descrizione:</td><td>{{node.description}}</td>
             </tr>
             <tr>
-                <td>Responsabile:</td><td>{{node.owner}} (<a href="">contatta</a>)</td>
+                <td>Responsabile:</td><td>{{node.owner}} (<a href="javascript:contactNode({{ node.id }})">contatta</a>)</td>
             </tr>
 
             <tr>

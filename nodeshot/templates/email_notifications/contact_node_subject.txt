@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktrans with sender=sender.from_name site=site.name %}Richiesta di contatto da {{ sender }} - {{ site }}{% endblocktrans %}

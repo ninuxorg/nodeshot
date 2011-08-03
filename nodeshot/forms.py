@@ -204,16 +204,21 @@ class AdminPasswordChangeForm(forms.Form):
             self.node.save()
         return self.node
     
-from math_captcha import MathCaptchaForm
+from math_captcha import MathCaptchaModelForm
 
-class ContactForm(MathCaptchaForm):
+class ContactForm(MathCaptchaModelForm):
     """
     A form used to contact node owners
     """
     
-    name = forms.CharField(max_length=50, min_length=4, widget=forms.TextInput)
-    email = forms.EmailField(max_length=500, min_length=8, widget=forms.TextInput)
-    text = forms.CharField(max_length=2000, widget=forms.Textarea)
+    class Meta:
+        model = Contact
+    
+    from_name = forms.CharField(max_length=50, min_length=4, widget=forms.TextInput)
+    from_email = forms.EmailField(max_length=50, min_length=8, widget=forms.TextInput)
+    message = forms.CharField(max_length=2000, widget=forms.Textarea)
+    # extra antispam
+    honeypot = forms.BooleanField(widget=forms.CheckboxInput, required=False)
     
     def __init__(self, *args, **kwargs):
         super(ContactForm, self).__init__(*args, **kwargs)
@@ -228,6 +233,11 @@ class ContactForm(MathCaptchaForm):
         # strip() values
         for field in self.cleaned_data: 
             if isinstance(self.cleaned_data[field], basestring): 
-                self.cleaned_data[field] = self.cleaned_data[field].strip() 
+                self.cleaned_data[field] = self.cleaned_data[field].strip()
+        
+        # if honeypot is True it surely means a spambot or something like that is trying to submit the form.
+        if self.cleaned_data.get('honeypot', False)==True:
+            # return a silly error
+            raise forms.ValidationError(_("Error 500"))
         
         return self.cleaned_data

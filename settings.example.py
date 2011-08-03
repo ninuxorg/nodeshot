@@ -153,7 +153,10 @@ NODESHOT_ROUTING_PROTOCOLS = (
 
 # set your default routing protocol
 NODESHOT_DEFAULT_ROUTING_PROTOCOL = 'olsr'
+# maximum number of days to activate a new node until is purged (automatic purging needs a cronjob to be set on the server)
 NODESHOT_ACTIVATION_DAYS = 7
+# log messages sent with contact form
+NODESHOT_LOG_CONTACTS = True
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

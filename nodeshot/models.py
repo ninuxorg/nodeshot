@@ -149,6 +149,7 @@ WIRELESS_CHANNEL = (
 
 class Node(models.Model):
     name = models.CharField('nome', max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, db_index=True, unique=True)
     owner = models.CharField('proprietario', max_length=50, blank=True, null=True)
     description = models.CharField('descrizione', max_length=200, blank=True, null=True)
     postal_code = models.CharField('CAP', max_length=10)
@@ -336,6 +337,24 @@ class Statistic(models.Model):
     class Meta:
         verbose_name = 'Statistica'
         verbose_name_plural = 'Statistiche'
+
+class Contact(models.Model):
+    node = models.ForeignKey(Node)
+    from_name = models.CharField('nome', max_length=50)
+    from_email = models.EmailField('email', max_length=50)
+    message = models.CharField('messaggio', max_length=2000)
+    ip = models.GenericIPAddressField(verbose_name='indirizzo ip')
+    user_agent = models.CharField(max_length=200, blank=True)
+    http_referer = models.CharField(max_length=200, blank=True)
+    accept_language = models.CharField(max_length=30, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
+    
+    def __unicode__(self):
+        return u'Message from %s to %s' % (self.from_name, self.node.name)
+    
+    class Meta:
+        verbose_name = 'Log contatto'
+        verbose_name_plural = 'Log Contatti'
     
 class UserProfile(models.Model):
     '''
