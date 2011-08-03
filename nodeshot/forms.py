@@ -16,7 +16,6 @@ from django.utils.translation import ugettext_lazy as _
 
 class NodeForm(forms.ModelForm):
     password2 = forms.CharField(max_length=20, required=True, widget=forms.PasswordInput())
-    postal_code = forms.CharField(max_length=10, required=True, widget=forms.TextInput())
     
     class Meta:
         model = Node
