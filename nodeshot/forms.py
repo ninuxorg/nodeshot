@@ -16,7 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class NodeForm(forms.ModelForm):
     password2 = forms.CharField(max_length=20, required=True, widget=forms.PasswordInput())
-    cap = forms.CharField(max_length=10, required=True, widget=forms.TextInput())
+    postal_code = forms.CharField(max_length=10, required=True, widget=forms.TextInput())
     
     class Meta:
         model = Node
@@ -60,6 +60,9 @@ def node_form(request):
             if form.is_valid():
                 # prepare the node model object but don't save in the database yet
                 node = form.save(commit=False)
+                # make slug
+                from django.template.defaultfilters import slugify
+                node.slug = slugify(node.name)
                 # save new node in the database (password encryption, activation_key and email notification is done in models.py)
                 node.save()
 

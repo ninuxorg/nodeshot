@@ -40,9 +40,9 @@
             </div>
             <div class="fieldWrapper">
                 <label for="id_postal_code">CAP: <big>*</big></label>
-                {% if form.cap.errors %}
+                {% if form.postal_code.errors %}
                     <div class="ui-state-error">
-                        {{ form.cap.errors }}
+                        {{ form.postal_code.errors }}
                     </div>
                 {% endif %}
                 {{ form.postal_code }}
@@ -119,6 +119,7 @@
                 {% endif %}
                 {{ form.alt}}
             </div>
+            <input type="hidden" name="slug" value="new" />
             <input type="hidden" name="status" value="u" /> 
             <p style="overflow:hidden">
                 <input id="node-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Salva Nodo" />
