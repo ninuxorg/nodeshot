@@ -3,7 +3,6 @@
         <li><a href="#tab-info"><span>Info</span></a></li>
         <li><a href="#tab-dev"><span>Devices</span></a></li>
         <li><a href="#tab-dist"><span>Distanza</span></a></li>
-        
     </ul>
 
     <div id="tab-info">
@@ -25,6 +24,7 @@
                 <td>Longitudine:</td><td class="selected-node-lng">{{node.lng}}</td>
             </tr>
         </table>
+        <br /><a href="{% url nodeshot_edit_node node.id %}">Modifica nodo</a>
     </div>
 
     <div id="tab-dev">

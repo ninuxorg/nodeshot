@@ -318,7 +318,7 @@ h3 {
 .green{ background: green !important }
 .red{ background: red !important }
 
-#node-form, #contact-form{
+#node-form, #contact-form, #editnode-form{
 	padding: 0 20px;
 	z-index:11;
 }
@@ -369,3 +369,5 @@ h3 {
     width: 25px;
     height: 25px;
 }
+
+.success{ padding: 0 0 0 5px; background: green; color: #fff }

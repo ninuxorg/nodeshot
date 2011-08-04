@@ -13,27 +13,40 @@ from django import forms
 from settings import DEBUG
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.template.defaultfilters import slugify
 
-class NodeForm(forms.ModelForm):
-    password2 = forms.CharField(max_length=20, required=True, widget=forms.PasswordInput())
+# base NodeForm class
+class BaseNodeForm(forms.ModelForm):
+    ''' Base Form Node, other forms will extend this class '''
     
     class Meta:
         model = Node
     
     def __init__(self, *args, **kwargs):
-        super(NodeForm, self).__init__(*args, **kwargs)
+        super(BaseNodeForm, self).__init__(*args, **kwargs)
         # css classes for fields
         for v in self.fields:
             self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
 
     def clean(self):
         ''' Calls parent clean() and performs additional validation for the password field '''
-        super(NodeForm, self).clean()
+        super(BaseNodeForm, self).clean()
         
         # strip() values
         for field in self.cleaned_data: 
             if isinstance(self.cleaned_data[field], basestring): 
                 self.cleaned_data[field] = self.cleaned_data[field].strip() 
+        
+        return self.cleaned_data
+
+class AddNodeForm(BaseNodeForm):
+    ''' Form to add a node, has an additional password2 field for password verification '''
+    
+    password2 = forms.CharField(max_length=20, required=True, widget=forms.PasswordInput())
+
+    def clean(self):
+        ''' Calls parent clean() and performs additional validation for the password field '''
+        super(NodeForm, self).clean()
         
         password = self.cleaned_data.get('password')
         password2 = self.cleaned_data.get('password2')
@@ -42,6 +55,13 @@ class NodeForm(forms.ModelForm):
             raise forms.ValidationError('I due campi password non corrispondono.')
         else:
             return self.cleaned_data
+
+class EditNodeForm(BaseNodeForm):
+    ''' Form to edit a node '''
+    
+    class Meta:
+        model = Node
+        exclude = ('status', 'password', 'slug')
 
 def node_form(request):
     ''' View for add/edit node '''
@@ -54,13 +74,14 @@ def node_form(request):
         # if a new node has been submitted
         if node_id == None:
             # return json: either errors or the redirect url
-            form = NodeForm(request.POST)
+            form = AddNodeForm(request.POST)
             # if form is valid
             if form.is_valid():
                 # prepare the node model object but don't save in the database yet
                 node = form.save(commit=False)
+                # set node as unconfirmed for security reasons, infact malicious users could edit the hidden field easily with instruments like firebug.
+                node.status = 'u'
                 # make slug
-                from django.template.defaultfilters import slugify
                 node.slug = slugify(node.name)
                 # save new node in the database (password encryption, activation_key and email notification is done in models.py)
                 node.save()
@@ -81,7 +102,7 @@ def node_form(request):
             # get object or return a 404
             node = get_object_or_404(Node, pk=node_id)
             # init the modelform object with the changes submitted
-            form = NodeForm(request.POST, instance=node)
+            form = AddNodeForm(request.POST, instance=node)
             # if form is valid
             if form.is_valid():
                 # save in the database
@@ -92,11 +113,11 @@ def node_form(request):
         # get object or return a 404
         node = get_object_or_404(Node, pk=node_id)
         # populate the form with the current node info
-        form = NodeForm(instance=node)
+        form = AddNodeForm(instance=node)
     # if inserting a new node
     else:
         # blank form
-        form = NodeForm()
+        form = AddNodeForm()
     
     # if request is sent with ajax
     if request.is_ajax():
@@ -109,6 +130,65 @@ def node_form(request):
             raise Http404
 
     return render_to_response(template, { 'form' : form }, context_instance=RequestContext(request))
+    
+def edit_node(request, node_id):
+        
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/edit_node.html';
+    else:
+        # alternative mode available just for testing
+        if DEBUG:
+            template = 'edit_node.html';
+        else:
+            raise Http404
+        
+    # get object or raise 404
+    try:
+        node = Node.objects.select_related().get(pk=node_id)
+    except DoesNotExists:
+        raise Http404
+    
+    # raw password to authenticate
+    raw_password = request.POST.get('raw_password', False)
+    # once authenticated password is sent in ecrypted format
+    encrypted_password = request.POST.get('encrypted_password', False)
+    # default value for authenticated variable
+    authenticated = 0
+    # init form
+    form = EditNodeForm(instance=node)
+    # default value for save variable
+    saved = False
+    
+    # if sending raw password check if is correct
+    if raw_password and node.check_password(raw_password):
+        authenticated = 1
+        encrypted_password = node.password
+    # if password is not correct value of authenticated is 2
+    elif raw_password and not node.check_password(raw_password):
+        authenticated = 2
+    # if password is being sent in encrypted format it means we are editing the form
+    elif encrypted_password and encrypted_password == node.password:
+        authenticated = 1
+        # init edit form with POST values
+        form = EditNodeForm(request.POST, instance=node)
+        
+        if form.is_valid():
+            node = form.save(commit=False)
+            node.slug = slugify(node.name)
+            node.save()
+            # this tells the template that the form has saved in order to display a message to the user
+            saved = True
+    
+    context = {
+        'node': node,
+        'form' : form,
+        'authenticated': authenticated,
+        'encrypted_password': encrypted_password,
+        'saved': saved
+    }
+    
+    return render_to_response(template, context, context_instance=RequestContext(request))
 
 def device_form(request, node_id):    
     # get object or return a 404
@@ -176,6 +256,34 @@ def configuration_form(request):
     else:
         formset = mInlineFormSet(instance=device, prefix=prefix_name)
     return render_to_response(template_form, { "formset": formset , 'device_id': device_id , 'configuration_type': entry_type , 'description': device.name } )
+
+#class AuthenticateNodeForm(forms.Form):
+#    """
+#    A form used to authenticate node owners
+#    """
+#    
+#    node_id = forms.IntegerField()
+#    password = forms.CharField(max_length=20, widget=forms.PasswordInput)
+#    
+#    def __init__(self, *args, **kwargs):
+#        super(AuthenticateNodeForm, self).__init__(*args, **kwargs)
+#        # css classes for fields
+#        for v in self.fields:
+#            self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
+#            
+#    def clean_password(self):
+#        
+#    
+#    def clean(self):
+#        ''' Strip values '''
+#        super(AuthenticateNodeForm, self).clean()
+#        
+#        # strip() values
+#        for field in self.cleaned_data: 
+#            if isinstance(self.cleaned_data[field], basestring): 
+#                self.cleaned_data[field] = self.cleaned_data[field].strip()
+#        
+#        return self.cleaned_data
 
 class AdminPasswordChangeForm(forms.Form):
     """

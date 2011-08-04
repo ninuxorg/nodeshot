@@ -1,0 +1,150 @@
+<div class="dialog-form ui-widget">
+    <form id="editnode-form" class="ui-corner-all ui-widget-content" method="post" action="">
+    {% csrf_token %}
+    {% if authenticated == 1 %}
+        <h1>Modifica il nodo "{{ node.name }}"</h1>
+        <p>I campi contrassegnati con un asterisco sono obbligatori.</p>
+        {{ request }}
+        <fieldset>
+            {% if form.non_field_errors %}
+                <div class="ui-state-error">
+                {{ form.non_field_errors }}
+                </div><br />
+            {% endif %}
+            {% if saved %}
+                <div class="success">
+                    Nodo salvato correttamente.
+                </div><br />
+            {% endif %}
+    
+            <div class="fieldWrapper">
+                <label for="id_name">Nome del nodo: <big>*</big><label>
+                {% if form.name.errors %}
+                    <div class="ui-state-error">
+                        {{ form.name.errors }}
+                    </div>
+                {% endif %}
+                {{ form.name }}
+            </div>
+            <div class="fieldWrapper">
+                {{ form.description.errors }}
+                {% if form.description.errors %}
+                    <div class="ui-state-error">
+                        {{ form.description.errors }}
+                    </div>
+                {% endif %}
+                <label for="id_description">Descrizione:</label>
+                {{ form.description}}
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_owner">Responsabile/i:</label>
+                {% if form.owner.errors %}
+                    <div class="ui-state-error">
+                        {{ form.owner.errors }}
+                    </div>
+                {% endif %}
+                {{ form.owner }}
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_postal_code">CAP: <big>*</big></label>
+                {% if form.postal_code.errors %}
+                    <div class="ui-state-error">
+                        {{ form.postal_code.errors }}
+                    </div>
+                {% endif %}
+                {{ form.postal_code }}
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_email">Indirizzo E-Mail principale: <big>*</big></label>
+                {% if form.email.errors %}
+                    <div class="ui-state-error">
+                        {{ form.email.errors }}
+                    </div>
+                {% endif %}
+                {{ form.email }}
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_email2">Indirizzo E-Mail 2:</label>
+                {% if form.email2.errors %}
+                    <div class="ui-state-error">
+                        {{ form.email2.errors }}
+                    </div>
+                {% endif %}
+                {{ form.email2 }}
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_email3">Indirizzo E-Mail 3: </label>
+                {% if form.email3.errors %}
+                    <div class="ui-state-error">
+                        {{ form.email3.errors }}
+                    </div>
+                {% endif %}
+                {{ form.email3 }}
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_lng">Longitudine: <big>*</big></label>
+                {% if form.lng.errors %}
+                    <div class="ui-state-error">
+                        {{ form.lng.errors }}
+                    </div>
+                {% endif %}
+                {{ form.lng}}
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_lat">Latitudine: <big>*</big></label>
+                {% if form.lat.errors %}
+                    <div class="ui-state-error">
+                        {{ form.lat.errors }}
+                    </div>
+                {% endif %}
+                {{ form.lat}}
+            </div>
+            <div class="fieldWrapper">
+                <label for="id_alt">Altitudine:</label>
+                {% if form.alt.errors %}
+                    <div class="ui-state-error">
+                        {{ form.alt.errors }}
+                    </div>
+                {% endif %}
+                {{ form.alt}}
+            </div>
+            <input type="hidden" name="encrypted_password" value="{{ encrypted_password }}" />
+            <p style="overflow:hidden">
+                <input id="editnode-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Salva Nodo" />
+                <input id="editnode-form-cancel" class="cancel-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="button" value="Annulla" />
+            </p>
+        </fieldset>
+    {% else %}
+        <h1>Modifica il nodo "{{ node.name }}"</h1>
+        <label for="id_password">Inserisci la password del nodo:</label>
+        {% if authenticated == 2 %}
+        <div class="ui-state-error">
+        La password non è corretta.
+        </div>
+        {% endif %}
+        <p><input id="id_password" type="password" class="text ui-widget-content ui-corner-all" name="raw_password" maxlength="20" /></p>
+        <p style="overflow:hidden">
+            <input id="editnode-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Entra" />
+            <input id="editnode-form-cancel" class="cancel-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="button" value="Annulla" />
+        </p>
+    {% endif %}
+    </form>
+</div>
+
+    
+<script>
+    $('#editnode-form-submit, #editnode-form-cancel').button();
+    var inputs = $("#editnode-form").find("input , select ,textarea");
+    $.each(inputs,function(){
+        $(this).bind({
+            focusin: function() {
+               $(this).toggleClass('ui-state-focus');
+            },
+            focusout: function() {
+                $(this).toggleClass('ui-state-focus');
+            }
+        });
+    });
+</script>
+
+

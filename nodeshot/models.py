@@ -14,10 +14,10 @@ from django.db.models.signals import post_save
 
 # django >= 1.4
 try:
-    from django.contrib.auth.utils import make_password
+    from django.contrib.auth.utils import make_password, check_password
 # django <= 1.3
 except ImportError:
-    from nodeshot.utils import make_password
+    from nodeshot.utils import make_password, check_password
 
 try:
     from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
@@ -170,6 +170,13 @@ class Node(models.Model):
         ''' Set the password like django does '''
         self.password = make_password('sha1', self.password)
         return self.password
+    
+    def check_password(self, raw_password):
+        """
+        Returns a boolean of whether the raw_password was correct. Handles
+        encryption formats behind the scenes.
+        """
+        return check_password(raw_password, self.password)
     
     def set_activation_key(self):
         ''' Set the activation key, generate it from a combinatin of the ''Node''s name and a random salt '''
