@@ -16,7 +16,7 @@ import time,re,os
 import settings
 from settings import DEBUG, NODESHOT_SITE as SITE
 from django.core.exceptions import ObjectDoesNotExist
-from forms import ContactForm
+from forms import ContactForm, PasswordRecoveryForm
 from datetime import datetime, timedelta
 from django.core.mail import EmailMessage
 
@@ -207,15 +207,6 @@ def info(request):
 
 def contact(request, node_id):
     ''' Form to contact node owners '''
-    # retrieve object or return 404 error
-    try:
-        node = Node.objects.only('name', 'email', 'email2', 'email3', 'status').get(pk=node_id)
-    except ObjectDoesNotExist:
-        raise Http404
-    # if node is unconfirmed return 404 error
-    if node.status == 'u':
-        raise Http404
-
     # if request is sent with ajax
     if request.is_ajax():
         # just load the fragment
@@ -226,6 +217,15 @@ def contact(request, node_id):
         template = 'contact.html'
     else:
         raise Http404
+    
+    # retrieve object or return 404 error
+    try:
+        node = Node.objects.only('name', 'email', 'email2', 'email3', 'status').get(pk=node_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    # if node is unconfirmed return 404 error
+    if node.status == 'u':
+        raise Http404
 
     # message has not been sent yet
     sent = False
@@ -233,17 +233,9 @@ def contact(request, node_id):
     # if form has been submitted
     if request.method == 'POST':
         # http referer
-        http_referer = request.POST.get('HTTP_REFERER')
-        # retrieve POST values in a new dictionary
-        values = {
-            'from_name': request.POST.get('from_name'),
-            'from_email': request.POST.get('from_email'),
-            'message': request.POST.get('message'),
-            'math_captcha_field': request.POST.get('math_captcha_field'),
-            'math_captcha_question': request.POST.get('math_captcha_question'),
-            'honeypot': request.POST.get('honeypot', False),
-            'http_referer': http_referer,
-            # add node we are contacting
+        http_referer = request.POST.get('http_referer')
+        # save extra information in a dictionary that we'll pass to the form
+        extra = {
             'node': node_id,
             # add extra info about the sender
             'ip': request.META.get('REMOTE_ADDR'),
@@ -251,11 +243,8 @@ def contact(request, node_id):
             'accept_language': request.META.get('HTTP_ACCEPT_LANGUAGE')
         }
 
-        import logging
-        logging.log(1, values['honeypot'])
-
-        # init form
-        form = ContactForm(values)
+        # init form and pass extra values to it
+        form = ContactForm(extra, request.POST)
         # proceed in sending email only if form is valid
         if form.is_valid():
             # prepare to list
@@ -269,7 +258,11 @@ def contact(request, node_id):
             # prepare context
             context = {
                 'node': node,
-                'sender': values,
+                'sender': {
+                    'from_name': request.POST.get('from_name'),
+                    'from_email': request.POST.get('from_email'),
+                    'message': request.POST.get('message'),
+                },
                 'site': SITE
             }
             # parse subject
@@ -279,11 +272,12 @@ def contact(request, node_id):
             # parse message
             message = render_to_string('email_notifications/contact_node_body.txt',context)
             # prepare EmailMessage object, we are using this one because we want to send one mail only with other eventual owners in CC so they can hit reply to all button easily
-            email = EmailMessage(subject, message, to=to, headers = {'Reply-To': values.get('from_email')})
+            email = EmailMessage(subject, message, to=to, headers = {'Reply-To': request.POST.get('from_name')})
             email.send()
             sent = True
+            # if enabled from settings
             if LOG_CONTACTS:
-                # log in the database
+                # save log into database
                 new_log = form.save()
 
     # if form has NOT been submitted
@@ -298,6 +292,56 @@ def contact(request, node_id):
         'http_referer': http_referer
     }
 
+    return render_to_response(template, context, context_instance=RequestContext(request))
+    
+def recover_password(request, node_id):
+    # if request is sent with ajax
+    if request.is_ajax():
+        # just load the fragment
+        template = 'ajax/recover_password.html'
+    # otherwise if request is sent normally and DEBUG is true
+    elif DEBUG:
+        # debuggin template
+        template = 'recover_password.html'
+    else:
+        raise Http404
+    
+    # retrieve object or return 404 error
+    try:
+        node = Node.objects.only('name', 'email', 'email2', 'email3', 'status').get(pk=node_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    # if node is unconfirmed return 404 error
+    if node.status == 'u':
+        raise Http404
+    
+    # default value for sent variable
+    sent = False
+    # default value for form
+    form = PasswordRecoveryForm(node)
+    
+    # if submitting the form
+    if request.method == 'POST':
+        # prepare custom dictionary to pass to the form, we need to pass the node object to verify the email and avoid querying the database twice.
+        values = {
+            'email': request.POST.get('email'),
+            'node_email1': node.email,
+            'node_email2': node.email2,
+            'node_email3': node.email3
+        }
+        # init form with POST values
+        form = PasswordRecoveryForm(node, request.POST)
+        # validate the form
+        if form.is_valid():
+            new_password = node.generate_new_password()
+            sent = new_password
+    
+    context = {
+        'sent': sent,
+        'node': node,
+        'form': form,
+    }
+    
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 def confirm_node(request, node_id, activation_key):

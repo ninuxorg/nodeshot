@@ -148,6 +148,9 @@ def edit_node(request, node_id):
         node = Node.objects.select_related().get(pk=node_id)
     except DoesNotExists:
         raise Http404
+    # if node is unconfirmed return 404 error
+    if node.status == 'u':
+        raise Http404
     
     # raw password to authenticate
     raw_password = request.POST.get('raw_password', False)
@@ -257,33 +260,33 @@ def configuration_form(request):
         formset = mInlineFormSet(instance=device, prefix=prefix_name)
     return render_to_response(template_form, { "formset": formset , 'device_id': device_id , 'configuration_type': entry_type , 'description': device.name } )
 
-#class AuthenticateNodeForm(forms.Form):
-#    """
-#    A form used to authenticate node owners
-#    """
-#    
-#    node_id = forms.IntegerField()
-#    password = forms.CharField(max_length=20, widget=forms.PasswordInput)
-#    
-#    def __init__(self, *args, **kwargs):
-#        super(AuthenticateNodeForm, self).__init__(*args, **kwargs)
-#        # css classes for fields
-#        for v in self.fields:
-#            self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
-#            
-#    def clean_password(self):
-#        
-#    
-#    def clean(self):
-#        ''' Strip values '''
-#        super(AuthenticateNodeForm, self).clean()
-#        
-#        # strip() values
-#        for field in self.cleaned_data: 
-#            if isinstance(self.cleaned_data[field], basestring): 
-#                self.cleaned_data[field] = self.cleaned_data[field].strip()
-#        
-#        return self.cleaned_data
+class PasswordRecoveryForm(forms.Form):
+    """
+    A form used to recover the password of a node.
+    """
+    
+    email = forms.EmailField(min_length=8, max_length=100)
+    
+    def __init__(self, node, *args, **kwargs):
+        self.node = node
+        super(PasswordRecoveryForm, self).__init__(*args, **kwargs)
+        # css classes for fields
+        for v in self.fields:
+            self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
+            
+    def clean_email(self):
+        ''' check if email corresponds to one of the node owners '''
+        
+        email = self.cleaned_data['email']
+        node = self.node
+        
+        import logging
+        logging.log(1, self.cleaned_data)
+        
+        if email != node.email and email != node.email2 and email != node.email3:
+            raise forms.ValidationError('L\'email inserita non corrisponde a nessuna delle email dei responsabili del nodo.')
+        
+        return email
 
 class AdminPasswordChangeForm(forms.Form):
     """
@@ -330,8 +333,19 @@ class ContactForm(MathCaptchaModelForm):
     # extra antispam
     honeypot = forms.BooleanField(widget=forms.CheckboxInput, required=False)
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, extra=False, *args, **kwargs):
         super(ContactForm, self).__init__(*args, **kwargs)
+        # if extra values are being passed
+        if extra:
+            # create a new editable QueryDict object (only copied QueryDict objects are editable)
+            new_data = self.data.copy()
+            # fill the new QueryDict object with extra values
+            new_data['node'] = extra.get('node')
+            new_data['ip'] = extra.get('ip')
+            new_data['user_agent'] = extra.get('user_agent')
+            new_data['accept_language'] = extra.get('accept_language')
+            # substitute old QueryDict object with new one
+            self.data = new_data
         # css classes for fields
         for v in self.fields:
             self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'

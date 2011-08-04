@@ -4,7 +4,6 @@
     {% if authenticated == 1 %}
         <h1>Modifica il nodo "{{ node.name }}"</h1>
         <p>I campi contrassegnati con un asterisco sono obbligatori.</p>
-        {{ request }}
         <fieldset>
             {% if form.non_field_errors %}
                 <div class="ui-state-error">
@@ -127,10 +126,10 @@
             <input id="editnode-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Entra" />
             <input id="editnode-form-cancel" class="cancel-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="button" value="Annulla" />
         </p>
+        <a href="{% url nodeshot_recover_password node.id %}">Hai dimenticato la password?</a><br /><br />
     {% endif %}
     </form>
 </div>
-
     
 <script>
     $('#editnode-form-submit, #editnode-form-cancel').button();

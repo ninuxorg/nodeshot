@@ -30,10 +30,10 @@ function contactNode(node_id){
         form = $('#contact-form');
         form.css('margin-top', ($(window).height()-form.height()) / 2);
         setDimensions();
-        $('#contact-form-cancel').click(function(){
+        $('#contact-form-cancel').live('click', function(){
             nodeshotCloseForm();
         });
-        $('#contact-form').submit(function(e){
+        $('#contact-form').live('submit', function(e){
             e.preventDefault();
             submitContactNode(node_id, $(this))
         });
@@ -63,6 +63,9 @@ function submitContactNode(node_id, $this){
             $('#nodeshot-overlay').css('z-index', '11');
             //form errors
             $('#nodeshot-overlay').html(data);
+            // optimizations needed!
+            form = $('#contact-form');
+            form.css('margin-top', ($(window).height()-form.height()) / 2);
         } else {            
             $('#contact-form').fadeOut(500, function(){
                 nodeshotModal('Messaggio inviato con successo.', nodeshotCloseForm);

@@ -318,7 +318,7 @@ h3 {
 .green{ background: green !important }
 .red{ background: red !important }
 
-#node-form, #contact-form, #editnode-form{
+#node-form, #contact-form, #editnode-form, #recoverpassword-form{
 	padding: 0 20px;
 	z-index:11;
 }

@@ -177,6 +177,16 @@ class Node(models.Model):
         encryption formats behind the scenes.
         """
         return check_password(raw_password, self.password)
+        
+    def generate_new_password(self):
+        import random
+        bit1 = ''.join(random.choice('abcdefghilmnopqrstuvz') for i in xrange(5))
+        bit2 = ''.join(random.choice('0123456789') for i in xrange(2))
+        raw_password = bit1 + bit2
+        self.password = raw_password
+        self.set_password()
+        self.save()
+        return raw_password
     
     def set_activation_key(self):
         ''' Set the activation key, generate it from a combinatin of the ''Node''s name and a random salt '''
