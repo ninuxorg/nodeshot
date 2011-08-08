@@ -16,7 +16,7 @@ import time,re,os
 import settings
 from settings import DEBUG, NODESHOT_SITE as SITE
 from django.core.exceptions import ObjectDoesNotExist
-from forms import ContactForm, PasswordRecoveryForm
+from forms import ContactForm, PasswordResetForm
 from datetime import datetime, timedelta
 from django.core.mail import EmailMessage
 
@@ -318,23 +318,24 @@ def recover_password(request, node_id):
     # default value for sent variable
     sent = False
     # default value for form
-    form = PasswordRecoveryForm(node)
+    form = PasswordResetForm(node)
     
     # if submitting the form
     if request.method == 'POST':
+        email = request.POST.get('email')
         # prepare custom dictionary to pass to the form, we need to pass the node object to verify the email and avoid querying the database twice.
         values = {
-            'email': request.POST.get('email'),
+            'email': email,
             'node_email1': node.email,
             'node_email2': node.email2,
             'node_email3': node.email3
         }
         # init form with POST values
-        form = PasswordRecoveryForm(node, request.POST)
+        form = PasswordResetForm(node, request.POST)
         # validate the form
         if form.is_valid():
-            new_password = node.generate_new_password()
-            sent = new_password
+            new_password = node.reset_password(email)
+            sent = True
     
     context = {
         'sent': sent,

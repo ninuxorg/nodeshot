@@ -3,7 +3,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
     url(r'^$', 'nodeshot.views.index', name='nodeshot_index'),
-    url(r'^select:(?P<slug>[-\w]+)/$', 'nodeshot.views.index', name='nodeshot_select'),
+    url(r'^select/(?P<slug>[-\w]+)/$', 'nodeshot.views.index', name='nodeshot_select'),
     url(r'^node_list.json', 'nodeshot.views.node_list', name='nodeshot_list_json'),
     url(r'^nodes.json', 'nodeshot.views.nodes', name='nodes_json'),
     url(r'^search/(?P<what>.*)/$', 'nodeshot.views.search', name='nodeshot_search'),

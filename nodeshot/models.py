@@ -178,7 +178,7 @@ class Node(models.Model):
         """
         return check_password(raw_password, self.password)
         
-    def generate_new_password(self):
+    def reset_password(self, petitioner):
         import random
         bit1 = ''.join(random.choice('abcdefghilmnopqrstuvz') for i in xrange(5))
         bit2 = ''.join(random.choice('0123456789') for i in xrange(2))
@@ -186,6 +186,25 @@ class Node(models.Model):
         self.password = raw_password
         self.set_password()
         self.save()
+        # prepare context
+        context = {
+            'petitioner': petitioner,
+            'node': self,
+            'password': raw_password,
+            'site': SITE
+        }
+        # parse subject
+        subject = 'Nuova password per il nodo %s' % self.name
+        # parse message
+        message = render_to_string('email_notifications/password_recovery.txt',context)
+        # send email to all the owners
+        recipient_list = [self.email]
+        if self.email2 != '' and self.email2 != None:
+            recipient_list += [self.email2]
+        if self.email3 != '' and self.email3 != None:
+            recipient_list += [self.email3]
+        # send mail
+        send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
         return raw_password
     
     def set_activation_key(self):

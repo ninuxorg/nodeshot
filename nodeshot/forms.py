@@ -260,7 +260,7 @@ def configuration_form(request):
         formset = mInlineFormSet(instance=device, prefix=prefix_name)
     return render_to_response(template_form, { "formset": formset , 'device_id': device_id , 'configuration_type': entry_type , 'description': device.name } )
 
-class PasswordRecoveryForm(forms.Form):
+class PasswordResetForm(forms.Form):
     """
     A form used to recover the password of a node.
     """
@@ -269,7 +269,7 @@ class PasswordRecoveryForm(forms.Form):
     
     def __init__(self, node, *args, **kwargs):
         self.node = node
-        super(PasswordRecoveryForm, self).__init__(*args, **kwargs)
+        super(PasswordResetForm, self).__init__(*args, **kwargs)
         # css classes for fields
         for v in self.fields:
             self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
@@ -277,13 +277,11 @@ class PasswordRecoveryForm(forms.Form):
     def clean_email(self):
         ''' check if email corresponds to one of the node owners '''
         
-        email = self.cleaned_data['email']
+        email = self.cleaned_data['email'].lower()
         node = self.node
         
-        import logging
-        logging.log(1, self.cleaned_data)
-        
-        if email != node.email and email != node.email2 and email != node.email3:
+        # check email submitted is one of the node owners, the check is case insensitive
+        if email != node.email.lower() and email != node.email2.lower() and email != node.email3.lower():
             raise forms.ValidationError('L\'email inserita non corrisponde a nessuna delle email dei responsabili del nodo.')
         
         return email
