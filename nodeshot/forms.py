@@ -46,7 +46,7 @@ class AddNodeForm(BaseNodeForm):
 
     def clean(self):
         ''' Calls parent clean() and performs additional validation for the password field '''
-        super(NodeForm, self).clean()
+        super(AddNodeForm, self).clean()
         
         password = self.cleaned_data.get('password')
         password2 = self.cleaned_data.get('password2')
@@ -59,9 +59,25 @@ class AddNodeForm(BaseNodeForm):
 class EditNodeForm(BaseNodeForm):
     ''' Form to edit a node '''
     
+    new_password = forms.CharField(max_length=20, required=False, widget=forms.PasswordInput())
+    new_password2 = forms.CharField(max_length=20, required=False, widget=forms.PasswordInput())
+
+    def clean(self):
+        ''' Calls parent clean() and performs additional validation for the password field '''
+        super(EditNodeForm, self).clean()
+        
+        new_password = self.cleaned_data.get('new_password')
+        new_password2 = self.cleaned_data.get('new_password2')
+
+        # password and password2 must be the same
+        if new_password != new_password2:
+            raise forms.ValidationError('I due campi password non corrispondono.')
+        else:
+            return self.cleaned_data
+    
     class Meta:
         model = Node
-        exclude = ('status', 'password', 'slug')
+        exclude = ('status', 'slug', 'password')
 
 def node_form(request):
     ''' View for add/edit node '''
@@ -79,9 +95,9 @@ def node_form(request):
             if form.is_valid():
                 # prepare the node model object but don't save in the database yet
                 node = form.save(commit=False)
-                # set node as unconfirmed for security reasons, infact malicious users could edit the hidden field easily with instruments like firebug.
+                # set node as unconfirmed, malicious users could edit the hidden input field easily with instruments like firebug.
                 node.status = 'u'
-                # make slug
+                # generate slug
                 node.slug = slugify(node.name)
                 # save new node in the database (password encryption, activation_key and email notification is done in models.py)
                 node.save()
@@ -178,6 +194,10 @@ def edit_node(request, node_id):
         
         if form.is_valid():
             node = form.save(commit=False)
+            new_password = request.POST.get('new_password', False)
+            if(new_password):
+                node.password = new_password
+                node.set_password()
             node.slug = slugify(node.name)
             node.save()
             # this tells the template that the form has saved in order to display a message to the user

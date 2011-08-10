@@ -55,7 +55,7 @@ def index(request, slug=False):
     # if node is in querystring we want to center the map somewhere else
     if slug:
         try:
-            node = Node.objects.only('lat', 'lng').get(slug=slug)
+            node = Node.objects.only('lat', 'lng', 'slug').get(slug=slug)
             gmap_center = {
                 # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
                 'is_default': 'false',

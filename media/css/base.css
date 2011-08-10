@@ -371,3 +371,10 @@ h3 {
 }
 
 .success{ padding: 0 0 0 5px; background: green; color: #fff }
+.readonly{ background: #070707 !important; border: 1px solid #666666 !important}
+#editnode-form label a{
+	color: #7ea7ef;
+}
+
+#change-password{ cursor: pointer }
+.hidden, #editnode-form .hidden{ display: none }
