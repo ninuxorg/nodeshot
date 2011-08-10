@@ -3,6 +3,7 @@
     {% csrf_token %}
     {% if authenticated == 1 %}
         <h1>Modifica il nodo "{{ node.name }}"</h1>
+        <p>Nodo - <a href="{% url nodeshot_edit_devices node.id %}?encrypted_password={{ encrypted_password }}">Devices</a><br /><br /></p>
         <p>I campi contrassegnati con un asterisco sono obbligatori.</p>
         <fieldset>
             {% if form.non_field_errors %}

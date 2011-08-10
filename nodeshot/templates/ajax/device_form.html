@@ -1,19 +1,23 @@
-<div class="dialog-form ui-widget" >
+<div class="dialog-form ui-widget">
     <form id="device-form" class="ui-corner-all ui-widget-content" method="post" action="">
         <h1>Informazioni sui dispositivi</h1>
         {% csrf_token %} 
         <fieldset>
+            <p><a href="{% url nodeshot_edit_node node_id %}?encrypted_password={{ encrypted_password }}">Nodo</a> - Devices<br /><br /></p>
+            {% if saved %}
+                <div class="success">
+                    Device salvati correttamente.
+                </div><br />
+            {% endif %}
+            {% if formset.forms|length > 0 %}
             {{ formset.management_form }}
             {% for form in formset.forms %}
+            {% if form.id.value %}
             <div class="formset-form-container">
                 {% if form.non_field_errors %}
                 <p class="validateTips">
                     {{ form.non_field_errors }}
                 </p>
-            {% endif %}
-            
-                {% if form.id.value %}
-                {{ form.id }}
                 {% endif %}
             
                 <div class="fieldWrapper">
@@ -22,7 +26,7 @@
                             {{ form.name.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-name">Nome (es. "M5RusticaSalcito"):<label>
+                    <label for="id_devices-{{ forloop.counter0 }}-name">Nome (es. "M5RusticaSalcito")*:<label>
                     {{ form.name }}
                 </div>
 
@@ -34,6 +38,16 @@
                     {% endif %}
                     <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo (es. NanoStationM5):<label>
                     {{ form.type }}
+                </div>
+                
+                <div class="fieldWrapper">
+                    {% if form.description.errors %}
+                        <div class="ui-state-error">
+                            {{ form.description.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="id_devices-{{ forloop.counter0 }}-description">Descrizione:<label>
+                    {{ form.description }}
                 </div>
 
                 <div class="fieldWrapper">
@@ -55,9 +69,15 @@
                     <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Routing protocol version:<label>
                     {{ form.routing_protocol_version }}
                 </div>
-                
+                {{ form.DELETE }}
+                {{ form.node }}
+                {{ form.id }}
             </div>
-            {% endfor %}
+        {% endif %}
+        {% endfor %}
+        {% else %}
+            <p>Non ci sono devices per questo nodo.</p>
+        {% endif %}
         </fieldset>
         <input type="submit" id="device-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />
     </form>
@@ -86,6 +106,21 @@
     $(".formset-form-container").formset({
             prefix: '{{ formset.prefix }}',
             added: apply_jquery_ui
+            // add removed ID to hidden input that will delete the removed devices
+            //removed: function(row){
+            //    var input = $('#removed');
+            //    var value = input.val()
+            //    var removed_id = row.find('input[type=hidden]').eq(0).val();
+            //    if(removed_id!=''){
+            //        if(value!=''){
+            //            value = value + ',' + removed_id
+            //        }
+            //        else{
+            //            value = removed_id
+            //        }
+            //    }
+            //    input.val(value);
+            //}
     });
     var inputs = $("#device-form");
     apply_jquery_ui(inputs);

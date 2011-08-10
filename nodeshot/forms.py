@@ -80,60 +80,7 @@ class EditNodeForm(BaseNodeForm):
         exclude = ('status', 'slug', 'password')
 
 def node_form(request):
-    ''' View for add/edit node '''
-
-    # retrieve node ID
-    node_id = request.GET.get('id', None)
-
-    # if form has been submitted
-    if request.method == 'POST':
-        # if a new node has been submitted
-        if node_id == None:
-            # return json: either errors or the redirect url
-            form = AddNodeForm(request.POST)
-            # if form is valid
-            if form.is_valid():
-                # prepare the node model object but don't save in the database yet
-                node = form.save(commit=False)
-                # set node as unconfirmed, malicious users could edit the hidden input field easily with instruments like firebug.
-                node.status = 'u'
-                # generate slug
-                node.slug = slugify(node.name)
-                # save new node in the database (password encryption, activation_key and email notification is done in models.py)
-                node.save()
-
-                # if request is sent with ajax
-                if request.is_ajax():
-                    # return a blank page with node id
-                    return HttpResponse(node.id)
-                # otherwise if request is sent normally and DEBUG is true
-                elif DEBUG:
-                    # redirect to device form
-                    return HttpResponseRedirect(reverse('nodeshot_device_form', args=[node.id]))
-                # if in production return 404 as this should not happen
-                else:
-                    raise Http404
-        # if changes to an existing node have been submitted
-        else:
-            # get object or return a 404
-            node = get_object_or_404(Node, pk=node_id)
-            # init the modelform object with the changes submitted
-            form = AddNodeForm(request.POST, instance=node)
-            # if form is valid
-            if form.is_valid():
-                # save in the database
-                form.save()
-            
-    # if form hasn't been submitted and we are going to edit an existing node
-    elif request.method != 'POST' and node_id != None:
-        # get object or return a 404
-        node = get_object_or_404(Node, pk=node_id)
-        # populate the form with the current node info
-        form = AddNodeForm(instance=node)
-    # if inserting a new node
-    else:
-        # blank form
-        form = AddNodeForm()
+    ''' View for add node '''
     
     # if request is sent with ajax
     if request.is_ajax():
@@ -144,6 +91,36 @@ def node_form(request):
             template = 'node_form.html';
         else:
             raise Http404
+
+    # if form has been submitted
+    if request.method == 'POST':
+        # return json: either errors or the redirect url
+        form = AddNodeForm(request.POST)
+        # if form is valid
+        if form.is_valid():
+            # prepare the node model object but don't save in the database yet
+            node = form.save(commit=False)
+            # set node as unconfirmed, malicious users could edit the hidden input field easily with instruments like firebug.
+            node.status = 'u'
+            # generate slug
+            node.slug = slugify(node.name)
+            # save new node in the database (password encryption, activation_key and email notification is done in models.py)
+            node.save()
+
+            # if request is sent with ajax
+            if request.is_ajax():
+                # return a blank page with node id
+                return HttpResponse(node.id)
+            # otherwise if request is sent normally and DEBUG is true
+            elif DEBUG:
+                # redirect to device form
+                return HttpResponseRedirect(reverse('nodeshot_device_form', args=[node.id]))
+            # if in production return 404 as this should not happen
+            else:
+                raise Http404
+    else:
+        # blank form
+        form = AddNodeForm()
 
     return render_to_response(template, { 'form' : form }, context_instance=RequestContext(request))
     
@@ -176,7 +153,7 @@ def edit_node(request, node_id):
     authenticated = 0
     # init form
     form = EditNodeForm(instance=node)
-    # default value for save variable
+    # default value for "saved" variable
     saved = False
     
     # if sending raw password check if is correct
@@ -193,11 +170,18 @@ def edit_node(request, node_id):
         form = EditNodeForm(request.POST, instance=node)
         
         if form.is_valid():
+            # get a Node object but don't save yet
             node = form.save(commit=False)
+            # get new password or False
             new_password = request.POST.get('new_password', False)
+            # if new password has been set
             if(new_password):
+                # encrypt the new password
                 node.password = new_password
                 node.set_password()
+                # encrypted_password now shall change to the new password
+                encrypted_password = node.password
+            # change slug
             node.slug = slugify(node.name)
             node.save()
             # this tells the template that the form has saved in order to display a message to the user
@@ -214,13 +198,39 @@ def edit_node(request, node_id):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 def device_form(request, node_id):    
-    # get object or return a 404
-    node = get_object_or_404(Node, pk=node_id)
+    
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/device_form.html';
+    else:
+        # alternative mode available just for testing
+        if DEBUG:
+            template = 'device_form.html';
+        else:
+            raise Http404
+        
+    # get object or raise 404
+    try:
+        node = Node.objects.only('name', 'status', 'password').get(pk=node_id)
+    except DoesNotExists:
+        raise Http404
+    # if node is unconfirmed return 404 error
+    if node.status == 'u':
+        raise Http404
+    
+    encrypted_password = request.GET.get('encrypted_password', False)
+    # default value for authenticated variable
+    
+    if node.password != encrypted_password:
+        raise Http404
     
     # init inlineformset_factory
-    DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)#, formfield_callback = my_formfield_cb)
+    DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)
+    
     # init first formset
     formset = DeviceInlineFormSet(instance=node, prefix='devices')
+    # default value for "saved" variable
+    saved = False
     
     # if form has been submitted
     if request.method == "POST":
@@ -230,22 +240,49 @@ def device_form(request, node_id):
         if formset.is_valid():
             # init list that will contain devices
             device_list = []
+            # print a nice message in the template
+            saved = True
             # loop through devices
-            for f in formset.forms:
-                # save every device
-                d = f.save()
-                # append id to device_list
-                device_list.append(str(d.id))
-            # set response as a blank page with just the IDs of the devices separated by commas
-            response = HttpResponse( ','.join(device_list))
-            
-    # else if form hasn't been submitted yet
-    else:
-        # set response with an empty form
-        response = render_to_response("device_form.html", { "formset": formset, 'node_id': node_id }, context_instance=RequestContext(request))
+            formset.save()
+            # init inlineformset_factory
+            #DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)
+            # reset formset
+            formset = DeviceInlineFormSet(instance=node, prefix='devices')
+            ##for f in formset.forms:
+            #    #if f.empty_permitted:
+            #    #    continue
+            #    # save every device
+            #    #d = f.save()
+            #    # append id to device_list
+            #    #device_list.append(str(d.id))
+            #    # set response as a blank page with just the IDs of the devices separated by commas
+            #    #response = HttpResponse( ','.join(device_list))
+            ## retrieve ids of removed devices
+            ##removed = request.POST.get('removed')
+            ##removed = removed.split(',')
+            ### for each removed ID
+            ##for r in removed:
+            ##    # break loop if empty
+            ##    if r=='':
+            ##        break
+            ##    # retrieve device
+            ##    d = Device.objects.get(pk=r)
+            ##    # check device is related to current node (malicious users might edit the hidden input field)
+            ##    if(d.node.id != int(node_id)):
+            ##        # in this case just return 404 to the malicious user
+            ##        raise Http404
+            ##    # delete the device
+            ##    d.delete()
     
-    # return the response we've got in one of the previous cases
-    return response
+    context = {
+        'formset': formset,
+        'length': len(formset),
+        'node_id': node_id,
+        'saved': saved
+    }
+    
+    # set response with an empty form
+    return render_to_response(template, context, context_instance=RequestContext(request))
 
 def configuration_form(request):
     device_id = request.GET.get('device_id', None)

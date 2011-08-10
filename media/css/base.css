@@ -203,10 +203,12 @@ html, body { height: 100%; min-width:1000px }
 a.add-row{ margin-left: 1em }
 #device-form-submit{ width: 100px; margin: 30px 1em 1em }
 
+#device-form fieldset{
+	padding: 1em;
+}
 .formset-form-container {
     padding: 1em;
     border:1px dashed orange;
-    margin: 1em;
 }
 .device-id , .configuration-type {
     display: none;
@@ -267,9 +269,6 @@ h3 {
 #info-window {
     width: 500px; 
     height: 300px;
-     
-     
-
 }
 
 

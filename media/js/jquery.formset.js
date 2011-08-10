@@ -27,11 +27,8 @@ function onNewForm(row) {
      });
  
 
-}
-
-
-
-;(function($) {
+};
+(function($) {
     $.fn.formset = function(opts)
     {
         var options = $.extend({}, $.fn.formset.defaults, opts),
