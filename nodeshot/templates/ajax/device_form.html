@@ -9,17 +9,17 @@
                     Device salvati correttamente.
                 </div><br />
             {% endif %}
-            {% if formset.forms|length > 0 %}
+            {% if formset.forms|length < 2 %}
+                <p>Non ci sono devices per questo nodo.<br /><br /></p>
+            {% endif %}
             {{ formset.management_form }}
             {% for form in formset.forms %}
-            {% if form.id.value %}
-            <div class="formset-form-container">
+            <div class="formset-form-container{% if not form.id.value %} hidden{% endif %}">
                 {% if form.non_field_errors %}
                 <p class="validateTips">
                     {{ form.non_field_errors }}
                 </p>
                 {% endif %}
-            
                 <div class="fieldWrapper">
                     {% if form.name.errors %}
                         <div class="ui-state-error">
@@ -69,15 +69,13 @@
                     <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Routing protocol version:<label>
                     {{ form.routing_protocol_version }}
                 </div>
-                {{ form.DELETE }}
                 {{ form.node }}
-                {{ form.id }}
+                {% if form.id.value %}
+                    {{ form.id }}
+                    {{ form.DELETE }}
+                {% endif %}
             </div>
-        {% endif %}
         {% endfor %}
-        {% else %}
-            <p>Non ci sono devices per questo nodo.</p>
-        {% endif %}
         </fieldset>
         <input type="submit" id="device-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />
     </form>

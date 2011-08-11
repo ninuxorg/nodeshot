@@ -227,8 +227,6 @@ def device_form(request, node_id):
     # init inlineformset_factory
     DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)
     
-    # init first formset
-    formset = DeviceInlineFormSet(instance=node, prefix='devices')
     # default value for "saved" variable
     saved = False
     
@@ -242,37 +240,13 @@ def device_form(request, node_id):
             device_list = []
             # print a nice message in the template
             saved = True
+            import logging
+            logging.log(1, saved)
             # loop through devices
             formset.save()
-            # init inlineformset_factory
-            #DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)
-            # reset formset
-            formset = DeviceInlineFormSet(instance=node, prefix='devices')
-            ##for f in formset.forms:
-            #    #if f.empty_permitted:
-            #    #    continue
-            #    # save every device
-            #    #d = f.save()
-            #    # append id to device_list
-            #    #device_list.append(str(d.id))
-            #    # set response as a blank page with just the IDs of the devices separated by commas
-            #    #response = HttpResponse( ','.join(device_list))
-            ## retrieve ids of removed devices
-            ##removed = request.POST.get('removed')
-            ##removed = removed.split(',')
-            ### for each removed ID
-            ##for r in removed:
-            ##    # break loop if empty
-            ##    if r=='':
-            ##        break
-            ##    # retrieve device
-            ##    d = Device.objects.get(pk=r)
-            ##    # check device is related to current node (malicious users might edit the hidden input field)
-            ##    if(d.node.id != int(node_id)):
-            ##        # in this case just return 404 to the malicious user
-            ##        raise Http404
-            ##    # delete the device
-            ##    d.delete()
+            
+    # init or reset formset
+    formset = DeviceInlineFormSet(instance=node, prefix='devices')
     
     context = {
         'formset': formset,
