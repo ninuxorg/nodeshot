@@ -3,12 +3,12 @@ from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
 from django.core.context_processors import csrf
 from nodeshot.models import *
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.core.exceptions import *
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import inlineformset_factory
 from django.utils import simplejson
 from django.db import models
+from django.db.models import Q
 from django import forms
 from settings import DEBUG
 from django.core.urlresolvers import reverse
@@ -139,7 +139,7 @@ def edit_node(request, node_id):
     # get object or raise 404
     try:
         node = Node.objects.select_related().get(pk=node_id)
-    except DoesNotExists:
+    except ObjectDoesNotExist:
         raise Http404
     # if node is unconfirmed return 404 error
     if node.status == 'u':
@@ -197,7 +197,7 @@ def edit_node(request, node_id):
     
     return render_to_response(template, context, context_instance=RequestContext(request))
 
-def device_form(request, node_id):    
+def device_form(request, node_id, password):    
     
     # if request is sent with ajax
     if request.is_ajax():
@@ -211,17 +211,8 @@ def device_form(request, node_id):
         
     # get object or raise 404
     try:
-        node = Node.objects.only('name', 'status', 'password').get(pk=node_id)
-    except DoesNotExists:
-        raise Http404
-    # if node is unconfirmed return 404 error
-    if node.status == 'u':
-        raise Http404
-    
-    encrypted_password = request.GET.get('encrypted_password', False)
-    # default value for authenticated variable
-    
-    if node.password != encrypted_password:
+        node = Node.objects.only('name', 'status', 'password').exclude(Q(status='u') & Q(status='p')).get(pk=node_id, password=password)
+    except ObjectDoesNotExist:
         raise Http404
     
     # init inlineformset_factory
@@ -236,27 +227,100 @@ def device_form(request, node_id):
         formset = DeviceInlineFormSet(request.POST, instance=node, prefix='devices')
         # if form is valid
         if formset.is_valid():
-            # init list that will contain devices
-            device_list = []
             # print a nice message in the template
             saved = True
-            import logging
-            logging.log(1, saved)
             # loop through devices
             formset.save()
-            
+    
     # init or reset formset
     formset = DeviceInlineFormSet(instance=node, prefix='devices')
     
     context = {
         'formset': formset,
         'length': len(formset),
+        'node': node,
         'node_id': node_id,
         'saved': saved
     }
     
     # set response with an empty form
     return render_to_response(template, context, context_instance=RequestContext(request))
+    
+def configuration(request, node_id, password, type):
+    
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/%s_form.html' % type;
+    else:
+        # alternative mode available just for testing
+        if DEBUG:
+            template = '%s_form.html' % type;
+        else:
+            raise Http404
+        
+    # get object or raise 404
+    try:
+        node = Node.objects.only('name', 'status', 'password').exclude(Q(status='u') & Q(status='p')).get(pk=node_id, password=password)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    # retrieve devices
+    devices = Device.objects.filter(node=node_id)
+    # determine which model to pass to inlineformset_favtory
+    model = Interface if type == 'interface' else Hna4
+    # init formset factory
+    modelFormSet = inlineformset_factory(Device, model, extra=1)
+    
+    saved = False
+    # init variables for the loops
+    objects = []
+    i = 1
+        
+    if request.method == "POST":
+        import logging
+        logging.log(1, request.POST)
+
+        # loop through devices
+        for device in devices:
+            # if this cycle has the device we submitted
+            if device.id == int(request.POST.get('device')):
+                formset = modelFormSet(request.POST, instance=device, prefix='%s%s'%(type,i))
+                if formset.is_valid():
+                    # print a nice message in the template
+                    saved = device.name
+                    # loop through devices
+                    formset.save()
+            else:
+                formset = modelFormSet(instance=device, prefix='%s%s'%(type,i))
+            objects += [{'device': device, 'formset': formset }]
+            i+=1
+    else:
+        for device in devices:
+            objects += [{'device': device, 'formset': modelFormSet(instance=device, prefix='%s%s'%(type,i))}]
+            i+=1
+    
+
+    #if request.method == "POST":
+    #    formset = mInlineFormSet(request.POST, instance=device, prefix=type)
+    #    if formset.is_valid():
+    #        for f in formset.forms:
+    #            # only if the form is not empty
+    #            if (entry_type == 'if' and f.data[f.prefix + "-ipv4_address"] == '' ) or (entry_type == 'h4' and f.data[f.prefix + "-route"] == '' ): 
+    #                   pass # STUPID DJANGO, STUPID STUPID STUPID
+    #            else:
+    #                f.save()
+    #        return HttpResponse('ok')
+    #else:
+    #    formset = mInlineFormSet(instance=device, prefix=type)
+    
+    context = {
+        'node': node,
+        'type': type,
+        'objects': objects,
+        'saved': saved
+    }    
+    
+    return render_to_response(template, context, context_instance=RequestContext(request) )
 
 def configuration_form(request):
     device_id = request.GET.get('device_id', None)
@@ -289,7 +353,15 @@ def configuration_form(request):
             return HttpResponse('ok')
     else:
         formset = mInlineFormSet(instance=device, prefix=prefix_name)
-    return render_to_response(template_form, { "formset": formset , 'device_id': device_id , 'configuration_type': entry_type , 'description': device.name } )
+    
+    context = {
+        'formset': formset ,
+        'device_id': device_id ,
+        'configuration_type': entry_type ,
+        'description': device.name
+    }    
+    
+    return render_to_response(template_form, context, context_instance=RequestContext(request) )
 
 class PasswordResetForm(forms.Form):
     """

@@ -325,7 +325,7 @@ class Device(models.Model):
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
     def __unicode__(self):
-        return u'%s (%s)' % (self.type, self.node.name )
+        return u'%s (%s)' % (self.name, self.node.name )
 
 class HNAv4(models.Model):
     device = models.ForeignKey(Device)
@@ -335,8 +335,8 @@ class HNAv4(models.Model):
         return u'%s' % (self.route)
 
 class Interface(models.Model):
-    ipv4_address = models.CharField(max_length=15, unique=True)
-    ipv6_address = models.CharField(max_length=50, blank=True, null=True)
+    ipv4_address = models.IPAddressField(verbose_name='indirizzo ipv4', unique=True)
+    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name='indirizzo ipv6', blank=True, null=True)
     type = models.CharField(max_length=1, choices=INTERFACE_TYPE)
     device = models.ForeignKey(Device)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)

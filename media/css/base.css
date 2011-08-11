@@ -171,6 +171,7 @@ html, body { height: 100%; min-width:1000px }
     width: 50%;
     margin: 20px auto;
     font-size:15px !important;
+     overflow: hidden
 }
 .dialog-form form{ overflow: hidden }
 .dialog-form label, .dialog-form input { display:block; }
@@ -203,7 +204,7 @@ html, body { height: 100%; min-width:1000px }
 a.add-row{ margin-left: 1em }
 #device-form-submit{ width: 100px; margin: 30px 1em 1em }
 
-#device-form fieldset{
+.inline-formset fieldset{
 	padding: 1em;
 }
 .formset-form-container {
@@ -265,12 +266,10 @@ h3 {
 
 }
 
-
 #info-window {
     width: 500px; 
     height: 300px;
 }
-
 
 #node-info-box {
     display: none; 

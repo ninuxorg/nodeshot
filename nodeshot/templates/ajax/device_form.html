@@ -1,9 +1,13 @@
 <div class="dialog-form ui-widget">
-    <form id="device-form" class="ui-corner-all ui-widget-content" method="post" action="">
+    <form id="device-form" class="ui-corner-all ui-widget-content inline-formset" method="post" action="">
         <h1>Informazioni sui dispositivi</h1>
         {% csrf_token %} 
         <fieldset>
-            <p><a href="{% url nodeshot_edit_node node_id %}?encrypted_password={{ encrypted_password }}">Nodo</a> - Devices<br /><br /></p>
+            <p>
+                <a href="{% url nodeshot_edit_node node.id %}?encrypted_password={{ node.password }}">Nodo</a> -
+                Devices -
+                <a href="{% url nodeshot_edit_interfaces node.id node.password %}">Interfacce</a><br /><br />
+            </p>
             {% if saved %}
                 <div class="success">
                     Device salvati correttamente.
@@ -26,7 +30,7 @@
                             {{ form.name.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-name">Nome (es. "M5RusticaSalcito")*:<label>
+                    <label for="id_devices-{{ forloop.counter0 }}-name">Nome*:<label>
                     {{ form.name }}
                 </div>
 
@@ -36,7 +40,7 @@
                             {{ form.type.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo (es. NanoStationM5):<label>
+                    <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo:<label>
                     {{ form.type }}
                 </div>
                 
@@ -56,7 +60,7 @@
                             {{ form.routing_protocol.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">Routing protocol:<label>
+                    <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">Protocollo di routing:<label>
                     {{ form.routing_protocol }}
                 </div>
                 
@@ -66,7 +70,7 @@
                             {{ form.routing_protocol_versopm.errors }}
                         </div>
                     {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Routing protocol version:<label>
+                    <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Versione protocollo di routing:<label>
                     {{ form.routing_protocol_version }}
                 </div>
                 {{ form.node }}
@@ -79,7 +83,6 @@
         </fieldset>
         <input type="submit" id="device-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />
     </form>
-    <input type="hidden" id="node_id" name="node_id" value="{{ node_id }}" />
 </div>
 
 <script>
@@ -103,22 +106,9 @@
     $('#device-form-submit').button();
     $(".formset-form-container").formset({
             prefix: '{{ formset.prefix }}',
-            added: apply_jquery_ui
-            // add removed ID to hidden input that will delete the removed devices
-            //removed: function(row){
-            //    var input = $('#removed');
-            //    var value = input.val()
-            //    var removed_id = row.find('input[type=hidden]').eq(0).val();
-            //    if(removed_id!=''){
-            //        if(value!=''){
-            //            value = value + ',' + removed_id
-            //        }
-            //        else{
-            //            value = removed_id
-            //        }
-            //    }
-            //    input.val(value);
-            //}
+            added: apply_jquery_ui,
+            addText: 'Aggiungi',
+            deleteText: 'Rimuovi'
     });
     var inputs = $("#device-form");
     apply_jquery_ui(inputs);

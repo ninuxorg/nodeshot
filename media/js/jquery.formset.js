@@ -141,7 +141,7 @@ function onNewForm(row) {
             }
             // FIXME: Perhaps using $.data would be a better idea?
             options.formTemplate = template;
-
+            console.log($$.attr('tagName'));
             if ($$.attr('tagName') == 'TR') {
                 // If forms are laid out as table rows, insert the
                 // "add" button in a new table row:
@@ -149,8 +149,10 @@ function onNewForm(row) {
                 $$.parent().append('<tr><td colspan="' + numCols + '"><a class="' + options.addCssClass + '" href="javascript:void(0)">' + options.addText + '</a></tr>');
                 addButton = $$.parent().find('tr:last a');
                 addButton.parents('tr').addClass(options.formCssClass + '-add');
+                console.log('yo');
             } else {
                 // Otherwise, insert it immediately after the last form:
+                console.log('yo');
                 $$.filter(':last').after('<a class="' + options.addCssClass + '" href="javascript:void(0)">' + options.addText + '</a>');
                 addButton = $$.filter(':last').next();
             }
