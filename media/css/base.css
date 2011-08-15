@@ -376,3 +376,5 @@ h3 {
 
 #change-password{ cursor: pointer }
 .hidden, #editnode-form .hidden{ display: none }
+.delete-row{ float: right }
+.formset-form-container{ overflow:hidden }

@@ -3,7 +3,7 @@
     {% csrf_token %}
     {% if authenticated == 1 %}
         <h1>Modifica il nodo "{{ node.name }}"</h1>
-        {% if node.status != 'p' %}<p>Nodo - <a href="{% url nodeshot_edit_devices node.id node.password%}">Devices</a> - <a href="{% url nodeshot_edit_interfaces node.id node.password %}">Interfacce</a><br /><br /></p>{% endif %}
+        {% if node.status != 'p' %}<p>Nodo - <a href="{% url nodeshot_edit_devices node.id node.password%}">Devices</a> - <a href="{% url nodeshot_edit_interfaces node.id node.password %}">Interfacce</a> - <a href="{% url nodeshot_edit_hna4s node.id node.password %}">HNA4s</a><br /><br /></p>{% endif %}
         <p>I campi contrassegnati con un asterisco sono obbligatori.</p>
         <fieldset>
             {% if form.non_field_errors %}

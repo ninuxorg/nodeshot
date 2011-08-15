@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^node_form', 'nodeshot.forms.node_form', name='nodeshot_node_form'),
     url(r'^edit/(?P<node_id>\d+)/$', 'nodeshot.forms.edit_node', name='nodeshot_edit_node'),
     url(r'^interface/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.configuration', {'type': 'interface'},name='nodeshot_edit_interfaces'),
-    url(r'^hna4/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.configuration', {'type': 'hna4'},name='nodeshot_edit_hna4s'),
+    url(r'^hna4/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.configuration', {'type': 'hnav4'},name='nodeshot_edit_hna4s'),
     url(r'^recover_password/(?P<node_id>\d+)/', 'nodeshot.views.recover_password', name='nodeshot_recover_password'),
     # needs review
     url(r'^device/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.device_form', name='nodeshot_edit_devices'),

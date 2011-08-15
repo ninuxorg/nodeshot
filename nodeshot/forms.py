@@ -40,7 +40,10 @@ class BaseNodeForm(forms.ModelForm):
         return self.cleaned_data
 
 class AddNodeForm(BaseNodeForm):
-    ''' Form to add a node, has an additional password2 field for password verification '''
+    '''
+    Add node django form
+    has an additional password2 field for password verification
+    '''
     
     password2 = forms.CharField(max_length=20, required=True, widget=forms.PasswordInput())
 
@@ -57,7 +60,10 @@ class AddNodeForm(BaseNodeForm):
             return self.cleaned_data
 
 class EditNodeForm(BaseNodeForm):
-    ''' Form to edit a node '''
+    '''
+    Edit node django form
+    if new_password and new_password2 fields are filled the view will take care of updating the password
+    '''
     
     new_password = forms.CharField(max_length=20, required=False, widget=forms.PasswordInput())
     new_password2 = forms.CharField(max_length=20, required=False, widget=forms.PasswordInput())
@@ -80,7 +86,7 @@ class EditNodeForm(BaseNodeForm):
         exclude = ('status', 'slug', 'password')
 
 def node_form(request):
-    ''' View for add node '''
+    ''' Add node view '''
     
     # if request is sent with ajax
     if request.is_ajax():
@@ -125,6 +131,7 @@ def node_form(request):
     return render_to_response(template, { 'form' : form }, context_instance=RequestContext(request))
     
 def edit_node(request, node_id):
+    ''' Edit node view '''
         
     # if request is sent with ajax
     if request.is_ajax():
@@ -138,11 +145,8 @@ def edit_node(request, node_id):
         
     # get object or raise 404
     try:
-        node = Node.objects.select_related().get(pk=node_id)
+        node = Node.objects.select_related().exclude(status='u').get(pk=node_id)
     except ObjectDoesNotExist:
-        raise Http404
-    # if node is unconfirmed return 404 error
-    if node.status == 'u':
         raise Http404
     
     # raw password to authenticate
@@ -197,7 +201,8 @@ def edit_node(request, node_id):
     
     return render_to_response(template, context, context_instance=RequestContext(request))
 
-def device_form(request, node_id, password):    
+def device_form(request, node_id, password):
+    ''' Edit device view '''
     
     # if request is sent with ajax
     if request.is_ajax():
@@ -211,6 +216,9 @@ def device_form(request, node_id, password):
         
     # get object or raise 404
     try:
+        # get only name, status and password columns
+        # don't consider unconfirmed or potential nodes
+        # get node only if password is correct
         node = Node.objects.only('name', 'status', 'password').exclude(Q(status='u') & Q(status='p')).get(pk=node_id, password=password)
     except ObjectDoesNotExist:
         raise Http404
@@ -247,6 +255,10 @@ def device_form(request, node_id, password):
     return render_to_response(template, context, context_instance=RequestContext(request))
     
 def configuration(request, node_id, password, type):
+    '''
+    Edit interface / HNA4 view
+    type is set at url config level
+    '''
     
     # if request is sent with ajax
     if request.is_ajax():
@@ -260,6 +272,9 @@ def configuration(request, node_id, password, type):
         
     # get object or raise 404
     try:
+        # get only name, status and password columns
+        # don't consider unconfirmed or potential nodes
+        # get node only if password is correct
         node = Node.objects.only('name', 'status', 'password').exclude(Q(status='u') & Q(status='p')).get(pk=node_id, password=password)
     except ObjectDoesNotExist:
         raise Http404
@@ -267,51 +282,36 @@ def configuration(request, node_id, password, type):
     # retrieve devices
     devices = Device.objects.filter(node=node_id)
     # determine which model to pass to inlineformset_favtory
-    model = Interface if type == 'interface' else Hna4
+    model = Interface if type == 'interface' else HNAv4
     # init formset factory
     modelFormSet = inlineformset_factory(Device, model, extra=1)
     
     saved = False
     # init variables for the loops
     objects = []
+    # init counter
     i = 1
-        
+    
+    # if submitting the form
     if request.method == "POST":
-        import logging
-        logging.log(1, request.POST)
-
         # loop through devices
         for device in devices:
             # if this cycle has the device we submitted
-            if device.id == int(request.POST.get('device')):
-                formset = modelFormSet(request.POST, instance=device, prefix='%s%s'%(type,i))
-                if formset.is_valid():
-                    # print a nice message in the template
-                    saved = device.name
-                    # loop through devices
-                    formset.save()
-            else:
+            formset = modelFormSet(request.POST, instance=device, prefix='%s%s'%(type,i))
+            if formset.is_valid():
+                # print a nice message in the template
+                saved = True
+                # loop through devices
+                formset.save()
+                # reload formset so it will show changes
                 formset = modelFormSet(instance=device, prefix='%s%s'%(type,i))
             objects += [{'device': device, 'formset': formset }]
             i+=1
     else:
+        # just load initial data
         for device in devices:
             objects += [{'device': device, 'formset': modelFormSet(instance=device, prefix='%s%s'%(type,i))}]
             i+=1
-    
-
-    #if request.method == "POST":
-    #    formset = mInlineFormSet(request.POST, instance=device, prefix=type)
-    #    if formset.is_valid():
-    #        for f in formset.forms:
-    #            # only if the form is not empty
-    #            if (entry_type == 'if' and f.data[f.prefix + "-ipv4_address"] == '' ) or (entry_type == 'h4' and f.data[f.prefix + "-route"] == '' ): 
-    #                   pass # STUPID DJANGO, STUPID STUPID STUPID
-    #            else:
-    #                f.save()
-    #        return HttpResponse('ok')
-    #else:
-    #    formset = mInlineFormSet(instance=device, prefix=type)
     
     context = {
         'node': node,

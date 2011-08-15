@@ -6,7 +6,8 @@
             <p>
                 <a href="{% url nodeshot_edit_node node.id %}?encrypted_password={{ node.password }}">Nodo</a> -
                 Devices -
-                <a href="{% url nodeshot_edit_interfaces node.id node.password %}">Interfacce</a><br /><br />
+                <a href="{% url nodeshot_edit_interfaces node.id node.password %}">Interfacce</a> -
+                <a href="{% url nodeshot_edit_hna4s node.id node.password %}">HNA4s</a><br /><br />
             </p>
             {% if saved %}
                 <div class="success">
@@ -73,6 +74,10 @@
                     <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Versione protocollo di routing:<label>
                     {{ form.routing_protocol_version }}
                 </div>
+                
+                <a href="{% url nodeshot_edit_interfaces node.id node.password %}#device{{ forloop.counter }}-interface" class="edit-configuration" title="Modifica le interfacce di questo device">Interfacce</a>
+                <a href="{% url nodeshot_edit_hna4s node.id node.password %}#device{{ forloop.counter }}-hna4" class="edit-configuration" title="Modifica gli Hna4 di questo device">Hna4</a>
+                
                 {{ form.node }}
                 {% if form.id.value %}
                     {{ form.id }}
@@ -92,13 +97,13 @@
             $(this).addClass("text ui-widget-content ui-corner-all");
             if ($(this).is("input[type='text']")||$(this).is("textarea")||$(this).is("input[type='password']") ) {
                 $(this).bind({
-                      focusin: function() {
-                       $(this).toggleClass('ui-state-focus');
-                         },
-                       focusout: function() {
-                        $(this).toggleClass('ui-state-focus');
-                         }
-                      });
+                    focusin: function() {
+                     $(this).toggleClass('ui-state-focus');
+                       },
+                    focusout: function() {
+                      $(this).toggleClass('ui-state-focus');
+                    }
+                });
             }
          });
     }
@@ -106,7 +111,11 @@
     $('#device-form-submit').button();
     $(".formset-form-container").formset({
             prefix: '{{ formset.prefix }}',
-            added: apply_jquery_ui,
+            added: function(row){
+                apply_jquery_ui(inputs);
+                // remove edit interface link
+                $(row).find('.edit-configuration').remove();
+            },
             addText: 'Aggiungi',
             deleteText: 'Rimuovi'
     });
