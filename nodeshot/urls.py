@@ -13,12 +13,13 @@ urlpatterns = patterns('',
     url(r'^info_tab', 'nodeshot.views.info', name='nodeshot_info_tab'),
     # needs review
     url(r'^node_form', 'nodeshot.forms.node_form', name='nodeshot_node_form'),
-    url(r'^edit/(?P<node_id>\d+)/$', 'nodeshot.forms.edit_node', name='nodeshot_edit_node'),
-    url(r'^interface/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.configuration', {'type': 'interface'},name='nodeshot_edit_interfaces'),
-    url(r'^hna4/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.configuration', {'type': 'hnav4'},name='nodeshot_edit_hna4s'),
-    url(r'^recover_password/(?P<node_id>\d+)/', 'nodeshot.views.recover_password', name='nodeshot_recover_password'),
+    url(r'^node/authenticate/(?P<node_id>\d+)/$', 'nodeshot.forms.auth_node', name='nodeshot_auth_node'),
+    url(r'^node/edit/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.edit_node', name='nodeshot_edit_node'),
+    url(r'^node/edit/interface/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.configuration', {'type': 'interface'},name='nodeshot_edit_interfaces'),
+    url(r'^node/edit/hna4/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.configuration', {'type': 'hnav4'},name='nodeshot_edit_hna4s'),
+    url(r'^node/recover_password/(?P<node_id>\d+)/', 'nodeshot.views.recover_password', name='nodeshot_recover_password'),
     # needs review
-    url(r'^device/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.device_form', name='nodeshot_edit_devices'),
+    url(r'^node/edit/device/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.device_form', name='nodeshot_edit_devices'),
     # needs review
     url(r'^configuration_form', 'nodeshot.forms.configuration_form', name='nodeshot_configuration_form'),
     url(r'^confirm/(?P<node_id>\d+)/(?P<activation_key>\w+)/$', 'nodeshot.views.confirm_node', name='nodeshot_confirm_node'),

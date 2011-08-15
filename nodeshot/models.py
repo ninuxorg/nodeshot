@@ -475,14 +475,13 @@ def update_statistics(sender, instance, using, **kwargs):
 
 # signals to update statistics every time something is modified or deleted
 post_delete.connect(update_statistics, sender=Node)
-post_delete.connect(update_statistics, sender=Device)
-post_delete.connect(update_statistics, sender=Interface)
+#post_delete.connect(update_statistics, sender=Device)
+#post_delete.connect(update_statistics, sender=Interface)
 post_delete.connect(update_statistics, sender=Link)
-post_delete.connect(update_statistics, sender=HNAv4)
+#post_delete.connect(update_statistics, sender=HNAv4)
 
 post_save.connect(update_statistics, sender=Node)
-post_save.connect(update_statistics, sender=Device)
-post_save.connect(update_statistics, sender=Interface)
+#post_save.connect(update_statistics, sender=Device)
+#post_save.connect(update_statistics, sender=Interface)
 post_save.connect(update_statistics, sender=Link)
-post_save.connect(update_statistics, sender=HNAv4)
-
+#post_save.connect(update_statistics, sender=HNAv4)

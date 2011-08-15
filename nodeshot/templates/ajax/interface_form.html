@@ -1,7 +1,7 @@
 <div class="dialog-form ui-corner-all ui-widget ui-widget-content" id="form-container">
     <h1>Interfacce del nodo {{ node.name }}</h1>
     <p>
-        <a href="{% url nodeshot_edit_node node.id %}?encrypted_password={{ node.password }}">Nodo</a> -
+        <a href="{% url nodeshot_edit_node node.id node.password %}">Nodo</a> -
         <a href="{% url nodeshot_edit_devices node.id node.password %}">Devices</a> -
         Interfacce -
         <a href="{% url nodeshot_edit_hna4s node.id node.password %}">HNA4s</a><br /><br />

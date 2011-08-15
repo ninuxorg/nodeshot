@@ -8,23 +8,27 @@
     <div id="tab-info">
         <table>
             <tr>
-                <td>Nome:</td><td>{{node.name}} - <a href="{% url nodeshot_select node.slug %}">Permalink</a></td>
+                <td>Nome:</td><td>{{ node.name }} - <a href="{% url nodeshot_select node.slug %}">Permalink</a></td>
             </tr>
             <tr>
-                <td>Descrizione:</td><td>{{node.description}}</td>
+                <td>Descrizione:</td><td>{{ node.description }}</td>
             </tr>
             <tr>
-                <td>Responsabile:</td><td>{{node.owner}} (<a href="javascript:contactNode({{ node.id }})">contatta</a>)</td>
-            </tr>
-
-            <tr>
-                <td>Latitudine:</td><td class="selected-node-lat">{{node.lat}}</td>
+                <td>Responsabile:</td><td>{{ node.owner }} (<a href="javascript:contactNode({{ node.id }})" id="contact-link">contatta</a>)</td>
             </tr>
             <tr>
-                <td>Longitudine:</td><td class="selected-node-lng">{{node.lng}}</td>
+                <td>Latitudine:</td><td class="selected-node-lat">{{ node.lat }}</td>
             </tr>
+            <tr>
+                <td>Longitudine:</td><td class="selected-node-lng">{{ node.lng }}</td>
+            </tr>
+            {% if node.alt %}
+            <tr>
+                <td>Altitudine:</td><td class="selected-node-lng">{{ node.alt }} metri</td>
+            </tr>
+            {% endif %}
         </table>
-        <br /><a href="{% url nodeshot_edit_node node.id %}">Modifica nodo</a>
+        <br /><a href="{% url nodeshot_auth_node node.id %}" id="edit-link">Modifica nodo</a>
     </div>
 
     <div id="tab-dev">

@@ -149,10 +149,14 @@ function initialize_map() {
 function handleMarkerClick(marker, node_id) {
   return function() {
     $.get(__project_home__+'info_window/'+node_id+'/', function(data) {
+        // add listener to domready of infowindows - it will be triggered when the infoWindow is ready
+        google.maps.event.addListener(infoWindow, 'domready', function(){
+            $(".tabs").tabs();
+            bindEditNode();
+        });
         infoWindow.setContent(data);
-        infoWindow.open(map, marker);
-        setTimeout(function(){ $(".tabs").tabs(); }, 100);
-    } );
+        infoWindow.open(map, marker);        
+    });
   };
 } 
 

@@ -112,34 +112,24 @@ def node_form(request):
             node.slug = slugify(node.name)
             # save new node in the database (password encryption, activation_key and email notification is done in models.py)
             node.save()
-
-            # if request is sent with ajax
-            if request.is_ajax():
-                # return a blank page with node id
-                return HttpResponse(node.id)
-            # otherwise if request is sent normally and DEBUG is true
-            elif DEBUG:
-                # redirect to device form
-                return HttpResponseRedirect(reverse('nodeshot_device_form', args=[node.id]))
-            # if in production return 404 as this should not happen
-            else:
-                raise Http404
+            # return a blank page with node id
+            return HttpResponse(node.id)
     else:
         # blank form
         form = AddNodeForm()
 
     return render_to_response(template, { 'form' : form }, context_instance=RequestContext(request))
     
-def edit_node(request, node_id):
-    ''' Edit node view '''
-        
+def auth_node(request, node_id):
+    ''' Authenticates user to edit a node '''
+    
     # if request is sent with ajax
     if request.is_ajax():
-        template = 'ajax/edit_node.html';
+        template = 'ajax/auth_node.html';
     else:
         # alternative mode available just for testing
         if DEBUG:
-            template = 'edit_node.html';
+            template = 'auth_node.html';
         else:
             raise Http404
         
@@ -163,13 +153,43 @@ def edit_node(request, node_id):
     # if sending raw password check if is correct
     if raw_password and node.check_password(raw_password):
         authenticated = 1
-        encrypted_password = node.password
+        return HttpResponseRedirect(reverse('nodeshot_edit_node', args=[node_id, node.password]))
     # if password is not correct value of authenticated is 2
     elif raw_password and not node.check_password(raw_password):
         authenticated = 2
     # if password is being sent in encrypted format it means we are editing the form
-    elif encrypted_password and encrypted_password == node.password:
-        authenticated = 1
+    
+    context = {
+        'node': node,
+        'authenticated': authenticated,
+    }
+    
+    return render_to_response(template, context, context_instance=RequestContext(request))
+    
+def edit_node(request, node_id, password):
+    ''' Edit node view '''
+        
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/edit_node.html';
+    else:
+        # alternative mode available just for testing
+        if DEBUG:
+            template = 'edit_node.html';
+        else:
+            raise Http404
+        
+    # get object or raise 404
+    try:
+        node = Node.objects.select_related().exclude(status='u').get(pk=node_id, password=password)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    # default value for "saved" variable
+    saved = False
+    
+    # if form has been submitted
+    if request.method == 'POST':
         # init edit form with POST values
         form = EditNodeForm(request.POST, instance=node)
         
@@ -190,12 +210,13 @@ def edit_node(request, node_id):
             node.save()
             # this tells the template that the form has saved in order to display a message to the user
             saved = True
+    else:
+        # init form
+        form = EditNodeForm(instance=node)
     
     context = {
         'node': node,
         'form' : form,
-        'authenticated': authenticated,
-        'encrypted_password': encrypted_password,
         'saved': saved
     }
     

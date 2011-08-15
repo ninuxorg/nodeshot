@@ -4,7 +4,7 @@
         {% csrf_token %} 
         <fieldset>
             <p>
-                <a href="{% url nodeshot_edit_node node.id %}?encrypted_password={{ node.password }}">Nodo</a> -
+                <a href="{% url nodeshot_edit_node node.id node.password %}">Nodo</a> -
                 Devices -
                 <a href="{% url nodeshot_edit_interfaces node.id node.password %}">Interfacce</a> -
                 <a href="{% url nodeshot_edit_hna4s node.id node.password %}">HNA4s</a><br /><br />

@@ -51,6 +51,31 @@ function insertNodeInfo(){
     });
 }
 
+function bindEditNode(){
+    // working on it
+    //$('#edit-link').click(function(e){
+    //    e.preventDefault();
+    //    var href = $(this).attr('href');
+    //    nodeshotMask(0.7);
+    //    nodeshotShowLoading();
+    //    $.get(href, function(data) {
+    //        nodeshotHideLoading();
+    //        $('body').append('<div id="nodeshot-overlay"></div>');
+    //        $('#nodeshot-overlay').html(data);
+    //        form = $('#contact-form');
+    //        form.css('margin-top', ($(window).height()-form.height()) / 2);
+    //        setDimensions();
+    //        $('#contact-form-cancel').live('click', function(){
+    //            nodeshotCloseForm();
+    //        });
+    //        $('#contact-form').live('submit', function(e){
+    //            e.preventDefault();
+    //            submitContactNode(node_id, $(this))
+    //        });
+    //    });
+    //});
+}
+
 function contactNode(node_id){
     nodeshotMask(0.7);
     nodeshotShowLoading();
