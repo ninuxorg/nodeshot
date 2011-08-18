@@ -299,12 +299,9 @@ def recover_password(request, node_id):
     if request.is_ajax():
         # just load the fragment
         template = 'ajax/recover_password.html'
-    # otherwise if request is sent normally and DEBUG is true
-    elif DEBUG:
-        # debuggin template
-        template = 'recover_password.html'
+    # otherwise if request is sent normally
     else:
-        raise Http404
+        template = 'recover_password.html'
     
     # retrieve object or return 404 error
     try:

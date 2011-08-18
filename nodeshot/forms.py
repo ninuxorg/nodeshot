@@ -127,11 +127,7 @@ def auth_node(request, node_id):
     if request.is_ajax():
         template = 'ajax/auth_node.html';
     else:
-        # alternative mode available just for testing
-        if DEBUG:
-            template = 'auth_node.html';
-        else:
-            raise Http404
+        template = 'auth_node.html';
         
     # get object or raise 404
     try:
@@ -173,11 +169,7 @@ def edit_node(request, node_id, password):
     if request.is_ajax():
         template = 'ajax/edit_node.html';
     else:
-        # alternative mode available just for testing
-        if DEBUG:
-            template = 'edit_node.html';
-        else:
-            raise Http404
+        template = 'edit_node.html';
         
     # get object or raise 404
     try:
@@ -185,8 +177,9 @@ def edit_node(request, node_id, password):
     except ObjectDoesNotExist:
         raise Http404
     
-    # default value for "saved" variable
+    # default value for "saved" and "error" variables
     saved = False
+    error = False
     
     # if form has been submitted
     if request.method == 'POST':
@@ -210,6 +203,8 @@ def edit_node(request, node_id, password):
             node.save()
             # this tells the template that the form has saved in order to display a message to the user
             saved = True
+        else:
+            error = True
     else:
         # init form
         form = EditNodeForm(instance=node)
@@ -217,7 +212,8 @@ def edit_node(request, node_id, password):
     context = {
         'node': node,
         'form' : form,
-        'saved': saved
+        'saved': saved,
+        'error': error
     }
     
     return render_to_response(template, context, context_instance=RequestContext(request))
@@ -229,11 +225,7 @@ def device_form(request, node_id, password):
     if request.is_ajax():
         template = 'ajax/device_form.html';
     else:
-        # alternative mode available just for testing
-        if DEBUG:
-            template = 'device_form.html';
-        else:
-            raise Http404
+        template = 'device_form.html';
         
     # get object or raise 404
     try:
@@ -247,8 +239,11 @@ def device_form(request, node_id, password):
     # init inlineformset_factory
     DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)
     
-    # default value for "saved" variable
+    # default value for "saved" and "error" variables
     saved = False
+    error = False
+    # init formset
+    formset = DeviceInlineFormSet(instance=node, prefix='devices')
     
     # if form has been submitted
     if request.method == "POST":
@@ -260,16 +255,19 @@ def device_form(request, node_id, password):
             saved = True
             # loop through devices
             formset.save()
-    
-    # init or reset formset
-    formset = DeviceInlineFormSet(instance=node, prefix='devices')
+            # reset formset with new saved values
+            formset = DeviceInlineFormSet(instance=node, prefix='devices')
+        else:
+            # print a nice message in the template
+            error = True
     
     context = {
         'formset': formset,
         'length': len(formset),
         'node': node,
         'node_id': node_id,
-        'saved': saved
+        'saved': saved,
+        'error': error
     }
     
     # set response with an empty form
@@ -285,11 +283,7 @@ def configuration(request, node_id, password, type):
     if request.is_ajax():
         template = 'ajax/%s_form.html' % type;
     else:
-        # alternative mode available just for testing
-        if DEBUG:
-            template = '%s_form.html' % type;
-        else:
-            raise Http404
+        template = '%s_form.html' % type;
         
     # get object or raise 404
     try:
@@ -308,6 +302,7 @@ def configuration(request, node_id, password, type):
     modelFormSet = inlineformset_factory(Device, model, extra=1)
     
     saved = False
+    error = False
     # init variables for the loops
     objects = []
     # init counter
@@ -320,14 +315,18 @@ def configuration(request, node_id, password, type):
             # if this cycle has the device we submitted
             formset = modelFormSet(request.POST, instance=device, prefix='%s%s'%(type,i))
             if formset.is_valid():
-                # print a nice message in the template
-                saved = True
                 # loop through devices
                 formset.save()
                 # reload formset so it will show changes
                 formset = modelFormSet(instance=device, prefix='%s%s'%(type,i))
+            else:
+                error = True
             objects += [{'device': device, 'formset': formset }]
             i+=1
+        # if no errors
+        if not error:
+            # print a nice message in the template
+            saved = True
     else:
         # just load initial data
         for device in devices:
@@ -338,51 +337,11 @@ def configuration(request, node_id, password, type):
         'node': node,
         'type': type,
         'objects': objects,
-        'saved': saved
+        'saved': saved,
+        'error': error
     }    
     
     return render_to_response(template, context, context_instance=RequestContext(request) )
-
-def configuration_form(request):
-    device_id = request.GET.get('device_id', None)
-    entry_type = request.GET.get('t', None)
-    try:
-        device = Device.objects.get(id=device_id)
-    except:
-        return HttpResponseNotFound('No such device id')
-
-    if entry_type == "h4":
-        mInlineFormSet = inlineformset_factory(Device, HNAv4, extra=1)#, formfield_callback = my_formfield_cb)
-        template_form = "hnav4_form.html"
-        prefix_name = 'hna4'
-    elif entry_type == "if":
-        mInlineFormSet = inlineformset_factory(Device, Interface, extra=1)#, formfield_callback = my_formfield_cb)
-        template_form = "interface_form.html"
-        prefix_name = 'interface'
-    else:
-        return HttpResponseNotFound('No type specified')
-
-    if request.method == "POST":
-        formset = mInlineFormSet(request.POST, instance=device, prefix=prefix_name)
-        if formset.is_valid():
-            for f in formset.forms:
-                # only if the form is not empty
-                if (entry_type == 'if' and f.data[f.prefix + "-ipv4_address"] == '' ) or (entry_type == 'h4' and f.data[f.prefix + "-route"] == '' ): 
-                       pass # STUPID DJANGO, STUPID STUPID STUPID
-                else:
-                    f.save()
-            return HttpResponse('ok')
-    else:
-        formset = mInlineFormSet(instance=device, prefix=prefix_name)
-    
-    context = {
-        'formset': formset ,
-        'device_id': device_id ,
-        'configuration_type': entry_type ,
-        'description': device.name
-    }    
-    
-    return render_to_response(template_form, context, context_instance=RequestContext(request) )
 
 class PasswordResetForm(forms.Form):
     """
@@ -470,7 +429,7 @@ class ContactForm(MathCaptchaModelForm):
             self.data = new_data
         # css classes for fields
         for v in self.fields:
-            self.fields[v].widget.attrs['class'] = 'text ui-widget-content ui-corner-all'
+            self.fields[v].widget.attrs['class'] = 'text'
     
     def clean(self):
         ''' Strip values '''

@@ -1,17 +1,25 @@
-<div class="dialog-form ui-widget" >
+{% extends 'ajax/base_form.html' %}
+{% block extra_class %} narrower{% endblock %}
+{% block h1 %}
     {% if not sent %}
-    <form id="contact-form" class="ui-corner-all ui-widget-content" method="post" action="">
-        <h1>Contatta il nodo {{ node.name }}</h1>
+        Contatta il nodo {{ node.name }}
+    {% else %}
+        Messaggio inviato
+    {% endif %}
+{% endblock %}
+{% block menu %}{% endblock %}
+{% block form_content %}
+    {% if not sent %}
         <p>Tutti i campi sono obbligatori.</p>
         <fieldset>
             {% csrf_token %}
             {% if form.non_field_errors %}
                 <div class="ui-state-error">
                 {{ form.non_field_errors }}
-                </div><br />
+                </div>
             {% endif %}
     
-            <div class="fieldWrapper">
+            <div class="field-wrapper">
                 <label for="id_name">Tuo nome:<label>
                 {% if form.from_name.errors %}
                     <div class="ui-state-error">
@@ -21,7 +29,7 @@
                 {{ form.from_name }}
             </div>
             
-            <div class="fieldWrapper">
+            <div class="field-wrapper">
                 <label for="id_email">Email:<label>
                 {% if form.from_email.errors %}
                     <div class="ui-state-error">
@@ -31,7 +39,7 @@
                 {{ form.from_email }}
             </div>
             
-            <div class="fieldWrapper">
+            <div class="field-wrapper">
                 <label for="id_text">Testo:<label>
                 {% if form.message.errors %}
                     <div class="ui-state-error">
@@ -41,7 +49,7 @@
                 {{ form.message }}
             </div>
             
-            <div class="fieldWrapper">
+            <div class="field-wrapper">
                 {% if form.math_captcha_field.errors %}
                     <div class="ui-state-error">
                         {{ form.math_captcha_field.errors }}
@@ -53,34 +61,14 @@
             
             <input type="checkbox" name="honeypot" class="accessibility" />
             
-            <p style="overflow:hidden">
-                <input id="contact-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Invia" />
-                <input id="contact-form-cancel" class="cancel-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="button" value="Annulla" />
+            <p class="button-wrapper">
+                <input type="submit" value="Entra" id="submit" class="button submit" />
+                <input type="button" value="Annulla" id="cancel" class="button cancel" />
             </p>
         </fieldset>
-    </form>
     {% else %}
-    <div id="contact-form" class="ui-corner-all ui-widget-content">
         <div id="success">
-            <h1>Messaggio inviato</h1>
             <p>Richiesta di contatto inviata con successo.</p>
-            <br />
         </div>
-    </div>
     {% endif %}
-</div>
-
-<script>
-    $('#contact-form-submit, #contact-form-cancel').button();
-    var inputs = $("#node-form").find("input , select ,textarea");
-    $.each(inputs,function(){
-        $(this).bind({
-            focusin: function() {
-               $(this).toggleClass('ui-state-focus');
-            },
-            focusout: function() {
-                $(this).toggleClass('ui-state-focus');
-            }
-        });
-    });
-</script>
+{% endblock %}

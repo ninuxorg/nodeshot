@@ -1,15 +1,17 @@
-<div class="dialog-form ui-corner-all ui-widget ui-widget-content" id="form-container">
-    <h1>Interfacce del nodo {{ node.name }}</h1>
-    <p>
-        <a href="{% url nodeshot_edit_node node.id node.password %}">Nodo</a> -
-        <a href="{% url nodeshot_edit_devices node.id node.password %}">Devices</a> -
-        <a href="{% url nodeshot_edit_interfaces node.id node.password %}">Interfacce</a> -
-        HNA4s<br /><br />
-    </p>
+{% extends 'ajax/base_form.html' %}
+{% block extra_class %} larger{% endblock %}
+{% block h1 %}Modifica Hna4 di {{ node.name }}{% endblock %}
+{% block hna4_link_extra %} class="active"{% endblock %}
+{% block form_content %}
     {% if saved %}
         <div class="success">
             HNA4 salvate correttamente.
-        </div><br />
+        </div>
+    {% endif %}
+    {% if error %}
+    <div class="ui-state-error extramarginbottom">
+        Alcuni campi non sono stati riempiti correttamente.
+    </div>
     {% endif %}
     <div id="tabs">
         <ul>
@@ -19,25 +21,26 @@
         </ul>
         <form id="hna4-form" class="inline-formset" method="post" action="">
         {% for object in objects %}
-            <div id="device{{ forloop.counter }}-hna4">
-                <h4>{{ object.device.name }}</h4>
+            <div id="device{{ forloop.counter }}-hna4" class="tab">
+                {% if object.formset.forms|length < 2 %}
+                    <p class="extramarginbottom">Non ci sono ancora Hna4 annunciati per questo device.</p>
+                {% endif %}
                 {{ object.formset.management_form }}
-                {% csrf_token %}
                 <fieldset id="device{{ forloop.counter }}-formset">
                 {% for form in object.formset.forms %}
-                    <div class="if-formset-form-container formset-form-container{% if not form.id.value %} hidden{% endif %}">
+                    <div class="formset-form-container{% if not form.id.value and not form.errors %} hidden{% endif %}">
                         {% if forms.non_field_errors %}
-                        <p class="validateTips">
+                        <p class="ui-state-error">
                             {{ form.non_field_errors }}
                         </p>
                         {% endif %}
-                        <div class="fieldWrapper">
+                        <div class="field-wrapper">                            
+                            <label for="id_route">HNA:<label>
                             {% if form.route.errors %}
                                 <div class="ui-state-error">
                                     {{ form.route.errors }}
                                 </div>
                             {% endif %}
-                            <label for="id_route">HNA:<label>
                             {{ form.route}}
                         </div>
                         {{ form.device }}
@@ -50,38 +53,37 @@
                 </fieldset>
             </div>
         {% endfor %}
-            <input type="submit" id="device{{ forloop.counter }}-hna4-submit" class="submit-button ui-priority-primary ui-corner-all hover ui-button ui-widget ui-state-default" value="Salva" />
+            <p class="button-wrapper tabbed">
+                <input type="submit" value="Salva" id="submit" class="button submit" />
+                <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
+            </p>
         </form>
     </div>
 </div>
 
 <script>
-
-    function apply_jquery_ui(inputs) {
-        $.each(inputs.find("input , select ,textarea"),function(){
-            $(this).addClass("text ui-widget-content ui-corner-all");
-            if ($(this).is("input[type='text']")||$(this).is("textarea")||$(this).is("input[type='password']") ) {
-                $(this).bind({
-                      focusin: function() {
-                       $(this).toggleClass('ui-state-focus');
-                         },
-                       focusout: function() {
-                        $(this).toggleClass('ui-state-focus');
-                         }
-                    });
+    // get current tab index
+    var hash = window.location.hash.replace('-tab', '');
+    var current_tab = 0;
+    // if # in the url is set
+    if(hash != ''){
+        tabs = $('.tab');
+        for(i=0; i<tabs.length; i++){
+            if('#'+tabs[i].id==hash){
+                current_tab = i;
             }
-         });
+        }
     }
+    
     $("#tabs").tabs({
-        load: function(event, ui) {
-            $('a', ui.panel).click(function() {
-                $(ui.panel).load(this.href);
-                return false;
-            });
+        create: function(event, ui){
+            // select correct tab
+            $(this).tabs('select', current_tab);
         },
         fx: { opacity: 'toggle', duration: 350 },
         show: function(event, ui){
-            newHash = '#'+ui.panel.id;
+            // trick to select the current tab without scrolling the page
+            var newHash = '#'+ui.panel.id+'-tab';
             if(window.location.hash != newHash){
                 window.location.hash = newHash;
             }
@@ -89,15 +91,11 @@
     });
     {% for object in objects %}
     $("div.formset-form-container", "#device{{ forloop.counter }}-formset").formset({
-        added: apply_jquery_ui,
         prefix: '{{ type }}{{ forloop.counter }}',
         addText: 'Aggiungi',
         deleteText: 'Rimuovi'
     });
     {% endfor %}
-    var inputs = $("div.formset-form-container", "#form-container");
-    apply_jquery_ui(inputs);
-
 </script>
-
+{% endblock %}
 

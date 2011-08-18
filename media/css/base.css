@@ -165,58 +165,182 @@ html, body { height: 100%; min-width:1000px }
     margin-top: 5px;
 }
 
+body#overlay-container{
+	padding: 20px 0;
+	background-color: gray !important;
+}
+
+#nodeshot-overlay{
+	font: normal 12px Arial, Freesans, sans-serif;
+}
+
+#nodeshot-overlay-inner{
+	margin: 20px auto;
+	padding: 20px;
+	width: 550px;
+	overflow: hidden;
+    border: 1px solid #666666;
+    background: #000000;
+	z-index:11;
+	-moz-border-radius: 6px; border-radius: 6px;
+}
+#nodeshot-overlay-inner.larger{ width:650px }
+#nodeshot-overlay-inner.narrower{ width:480px }
 
 /* DLG */
-.dialog-form {
-    width: 50%;
-    margin: 20px auto;
-    font-size:15px !important;
-     overflow: hidden
+.dialog-form,
+#nodeshot-overlay .content, #info-window .content {
+    color: #fff;
+    font: normal 12px/24px Arial, Freesans, sans-serif;
 }
-.dialog-form form{ overflow: hidden }
-.dialog-form label, .dialog-form input { display:block; }
-.dialog-form .text {
-	margin: 5px 0 12px;
-	width:95%;
-	font: normal 13px "Arial", sans-serif;
-	padding: .4em .7em;
+#info-window .content{ line-height: 20px }
+.dialog-form form,
+#nodeshot-overlay .content form{ overflow: hidden }
+.dialog-form label, .dialog-form input,
+.content label, .content input { display:block; }
+
+#nodeshot-overlay .content p,
+#info-window .content p{
+	margin: 10px 0 0;
 }
-.dialog-form select.text{
+
+.dialog-form .text,
+#nodeshot-form .text,
+#nodeshot-form .formset-form-container input,
+#nodeshot-form .formset-form-container select{
+	margin: 0;
+	width: 528px;
+	font: normal 13px Arial, Freesans, sans-serif;
+	padding: 5px 10px;
+	border: 1px solid #666;
+	background-color: #262626;
+	color: #fff;
+	-moz-border-radius: 6px; border-radius: 6px;
+}
+.dialog-form select.text, #nodeshot-form select.text,
+#nodeshot-form .formset-form-container select{
 	width: auto;
 	padding:0;
 }
-.dialog-form fieldset { padding:0; border:0; margin-top:25px }
-.dialog-form .form-tips {font-size: 13px;}
+#nodeshot-form .formset-form-container input{
+	width: 502px;
+}
+#nodeshot-overlay-inner.narrower .text{
+	width:458px;
+}
 
-.dialog-form h1 { text-align: center; font-size: 1.2em; margin: .6em 0; }
-.dialog-form div#users-contain { width: 350px; margin: 20px 0; }
+#nodeshot-overlay .content a{
+	color: #9bbfff;
+}
+#nodeshot-overlay .content a:hover{
+	color: #fff;
+	text-decoration: none;
+}
+
+.button, #nodeshot-form .add-row{
+	position: relative;
+	padding: 5px 12px;
+	cursor: pointer;
+	text-decoration: none;
+	text-align: center;
+	background: #555 url(ui-darkness/images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x;
+	color: #EEE;
+	font: bold 13px "Segoe UI", Arial, sans-serif;
+	border: 1px solid #777777;
+	zoom: 1;
+	-moz-border-radius: 5px; border-radius: 5px;
+}
+.button.link{
+	-moz-border-radius: 3px; border-radius: 3px;
+	margin-right: 6px;
+}
+.button.cancel{ color: #c6c6c6 }
+a.button{ color: #fff !important }
+
+#nodeshot-form .add-row{
+	background: #006601 none;
+	color: #fff !important;
+	border: 1px solid #006601;
+}
+
+#nodeshot-overlay #nodeshot-form .delete-row{
+	float: right;
+	color: #fff;
+	padding: 0 7px;
+	font-weight: bold;
+	text-decoration: none;
+	background: #d50000;
+	-moz-border-radius: 5px; border-radius: 5px;
+}
+
+.button:hover,
+#nodeshot-overlay .text:focus,
+#nodeshot-form .formset-form-container input:focus,
+#nodeshot-form .formset-form-container select:focus{
+	color: #fff;
+	border: 1px solid #59b4d4;
+	background: #0078a3 url(ui-darkness/images/ui-bg_glass_40_0078a3_1x400.png) 50% 50% repeat-x;
+	outline: 0 none;
+	font-weight: bold;
+}
+#nodeshot-form a.add-row:hover{ background-color: #009001 }
+#nodeshot-overlay #nodeshot-form .delete-row:hover{ background-color: #ff2f2f }
+
+#nodeshot-form .ui-state-error,
+#nodeshot-form .success{
+	display: block;
+	padding: 0 7px;
+	margin: 2px 0 9px;
+	border: 1px solid #ffb73d;
+	background: #ffc73d url(ui-darkness/images/ui-bg_glass_40_ffc73d_1x400.png) 50% 50% repeat-x;
+	color: #111111;
+}
+#nodeshot-form .success{
+	border: 1px solid #006601;
+	background: #006601 none;
+	color: #fff
+}
+
+.dialog-form fieldset, .content fieldset { padding:0; border:0; margin-top:10px }
+.dialog-form .form-tips, .content .form-tips {font-size: 13px}
+
+.dialog-form h1,
+.content h1 {
+	font-family: Segoe UI, Arial, sans-serif;
+	font-size: 19px;
+	margin-bottom: 20px;
+}
+.dialog-form div#users-contain,
+.content #users-contain{ width: 350px; margin: 20px 0; }
 .dialog-form div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
 .dialog-form div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
-.dialog-form .ui-dialog .ui-state-error { padding: .3em; }
-.dialog-form .validateTips { border: 1px solid transparent; padding: 0.3em; }
-.dialog-form .errorlist {
+.dialog-form .ui-dialog .ui-state-error,
+/*.content .ui-state-error { padding: .3em; }*/
+.dialog-form .validateTips,
+.content .validateTips { border: 1px solid transparent; padding: 0.3em; }
+.dialog-form .errorlist,
+.content .errorlist {
     list-style-type: none;
     display: inline;
 }
 
-.submit-button, .cancel-button { float: left; margin: 20px 15px 20px 0 }
-.cancel-button{ float: right; margin-left: 30px }
-a.add-row{ margin-left: 1em }
+.submit{ float: left }
+.cancel{ float: right }
 #device-form-submit{ width: 100px; margin: 30px 1em 1em }
 
 .inline-formset fieldset{
 	padding: 1em;
 }
-.formset-form-container {
+#nodeshot-form .formset-form-container {
+	margin: 20px 0 10px;
     padding: 1em;
     border:1px dashed orange;
 }
+#nodeshot-form .formset-form-container.first{
+	margin-top: 0;
+}
 .device-id , .configuration-type {
     display: none;
-}
-
-.if-configuration {
-
 }
 
 .defaultText { width: 300px; }
@@ -266,10 +390,10 @@ h3 {
 
 }
 
-#info-window {
+/*#info-window {
     width: 500px; 
     height: 300px;
-}
+}*/
 
 #node-info-box {
     display: none; 
@@ -297,7 +421,7 @@ h3 {
 	margin-bottom: 15px;
 }
 
-#confirm-new a, .button{
+/*#confirm-new a, .button{
 	float: left;
 	margin-right: 10px;
 	background: #000;
@@ -311,22 +435,16 @@ h3 {
 	cursor: pointer;
 }
 
-.button{ margin-top: 10px }
+.button{ margin-top: 10px }*/
 
 .green{ background: green !important }
 .red{ background: red !important }
 
-#node-form, #contact-form, #editnode-form, #recoverpassword-form{
-	padding: 0 20px;
-	z-index:11;
-}
-#contact-form{
-	width:500px;
-	margin: 0 auto;
-}
-
-#node-form .fieldWrapper big{
+.field-wrapper big{
 	font-weight: bold
+}
+.field-wrapper{
+	margin: 0 0 10px !important;
 }
 
 #nodeshot-modal-mask{
@@ -368,13 +486,68 @@ h3 {
     height: 25px;
 }
 
-.success{ padding: 0 0 0 5px; background: green; color: #fff }
-.readonly{ background: #070707 !important; border: 1px solid #666666 !important}
-#editnode-form label a{
-	color: #7ea7ef;
+#nodeshot-form .readonly{ background: #070707 !important; border: 1px solid #666666 !important}
+#nodeshot-form .edit-configuration{ font-weight:bold; margin-right: 10px }
+
+#edit-node-menu{ overflow: hidden; margin-bottom: 20px }
+#edit-node-menu li{
+	float: left;
+	list-style: outside none;
+	margin-right: 10px
+}
+#edit-node-menu a{
+	display: block;
+	background-color: #0078a3;
+	color: #fff !important;
+	font-weight: bold;
+	text-decoration: none;
+	padding: 2px 13px;
+	border: 1px solid #005b7b;
+}
+#edit-node-menu a:hover{
+	background-color: #2b9bc3;
+}
+#edit-node-menu a.active{
+	background-color: transparent;
+	border: 1px solid #666;
+	cursor: default;
 }
 
-#change-password{ cursor: pointer }
-.hidden, #editnode-form .hidden{ display: none }
-.delete-row{ float: right }
-.formset-form-container{ overflow:hidden }
+#nodeshot-form #tabs ul{
+	font: normal 12px Arial, Freesans, sans-serif;
+}
+#nodeshot-form #tabs ul a{ color: #fff }
+#nodeshot-form #tabs .ui-state-active{
+	background: #000 none;
+	border: 1px solid orange
+}
+#nodeshot-form #tabs .tab{ padding-top: 0 }
+
+#change-password{ margin-left: 5px; text-decoration: underline; cursor: pointer }
+
+#nodeshot-overlay .hidden{ display: none }
+#nodeshot-form .formset-form-container{ overflow: hidden }
+#nodeshot-form .button-wrapper{ margin-top: 20px !important; overflow: hidden }
+.clear{ clear:both }
+.alignright{ text-align: right }
+.right{ float: right }
+#nodeshot-overlay .extrapaddingtop{ padding-top: 15px }
+#nodeshot-overlay .extramarginbottom{ margin-bottom: 10px !important }
+#nodeshot-form .ui-state-error.extramarginbottom{ margin-bottom: 20px !important } 
+#nodeshot-form .tabbed{ padding: 5px 20px 15px }
+
+#info-window .list-values{
+	margin-bottom: 20px;
+	overflow: hidden;
+	clear: both;
+}
+
+#info-window .list-values td{
+	padding: 2px 0;
+}
+
+#info-window .list-values .key{
+	padding-right: 10px;
+	font-weight: bold;
+	vertical-align: top;
+}

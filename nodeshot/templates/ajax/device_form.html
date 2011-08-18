@@ -1,149 +1,104 @@
-<div class="dialog-form ui-widget">
-    <form id="device-form" class="ui-corner-all ui-widget-content inline-formset" method="post" action="">
-        <h1>Informazioni sui dispositivi</h1>
-        {% csrf_token %} 
-        <fieldset>
-            <p>
-                <a href="{% url nodeshot_edit_node node.id node.password %}">Nodo</a> -
-                Devices -
-                <a href="{% url nodeshot_edit_interfaces node.id node.password %}">Interfacce</a> -
-                <a href="{% url nodeshot_edit_hna4s node.id node.password %}">HNA4s</a><br /><br />
-            </p>
-            {% if saved %}
-                <div class="success">
-                    Device salvati correttamente.
-                </div><br />
+{% extends 'ajax/base_form.html' %}
+{% block h1 %}Modifica device di "{{ node.name }}"{% endblock %}
+{% block device_link_extra %} class="active"{% endblock %}
+{% block form_content %}
+<fieldset>
+    {% if saved %}
+    <div class="success">
+        Device salvati correttamente.
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="ui-state-error extramarginbottom">
+        Alcuni campi non sono stati riempiti correttamente.
+    </div>
+    {% endif %}
+    {% if formset.forms|length < 2 %}
+        <p>Non ci sono devices per questo nodo.</p>
+    {% endif %}
+    {{ formset.management_form }}
+    {% for form in formset.forms %}
+    <div class="formset-form-container{% if not form.id.value and not form.errors  %} hidden{% endif %}{% if forloop.first %} first{% endif %}">
+        {% if form.non_field_errors %}
+        <div class="ui-state-error">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        <div class="field-wrapper">
+            <label for="id_devices-{{ forloop.counter0 }}-name">Nome: <big>*</big><label>
+            {% if form.name.errors %}
+                <div class="ui-state-error">
+                    {{ form.name.errors }}
+                </div>
             {% endif %}
-            {% if formset.forms|length < 2 %}
-                <p>Non ci sono devices per questo nodo.<br /><br /></p>
+            {{ form.name }}
+        </div>
+
+        <div class="field-wrapper">
+            <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo:<label>
+            {% if form.type.errors %}
+                <div class="ui-state-error">
+                    {{ form.type.errors }}
+                </div>
             {% endif %}
-            {{ formset.management_form }}
-            {% for form in formset.forms %}
-            <div class="formset-form-container{% if not form.id.value %} hidden{% endif %}">
-                {% if form.non_field_errors %}
-                <p class="validateTips">
-                    {{ form.non_field_errors }}
-                </p>
-                {% endif %}
-                <div class="fieldWrapper">
-                    {% if form.name.errors %}
-                        <div class="ui-state-error">
-                            {{ form.name.errors }}
-                        </div>
-                    {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-name">Nome*:<label>
-                    {{ form.name }}
+            {{ form.type }}
+        </div>
+        
+        <div class="field-wrapper">
+            <label for="id_devices-{{ forloop.counter0 }}-description">Descrizione:<label>
+            {% if form.description.errors %}
+                <div class="ui-state-error">
+                    {{ form.description.errors }}
                 </div>
+            {% endif %}
+            {{ form.description }}
+        </div>
 
-                <div class="fieldWrapper">
-                    {% if form.type.errors %}
-                        <div class="ui-state-error">
-                            {{ form.type.errors }}
-                        </div>
-                    {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo:<label>
-                    {{ form.type }}
+        <div class="field-wrapper">
+            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">Protocollo di routing:<label>
+            {% if form.olsr_version.errors %}
+                <div class="ui-state-error">
+                    {{ form.routing_protocol.errors }}
                 </div>
-                
-                <div class="fieldWrapper">
-                    {% if form.description.errors %}
-                        <div class="ui-state-error">
-                            {{ form.description.errors }}
-                        </div>
-                    {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-description">Descrizione:<label>
-                    {{ form.description }}
+            {% endif %}
+            {{ form.routing_protocol }}
+        </div>
+        
+        <div class="field-wrapper">
+            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Versione protocollo di routing:<label>
+            {% if form.olsr_version.errors %}
+                <div class="ui-state-error">
+                    {{ form.routing_protocol_versopm.errors }}
                 </div>
-
-                <div class="fieldWrapper">
-                    {% if form.olsr_version.errors %}
-                        <div class="ui-state-error">
-                            {{ form.routing_protocol.errors }}
-                        </div>
-                    {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">Protocollo di routing:<label>
-                    {{ form.routing_protocol }}
-                </div>
-                
-                <div class="fieldWrapper">
-                    {% if form.olsr_version.errors %}
-                        <div class="ui-state-error">
-                            {{ form.routing_protocol_versopm.errors }}
-                        </div>
-                    {% endif %}
-                    <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Versione protocollo di routing:<label>
-                    {{ form.routing_protocol_version }}
-                </div>
-                
-                <a href="{% url nodeshot_edit_interfaces node.id node.password %}#device{{ forloop.counter }}-interface" class="edit-configuration" title="Modifica le interfacce di questo device">Interfacce</a>
-                <a href="{% url nodeshot_edit_hna4s node.id node.password %}#device{{ forloop.counter }}-hna4" class="edit-configuration" title="Modifica gli Hna4 di questo device">Hna4</a>
-                
-                {{ form.node }}
-                {% if form.id.value %}
-                    {{ form.id }}
-                    {{ form.DELETE }}
-                {% endif %}
-            </div>
-        {% endfor %}
-        </fieldset>
-        <input type="submit" id="device-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />
-    </form>
-</div>
+            {% endif %}
+            {{ form.routing_protocol_version }}
+        </div>
+        
+        <a href="{% url nodeshot_edit_interfaces node.id node.password %}#device{{ forloop.counter }}-interface-tab" class="edit-configuration" title="Modifica le interfacce di questo device">Interfacce</a>
+        <a href="{% url nodeshot_edit_hna4s node.id node.password %}#device{{ forloop.counter }}-hna4-tab" class="edit-configuration" title="Modifica gli Hna4 di questo device">Hna4</a>
+        
+        {{ form.node }}
+        {% if form.id.value %}
+            {{ form.id }}
+            {{ form.DELETE }}
+        {% endif %}
+    </div>
+{% endfor %}
+    <p class="button-wrapper extrapaddingtop">
+        <input type="submit" value="Salva" id="submit" class="button submit" />
+        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
+    </p>
+</fieldset>
 
 <script>
-
-    function apply_jquery_ui(inputs) {
-        $.each(inputs.find("input , select ,textarea") ,function(){
-            $(this).addClass("text ui-widget-content ui-corner-all");
-            if ($(this).is("input[type='text']")||$(this).is("textarea")||$(this).is("input[type='password']") ) {
-                $(this).bind({
-                    focusin: function() {
-                     $(this).toggleClass('ui-state-focus');
-                       },
-                    focusout: function() {
-                      $(this).toggleClass('ui-state-focus');
-                    }
-                });
-            }
-         });
-    }
-
-    $('#device-form-submit').button();
     $(".formset-form-container").formset({
-            prefix: '{{ formset.prefix }}',
-            added: function(row){
-                apply_jquery_ui(inputs);
-                // remove edit interface link
-                $(row).find('.edit-configuration').remove();
-            },
-            addText: 'Aggiungi',
-            deleteText: 'Rimuovi'
+        prefix: '{{ formset.prefix }}',
+        added: function(row){
+            // remove edit interface link
+            $(row).find('.edit-configuration').remove();
+        },
+        addText: 'Aggiungi',
+        deleteText: 'Rimuovi'
     });
-    var inputs = $("#device-form");
-    apply_jquery_ui(inputs);
-/*
-        //if (($this).is("select")) {
-        if (False) {
-                 $(this).wrap("<label />");
-                 var parent = $(this).parent();
-                 parent.css({"display":"block",width:140,height:21}).addClass("ui-state-default ui-corner-all");
-                 $(this).addClass("ui-helper-hidden");
-                 parent.append("<span id='labeltext' style='float:left;'></span><span style='float:right;display:inline-block' class='ui-icon ui-icon-triangle-1-s' ></span>");
-                 parent.after("<ul class=' ui-helper-reset ui-widget-content ui-helper-hidden' style='position:absolute;z-index:50;width:140px;' ></ul>");
-                 $.each($(this).find("option"),function(){
-                            $(parent).next("ul").append("<li class='hover'>"+$(this).html()+"</li>");
-                         });
-                 $(parent).next("ul").find("li").click(function(){ $("#labeltext").html($(this).html());
-                            $(this).val($(this).html());
-                         });
-
-                 $(parent).click(function(event){ $(this).next().slideToggle('fast');
-                             event.preventDefault();
-                         });
- 
-
-        }
-*/
 </script>
-
-
+{% endblock %}

@@ -1,38 +1,23 @@
-<div class="dialog-form ui-widget">
-    <form id="editnode-form" class="ui-corner-all ui-widget-content" method="post" action="">
-    {% csrf_token %}
-    <h1>Autenticazione nodo "{{ node.name }}"</h1>
-    <label for="id_password">Inserisci la password del nodo:</label>
-    {% if authenticated == 2 %}
-    <div class="ui-state-error">
-    La password non è corretta.
+{% extends 'ajax/base_form.html' %}
+{% block h1 %}Autenticazione nodo "{{ node.name }}"{% endblock %}
+{% block menu %}{% endblock %}
+{% block form_content %}
+    <div class="field-wrapper">
+        <label for="id_password">Inserisci la password del nodo:</label>
+        {% if authenticated == 2 %}
+            <div class="ui-state-error">
+                La password non è corretta.
+            </div>
+        {% endif %}
+        <input id="id_password" type="password" class="text" name="raw_password" maxlength="20" />
     </div>
-    {% else %}
-    <p><input id="id_password" type="password" class="text ui-widget-content ui-corner-all" name="raw_password" maxlength="20" /></p>
-    <p style="overflow:hidden">
-        <input id="editnode-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="submit" value="Entra" />
-        <input id="editnode-form-cancel" class="cancel-button ui-priority-primary ui-corner-all ui-state-disabled hover" type="button" value="Annulla" />
+    <p class="button-wrapper">
+        <input type="submit" value="Entra" id="submit" class="button submit" />
+        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
     </p>
-    <a href="{% url nodeshot_recover_password node.id %}">Hai dimenticato la password?</a><br /><br />
-    {% endif %}
+    <p class="clear alignright"><a href="{% url nodeshot_recover_password node.id %}">Hai dimenticato la password?</a></p>
 </div>
-    
 <script>
     bindChangePassword();
-    $('#editnode-form-submit, #editnode-form-cancel').button();
-    var inputs = $("#editnode-form").find("input , select ,textarea");
-    $.each(inputs,function(){
-        if($(this).attr('readonly')!='readonly'){
-            $(this).bind({
-                focusin: function() {
-                   $(this).toggleClass('ui-state-focus');
-                },
-                focusout: function() {
-                    $(this).toggleClass('ui-state-focus');
-                }
-            });
-        }
-    });
 </script>
-
-
+{% endblock %}

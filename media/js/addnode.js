@@ -1,6 +1,120 @@
 /*  This file contains all the functions to add/modify information about a new/existing node
  */
 
+var nodeshot = {
+    /*
+     * nodeshot.overlay
+     * Overlay, Mask, Modal message, Loading
+     */
+    overlay: {
+        /*
+        * nodeshot.overlay.bindCancelButton()
+        * binds actions to the cancel button of an overlay
+        */
+        bindCancelButton: function(){
+            $('#cancel').click(function(){
+                nodeshotCloseForm();
+            });
+        },
+        /*
+        * nodeshot.overlay.bindSubmitForm()
+        * binds actions to the submit event of an overlay
+        */
+        bindSubmitForm: function(action){
+            console.log(nodeshot.sending);
+            $('#nodeshot-form').submit(function(e){
+                // cache current form
+                form = $(this);
+                e.preventDefault();
+                // avoid duplicate emails by setting/checking sending property
+                if(!nodeshot.sending){
+                    // pass form
+                    action(form);
+                    nodeshot.sending = true;
+                }
+            });
+        }
+    },
+    /*
+     * nodeshot.contact
+     * Contact node
+     */
+    contact: {
+        /*
+        * nodeshot.contact.init()
+        * opens an overlay with the form to contact a node and binds the submit and cancel buttons
+        */
+        init: function(url){
+            nodeshotMask(0.7);
+            nodeshotShowLoading();
+            $.get(url, function(data) {
+                nodeshotHideLoading();
+                if(document.getElementById('nodeshot-overlay')==null){
+                    $('body').append('<div id="nodeshot-overlay"></div>');   
+                }
+                $('#nodeshot-overlay').html(data);
+                div = $('#nodeshot-overlay-inner');
+                div.css('margin-top', -25 + ($(window).height()-div.height()) / 2);
+                setDimensions();
+                // remember we are not using0 $.live() to optimize performance
+                nodeshot.overlay.bindCancelButton();
+                nodeshot.overlay.bindSubmitForm(function(form){
+                    nodeshot.contact.submit(url, form);
+                });
+            });
+        },
+        submit: function(url, form){
+            nodeshotShowLoading();
+            $('#nodeshot-modal-mask').css({
+                zIndex: 11,
+                opacity: 0.7
+            });
+            $('#nodeshot-overlay').css('z-index', '10');
+            
+            var form_data = form.serialize();
+        
+            $.post(url, form_data, function(data) {
+                
+                nodeshotHideLoading();
+                
+                if ($(data).find('#success').length < 1) {
+                    // switch back mask and overlay
+                    $('#nodeshot-modal-mask').css({
+                        zIndex: 10,
+                        opacity: 0.5
+                    });
+                    $('#nodeshot-overlay').css('z-index', '11');
+                    //form errors
+                    $('#nodeshot-overlay').html(data);
+                    // optimizations needed!
+                    div = $('#nodeshot-overlay-inner');
+                    div.css('margin-top', -25 + ($(window).height()-div.height()) / 2);
+                    // rebind events because we are not using $.live()
+                    nodeshot.overlay.bindCancelButton();
+                    nodeshot.overlay.bindSubmitForm(function(form){
+                        console.log(url);
+                        nodeshot.contact.submit(url, form);
+                    });
+                } else {
+                    $('#nodeshot-overlay-inner').fadeOut(500, function(){
+                        nodeshotModal('Messaggio inviato con successo.', nodeshotCloseForm);
+                    });
+                }
+                // reset sending
+                nodeshot.sending = false;
+            });
+        
+            return false;
+        },
+        link: function(){
+            $('#contact-link').click(function(e){
+                e.preventDefault();
+                nodeshot.contact.init(this.href);
+            });
+        }
+    }
+}
+
 function bindChangePassword(){
     $('#change-password').click(function(e){
         var $this = $(this);
@@ -74,62 +188,6 @@ function bindEditNode(){
     //        });
     //    });
     //});
-}
-
-function contactNode(node_id){
-    nodeshotMask(0.7);
-    nodeshotShowLoading();
-    $.get(__project_home__+'contact/'+node_id+'/', function(data) {
-        nodeshotHideLoading();
-        $('body').append('<div id="nodeshot-overlay"></div>');
-        $('#nodeshot-overlay').html(data);
-        form = $('#contact-form');
-        form.css('margin-top', ($(window).height()-form.height()) / 2);
-        setDimensions();
-        $('#contact-form-cancel').live('click', function(){
-            nodeshotCloseForm();
-        });
-        $('#contact-form').live('submit', function(e){
-            e.preventDefault();
-            submitContactNode(node_id, $(this))
-        });
-    });
-}
-
-function submitContactNode(node_id, $this){
-    nodeshotShowLoading();
-    $('#nodeshot-modal-mask').css({
-        zIndex: 11,
-        opacity: 0.7
-    });
-    $('#nodeshot-overlay').css('z-index', '10');
-    
-    var form_data = $this.serialize();
-
-    $.post(__project_home__+'contact/'+node_id+'/', form_data, function(data) {
-        
-        nodeshotHideLoading();
-        
-        if ($(data).find('#success').length < 1) {
-            // switch back mask and overlay
-            $('#nodeshot-modal-mask').css({
-                zIndex: 10,
-                opacity: 0.5
-            });
-            $('#nodeshot-overlay').css('z-index', '11');
-            //form errors
-            $('#nodeshot-overlay').html(data);
-            // optimizations needed!
-            form = $('#contact-form');
-            form.css('margin-top', ($(window).height()-form.height()) / 2);
-        } else {            
-            $('#contact-form').fadeOut(500, function(){
-                nodeshotModal('Messaggio inviato con successo.', nodeshotCloseForm);
-            });
-        }
-    });
-
-    return false; 
 }
 
 $("#node-form").live("submit", function() {

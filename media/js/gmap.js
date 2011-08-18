@@ -152,7 +152,7 @@ function handleMarkerClick(marker, node_id) {
         // add listener to domready of infowindows - it will be triggered when the infoWindow is ready
         google.maps.event.addListener(infoWindow, 'domready', function(){
             $(".tabs").tabs();
-            bindEditNode();
+            nodeshot.contact.link();
         });
         infoWindow.setContent(data);
         infoWindow.open(map, marker);        

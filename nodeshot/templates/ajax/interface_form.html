@@ -1,167 +1,166 @@
-<div class="dialog-form ui-corner-all ui-widget ui-widget-content" id="form-container">
-    <h1>Interfacce del nodo {{ node.name }}</h1>
-    <p>
-        <a href="{% url nodeshot_edit_node node.id node.password %}">Nodo</a> -
-        <a href="{% url nodeshot_edit_devices node.id node.password %}">Devices</a> -
-        Interfacce -
-        <a href="{% url nodeshot_edit_hna4s node.id node.password %}">HNA4s</a><br /><br />
-    </p>
-    {% if saved %}
-        <div class="success">
-            Interfacce salvate correttamente.
-        </div><br />
-    {% endif %}
-    <div id="tabs">
-        <ul>
-        {% for object in objects %}
-            <li><a href="#device{{ forloop.counter }}-interface">{{ object.device.name }}</a></li>
-        {% endfor %}
-        </ul>
-        <form id="interface-form" class="inline-formset" method="post" action="">
-        {% for object in objects %}
-            <div id="device{{ forloop.counter }}-interface">
-                <h4>{{ object.device.name }}</h4>
-                {{ object.formset.management_form }}
-                {% csrf_token %}
-                <fieldset id="device{{ forloop.counter }}-formset">
-                {% for form in object.formset.forms %}
-                    <div class="if-formset-form-container formset-form-container{% if not form.id.value %} hidden{% endif %}">
-                        {% if forms.non_field_errors %}
-                        <p class="validateTips">
-                            {{ form.non_field_errors }}
-                        </p>
-                        {% endif %}
-                        <div class="fieldWrapper">
-                            {% if form.type.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.type.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-type">Tipo di interfaccia: <big>*</big><label>
-                            {{ form.type }}
+{% extends 'ajax/base_form.html' %}
+{% block extra_class %} larger{% endblock %}
+{% block h1 %}Modifica interfacce di "{{ node.name }}"{% endblock %}
+{% block interface_link_extra %} class="active"{% endblock %}
+{% block form_content %}
+{% if saved %}
+<div class="success">
+    Interfacce salvate correttamente.
+</div>
+{% endif %}
+{% if error %}
+    <div class="ui-state-error extramarginbottom">
+        Alcuni campi non sono stati riempiti correttamente.
+    </div>
+{% endif %}
+<div id="tabs">
+    <ul>
+    {% for object in objects %}
+        <li><a href="#device{{ forloop.counter }}-interface">{{ object.device.name }}</a></li>
+    {% endfor %}
+    </ul>
+    {% for object in objects %}
+    <div id="device{{ forloop.counter }}-interface" class="tab">
+        {{ object.formset.management_form }}
+        <fieldset id="device{{ forloop.counter }}-formset">
+            {% if object.formset.forms|length < 2 %}
+                <p class="extramarginbottom">Non ci sono ancora interfacce per questo device.</p>
+            {% endif %}
+        {% for form in object.formset.forms %}
+            <div class="formset-form-container{% if not form.id.value and not form.errors %} hidden{% endif %}">
+                {% if forms.non_field_errors %}
+                <p class="ui-state-error">
+                    {{ form.non_field_errors }}
+                </p>
+                {% endif %}
+                <div class="field-wrapper">
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-type">Tipo di interfaccia: <big>*</big><label>
+                    {% if form.type.errors %}
+                        <div class="ui-state-error">
+                            {{ form.type.errors }}
                         </div>
-                        
-                        <div class="fieldWrapper">
-                            {% if form.ipv4_address.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.ipv4_address.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv4_address">Indirizzo IPv4: <big>*</big><label>
-                            {{ form.ipv4_address }}
+                    {% endif %}
+                    {{ form.type }}
+                </div>
+                
+                <div class="field-wrapper">                    
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv4_address">Indirizzo IPv4: <big>*</big><label>
+                    {% if form.ipv4_address.errors %}
+                        <div class="ui-state-error">
+                            {{ form.ipv4_address.errors }}
                         </div>
-        
-                        <div class="fieldWrapper">
-                            {% if form.ipv6_address.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.ipv6_address.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv6_address">Indirizzo IPv6:<label>
-                            {{ form.ipv6_address }}
+                    {% endif %}
+                    {{ form.ipv4_address }}
+                </div>
+
+                <div class="field-wrapper">                    
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv6_address">Indirizzo IPv6:<label>
+                    {% if form.ipv6_address.errors %}
+                        <div class="ui-state-error">
+                            {{ form.ipv6_address.errors }}
                         </div>
-        
-                        <div class="fieldWrapper">
-                            {% if form.wireless_mode.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.wireless_mode.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_mode">Wireless mode:<label>
-                            {{ form.wireless_mode }}
+                    {% endif %}
+                    {{ form.ipv6_address }}
+                </div>
+
+                <div class="field-wrapper">                    
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_mode">Wireless mode:<label>
+                    {% if form.wireless_mode.errors %}
+                        <div class="ui-state-error">
+                            {{ form.wireless_mode.errors }}
                         </div>
-        
-                        <div class="fieldWrapper">
-                            {% if form.wireless_channel.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.wireless_channel.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_channel">Canale:<label>
-                            {{ form.wireless_channel }}
+                    {% endif %}
+                    {{ form.wireless_mode }}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_channel">Canale:<label>
+                    {% if form.wireless_channel.errors %}
+                        <div class="ui-state-error">
+                            {{ form.wireless_channel.errors }}
                         </div>
-        
-                        <div class="fieldWrapper">
-                            {% if form.wireless_polarity.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.wireless_polarity.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_polarization">Polarizzazione:<label>
-                            {{ form.wireless_polarity }}
+                    {% endif %}
+                    {{ form.wireless_channel }}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_polarization">Polarizzazione:<label>
+                    {% if form.wireless_polarity.errors %}
+                        <div class="ui-state-error">
+                            {{ form.wireless_polarity.errors }}
                         </div>
-        
-                        <div class="fieldWrapper">
-                            {% if form.mac_address.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.mac_address.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-mac_address">Indirizzo MAC:<label>
-                            {{ form.mac_address }}
+                    {% endif %}
+                    {{ form.wireless_polarity }}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-mac_address">Indirizzo MAC:<label>
+                    {% if form.mac_address.errors %}
+                        <div class="ui-state-error">
+                            {{ form.mac_address.errors }}
                         </div>
-        
-                        <div class="fieldWrapper">
-                            {% if form.ssid.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.ssid.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ssid">SSID:<label>
-                            {{ form.ssid }}
+                    {% endif %}
+                    {{ form.mac_address }}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ssid">SSID:<label>
+                    {% if form.ssid.errors %}
+                        <div class="ui-state-error">
+                            {{ form.ssid.errors }}
                         </div>
-                        
-                        <div class="fieldWrapper">
-                            {% if form.status.errors %}
-                                <div class="ui-state-error">
-                                    {{ form.status.errors }}
-                                </div>
-                            {% endif %}
-                            <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-status">Status:<label>
-                            {{ form.status }}
+                    {% endif %}
+                    {{ form.ssid }}
+                </div>
+                
+                <div class="field-wrapper">
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-status">Status:<label>
+                    {% if form.status.errors %}
+                        <div class="ui-state-error">
+                            {{ form.status.errors }}
                         </div>
-                        {{ form.device }}
-                        {% if form.id.value %}
-                            {{ form.id }}
-                            {{ form.DELETE }}
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                </fieldset>
+                    {% endif %}
+                    {{ form.status }}
+                </div>
+                {{ form.device }}
+                {% if form.id.value %}
+                    {{ form.id }}
+                    {{ form.DELETE }}
+                {% endif %}
             </div>
         {% endfor %}
-            <input type="submit" id="device{{ forloop.counter }}-interface-submit" class="submit-button ui-priority-primary ui-corner-all hover ui-button ui-widget ui-state-default" value="Salva" />
-        </form>
+        </fieldset>
     </div>
+    {% endfor %}
+    <p class="button-wrapper tabbed">
+        <input type="submit" value="Salva" id="submit" class="button submit" />
+        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
+    </p>
 </div>
 
 <script>
-
-    function apply_jquery_ui(inputs) {
-        $.each(inputs.find("input , select ,textarea"),function(){
-            $(this).addClass("text ui-widget-content ui-corner-all");
-            if ($(this).is("input[type='text']")||$(this).is("textarea")||$(this).is("input[type='password']") ) {
-                $(this).bind({
-                      focusin: function() {
-                       $(this).toggleClass('ui-state-focus');
-                         },
-                       focusout: function() {
-                        $(this).toggleClass('ui-state-focus');
-                         }
-                    });
+    // get current tab index
+    var hash = window.location.hash.replace('-tab', '');
+    var current_tab = 0;
+    // if # in the url is set
+    if(hash != ''){
+        tabs = $('.tab');
+        for(i=0; i<tabs.length; i++){
+            if('#'+tabs[i].id==hash){
+                current_tab = i;
             }
-         });
+        }
     }
+    
     $("#tabs").tabs({
-        load: function(event, ui) {
-            $('a', ui.panel).click(function() {
-                $(ui.panel).load(this.href);
-                return false;
-            });
+        create: function(event, ui){
+            // select correct tab
+            $(this).tabs('select', current_tab);
         },
         fx: { opacity: 'toggle', duration: 350 },
         show: function(event, ui){
-            newHash = '#'+ui.panel.id;
+            // trick to select the current tab without scrolling the page
+            var newHash = '#'+ui.panel.id+'-tab';
             if(window.location.hash != newHash){
                 window.location.hash = newHash;
             }
@@ -169,15 +168,10 @@
     });
     {% for object in objects %}
     $("div.formset-form-container", "#device{{ forloop.counter }}-formset").formset({
-        added: apply_jquery_ui,
         prefix: '{{ type }}{{ forloop.counter }}',
         addText: 'Aggiungi',
         deleteText: 'Rimuovi'
     });
     {% endfor %}
-    var inputs = $("div.formset-form-container", "#form-container");
-    apply_jquery_ui(inputs);
-
 </script>
-
-
+{% endblock %}
