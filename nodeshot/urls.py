@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     url(r'^info_window/(?P<node_id>\d+)/$', 'nodeshot.views.info_window', name='nodeshot_info_window'),
     url(r'^info_tab', 'nodeshot.views.info', name='nodeshot_info_tab'),
     # needs review
-    url(r'^node_form', 'nodeshot.forms.node_form', name='nodeshot_node_form'),
+    url(r'^node/add/', 'nodeshot.forms.add_node', name='nodeshot_node_add'),
     url(r'^node/authenticate/(?P<node_id>\d+)/$', 'nodeshot.forms.auth_node', name='nodeshot_auth_node'),
     url(r'^node/edit/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.edit_node', name='nodeshot_edit_node'),
     url(r'^node/edit/interface/(?P<node_id>\d+)/(?P<password>.*)/$', 'nodeshot.forms.configuration', {'type': 'interface'},name='nodeshot_edit_interfaces'),

@@ -7,7 +7,7 @@
         <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/tablesorter/style.css" />
         <link type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" rel="stylesheet" />
         <!--[if lte IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-        <!--<base href="{% url nodeshot.views.index %}" />-->
+        <base href="{% url nodeshot.views.index %}" />
     </head>
     <body>
         <div id="container">
@@ -91,35 +91,23 @@
                 initialize();
         });
         
-        // calculate dimensions of html elements in pixel
-        setDimensions = function(){
-            $("#content").width($(window).width()-295);
-            $("#aside").width('295');
-            $("#container").width($(window).width());
-            $("#map_canvas").height($(window).height()-$("#header").height());
-        }
+        //// calculate dimensions of html elements in pixel
+        //setDimensions = function(){
+        //    $("#content").width($(window).width()-295);
+        //    $("#aside").width('295');
+        //    $("#container").width($(window).width());
+        //    $("#map_canvas").height($(window).height()-$("#header").height());
+        //}
         
         // when content has been loaded
         $(window).load(function(){
-            setDimensions();
-            $("#content").css({
-                position:"absolute",
-                top: $("#header").height(),
-                left: 0
-            });
-            $("#aside").css({
-                position:"absolute",
-                top: $("#header").height(),
-                right: 0
-            });
-            
-            // preload ajax-loader.gif
-            $('body').append('<img src="'+__project_home__+'media/images/ajax-loader.gif" alt="" id="nodeshot-ajaxloader" />');
-            //nodeshotMask();
-            
+            nodeshot.layout.cacheObjects();
+            nodeshot.layout.setFullScreen();
+            nodeshot.layout.setElementDimensions();
+            nodeshot.overlay.appendLoading();           
         // update dimensions on resize
         }).resize(function(){
-            setDimensions();
+            nodeshot.layout.setFullScreen();
             // hide orizontal scrollbar
             $("body").css("overflow-x", "hidden");
         });

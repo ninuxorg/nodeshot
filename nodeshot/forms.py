@@ -85,16 +85,16 @@ class EditNodeForm(BaseNodeForm):
         model = Node
         exclude = ('status', 'slug', 'password')
 
-def node_form(request):
+def add_node(request):
     ''' Add node view '''
     
     # if request is sent with ajax
     if request.is_ajax():
-        template = 'ajax/node_form.html';
+        template = 'ajax/add_node.html';
     else:
         # alternative mode available just for testing
         if DEBUG:
-            template = 'node_form.html';
+            template = 'add_node.html';
         else:
             raise Http404
 

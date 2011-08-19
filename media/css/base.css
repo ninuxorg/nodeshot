@@ -237,6 +237,22 @@ body#overlay-container{
 	text-decoration: none;
 }
 
+#confirm-new a, #nodeshot-modal .button{
+	float: left;
+	margin-right: 10px;
+	color: #fff;
+	padding: 6px 15px;
+	border-radius:3px;
+	-moz-border-radius:3px;
+	text-decoration: none;
+	font: bold 12px Arial, Freesans, sans-serof;
+	cursor: pointer;
+}
+
+#nodeshot-modal .button{ margin-top: 10px }
+.green{ background: #006601 }
+.red{ background: #d50000 }
+
 .button, #nodeshot-form .add-row{
 	position: relative;
 	padding: 5px 12px;
@@ -283,8 +299,8 @@ a.button{ color: #fff !important }
 	outline: 0 none;
 	font-weight: bold;
 }
-#nodeshot-form a.add-row:hover{ background-color: #009001 }
-#nodeshot-overlay #nodeshot-form .delete-row:hover{ background-color: #ff2f2f }
+#nodeshot-form a.add-row:hover,a.green:hover{ background-color: #009001 !important }
+#nodeshot-overlay #nodeshot-form .delete-row:hover, a.red:hover{ background-color: #ff2f2f !important }
 
 #nodeshot-form .ui-state-error,
 #nodeshot-form .success{
@@ -421,31 +437,8 @@ h3 {
 	margin-bottom: 15px;
 }
 
-/*#confirm-new a, .button{
-	float: left;
-	margin-right: 10px;
-	background: #000;
-	color: #fff;
-	padding: 3px 14px;
-	border-radius:3px;
-	-moz-border-radius:3px;
-	text-decoration: none;
-	font-size: 12px;
-	font-weight: bold;
-	cursor: pointer;
-}
-
-.button{ margin-top: 10px }*/
-
-.green{ background: green !important }
-.red{ background: red !important }
-
-.field-wrapper big{
-	font-weight: bold
-}
-.field-wrapper{
-	margin: 0 0 10px !important;
-}
+.field-wrapper big{	font-weight: bold }
+.field-wrapper{ margin: 0 0 5px !important }
 
 #nodeshot-modal-mask{
 	position:fixed;

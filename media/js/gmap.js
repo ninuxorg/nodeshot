@@ -111,7 +111,7 @@ function newNodeMarker(location) {
             icon: __project_home__+'media/images/marker_new.png'
         });
         var contentString = '<div id="confirm-new"><h2>Mi hai posizionato bene?</h2>'+
-            '<a href="javascript:insertNodeInfo()" class="green">Si</a>'+
+            '<a href="javascript:nodeshot.node.add()" class="green">Si</a>'+
             '<a href="javascript:removeNewMarker()" class="red">No</a></div>'
 
         var infowindow = new google.maps.InfoWindow({
@@ -143,6 +143,13 @@ function initialize_map() {
                 mapGoTo(__center__.node);
             }
         }, 500);
+    }
+    // remove loading gif and mask if necessary
+    if(nodeshot.layout.$loading){
+        nodeshot.overlay.removeMask();
+        nodeshot.overlay.hideLoading();
+        nodeshot.layout.cacheObjects();
+        nodeshot.layout.setFullScreen();
     }
 }
 
@@ -272,76 +279,76 @@ function remove_markers(type) {
     }
 }
 
-var nodeshotModal = function(message, callback){
-    nodeshotMask();
-    $('body').append('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
-    var modal = $('#nodeshot-modal');
-    modal.css({
-        opacity: 0,
-        display: 'block',
-        left: ($(window).width() - modal.width()) / 2,
-        top: ($(window).height() - modal.height()) / 3
-    }).animate({
-        opacity: 1
-    }, 500);
-    
-    $('#nodeshot-modal-close').click(function(){
-        var dialog = $(this).parent();
-        dialog.fadeOut(500, function(){
-            dialog.remove();
-        })
-        nodeshotRemoveMask();
-        if(callback){
-            callback();
-        }
-    });
-}
-
-var nodeshotShowLoading = function(){
-    img = $('#nodeshot-ajaxloader');
-    img.css({
-        left: ($(window).width()-img.width()) / 2,
-        top: ($(window).height()-img.height()) / 2
-    });
-}
-
-var nodeshotHideLoading = function(){
-    $('#nodeshot-ajaxloader').css('top', '-9999px');
-}
-
-var nodeshotMask = function(opacity){
-    if(document.getElementById("nodeshot-modal-mask") != null){
-        return false;
-    }
-    if(!opacity){ opacity = 0.5 }
-    $('body').append('<div id="nodeshot-modal-mask"></div>');
-    $('#nodeshot-modal-mask').css({
-        opacity: 0,
-        display: 'block'
-    }).animate({
-        opacity: opacity
-    }, 500);
-}
-
-var nodeshotRemoveMask = function(){
-    var mask = $('#nodeshot-modal-mask');
-    if(mask.length < 1){
-        return false;
-    }
-    mask.fadeOut(500, function(){
-        mask.remove();
-    });
-}
-
-var nodeshotCloseForm = function(){
-    nodeshotRemoveMask();
-    $('#nodeshot-overlay').remove();
-    $('#addnode').button('option', 'label', 'Aggiungi un nuovo nodo');
-    if (clickListenerHandle) {
-        google.maps.event.removeListener(clickListenerHandle);
-        clickListenerHandle = null;
-    }
-}
+//var nodeshotModal = function(message, callback){
+//    nodeshotMask();
+//    $('body').append('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
+//    var modal = $('#nodeshot-modal');
+//    modal.css({
+//        opacity: 0,
+//        display: 'block',
+//        left: ($(window).width() - modal.width()) / 2,
+//        top: ($(window).height() - modal.height()) / 3
+//    }).animate({
+//        opacity: 1
+//    }, 500);
+//    
+//    $('#nodeshot-modal-close').click(function(){
+//        var dialog = $(this).parent();
+//        dialog.fadeOut(500, function(){
+//            dialog.remove();
+//        })
+//        nodeshotRemoveMask();
+//        if(callback){
+//            callback();
+//        }
+//    });
+//}
+//
+//var nodeshotShowLoading = function(){
+//    img = $('#nodeshot-ajaxloader');
+//    img.css({
+//        left: ($(window).width()-img.width()) / 2,
+//        top: ($(window).height()-img.height()) / 2
+//    });
+//}
+//
+//var nodeshotHideLoading = function(){
+//    $('#nodeshot-ajaxloader').css('top', '-9999px');
+//}
+//
+//var nodeshotMask = function(opacity){
+//    if(document.getElementById("nodeshot-modal-mask") != null){
+//        return false;
+//    }
+//    if(!opacity){ opacity = 0.5 }
+//    $('body').append('<div id="nodeshot-modal-mask"></div>');
+//    $('#nodeshot-modal-mask').css({
+//        opacity: 0,
+//        display: 'block'
+//    }).animate({
+//        opacity: opacity
+//    }, 500);
+//}
+//
+//var nodeshotRemoveMask = function(){
+//    var mask = $('#nodeshot-modal-mask');
+//    if(mask.length < 1){
+//        return false;
+//    }
+//    mask.fadeOut(500, function(){
+//        mask.remove();
+//    });
+//}
+//
+//var nodeshotCloseForm = function(){
+//    nodeshotRemoveMask();
+//    $('#nodeshot-overlay').remove();
+//    $('#addnode').button('option', 'label', 'Aggiungi un nuovo nodo');
+//    if (clickListenerHandle) {
+//        google.maps.event.removeListener(clickListenerHandle);
+//        clickListenerHandle = null;
+//    }
+//}
 
 
 var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
@@ -420,7 +427,7 @@ function initialize() {
     });
 
     $('#addnode').click(function() {
-        nodeshotModal('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
+        nodeshot.dialog.open('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
         //$('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
         //$(this).button('option', 'label', 'Annulla inserimento');
         clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
@@ -489,6 +496,8 @@ function initialize() {
     $("input[name='view-radio']").change(function(){
         var choice = $("input[name='view-radio']:checked").val();
         if (choice == 'map') {
+            nodeshot.overlay.addMask(0.7);
+            nodeshot.overlay.showLoading();
             $('#content').html("<div id='map_canvas' style='width:100%; height:700px'></div> ");
             initialize_map();
             if ($('#active').is(':checked') ) 
@@ -498,11 +507,11 @@ function initialize() {
             if ($('#potential').is(':checked') )
                 draw_nodes('p');
         } else if (choice == 'info') {
-            nodeshotMask();
-            nodeshotShowLoading();
+            nodeshot.overlay.addMask(0.7);
+            nodeshot.overlay.showLoading();
             $('#content').load(__project_home__+'info_tab' , function() {
-                nodeshotRemoveMask();
-                nodeshotHideLoading();
+                nodeshot.overlay.removeMask();
+                nodeshot.overlay.hideLoading();
                 $("#myTable").tablesorter(); 
                 //$("#myTable").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")}); 
               });
