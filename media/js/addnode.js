@@ -432,40 +432,79 @@ var nodeshot = {
                     });
                 }
             });
+        },
+        /*
+        * nodeshot.node.bindChangePassword()
+        * binds event to the change password link in edit node form
+        */
+        bindChangePassword: function(){
+            $('#change-password').click(function(e){
+                var $this = $(this);
+                var password_field = $('#id_new_password');
+                
+                if($this.data('info')==undefined || $this.data('info').status==0){
+                    $this.data('info', {
+                        text: $this.text(),
+                        status: 1
+                    });
+                    $this.text('annulla');
+                    $('#id_new_password2').val('');
+                    $('#id_fake_password').hide();
+                    password_field.val('').show(500);
+                    $('#verify-password').show(500);   
+                }
+                else{
+                    $this.text($this.data('info').text);
+                    $('#id_new_password2').val('');
+                    $('#id_fake_password').show(500);
+                    password_field.val('').hide();
+                    $('#verify-password').hide();
+                    $this.data('info').status = 0;
+                }
+            });
+            
+            if($('#non-field-errors').length > 0){
+                $('#change-password').click();
+            }
         }
+    },
+    
+    links: {
+        //temporary: []
     }
+    
 }
 
-function bindChangePassword(){
-    $('#change-password').click(function(e){
-        var $this = $(this);
-        var password_field = $('#id_new_password');
-        
-        if($this.data('info')==undefined || $this.data('info').status==0){
-            $this.data('info', {
-                text: $this.text(),
-                status: 1
-            });
-            $this.text('annulla');
-            $('#id_new_password2').val('');
-            $('#id_fake_password').hide();
-            password_field.val('').show(500);
-            $('#verify-password').show(500);   
-        }
-        else{
-            $this.text($this.data('info').text);
-            $('#id_new_password2').val('');
-            $('#id_fake_password').show(500);
-            password_field.val('').hide();
-            $('#verify-password').hide();
-            $this.data('info').status = 0;
-        }
-    });
-    
-    if($('#non-field-errors').length > 0){
-        $('#change-password').click();
-    }
-}
+//function bindChangePassword(){
+//    $('#change-password').click(function(e){
+//        var $this = $(this);
+//        var password_field = $('#id_new_password');
+//        
+//        if($this.data('info')==undefined || $this.data('info').status==0){
+//            $this.data('info', {
+//                text: $this.text(),
+//                status: 1
+//            });
+//            $this.text('annulla');
+//            $('#id_new_password2').val('');
+//            $('#id_fake_password').hide();
+//            password_field.val('').show(500);
+//            $('#verify-password').show(500);   
+//        }
+//        else{
+//            $this.text($this.data('info').text);
+//            $('#id_new_password2').val('');
+//            $('#id_fake_password').show(500);
+//            password_field.val('').hide();
+//            $('#verify-password').hide();
+//            $this.data('info').status = 0;
+//        }
+//    });
+//    
+//    if($('#non-field-errors').length > 0){
+//        $('#change-password').click();
+//    }
+//}
 
 //function insertNodeInfo(){
 //    nodeshot.overlay.addMask();

@@ -252,6 +252,7 @@ body#overlay-container{
 #nodeshot-modal .button{ margin-top: 10px }
 .green{ background: #006601 }
 .red{ background: #d50000 }
+.purple{ color: #5f0060; }
 
 .button, #nodeshot-form .add-row{
 	position: relative;
@@ -371,7 +372,6 @@ a.button{ color: #fff !important }
 
 h3 {
     color: #FFA500;
-    padding-top: 10px;
     display: block;
     font-size: 14px;
 }
@@ -518,7 +518,7 @@ h3 {
 
 #change-password{ margin-left: 5px; text-decoration: underline; cursor: pointer }
 
-#nodeshot-overlay .hidden{ display: none }
+#nodeshot-overlay .hidden, #info-window .hidden{ display: none }
 #nodeshot-form .formset-form-container{ overflow: hidden }
 #nodeshot-form .button-wrapper{ margin-top: 20px !important; overflow: hidden }
 .clear{ clear:both }
@@ -529,8 +529,13 @@ h3 {
 #nodeshot-form .ui-state-error.extramarginbottom{ margin-bottom: 20px !important } 
 #nodeshot-form .tabbed{ padding: 5px 20px 15px }
 
+#info-window .content{
+	padding-top: 15px;
+	padding-bottom: 20px;
+}
+
 #info-window .list-values{
-	margin-bottom: 20px;
+	margin: 5px 0 20px;
 	overflow: hidden;
 	clear: both;
 }

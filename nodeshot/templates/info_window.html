@@ -1,14 +1,15 @@
-<div id="info-window" class="tabs">
-    <ul>
-        <li><a href="#tab-info"><span>Info</span></a></li>
+<div id="info-window" class="tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
+    <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+        <li class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active"><a href="#tab-info"><span>Info</span></a></li>
         <!--<li><a href="#tab-dev"><span>Devices</span></a></li>-->
-        <li><a href="#tab-dist"><span>Distanza</span></a></li>
+        <li class="ui-state-default ui-corner-top"><a href="#tab-dist"><span>Distanza</span></a></li>
     </ul>
 
-    <div id="tab-info" class="content">
+    <div id="tab-info" class="content ui-tabs-panel ui-widget-content ui-corner-bottom">
+        <h3>Informazioni generali sul nodo</h3>
         <table class="list-values">
             <tr>
-                <td class="key">Nome:</td><td class="value">{{ node.name }}</td>
+                <td class="key">Nome:</td><td class="value" id="node_name">{{ node.name }}</td>
             </tr>
             <tr>
                 <td class="key">Descrizione:</td><td class="value">{{ node.description }}</td>
@@ -17,14 +18,14 @@
                 <td class="key">Responsabile:</td><td class="value">{{ node.owner }}</td>
             </tr>
             <tr>
-                <td class="key">Latitudine:</td><td class="selected-node-lat value">{{ node.lat }}</td>
+                <td class="key">Latitudine:</td><td id="lat" class="value">{{ node.lat }}</td>
             </tr>
             <tr>
-                <td class="key">Longitudine:</td><td class="selected-node-lng value">{{ node.lng }}</td>
+                <td class="key">Longitudine:</td><td id="lng" class="value">{{ node.lng }}</td>
             </tr>
             {% if node.alt %}
             <tr>
-                <td class="key">Altitudine:</td><td class="selected-node-lng value">{{ node.alt }} metri</td>
+                <td class="key">Altitudine:</td><td class="value">{{ node.alt }} metri</td>
             </tr>
             {% endif %}
         </table>    
@@ -57,11 +58,12 @@
         {% endfor %}
     </div>-->
 
-    <div id="tab-dist">                
-
-        <div class="ui-widget">
-            <label for="distance-nodeto">Distanza nodeTO: </label>
-            <select class="distance-nodeto">
+    <div id="tab-dist" class="content ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
+        <h3>Calcola distanza</h3>
+        <p>Calcola la distanza tra "{{ node.name }}" e un'altro nodo a tuo piacimento.</p>
+        <p>Il risultato può essere salvato in modo da poter confrontare più risultati tra loro.</p>
+        <p>Seleziona il nodo:
+            <select id="distance-select">
                 <option>Selezionare un nodo</option>
                 <option> ----------------- </option>
                 <optgroup label="Nodi Attivi">
@@ -81,21 +83,11 @@
                         {% if node.status == 'p' %}<option value="{{node.lat}};{{node.lng}}">{{node.name}}</option>{% endif %}
                     {% endfor %}
                 </optgroup>
-                                        
-                <optgroup label="Nodi Offline">
-                    {% for node in nodes %}
-                        {% if node.status == 'o' %}<option value="{{node.lat}};{{node.lng}}">{{node.name}}</option>{% endif %}
-                    {% endfor %}
-                </optgroup>
             </select>
-            <br/>
-            <table>
-                <tr>
-                    <td>Distanza link: KM</td><td id="distance"></td>
-                </tr>
-            </table>
-        </div>
-   
+        </p>
+        <p id="result-row" class="hidden">
+            Risultato: <b><span id="result"></span> km</b>
+        </p>
     </div>
 
 </div>

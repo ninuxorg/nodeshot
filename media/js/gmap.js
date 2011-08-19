@@ -158,10 +158,35 @@ function handleMarkerClick(marker, node_id) {
     $.get(__project_home__+'info_window/'+node_id+'/', function(data) {
         // add listener to domready of infowindows - it will be triggered when the infoWindow is ready
         google.maps.event.addListener(infoWindow, 'domready', function(){
-            $(".tabs").tabs();
+            $(".tabs").tabs({
+                // save height of first tab for comparison
+                create: function(e, ui){
+                    // cache $(this)
+                    $this = $(this);
+                    // save height of active tab in nodeshot object
+                    nodeshot.tab0Height = $this.find('.ui-tabs-panel').eq($this.tabs('option', 'selected')).height();
+                },
+                // change height of tab if tab is shorter
+                show: function(e, ui){
+                    // cache object
+                    $this = $(this);
+                    // if distance tab
+                    if($this.tabs('option', 'selected')===1){
+                        // cache object
+                        var tab = $this.find('.ui-tabs-panel').eq(1);
+                        // save this height
+                        nodeshot.tab1Height = tab.height();
+                        // compare and if first tab was higher set the same height
+                        if(nodeshot.tab0Height > nodeshot.tab1Height){
+                            tab.height(nodeshot.tab0Height);
+                        }
+                    }
+                }
+            });
             nodeshot.contact.link();
         });
         infoWindow.setContent(data);
+        infoWindow.maxWidth = 500;
         infoWindow.open(map, marker);        
     });
   };
@@ -198,7 +223,7 @@ function draw_link(flat, flng, tlat, tlng, quality) {
     else if (quality==3) 
         qualityColor =  '#ee0000' //Bad
     else if (quality==4) 
-        qualityColor =  '#000000' //used for tested link
+        qualityColor =  '#5f0060' //used for tested link
 
     var link = new google.maps.Polyline({
         path: linkCoordinates,
@@ -207,8 +232,12 @@ function draw_link(flat, flng, tlat, tlng, quality) {
         strokeWeight: 5 
     });
     link.setMap(map);
-    markersArray.links.push(link);
-
+    if(quality!=4){
+        markersArray.links.push(link);   
+    }
+    else{
+        return link;
+    }
 }
 
 function draw_nodes(type) {
@@ -471,19 +500,36 @@ function initialize() {
 
     /* -------------------------- */
     /* visualize tested-link made */
-    $('select.distance-nodeto').live('change',function(){
-        var latlng = $(this).val();
+    $('#distance-select').live('change',function(){
+        // if there is any temporary distance calculation clear it
+        if(nodeshot.links.temporary){
+            nodeshot.links.temporary.link.setMap(null);
+        }
+        
+        $this = $(this);
+        var latlng = $this.val();
+        var start_node = $('#node_name').text();
+        var destination_node = $this.find('option[value="'+latlng+'"]').text();
         //alert(latlng);
         var latlng_array = latlng.split(';');       
-        var slat = $('td.selected-node-lat').text().replace(",",".");
-        var slng = $('td.selected-node-lng').text().replace(",",".");
+        var slat = $('#lat').text().replace(",",".");
+        var slng = $('#lng').text().replace(",",".");
         var flat = parseFloat(slat);
         var flng = parseFloat(slng);
         var tlat = parseFloat(((latlng_array[0]).replace(",",".")));
         var tlng = parseFloat(((latlng_array[1]).replace(",",".")));
-        draw_link(flat, flng, tlat, tlng, 4);
-        distanceL = calc_distance(flat, flng, tlat, tlng, "K");
-        $('#distance').html(distanceL);
+        link = draw_link(flat, flng, tlat, tlng, 4);
+        var distanceL = calc_distance(flat, flng, tlat, tlng, "K");
+        distanceL = Math.round(distanceL*Math.pow(10,2))/Math.pow(10,2);
+        $('#result').html(distanceL);
+        $('#result-row').fadeIn(500);
+        
+        nodeshot.links.temporary = {
+            link: link,
+            start: start_node,
+            destination: destination_node
+        };
+        console.log(nodeshot.links.temporary);
     });
     
     /* visualize ETX values or dbm values */
