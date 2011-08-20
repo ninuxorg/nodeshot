@@ -33,6 +33,7 @@
             <section id="content-container">
                 <article id="content">
                     <div id="map_canvas"></div>
+                    <div id="side-links"></div>
                 </article>
                 <aside id="aside">
                     <div class="wrapper">
@@ -66,8 +67,6 @@
                         </div>
                     </div>
                 </aside>
-                
-               
             </section>
         </div>
         
@@ -102,6 +101,7 @@
         // when content has been loaded
         $(window).load(function(){
             nodeshot.layout.cacheObjects();
+            nodeshot.distance.remember();
             nodeshot.layout.setFullScreen();
             nodeshot.layout.setElementDimensions();
             nodeshot.overlay.appendLoading();           
@@ -132,5 +132,7 @@
  	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery.progressbar/js/jquery.progressbar.js"></script>
 	<script type="text/javascript" src="{{MEDIA_URL}}js/gmap.js"></script>
 	<script type="text/javascript" src="{{MEDIA_URL}}js/rrd.js"></script>
+    
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
     </body>
 </html>

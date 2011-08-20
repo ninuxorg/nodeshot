@@ -146,16 +146,16 @@ function initialize_map() {
     }
     // remove loading gif and mask if necessary
     if(nodeshot.layout.$loading){
+        nodeshot.layout.cacheObjects();
         nodeshot.overlay.removeMask();
         nodeshot.overlay.hideLoading();
-        nodeshot.layout.cacheObjects();
         nodeshot.layout.setFullScreen();
     }
 }
 
-function handleMarkerClick(marker, node_id) {
+function handleMarkerClick(marker, node) {
   return function() {
-    $.get(__project_home__+'info_window/'+node_id+'/', function(data) {
+    $.get(__project_home__+'info_window/'+node.id+'/', function(data) {
         // add listener to domready of infowindows - it will be triggered when the infoWindow is ready
         google.maps.event.addListener(infoWindow, 'domready', function(){
             $(".tabs").tabs({
@@ -184,10 +184,40 @@ function handleMarkerClick(marker, node_id) {
                 }
             });
             nodeshot.contact.link();
+            var search_input = $("#distance-search");
+            nodeshot.layout.bindFocusBlur(search_input);
+            // Implements the search function
+            search_input.autocomplete({
+                minLength: 4,
+                source: function(req, add) {
+                    $.getJSON("search/"+req.term+'/', function(data) {
+                        if (data != null && data.length > 0) 
+                            add(data);
+                        else
+                            add("");
+                    });
+                },
+                select: function(event, ui) {
+                    nodeshot.distance.calculate({
+                        from_name: infoWindow.node.name,
+                        from_slug: infoWindow.node.slug,
+                        from_lat: infoWindow.node.lat,
+                        from_lng: infoWindow.node.lng,
+                        to_name: ui.item.name,
+                        to_slug: ui.item.value,
+                        to_lat: ui.item.lat,
+                        to_lng: ui.item.lng
+                    });
+                    search_input.val(ui.item.label)
+                    return false;
+                }
+            });
+            nodeshot.layout.setFullScreen();
         });
         infoWindow.setContent(data);
         infoWindow.maxWidth = 500;
-        infoWindow.open(map, marker);        
+        infoWindow.open(map, marker);
+        infoWindow.node = node;
     });
   };
 } 
@@ -273,8 +303,7 @@ function draw_nodes(type) {
         marray.push(marker);
         marker.setMap(map);  
         
-        var listenerHandle = google.maps.event.addListener(marker, 'click',  handleMarkerClick(marker, data[i].id) );
-                
+        var listenerHandle = google.maps.event.addListener(marker, 'click',  handleMarkerClick(marker, data[i]) );
         larray.push(listenerHandle);
     }
     // draw links if type is active
@@ -399,6 +428,7 @@ function initialize() {
     $(function() {
         // Implements the search function 
         $("#search").autocomplete({
+            minLength: 4,
             source: function(req, add) {
                 $.getJSON("search/"+req.term+'/', function(data) {
                     if (data != null && data.length > 0) 
@@ -410,14 +440,16 @@ function initialize() {
             select: function(event, ui) {
                 var choice = $("input[name='view-radio']:checked").val();
                 if (choice == 'map'){
+                    // go to point on map
                     mapGoTo(ui.item.value);
+                    // put label on input
+                    $(this).val(ui.item.label);
+                    // return false to avoid default autocomplete plugin behaviour
+                    return false;
                 }
                 else{
                     alert('Not (yet) implemented');
                 }
-            },
-            close: function(event, ui){
-                $('#search').val('')
             }
         });
     });
@@ -498,38 +530,27 @@ function initialize() {
         }
     });
 
-    /* -------------------------- */
-    /* visualize tested-link made */
+    /* distance calculation */
     $('#distance-select').live('change',function(){
-        // if there is any temporary distance calculation clear it
-        if(nodeshot.links.temporary){
-            nodeshot.links.temporary.link.setMap(null);
-        }
-        
+        // cache $(this)
         $this = $(this);
-        var latlng = $this.val();
-        var start_node = $('#node_name').text();
-        var destination_node = $this.find('option[value="'+latlng+'"]').text();
-        //alert(latlng);
-        var latlng_array = latlng.split(';');       
-        var slat = $('#lat').text().replace(",",".");
-        var slng = $('#lng').text().replace(",",".");
-        var flat = parseFloat(slat);
-        var flng = parseFloat(slng);
-        var tlat = parseFloat(((latlng_array[0]).replace(",",".")));
-        var tlng = parseFloat(((latlng_array[1]).replace(",",".")));
-        link = draw_link(flat, flng, tlat, tlng, 4);
-        var distanceL = calc_distance(flat, flng, tlat, tlng, "K");
-        distanceL = Math.round(distanceL*Math.pow(10,2))/Math.pow(10,2);
-        $('#result').html(distanceL);
-        $('#result-row').fadeIn(500);
-        
-        nodeshot.links.temporary = {
-            link: link,
-            start: start_node,
-            destination: destination_node
-        };
-        console.log(nodeshot.links.temporary);
+        // split values in array
+        var values = ($this.val()).split(';');
+        //// replace comma
+        var to_lat = (values[0]).replace(",",".");
+        var to_lng = (values[1]).replace(",",".");
+        var to_slug = values[2];
+        // calculate distance and add controls
+        nodeshot.distance.calculate({
+            from_name: infoWindow.node.name,
+            from_slug: infoWindow.node.slug,
+            from_lat: infoWindow.node.lat,
+            from_lng: infoWindow.node.lng,
+            to_name: $this.find('option[value="'+$this.val()+'"]').text(),
+            to_slug: to_slug,
+            to_lat: to_lat,
+            to_lng: to_lng
+        });
     });
     
     /* visualize ETX values or dbm values */
@@ -637,6 +658,5 @@ function initialize() {
             }
         }
     });
-
 };
 

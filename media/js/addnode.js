@@ -16,7 +16,8 @@ var nodeshot = {
             this.$header = $('#header');
             this.$content = $('#content');
             this.$aside = $('#aside');
-            this.$map = $("#map_canvas");
+            this.$map = $('#map_canvas');
+            this.$sideLinks = $('#side-links');
         },
         /*
         * nodeshot.layout.setFullScreen()
@@ -89,6 +90,23 @@ var nodeshot = {
             var borderBottom = this.getCssInt(obj.css('border-bottom-width'));
             height = obj.height() + paddingTop + paddingBottom + borderTop + borderBottom;
             return ($(window).height() - height) / 2;
+        },
+        /*
+        * nodeshot.layout.bindFocusBlue(obj)
+        * binds onfocus and onblur event to obj (should be an input text field)
+        */
+        bindFocusBlur: function(obj){
+            obj.focus(function(src){
+                if (obj.val() == obj[0].defaultValue){
+                    obj.val('');
+                }
+            });                
+            obj.blur(function(){
+                if ($(this).val() == '')
+                {
+                    $(this).val(obj[0].defaultValue);
+                }
+            });
         }
         
     },
@@ -469,8 +487,117 @@ var nodeshot = {
         }
     },
     
-    links: {
-        //temporary: []
+    distance: {
+        calculate: function(data, saved){
+            if(!data){
+                return false;
+            }
+            // ensure coords are float type
+            data.from_lat = parseFloat(data.from_lat);
+            data.from_lng = parseFloat(data.from_lng);
+            data.to_lat = parseFloat(data.to_lat);
+            data.to_lng = parseFloat(data.to_lng);
+            // draw link on map and save it in a local variable
+            var link = draw_link(data.from_lat, data.from_lng, data.to_lat, data.to_lng, 4);
+            // calculate distance
+            var distance = calc_distance(data.from_lat, data.from_lng, data.to_lat, data.to_lng, "K");
+            // round distance 2 decimals
+            distance = Math.round(distance*Math.pow(10,2))/Math.pow(10,2);
+            // innerHTML
+            $('#result').html(distance);
+            // show result
+            $('#result-row').fadeIn(500);
+            // add distance link controls
+            nodeshot.distance.add(link, data, distance, saved);
+        },
+        
+        add: function(link, data, distance, saved){
+            
+            var index = this.links.push({
+                link: link,
+                from_name: data.from_name,
+                to_name: data.to_name,
+                $div: null,
+                remove: function(){
+                    if(nodeshot.distance.saved_links){
+                        var found = false;
+                        for(i=0; i<nodeshot.distance.saved_links.length; i++){
+                            if(nodeshot.distance.saved_links[i] && nodeshot.distance.saved_links[i].from_name == this.from_name && nodeshot.distance.saved_links[i].to_name == this.to_name){
+                                delete nodeshot.distance.saved_links[i];
+                                var found = true;
+                            }
+                        }
+                        if(found){
+                            $.cookie('nodeshot_saved_distances', JSON.stringify(nodeshot.distance.saved_links), { expires: 365, path: __project_home__ });
+                        }
+                    }
+                    this.link.setMap(null);
+                    this.$div.fadeOut(500, this.$div.remove);
+                    delete this.link;
+                },
+                hide: function(){
+                    this.link.setMap(null);
+                    this.$div.find('.link-hide').hide();
+                    this.$div.find('.link-show').show();
+                },
+                show: function(){
+                    this.link.setMap(map);
+                    this.$div.find('.link-show').hide();
+                    this.$div.find('.link-hide').show();                    
+                },
+                save: function(){
+                    if(saved){
+                        return false;
+                    }
+                    this.$div.find('.link-save').fadeOut(500);
+                    // if no cookie
+                    if(nodeshot.distance.cookie == null){
+                        // convert current object to json string
+                        var json_string = JSON.stringify([data]);
+                    }
+                    // if there is a cookie with saved stuff
+                    else{
+                        // add this distance link to the array
+                        nodeshot.distance.saved_links.push(data);
+                        // convert back to JSON string
+                        var json_string = JSON.stringify(nodeshot.distance.saved_links);
+                    }
+                    // save a cookie with the JSON string
+                    $.cookie('nodeshot_saved_distances', json_string, { expires: 365, path: __project_home__ });
+                }
+            });
+            index = index - 1;
+            
+            var from_link = '<a class="link-node" href="javascript:mapGoTo(\''+data.from_slug+'\')">'+data.from_name+'</a>';
+            var to_link = '<a class="link-node" href="javascript:mapGoTo(\''+data.to_slug+'\')">'+data.to_name+'</a>';
+            
+            var html = '<div id="distance-link'+index+'" class="distance-link"><span>'+from_link+' - '+to_link+': <b>'+distance+' km</b> ';
+            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].show()" class="link-show">mostra</a>';
+            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].hide()" class="link-hide">nascondi</a>';
+            if(!saved){
+                html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].save()" class="link-save">salva</a>';
+            }
+            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].remove()" class="link-remove">elimina</a>';
+            html =html+'</span></div>';
+            
+            nodeshot.layout.$sideLinks.prepend(html);
+            this.links[index].$div =  $('#distance-link'+index);
+            this.links[index].$div.fadeIn(500);
+            // layout might need this ;-)
+            nodeshot.layout.setFullScreen();
+        },
+        
+        remember: function(){
+            this.cookie = $.cookie('nodeshot_saved_distances');
+            if(this.cookie){
+                this.saved_links = JSON.parse(this.cookie);
+                for(i=0; i<this.saved_links.length; i++){
+                    this.calculate(this.saved_links[i], 'saved');
+                }
+            }
+        },
+        
+        links: []
     }
     
 }

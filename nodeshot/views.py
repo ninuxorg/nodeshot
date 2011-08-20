@@ -150,10 +150,10 @@ def info_window(request, node_id):
 
 def search(request, what):
     data = []
-    data = data + [{'label': d.name, 'value': d.slug }  for d in Node.objects.filter(name__icontains=what).only('name','slug')]
-    data = data + [{'label': d.ipv4_address , 'value': d.device.node.slug }  for d in Interface.objects.filter(ipv4_address__icontains=what).only('device__node__name')]
-    data = data + [{'label': d.mac_address , 'value': d.device.node.slug }  for d in Interface.objects.filter(mac_address__icontains=what).only('device__node__name')]
-    data = data + [{'label': d.ssid , 'value': d.device.node.slug }  for d in Interface.objects.filter(ssid__icontains=what).only('device__node__name')]
+    data = data + [{'label': d.name, 'value': d.slug, 'name': d.name, 'lat': d.lat, 'lng': d.lng }  for d in Node.objects.filter(name__icontains=what).only('name','slug','lat','lng')]
+    data = data + [{'label': d.ipv4_address , 'value': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng }  for d in Interface.objects.filter(ipv4_address__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng')]
+    data = data + [{'label': d.mac_address , 'value': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng }  for d in Interface.objects.filter(mac_address__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng')]
+    data = data + [{'label': d.ssid , 'value': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng }  for d in Interface.objects.filter(ssid__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng')]
     if len(data) > 0:
         return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     else:

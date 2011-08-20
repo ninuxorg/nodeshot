@@ -204,10 +204,10 @@ body#overlay-container{
 	margin: 10px 0 0;
 }
 
-.dialog-form .text,
 #nodeshot-form .text,
 #nodeshot-form .formset-form-container input,
-#nodeshot-form .formset-form-container select{
+#nodeshot-form .formset-form-container select,
+#info-window .text{
 	margin: 0;
 	width: 528px;
 	font: normal 13px Arial, Freesans, sans-serif;
@@ -217,10 +217,17 @@ body#overlay-container{
 	color: #fff;
 	-moz-border-radius: 6px; border-radius: 6px;
 }
-.dialog-form select.text, #nodeshot-form select.text,
+#nodeshot-form select.text,
 #nodeshot-form .formset-form-container select{
 	width: auto;
 	padding:0;
+}
+#info-window .text{
+	display: inline;
+	width: auto;
+	min-width: 210px;
+	max-width: 300px;
+	font-size: 12px;
 }
 #nodeshot-form .formset-form-container input{
 	width: 502px;
@@ -318,10 +325,9 @@ a.button{ color: #fff !important }
 	color: #fff
 }
 
-.dialog-form fieldset, .content fieldset { padding:0; border:0; margin-top:10px }
-.dialog-form .form-tips, .content .form-tips {font-size: 13px}
+#nodeshot-form .content fieldset { padding:0; border:0; margin-top:10px }
+#nodeshot-form .content .form-tips {font-size: 13px}
 
-.dialog-form h1,
 .content h1 {
 	font-family: Segoe UI, Arial, sans-serif;
 	font-size: 19px;
@@ -331,21 +337,21 @@ a.button{ color: #fff !important }
 .content #users-contain{ width: 350px; margin: 20px 0; }
 .dialog-form div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
 .dialog-form div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
-.dialog-form .ui-dialog .ui-state-error,
-/*.content .ui-state-error { padding: .3em; }*/
+/*.dialog-form .ui-dialog .ui-state-error,
+.content .ui-state-error { padding: .3em; }
 .dialog-form .validateTips,
 .content .validateTips { border: 1px solid transparent; padding: 0.3em; }
 .dialog-form .errorlist,
 .content .errorlist {
     list-style-type: none;
     display: inline;
-}
+}*/
 
-.submit{ float: left }
-.cancel{ float: right }
+#nodeshot-form .submit{ float: left }
+#nodeshot-form .cancel{ float: right }
 #device-form-submit{ width: 100px; margin: 30px 1em 1em }
 
-.inline-formset fieldset{
+#nodeshot-form .inline-formset fieldset{
 	padding: 1em;
 }
 #nodeshot-form .formset-form-container {
@@ -470,6 +476,7 @@ h3 {
 #nodeshot-overlay{ position:absolute;top:0;left:0;width:100%;height:100%;z-index:11 }
 
 #view-nodes input{ position:relative; bottom:-1px; margin-right:5px }
+#view-nodes label{ cursor: pointer }
 #addnode{ margin-top: 10px }
 
 #link-quality-selector { display: block; margin: 20px 0 10px }
@@ -549,3 +556,49 @@ h3 {
 	font-weight: bold;
 	vertical-align: top;
 }
+
+#info-window .valignmiddle{ padding: 12px 10px 12px 0 !important; vertical-align: middle !important }
+
+#side-links{
+	position: absolute;
+	left:0;
+	bottom:0;
+	padding: 0 0 12px 10px;
+}
+
+#side-links .distance-link{
+	display: none;
+	margin-top: 17px;
+}
+
+#side-links span{
+	padding: 6px 4px 6px 7px;
+	font: bold 11px Arial, Freesans, sans-serif;
+	color: #fff;
+	background-color: #000;
+	background: rgba(0,0,0,0.7);
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+#side-links b{
+	color: #ffb11e;
+	margin-right: 6px
+}
+
+#side-links a{
+	margin: 0 3px;
+	padding: 2px 4px;
+	color: #fff;
+	text-decoration: none;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+#side-links a.link-node{
+	margin: 0;
+	text-decoration: underline;
+}
+#side-links a.link-show{ background-color: #FFA500; color: #000; display: none }
+#side-links a.link-hide{ background-color: #cfcfcf; color: #000 }
+#side-links a.link-save{ background-color: green; color: #fff }
+#side-links a.link-remove{ background-color: red; color: #fff }
