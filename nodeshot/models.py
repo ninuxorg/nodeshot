@@ -409,7 +409,7 @@ from datetime import datetime, timedelta
 
 def notify_on_delete(sender, instance, using, **kwargs):
     ''' Notify admins when nodes are deleted. Only for production use '''
-    # if in testing modedon't send emails
+    # if in testing mode don't send emails
     if DEBUG:
         return False
     # if purging old unconfirmed nodes don't send emails
@@ -421,7 +421,7 @@ def notify_on_delete(sender, instance, using, **kwargs):
         'site': SITE
     }
     # notify admins that want to receive notifications
-    notify_admins(instance, 'email_notifications/node-deleted-admin_subject.txt', 'email_notifications/node-deleted-admin_body.txt', context, skip=False)
+    notify_admins(instance, 'Nodo cancellato su %s' % SITE.get('name'), 'email_notifications/node-deleted-admin.txt', context, skip=False)
 
 post_delete.connect(notify_on_delete, sender=Node)
 

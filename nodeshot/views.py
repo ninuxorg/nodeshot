@@ -18,7 +18,8 @@ from settings import DEBUG, NODESHOT_SITE as SITE
 from django.core.exceptions import ObjectDoesNotExist
 from forms import ContactForm, PasswordResetForm
 from datetime import datetime, timedelta
-from django.core.mail import EmailMessage
+#from django.core.mail import EmailMessage
+from nodeshot.utils import email_owners
 
 # retrieve map center or set default if not specified
 try:
@@ -274,14 +275,6 @@ def contact(request, node_id):
         form = ContactForm(extra, request.POST)
         # proceed in sending email only if form is valid
         if form.is_valid():
-            # prepare to list
-            to = [node.email]
-            # if node has an second email address specified include it in the cc
-            if node.email2 != '' and node.email2 != None:
-                to += [node.email2]
-            # if node has a third email address specified include it in the cc
-            if node.email3 != '' and node.email3 != None:
-                to += [node.email3]
             # prepare context
             context = {
                 'node': node,
@@ -292,15 +285,9 @@ def contact(request, node_id):
                 },
                 'site': SITE
             }
-            # parse subject
-            subject = render_to_string('email_notifications/contact_node_subject.txt',context)
-            # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())
-            # parse message
-            message = render_to_string('email_notifications/contact_node_body.txt',context)
-            # prepare EmailMessage object, we are using this one because we want to send one mail only with other eventual owners in CC so they can hit reply to all button easily
-            email = EmailMessage(subject, message, to=to, headers = {'Reply-To': request.POST.get('from_name')})
-            email.send()
+            # email owners
+            email_owners(node, 'Richiesta di contatto da %s - %s' % (context['sender']['from_name'], SITE['name']), 'email_notifications/contact-node-owners.txt', context, reply_to=request.POST.get('from_name'))
+            # set sent to true
             sent = True
             # if enabled from settings
             if LOG_CONTACTS:
@@ -319,6 +306,38 @@ def contact(request, node_id):
         'http_referer': http_referer
     }
 
+    return render_to_response(template, context, context_instance=RequestContext(request))
+    
+def delete_node(request, node_id, password):
+    ''' Delete node view '''
+        
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/delete_node.html';
+    else:
+        template = 'delete_node.html';
+        
+    # get object or raise 404
+    try:
+        node = Node.objects.select_related().exclude(status='u').get(pk=node_id, password=password)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    # if form has been submitted
+    if request.method == 'POST':
+        # prepare context
+        email_context = {
+            'node': node,
+            'site': SITE
+        }
+        email_owners(node, 'Nodo %s cancellato' % node.name, 'email_notifications/node-deleted-owners.txt', email_context)
+        node.delete()
+        return HttpResponse('deleted')
+    
+    context = {
+        'node': node,
+    }
+    
     return render_to_response(template, context, context_instance=RequestContext(request))
     
 def recover_password(request, node_id):

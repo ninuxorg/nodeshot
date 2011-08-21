@@ -1,0 +1,4 @@
+{% load i18n %}Il nodo {{ node.name }} è stato cancellato con successo.
+
+Grazie per aver utilizzato il nostro map-server.
+{{ site.name }} - http://{{ site.domain }}{% url nodeshot_index %}

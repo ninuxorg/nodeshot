@@ -1,6 +1,6 @@
 {% load i18n %}Ciao {% if admin.first_name != '' %}{{ admin.first_name }}{% else %}{{ admin.username }}{% endif %},
     
-Il nodo {{ node.name }} è stato appena cancellato da un admin.
+Il nodo {{ node.name }} è stato appena cancellato.
 
 Ricevi questa email perchè sei tra gli amministratori del sito {{ site.name }} ed hai scelto di ricevere notifiche riguardanti la gestione dei nodi.
 Se non vuoi più ricevere notifiche modifica il tuo profilo in:

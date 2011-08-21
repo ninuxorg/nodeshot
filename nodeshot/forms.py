@@ -113,7 +113,7 @@ def add_node(request):
             # save new node in the database (password encryption, activation_key and email notification is done in models.py)
             node.save()
             # return a blank page with node id
-            return HttpResponse(node.id)
+            return HttpResponse(str(node.id))
     else:
         # blank form
         form = AddNodeForm()

@@ -240,12 +240,8 @@ var nodeshot = {
             nodeshot.layout.$overlay.html(data);
             // cache inner object
             nodeshot.layout.$overlayInner = $('#nodeshot-overlay-inner');
-            // insert close button to overlay
-            nodeshot.layout.$overlayInner.prepend('<a class="close"></a>');
-            // bind onclick event to close button
-            nodeshot.layout.$overlayInner.find('.close').click(function(){
-                nodeshot.overlay.close();
-            });
+            // close button
+            this.initClose();
             // center overlay to window
             this.centerVertically();
             // update layout dimensions
@@ -259,6 +255,18 @@ var nodeshot = {
             }
         },
         /*
+        * nodeshot.overlay.initClose()
+        * insert close button to overlay
+        */
+        initClose: function(){
+            // insert close button to overlay
+            nodeshot.layout.$overlayInner.prepend('<a class="close"></a>');
+            // bind onclick event to close button
+            nodeshot.layout.$overlayInner.find('.close').click(function(){
+                nodeshot.overlay.close();
+            });
+        },
+        /*
         * nodeshot.overlay.centerVertically(animate, duration)
         * center the overlay vertically
         * if animate is true the overlay will move to the center with an animation of the specified duration
@@ -266,15 +274,15 @@ var nodeshot = {
         centerVertically: function(animate, duration){
             // cache calculation
             var margin = nodeshot.layout.verticalCenter(nodeshot.layout.$overlayInner);
-            // only if margin is positive
-            if(margin>0){
-                if(animate){
-                    nodeshot.layout.$overlayInner.animate({'margin-top': margin}, duration);
-                }
-                else{
-                    nodeshot.layout.$overlayInner.css('margin-top', nodeshot.layout.verticalCenter(nodeshot.layout.$overlayInner));
-                }
-            }  
+            // if margin is negative set to 10            
+            if(margin<0){ margin = 10 }
+            // animate if specified
+            if(animate){
+                nodeshot.layout.$overlayInner.animate({'margin-top': margin}, duration);
+            }
+            else{
+                nodeshot.layout.$overlayInner.css('margin-top', margin);
+            }
         },
         /*
         * nodeshot.overlay.bindCancelButton()
@@ -381,7 +389,7 @@ var nodeshot = {
             // ajax get
             $.get(url, function(data) {
                 nodeshot.overlay.hideLoading();
-                nodeshot.overlay.open(data, true)
+                nodeshot.overlay.open(data)
                 // remember we are not using0 $.live() to optimize performance
                 nodeshot.overlay.bindCancelButton();
                 nodeshot.overlay.bindSubmitForm(function(form){
@@ -399,12 +407,11 @@ var nodeshot = {
                 zIndex: 11,
                 opacity: 0.7
             });
-            $('#nodeshot-overlay').css('z-index', '10');
+            nodeshot.layout.$overlay.css('z-index', '10');
             
             var form_data = form.serialize();
         
             $.post(url, form_data, function(data) {
-                
                 nodeshot.overlay.hideLoading();
                 
                 if ($(data).find('#success').length < 1) {
@@ -413,13 +420,15 @@ var nodeshot = {
                         zIndex: 10,
                         opacity: 0.5
                     });
-                    $('#nodeshot-overlay').css('z-index', '11');
+                    nodeshot.layout.$overlay.css('z-index', '11');
                     //form errors
-                    $('#nodeshot-overlay').html(data);
-                    // optimizations needed!
-                    div = $('#nodeshot-overlay-inner');
-                    div.css('margin-top', -25 + ($(window).height()-div.height()) / 2);
+                    nodeshot.layout.$overlay.html(data);
+                    nodeshot.layout.$overlay = $('#nodeshot-overlay');
+                    nodeshot.layout.$overlayInner = $('#nodeshot-overlay-inner');
+                    // vertically center overlay
+                    nodeshot.overlay.centerVertically();
                     // rebind events because we are not using $.live()
+                    nodeshot.overlay.initClose();
                     nodeshot.overlay.bindCancelButton();
                     nodeshot.overlay.bindSubmitForm(function(form){
                         nodeshot.contact.submit(url, form);
@@ -474,7 +483,7 @@ var nodeshot = {
             });
         },
         /*
-        * nodeshot.node.submitNew()
+        * nodeshot.node.submit()
         * submits form to add a new node
         */
         submit: function(form){
@@ -484,7 +493,7 @@ var nodeshot = {
                 zIndex: 11,
                 opacity: 0.7
             });
-            $('#nodeshot-overlay').css('z-index', '10');
+            nodeshot.layout.$overlay.css('z-index', '10');
             
             var form_data = form.serialize();
         
@@ -498,19 +507,27 @@ var nodeshot = {
                         zIndex: 10,
                         opacity: 0.5
                     });
-                    $('#nodeshot-overlay').css('z-index', '11');
+                    nodeshot.layout.$overlay.css('z-index', '11');
                     //form errors
-                    $('#nodeshot-overlay').html(data);
+                    nodeshot.layout.$overlay.html(data);
+                    nodeshot.layout.$overlay = $('#nodeshot-overlay');
+                    nodeshot.layout.$overlayInner = $('#nodeshot-overlay-inner');
+                    // vertically center overlay
+                    nodeshot.overlay.centerVertically();
+                    
                     // bind events again because we are not using $.live()
+                    nodeshot.overlay.initClose();
                     nodeshot.overlay.bindCancelButton();
                     nodeshot.overlay.bindSubmitForm(function(form){
                         nodeshot.node.submit(form);
                     });
                 } else {            
-                    $('#nodeshot-overlay-inner').fadeOut(500, function(){
+                    nodeshot.layout.$overlayInner.fadeOut(500, function(){
                         nodeshot.dialog.open('Grazie per aver inserito un nuovo nodo potenziale, ti abbiamo inviato un\'email con il link di conferma.', nodeshot.overlay.close);
                     });
                 }
+                nodeshot.layout.setFullScreen();
+                nodeshot.sending = false;
             });
         },
         /*

@@ -211,7 +211,6 @@ body#overlay-container{
 	cursor: pointer;
 }
 
-#nodeshot-modal .button{ margin-top: 10px }
 .button, #nodeshot-form .add-row{
 	position: relative;
 	padding: 5px 12px;
@@ -231,6 +230,7 @@ body#overlay-container{
 }
 .button.cancel{ color: #c6c6c6 }
 a.button{ color: #fff !important }
+#nodeshot-modal .button{ margin-top: 10px; border: 0 none }
 
 #nodeshot-form .add-row{
 	background: #006601 none;

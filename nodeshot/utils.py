@@ -7,6 +7,12 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_str
 from django.utils.crypto import constant_time_compare
+from django.template import TemplateDoesNotExist
+
+try:
+    from settings import DEFAULT_FROM_EMAIL
+except ImportError:
+    raise ImproperlyConfigured('DEFAULT_FROM_EMAIL is not defined in your settings.py. See settings.example.py for reference.')
 
 def distance(origin, destination):
     'Haversine formula'
@@ -29,12 +35,35 @@ def signal_to_bar(signal):
     else:
         return 0
     
-def notify_admins(node, subject_template, body_template, context, skip=False):
+def email_owners(node, subject, body_template, context, reply_to=False):
+    # Email subject *must not* contain newlines
+    subject = ''.join(subject.splitlines())
+    # parse message
+    message = render_to_string(body_template,context)
+    # send email to all the owners        
+    recipient_list = [node.email]
+    if node.email2 != '' and node.email2 != None:
+        recipient_list += [node.email2]
+    if node.email3 != '' and node.email3 != None:
+        recipient_list += [node.email3]
+    # send mail
+    if reply_to:
+        from django.core.mail import EmailMessage
+        email = EmailMessage(subject, message, to=recipient_list, headers = {'Reply-To': reply_to})
+        email.send()
+    else:
+        from django.core.mail import send_mail
+        send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+    
+def notify_admins(node, subject, body_template, context, skip=False):
     ''' todo: comment this '''
     admins = User.objects.filter(is_staff=True, userprofile__receive_notifications=True).exclude(email='').select_related().order_by('pk')
     if(len(admins)>0):
         # parse subject (which is the same for every admin)
-        subject = render_to_string(subject_template,context)
+        try:
+            subject = render_to_string(subject,context)
+        except TemplateDoesNotExist:
+            pass
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
         # loop over admins
