@@ -11,7 +11,7 @@
     </head>
     <body>
         <div id="container">
-            <header id="header">
+            <header id="header">                
                 <h1>
                     Nodeshot
                 </h1>
@@ -24,11 +24,11 @@
                     {% endif %}
                 </p>
                 <div id="head-controls" class="ui-widget">
+                    <input id="search" class="defaultText text ui-corner-all" title="Cerca un un nodo, IP, MAC o SSID" />
                     <a href="/admin"><img src="{{MEDIA_URL}}images/icons/Config.png" class="top-icon" alt="Admin" /></a>
                     <a href="/kml-feed.kml"><img src="{{MEDIA_URL}}images/icons/Rss.png" class="top-icon" alt="KML Feed" /></a>
                     <a href="http://wiki.ninux.org/UsareMapserver"><img src="{{MEDIA_URL}}images/icons/Lifesaver.png" alt="Help" class="top-icon" /></a>
-                    <input id="search" class="defaultText text ui-corner-all" title="Cerca un nome di un nodo, IP, MAC o SSID" />
-                </span>
+                </div>
             </header>
             <section id="content-container">
                 <article id="content">
@@ -53,6 +53,8 @@
                                 <input type="checkbox" id="hotspot" checked="checked" /><label for="hotspot">Visualizza hotspots</label><br />
                                 <input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label><br />
                             </menu>
+                            <br />
+                            <a id="hide-side" href="#" class="button">Nascondi</a>
                             <menu id="link-quality-selector">
                                     Visualizza la qualita' dei collegamenti: <br/>
                                     <!-- input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /><label for="etx">ETX</label>
@@ -61,7 +63,7 @@
                                     <input type="radio" id="dbm" name="link-quality-selector" value="dbm" /><img src="{{MEDIA_URL}}images/icons/signal2.png" class="top-icon"/><label for="dbm">Segnale ricevuto (DBm)</label>
                             </menu>
                             <h3>Lista dei nodi</h3>
-                             <div id="node-tree-container" class="widget-content text ui-corner-all">
+                             <div id="node-tree-container" class="widget-content">
                                 <div id="node-tree"></div>
                             </div>
                         </div>
@@ -104,7 +106,8 @@
             nodeshot.distance.remember();
             nodeshot.layout.setFullScreen();
             nodeshot.layout.setElementDimensions();
-            nodeshot.overlay.appendLoading();           
+            nodeshot.overlay.appendLoading();
+            nodeshot.layout.initSideControl();
         // update dimensions on resize
         }).resize(function(){
             nodeshot.layout.setFullScreen();

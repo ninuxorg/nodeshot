@@ -15,12 +15,12 @@ article, aside, figure, footer, header, hgroup, menu, nav, section { display:blo
 
 .accessibility{ position:absolute;top:-9999px }
 
-html, body { height: 100%; min-width:1000px }
+html, body { height: 100% }
 
-#container
-{
+#container{
     margin: 0 auto;
     height: 100%;
+    min-height: 500px;
     width: 100%;
     background: #fff;
     font-family: sans-serif;
@@ -28,66 +28,28 @@ html, body { height: 100%; min-width:1000px }
     color: #000;
 }
 
-#header
-{
-	min-width:1000px;
+#header{
+	min-width:950px;
     background: #000;
     color: #fff;
     overflow: hidden;
     height: 35px;
 }
 
-#header h1 
-{ 
-    float: left;
-    width:11.7%;
-    padding-left:0.3%;
+#header h1{ 
+    display: inline;
+    padding-left: 6px;
     color: #FFA500;
     font: bold 28px "Arial", sans-serif;
     letter-spacing:-1px;
 }
-/*
-#navigation
-{
-    float: right;
-    width: 100%;
-    background: #000;
-}
 
-#navigation ul
-{
-    margin: 0;
-    padding: 0;
-}
-
-#navigation ul li
-{
-    list-style-type: none;
-    display: inline;
-}
-
-#navigation li a
-{
-    display: block;
-    float: left;
-    padding: 5px 10px;
-    color: #fff;
-    text-decoration: none;
-    border-right: 1px solid #fff;
-}
-
-#navigation li a:hover { background: #383; }
-*/
-
-#content-container
-{
+#content-container{
     float: left;
     width: 100%;
-    background: #FFF;
 }
 
-#content
-{
+#content{
     float: left;
     width: 74%;
     min-height:500px;
@@ -97,9 +59,8 @@ html, body { height: 100%; min-width:1000px }
 
 #content h2, #overlay h2 { margin: 0; }
 
-#aside
-{
-    float: left;
+#aside{
+    float: right;
     width: 24%;
     padding: 0;
     margin: 0;
@@ -112,47 +73,41 @@ html, body { height: 100%; min-width:1000px }
 }
 
 #aside h3 { margin: 0; }
-/*
-#footer
-{
-    clear: left;
-    background: #ccc;
-    text-align: right;
-    padding: 20px;
-    height: 1%;
-}
-*/
 
 #map_canvas { height:700px }
 
-#network-stat
-{
-	float: left;
-	width:50%;
+#network-stat{
+	display: inline;
+	position: relative;
+	top: -4px;
+	padding-left: 15px;
     line-height: 35px;
     font-size: 12px;
-    text-align: center;
+    text-align: left;
 }
 
-#network-stat span
-{
-    margin: 0 3px
-}
+#network-stat span{ margin: 0 3px }
 
 #head-controls
 {
 	width: 37.5%;
-	padding: 5px 0.5% 0 0;
-    float: right;
+	padding: 5px 5px 0 0;
+    position: absolute;
+    top: 0;
+    right: 0;
     text-align: right;
 }
 
 #search {
+	float: right;
 	position: relative;
-	bottom:-2px;
+	top: -1px;
+	padding-top: 3px;
+	padding-bottom: 4px;
+	margin-left: 5px;
     text-align: center;
     vertical-align: top;
-    width: 300px;
+    width: 288px;
 }
 
 #view-radio{ margin: 0 auto 10px }
@@ -175,10 +130,10 @@ body#overlay-container{
 }
 
 #nodeshot-overlay-inner{
+	position: relative;
 	margin: 20px auto;
 	padding: 20px;
 	width: 550px;
-	overflow: hidden;
     border: 1px solid #666666;
     background: #000000;
 	z-index:11;
@@ -257,10 +212,6 @@ body#overlay-container{
 }
 
 #nodeshot-modal .button{ margin-top: 10px }
-.green{ background: #006601 }
-.red{ background: #d50000 }
-.purple{ color: #5f0060; }
-
 .button, #nodeshot-form .add-row{
 	position: relative;
 	padding: 5px 12px;
@@ -287,7 +238,8 @@ a.button{ color: #fff !important }
 	border: 1px solid #006601;
 }
 
-#nodeshot-overlay #nodeshot-form .delete-row{
+#nodeshot-overlay #nodeshot-form .delete-row,
+#advanced-info .toggle-info{
 	float: right;
 	color: #fff;
 	padding: 0 7px;
@@ -296,6 +248,18 @@ a.button{ color: #fff !important }
 	background: #d50000;
 	-moz-border-radius: 5px; border-radius: 5px;
 }
+#nodeshot-overlay #nodeshot-form .delete-row{
+	position: relative;
+	bottom: -4px;
+}
+#advanced-info .toggle-info{
+	float: none;
+	padding: 3px 7px;
+	cursor: pointer;
+}
+.green{ background: #006601 !important }
+.red{ background: #d50000 !important }
+.purple{ color: #5f0060; }
 
 .button:hover,
 #nodeshot-overlay .text:focus,
@@ -325,13 +289,13 @@ a.button{ color: #fff !important }
 	color: #fff
 }
 
-#nodeshot-form .content fieldset { padding:0; border:0; margin-top:10px }
-#nodeshot-form .content .form-tips {font-size: 13px}
+#nodeshot-form fieldset { padding:0; border:0; margin-top:10px }
+#nodeshot-form .form-tips {font-size: 13px}
 
 .content h1 {
 	font-family: Segoe UI, Arial, sans-serif;
 	font-size: 19px;
-	margin-bottom: 20px;
+	margin-bottom: 15px;
 }
 .dialog-form div#users-contain,
 .content #users-contain{ width: 350px; margin: 20px 0; }
@@ -489,7 +453,7 @@ h3 {
 #nodeshot-form .readonly{ background: #070707 !important; border: 1px solid #666666 !important}
 #nodeshot-form .edit-configuration{ font-weight:bold; margin-right: 10px }
 
-#edit-node-menu{ overflow: hidden; margin-bottom: 20px }
+#edit-node-menu{ overflow: hidden; margin: 20px 0 20px }
 #edit-node-menu li{
 	float: left;
 	list-style: outside none;
@@ -512,8 +476,10 @@ h3 {
 	border: 1px solid #666;
 	cursor: default;
 }
+#delete-node-link{ float: right !important; margin: 0 !important }
+#delete-node-link a{ border: 1px solid #d50000 }
 
-#nodeshot-form #tabs ul{
+#nodeshot-form #tabs ul, #advanced-info ul{
 	font: normal 12px Arial, Freesans, sans-serif;
 }
 #nodeshot-form #tabs ul a{ color: #fff }
@@ -525,7 +491,7 @@ h3 {
 
 #change-password{ margin-left: 5px; text-decoration: underline; cursor: pointer }
 
-#nodeshot-overlay .hidden, #info-window .hidden{ display: none }
+#nodeshot-overlay .hidden, #info-window .hidden, #advanced-info .hidden{ display: none }
 #nodeshot-form .formset-form-container{ overflow: hidden }
 #nodeshot-form .button-wrapper{ margin-top: 20px !important; overflow: hidden }
 .clear{ clear:both }
@@ -541,23 +507,23 @@ h3 {
 	padding-bottom: 20px;
 }
 
-#info-window .list-values{
+table.list-values{
 	margin: 5px 0 20px;
 	overflow: hidden;
 	clear: both;
 }
 
-#info-window .list-values td{
+table.list-values td{
 	padding: 2px 0;
 }
 
-#info-window .list-values .key{
+table.list-values td.key{
 	padding-right: 10px;
 	font-weight: bold;
 	vertical-align: top;
 }
 
-#info-window .valignmiddle{ padding: 12px 10px 12px 0 !important; vertical-align: middle !important }
+table.list-values td.valignmiddle{ padding: 12px 10px 12px 0 !important; vertical-align: middle !important }
 
 #side-links{
 	position: absolute;
@@ -602,3 +568,25 @@ h3 {
 #side-links a.link-hide{ background-color: #cfcfcf; color: #000 }
 #side-links a.link-save{ background-color: green; color: #fff }
 #side-links a.link-remove{ background-color: red; color: #fff }
+
+#nodeshot-overlay-inner .nomargintop{ margin: 0 0 20px !important }
+#advanced-info table.list-values{ margin: 0 }
+#advanced-info{ font-size: 12px; font-family: Arial,Freesans,sans-serif }
+#advanced-info a{ color: #fff !important }
+
+#advanced-info .configuration{
+	padding: 10px 20px;
+	border: 1px solid gray;
+	border-top-width: 0;
+}
+#advanced-info .configuration.first{ margin-top: 10px !important; border-top-width: 1px; margin-top: 0 }
+#nodeshot-overlay-inner .close{
+	position: absolute;
+	top: -13px;
+	right: -13px;
+	width: 36px;
+	height: 36px;
+	background: transparent url(../images/close.png) no-repeat scroll 0 0;
+	cursor: pointer;
+}
+#node-tree-container{ border: 1px solid gray }

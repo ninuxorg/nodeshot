@@ -135,18 +135,20 @@ def node_list(request):
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def info_window(request, node_id):
-    # vedere la class in models.py
-    n = Node.objects.get(pk=node_id)
-    # https://docs.djangoproject.com/en/dev/topics/db/queries/#following-relationships-backward
-    devices = n.device_set.select_related().all()
-    # interfaces=[]
-    # for device in devices:
-    #    interfaces.append(device.interface_set.all())
+    ''' Content of gmap.infoWindow '''
+    # this view must be called with ajax only
+    if not request.is_ajax() and not DEBUG:
+        raise Http404
+    
+    # get object or raise 404
+    try:
+        node = Node.objects.exclude(status='u').only('id','name','slug','description','owner','postal_code','lat','lng','alt').get(pk=node_id)
+    except ObjectDoesNotExist:
+        raise Http404
 
-    # i= Interface.objects.get(device = d)
-    info = {'node' : n, 'devices' : devices, 'nodes' : Node.objects.all().order_by('name')}
+    context = {'node' : node, 'nodes' : Node.objects.all().order_by('name').only('name','slug','lat','lng','status')}
 
-    return render_to_response('info_window.html', info, context_instance=RequestContext(request))
+    return render_to_response('info_window.html', context, context_instance=RequestContext(request))
 
 def search(request, what):
     data = []
@@ -205,6 +207,34 @@ def info(request):
 
     return render_to_response(template,{'devices': devices}, context_instance=RequestContext(request))
 
+def advanced(request, node_id):
+    ''' Advanced information about a node '''
+    # if request is sent with ajax
+    if request.is_ajax():
+        # just load the fragment
+        template = 'ajax/advanced.html'
+    # otherwise if request is sent normally and DEBUG is true
+    elif DEBUG:
+        # debuggin template
+        template = 'advanced.html'
+    else:
+        raise Http404
+    
+    # retrieve object or return 404 error
+    try:
+        node = Node.objects.exclude(status='u').only('id','name','slug').get(pk=node_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    devices = Device.objects.filter(node=node_id)
+    
+    context = {
+        'node': node,
+        'devices': devices
+    }
+    
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
 def contact(request, node_id):
     ''' Form to contact node owners '''
     # if request is sent with ajax
@@ -220,11 +250,8 @@ def contact(request, node_id):
     
     # retrieve object or return 404 error
     try:
-        node = Node.objects.only('name', 'email', 'email2', 'email3', 'status').get(pk=node_id)
+        node = Node.objects.only('name', 'email', 'email2', 'email3', 'status').exclude(status='u').get(pk=node_id)
     except ObjectDoesNotExist:
-        raise Http404
-    # if node is unconfirmed return 404 error
-    if node.status == 'u':
         raise Http404
 
     # message has not been sent yet

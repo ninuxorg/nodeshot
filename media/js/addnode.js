@@ -18,6 +18,7 @@ var nodeshot = {
             this.$aside = $('#aside');
             this.$map = $('#map_canvas');
             this.$sideLinks = $('#side-links');
+            this.$nodeTreeContainer = $('#node-tree-container');
         },
         /*
         * nodeshot.layout.setFullScreen()
@@ -26,29 +27,49 @@ var nodeshot = {
         setFullScreen: function(){
             // cache window
             var $window = $(window);
-            // set content column width
-            this.$content.width($window.width()-295);
-            // set side column width
-            this.$aside.width('295');
-            // set total width
-            this.$container.width($window.width());
+            // not too narrow
+            if($window.width() > 950){
+                if(!nodeshot.layout.$aside.hidden){
+                    // set content column width
+                    this.$content.width($window.width()-295);
+                    // set side column width
+                    this.$aside.width('295');   
+                }
+                else{
+                    this.$content.width($window.width());
+                }
+                // set total width
+                this.$container.width($window.width());
+                // set header width:
+                this.$header.width($window.width());
+            }
             // set map canvas height
             this.$map.height($window.height()-this.$header.height());
+            // set nodeTreeContainer height if not too short
+            var newTreeHeight = this.$container.height()-this.$header.height()-(this.$nodeTreeContainer.position()).top;
+            if(newTreeHeight > 200){
+                this.$nodeTreeContainer.height(newTreeHeight);
+            }
         },
         /*
         * nodeshot.layout.setElementDimensions()
         * set absolute positioning to HTML elements dinamically
         */
         setElementDimensions: function(){
+            this.$header.css({
+                position:'absolute',
+                top: 0,
+                left: 0
+            });
             this.$content.css({
-                position:"absolute",
-                top: this.$header.height(),
+                position:'absolute',
+                marginTop: this.$header.height(),
                 left: 0
             });
             this.$aside.css({
-                position:"absolute",
-                top: this.$header.height(),
-                right: 0
+                //position:'absolute',
+                marginTop: this.$header.height()
+                //right: 0
             });
         },
         /*
@@ -84,12 +105,14 @@ var nodeshot = {
         * calculates absolute top distance to center an object vertically to the window
         */
         verticalCenter: function(obj){
-            var paddingTop = this.getCssInt(obj.css('padding-top'));
-            var paddingBottom = this.getCssInt(obj.css('padding-bottom'));
-            var borderTop = this.getCssInt(obj.css('border-top-width'));
-            var borderBottom = this.getCssInt(obj.css('border-bottom-width'));
-            height = obj.height() + paddingTop + paddingBottom + borderTop + borderBottom;
-            return ($(window).height() - height) / 2;
+            if(obj){
+                var paddingTop = this.getCssInt(obj.css('padding-top'));
+                var paddingBottom = this.getCssInt(obj.css('padding-bottom'));
+                var borderTop = this.getCssInt(obj.css('border-top-width'));
+                var borderBottom = this.getCssInt(obj.css('border-bottom-width'));
+                height = obj.height() + paddingTop + paddingBottom + borderTop + borderBottom;
+                return ($(window).height() - height) / 2;
+            }
         },
         /*
         * nodeshot.layout.bindFocusBlue(obj)
@@ -107,8 +130,19 @@ var nodeshot = {
                     $(this).val(obj[0].defaultValue);
                 }
             });
-        }
-        
+        },
+        /*
+        * nodeshot.layout.initSideControl()
+        * some stuff
+        */
+        initSideControl: function(){
+            $('#hide-side').click(function(e){
+                e.preventDefault();
+                nodeshot.layout.$aside.animate({width: 0},500);
+                nodeshot.layout.$aside.hidden = true;
+                nodeshot.layout.$content.width(nodeshot.layout.$container.width());
+            });
+        }        
     },
     /*
      * nodeshot.overlay
@@ -146,10 +180,6 @@ var nodeshot = {
                     // if dialog is open close it
                     if(nodeshot.layout.$dialog){
                         nodeshot.dialog.close();
-                    }
-                    // if overlay is open close it
-                    if(nodeshot.layout.$overlay){
-                        nodeshot.overlay.close();
                     }
                 })
             }
@@ -198,7 +228,7 @@ var nodeshot = {
         * nodeshot.overlay.open()
         * opens overlay with data and positions to the center of the window
         */
-        open: function(data){
+        open: function(data, closeOnClick){
             this.hideLoading();
             // check if overlay is not already open
             if(!nodeshot.layout.$overlay){
@@ -209,11 +239,42 @@ var nodeshot = {
             // innerHTML
             nodeshot.layout.$overlay.html(data);
             // cache inner object
-            var div = $('#nodeshot-overlay-inner');
+            nodeshot.layout.$overlayInner = $('#nodeshot-overlay-inner');
+            // insert close button to overlay
+            nodeshot.layout.$overlayInner.prepend('<a class="close"></a>');
+            // bind onclick event to close button
+            nodeshot.layout.$overlayInner.find('.close').click(function(){
+                nodeshot.overlay.close();
+            });
             // center overlay to window
-            div.css('margin-top', nodeshot.layout.verticalCenter(div));
+            this.centerVertically();
             // update layout dimensions
             nodeshot.layout.setFullScreen();
+            // if closeOnClick bind click event with a function that closes the overlay
+            if(closeOnClick){
+                nodeshot.layout.$overlay.click(function(e){
+                    nodeshot.overlay.close();
+                });
+                nodeshot.layout.$overlayInner.click(function(){ return false });
+            }
+        },
+        /*
+        * nodeshot.overlay.centerVertically(animate, duration)
+        * center the overlay vertically
+        * if animate is true the overlay will move to the center with an animation of the specified duration
+        */
+        centerVertically: function(animate, duration){
+            // cache calculation
+            var margin = nodeshot.layout.verticalCenter(nodeshot.layout.$overlayInner);
+            // only if margin is positive
+            if(margin>0){
+                if(animate){
+                    nodeshot.layout.$overlayInner.animate({'margin-top': margin}, duration);
+                }
+                else{
+                    nodeshot.layout.$overlayInner.css('margin-top', nodeshot.layout.verticalCenter(nodeshot.layout.$overlayInner));
+                }
+            }  
         },
         /*
         * nodeshot.overlay.bindCancelButton()
@@ -250,6 +311,7 @@ var nodeshot = {
             nodeshot.overlay.removeMask();
             nodeshot.layout.$overlay.remove();
             nodeshot.layout.$overlay = false;
+            nodeshot.layout.$overlayInner = false;
             //$('#addnode').button('option', 'label', 'Aggiungi un nuovo nodo');
             // TODO: move clickListenerHandle inside the nodeshot javascript object
             if (clickListenerHandle) {
@@ -319,7 +381,7 @@ var nodeshot = {
             // ajax get
             $.get(url, function(data) {
                 nodeshot.overlay.hideLoading();
-                nodeshot.overlay.open(data)
+                nodeshot.overlay.open(data, true)
                 // remember we are not using0 $.live() to optimize performance
                 nodeshot.overlay.bindCancelButton();
                 nodeshot.overlay.bindSubmitForm(function(form){
@@ -484,6 +546,47 @@ var nodeshot = {
             if($('#non-field-errors').length > 0){
                 $('#change-password').click();
             }
+        }
+    },
+    
+    advanced: {
+        /*
+        * nodeshot.advanced.init()
+        * init jquery ui tabs and +info buttons in advanced node info
+        */
+        init: function(){
+            nodeshot.overlay.firstTimeLoadingTab = true;
+            $('#advanced-info').tabs({
+                fx: { opacity: 'toggle', height: 'toggle', duration: 400 },
+                show: function(e, ui){
+                    if(nodeshot.overlay.firstTimeLoadingTab){
+                        nodeshot.overlay.firstTimeLoadingTab = false;
+                    }
+                    else{
+                        nodeshot.overlay.centerVertically(true, 400);
+                    }
+                }
+            });
+            $('.toggle-info', '#advanced-info').toggle(
+                function(){
+                    var $this = $(this);
+                    $this.parent().parent().parent().parent().find('.additional').show(300, function(){
+                        nodeshot.overlay.centerVertically(true, 300)
+                    });
+                    $this.removeClass('green');
+                    $this.addClass('red');
+                    $this.text('– info');
+                },
+                function(){
+                    var $this = $(this);
+                    $this.parent().parent().parent().parent().find('.additional').hide(300, function(){
+                        nodeshot.overlay.centerVertically(true, 300)
+                    });
+                    $this.removeClass('red');
+                    $this.addClass('green');
+                    $this.text('+ info');
+                }
+            )
         }
     },
     

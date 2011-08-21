@@ -181,6 +181,23 @@ function handleMarkerClick(marker, node) {
                             tab.height(nodeshot.tab0Height);
                         }
                     }
+                },
+                // advanced tab
+                select: function(e, ui){
+                    if(ui.tab.id=='advanced-link'){
+                        nodeshot.overlay.addMask(0.8, true);
+                        nodeshot.overlay.showLoading();
+                        $.get($(ui.tab).attr('data-url'), function(data) {
+                            // open overlay, closeOnClick = true
+                            nodeshot.overlay.open(data, true);
+                            // init controls
+                            nodeshot.advanced.init();
+                            // we are not using $.live() for performance reasons
+                            nodeshot.overlay.bindCancelButton();
+                            // todo
+                        });
+                        return false
+                    }
                 }
             });
             nodeshot.contact.link();
@@ -188,7 +205,7 @@ function handleMarkerClick(marker, node) {
             nodeshot.layout.bindFocusBlur(search_input);
             // Implements the search function
             search_input.autocomplete({
-                minLength: 4,
+                minLength: 3,
                 source: function(req, add) {
                     $.getJSON("search/"+req.term+'/', function(data) {
                         if (data != null && data.length > 0) 
@@ -337,78 +354,6 @@ function remove_markers(type) {
     }
 }
 
-//var nodeshotModal = function(message, callback){
-//    nodeshotMask();
-//    $('body').append('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
-//    var modal = $('#nodeshot-modal');
-//    modal.css({
-//        opacity: 0,
-//        display: 'block',
-//        left: ($(window).width() - modal.width()) / 2,
-//        top: ($(window).height() - modal.height()) / 3
-//    }).animate({
-//        opacity: 1
-//    }, 500);
-//    
-//    $('#nodeshot-modal-close').click(function(){
-//        var dialog = $(this).parent();
-//        dialog.fadeOut(500, function(){
-//            dialog.remove();
-//        })
-//        nodeshotRemoveMask();
-//        if(callback){
-//            callback();
-//        }
-//    });
-//}
-//
-//var nodeshotShowLoading = function(){
-//    img = $('#nodeshot-ajaxloader');
-//    img.css({
-//        left: ($(window).width()-img.width()) / 2,
-//        top: ($(window).height()-img.height()) / 2
-//    });
-//}
-//
-//var nodeshotHideLoading = function(){
-//    $('#nodeshot-ajaxloader').css('top', '-9999px');
-//}
-//
-//var nodeshotMask = function(opacity){
-//    if(document.getElementById("nodeshot-modal-mask") != null){
-//        return false;
-//    }
-//    if(!opacity){ opacity = 0.5 }
-//    $('body').append('<div id="nodeshot-modal-mask"></div>');
-//    $('#nodeshot-modal-mask').css({
-//        opacity: 0,
-//        display: 'block'
-//    }).animate({
-//        opacity: opacity
-//    }, 500);
-//}
-//
-//var nodeshotRemoveMask = function(){
-//    var mask = $('#nodeshot-modal-mask');
-//    if(mask.length < 1){
-//        return false;
-//    }
-//    mask.fadeOut(500, function(){
-//        mask.remove();
-//    });
-//}
-//
-//var nodeshotCloseForm = function(){
-//    nodeshotRemoveMask();
-//    $('#nodeshot-overlay').remove();
-//    $('#addnode').button('option', 'label', 'Aggiungi un nuovo nodo');
-//    if (clickListenerHandle) {
-//        google.maps.event.removeListener(clickListenerHandle);
-//        clickListenerHandle = null;
-//    }
-//}
-
-
 var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
 $(document).keydown(function(e) {
   kkeys.push( e.keyCode );
@@ -428,7 +373,7 @@ function initialize() {
     $(function() {
         // Implements the search function 
         $("#search").autocomplete({
-            minLength: 4,
+            minLength: 3,
             source: function(req, add) {
                 $.getJSON("search/"+req.term+'/', function(data) {
                     if (data != null && data.length > 0) 

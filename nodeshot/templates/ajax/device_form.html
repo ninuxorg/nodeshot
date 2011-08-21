@@ -1,6 +1,7 @@
 {% extends 'ajax/base_form.html' %}
 {% block h1 %}Modifica device di "{{ node.name }}"{% endblock %}
 {% block device_link_extra %} class="active"{% endblock %}
+{% block delete_node_link %}{% endblock %}
 {% block form_content %}
 <fieldset>
     {% if saved %}

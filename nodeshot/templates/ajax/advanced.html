@@ -1,0 +1,90 @@
+<div id="nodeshot-overlay-inner" class="content larger">
+    {% if devices|length > 0 %}
+    <p class="nomargintop">Informazioni avanzate su apparati, interfacce e hna4 destinate ad utenti esperti.</p>
+    <div id="advanced-info" class="ui-tabs ui-widget ui-widget-content ui-corner-all">        
+        
+        <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+        {% for device in devices %}
+            <li class="ui-state-default ui-corner-top ui-tabs-selected{% if forloop.first %} ui-state-active{% endif %}"><a href="#device{{ forloop.counter }}">{{ device.name }}</a></li>
+        {% endfor %}
+        </ul>
+        {% for device in devices %}
+        <div id="device{{ forloop.counter }}" class="device ui-tabs-panel ui-corner-bottom">
+            <table class="list-values">
+                {% if device.type %}
+                <tr>
+                    <td class="key">Tipo:</td><td class="value">{{ device.type }}</td>
+                </tr>
+                {% endif %}
+                {% if device.description %}
+                <tr>
+                    <td class="key">Descrizione:</td><td class="value">{{ device.description }}</td>
+                </tr>
+                {% endif %}
+                {% if device.routing_protocol %}
+                <tr>
+                    <td class="key">Protocollo di routing:</td><td class="value">{{ device.routing_protocol }} {{ device.routing_protocol_version }}</td>
+                </tr>
+                {% endif %}
+            </table>
+            {% for interface in device.interface_set.all %}
+            <div class="configuration{% if forloop.first %} first{% endif %}">
+                <h3>Interfaccia {{ interface.get_type_display }}</h3>
+                <table class="list-values">
+                    <tbody class="essential">
+                        <tr>
+                            <td class="key">IPv4:</td><td class="value">{{ interface.ipv4_address }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">IPv6:</td><td class="value">{{ interface.ipv6_address }}</td>
+                        </tr>                  
+                        <tr>
+                            <td class="key">Stato:</td><td class="value">{{ interface.get_status_display }}</td>
+                        </tr>
+                        {% if interface.type != 'v' %}
+                        <tr>
+                            <td colspan="2">
+                                <a class="toggle-info green">+ info</a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                    <tbody class="additional hidden">
+                        {% if interface.type == 'w' %}
+                        <tr>
+                            <td class="key">Wireless mode:</td><td class="value">{{ interface.wireless_mode }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Wireless channel:</td><td class="value">{{ interface.wireless_channel }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Wireless polarity:</td><td class="value">{{ interface.wireless_polarity }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">SSID:</td><td class="value">{{ interface.ssid }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td class="key">MAC address:</td><td class="value">{{ interface.mac_address }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+            {% for hna4 in device.hnav4_set.all %}
+            <div class="configuration">
+                <h3>Hna4</h3>
+                <table class="hna4 list-values">
+                    <tr>
+                        <td class="key">Hna4 route:</td><td class="value">{{ hna4.route }}</td>
+                    </tr>
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div><!--/#advanced-info-->
+    {% else %}
+    <p class="nomargintop">Informazioni avanzate non disponibili per questo nodo.</p>
+    {% endif %}
+</div><!--/#nodeshot-overlay-inner.content-->

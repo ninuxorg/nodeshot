@@ -1,8 +1,8 @@
 <div id="info-window" class="tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
     <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
         <li class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active"><a href="#tab-info"><span>Info</span></a></li>
-        <!--<li><a href="#tab-dev"><span>Devices</span></a></li>-->
         <li class="ui-state-default ui-corner-top"><a href="#tab-dist"><span>Distanza</span></a></li>
+        {% if node.status != 'p' %}<li class="ui-state-default ui-corner-top"><a href="#tab-advanced" id="advanced-link" data-url="{% url nodeshot_node_advanced node.id %}" ><span>Avanzate</span></a></li>{% endif %}
     </ul>
 
     <div id="tab-info" class="content ui-tabs-panel ui-widget-content ui-corner-bottom">
@@ -13,6 +13,9 @@
             </tr>
             <tr>
                 <td class="key">Descrizione:</td><td class="value">{{ node.description }}</td>
+            </tr>
+            <tr>
+                <td class="key">Cap:</td><td class="value">{{ node.postal_code }}</td>
             </tr>
             <tr>
                 <td class="key">Responsabile:</td><td class="value">{{ node.owner }}</td>
@@ -34,35 +37,15 @@
         <a href="{% url nodeshot_auth_node node.id %}" class="button link">Modifica nodo</a>
     </div>
 
-    <!--<div id="tab-dev">
-        {% for device in devices %}
-        <table>
-            <tr>
-                <td>Nome:</td><td>{{device.name}}</td>
-            </tr>
-            <tr>
-                <td>Modello:</td><td>{{device.type}}</td>
-            </tr>
-            <tr>
-                <td>Protocollo di routing:</td><td>{{device.routing_protocol}}</td>
-            </tr>
-            <tr>
-                <td>Data di creazione:</td><td>{{device.added}}</td>
-            </tr>
-            {% for interface in device.interface_set.all %}
-            <tr>
-                <td>IPv4:</td><td>{{interface.ipv4_address}}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% endfor %}
-    </div>-->
-
     <div id="tab-dist" class="content ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>Calcola distanza</h3>
         <p>Calcola la distanza tra "{{ node.name }}" e un'altro nodo a tuo piacimento.</p>
         <!--<p>Il risultato può essere salvato in modo da poter confrontare più risultati tra loro.</p>-->
         <table class="list-values">
+            <tr>
+                <td class="key valigncenter">Cerca il nodo:</td>
+                <td class="value"><input id="distance-search" class="text" value="Cerca nodo, ip, mac, ssid" /></td>
+            </tr>
             <tr>
                 <td class="key valignmiddle">Seleziona il nodo:</td>
                 <td class="value">
@@ -89,14 +72,10 @@
                     </select>
                 </td>
             </tr>
-            <tr>
-                <td class="key valigncenter">Cerca il nodo:</td>
-                <td class="value"><input id="distance-search" class="text" value="Cerca nodo, ip, mac, ssid" /></td>
-            </tr>
         </table>    
         <p id="result-row" class="hidden">
             Risultato: <b><span id="result"></span> km</b>
         </p>
     </div>
-
+    {% if node.status != 'p' %}<div id="tab-advanced"></div>{% endif %}
 </div>
