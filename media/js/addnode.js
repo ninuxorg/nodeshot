@@ -12,6 +12,7 @@ var nodeshot = {
         * caches some jquery objects
         */
         cacheObjects: function(){
+            this.$body = $('body');
             this.$container = $('#container');
             this.$header = $('#header');
             this.$content = $('#content');
@@ -29,6 +30,11 @@ var nodeshot = {
             var $window = $(window);
             // not too narrow
             if($window.width() > 950){
+                // set total width
+                this.$container.width($window.width());
+                // set header width:
+                this.$header.width($window.width());
+                // if side column is not hidden
                 if(!nodeshot.layout.$aside.hidden){
                     // set content column width
                     this.$content.width($window.width()-295);
@@ -36,12 +42,9 @@ var nodeshot = {
                     this.$aside.width('295');   
                 }
                 else{
+                    // set content 100%
                     this.$content.width($window.width());
                 }
-                // set total width
-                this.$container.width($window.width());
-                // set header width:
-                this.$header.width($window.width());
             }
             // set map canvas height
             this.$map.height($window.height()-this.$header.height());
@@ -93,12 +96,14 @@ var nodeshot = {
         * calculates absolute left distance to center an object horizontally to the window
         */
         horizontalCenter: function(obj){
-            var paddingLeft = this.getCssInt(obj.css('padding-left'));
-            var paddingRight = this.getCssInt(obj.css('padding-right'));
-            var borderLeft = this.getCssInt(obj.css('border-left-width'));
-            var borderRight = this.getCssInt(obj.css('border-right-width'));
-            width = obj.width() + paddingLeft + paddingRight + borderLeft + borderRight;
-            return ($(window).width() - width) / 2;
+            if(obj){
+                var paddingLeft = this.getCssInt(obj.css('padding-left'));
+                var paddingRight = this.getCssInt(obj.css('padding-right'));
+                var borderLeft = this.getCssInt(obj.css('border-left-width'));
+                var borderRight = this.getCssInt(obj.css('border-right-width'));
+                width = obj.width() + paddingLeft + paddingRight + borderLeft + borderRight;
+                return ($(window).width() - width) / 2;   
+            }
         },
         /*
         * nodeshot.layout.verticalCenter()
@@ -132,16 +137,167 @@ var nodeshot = {
             });
         },
         /*
+        * nodeshot.layout.initSearchAddress()
+        * search an address on google maps
+        */
+        initSearchAddress: function(){
+            $('#search-address').click(function(e){
+                e.preventDefault();
+                if(infoWindow){
+                    infoWindow.close()
+                }
+                nodeshot.overlay.addMask();
+                var data = '<div id="nodeshot-overlay-inner" class="content narrower"><div id="gmap-search"><h3>Cerca un\'indirizzo</h3><p>Inserisci l\'indirizzo completo</p><p><input type="text" class="text" id="gmap-address" value="Viale Guglielmo Massaia, Roma" /><input class="button" type="submit" value="Cerca" id="gmap-submit" /></p></div></div>';
+                nodeshot.overlay.open(data, false, removeNewMarker);
+                
+                var input = $('#gmap-address');
+                
+                // bind keypress of search field
+                input.bind('keypress', function(e) {
+                    var code = (e.keyCode ? e.keyCode : e.which);
+                    // if pressing enter
+                    if (code == 13 && input.val()!=''){
+                        nodeshot.layout.searchAddress(input.val(), input);
+                    }
+                    // if just typing
+                    else{
+                        // remove eventual error class
+                        if(input.hasClass('error')){
+                            input.removeClass('error');
+                        }
+                    }
+                });
+                $('#gmap-submit').click(function(){
+                    nodeshot.layout.searchAddress(input.val(), input);
+                });
+            });
+        },
+        searchAddress: function(address, input){
+            if (geocoder) {
+                // gmap geocode
+                geocoder.geocode({ 'address': address }, function (results, status) {
+                    // if address has been found
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        // remove mask
+                        nodeshot.overlay.removeMask();
+                        // save actions in this function that will be executed later
+                        var moveMap = function(results){
+                            var latlng = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
+                            if(nodeshot.gmap.addressMarker){
+                                nodeshot.gmap.removeAddressMarker();
+                            }
+                            nodeshot.gmap.addressMarker = new google.maps.Marker({
+                                position: latlng,
+                                map: map
+                            });
+                            map.panTo(latlng);
+                            map.setZoom(16);
+                        }
+                        // if overlay hasn't been moved yet
+                        if(!nodeshot.layout.$overlayInner.hasClass('ui-draggable')){
+                            nodeshot.layout.$overlayInner.css({
+                                top: nodeshot.layout.$overlayInner.css('margin-top'),
+                                left: (nodeshot.layout.$overlayInner.position()).left,
+                                position: 'absolute',
+                                marginTop: 0
+                            })
+                            nodeshot.layout.$overlay.css({
+                                width: 0,
+                                height: 0
+                            });
+                            nodeshot.layout.$overlayInner.animate({
+                                top: 50,
+                                left: 80
+                            },
+                            // when animation is finished
+                            function(){
+                                // make the overlay draggable
+                                nodeshot.layout.$overlayInner.draggable();
+                                // update google map
+                                moveMap(results);
+                            });
+                        }
+                        // if overlay has already been moved
+                        else{
+                            // just update google map
+                            moveMap(results);
+                        }
+                    }
+                    // if address not found
+                    else {
+                        input.addClass('error');
+                    }
+                });
+            }
+        },
+        /*
         * nodeshot.layout.initSideControl()
-        * some stuff
+        * hide / show side column
         */
         initSideControl: function(){
+            // append invisible show-column button
+            this.$body.append('<a id="show-column"></a>');
+            // cache it
+            this.$showColumn = $('#show-column');
+            // bind click event on hide-side
             $('#hide-side').click(function(e){
                 e.preventDefault();
-                nodeshot.layout.$aside.animate({width: 0},500);
-                nodeshot.layout.$aside.hidden = true;
-                nodeshot.layout.$content.width(nodeshot.layout.$container.width());
+                // disable scrollbars
+                nodeshot.layout.$body.css('overflow', 'hidden');
+                // prepare column to be moved
+                nodeshot.layout.$aside.css({
+                    right: 0,
+                    position: 'absolute'
+                });
+                // hide column with an animation
+                nodeshot.layout.$aside.animate({right: -300},500,function(){
+                    // be sure $aside is hidden
+                    nodeshot.layout.$aside.hide();
+                    nodeshot.layout.$aside.hidden = true;
+                });
+                // enlarge the content with an animation
+                nodeshot.layout.$content.animate({width: nodeshot.layout.$header.width()},500,function(){
+                    nodeshot.layout.$showColumn.show(500);
+                });
+                // reset dimensions and re-enable scrollbar with some delay
+                setTimeout(function(){
+                    nodeshot.layout.setFullScreen();
+                    // re-enable scrollbar
+                    nodeshot.layout.$body.css('overflow', 'auto');
+                }, 600);      
             });
+            this.$showColumn.css('opacity', 0.3).hover(
+                // mouse-enter
+                function(){
+                    nodeshot.layout.$showColumn.fadeTo(250, 1);
+                },
+                // mouse-out
+                function(){
+                    nodeshot.layout.$showColumn.fadeTo(250, 0.3);
+                }
+            ).click(function(){
+                // disable scrollbar
+                nodeshot.layout.$body.css('overflow', 'hidden');
+                // set side column width
+                nodeshot.layout.$aside.show().animate({
+                    right: 0
+                }, function(){
+                    nodeshot.layout.$aside.hidden = false;
+                    nodeshot.layout.$aside.css('position', 'static');
+                    
+                });
+                // set content column width
+                nodeshot.layout.$content.animate({
+                    width: $(window).width()-295
+                });
+                // hide show button
+                nodeshot.layout.$showColumn.hide(500);
+                // reset dimensions and re-enable scrollbar with some delay
+                setTimeout(function(){                    
+                    nodeshot.layout.setFullScreen();
+                    nodeshot.layout.$body.css('overflow', 'auto');
+                },600);
+            });            
         }        
     },
     /*
@@ -228,12 +384,13 @@ var nodeshot = {
         * nodeshot.overlay.open()
         * opens overlay with data and positions to the center of the window
         */
-        open: function(data, closeOnClick){
+        open: function(data, closeOnClick, callback){
             this.hideLoading();
             // check if overlay is not already open
-            if(!nodeshot.layout.$overlay){
-                $('body').append('<div id="nodeshot-overlay"></div>');   
+            if(nodeshot.layout.$overlay){
+                nodeshot.layout.$overlay.remove();
             }
+            nodeshot.layout.$body.append('<div id="nodeshot-overlay"></div>');   
             // cache jquery object
             nodeshot.layout.$overlay = $('#nodeshot-overlay');
             // innerHTML
@@ -320,12 +477,24 @@ var nodeshot = {
             nodeshot.layout.$overlay.remove();
             nodeshot.layout.$overlay = false;
             nodeshot.layout.$overlayInner = false;
+            // reset dimensions
+            nodeshot.layout.setFullScreen();
             //$('#addnode').button('option', 'label', 'Aggiungi un nuovo nodo');
             // TODO: move clickListenerHandle inside the nodeshot javascript object
             if (clickListenerHandle) {
                 google.maps.event.removeListener(clickListenerHandle);
                 clickListenerHandle = null;
             }
+            // delete any address marker
+            if(nodeshot.gmap.addressMarker){
+                nodeshot.gmap.removeAddressMarker();                
+            }
+        }
+    },
+    gmap:{
+        removeAddressMarker: function(){
+            nodeshot.gmap.addressMarker.setMap(null);
+            delete nodeshot.gmap.addressMarker;
         }
     },
     /*
@@ -578,6 +747,7 @@ var nodeshot = {
                 show: function(e, ui){
                     if(nodeshot.overlay.firstTimeLoadingTab){
                         nodeshot.overlay.firstTimeLoadingTab = false;
+                        nodeshot.overlay.centerVertically();
                     }
                     else{
                         nodeshot.overlay.centerVertically(true, 400);

@@ -154,89 +154,94 @@ function initialize_map() {
 }
 
 function handleMarkerClick(marker, node) {
-  return function() {
-    $.get(__project_home__+'info_window/'+node.id+'/', function(data) {
-        // add listener to domready of infowindows - it will be triggered when the infoWindow is ready
-        google.maps.event.addListener(infoWindow, 'domready', function(){
-            $(".tabs").tabs({
-                // save height of first tab for comparison
-                create: function(e, ui){
-                    // cache $(this)
-                    $this = $(this);
-                    // save height of active tab in nodeshot object
-                    nodeshot.tab0Height = $this.find('.ui-tabs-panel').eq($this.tabs('option', 'selected')).height();
-                },
-                // change height of tab if tab is shorter
-                show: function(e, ui){
-                    // cache object
-                    $this = $(this);
-                    // if distance tab
-                    if($this.tabs('option', 'selected')===1){
+    return function() {
+        // if overlay is open
+        if(nodeshot.layout.$overlay){
+            // close it first
+            nodeshot.overlay.close();
+        }
+        $.get(__project_home__+'info_window/'+node.id+'/', function(data) {
+            // add listener to domready of infowindows - it will be triggered when the infoWindow is ready
+            google.maps.event.addListener(infoWindow, 'domready', function(){
+                $(".tabs").tabs({
+                    // save height of first tab for comparison
+                    create: function(e, ui){
+                        // cache $(this)
+                        $this = $(this);
+                        // save height of active tab in nodeshot object
+                        nodeshot.tab0Height = $this.find('.ui-tabs-panel').eq($this.tabs('option', 'selected')).height();
+                    },
+                    // change height of tab if tab is shorter
+                    show: function(e, ui){
                         // cache object
-                        var tab = $this.find('.ui-tabs-panel').eq(1);
-                        // save this height
-                        nodeshot.tab1Height = tab.height();
-                        // compare and if first tab was higher set the same height
-                        if(nodeshot.tab0Height > nodeshot.tab1Height){
-                            tab.height(nodeshot.tab0Height);
+                        $this = $(this);
+                        // if distance tab
+                        if($this.tabs('option', 'selected')===1){
+                            // cache object
+                            var tab = $this.find('.ui-tabs-panel').eq(1);
+                            // save this height
+                            nodeshot.tab1Height = tab.height();
+                            // compare and if first tab was higher set the same height
+                            if(nodeshot.tab0Height > nodeshot.tab1Height){
+                                tab.height(nodeshot.tab0Height);
+                            }
+                        }
+                    },
+                    // advanced tab
+                    select: function(e, ui){
+                        if(ui.tab.id=='advanced-link'){
+                            nodeshot.overlay.addMask(0.8, true);
+                            nodeshot.overlay.showLoading();
+                            $.get($(ui.tab).attr('data-url'), function(data) {
+                                // open overlay, closeOnClick = true
+                                nodeshot.overlay.open(data, true);
+                                // init controls
+                                nodeshot.advanced.init();
+                                // we are not using $.live() for performance reasons
+                                nodeshot.overlay.bindCancelButton();
+                                // todo
+                            });
+                            return false
                         }
                     }
-                },
-                // advanced tab
-                select: function(e, ui){
-                    if(ui.tab.id=='advanced-link'){
-                        nodeshot.overlay.addMask(0.8, true);
-                        nodeshot.overlay.showLoading();
-                        $.get($(ui.tab).attr('data-url'), function(data) {
-                            // open overlay, closeOnClick = true
-                            nodeshot.overlay.open(data, true);
-                            // init controls
-                            nodeshot.advanced.init();
-                            // we are not using $.live() for performance reasons
-                            nodeshot.overlay.bindCancelButton();
-                            // todo
+                });
+                nodeshot.contact.link();
+                var search_input = $("#distance-search");
+                nodeshot.layout.bindFocusBlur(search_input);
+                // Implements the search function
+                search_input.autocomplete({
+                    minLength: 3,
+                    source: function(req, add) {
+                        $.getJSON("search/"+req.term+'/', function(data) {
+                            if (data != null && data.length > 0) 
+                                add(data);
+                            else
+                                add("");
                         });
-                        return false
+                    },
+                    select: function(event, ui) {
+                        nodeshot.distance.calculate({
+                            from_name: infoWindow.node.name,
+                            from_slug: infoWindow.node.slug,
+                            from_lat: infoWindow.node.lat,
+                            from_lng: infoWindow.node.lng,
+                            to_name: ui.item.name,
+                            to_slug: ui.item.value,
+                            to_lat: ui.item.lat,
+                            to_lng: ui.item.lng
+                        });
+                        search_input.val(ui.item.label)
+                        return false;
                     }
-                }
+                });
+                nodeshot.layout.setFullScreen();
             });
-            nodeshot.contact.link();
-            var search_input = $("#distance-search");
-            nodeshot.layout.bindFocusBlur(search_input);
-            // Implements the search function
-            search_input.autocomplete({
-                minLength: 3,
-                source: function(req, add) {
-                    $.getJSON("search/"+req.term+'/', function(data) {
-                        if (data != null && data.length > 0) 
-                            add(data);
-                        else
-                            add("");
-                    });
-                },
-                select: function(event, ui) {
-                    nodeshot.distance.calculate({
-                        from_name: infoWindow.node.name,
-                        from_slug: infoWindow.node.slug,
-                        from_lat: infoWindow.node.lat,
-                        from_lng: infoWindow.node.lng,
-                        to_name: ui.item.name,
-                        to_slug: ui.item.value,
-                        to_lat: ui.item.lat,
-                        to_lng: ui.item.lng
-                    });
-                    search_input.val(ui.item.label)
-                    return false;
-                }
-            });
-            nodeshot.layout.setFullScreen();
+            infoWindow.setContent(data);
+            infoWindow.maxWidth = 500;
+            infoWindow.open(map, marker);
+            infoWindow.node = node;
         });
-        infoWindow.setContent(data);
-        infoWindow.maxWidth = 500;
-        infoWindow.open(map, marker);
-        infoWindow.node = node;
-    });
-  };
+    };
 } 
 
 function calc_distance(lat1, lon1, lat2, lon2, unit) {
@@ -326,7 +331,7 @@ function draw_nodes(type) {
     // draw links if type is active
     if (type == 'a') {
         for (var i = 0; i < nodes.links.length; i++) {
-            if ($("input[name='link-quality-selector']:checked").val() == 'etx')
+            if ($("#link-quality-selector input:checked").val() == 'etx')
                 draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].etx);
             else
                 draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].dbm);
@@ -426,11 +431,11 @@ function initialize() {
         text: false
     });
 
-    $('#addnode').button({
-         icons: {
-            primary: "ui-icon-plusthick"
-        }   
-    });
+    //$('#addnode').button({
+    //     icons: {
+    //        primary: "ui-icon-plusthick"
+    //    }   
+    //});
 
     $('#addnode').click(function() {
         nodeshot.dialog.open('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
@@ -451,29 +456,6 @@ function initialize() {
     document.getElementById('radio4').checked=false;
     $("#view-radio").buttonset("refresh");
     //$("#link-quality-selector").buttonset("refresh");
-
-
-    /* Type an address and go to that address on the map */
-    $('#search-address').bind('keypress', function(e) {
-        var code = (e.keyCode ? e.keyCode : e.which);
-        if (!$(this).val())
-            $(this).css('background', 'none');
-        if(code == 13) { //Enter keycode
-            var address = $(this).val();
-            if (geocoder) {
-                geocoder.geocode({ 'address': address }, function (results, status) {
-                            if (status == google.maps.GeocoderStatus.OK) {
-                                var latlng = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
-                                map.panTo(latlng); 
-                                $('#search-address').css('background' , '#00CD66');
-                            } 
-                            else {
-                                $('#search-address').css('background' , '#F08080');
-                            }
-                });
-            }
-        }
-    });
 
     /* distance calculation */
     $('#distance-select').live('change',function(){
@@ -499,7 +481,7 @@ function initialize() {
     });
     
     /* visualize ETX values or dbm values */
-    $("input[name='link-quality-selector']").change(function(){
+    $("#link-quality-selector input").change(function(){
         remove_markers('a'); 
         draw_nodes('a'); 
     });
@@ -553,28 +535,28 @@ function initialize() {
 
     $.getJSON(__project_home__+"nodes.json", function(data) {
         nodes = data;
-        if ( $('#hotspot').is(':checked') )
-            draw_nodes('h');
-        if ( $('#active').is(':checked') )
-            draw_nodes('a');
+        //if ( $('#hotspot').is(':checked') )
+        draw_nodes('h');
+        //if ( $('#active').is(':checked') )
+        draw_nodes('a');
         if ( $('#potential').is(':checked') )
             draw_nodes('p');
     });
 
     /* view active nodes */
-    $('#active').change(function() {
-        if ($(this).is(':checked')) {
-            if (markersArray.active.length == 0)
-                draw_nodes('a');
-        } else {
-            if (markersArray.active.length > 0) {
-                remove_markers('a');
-                markersArray.links = [];
-                markersArray.active = [];
-                markersArray.activeListeners  = [];
-            }
-        }
-    });
+    //$('#active').change(function() {
+    //    if ($(this).is(':checked')) {
+    //        if (markersArray.active.length == 0)
+    //            draw_nodes('a');
+    //    } else {
+    //        if (markersArray.active.length > 0) {
+    //            remove_markers('a');
+    //            markersArray.links = [];
+    //            markersArray.active = [];
+    //            markersArray.activeListeners  = [];
+    //        }
+    //    }
+    //});
 
     /* view potential nodes */
     $('#potential').change(function() {
@@ -591,17 +573,17 @@ function initialize() {
     });
     
     /* view hotspot nodes */
-    $('#hotspot').change(function() {
-        if ($(this).is(':checked')) {
-            if (markersArray.hotspot.length == 0)
-                draw_nodes('h');
-        } else {
-            if (markersArray.hotspot.length > 0) {
-                remove_markers('h');
-                markersArray.hotspot = [];
-                markersArray.hotspotListeners  = [];
-            }
-        }
-    });
+    //$('#hotspot').change(function() {
+    //    if ($(this).is(':checked')) {
+    //        if (markersArray.hotspot.length == 0)
+    //            draw_nodes('h');
+    //    } else {
+    //        if (markersArray.hotspot.length > 0) {
+    //            remove_markers('h');
+    //            markersArray.hotspot = [];
+    //            markersArray.hotspotListeners  = [];
+    //        }
+    //    }
+    //});
 };
 
