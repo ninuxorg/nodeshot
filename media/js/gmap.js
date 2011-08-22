@@ -62,7 +62,7 @@ function findMarker(nodeSlug) {
     } else if (nodeStatus == 'h' &&  ! $('#hotspot').is(':checked') ) {
         $('#hotspot').attr('checked', true);
         draw_nodes('h');
-    } else if (nodeStatus == 'p' &&  ! $('#potential').is(':checked') ) {
+    } else if (nodeStatus == 'p' &&  ! $('#potential').is(':checked')) {
         $('#potential').attr('checked', true);
         draw_nodes('p');
     }
@@ -376,6 +376,9 @@ function initialize() {
     initialize_map();
     // Jquery autocomplete
     $(function() {
+        
+        nodeshot.init();
+        
         // Implements the search function 
         $("#search").autocomplete({
             minLength: 3,
@@ -388,7 +391,7 @@ function initialize() {
                 });
             },
             select: function(event, ui) {
-                var choice = $("input[name='view-radio']:checked").val();
+                var choice = $("#view-radio input:checked").val();
                 if (choice == 'map'){
                     // go to point on map
                     mapGoTo(ui.item.value);
@@ -446,7 +449,7 @@ function initialize() {
         });
     });
 
-    $( "#view-radio" ).buttonset();
+    $("#view-radio").buttonset();
     //$( "#link-quality-selector" ).buttonset();
     //document.getElementById('etx').checked=true;
     //document.getElementById('dbm').checked=false;
@@ -458,6 +461,7 @@ function initialize() {
     //$("#link-quality-selector").buttonset("refresh");
 
     /* distance calculation */
+    // todo: change live
     $('#distance-select').live('change',function(){
         // cache $(this)
         $this = $(this);
@@ -482,28 +486,31 @@ function initialize() {
     
     /* visualize ETX values or dbm values */
     $("#link-quality-selector input").change(function(){
-        remove_markers('a'); 
+        $.cookie('nodeshot_link_quality', this.id, { expires: 365, path: __project_home__ });
+        remove_markers('a');
         draw_nodes('a'); 
     });
 
     /* dynamically load map,info,olsr and vpn when the radio button is pressed */
-    $("input[name='view-radio']").change(function(){
-        var choice = $("input[name='view-radio']:checked").val();
+    $("#view-radio input").change(function(){
+        var choice = this.value;
         if (choice == 'map') {
             nodeshot.overlay.addMask(0.7);
             nodeshot.overlay.showLoading();
-            $('#content').html("<div id='map_canvas' style='width:100%; height:700px'></div> ");
+            nodeshot.layout.$content.html('<div id="map_canvas"></div><div id="side-links"></div>');
             initialize_map();
-            if ($('#active').is(':checked') ) 
-                draw_nodes('a');
-            if ($('#hotspot').is(':checked') )
-                draw_nodes('h');
+            nodeshot.init();
+            draw_nodes('a');
+            draw_nodes('h');
             if ($('#potential').is(':checked') )
                 draw_nodes('p');
         } else if (choice == 'info') {
+            nodeshot.layout.$map = false;
             nodeshot.overlay.addMask(0.7);
             nodeshot.overlay.showLoading();
-            $('#content').load(__project_home__+'info_tab' , function() {
+            nodeshot.layout.$content.load(__project_home__+'info_tab' , function() {
+                nodeshot.layout.$infoWrapper = $('#info-wrapper');
+                nodeshot.layout.setFullScreen();
                 nodeshot.overlay.removeMask();
                 nodeshot.overlay.hideLoading();
                 $("#myTable").tablesorter(); 
@@ -520,16 +527,16 @@ function initialize() {
     $("#node-tree")
         /*.bind("open_node.jstree close_node.jstree", function (e) {
                 alert("Last operation: " + e.type);
-        })*/.jstree({ 
+        })*/.jstree({
         "json_data" : {
             "ajax" : {
                 "url" : __project_home__+"node_list.json",
-                "data" : function (n) { 
+                "data" : function (n) {
                     return { id : n.attr ? n.attr("id") : 0 }; 
                 }
             }
         },
-        'themes' : {'theme' : 'apple'},
+        'themes' : {'theme' : 'classic'},
         "plugins" : [ "themes", "json_data"  ]
     });
 
@@ -561,9 +568,11 @@ function initialize() {
     /* view potential nodes */
     $('#potential').change(function() {
         if ($(this).is(':checked')) {
+            $.cookie('nodeshot_potential_nodes', 'true', { expires: 365, path: __project_home__ });
             if (markersArray.potential.length == 0)
                 draw_nodes('p');
         } else {
+            $.cookie('nodeshot_potential_nodes', 'false', { expires: 365, path: __project_home__ });
             if (markersArray.potential.length > 0) {
                 remove_markers('p');
                 markersArray.potential = [];

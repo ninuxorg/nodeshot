@@ -111,13 +111,9 @@
         
         // when content has been loaded
         $(window).load(function(){
-            nodeshot.layout.cacheObjects();
-            nodeshot.distance.remember();
             nodeshot.layout.setFullScreen();
             nodeshot.layout.setElementDimensions();
             nodeshot.overlay.appendLoading();
-            nodeshot.layout.initSideControl();
-            nodeshot.layout.initSearchAddress();
         // update dimensions on resize
         }).resize(function(){
             nodeshot.layout.setFullScreen();

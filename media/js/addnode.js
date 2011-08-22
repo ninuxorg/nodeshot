@@ -2,6 +2,14 @@
  */
 
 var nodeshot = {
+    
+    init: function(){
+        nodeshot.layout.cacheObjects();
+        nodeshot.layout.initSideControl();
+        nodeshot.layout.initSearchAddress();
+        nodeshot.distance.remember();
+    },
+    
     /*
      * nodeshot.layout
      * handle the css dynamically
@@ -20,6 +28,7 @@ var nodeshot = {
             this.$map = $('#map_canvas');
             this.$sideLinks = $('#side-links');
             this.$nodeTreeContainer = $('#node-tree-container');
+            this.$hideSide = $('#hide-side');
         },
         /*
         * nodeshot.layout.setFullScreen()
@@ -46,8 +55,13 @@ var nodeshot = {
                     this.$content.width($window.width());
                 }
             }
-            // set map canvas height
-            this.$map.height($window.height()-this.$header.height());
+            if(this.$map){
+                // set map canvas height
+                this.$map.height($window.height()-this.$header.height());
+            }
+            else{
+                this.$infoWrapper.height($window.height()-this.$header.height());
+            }
             // set nodeTreeContainer height if not too short
             var newTreeHeight = this.$container.height()-this.$header.height()-(this.$nodeTreeContainer.position()).top;
             if(newTreeHeight > 200){
@@ -147,13 +161,13 @@ var nodeshot = {
                     infoWindow.close()
                 }
                 nodeshot.overlay.addMask();
-                var data = '<div id="nodeshot-overlay-inner" class="content narrower"><div id="gmap-search"><h3>Cerca un\'indirizzo</h3><p>Inserisci l\'indirizzo completo</p><p><input type="text" class="text" id="gmap-address" value="Viale Guglielmo Massaia, Roma" /><input class="button" type="submit" value="Cerca" id="gmap-submit" /></p></div></div>';
+                var data = '<div id="nodeshot-overlay-inner" class="content narrower"><div id="gmap-search"><h3>Cerca un\'indirizzo</h3><p>Inserisci l\'indirizzo completo</p><p><input type="text" class="text" id="gmap-address" /><input class="button" type="submit" value="Cerca" id="gmap-submit" /></p></div></div>';
                 nodeshot.overlay.open(data, false, removeNewMarker);
                 
                 var input = $('#gmap-address');
                 
-                // bind keypress of search field
-                input.bind('keypress', function(e) {
+                // bind keyup of search field
+                input.bind('keyup', function(e) {
                     var code = (e.keyCode ? e.keyCode : e.which);
                     // if pressing enter
                     if (code == 13 && input.val()!=''){
@@ -240,7 +254,7 @@ var nodeshot = {
             // cache it
             this.$showColumn = $('#show-column');
             // bind click event on hide-side
-            $('#hide-side').click(function(e){
+            this.$hideSide.click(function(e){
                 e.preventDefault();
                 // disable scrollbars
                 nodeshot.layout.$body.css('overflow', 'hidden');
@@ -264,7 +278,9 @@ var nodeshot = {
                     nodeshot.layout.setFullScreen();
                     // re-enable scrollbar
                     nodeshot.layout.$body.css('overflow', 'auto');
-                }, 600);      
+                }, 600);
+                // save cookie to remember this choice
+                $.cookie('nodeshot_sidebar', 'false', { expires: 365, path: __project_home__ });
             });
             this.$showColumn.css('opacity', 0.3).hover(
                 // mouse-enter
@@ -297,7 +313,9 @@ var nodeshot = {
                     nodeshot.layout.setFullScreen();
                     nodeshot.layout.$body.css('overflow', 'auto');
                 },600);
-            });            
+                // save cookie
+                $.cookie('nodeshot_sidebar', 'true', { expires: 365, path: __project_home__ });
+            });
         }        
     },
     /*
@@ -522,6 +540,15 @@ var nodeshot = {
                 // fade in
                 opacity: 1
             }, 500);
+            // bind key press event
+            nodeshot.layout.$body.bind('keyup', function(e) {
+                var code = (e.keyCode ? e.keyCode : e.which);
+                // if pressing enter
+                if (code == 13 || code == 27){
+                    nodeshot.dialog.close(callback);
+                    nodeshot.layout.$body.unbind('keyup');
+                }
+            });
             // bind close event
             $('#nodeshot-modal-close').click(function(){
                 nodeshot.dialog.close(callback);
@@ -884,6 +911,18 @@ var nodeshot = {
                 for(i=0; i<this.saved_links.length; i++){
                     this.calculate(this.saved_links[i], 'saved');
                 }
+            }
+            // potential nodes
+            if($.cookie('nodeshot_potential_nodes')=='false'){
+                $('#potential').attr('checked', '');
+            }
+            // link quality
+            if($.cookie('nodeshot_link_quality')=='dbm'){
+                $('#dbm').attr('checked', 'checked');
+            }
+            // sidebar
+            if($.cookie('nodeshot_sidebar')=='false'){
+                nodeshot.layout.$hideSide.trigger('click');
             }
         },
         

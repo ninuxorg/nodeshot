@@ -372,8 +372,6 @@ h3 {
 #info-wrapper {
      height: 600px;
      width: 100%;
-     background-color: #000000;
-
 }
 
 /*#info-window {
@@ -633,3 +631,18 @@ table.list-values td.valignmiddle{ padding: 12px 10px 12px 0 !important; vertica
 #gmap-search #gmap-address{ width: 380px; margin-right: 15px }
 #gmap-address.error{ background: #e30000 none !important }
 .ui-draggable{ cursor: move }
+
+.active_nodes a .jstree-icon{
+	background: transparent url(../images/marker_active_small.png) no-repeat scroll 2px -1px !important;
+}
+
+.hotspot_nodes a .jstree-icon{
+	background: transparent url(../images/marker_hotspot_small.png) no-repeat scroll 2px -1px !important;
+}
+
+.potential_nodes a .jstree-icon{
+	background: transparent url(../images/marker_potential_small.png) no-repeat scroll 2px -1px !important;
+}
+
+#node-tree a{ font-weight: bold }
+#node-tree a.child{ font-weight: normal }

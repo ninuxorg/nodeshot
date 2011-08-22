@@ -119,19 +119,19 @@ def node_list(request):
     data, active_list, hotspot_list, potential_list = [], [], [], []
 
     for a in active:
-        active_list.append({ 'data' : {'title' : a['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + a['slug'] + '\')'} } })
+        active_list.append({ 'data' : {'title' : a['name'], 'attr' : {'class': 'child', 'href' : 'javascript:mapGoTo(\'' + a['slug'] + '\')'} } })
     if len(active_list) > 0:
-        data.append( { "data" : "Attivi", "state" : "open", "children" : list(active_list) } )
+        data.append( { "data" : "Nodi Attivi", "state": "open", 'attr': {'class': 'active_nodes'}, "children" : list(active_list) } )
 
     for h in hotspot:
-        hotspot_list.append({'data' :{'title' : h['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + h['slug'] + '\')'} } })
+        hotspot_list.append({'data' :{'title' : h['name'], 'attr' : {'class': 'child', 'href' : 'javascript:mapGoTo(\'' + h['slug'] + '\')'} } })
     if len(hotspot_list) > 0:
-        data.append( { "data" : "Hotspots", "state" : "open", "children" : list(hotspot_list) } )
+        data.append( { "data" : "Nodi Hotspots", "state": "open", 'attr': {'class': 'hotspot_nodes'}, "children" : list(hotspot_list) } )
 
     for p in potential:
-        potential_list.append({'data' :{'title' : p['name'], 'attr' : {'href' : 'javascript:mapGoTo(\'' + p['slug'] + '\')'} } })
+        potential_list.append({'data' :{'title' : p['name'], 'attr' : {'class': 'child', 'href' : 'javascript:mapGoTo(\'' + p['slug'] + '\')'} } })
     if len(potential_list) > 0:
-        data.append( { "data" : "Potenziali", "state" : "open", "children" : list(potential_list) } )
+        data.append( { "data" : "Nodi Potenziali", "state": "open", 'attr': {'class': 'potential_nodes'}, "children" : list(potential_list) } )
 
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
