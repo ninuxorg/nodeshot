@@ -71,7 +71,7 @@ class NodeAdmin(admin.ModelAdmin):
             'original': node,
             'save_as': False,
             'show_save': True,
-            'root_path': self.admin_site.root_path,
+            #'root_path': self.admin_site.root_path,
         }, context_instance=RequestContext(request))
 
 class DeviceAdmin(admin.ModelAdmin):
@@ -91,16 +91,27 @@ class StatisticAdmin(admin.ModelAdmin):
 class ContactAdmin(admin.ModelAdmin):
     list_display  = ('from_name', 'from_email', 'node', 'date')
     ordering = ('-id',)
-    actions = ('test',)
     date_hierarchy = 'date'
     readonly_fields = ('from_name', 'from_email', 'message', 'ip', 'user_agent', 'http_referer', 'accept_language')
     actions = None
+    
+class InterfaceAdmin(admin.ModelAdmin):
+    list_select_related = True
+    
+class LinkAdmin(admin.ModelAdmin):
+    list_select_related = True
+    #list_display  = ('from_interface__device', 'from_email', 'node', 'date')
+    #ordering = ('-id',)
+    #actions = []
+    #date_hierarchy = 'date'
+    #readonly_fields = ('from_name', 'from_email', 'message', 'ip', 'user_agent', 'http_referer', 'accept_language')
+    #actions = None
 
 admin.site.register(Node, NodeAdmin)
 admin.site.register(Device, DeviceAdmin)
-admin.site.register(Interface)
+admin.site.register(Interface, InterfaceAdmin)
 admin.site.register(HNAv4)
-admin.site.register(Link)
+admin.site.register(Link, LinkAdmin)
 admin.site.register(Statistic, StatisticAdmin)
 admin.site.register(Contact, ContactAdmin)
 

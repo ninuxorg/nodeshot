@@ -11,14 +11,18 @@
             <tr>
                 <td class="key">Nome:</td><td class="value">{{ node.name }}</td>
             </tr>
+            {% if node.description %}
             <tr>
                 <td class="key">Descrizione:</td><td class="value">{{ node.description }}</td>
             </tr>
-            <tr>
-                <td class="key">Cap:</td><td class="value">{{ node.postal_code }}</td>
-            </tr>
+            {% endif %}
+            {% if node.owner %}
             <tr>
                 <td class="key">Responsabile:</td><td class="value">{{ node.owner }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td class="key">Cap:</td><td class="value">{{ node.postal_code }}</td>
             </tr>
             <tr>
                 <td class="key">Latitudine:</td><td class="value">{{ node.lat }}</td>
@@ -40,7 +44,6 @@
     <div id="tab-dist" class="content ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
         <h3>Calcola distanza</h3>
         <p>Calcola la distanza tra "{{ node.name }}" e un'altro nodo a tuo piacimento.</p>
-        <!--<p>Il risultato può essere salvato in modo da poter confrontare più risultati tra loro.</p>-->
         <table class="list-values">
             <tr>
                 <td class="key valigncenter">Cerca il nodo:</td>

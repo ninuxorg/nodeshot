@@ -620,7 +620,7 @@ table.list-values td.valignmiddle{ padding: 12px 10px 12px 0 !important; vertica
 	overflow: hidden;
 	padding: 3px 0 3px 3px;
 	border: 1px solid #000;
-	background: transparent url(../images/show.png) no-repeat scroll 3px 3px;
+	background: #fff url(../images/show.png) no-repeat scroll 3px 3px;
 	cursor: pointer;
 	z-index:15;
 }

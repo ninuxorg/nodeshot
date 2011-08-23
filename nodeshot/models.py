@@ -349,7 +349,7 @@ class Interface(models.Model):
     updated = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return u'IP: %s' % (self.ipv4_address)
+        return u'IP: %s - Node: %s - Device: %s' % (self.ipv4_address, self.device.node.name, self.device.name)
 
 class Link(models.Model):
     from_interface = models.ForeignKey(Interface, related_name='from_interface')
@@ -358,6 +358,9 @@ class Link(models.Model):
     dbm = models.IntegerField(default=0)
     sync_tx = models.IntegerField(default=0)
     sync_rx = models.IntegerField(default=0)
+    
+    def __unicode__(self):
+        return u'%s %s » %s %s' % (self.from_interface.ipv4_address, self.from_interface.device, self.to_interface.ipv4_address, self.to_interface.device)
     
 class Statistic(models.Model):
     active_nodes = models.IntegerField('nodi attivi')

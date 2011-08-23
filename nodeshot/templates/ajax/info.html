@@ -1,6 +1,6 @@
 <div id="info-wrapper">
     <div id="table-wrapper" class="ui-corner-all">
-        <table id="myTable" class="tablesorter"> 
+        <table id="info-table" class="tablesorter"> 
             <thead> 
                 <tr> 
                     <th style="width: 10%">Status</th> 
@@ -13,15 +13,15 @@
             <tbody> 
                 {% for device in devices %}
                 <tr> 
-                    <td><a name="{{device.nodeid}}"></a><div class="status-{{ device.status }}"></div><span style="display: none">{{ device.status }}</span></td> 
-                    <td>{{ device.name }} ({{ device.node_name }}) </td> 
+                    <td><a name="{{device.node.slug }}"></a><div class="status-{{ device.status }}"></div><span style="display: none">{{ device.status }}</span></td> 
+                    <td>{{ device.name }} ({{ device.node.name }}) </td> 
                     <td>{{ device.device_type }}</td> 
                     <td>{% for ip in device.ips %} <a href="#">{{ip}}</a> <br /> {% endfor %}</td> 
                     <td>
                         {% for signal in device.links %}
                         <div>
-                            <div class="signalbar" data-value="9{{ signal.signal_bar }}"></div>
-                            {{signal.dbm}} dBm -> <a href="#{{signal.to_interface.device.node.id}}">{{signal.to_interface.device.node.name}}</a>
+                            <div class="signalbar" data-value="{{ signal.signal_bar }}"></div>
+                            {{signal.dbm}} dBm &raquo; <a href="javascript:nodeshot.infotab.scrollTo('{{signal.destination.slug}}')">{{signal.destination.name}}</a>
                         </div>
                         {% endfor %}
                     </td>

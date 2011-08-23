@@ -927,6 +927,35 @@ var nodeshot = {
         },
         
         links: []
+    },
+    
+    infotab:{
+        
+        scrollTo: function(name){
+            // cache object
+            var to = $('a[name='+name+']');            
+            // if target is found
+            if(to.length>0){
+                var scroll = $('#table-wrapper').scrollTop() + to.parent().position().top - 100// - nodeshot.layout.$header.height();
+                // scrolling animation
+                $('#table-wrapper').animate({scrollTop: scroll/* - $(window).height() / 4*/},'slow', function(){
+                    console.log(scroll);
+                    // when animation is finished find the row
+                    var row = to.parent().parent().find('td');
+                    // change its background color to highlight it
+                    row.css('background-color', '#ffffc8');
+                    // then change it back to white background
+                    setTimeout(function(){
+                        row.css('background-color', '#fff');
+                    }, 2500)
+                });
+            }
+            // if target not found return a message
+            else{
+                nodeshot.dialog.open('Il nodo selezionato non è presente in questa lista.')
+            }
+        }
+        
     }
     
 }

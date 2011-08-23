@@ -394,15 +394,15 @@ function initialize() {
                 var choice = $("#view-radio input:checked").val();
                 if (choice == 'map'){
                     // go to point on map
-                    mapGoTo(ui.item.value);
-                    // put label on input
-                    $(this).val(ui.item.label);
-                    // return false to avoid default autocomplete plugin behaviour
-                    return false;
+                    mapGoTo(ui.item.value);                    
                 }
                 else{
-                    alert('Not (yet) implemented');
+                    nodeshot.infotab.scrollTo(ui.item.value);
                 }
+                // put label on input
+                $(this).val(ui.item.label);
+                // return false to avoid default autocomplete plugin behaviour
+                return false;
             }
         });
     });
@@ -513,7 +513,7 @@ function initialize() {
                 nodeshot.layout.setFullScreen();
                 nodeshot.overlay.removeMask();
                 nodeshot.overlay.hideLoading();
-                $("#myTable").tablesorter(); 
+                $("#info-table").tablesorter(); 
                 //$("#myTable").tablesorter({widthFixed: true, widgets: ['zebra']}).tablesorterPager({container: $("#pager")}); 
               });
         } else if (choice == 'olsr') {

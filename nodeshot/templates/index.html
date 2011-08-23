@@ -114,6 +114,11 @@
             nodeshot.layout.setFullScreen();
             nodeshot.layout.setElementDimensions();
             nodeshot.overlay.appendLoading();
+            
+            {% if messages %}
+            nodeshot.dialog.open("{% for message in messages %}{{ message }}{% endfor %}");
+            {% endif %}
+            
         // update dimensions on resize
         }).resize(function(){
             nodeshot.layout.setFullScreen();

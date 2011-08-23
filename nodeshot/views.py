@@ -1,25 +1,20 @@
 # -*- coding: utf-8 -*-
-import datetime
-from datetime import timedelta
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django import forms
 from django.utils import simplejson
-from django.core.context_processors import csrf
 from nodeshot.models import *
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.forms import ModelForm
-from utils import *
+from django.contrib import messages
+from django.core.urlresolvers import reverse
+from nodeshot.utils import signal_to_bar, distance, email_owners
 import time,re,os
 import settings
 from settings import DEBUG, NODESHOT_SITE as SITE
 from django.core.exceptions import ObjectDoesNotExist
 from forms import ContactForm, PasswordResetForm
 from datetime import datetime, timedelta
-#from django.core.mail import EmailMessage
-from nodeshot.utils import email_owners
 
 # retrieve map center or set default if not specified
 try:
@@ -172,28 +167,61 @@ def generate_rrd(request):
         return HttpResponse('Error')
 
 def info(request):
-    devices = []
-    entry = {}
-    for d in Device.objects.all().order_by('node__status').select_related().only('name', 'type', 'node__name', 'node__status'):
-        entry['status'] = "on" if d.node.status == 'a' else "off"
-        entry['device_type'] = d.type
-        entry['node_name'] = d.node.name
-        entry['name'] = d.name
-        entry['ips'] = [ip['ipv4_address'] for ip in d.interface_set.values('ipv4_address')] if d.interface_set.count() > 0 else ""
-        entry['macs'] = [mac['mac_address'] if mac['mac_address'] != None else '' for mac in d.interface_set.values('mac_address')] if d.interface_set.count() > 0 else ""
-        # heuristic count for good representation of the signal bar (from 0 to 100)
-        #entry['signal_bar'] = signal_to_bar(d.max_signal)  if d.max_signal < 0 else 0
-        #entry['signal'] = d.max_signal
-        links = Link.objects.filter(from_interface__device = d).select_related().only('dbm', 'to_interface__mac_address', 'to_interface__device__node__name')
-        # convert QuerySet in list
-        links = list(links)
-        for l in links:
-            l.signal_bar = signal_to_bar(l.dbm) if l.to_interface.mac_address not in  entry['macs'] else links.remove(l)
-        entry['links'] = links
-        entry['ssids'] = [ssid['ssid'] for ssid in d.interface_set.values('ssid')] if d.interface_set.count() > 0 else ""
-        entry['nodeid'] = d.node.id
-        devices.append(entry)
+    import logging
+    devices = Device.objects.all().order_by('node__name', 'added').select_related().only('name', 'type', 'node__name', 'node__status', 'node__slug');
+    new_devices = []
+    # loop over queryset
+    for device in devices:
         entry = {}
+        if device.node.status == 'a' or device.node.status == 'h':
+            entry['status'] = 'on'
+        else:
+            entry['status'] = 'off'
+        entry['device_type'] = device.type
+        entry['node'] = device.node
+        entry['name'] = device.name
+        entry['ips'] = [ip['ipv4_address'] for ip in device.interface_set.values('ipv4_address')] if device.interface_set.count() > 0 else ""
+        #entry['macs'] = [mac['mac_address'] if mac['mac_address'] != None else '' for mac in device.interface_set.values('mac_address')] if device.interface_set.count() > 0 else ""
+        
+        macs_list = []
+        for interface in device.interface_set.all():
+            if interface.mac_address != None and interface.mac_address != '':
+                macs_list.append(interface.mac_address)
+        entry['macs'] = macs_list
+        
+        # heuristic count for good representation of the signal bar (from 0 to 100)
+        links_from = Link.objects.filter(from_interface__device = device).select_related().only('dbm', 'to_interface__mac_address', 'to_interface__device__node__name', 'to_interface__device__node__slug')
+        links_to = Link.objects.filter(to_interface__device = device).select_related().only('dbm', 'from_interface__mac_address', 'from_interface__device__node__name', 'from_interface__device__node__slug')
+        # convert QuerySet in list
+        links_from = list(links_from)
+        for link in links_from:
+            if link.to_interface.mac_address not in entry['macs']:
+                link.signal_bar = signal_to_bar(link.dbm)
+                link.destination = {
+                    'name': link.to_interface.device.node.name,
+                    'slug': link.to_interface.device.node.slug
+                }
+                #link.destination['name'] = link.to_interface.device.name
+                #link.destination['slug'] = link.to_interface.device.slug
+            else:
+                links_from.remove(link)
+        links_to = list(links_to)
+        for link in links_to:
+            if link.from_interface.mac_address not in entry['macs']:
+                link.signal_bar = signal_to_bar(link.dbm)
+                link.destination = {
+                    'name': link.from_interface.device.node.name,
+                    'slug': link.from_interface.device.node.slug
+                }
+                #link.destination['name'] = link.from_interface.device.name
+                #link.destination['slug'] = link.from_interface.device.slug
+            else:
+                links_to.remove(link) 
+                
+        entry['links'] = links_from + links_to
+        #entry['ssids'] = [ssid['ssid'] for ssid in device.interface_set.values('ssid')] if device.interface_set.count() > 0 else ""
+        new_devices.append(entry)
+        
 
     # if request is sent with ajax
     if request.is_ajax():
@@ -206,7 +234,7 @@ def info(request):
     else:
         raise Http404
 
-    return render_to_response(template,{'devices': devices}, context_instance=RequestContext(request))
+    return render_to_response(template,{'devices': new_devices}, context_instance=RequestContext(request))
 
 def advanced(request, node_id):
     ''' Advanced information about a node '''
@@ -331,8 +359,10 @@ def delete_node(request, node_id, password):
             'site': SITE
         }
         email_owners(node, 'Nodo %s cancellato' % node.name, 'email_notifications/node-deleted-owners.txt', email_context)
+        messages.add_message(request, messages.INFO, u'Il nodo %s è stato cancellato con successo.' % node.name)
         node.delete()
-        return HttpResponse('deleted')
+        
+        return HttpResponseRedirect(reverse('nodeshot_index'))
     
     context = {
         'node': node,
@@ -392,22 +422,30 @@ def confirm_node(request, node_id, activation_key):
     ''' Confirm node view '''
     # retrieve object or return 404 error
     node = get_object_or_404(Node, pk=node_id)
+    # redirect to url default
+    redirect_to = reverse('nodeshot_index')
 
     if(node.activation_key != '' and node.activation_key != None):
         if(node.activation_key == activation_key):
             if(node.added + timedelta(days=NODESHOT_ACTIVATION_DAYS) > datetime.now()):
                 # confirm node
                 node.confirm()
-                response = 'confirmed'
+                message = u'Il nodo è stato confermato con successo.'
+                redirect_to = reverse('nodeshot_select', args=[node.slug])
             else:
-                response = 'expired'
+                message = u'La chiave di attivazione è scaduta.'
         else:
             # wrong activation key
-            response = 'wrong activation key'
+            message = u'La chiave di attivazione non è corretta.'
     else:
         # node has been already confirmed
-        response = 'node has been already confirmed'
-    return HttpResponse(response)
+        message = u'Il nodo è già stato confermato in precedenza.'
+        redirect_to = reverse('nodeshot_select', args=[node.slug])
+    
+    # message that will be displayed to the user 
+    messages.add_message(request, messages.INFO, message)
+        
+    return HttpResponseRedirect(redirect_to)
 
 def generate_kml(request):
     data = '''<kml xmlns="http://earth.google.com/kml/2.0">
@@ -555,8 +593,11 @@ def report_abuse(request, node_id, email):
         'site': NODESHOT_SITE
     }
     notify_admins(node, 'email_notifications/report_abuse_subject.txt', 'email_notifications/report_abuse_body.txt', context)
-
-    return HttpResponse('reported')
+    
+    # message that will be displayed to the user 
+    messages.add_message(request, messages.INFO, u'Grazie per aver segnalato l\'abuso. Controlleremo e ti ricontatteremo il prima possibile.')
+    
+    return HttpResponseRedirect(reverse('nodeshot_index'))
 
 def purge_expired(request):
     '''
