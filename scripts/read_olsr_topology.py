@@ -157,14 +157,8 @@ if __name__ == "__main__":
                         else:
                             fi = Interface.objects.filter(ipv4_address = ipA)
                             to = Interface.objects.filter(ipv4_address = ipB)
-                            if fi.count() == 1 and to.count() == 1:
+                            if fi.device.node != to.device.node and fi.count() == 1 and to.count() == 1:
                                 Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
                                 found = True
-                            else:
-                                to = Interface.objects.filter(ipv4_address = ipA)
-                                fi  = Interface.objects.filter(ipv4_address = ipB)
-                                if fi.count() == 1 and to.count() == 1:
-                                    Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
-                                    found = True
 
 
