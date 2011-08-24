@@ -126,15 +126,7 @@ NODESHOT_GMAP_CENTER = {
 # site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
 NODESHOT_SITE = {
     'name': 'Nodeshot',
-    'domain': '10.40.0.56'
-}
-
-
-
-# site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
-NODESHOT_SITE = {
-    'name': 'Nodeshot',
-    'domain': '10.40.0.56'
+    'domain': 'domain.com'
 }
 
 # routing protocols used in nodeshot.models
