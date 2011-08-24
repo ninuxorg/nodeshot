@@ -15,6 +15,7 @@ from settings import DEBUG, NODESHOT_SITE as SITE
 from django.core.exceptions import ObjectDoesNotExist
 from forms import ContactForm, PasswordResetForm
 from datetime import datetime, timedelta
+from django.db.models import Q
 
 # retrieve map center or set default if not specified
 try:
@@ -167,7 +168,6 @@ def generate_rrd(request):
         return HttpResponse('Error')
 
 def info(request):
-    import logging
     devices = Device.objects.all().order_by('node__name', 'added').select_related().only('name', 'type', 'node__name', 'node__status', 'node__slug');
     new_devices = []
     # loop over queryset
@@ -177,48 +177,109 @@ def info(request):
             entry['status'] = 'on'
         else:
             entry['status'] = 'off'
+            
+        interfaces = device.interface_set.all()
+            
         entry['device_type'] = device.type
         entry['node'] = device.node
         entry['name'] = device.name
-        entry['ips'] = [ip['ipv4_address'] for ip in device.interface_set.values('ipv4_address')] if device.interface_set.count() > 0 else ""
-        #entry['macs'] = [mac['mac_address'] if mac['mac_address'] != None else '' for mac in device.interface_set.values('mac_address')] if device.interface_set.count() > 0 else ""
         
+        ip_list = []
         macs_list = []
-        for interface in device.interface_set.all():
+        for interface in interfaces:
+            ip_list.append(interface.ipv4_address)
             if interface.mac_address != None and interface.mac_address != '':
                 macs_list.append(interface.mac_address)
+        entry['ips'] = ip_list
         entry['macs'] = macs_list
+            
+        #entry['ips'] = [ip['ipv4_address'] for ip in device.interface_set.values('ipv4_address')] if device.interface_set.count() > 0 else ""
+        #entry['macs'] = [mac['mac_address'] if mac['mac_address'] != None else '' for mac in device.interface_set.values('mac_address')] if device.interface_set.count() > 0 else ""
+        
+        links = Link.objects.filter(
+            Q(from_interface__device = device) | Q(to_interface__device = device)
+        ).select_related().only(
+            'dbm',
+            'from_interface__mac_address',
+            'from_interface__device__node__name',
+            'from_interface__device__node__slug',
+            'to_interface__mac_address',
+            'to_interface__device__node__name',
+            'to_interface__device__node__slug'            
+        )
+        import logging
+        #links_to = Link.objects.filter(to_interface__device = device).select_related().only('dbm', 'from_interface__mac_address', 'from_interface__device__node__name', 'from_interface__device__node__slug')
+        # evaluate QuerySet
+        links = list(links)
+        for link in links:
+            #logging.log(1, link.to_interface.device.node.name == device.node.name)
+            #logging.log(1, link.from_interface.device.node.name == device.node.name)
+            # if link is between same node skip
+            if(link.to_interface.device.node.id == device.node.id and link.from_interface.device.node.id == device.node.id):
+                if DEBUG: 
+                    #logging.log(1, 'duplicate for node %s' % device.node.name)
+                    logging.log(1, 'removing link %s' % link)
+                links.remove(link)
+                #continue
+            if(link.from_interface.device.id == device.id):
+                if link.to_interface.mac_address not in entry['macs']:
+                    link.signal_bar = signal_to_bar(link.dbm)
+                    link.destination = {
+                        'name': link.to_interface.device.node.name,
+                        'slug': link.to_interface.device.node.slug
+                    }
+                    
+                else:
+                    links.remove(link)
+            elif(link.to_interface.device.id == device.id):
+                if link.from_interface.mac_address not in entry['macs']:
+                    link.signal_bar = signal_to_bar(link.dbm)
+                    link.destination = {
+                        'name': link.from_interface.device.node.name,
+                        'slug': link.from_interface.device.node.slug
+                    }
+                else:
+                    links.remove(link)
+            logging.log(1, 'adding link %s' % link)
+        #links_to = list(links_to)
+        #for link in links_to:
+        #    if link.from_interface.mac_address not in entry['macs']:
+        #        link.signal_bar = signal_to_bar(link.dbm)
+        #        link.destination = {
+        #            'name': link.from_interface.device.node.name,
+        #            'slug': link.from_interface.device.node.slug
+        #        }
+        #    else:
+        #        links_to.remove(link) 
         
         # heuristic count for good representation of the signal bar (from 0 to 100)
-        links_from = Link.objects.filter(from_interface__device = device).select_related().only('dbm', 'to_interface__mac_address', 'to_interface__device__node__name', 'to_interface__device__node__slug')
-        links_to = Link.objects.filter(to_interface__device = device).select_related().only('dbm', 'from_interface__mac_address', 'from_interface__device__node__name', 'from_interface__device__node__slug')
-        # convert QuerySet in list
-        links_from = list(links_from)
-        for link in links_from:
-            if link.to_interface.mac_address not in entry['macs']:
-                link.signal_bar = signal_to_bar(link.dbm)
-                link.destination = {
-                    'name': link.to_interface.device.node.name,
-                    'slug': link.to_interface.device.node.slug
-                }
-                #link.destination['name'] = link.to_interface.device.name
-                #link.destination['slug'] = link.to_interface.device.slug
-            else:
-                links_from.remove(link)
-        links_to = list(links_to)
-        for link in links_to:
-            if link.from_interface.mac_address not in entry['macs']:
-                link.signal_bar = signal_to_bar(link.dbm)
-                link.destination = {
-                    'name': link.from_interface.device.node.name,
-                    'slug': link.from_interface.device.node.slug
-                }
-                #link.destination['name'] = link.from_interface.device.name
-                #link.destination['slug'] = link.from_interface.device.slug
-            else:
-                links_to.remove(link) 
+        #links_from = Link.objects.filter(from_interface__device = device).select_related().only('dbm', 'to_interface__mac_address', 'to_interface__device__node__name', 'to_interface__device__node__slug')
+        #links_to = Link.objects.filter(to_interface__device = device).select_related().only('dbm', 'from_interface__mac_address', 'from_interface__device__node__name', 'from_interface__device__node__slug')
+        ## convert QuerySet in list
+        #links_from = list(links_from)
+        #for link in links_from:
+        #    if link.to_interface.mac_address not in entry['macs']:
+        #        link.signal_bar = signal_to_bar(link.dbm)
+        #        link.destination = {
+        #            'name': link.to_interface.device.node.name,
+        #            'slug': link.to_interface.device.node.slug
+        #        }
+        #    else:
+        #        links_from.remove(link)
+        #links_to = list(links_to)
+        #for link in links_to:
+        #    if link.from_interface.mac_address not in entry['macs']:
+        #        link.signal_bar = signal_to_bar(link.dbm)
+        #        link.destination = {
+        #            'name': link.from_interface.device.node.name,
+        #            'slug': link.from_interface.device.node.slug
+        #        }
+        #    else:
+        #        links_to.remove(link) 
                 
-        entry['links'] = links_from + links_to
+        #entry['links'] = links_from + links_to
+        
+        entry['links'] = links
         #entry['ssids'] = [ssid['ssid'] for ssid in device.interface_set.values('ssid')] if device.interface_set.count() > 0 else ""
         new_devices.append(entry)
         

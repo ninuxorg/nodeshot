@@ -109,6 +109,7 @@ def add_node(request):
             # set node as unconfirmed, malicious users could edit the hidden input field easily with instruments like firebug.
             node.status = 'u'
             # generate slug
+            # TODO: remove this because is being done at model level
             node.slug = slugify(node.name)
             # save new node in the database (password encryption, activation_key and email notification is done in models.py)
             node.save()

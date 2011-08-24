@@ -6,6 +6,7 @@ from django.utils.hashcompat import sha_constructor
 from django.core.mail import send_mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
+from django.template.defaultfilters import slugify
 from nodeshot.utils import notify_admins
 
 # for UserProfile
@@ -298,6 +299,9 @@ class Node(models.Model):
         
     def save(self):
         ''' Override the save method in order to generate the activation key for new nodes. '''
+        # generate slug if needed
+        if self.slug == '':
+            self.slug = slugify(self.name)
         # if saving a new object
         if self.pk is None and not IMPORTING:
             self.set_activation_key()
@@ -413,7 +417,7 @@ from datetime import datetime, timedelta
 def notify_on_delete(sender, instance, using, **kwargs):
     ''' Notify admins when nodes are deleted. Only for production use '''
     # if in testing mode don't send emails
-    if DEBUG:
+    if DEBUG or IMPORTING:
         return False
     # if purging old unconfirmed nodes don't send emails
     if instance.status == 'u' and instance.added + timedelta(days=ACTIVATION_DAYS) < datetime.now():
@@ -433,6 +437,8 @@ from django.db.models import Q, Count
 
 def update_statistics(sender, instance, using, **kwargs):
     ''' Adds a new record in the statistic table if needed. Called by signals '''
+    if IMPORTING:
+        return False
     # retrieve links, select_related() reduces the number of queries, only() selects only the fields we need
     links = Link.objects.all().select_related().only(
         'from_interface__device__node__lat', 'from_interface__device__node__lng',
