@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
-from nodeshot.utils import notify_admins
+from nodeshot.utils import notify_admins, email_owners
 
 # for UserProfile
 from django.contrib.auth.models import User
@@ -168,7 +168,10 @@ class Node(models.Model):
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
     def set_password(self):
-        ''' Set the password like django does '''
+        """
+        Encrypts node.password with salt and sha1.
+        The password property must have been set previously (node.password = 'rawpassword')
+        """
         self.password = make_password('sha1', self.password)
         return self.password
     
@@ -180,6 +183,11 @@ class Node(models.Model):
         return check_password(raw_password, self.password)
         
     def reset_password(self, petitioner):
+        """
+        Resets the password of a node and send an email to the owners with the new password.
+        petitioner: string containing the email address of who's requesting the password reset
+        returns the raw password
+        """
         import random
         bit1 = ''.join(random.choice('abcdefghilmnopqrstuvz') for i in xrange(5))
         bit2 = ''.join(random.choice('0123456789') for i in xrange(2))
@@ -194,18 +202,8 @@ class Node(models.Model):
             'password': raw_password,
             'site': SITE
         }
-        # parse subject
-        subject = 'Nuova password per il nodo %s' % self.name
-        # parse message
-        message = render_to_string('email_notifications/password_recovery.txt',context)
-        # send email to all the owners
-        recipient_list = [self.email]
-        if self.email2 != '' and self.email2 != None:
-            recipient_list += [self.email2]
-        if self.email3 != '' and self.email3 != None:
-            recipient_list += [self.email3]
         # send mail
-        send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+        email_owners(self, 'Nuova password per il nodo %s' % self.name, 'email_notifications/password_recovery.txt', context)
         return raw_password
     
     def set_activation_key(self):
@@ -266,20 +264,8 @@ class Node(models.Model):
             'password': raw_password,
             'site': SITE
         }
-        # parse subject
-        subject = render_to_string('email_notifications/success_subject.txt',context)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        # parse message
-        message = render_to_string('email_notifications/success_body.txt',context)
-        # send email to all the owners        
-        recipient_list = [self.email]
-        if self.email2 != '' and self.email2 != None:
-            recipient_list += [self.email2]
-        if self.email3 != '' and self.email3 != None:
-            recipient_list += [self.email3]
-        # send mail
-        send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+        # send email to owners
+        email_owners(self, 'Nodo confermato con successo su %s' % SITE['name'], 'email_notifications/success_body.txt', context)
         # notify admins that want to receive notifications
         notify_admins(self, 'email_notifications/new-node-admin_subject.txt', 'email_notifications/new-node-admin_body.txt', context, skip=True)
         
@@ -295,7 +281,7 @@ class Node(models.Model):
         raw_password = self.password
         self.set_password()
         self.save()
-        self.send_success_mail(raw_password)
+        #self.send_success_mail(raw_password)
         
     def save(self):
         ''' Override the save method in order to generate the activation key for new nodes. '''

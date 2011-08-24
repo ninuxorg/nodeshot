@@ -54,9 +54,9 @@ def index(request, slug=False):
         try:
             node = Node.objects.only('lat', 'lng', 'slug').get(slug=slug)
             gmap_center = {
-                # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
                 'is_default': 'false',
                 'node': node.slug,
+                # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
                 'lat': str(node.lat),
                 'lng': str(node.lng)
             }
@@ -131,10 +131,17 @@ def node_list(request):
 
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
-def info_window(request, node_id):
+def node_info(request, node_id):
     ''' Content of gmap.infoWindow '''
-    # this view must be called with ajax only
-    if not request.is_ajax() and not DEBUG:
+    # if request is sent with ajax
+    if request.is_ajax():
+        # just load the fragment
+        template = 'ajax/node_info.html'
+    # otherwise if request is sent normally and DEBUG is true
+    elif DEBUG:
+        # debuggin template
+        template = 'node_info.html'
+    else:
         raise Http404
     
     # get object or raise 404
@@ -145,7 +152,7 @@ def info_window(request, node_id):
 
     context = {'node' : node, 'nodes' : Node.objects.all().order_by('name').only('name','slug','lat','lng','status')}
 
-    return render_to_response('info_window.html', context, context_instance=RequestContext(request))
+    return render_to_response(template, context, context_instance=RequestContext(request))
 
 def search(request, what):
     data = []
@@ -167,7 +174,19 @@ def generate_rrd(request):
     else:
         return HttpResponse('Error')
 
-def info(request):
+def info_tab(request):
+    # if request is sent with ajax
+    if request.is_ajax():
+        # just load the fragment
+        template = 'ajax/info.html'
+    # otherwise if request is sent normally and DEBUG is true
+    elif DEBUG:
+        # debuggin template
+        template = 'info.html'
+    else:
+        raise Http404
+    
+    import logging
     devices = Device.objects.all().order_by('node__name', 'added').select_related().only('name', 'type', 'node__name', 'node__status', 'node__slug');
     new_devices = []
     # loop over queryset
@@ -178,7 +197,7 @@ def info(request):
         else:
             entry['status'] = 'off'
             
-        interfaces = device.interface_set.all()
+        interfaces = device.interface_set.all().only('ipv4_address', 'mac_address', 'type')
             
         entry['device_type'] = device.type
         entry['node'] = device.node
@@ -207,18 +226,14 @@ def info(request):
             'to_interface__device__node__name',
             'to_interface__device__node__slug'            
         )
-        import logging
-        #links_to = Link.objects.filter(to_interface__device = device).select_related().only('dbm', 'from_interface__mac_address', 'from_interface__device__node__name', 'from_interface__device__node__slug')
         # evaluate QuerySet
         links = list(links)
         for link in links:
-            #logging.log(1, link.to_interface.device.node.name == device.node.name)
-            #logging.log(1, link.from_interface.device.node.name == device.node.name)
             # if link is between same node skip
             if(link.to_interface.device.node.id == device.node.id and link.from_interface.device.node.id == device.node.id):
                 if DEBUG: 
-                    #logging.log(1, 'duplicate for node %s' % device.node.name)
-                    logging.log(1, 'removing link %s' % link)
+                    logging.log(1, 'duplicate for node %s' % device.node.name)
+                    #logging.log(1, 'removing link %s' % link)
                 links.remove(link)
                 #continue
             if(link.from_interface.device.id == device.id):
@@ -240,7 +255,6 @@ def info(request):
                     }
                 else:
                     links.remove(link)
-            logging.log(1, 'adding link %s' % link)
         #links_to = list(links_to)
         #for link in links_to:
         #    if link.from_interface.mac_address not in entry['macs']:
@@ -281,19 +295,7 @@ def info(request):
         
         entry['links'] = links
         #entry['ssids'] = [ssid['ssid'] for ssid in device.interface_set.values('ssid')] if device.interface_set.count() > 0 else ""
-        new_devices.append(entry)
-        
-
-    # if request is sent with ajax
-    if request.is_ajax():
-        # just load the fragment
-        template = 'ajax/info.html'
-    # otherwise if request is sent normally and DEBUG is true
-    elif DEBUG:
-        # debuggin template
-        template = 'info.html'
-    else:
-        raise Http404
+        new_devices.append(entry)    
 
     return render_to_response(template,{'devices': new_devices}, context_instance=RequestContext(request))
 

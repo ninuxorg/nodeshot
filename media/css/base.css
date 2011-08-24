@@ -112,9 +112,11 @@ html, body { height: 100% }
     text-align: center;
     vertical-align: top;
     width: 288px;
+    color: #a1a1a1;
+    font-style: italic;
 }
 
-#view-radio{ margin: 0 auto 10px }
+#choices{ margin: 0 auto 10px }
 
 #node-tree-container
 {
@@ -337,9 +339,6 @@ a.button{ color: #fff !important }
     display: none;
 }
 
-.defaultText { width: 300px; }
-.defaultTextActive { color: #a1a1a1; font-style: italic; }
-
 h3 {
     color: #FFA500;
     display: block;
@@ -451,16 +450,16 @@ h3 {
 #search-address{ background-image: url(../images/magnifier.png) !important }
 #addnode{ margin-top: 10px }
 
-#link-quality-selector { display: block; margin: 10px 0 10px }
-#link-quality-selector li{
+#link-quality { display: block; margin: 10px 0 10px }
+#link-quality li{
 	height: 25px;
 	line-height: 25px;
 	padding: 0 0 0 30px;
 	margin: 0 0 5px;
 	background: transparent url(../images/etx.png) no-repeat scroll 4px 0;
 }
-#link-quality-selector input{ position: relative; bottom: -2px }
-#link-quality-selector label{ cursor: pointer }
+#link-quality input{ position: relative; bottom: -2px }
+#link-quality label{ cursor: pointer }
 #dbmli{ background: transparent url(../images/dbm.png) no-repeat scroll 0 0 !important }
 
 .top-icon {

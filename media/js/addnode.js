@@ -4,10 +4,23 @@
 var nodeshot = {
     
     init: function(){
+        nodeshot.gmap.init();
         nodeshot.layout.cacheObjects();
+        nodeshot.distance.remember();
+        nodeshot.layout.getJsonList();
         nodeshot.layout.initSideControl();
         nodeshot.layout.initSearchAddress();
-        nodeshot.distance.remember();
+        nodeshot.layout.initMainSearch();
+        nodeshot.layout.initAddNode();
+        nodeshot.layout.initChoices()
+        nodeshot.layout.initPotential();
+        nodeshot.layout.initLinkQuality();
+        nodeshot.layout.initNodeTree();
+    },
+    
+    global: {
+        map: '',
+        geocoder: ''        
     },
     
     /*
@@ -28,7 +41,13 @@ var nodeshot = {
             this.$map = $('#map_canvas');
             this.$sideLinks = $('#side-links');
             this.$nodeTreeContainer = $('#node-tree-container');
+            this.$nodeTree = $('#node-tree');
             this.$hideSide = $('#hide-side');
+            this.$search = $('#search');
+            this.$addNode = $('#addnode');
+            this.$choices = $('#choices');
+            this.$potential = $('#potential');
+            this.$linkQuality = $('#link-quality');
         },
         /*
         * nodeshot.layout.setFullScreen()
@@ -165,6 +184,7 @@ var nodeshot = {
                 nodeshot.overlay.open(data, false, removeNewMarker);
                 
                 var input = $('#gmap-address');
+                input.trigger('focus');
                 
                 // bind keyup of search field
                 input.bind('keyup', function(e) {
@@ -186,10 +206,11 @@ var nodeshot = {
                 });
             });
         },
+        
         searchAddress: function(address, input){
-            if (geocoder) {
+            if (nodeshot.global.geocoder) {
                 // gmap geocode
-                geocoder.geocode({ 'address': address }, function (results, status) {
+                nodeshot.global.geocoder.geocode({ 'address': address }, function (results, status) {
                     // if address has been found
                     if (status == google.maps.GeocoderStatus.OK) {
                         // remove mask
@@ -202,10 +223,10 @@ var nodeshot = {
                             }
                             nodeshot.gmap.addressMarker = new google.maps.Marker({
                                 position: latlng,
-                                map: map
+                                map: nodeshot.global.map
                             });
-                            map.panTo(latlng);
-                            map.setZoom(16);
+                            nodeshot.global.map.panTo(latlng);
+                            nodeshot.global.map.setZoom(16);
                         }
                         // if overlay hasn't been moved yet
                         if(!nodeshot.layout.$overlayInner.hasClass('ui-draggable')){
@@ -280,7 +301,7 @@ var nodeshot = {
                     nodeshot.layout.$body.css('overflow', 'auto');
                 }, 600);
                 // save cookie to remember this choice
-                $.cookie('nodeshot_sidebar', 'false', { expires: 365, path: __project_home__ });
+                $.cookie('nodeshot_sidebar', 'false', { expires: 365, path: nodeshot.global.root_url });
             });
             this.$showColumn.css('opacity', 0.3).hover(
                 // mouse-enter
@@ -314,9 +335,154 @@ var nodeshot = {
                     nodeshot.layout.$body.css('overflow', 'auto');
                 },600);
                 // save cookie
-                $.cookie('nodeshot_sidebar', 'true', { expires: 365, path: __project_home__ });
+                $.cookie('nodeshot_sidebar', 'true', { expires: 365, path: nodeshot.global.root_url });
             });
-        }        
+        },
+        /*
+        * nodeshot.layout.initMainSearch()
+        * initialize jquery autocomplete for the main search (nodes, ip, ecc.)
+        */
+        initMainSearch: function(){
+            this.bindFocusBlur(this.$search);
+            this.$search.autocomplete({
+                // minimum length of keyword to start querying the database
+                minLength: 3,
+                source: function(req, add) {
+                    $.getJSON("search/"+req.term+'/', function(data) {
+                        if (data != null && data.length > 0){
+                            add(data);
+                        }
+                        else{
+                            add('');
+                        }
+                    });
+                },
+                select: function(event, ui) {
+                    var choice = nodeshot.layout.$choices.find('input:checked').val();
+                    if (choice == 'map'){
+                        // go to point on map
+                        mapGoTo(ui.item.value);                    
+                    }
+                    else if(choice == 'info'){
+                        nodeshot.infotab.scrollTo(ui.item.value);
+                    }
+                    else{
+                        return false;
+                    }
+                    // put label on input
+                    $(this).val(ui.item.label);
+                    // return false to avoid default autocomplete plugin behaviour
+                    return false;
+                }
+            });
+        },
+        /*
+        * nodeshot.layout.initAddNode()
+        * initialize add node button
+        */
+        initAddNode: function(){
+            this.$addNode.click(function() {
+                nodeshot.dialog.open('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
+                clickListenerHandle = google.maps.event.addListener(nodeshot.global.map, 'click', function(event) {
+                       newNodeMarker(event.latLng);
+                });
+            });
+        },
+        
+        initChoices: function(){
+            this.$choices.buttonset();
+            document.getElementById('radio1').checked=true;
+            document.getElementById('radio2').checked=false;
+            document.getElementById('radio3').checked=false;
+            document.getElementById('radio4').checked=false;
+            this.$choices.buttonset('refresh');
+            /* dynamically load map,info,olsr and vpn when the radio button is pressed */
+            this.$choices.find('input').change(function(){
+                var choice = this.value;
+                if (choice == 'map') {
+                    nodeshot.overlay.addMask(0.7);
+                    nodeshot.overlay.showLoading();
+                    nodeshot.layout.$content.html('<div id="map_canvas"></div><div id="side-links"></div>');
+                    nodeshot.gmap.init();
+                    nodeshot.init();
+                    draw_nodes('a');
+                    draw_nodes('h');
+                    if ($('#potential').is(':checked') )
+                        draw_nodes('p');
+                } else if (choice == 'info') {
+                    nodeshot.layout.$map = false;
+                    nodeshot.overlay.addMask(0.7);
+                    nodeshot.overlay.showLoading();
+                    nodeshot.layout.$content.load(nodeshot.global.root_url+'info_tab' , function() {
+                        nodeshot.infotab.init();
+                        nodeshot.layout.setFullScreen();
+                        nodeshot.overlay.removeMask();
+                        nodeshot.overlay.hideLoading();
+                    });
+                }
+                else if (choice == 'olsr') {
+                    nodeshot.layout.$content.html("<img src='http://tuscolomesh.ninux.org/images/topology.png' width='100%' height='700px' />"); 
+                }
+                else if (choice == 'vpn') {
+                    nodeshot.layout.$content.html("<img src='http://zioproto.ninux.org/download/file.png' width='100%' height='700px' />");
+                }
+            });
+        },
+        
+        initLinkQuality: function(){
+            /* visualize ETX values or dbm values */
+            nodeshot.layout.$linkQuality.find('input').change(function(){
+                $.cookie('nodeshot_link_quality', this.id, { expires: 365, path: nodeshot.global.root_url });
+                remove_markers('a');
+                draw_nodes('a'); 
+            });
+        },
+        
+        initPotential: function(){
+            /* view potential nodes */
+            nodeshot.layout.$potential.change(function() {
+                if ($(this).is(':checked')) {
+                    $.cookie('nodeshot_potential_nodes', 'true', { expires: 365, path: nodeshot.global.root_url });
+                    if (markersArray.potential.length == 0)
+                        draw_nodes('p');
+                } else {
+                    $.cookie('nodeshot_potential_nodes', 'false', { expires: 365, path: nodeshot.global.root_url });
+                    if (markersArray.potential.length > 0) {
+                        remove_markers('p');
+                        markersArray.potential = [];
+                        markersArray.potentialListeners  = [];
+                    }
+                }
+            });
+        },
+        
+        initNodeTree: function(){
+            this.$nodeTree.jstree({
+                'json_data' : {
+                    'ajax' : {
+                        'url' : nodeshot.global.root_url+'node_list.json',
+                        'data' : function (n) {
+                            return { id : n.attr ? n.attr('id') : 0 } 
+                        }
+                    }
+                },
+                'themes' : {'theme' : 'classic'},
+                'plugins' : [ 'themes', 'json_data' ]
+            });
+        },
+        
+        getJsonList: function(){
+            $.getJSON(nodeshot.global.root_url+"nodes.json", function(data) {
+                nodes = data;
+                //if ( $('#hotspot').is(':checked') )
+                draw_nodes('h');
+                //if ( $('#active').is(':checked') )
+                draw_nodes('a');
+                if(nodeshot.layout.$potential.is(':checked')){
+                    draw_nodes('p');
+                }
+            });
+        }
     },
     /*
      * nodeshot.overlay
@@ -378,7 +544,7 @@ var nodeshot = {
         */
         appendLoading: function(){
             // preload ajax-loader.gif
-            $('body').append('<img src="'+__project_home__+'media/images/ajax-loader.gif" alt="" id="nodeshot-ajaxloader" />');
+            $('body').append('<img src="'+nodeshot.global.root_url+'media/images/ajax-loader.gif" alt="" id="nodeshot-ajaxloader" />');
             nodeshot.layout.$loading = $('#nodeshot-ajaxloader');
         },
         /*
@@ -507,12 +673,6 @@ var nodeshot = {
             if(nodeshot.gmap.addressMarker){
                 nodeshot.gmap.removeAddressMarker();                
             }
-        }
-    },
-    gmap:{
-        removeAddressMarker: function(){
-            nodeshot.gmap.addressMarker.setMap(null);
-            delete nodeshot.gmap.addressMarker;
         }
     },
     /*
@@ -664,7 +824,7 @@ var nodeshot = {
         add: function(){
             nodeshot.overlay.addMask();
             nodeshot.overlay.showLoading();
-            $.get(__project_home__+'node/add/', function(data) {
+            $.get(nodeshot.global.root_url+'node/add/', function(data) {
                 nodeshot.overlay.open(data);
                 if (newMarker) {
                     $("#id_lat").val(newMarker.getPosition().lat());
@@ -693,7 +853,7 @@ var nodeshot = {
             
             var form_data = form.serialize();
         
-            $.post(__project_home__+'node/add/', form_data, function(data) {
+            $.post(nodeshot.global.root_url+'node/add/', form_data, function(data) {
                 
                 nodeshot.overlay.hideLoading();
                 
@@ -845,7 +1005,7 @@ var nodeshot = {
                             }
                         }
                         if(found){
-                            $.cookie('nodeshot_saved_distances', JSON.stringify(nodeshot.distance.saved_links), { expires: 365, path: __project_home__ });
+                            $.cookie('nodeshot_saved_distances', JSON.stringify(nodeshot.distance.saved_links), { expires: 365, path: nodeshot.global.root_url });
                         }
                     }
                     this.link.setMap(null);
@@ -858,7 +1018,7 @@ var nodeshot = {
                     this.$div.find('.link-show').show();
                 },
                 show: function(){
-                    this.link.setMap(map);
+                    this.link.setMap(nodeshot.global.map);
                     this.$div.find('.link-show').hide();
                     this.$div.find('.link-hide').show();                    
                 },
@@ -880,7 +1040,7 @@ var nodeshot = {
                         var json_string = JSON.stringify(nodeshot.distance.saved_links);
                     }
                     // save a cookie with the JSON string
-                    $.cookie('nodeshot_saved_distances', json_string, { expires: 365, path: __project_home__ });
+                    $.cookie('nodeshot_saved_distances', json_string, { expires: 365, path: nodeshot.global.root_url });
                 }
             });
             index = index - 1;
@@ -929,19 +1089,71 @@ var nodeshot = {
         links: []
     },
     
+    gmap: {
+        init: function(){
+            // init latlng object with coordinates specified in settings.py
+            var latlng = new google.maps.LatLng(nodeshot.global.gmap_center.lat, nodeshot.global.gmap_center.lng);
+            // init gmpap 
+            nodeshot.global.map = new google.maps.Map(document.getElementById('map_canvas'), {
+                zoom: 12,
+                center: latlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+            // init geocoder
+            nodeshot.global.geocoder = new google.maps.Geocoder();
+            // if map center is not the default one
+            if(!nodeshot.global.gmap_center.is_default){
+                // try to get the coordinates of the point we need to center the map to every 500ms
+                var intervalId = setInterval(function(){
+                    // if nodes array has been populated
+                    if(nodes.active!=undefined){
+                        // clear interval
+                        clearInterval(intervalId);
+                        // center map and open the node
+                        mapGoTo(nodeshot.global.gmap_center.node);
+                    }
+                }, 500);
+            }
+            // remove loading gif and mask if necessary
+            if(nodeshot.layout.$loading){
+                nodeshot.layout.cacheObjects();
+                nodeshot.overlay.removeMask();
+                nodeshot.overlay.hideLoading();
+                nodeshot.layout.setFullScreen();
+            }
+        },
+        
+        removeAddressMarker: function(){
+            nodeshot.gmap.addressMarker.setMap(null);
+            delete nodeshot.gmap.addressMarker;
+        }
+    },
+    
     infotab:{
+        
+        init: function(){           
+            nodeshot.layout.$infoTable = $("#info-table")
+            nodeshot.layout.$infoWrapper = $('#info-wrapper');
+            nodeshot.layout.$tableWrapper = $('#table-wrapper');
+            nodeshot.layout.$signalbar = $(".signalbar");
+            nodeshot.layout.$infoTable.tablesorter();
+            for(i=0; i<nodeshot.layout.$signalbar.length; i++){
+                var value = nodeshot.layout.$signalbar.eq(i).attr('data-value');
+                nodeshot.layout.$signalbar.eq(i).progressBar(value);
+            }
+        },
         
         scrollTo: function(name){
             // cache object
-            var to = $('a[name='+name+']');            
+            var to = $('tr.'+name);            
             // if target is found
             if(to.length>0){
-                var scroll = $('#table-wrapper').scrollTop() + to.parent().position().top - 100// - nodeshot.layout.$header.height();
+                // define how much scrolling is needed
+                var scroll = nodeshot.layout.$tableWrapper.scrollTop() + to.position().top - 100
                 // scrolling animation
-                $('#table-wrapper').animate({scrollTop: scroll/* - $(window).height() / 4*/},'slow', function(){
-                    console.log(scroll);
+                nodeshot.layout.$tableWrapper.animate({scrollTop: scroll},'slow', function(){
                     // when animation is finished find the row
-                    var row = to.parent().parent().find('td');
+                    var row = to.find('td');
                     // change its background color to highlight it
                     row.css('background-color', '#ffffc8');
                     // then change it back to white background
@@ -952,207 +1164,12 @@ var nodeshot = {
             }
             // if target not found return a message
             else{
-                nodeshot.dialog.open('Il nodo selezionato non è presente in questa lista.')
+                setTimeout(function(){
+                    nodeshot.dialog.open('Il nodo selezionato non è presente in questa lista.')
+                }, 300);
             }
         }
         
     }
     
 }
-
-//function bindChangePassword(){
-//    $('#change-password').click(function(e){
-//        var $this = $(this);
-//        var password_field = $('#id_new_password');
-//        
-//        if($this.data('info')==undefined || $this.data('info').status==0){
-//            $this.data('info', {
-//                text: $this.text(),
-//                status: 1
-//            });
-//            $this.text('annulla');
-//            $('#id_new_password2').val('');
-//            $('#id_fake_password').hide();
-//            password_field.val('').show(500);
-//            $('#verify-password').show(500);   
-//        }
-//        else{
-//            $this.text($this.data('info').text);
-//            $('#id_new_password2').val('');
-//            $('#id_fake_password').show(500);
-//            password_field.val('').hide();
-//            $('#verify-password').hide();
-//            $this.data('info').status = 0;
-//        }
-//    });
-//    
-//    if($('#non-field-errors').length > 0){
-//        $('#change-password').click();
-//    }
-//}
-
-//function insertNodeInfo(){
-//    nodeshot.overlay.addMask();
-//    nodeshot.overlay.showLoading();
-//    $.get(__project_home__+'node/add/', function(data) {
-//        nodeshot.overlay.hideLoading();
-//        $('body').append('<div id="nodeshot-overlay"></div>');
-//        $('#nodeshot-overlay').html(data);
-//        nodeshot.layout.setFullScreen();
-//        if (newMarker) {
-//            $("#id_lat").val(newMarker.getPosition().lat());
-//            $("#id_lng").val(newMarker.getPosition().lng());
-//            removeNewMarker();
-//        }
-//        $('#node-form-cancel').click(function(){
-//            nodeshot.overlay.close();
-//        });
-//    });
-//}
-
-//function bindEditNode(){
-    // working on it
-    //$('#edit-link').click(function(e){
-    //    e.preventDefault();
-    //    var href = $(this).attr('href');
-    //    nodeshotMask(0.7);
-    //    nodeshotShowLoading();
-    //    $.get(href, function(data) {
-    //        nodeshotHideLoading();
-    //        $('body').append('<div id="nodeshot-overlay"></div>');
-    //        $('#nodeshot-overlay').html(data);
-    //        form = $('#contact-form');
-    //        form.css('margin-top', ($(window).height()-form.height()) / 2);
-    //        nodeshot.layout.setFullScreen();
-    //        $('#contact-form-cancel').live('click', function(){
-    //            nodeshotclose();
-    //        });
-    //        $('#contact-form').live('submit', function(e){
-    //            e.preventDefault();
-    //            submitContactNode(node_id, $(this))
-    //        });
-    //    });
-    //});
-//}
-
-//$("#node-form").live("submit", function() {
-//    
-//    nodeshot.overlay.showLoading();
-//    $('#nodeshot-modal-mask').css({
-//        zIndex: 11,
-//        opacity: 0.7
-//    });
-//    $('#nodeshot-overlay').css('z-index', '10');
-//    
-//    var form_data = $(this).serialize();
-//
-//    $.post(__project_home__+'node_form', form_data, function(data) {
-//        
-//        nodeshot.overlay.hideLoading();
-//        
-//        if (data.length >= 10) {
-//            // switch back mask and overlay
-//            $('#nodeshot-modal-mask').css({
-//                zIndex: 10,
-//                opacity: 0.5
-//            });
-//            $('#nodeshot-overlay').css('z-index', '11');
-//            //form errors
-//            $('#nodeshot-overlay').html(data);
-//        } else {            
-//            $('#node-form').fadeOut(500, function(){
-//                nodeshot.dialog.open('Grazie per aver inserito un nuovo nodo potenziale, ti abbiamo inviato un\'email con il link di conferma.', nodeshot.overlay.close);
-//            });
-//            /* do not redirect because is not needed
-//            $.get(__project_home__+'device_form/'+data+'/',  function(data) {
-//                $('#nodeshot-overlay').html(data); //all fine, go to device form    
-//            });*/
-//        }
-//    });
-//
-//    return false; 
-//});
-
-//var conf_html_data = [];
-//
-//function is_last(conf_html_data) {
-//    // True if the last for is fetched for the configuration of all the interfaces
-//    var res = false;
-//    $.each(conf_html_data, function(index, value) {
-//        if (conf_html_data[index] != undefined) {
-//            res = true;
-//            if (!(conf_html_data[index].hnav4 && conf_html_data[index].interfaces))
-//                res = false;
-//        }
-//    });
-//    return res;
-//}
-
-//function append_configuration(conf_html_data) {
-//    var c = $('#nodeshot-overlay'); 
-//  for(var index in conf_html_data) {
-//      c.append("<div class='if-configuration'>" + conf_html_data[index].hnav4 + conf_html_data[index].interfaces + "</div>");
-//    }
-//    $('#nodeshot-overlay').append('<input type="submit" id="configuration-form-submit" class="submit-button ui-priority-primary ui-corner-all ui-state-disabled hover" value="Salva" />');
-//    $('#configuration-form-submit').button();
-//}
-
-//$("#device-form").live("submit", function() { 
-//        var form_data = $(this).serialize();
-//        var node_id = $('#node_id').val()
-//        
-//        $.post(__project_home__+'device_form/'+node_id+'/', form_data, function(data) {
-//            if (data.length >= 10) {
-//                $('#nodeshot-overlay').html(data); //form errors
-//            } else {
-//                var device_ids = data.split(',');
-//                $('#nodeshot-overlay').empty();
-//                
-//                $.each( device_ids, function(index, value) {
-//                    conf_html_data[String(value)] = [];
-//                    // for each device, get HNAv4 and Interface forms
-//                    $.get(__project_home__+'configuration_form?t=h4&device_id=' + value,  function(data) {
-//                        // add data in array
-//                        conf_html_data[String(value)].hnav4 = data;
-//                        if (is_last(conf_html_data))
-//                            append_configuration(conf_html_data);
-//                    }); 
-//                    $.get(__project_home__+'configuration_form?t=if&device_id=' + value,  function(data) {
-//                        //add data in array
-//                        conf_html_data[String(value)].interfaces = data;
-//                        // if last data, construct html
-//                        if (is_last(conf_html_data))
-//                            append_configuration(conf_html_data); 
-//                            
-//                    }); 
-//                });
-//            }
-//        });     
-//        return false;
-//});
-//
-//$("#configuration-form-submit").live("click", function() {
-//    // for each dialog-form (interface and hnav4), submit the data and display errors if any
-//    // if all the submissions are fine, then display thank you
-//    var n_submitted = 0;
-//    $.ajaxSetup({async:false});
-//    $('.dialog-form').each( function(index) {
-//        var form = $(this).find('form');
-//        var form_data = form.serialize();
-//        var new_device_id = $(this).find('.device-id').html();
-//        var configuration_type = $(this).find('.configuration-type').html();
-//        var mdiv = $(this);
-//        $.post(__project_home__+'configuration_form?t='+configuration_type+'&device_id=' + new_device_id, form_data, function(data) {
-//            if (data.length >= 10) {
-//                mdiv.html(data);//errors
-//            } else {
-//               n_submitted = n_submitted + 1;
-//               if (n_submitted == 2) {
-//                    alert('Thank you!');
-//                    window.location.href = "/";
-//               }
-//            }
-//        });
-//    });
-//    $.ajaxSetup({async:true});
-//});

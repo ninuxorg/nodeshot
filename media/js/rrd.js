@@ -46,7 +46,7 @@ function update_fname_handler(bf, fname) {
 
 // this function is invoked when the RRD file name changes
 function fname_update(ip) {
-    fname = __project_home__+'media/graphs/rrds/' + ip + '.rrd';
+    fname = nodeshot.global.root_url+'media/graphs/rrds/' + ip + '.rrd';
     try {
       FetchBinaryURLAsync(fname,update_fname_handler);
       return true;

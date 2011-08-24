@@ -24,9 +24,9 @@
                 {% endif %}
             </p>
             <div id="head-controls" class="ui-widget">
-                <input id="search" class="defaultText text ui-corner-all" title="Cerca un un nodo, IP, MAC o SSID" />
-                <a href="/admin"><img src="{{MEDIA_URL}}images/icons/Config.png" class="top-icon" alt="Admin" /></a>
-                <a href="/kml-feed.kml"><img src="{{MEDIA_URL}}images/icons/Rss.png" class="top-icon" alt="KML Feed" /></a>
+                <input id="search" class="defaultText text ui-corner-all" value="Cerca un un nodo, IP, MAC o SSID" />
+                <a href="{% url admin:index %}"><img src="{{MEDIA_URL}}images/icons/Config.png" class="top-icon" alt="Admin" /></a>
+                <a href="{% url nodeshot_generate_kml %}"><img src="{{MEDIA_URL}}images/icons/Rss.png" class="top-icon" alt="KML Feed" /></a>
                 <a href="http://wiki.ninux.org/UsareMapserver"><img src="{{MEDIA_URL}}images/icons/Lifesaver.png" alt="Help" class="top-icon" /></a>
             </div>
         </header>
@@ -37,7 +37,7 @@
             </article>
             <aside id="aside">
                 <div class="wrapper">
-                    <menu id="view-radio">
+                    <menu id="choices">
                         <input type="radio" id="radio1" name="view-radio" value="map" checked="checked" /><label for="radio1">Mappa</label>
                         <input type="radio" id="radio2" name="view-radio" value="info" /><label for="radio2">Info</label>
                         <input type="radio" id="radio3" name="view-radio" value="olsr" /><label for="radio3">OLSR</label>
@@ -57,13 +57,8 @@
                                 <li class="last"><input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label></li>
                             </ul>
                         </menu>
-                        <!--<input id="search-address" class="defaultText text ui-corner-all" title="Cerca un indirizzo"  />-->
                         
-                            <!--<input type="checkbox" id="active" checked="checked" /><label for="active">Visualizza nodi attivi</label><br />
-                            <input type="checkbox" id="hotspot" checked="checked" /><label for="hotspot">Visualizza hotspots</label><br />-->
-                        
-                        <!--<a id="hide-side" href="#" class="button">Nascondi</a>-->
-                        <menu id="link-quality-selector">
+                        <menu id="link-quality">
                             Visualizza la qualità dei collegamenti:
                             <ul>
                                 <li><input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /> <label for="etx">Pacchetti persi (ETX)</label></li>
@@ -84,36 +79,39 @@
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-ui.js"></script>
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.formset.min.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/addnode.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
     <script type="text/javascript">
-        var __project_home__ = '{% url nodeshot.views.index %}'
-        var __center__ = {
+        //google.load("jquery", "1.5.1");
+        //google.load("jqueryui", "1.8.11");
+        google.load('maps','3',{other_params:'sensor=false'});
+        google.load('search','1');
+        //google.setOnLoadCallback(function() {
+        //        // Place init code here instead of $(document).ready()
+        //        //initialize();
+        //});
+        nodeshot.global.root_url = '{% url nodeshot.views.index %}'
+        nodeshot.global.gmap_center = {
             is_default: {{ gmap_center.is_default }},
             {% if gmap_center.is_default == 'false' %}node: '{{ gmap_center.node }}',{% endif %}
             lat: '{{ gmap_center.lat }}',
             lng: '{{ gmap_center.lng }}'
         };
-        //google.load("jquery", "1.5.1");
-        //google.load("jqueryui", "1.8.11");
-        google.load('maps','3',{other_params:'sensor=false'});
-        google.load('search','1');
-        google.setOnLoadCallback(function() {
-                // Place init code here instead of $(document).ready()
-                initialize();
+        
+        // on dom ready
+        $(function() {
+            nodeshot.overlay.appendLoading();
+            nodeshot.init();            
         });
-        
-        //// calculate dimensions of html elements in pixel
-        //setDimensions = function(){
-        //    $("#content").width($(window).width()-295);
-        //    $("#aside").width('295');
-        //    $("#container").width($(window).width());
-        //    $("#map_canvas").height($(window).height()-$("#header").height());
-        //}
-        
         // when content has been loaded
         $(window).load(function(){
             nodeshot.layout.setFullScreen();
             nodeshot.layout.setElementDimensions();
-            nodeshot.overlay.appendLoading();
+            
             
             {% if messages %}
             nodeshot.dialog.open("{% for message in messages %}{{ message }}{% endfor %}");
@@ -123,30 +121,23 @@
         }).resize(function(){
             nodeshot.layout.setFullScreen();
             // hide orizontal scrollbar
-            $("body").css("overflow-x", "hidden");
+            nodeshot.layout.$body.css("overflow-x", "hidden");
         });
-         
     </script>
-    
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.formset.min.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/addnode.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.progressbar/js/jquery.progressbar.js"></script>
+	<script type="text/javascript" src="{{MEDIA_URL}}js/gmap.js"></script>
     <!-- for rrd -->
-    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/binaryXHR.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFile.js"></script>
+    <!--<script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/binaryXHR.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFile.js"></script>-->
 
     <!-- rrdFlot class needs the following four include files !-->
-    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlotSupport.js"></script>
+    <!--<script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlotSupport.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlot.js"></script>
     <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.selection.js"></script>
+    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.selection.js"></script>-->
     <!-- -->
- 	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery.progressbar/js/jquery.progressbar.js"></script>
-	<script type="text/javascript" src="{{MEDIA_URL}}js/gmap.js"></script>
-	<script type="text/javascript" src="{{MEDIA_URL}}js/rrd.js"></script>
+ 	
+	<!--<script type="text/javascript" src="{{MEDIA_URL}}js/rrd.js"></script>-->
     
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
 </body>
 </html>
