@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8" />
     <title>Nodeshot Open Source Map Server</title>
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/tablesorter/style.css" />
-    <link type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" />
     <!--[if lte IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <base href="{% url nodeshot.views.index %}" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <!-- TODO: add robots -->
 </head>
 <body>
     <div id="container">
@@ -25,14 +27,16 @@
             </p>
             <div id="head-controls" class="ui-widget">
                 <input id="search" class="defaultText text ui-corner-all" value="Cerca un un nodo, IP, MAC o SSID" />
-                <a href="{% url admin:index %}"><img src="{{MEDIA_URL}}images/icons/Config.png" class="top-icon" alt="Admin" /></a>
-                <a href="{% url nodeshot_generate_kml %}"><img src="{{MEDIA_URL}}images/icons/Rss.png" class="top-icon" alt="KML Feed" /></a>
-                <a href="http://wiki.ninux.org/UsareMapserver"><img src="{{MEDIA_URL}}images/icons/Lifesaver.png" alt="Help" class="top-icon" /></a>
+                <a href="{% url admin:index %}"><img src="{{ MEDIA_URL }}images/icons/Config.png" class="top-icon" alt="Admin" /></a>
+                <a href="{% url nodeshot_generate_kml %}"><img src="{{ MEDIA_URL }}images/icons/Rss.png" class="top-icon" alt="KML Feed" /></a>
+                <a href="http://wiki.ninux.org/UsareMapserver"><img src="{{ MEDIA_URL }}images/icons/Lifesaver.png" alt="Help" class="top-icon" /></a>
             </div>
         </header>
         <section id="content-container">
             <article id="content">
-                <div id="map_canvas"></div>
+                <div id="map_canvas">
+                    <noscript>Per utilizzare questa applicazione è necessario abilitare Javascript.</noscript>
+                </div>
                 <div id="side-links"></div>
             </article>
             <aside id="aside">
@@ -53,7 +57,7 @@
                         <menu id="other-controls">
                             <ul>
                                 <li><a id="hide-side">Nascondi questa colonna</a></li>
-                                <li><a id="search-address">Cerca un'indirizzo</a></li>
+                                <li><a id="search-address">Cerca un indirizzo</a></li>
                                 <li class="last"><input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label></li>
                             </ul>
                         </menu>
@@ -76,26 +80,22 @@
         </section>
     </div>
         
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery-ui.js"></script>
-	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.formset.min.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/addnode.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
-    <script type="text/javascript">
-        //google.load("jquery", "1.5.1");
-        //google.load("jqueryui", "1.8.11");
-        google.load('maps','3',{other_params:'sensor=false'});
-        google.load('search','1');
-        //google.setOnLoadCallback(function() {
-        //        // Place init code here instead of $(document).ready()
-        //        //initialize();
-        //});
-        nodeshot.global.root_url = '{% url nodeshot.views.index %}'
-        nodeshot.global.gmap_center = {
+    <script src="{{MEDIA_URL}}js/jquery.js"></script>
+    <script src="{{MEDIA_URL}}js/jquery-ui.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false" type="text/javascript"></script>
+	<!--<script src="http://www.google.com/jsapi"></script>-->
+    <script src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
+    <script src="{{MEDIA_URL}}js/jquery.formset.min.js"></script>
+    <!-- TODO: with some delay (will need to check that nodeshot.infoTab.init() will work correctly -->
+    <script src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script>
+    <!--<script src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script>-->
+    <script src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
+    <script src="{{MEDIA_URL}}js/nodeshot.js"></script>
+    <!--<script src="{{MEDIA_URL}}js/compressed/nodeshot.js"></script>-->
+    <script>
+        nodeshot.url.index = '{% url nodeshot.views.index %}';
+        nodeshot.url.media = '{{ MEDIA_URL }}';
+        nodeshot.gmap.map_center = {
             is_default: {{ gmap_center.is_default }},
             {% if gmap_center.is_default == 'false' %}node: '{{ gmap_center.node }}',{% endif %}
             lat: '{{ gmap_center.lat }}',
@@ -112,11 +112,9 @@
             nodeshot.layout.setFullScreen();
             nodeshot.layout.setElementDimensions();
             
-            
             {% if messages %}
             nodeshot.dialog.open("{% for message in messages %}{{ message }}{% endfor %}");
             {% endif %}
-            
         // update dimensions on resize
         }).resize(function(){
             nodeshot.layout.setFullScreen();
@@ -124,20 +122,6 @@
             nodeshot.layout.$body.css("overflow-x", "hidden");
         });
     </script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/jquery.progressbar/js/jquery.progressbar.js"></script>
-	<script type="text/javascript" src="{{MEDIA_URL}}js/gmap.js"></script>
-    <!-- for rrd -->
-    <!--<script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/binaryXHR.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFile.js"></script>-->
-
-    <!-- rrdFlot class needs the following four include files !-->
-    <!--<script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlotSupport.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/src/lib/rrdFlot.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}js/javascriptrrd-0.5.0/flot/jquery.flot.selection.js"></script>-->
-    <!-- -->
- 	
-	<!--<script type="text/javascript" src="{{MEDIA_URL}}js/rrd.js"></script>-->
-    
+    <script src="{{MEDIA_URL}}js/jquery.progressbar.js"></script>    
 </body>
 </html>

@@ -281,7 +281,7 @@ class Node(models.Model):
         raw_password = self.password
         self.set_password()
         self.save()
-        #self.send_success_mail(raw_password)
+        self.send_success_mail(raw_password)
         
     def save(self):
         ''' Override the save method in order to generate the activation key for new nodes. '''

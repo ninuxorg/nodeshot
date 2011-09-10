@@ -16,12 +16,12 @@
                     <td><div class="status-{{ device.status }}"></div><span style="display: none">{{ device.status }}</span></td> 
                     <td>{{ device.name }} ({{ device.node.name }}) </td> 
                     <td>{{ device.device_type }}</td> 
-                    <td>{% for ip in device.ips %} <a href="#">{{ip}}</a> <br /> {% endfor %}</td> 
+                    <td>{% for ip in device.ips %} {{ip}} <br /> {% endfor %}</td> 
                     <td>
                         {% for signal in device.links %}
                         <div>
                             <div class="signalbar" data-value="{{ signal.signal_bar }}"></div>
-                            {{signal.dbm}} dBm &raquo; <a href="javascript:nodeshot.infotab.scrollTo('{{signal.destination.slug}}')">{{signal.destination.name}}</a>
+                            {{signal.dbm}} dBm &raquo; <a href="javascript:nodeshot.infoTab.scrollTo('{{signal.destination.slug}}')">{{signal.destination.name}}</a>
                         </div>
                         {% endfor %}
                     </td>
@@ -29,15 +29,5 @@
                 {% endfor %}
             </tbody> 
         </table> 
-    </div>
-    <script>
-        nodeshot.layout.$signalbar = $(".signalbar");
-        for(i=0; i<nodeshot.layout.$signalbar.length; i++){
-            var value = nodeshot.layout.$signalbar.eq(i).attr('data-value');
-            nodeshot.layout.$signalbar.eq(i).progressBar(value);
-        }
-    </script>
-    <div id="node-info-box" class="ui-corner-all" title="RRD Traffico uscente ed entrante">
-        <div id="rrd-graph"></div>
     </div>
 </div>

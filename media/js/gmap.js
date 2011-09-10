@@ -1,554 +1,343 @@
-var nodes = [];
+
 //var map;
-//var nodeshot.global.geocoder;
-var markersArray = {
-    'active' : [],
-    'potential': [],
-    'activeListeners': [],
-    'potentialListeners': [],
-    'hotspot': [],
-    'hotspotListeners': [],
-    'links': []
-};
-var newMarker;
-var newMarkerListenerHandle;
-var clickListenerHandle;
-var infoWindow = new google.maps.InfoWindow;
+//var nodeshot.gmap.geocoder;
+//var markersArray = {
+//    'active' : [],
+//    'potential': [],
+//    'activeListeners': [],
+//    'potentialListeners': [],
+//    'hotspot': [],
+//    'hotspotListeners': [],
+//    'links': []
+//};
+//var nodeshot.gmap.newMarker;
+//var nodeshot.gmap.newMarkerListener;
+//var clickListener;
+//var infoWindow = new google.maps.InfoWindow;
 
-function getget(name) {
-  var q = document.location.search;
-  var i = q.indexOf(name + '=');
 
-  if (i == -1) {
-    return false;
-  }
-
-  var r = q.substr(i + name.length + 1, q.length - i - name.length - 1);
-
-  i = r.indexOf('&');
-
-  if (i != -1) {
-    r = r.substr(0, i);
-  }
-
-  return r.replace(/\+/g, ' ');
-}
-
-function getNodeState(nodeSlug) {
-    for (var i = 0; i < nodes.active.length; i++){
-        if (nodes.active[i].slug == nodeSlug){
-            return 'a';
-        }
-    }
-    for (var i = 0; i < nodes.hotspot.length; i++){ 
-        if (nodes.hotspot[i].slug == nodeSlug){
-            return 'h';
-        }
-    }
-    for (var i = 0; i < nodes.potential.length; i++){
-        if (nodes.potential[i].slug == nodeSlug){
-            return 'p';
-        }
-    }
-    return 'n';
-}
-
-function findMarker(nodeSlug) {
-    var nodeStatus = getNodeState(nodeSlug);
-    if (nodeStatus == 'p' &&  ! $('#potential').is(':checked')) {
-        $('#potential').attr('checked', true);
-        draw_nodes('p');
-    }
-    if (nodeStatus == 'a'){
-        status = 'active';
-    }
-    else if (nodeStatus == 'h'){
-        status = 'hotspot';
-    }
-    else if (nodeStatus == 'p'){
-        status = 'potential';
-    }
-    else{
-        return false;
-    }
-    for (var i = 0; i <  markersArray[status].length; i++) {
-        if (markersArray[status][i].slug == nodeSlug){
-            return markersArray[status][i];
-        }
-    }
-    return null;
-}
-
-function mapGoTo(nodeSlug) {
-    var marker = findMarker(nodeSlug);
-    if (marker) {
-        google.maps.event.trigger(marker, "click");
-        nodeshot.global.map.panTo(marker.getPosition());
-        nodeshot.global.map.setZoom(13);
-    } else {
-        alert('il nodo non esiste!')
-    }
-}
-
-/* remove the new marker (if exists) */
-function removeNewMarker(){
-    if (newMarker) 
-        newMarker.setMap(null);
-    if (newMarkerListenerHandle) 
-        google.maps.event.removeListener(newMarkerListenerHandle);
-    newMarker = null;
-    newMarkerListenerHandle = null;
-}
-
-function newNodeMarker(location) {
-        removeNewMarker();   
-        marker = new google.maps.Marker({
-            position: location,
-            map: nodeshot.global.map,
-            icon: nodeshot.global.root_url+'media/images/marker_new.png'
-        });
-        var contentString = '<div id="confirm-new"><h2>Mi hai posizionato bene?</h2>'+
-            '<a href="javascript:nodeshot.node.add()" class="green">Si</a>'+
-            '<a href="javascript:removeNewMarker()" class="red">No</a></div>'
-
-        var infowindow = new google.maps.InfoWindow({
-            content: contentString
-        });
-        //map.setCenter(location);
-        infowindow.open(nodeshot.global.map,marker); 
-        newMarkerListenerHandle = google.maps.event.addListener(marker, 'click', function() {
-            infowindow.open(nodeshot.global.map,marker);
-        });
-        newMarker = marker;
-}
-
-//function initialize_map() {
-//    var latlng = new google.maps.LatLng(nodeshot.global.gmap_center.lat, nodeshot.global.gmap_center.lng);
-//
-//    var myOptions = {
-//        zoom: 12,
-//        center: latlng,
-//        mapTypeId: google.maps.MapTypeId.ROADMAP
-//    };
-//    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-//    nodeshot.global.geocoder = new google.maps.nodeshot.global.geocoder();
+//function draw_nodes(status) {
+//    // shortcut to the object we need
+//    var data = nodeshot.nodes[status];
+//    // marker icon depends on the status (green = active, blue = hotspot, orange = potential)
+//    var image = nodeshot.url.media+'images/marker_'+status+'.png';
 //    
-//    if(!nodeshot.global.gmap_center.is_default){
-//        intervalId = setInterval(function(){
-//            if(nodes.active!=undefined){
-//                clearInterval(intervalId);
-//                mapGoTo(nodeshot.global.gmap_center.node);
-//            }
-//        }, 500);
+//    for(var node in data) {
+//        // save marker in current node object
+//        var latlng = new google.maps.LatLng(data[node].lat, data[node].lng);
+//        data[node].marker = new google.maps.Marker({
+//            position: latlng,
+//            map: nodeshot.gmap.map,
+//            title: data[node].name,
+//            icon: image
+//        });
+//        data[node].marker.slug = data[node].slug;
+//        // show marker on gmap
+//        data[node].marker.setMap(nodeshot.gmap.map);
+//        // add event listener
+//        data[node].listener = google.maps.event.addListener(data[node].marker, 'click',  clickMarker(data[node].marker, data[node]));
 //    }
-//    // remove loading gif and mask if necessary
-//    if(nodeshot.layout.$loading){
-//        nodeshot.layout.cacheObjects();
-//        nodeshot.overlay.removeMask();
-//        nodeshot.overlay.hideLoading();
-//        nodeshot.layout.setFullScreen();
+//    // draw links if status is active
+//    if (status == status_choices.a) {
+//        // cache length for upcount while loop
+//        var len = nodes.links.length;
+//        var ilen = len;
+//        // determine which link quality calculation method we should use
+//        var quality = nodeshot.layout.$linkQuality.find('input:checked').val();
+//        // this is performant on modern browsers
+//        while(--len){
+//            // shortcut to link
+//            var link = nodes.links[ilen-len];
+//            // draw link from ... to ...
+//            /*
+//            writing
+//                quality = 'dbm';
+//                link[quality]
+//            is the same as writing
+//                link.dbm
+//            */
+//            draw_link(link.from_lat, link.from_lng, link.to_lat, link.to_lng, link[quality]);
+//        }
 //    }
 //}
 
-function handleMarkerClick(marker, node) {
-    return function() {
-        // if overlay is open
-        if(nodeshot.layout.$overlay){
-            // close it first
-            nodeshot.overlay.close();
-        }
-        nodeshot.overlay.addMask(0.7);
-        nodeshot.overlay.showLoading();
-        $.get(nodeshot.global.root_url+'node/info/'+node.id+'/', function(data) {
-            // add listener to domready of infowindows - it will be triggered when the infoWindow is ready
-            google.maps.event.addListener(infoWindow, 'domready', function(){
-                $(".tabs").tabs({
-                    // save height of first tab for comparison
-                    create: function(e, ui){
-                        // cache $(this)
-                        $this = $(this);
-                        // save height of active tab in nodeshot object
-                        nodeshot.tab0Height = $this.find('.ui-tabs-panel').eq($this.tabs('option', 'selected')).height();
-                    },
-                    // change height of tab if tab is shorter
-                    show: function(e, ui){
-                        // cache object
-                        $this = $(this);
-                        // if distance tab
-                        if($this.tabs('option', 'selected')===1){
-                            // cache object
-                            var tab = $this.find('.ui-tabs-panel').eq(1);
-                            // save this height
-                            nodeshot.tab1Height = tab.height();
-                            // compare and if first tab was higher set the same height
-                            if(nodeshot.tab0Height > nodeshot.tab1Height){
-                                tab.height(nodeshot.tab0Height);
-                            }
-                        }
-                    },
-                    // advanced tab
-                    select: function(e, ui){
-                        if(ui.tab.id=='advanced-link'){
-                            nodeshot.overlay.addMask(0.8, true);
-                            nodeshot.overlay.showLoading();
-                            $.get($(ui.tab).attr('data-url'), function(data) {
-                                // open overlay, closeOnClick = true
-                                nodeshot.overlay.open(data, true);
-                                // init controls
-                                nodeshot.advanced.init();
-                                // we are not using $.live() for performance reasons
-                                nodeshot.overlay.bindCancelButton();
-                                // todo
-                            });
-                            return false
-                        }
-                    }
-                });
-                nodeshot.contact.link();
-                var search_input = $("#distance-search");
-                nodeshot.layout.bindFocusBlur(search_input);
-                // Implements the search function
-                search_input.autocomplete({
-                    minLength: 3,
-                    source: function(req, add) {
-                        $.getJSON("search/"+req.term+'/', function(data) {
-                            if (data != null && data.length > 0){
-                                add(data);
-                            }
-                            else{
-                                add("");
-                            }
-                        });
-                    },
-                    select: function(event, ui) {
-                        nodeshot.distance.calculate({
-                            from_name: infoWindow.node.name,
-                            from_slug: infoWindow.node.slug,
-                            from_lat: infoWindow.node.lat,
-                            from_lng: infoWindow.node.lng,
-                            to_name: ui.item.name,
-                            to_slug: ui.item.value,
-                            to_lat: ui.item.lat,
-                            to_lng: ui.item.lng
-                        });
-                        search_input.val(ui.item.label)
-                        return false;
-                    }
-                });
-                $('#distance-select').change(function(){
-                    // cache $(this)
-                    $this = $(this);
-                    // split values in array
-                    var values = ($this.val()).split(';');
-                    //// replace comma
-                    var to_lat = (values[0]).replace(",",".");
-                    var to_lng = (values[1]).replace(",",".");
-                    var to_slug = values[2];
-                    // calculate distance and add controls
-                    nodeshot.distance.calculate({
-                        from_name: infoWindow.node.name,
-                        from_slug: infoWindow.node.slug,
-                        from_lat: infoWindow.node.lat,
-                        from_lng: infoWindow.node.lng,
-                        to_name: $this.find('option[value="'+$this.val()+'"]').text(),
-                        to_slug: to_slug,
-                        to_lat: to_lat,
-                        to_lng: to_lng
-                    });
-                });
-                nodeshot.layout.setFullScreen();
-            });
-            infoWindow.setContent(data);
-            infoWindow.maxWidth = 500;
-            infoWindow.open(nodeshot.global.map, marker);
-            nodeshot.overlay.hideLoading();
-            // remove mask only if there isn't any dialog
-            if(!nodeshot.layout.$dialog){
-                nodeshot.overlay.removeMask();
-            }
-            infoWindow.node = node;
-        });
-    };
-} 
+//function remove_markers(status) {
+//    // loop over nodes with the specified status and remove them from gmap
+//    for(var node in nodeshot.nodes[status]){
+//        // remove from gmap
+//        nodeshot.nodes[status][node].marker.setMap(null);
+//        // remove listener
+//        google.maps.event.removeListener(nodeshot.nodes[status][node].listener);
+//    }
+//}
 
-function calc_distance(lat1, lon1, lat2, lon2, unit) {
-    var radlat1 = Math.PI * lat1/180;
-    var radlat2 = Math.PI * lat2/180;
-    var radlon1 = Math.PI * lon1/180;
-    var radlon2 = Math.PI * lon2/180;
-    var theta = lon1-lon2;
-    var radtheta = Math.PI * theta/180;
-    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-    dist = Math.acos(dist);
-    dist = dist * 180/Math.PI;
-    dist = dist * 60 * 1.1515;
-    if (unit=="K") { dist = dist * 1.609344 };
-    if (unit=="N") { dist = dist * 0.8684 };
-    return dist;
-    
-}
+//function getNodeState(nodeSlug) {
+//    // repeat action for each possible status
+//    for(var status in status_choices){
+//        // loop over nodes with that status
+//        for (var i = 0; i < nodes[status].length; i++){
+//            // if node is found
+//            if (nodes[status][i].slug == nodeSlug){
+//                // return status
+//                return status_choices[status];
+//            }
+//        }
+//    }
+//    //for (var i = 0; i < nodes.active.length; i++){
+//    //    if (nodes.active[i].slug == nodeSlug){
+//    //        return 'a';
+//    //    }
+//    //}
+//    //for (var i = 0; i < nodes.hotspot.length; i++){ 
+//    //    if (nodes.hotspot[i].slug == nodeSlug){
+//    //        return 'h';
+//    //    }
+//    //}
+//    //for (var i = 0; i < nodes.potential.length; i++){
+//    //    if (nodes.potential[i].slug == nodeSlug){
+//    //        return 'p';
+//    //    }
+//    //}
+//    return 'n';
+//}
 
-function draw_link(flat, flng, tlat, tlng, quality) {
 
-    var linkCoordinates = [
-        new google.maps.LatLng(flat, flng),
-        new google.maps.LatLng(tlat, tlng)
-    ];
-    var qualityColor = '#000000';
-    if (quality==1) 
-        qualityColor =  '#00ff00' //Good
-    else if (quality==2) 
-        qualityColor =  '#ffff00' //Medium
-    else if (quality==3) 
-        qualityColor =  '#ee0000' //Bad
-    else if (quality==4) 
-        qualityColor =  '#5f0060' //used for tested link
 
-    var link = new google.maps.Polyline({
-        path: linkCoordinates,
-        strokeColor: qualityColor,
-        strokeOpacity: 0.4,
-        strokeWeight: 5 
-    });
-    link.setMap(nodeshot.global.map);
-    if(quality!=4){
-        markersArray.links.push(link);   
-    }
-    else{
-        return link;
-    }
-}
 
-function draw_nodes(type) {
-    var marray;
-    var image = '';
-    
-    if (type == 'a') {
-        data = nodes.active;
-        marray = markersArray.active;
-        larray = markersArray.activeListeners;
-        image = nodeshot.global.root_url+'media/images/marker_active.png';
-    } else if (type == 'p') {
-        data = nodes.potential;
-        marray = markersArray.potential;
-        larray = markersArray.potentialListeners;
-        image = nodeshot.global.root_url+'media/images/marker_potential.png';
-    } else if (type == 'h') {
-        data = nodes.hotspot;
-        marray = markersArray.hotspot;
-        larray = markersArray.hotspotListeners;
-        image = nodeshot.global.root_url+'media/images/marker_hotspot.png';
-    }
-    
-    for (var i = 0; i < data.length; i++) { 
-        var latlng = new google.maps.LatLng(data[i].lat, data[i].lng);
-        marker = new google.maps.Marker({
-            position: latlng,
-            map: nodeshot.global.map,
-            title: data[i].name,
-            icon: image
-        });
-        marker.slug = data[i].slug;
-        marray.push(marker);
-        marker.setMap(nodeshot.global.map);  
-        
-        var listenerHandle = google.maps.event.addListener(marker, 'click',  handleMarkerClick(marker, data[i]) );
-        larray.push(listenerHandle);
-    }
-    // draw links if type is active
-    if (type == 'a') {
-        for (var i = 0; i < nodes.links.length; i++) {
-            if ($("#link-quality input:checked").val() == 'etx')
-                draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].etx);
-            else
-                draw_link(nodes.links[i].from_lat, nodes.links[i].from_lng, nodes.links[i].to_lat, nodes.links[i].to_lng, nodes.links[i].dbm);
-        }
-    }
-}
+//function findMarker(node) {
+//    // if destination is a potential node and $potential is unchecked show potential nodes
+//    nodeshot.gmap.check$potential(nodeshot.status_choices[node.status]);
+//    // return google.maps.Marker object
+//    return node.marker;
+//}
+//
+//function mapGoTo(node) {
+//    // get google.maps.Marker object
+//    var marker = findMarker(node);
+//    if (marker) {
+//        // trigger click event
+//        google.maps.event.trigger(marker, 'click');
+//        // center gmap
+//        nodeshot.gmap.map.panTo(marker.getPosition());
+//        // zoom a little bit
+//        nodeshot.gmap.map.setZoom(13);
+//    } else {
+//        // node not found
+//        nodeshot.dialog.open('Il nodo non esiste.');
+//    }
+//}
+//
+///* remove the new marker (if exists) */
+//function removeNewMarker(){
+//    if (nodeshot.gmap.newMarker){ 
+//        nodeshot.gmap.newMarker.setMap(null);
+//    }
+//    if (nodeshot.gmap.newMarkerListener){
+//        google.maps.event.removeListener(nodeshot.gmap.newMarkerListener);
+//    }
+//    nodeshot.gmap.newMarker = null;
+//    nodeshot.gmap.newMarkerListener = null;
+//}
+//
+//function newNodeMarker(location) {
+//        removeNewMarker();   
+//        var marker = new google.maps.Marker({
+//            position: location,
+//            map: nodeshot.gmap.map,
+//            icon: nodeshot.url.media+'images/marker_new.png'
+//        });
+//        var contentString = '<div id="confirm-new"><h2>Mi hai posizionato bene?</h2>'+
+//            '<a href="javascript:nodeshot.node.add()" class="green">Si</a>'+
+//            '<a href="javascript:removeNewMarker()" class="red">No</a></div>'
+//
+//        nodeshot.gmap.infoWindow = new google.maps.InfoWindow({
+//            content: contentString
+//        });
+//        //map.setCenter(location);
+//        nodeshot.gmap.infoWindow.open(nodeshot.gmap.map,marker); 
+//        nodeshot.gmap.newMarkerListener = google.maps.event.addListener(marker, 'click', function() {
+//            nodeshot.gmap.infoWindow.open(nodeshot.gmap.map,marker);
+//        });
+//        nodeshot.gmap.newMarker = marker;
+//}
 
-function remove_markers(type) {
-    var marray;
-    if (type == 'a') {
-        marray = markersArray.active;
-        larray = markersArray.activeListeners;
-        for (i in markersArray.links)
-            markersArray.links[i].setMap(null);
-    } else if (type == 'h') {
-        marray = markersArray.hotspot;
-        larray = markersArray.hotspotListeners;
-    } else if (type == 'p') {
-        marray = markersArray.potential;
-        larray = markersArray.potentialListeners;
-    }
-    for (i in marray) {
-        google.maps.event.removeListener(larray[i]);
-        marray[i].setMap(null);
-    }
-}
 
-var kkeys = [], konami = "38,38,40,40,37,39,37,39,66,65";
-$(document).keydown(function(e) {
-  kkeys.push( e.keyCode );
-  if ( kkeys.toString().indexOf( konami ) >= 0 ){
-    $(document).unbind('keydown',arguments.callee);
-    $.getScript('http://www.cornify.com/js/cornify.js',function(){
-      cornify_add();
-      $(document).keydown(cornify_add);
-    });          
-  }
-});
 
-//function initialize() {
-    //initialize_map();
-    
+//function clickMarker(marker, node) {
+//    return function() {
+//        // if overlay is open
+//        if(nodeshot.layout.$overlay){
+//            // close it first
+//            nodeshot.overlay.close();
+//        }
+//        nodeshot.overlay.addMask(0.7);
+//        nodeshot.overlay.showLoading();
+//        $.get(nodeshot.url.index+'node/info/'+node.id+'/', function(data) {
+//            // remove listener in case it has already been set
+//            if(nodeshot.gmap.infoWindow.domready){
+//                google.maps.event.removeListener(nodeshot.gmap.infoWindow.domready);
+//            }
+//            // add listener to domready of infowindows - it will be triggered when the infoWindow is ready
+//            nodeshot.gmap.infoWindow.domready = google.maps.event.addListener(nodeshot.gmap.infoWindow, 'domready', function(){
+//                $(".tabs").tabs({
+//                    // save height of first tab for comparison
+//                    create: function(e, ui){
+//                        // cache $(this)
+//                        $this = $(this);
+//                        // save height of active tab in nodeshot object
+//                        nodeshot.tab0Height = $this.find('.ui-tabs-panel').eq($this.tabs('option', 'selected')).height();
+//                    },
+//                    // change height of tab if tab is shorter
+//                    show: function(e, ui){
+//                        // cache object
+//                        $this = $(this);
+//                        // if distance tab
+//                        if($this.tabs('option', 'selected')===1){
+//                            // cache object
+//                            var tab = $this.find('.ui-tabs-panel').eq(1);
+//                            // save this height
+//                            nodeshot.tab1Height = tab.height();
+//                            // compare and if first tab was higher set the same height
+//                            if(nodeshot.tab0Height > nodeshot.tab1Height){
+//                                tab.height(nodeshot.tab0Height);
+//                            }
+//                        }
+//                    },
+//                    // advanced tab
+//                    select: function(e, ui){
+//                        if(ui.tab.id=='advanced-link'){
+//                            nodeshot.overlay.addMask(0.8, true);
+//                            nodeshot.overlay.showLoading();
+//                            $.get($(ui.tab).attr('data-url'), function(data) {
+//                                // open overlay, closeOnClick = true
+//                                nodeshot.overlay.open(data, true);
+//                                // init controls
+//                                nodeshot.advanced.init();
+//                                // we are not using $.live() for performance reasons
+//                                nodeshot.overlay.bindCancelButton();
+//                                // todo
+//                            });                            
+//                        }
+//                        return false
+//                    }
+//                });
+//                nodeshot.contact.link();
+//                var search_input = $('#distance-search');
+//                nodeshot.layout.bindFocusBlur(search_input);
+//                // Implements the search function
+//                search_input.autocomplete({
+//                    minLength: 3,
+//                    source: function(req, add) {
+//                        $.getJSON("search/"+req.term+'/', function(data) {
+//                            if (data != null && data.length > 0){
+//                                add(data);
+//                            }
+//                            else{
+//                                add("");
+//                            }
+//                        });
+//                    },
+//                    select: function(event, ui) {
+//                        nodeshot.distance.calculate({
+//                            // TODO: storing stuff in infowindow might not be necessary
+//                            from_name: nodeshot.gmap.infoWindow.node.name,
+//                            from_slug: nodeshot.gmap.infoWindow.node.slug,
+//                            from_lat: nodeshot.gmap.infoWindow.node.lat,
+//                            from_lng: nodeshot.gmap.infoWindow.node.lng,
+//                            to_name: ui.item.name,
+//                            to_slug: ui.item.value,
+//                            to_lat: ui.item.lat,
+//                            to_lng: ui.item.lng,
+//                            to_status: ui.item.status
+//                        });
+//                        search_input.val(ui.item.label)
+//                        return false;
+//                    }
+//                });
+//                $('#distance-select').change(function(){
+//                    // cache $(this)
+//                    $this = $(this);
+//                    // split values in array
+//                    var values = ($this.val()).split(';');
+//                    //// replace comma
+//                    var to_lat = (values[0]).replace(",",".");
+//                    var to_lng = (values[1]).replace(",",".");
+//                    var to_slug = values[2];
+//                    var to_status = values[3]
+//                    // calculate distance and add controls
+//                    nodeshot.distance.calculate({
+//                        from_name: nodeshot.gmap.infoWindow.node.name,
+//                        from_slug: nodeshot.gmap.infoWindow.node.slug,
+//                        from_lat: nodeshot.gmap.infoWindow.node.lat,
+//                        from_lng: nodeshot.gmap.infoWindow.node.lng,
+//                        to_name: $this.find('option[value="'+$this.val()+'"]').text(),
+//                        to_slug: to_slug,
+//                        to_lat: to_lat,
+//                        to_lng: to_lng,
+//                        to_status: to_status
+//                    });
+//                });
+//                nodeshot.layout.setFullScreen();
+//            });
+//            nodeshot.gmap.infoWindow.setContent(data);
+//            nodeshot.gmap.infoWindow.maxWidth = 500;
+//            nodeshot.gmap.infoWindow.open(nodeshot.gmap.map, marker);
+//            nodeshot.overlay.hideLoading();
+//            // remove mask only if there isn't any dialog
+//            if(!nodeshot.layout.$dialog){
+//                nodeshot.overlay.removeMask();
+//            }
+//            nodeshot.gmap.infoWindow.node = node;
+//        });
+//    };
+//} 
 
-    //$(".defaultText").focus(function(srcc)
-    //    {
-    //        if ($(this).val() == $(this)[0].title)
-    //        {
-    //            $(this).removeClass("defaultTextActive");
-    //            $(this).val("");
-    //        }
-    //});
-    //    
-    //$(".defaultText").blur(function()
-    //{
-    //    if ($(this).val() == "")
-    //    {
-    //        $(this).addClass("defaultTextActive");
-    //        $(this).val($(this)[0].title);
-    //    }
-    //});
-    
-    //$(".defaultText").blur();    
+//function calc_distance(lat1, lon1, lat2, lon2, unit) {
+//    var radlat1 = Math.PI * lat1/180;
+//    var radlat2 = Math.PI * lat2/180;
+//    var radlon1 = Math.PI * lon1/180;
+//    var radlon2 = Math.PI * lon2/180;
+//    var theta = lon1-lon2;
+//    var radtheta = Math.PI * theta/180;
+//    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+//    dist = Math.acos(dist);
+//    dist = dist * 180/Math.PI;
+//    dist = dist * 60 * 1.1515;
+//    if (unit=="K") { dist = dist * 1.609344 };
+//    if (unit=="N") { dist = dist * 0.8684 };
+//    return dist;
+//}
 
-    //$('#search-span button').button({
-    //    icons: {
-    //        primary: "ui-icon-search"
-    //    },
-    //    text: false
-    //});
-
-    //$('#addnode').button({
-    //     icons: {
-    //        primary: "ui-icon-plusthick"
-    //    }   
-    //});
-
-    //$('#addnode').click(function() {
-    //    nodeshot.dialog.open('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
-    //    //$('#addhelper').html("Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :) ");
-    //    //$(this).button('option', 'label', 'Annulla inserimento');
-    //    clickListenerHandle = google.maps.event.addListener(map, 'click', function(event) {
-    //           newNodeMarker(event.latLng);
-    //    });
-    //});
-
-    //$("#view-radio").buttonset();
-    ////$( "#link-quality" ).buttonset();
-    ////document.getElementById('etx').checked=true;
-    ////document.getElementById('dbm').checked=false;
-    //document.getElementById('radio1').checked=true;
-    //document.getElementById('radio2').checked=false;
-    //document.getElementById('radio3').checked=false;
-    //document.getElementById('radio4').checked=false;
-    //$("#view-radio").buttonset("refresh");
-    //$("#link-quality").buttonset("refresh");
-
-    /* distance calculation */
-    // todo: change live
-    //$('#distance-select').live('change',function(){
-    //    // cache $(this)
-    //    $this = $(this);
-    //    // split values in array
-    //    var values = ($this.val()).split(';');
-    //    //// replace comma
-    //    var to_lat = (values[0]).replace(",",".");
-    //    var to_lng = (values[1]).replace(",",".");
-    //    var to_slug = values[2];
-    //    // calculate distance and add controls
-    //    nodeshot.distance.calculate({
-    //        from_name: infoWindow.node.name,
-    //        from_slug: infoWindow.node.slug,
-    //        from_lat: infoWindow.node.lat,
-    //        from_lng: infoWindow.node.lng,
-    //        to_name: $this.find('option[value="'+$this.val()+'"]').text(),
-    //        to_slug: to_slug,
-    //        to_lat: to_lat,
-    //        to_lng: to_lng
-    //    });
-    //});
-
-    /* populate the list of nodes */
-    //$("#node-tree")
-    //    /*.bind("open_node.jstree close_node.jstree", function (e) {
-    //            alert("Last operation: " + e.type);
-    //    })*/.jstree({
-    //    "json_data" : {
-    //        "ajax" : {
-    //            "url" : nodeshot.global.root_url+"node_list.json",
-    //            "data" : function (n) {
-    //                return { id : n.attr ? n.attr("id") : 0 }; 
-    //            }
-    //        }
-    //    },
-    //    'themes' : {'theme' : 'classic'},
-    //    "plugins" : [ "themes", "json_data"  ]
-    //});
-
-    //$.getJSON(nodeshot.global.root_url+"nodes.json", function(data) {
-    //    nodes = data;
-    //    //if ( $('#hotspot').is(':checked') )
-    //    draw_nodes('h');
-    //    //if ( $('#active').is(':checked') )
-    //    draw_nodes('a');
-    //    if ( $('#potential').is(':checked') )
-    //        draw_nodes('p');
-    //});
-
-    /* view active nodes */
-    //$('#active').change(function() {
-    //    if ($(this).is(':checked')) {
-    //        if (markersArray.active.length == 0)
-    //            draw_nodes('a');
-    //    } else {
-    //        if (markersArray.active.length > 0) {
-    //            remove_markers('a');
-    //            markersArray.links = [];
-    //            markersArray.active = [];
-    //            markersArray.activeListeners  = [];
-    //        }
-    //    }
-    //});
-
-    ///* view potential nodes */
-    //$('#potential').change(function() {
-    //    if ($(this).is(':checked')) {
-    //        $.cookie('nodeshot_potential_nodes', 'true', { expires: 365, path: nodeshot.global.root_url });
-    //        if (markersArray.potential.length == 0)
-    //            draw_nodes('p');
-    //    } else {
-    //        $.cookie('nodeshot_potential_nodes', 'false', { expires: 365, path: nodeshot.global.root_url });
-    //        if (markersArray.potential.length > 0) {
-    //            remove_markers('p');
-    //            markersArray.potential = [];
-    //            markersArray.potentialListeners  = [];
-    //        }
-    //    }
-    //});
-    
-    /* view hotspot nodes */
-    //$('#hotspot').change(function() {
-    //    if ($(this).is(':checked')) {
-    //        if (markersArray.hotspot.length == 0)
-    //            draw_nodes('h');
-    //    } else {
-    //        if (markersArray.hotspot.length > 0) {
-    //            remove_markers('h');
-    //            markersArray.hotspot = [];
-    //            markersArray.hotspotListeners  = [];
-    //        }
-    //    }
-    //});
-//};
+//function draw_link(from_lat, from_lng, to_lat, to_lng, quality) {
+//    // init local var
+//    var color;
+//    // determine color depending on link quality
+//    if (quality==1){
+//        color =  '#00ff00'; // Good
+//    }
+//    else if (quality==2){ 
+//        color =  '#ffff00'; // Medium
+//    }
+//    else if (quality==3){
+//        color =  '#ee0000'; // Bad
+//    }
+//    else if (quality==4){
+//        color =  '#5f0060'; // used for distance calculations
+//    }
+//    // draw link on gmap
+//    var link = new google.maps.Polyline({
+//        // coordinates
+//        path: [new google.maps.LatLng(from_lat, from_lng),new google.maps.LatLng(to_lat, to_lng)],
+//        // line features
+//        strokeColor: color,
+//        strokeOpacity: 0.4,
+//        strokeWeight: 5 
+//    });
+//    // show link on gmap
+//    link.setMap(nodeshot.gmap.map);
+//    if(quality==4){
+//        return link;
+//    }
+//    return true;
+//}
 

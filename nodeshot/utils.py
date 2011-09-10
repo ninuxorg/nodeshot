@@ -78,6 +78,22 @@ def notify_admins(node, subject, body_template, context, skip=False):
             # send email
             admin.email_user(subject, message)
 
+def jslugify(slug):
+    """
+    Converts a slug into a javascript var
+    replaces - with _
+    avoid that strings begins with a number (which is not valid in js)
+    """
+    conversions = ['A','B','C','D','E','F','G','H','I','J','K']
+    count = 0;
+    try:
+        if isinstance(int(slug[0]), int):
+            new = conversions[int(slug[0])]
+            slug = '%s%s__%s' % (new, slug[0], slug[1:])
+    except:
+        pass
+    return slug.replace('-', '_')
+
 #
 # the following functions are needed for versions < than django 1.4 (in django 1.4 these functions are wrapped in django.contrib.auth.utils)
 #

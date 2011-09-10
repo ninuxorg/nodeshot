@@ -33,6 +33,7 @@ this script was modified to be used in nodeshot and differs slightly with the or
 				barImage		: {
 									0:	nodeshot.url.media+'/images/progressbg_red.gif',
 									30: nodeshot.url.media+'/images/progressbg_orange.gif',
+                                    45: nodeshot.url.media+'/images/progressbg_yellow.gif',
 									70: nodeshot.url.media+'/images/progressbg_green.gif'
 								},
 				
@@ -117,7 +118,7 @@ this script was modified to be used in nodeshot and differs slightly with the or
 							for (var i in config.barImage) {
 								if (config.running_value >= parseInt(i)) {
 									image = config.barImage[i];
-								} else { break; }
+								} else { break }
 							}
 						}
 						return image;
@@ -131,13 +132,16 @@ this script was modified to be used in nodeshot and differs slightly with the or
 								return " " + config.running_value + '/' + config.max;
 							}
 						}
+                        return false;
 					}
 					
 					config.increment = Math.round((config.value - config.running_value)/config.steps);
-					if (config.increment < 0)
+					if (config.increment < 0){
 						config.increment *= -1;
-					if (config.increment < 1)
+					}
+					if (config.increment < 1){
 						config.increment = 1;
+					}
 					
 					var t = setInterval(function() {
 						var pixels	= config.width / 100;			// Define how many pixels go into 1%
@@ -157,8 +161,9 @@ this script was modified to be used in nodeshot and differs slightly with the or
 							}
 						}
 						
-						if (config.running_value == config.value)
+						if (config.running_value == config.value){
 							clearInterval(t);
+						}
 						
 						var $bar	= $("#" + config.id + "_pbImage");
 						var $text	= $("#" + config.id + "_pbText");

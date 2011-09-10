@@ -8,7 +8,7 @@ from nodeshot.models import *
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from nodeshot.utils import signal_to_bar, distance, email_owners
+from nodeshot.utils import signal_to_bar, distance, email_owners, jslugify
 import time,re,os
 import settings
 from settings import DEBUG, NODESHOT_SITE as SITE
@@ -16,6 +16,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from forms import ContactForm, PasswordResetForm
 from datetime import datetime, timedelta
 from django.db.models import Q
+
+if DEBUG:
+    import logging
 
 # retrieve map center or set default if not specified
 try:
@@ -52,10 +55,10 @@ def index(request, slug=False):
     # if node is in querystring we want to center the map somewhere else
     if slug:
         try:
-            node = Node.objects.only('lat', 'lng', 'slug').get(slug=slug)
+            node = Node.objects.only('lat', 'lng', 'slug','status').get(slug=slug)
             gmap_center = {
                 'is_default': 'false',
-                'node': node.slug,
+                'node': '%s;%s' % (jslugify(node.slug), node.status),
                 # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
                 'lat': str(node.lat),
                 'lng': str(node.lng)
@@ -73,62 +76,156 @@ def index(request, slug=False):
     return render_to_response('index.html', context, context_instance=RequestContext(request))
 
 def nodes(request):
-    active = Node.objects.filter(status = 'a').values('name', 'slug', 'id', 'lng', 'lat')
-    potential = Node.objects.filter(status = 'p').values('name', 'slug', 'id', 'lng', 'lat')
-    hotspot = Node.objects.filter(status = 'h').values('name', 'slug', 'id', 'lng', 'lat')
+    """
+    Returns a json list with all the nodes divided in active, potential and hostspot
+    """
+    # retrieve nodes in 3 different objects depending on the status
+    active = Node.objects.filter(status = 'a').values('name', 'slug', 'id', 'lng', 'lat', 'status')
+    potential = Node.objects.filter(status = 'p').values('name', 'slug', 'id', 'lng', 'lat', 'status')
+    hotspot = Node.objects.filter(status = 'h').values('name', 'slug', 'id', 'lng', 'lat', 'status')
 
-    # retrieve links, select_related() reduces the number of queries, only() selects only the fields we need
-    link_query = Link.objects.all().select_related().only(
+    # retrieve links, select_related() reduces the number of queries,
+    # only() selects only the fields we need
+    # double underscore __ indicates that we are following a foreign key
+    link_queryset = Link.objects.all().select_related().only(
         'from_interface__device__node__lat', 'from_interface__device__node__lng',
         'to_interface__device__node__lat', 'to_interface__device__node__lng',
         'to_interface__device__node__name', 'to_interface__device__node__name',
         'etx', 'dbm'
     )
-
+    
+    # prepare empty list
     links = []
-    for l in link_query:
-       etx = 0
-       if 0 < l.etx < 1.5:
-           etx = 1
-       elif l.etx < 3:
-           etx = 2
-       else:
-           etx = 3
-
-       if -60 < l.dbm < 0:
+    # loop over queryset (remember: evaluating queryset makes query to the db)
+    for l in link_queryset:
+        # determining link colour (depending on link quality)
+        etx = 0
+        if 0 < l.etx < 1.5:
+            etx = 1
+        elif l.etx < 3:
+            etx = 2
+        else:
+            etx = 3
+        # same but with dbm instead of etx
+        if -60 < l.dbm < 0:
             dbm = 1
-       elif l.dbm > -75:
+        elif l.dbm > -75:
             dbm = 2
-       else:
+        else:
             dbm = 3
-
-       entry = {'from_lng': l.from_interface.device.node.lng , 'from_lat': l.from_interface.device.node.lat, 'to_lng': l.to_interface.device.node.lng, 'to_lat': l.to_interface.device.node.lat, 'etx': etx , 'dbm': dbm }
-       links.append(entry)
-
-    data = {'hotspot': list(hotspot), 'active': list(active), 'potential': list(potential), 'links': links}
+        # prepare result
+        entry = {
+            'from_lng': l.from_interface.device.node.lng ,
+            'from_lat': l.from_interface.device.node.lat,
+            'to_lng': l.to_interface.device.node.lng,
+            'to_lat': l.to_interface.device.node.lat,
+            'etx': etx ,
+            'dbm': dbm
+        }
+        # append/push result into list
+        links.append(entry)
+        
+    ## prepare data for json serialization
+    ## list() evaluates a queryset
+    #data = {
+    #    'hotspot': list(hotspot),
+    #    'active': list(active),
+    #    'potential': list(potential),
+    #    'links': links
+    #}
+    
+    #prepare data for json serialization
+    active_nodes, hotspot_nodes, potential_nodes = {}, {}, {}
+    for node in active:
+        node['jslug'] = jslugify(node['slug'])
+        active_nodes[jslugify(node['slug'])] = node
+    for node in hotspot:
+        node['jslug'] = jslugify(node['slug'])
+        hotspot_nodes[jslugify(node['slug'])] = node
+    for node in potential:
+        node['jslug'] = jslugify(node['slug'])
+        potential_nodes[jslugify(node['slug'])] = node
+    data = {
+        'active': active_nodes,
+        'hotspot': hotspot_nodes,        
+        'potential': potential_nodes,
+        'links': links
+    }
+    # return json
+    #return HttpResponse('<body>%s</body>'%simplejson.dumps(data))
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def node_list(request):
+    """
+    Populates jquery.jstree
+    """
+    # retrieve nodes in 3 different objects depending on the status
     active = Node.objects.filter(status = 'a').values('name', 'slug', 'lng', 'lat').order_by('name')
     hotspot = Node.objects.filter(status = 'h').values('name', 'slug', 'lng', 'lat').order_by('name')
     potential = Node.objects.filter(status = 'p').values('name', 'slug', 'lng', 'lat').order_by('name')
+    # prepare empty lists
     data, active_list, hotspot_list, potential_list = [], [], [], []
 
     for a in active:
-        active_list.append({ 'data' : {'title' : a['name'], 'attr' : {'class': 'child', 'href' : 'javascript:mapGoTo(\'' + a['slug'] + '\')'} } })
+        active_list.append({
+            'data': {
+                'title': a['name'],
+                'attr': {
+                    'class': 'child',
+                    'href': "javascript:nodeshot.gmap.goToNode(nodeshot.nodes.active.%s)" % jslugify(a['slug'])
+                }
+            }
+        })
     if len(active_list) > 0:
-        data.append( { "data" : "Nodi Attivi", "state": "open", 'attr': {'class': 'active_nodes'}, "children" : list(active_list) } )
+        data.append({
+            'data': 'Nodi Attivi',
+            'state': 'open',
+            'attr': {
+                'class': 'active_nodes'
+            },
+            'children': list(active_list)
+        })
 
     for h in hotspot:
-        hotspot_list.append({'data' :{'title' : h['name'], 'attr' : {'class': 'child', 'href' : 'javascript:mapGoTo(\'' + h['slug'] + '\')'} } })
+        hotspot_list.append({
+            'data': {
+                'title': h['name'],
+                'attr': {
+                    'class': 'child',
+                    'href': "javascript:nodeshot.gmap.goToNode(nodeshot.nodes.hotspot.%s)" % jslugify(h['slug'])
+                }
+            }
+        })
     if len(hotspot_list) > 0:
-        data.append( { "data" : "Nodi Hotspots", "state": "open", 'attr': {'class': 'hotspot_nodes'}, "children" : list(hotspot_list) } )
+        data.append({
+            'data': 'Nodi Hotspots',
+            'state': 'open',
+            'attr': {
+                'class': 'hotspot_nodes'
+            },
+            'children': list(hotspot_list)
+        })
 
     for p in potential:
-        potential_list.append({'data' :{'title' : p['name'], 'attr' : {'class': 'child', 'href' : 'javascript:mapGoTo(\'' + p['slug'] + '\')'} } })
+        potential_list.append({
+            'data': {
+                'title': p['name'],
+                'attr': {
+                    'class': 'child',
+                    'href': "javascript:nodeshot.gmap.goToNode(nodeshot.nodes.potential.%s)" % jslugify(p['slug'])
+                }
+            }
+        })
     if len(potential_list) > 0:
-        data.append( { "data" : "Nodi Potenziali", "state": "open", 'attr': {'class': 'potential_nodes'}, "children" : list(potential_list) } )
-
+        data.append({
+            'data': 'Nodi Potenziali',
+            'state': 'open',
+            'attr': {
+                'class': 'potential_nodes'
+            },
+            'children': list(potential_list)
+        })
+    # return json
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 def node_info(request, node_id):
@@ -146,33 +243,34 @@ def node_info(request, node_id):
     
     # get object or raise 404
     try:
-        node = Node.objects.exclude(status='u').only('id','name','slug','description','owner','postal_code','lat','lng','alt').get(pk=node_id)
+        node = Node.objects.exclude(status='u').only('id','name','slug','description','owner','postal_code','lat','lng','alt','status').get(pk=node_id)
     except ObjectDoesNotExist:
         raise Http404
 
-    context = {'node' : node, 'nodes' : Node.objects.all().order_by('name').only('name','slug','lat','lng','status')}
+    context = {'node': node, 'nodes': Node.objects.all().order_by('name').only('name','slug','lat','lng','status')}
 
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 def search(request, what):
     data = []
-    data = data + [{'label': d.name, 'value': d.slug, 'name': d.name, 'lat': d.lat, 'lng': d.lng }  for d in Node.objects.filter(name__icontains=what).only('name','slug','lat','lng')]
-    data = data + [{'label': d.ipv4_address , 'value': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng }  for d in Interface.objects.filter(ipv4_address__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng')]
-    data = data + [{'label': d.mac_address , 'value': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng }  for d in Interface.objects.filter(mac_address__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng')]
-    data = data + [{'label': d.ssid , 'value': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng }  for d in Interface.objects.filter(ssid__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng')]
+    data = data + [{'label': d.name, 'value': jslugify(d.slug), 'slug': d.slug, 'name': d.name, 'lat': d.lat, 'lng': d.lng, 'status': d.status }  for d in Node.objects.filter(name__icontains=what).only('name','slug','lat','lng','status')]
+    data = data + [{'label': d.ipv4_address , 'value': jslugify(d.device.node.slug), 'slug': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng, 'status': d.device.node.status }  for d in Interface.objects.filter(ipv4_address__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng','status')]
+    data = data + [{'label': d.mac_address , 'value': jslugify(d.device.node.slug), 'slug': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng, 'status': d.device.node.status }  for d in Interface.objects.filter(mac_address__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng','status')]
+    data = data + [{'label': d.ssid , 'value': jslugify(d.device.node.slug), 'slug': d.device.node.slug, 'name': d.device.node.name, 'lat': d.device.node.lat, 'lng': d.device.node.lng, 'status': d.device.node.status }  for d in Interface.objects.filter(ssid__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng','status')]
     if len(data) > 0:
         return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     else:
-        return HttpResponse("", mimetype='application/json')
+        return HttpResponse('', mimetype='application/json')
 
-def generate_rrd(request):
-    ip = request.GET.get('ip', None)
-    pattern = r"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
-    if re.match(pattern, ip):
-        os.system("/home/ninux/nodeshot/scripts/ninuxstats/create_rrd_image.sh " + ip + " > /dev/null")
-        return  render_to_response('rrd.html', {'filename' : ip + '.png' } ,context_instance=RequestContext(request))
-    else:
-        return HttpResponse('Error')
+# this might be implemented in a future version
+#def generate_rrd(request):
+#    ip = request.GET.get('ip', None)
+#    pattern = r"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
+#    if re.match(pattern, ip):
+#        os.system("/home/ninux/nodeshot/scripts/ninuxstats/create_rrd_image.sh " + ip + " > /dev/null")
+#        return  render_to_response('rrd.html', {'filename' : ip + '.png' } ,context_instance=RequestContext(request))
+#    else:
+#        return HttpResponse('Error')
 
 def info_tab(request):
     # if request is sent with ajax
@@ -186,7 +284,6 @@ def info_tab(request):
     else:
         raise Http404
     
-    import logging
     devices = Device.objects.all().order_by('node__name', 'added').select_related().only('name', 'type', 'node__name', 'node__status', 'node__slug');
     new_devices = []
     # loop over queryset
@@ -233,7 +330,6 @@ def info_tab(request):
             if(link.to_interface.device.node.id == device.node.id and link.from_interface.device.node.id == device.node.id):
                 if DEBUG: 
                     logging.log(1, 'duplicate for node %s' % device.node.name)
-                    #logging.log(1, 'removing link %s' % link)
                 links.remove(link)
                 #continue
             if(link.from_interface.device.id == device.id):
