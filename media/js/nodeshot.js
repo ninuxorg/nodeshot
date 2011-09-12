@@ -9,6 +9,7 @@ var nodeshot = {
     
     // here we'll store the nodes (retrieved with nodeshot.getNodes())
     nodes: [],
+    
     // possible statuses
     status_choices: {
         a: 'active',
@@ -433,6 +434,7 @@ var nodeshot = {
         */
         initAddNode: function(){
             this.$addNode.click(function() {
+                // TODO: translate
                 nodeshot.dialog.open('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
                 nodeshot.gmap.clickListener = google.maps.event.addListener(nodeshot.gmap.map, 'click', function(e) {
                     nodeshot.gmap.newNodeMarker(e.latLng);
@@ -470,7 +472,7 @@ var nodeshot = {
                     nodeshot.gmap.unload();
                     nodeshot.overlay.addMask(0.7);
                     nodeshot.overlay.showLoading();
-                    nodeshot.layout.$content.load(nodeshot.url.index+'info_tab' , function() {
+                    nodeshot.layout.$content.load(nodeshot.url.index+'overview/' , function() {
                         nodeshot.infoTab.init();
                         nodeshot.layout.setFullScreen();
                         nodeshot.overlay.removeMask();
@@ -534,7 +536,7 @@ var nodeshot = {
                 'json_data' : {
                     'ajax' : {
                         // take stuff from the following url
-                        'url' : nodeshot.url.index+'node_list.json',
+                        'url' : nodeshot.url.index+'jstree.json',
                         // i wonder you don't understand this. Not me either. Who wrote it didn't bother to comment
                         'data' : function (n) {
                             return { id : n.attr ? n.attr('id') : 0 } 

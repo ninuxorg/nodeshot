@@ -110,8 +110,7 @@
         // when content has been loaded
         $(window).load(function(){
             nodeshot.layout.setFullScreen();
-            nodeshot.layout.setElementDimensions();
-            
+            nodeshot.layout.setElementDimensions();            
             {% if messages %}
             nodeshot.dialog.open("{% for message in messages %}{{ message }}{% endfor %}");
             {% endif %}

@@ -1,47 +1,28 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
+from django.db.models import Q
 from django.template import RequestContext
-from django import forms
+from django.forms.models import inlineformset_factory
 from django.utils import simplejson
-from nodeshot.models import *
-from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from nodeshot.utils import signal_to_bar, distance, email_owners, jslugify
-import time,re,os
-import settings
-from settings import DEBUG, NODESHOT_SITE as SITE
 from django.core.exceptions import ObjectDoesNotExist
-from forms import ContactForm, PasswordResetForm
+from nodeshot.models import *
+from nodeshot.forms import *
+from nodeshot.utils import signal_to_bar, distance, email_owners, jslugify
 from datetime import datetime, timedelta
-from django.db.models import Q
+from django.template.defaultfilters import slugify
+
+from settings import SITE, GMAP_CENTER, KML, ACTIVATION_DAYS, LOG_CONTACTS, DEBUG
 
 if DEBUG:
     import logging
 
-# retrieve map center or set default if not specified
-try:
-    from settings import NODESHOT_GMAP_CENTER
-except ImportError:
-    # default value is Rome - why? Because the developers of Nodeshot are based in Rome ;-)
-    NODESHOT_GMAP_CENTER = {
-        'lat': '41.90636538970964',
-        'lng': '12.509307861328125'
-    }
-NODESHOT_GMAP_CENTER['is_default'] = 'true'
-
-try:
-    from settings import NODESHOT_ACTIVATION_DAYS
-except ImportError:
-    NODESHOT_ACTIVATION_DAYS = 7
-
-try:
-    from settings import NODESHOT_LOG_CONTACTS as LOG_CONTACTS
-except ImportError:
-    LOG_CONTACTS = True
-
 def index(request, slug=False):
+    """
+    Home of the map-server app with Google Maps and all that stuff ;-)
+    """
     # retrieve statistics
     try:
         stat = Statistic.objects.latest('date')
@@ -51,7 +32,7 @@ def index(request, slug=False):
         stat = False
 
     # default case for next code block
-    gmap_center = NODESHOT_GMAP_CENTER
+    gmap_center = GMAP_CENTER
     # if node is in querystring we want to center the map somewhere else
     if slug:
         try:
@@ -78,6 +59,7 @@ def index(request, slug=False):
 def nodes(request):
     """
     Returns a json list with all the nodes divided in active, potential and hostspot
+    Populates javascript object nodeshot.nodes
     """
     # retrieve nodes in 3 different objects depending on the status
     active = Node.objects.filter(status = 'a').values('name', 'slug', 'id', 'lng', 'lat', 'status')
@@ -93,33 +75,22 @@ def nodes(request):
         'to_interface__device__node__name', 'to_interface__device__node__name',
         'etx', 'dbm'
     )
+    # evaluate queryset
     
     # prepare empty list
     links = []
     # loop over queryset (remember: evaluating queryset makes query to the db)
     for l in link_queryset:
         # determining link colour (depending on link quality)
-        etx = 0
-        if 0 < l.etx < 1.5:
-            etx = 1
-        elif l.etx < 3:
-            etx = 2
-        else:
-            etx = 3
-        # same but with dbm instead of etx
-        if -60 < l.dbm < 0:
-            dbm = 1
-        elif l.dbm > -75:
-            dbm = 2
-        else:
-            dbm = 3
+        etx = l.get_quality('etx')
+        dbm = l.get_quality('dbm')
         # prepare result
         entry = {
             'from_lng': l.from_interface.device.node.lng ,
             'from_lat': l.from_interface.device.node.lat,
             'to_lng': l.to_interface.device.node.lng,
             'to_lat': l.to_interface.device.node.lat,
-            'etx': etx ,
+            'etx': etx,
             'dbm': dbm
         }
         # append/push result into list
@@ -152,12 +123,11 @@ def nodes(request):
         'links': links
     }
     # return json
-    #return HttpResponse('<body>%s</body>'%simplejson.dumps(data))
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
-def node_list(request):
+def jstree(request):
     """
-    Populates jquery.jstree
+    Populates jquery.jstree plugin
     """
     # retrieve nodes in 3 different objects depending on the status
     active = Node.objects.filter(status = 'a').values('name', 'slug', 'lng', 'lat').order_by('name')
@@ -227,30 +197,7 @@ def node_list(request):
         })
     # return json
     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
-
-def node_info(request, node_id):
-    ''' Content of gmap.infoWindow '''
-    # if request is sent with ajax
-    if request.is_ajax():
-        # just load the fragment
-        template = 'ajax/node_info.html'
-    # otherwise if request is sent normally and DEBUG is true
-    elif DEBUG:
-        # debuggin template
-        template = 'node_info.html'
-    else:
-        raise Http404
     
-    # get object or raise 404
-    try:
-        node = Node.objects.exclude(status='u').only('id','name','slug','description','owner','postal_code','lat','lng','alt','status').get(pk=node_id)
-    except ObjectDoesNotExist:
-        raise Http404
-
-    context = {'node': node, 'nodes': Node.objects.all().order_by('name').only('name','slug','lat','lng','status')}
-
-    return render_to_response(template, context, context_instance=RequestContext(request))
-
 def search(request, what):
     data = []
     data = data + [{'label': d.name, 'value': jslugify(d.slug), 'slug': d.slug, 'name': d.name, 'lat': d.lat, 'lng': d.lng, 'status': d.status }  for d in Node.objects.filter(name__icontains=what).only('name','slug','lat','lng','status')]
@@ -262,25 +209,19 @@ def search(request, what):
     else:
         return HttpResponse('', mimetype='application/json')
 
-# this might be implemented in a future version
-#def generate_rrd(request):
-#    ip = request.GET.get('ip', None)
-#    pattern = r"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
-#    if re.match(pattern, ip):
-#        os.system("/home/ninux/nodeshot/scripts/ninuxstats/create_rrd_image.sh " + ip + " > /dev/null")
-#        return  render_to_response('rrd.html', {'filename' : ip + '.png' } ,context_instance=RequestContext(request))
-#    else:
-#        return HttpResponse('Error')
-
-def info_tab(request):
+def overview(request):
+    """
+    Overview about the wireless network. Device status and link performance for the entire network.
+    This is quite database expensive. Use with caution. Needs caching.
+    """
     # if request is sent with ajax
     if request.is_ajax():
         # just load the fragment
-        template = 'ajax/info.html'
+        template = 'ajax/overview.html'
     # otherwise if request is sent normally and DEBUG is true
     elif DEBUG:
         # debuggin template
-        template = 'info.html'
+        template = 'overview.html'
     else:
         raise Http404
     
@@ -351,52 +292,44 @@ def info_tab(request):
                     }
                 else:
                     links.remove(link)
-        #links_to = list(links_to)
-        #for link in links_to:
-        #    if link.from_interface.mac_address not in entry['macs']:
-        #        link.signal_bar = signal_to_bar(link.dbm)
-        #        link.destination = {
-        #            'name': link.from_interface.device.node.name,
-        #            'slug': link.from_interface.device.node.slug
-        #        }
-        #    else:
-        #        links_to.remove(link) 
-        
-        # heuristic count for good representation of the signal bar (from 0 to 100)
-        #links_from = Link.objects.filter(from_interface__device = device).select_related().only('dbm', 'to_interface__mac_address', 'to_interface__device__node__name', 'to_interface__device__node__slug')
-        #links_to = Link.objects.filter(to_interface__device = device).select_related().only('dbm', 'from_interface__mac_address', 'from_interface__device__node__name', 'from_interface__device__node__slug')
-        ## convert QuerySet in list
-        #links_from = list(links_from)
-        #for link in links_from:
-        #    if link.to_interface.mac_address not in entry['macs']:
-        #        link.signal_bar = signal_to_bar(link.dbm)
-        #        link.destination = {
-        #            'name': link.to_interface.device.node.name,
-        #            'slug': link.to_interface.device.node.slug
-        #        }
-        #    else:
-        #        links_from.remove(link)
-        #links_to = list(links_to)
-        #for link in links_to:
-        #    if link.from_interface.mac_address not in entry['macs']:
-        #        link.signal_bar = signal_to_bar(link.dbm)
-        #        link.destination = {
-        #            'name': link.from_interface.device.node.name,
-        #            'slug': link.from_interface.device.node.slug
-        #        }
-        #    else:
-        #        links_to.remove(link) 
-                
-        #entry['links'] = links_from + links_to
         
         entry['links'] = links
         #entry['ssids'] = [ssid['ssid'] for ssid in device.interface_set.values('ssid')] if device.interface_set.count() > 0 else ""
         new_devices.append(entry)    
 
     return render_to_response(template,{'devices': new_devices}, context_instance=RequestContext(request))
+    
+def node_info(request, node_id):
+    """
+    Content of nodeshot.gmap.infoWindow
+    This view is requested asynchronously each time a marker is clicked
+    """
+    # if request is sent with ajax
+    if request.is_ajax():
+        # just load the fragment
+        template = 'ajax/node_info.html'
+    # otherwise if request is sent normally and DEBUG is true
+    elif DEBUG:
+        # debuggin template
+        template = 'node_info.html'
+    else:
+        raise Http404
+    
+    # get object or raise 404
+    try:
+        node = Node.objects.exclude(status='u').only('id','name','slug','description','owner','postal_code','lat','lng','alt','status').get(pk=node_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    context = {'node': node, 'nodes': Node.objects.all().order_by('name').only('name','slug','lat','lng','status')}
+
+    return render_to_response(template, context, context_instance=RequestContext(request))
 
 def advanced(request, node_id):
-    ''' Advanced information about a node '''
+    """
+    Advanced information about a node.
+    Loaded when clicking on the advanced tab after clicking on a marker.
+    """
     # if request is sent with ajax
     if request.is_ajax():
         # just load the fragment
@@ -424,7 +357,9 @@ def advanced(request, node_id):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 def contact(request, node_id):
-    ''' Form to contact node owners '''
+    """
+    Displays a form to contact node owners
+    """
     # if request is sent with ajax
     if request.is_ajax():
         # just load the fragment
@@ -494,9 +429,352 @@ def contact(request, node_id):
     }
 
     return render_to_response(template, context, context_instance=RequestContext(request))
+
+def generate_kml(request):
+    """
+    Generates KML feed (Google Earth, ecc).
+    """
     
+    # retrieve nodes in 3 different objects depending on the status
+    active = Node.objects.filter(status = 'a').only('name', 'lng', 'lat')
+    hotspot = Node.objects.filter(status = 'h').only('name', 'lng', 'lat')
+    potential = Node.objects.filter(status = 'p').only('name', 'lng', 'lat')
+
+    # retrieve links, select_related() reduces the number of queries,
+    # only() selects only the fields we need
+    # double underscore __ indicates that we are following a foreign key
+    links = Link.objects.all().select_related().only(
+        'from_interface__device__node__lat', 'from_interface__device__node__lng',
+        'to_interface__device__node__lat', 'to_interface__device__node__lng',
+        'to_interface__device__node__name', 'to_interface__device__node__name',
+        'etx',
+    )
+    
+    context = {
+        'KML': KML,
+        'GMAP_CENTER': GMAP_CENTER,
+        'active': active,
+        'hotspot': hotspot,
+        'potential': potential,
+        'links': links
+    }
+    
+    return render_to_response('kml.xml', context, context_instance=RequestContext(request), mimetype='application/vnd.google-earth.kml+xml')
+    
+# this might be implemented in a future version
+#def generate_rrd(request):
+#    ip = request.GET.get('ip', None)
+#    pattern = r"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
+#    if re.match(pattern, ip):
+#        os.system("/home/ninux/nodeshot/scripts/ninuxstats/create_rrd_image.sh " + ip + " > /dev/null")
+#        return  render_to_response('rrd.html', {'filename' : ip + '.png' } ,context_instance=RequestContext(request))
+#    else:
+#        return HttpResponse('Error')
+   
+def add_node(request):
+    """
+    Displays form to add a new node.
+    """
+    
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/add_node.html';
+    else:
+        # alternative mode available just for testing
+        if DEBUG:
+            template = 'add_node.html';
+        else:
+            raise Http404
+
+    # if form has been submitted
+    if request.method == 'POST':
+        # return json: either errors or the redirect url
+        form = AddNodeForm(request.POST)
+        # if form is valid
+        if form.is_valid():
+            # prepare the node model object but don't save in the database yet
+            node = form.save(commit=False)
+            # set node as unconfirmed, malicious users could edit the hidden input field easily with instruments like firebug.
+            node.status = 'u'
+            # generate slug
+            # TODO: remove this because is being done at model level
+            node.slug = slugify(node.name)
+            # save new node in the database (password encryption, activation_key and email notification is done in models.py)
+            node.save()
+            # return a blank page with node id
+            return HttpResponse(str(node.id))
+    else:
+        # blank form
+        form = AddNodeForm()
+
+    return render_to_response(template, { 'form' : form }, context_instance=RequestContext(request))
+
+def confirm_node(request, node_id, activation_key):
+    """
+    Confirms a node with the specified ID and activation key.
+    Handles different cases.
+    """
+    # retrieve object or return 404 error
+    node = get_object_or_404(Node, pk=node_id)
+    # redirect to url default
+    redirect_to = reverse('nodeshot_index')
+
+    if(node.activation_key != '' and node.activation_key != None):
+        if(node.activation_key == activation_key):
+            if(node.added + timedelta(days=ACTIVATION_DAYS) > datetime.now()):
+                # confirm node
+                node.confirm()
+                message = u'Il nodo è stato confermato con successo.'
+                redirect_to = reverse('nodeshot_select', args=[node.slug])
+            else:
+                message = u'La chiave di attivazione è scaduta.'
+        else:
+            # wrong activation key
+            message = u'La chiave di attivazione non è corretta.'
+    else:
+        # node has been already confirmed
+        message = u'Il nodo è già stato confermato in precedenza.'
+        redirect_to = reverse('nodeshot_select', args=[node.slug])
+    
+    # message that will be displayed to the user 
+    messages.add_message(request, messages.INFO, message)
+        
+    return HttpResponseRedirect(redirect_to)
+    
+def auth_node(request, node_id):
+    """
+    Authenticates user to edit a node.
+    Authentication is method will be improved in future versions (if you wanna help, join us).
+    """
+    
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/auth_node.html';
+    else:
+        template = 'auth_node.html';
+        
+    # get object or raise 404
+    try:
+        node = Node.objects.select_related().exclude(status='u').get(pk=node_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    # raw password to authenticate
+    raw_password = request.POST.get('raw_password', False)
+    # once authenticated password is sent in ecrypted format
+    encrypted_password = request.POST.get('encrypted_password', False)
+    # default value for authenticated variable
+    authenticated = 0
+    # init form
+    form = EditNodeForm(instance=node)
+    # default value for "saved" variable
+    saved = False
+    
+    # if sending raw password check if is correct
+    if raw_password and node.check_password(raw_password):
+        authenticated = 1
+        return HttpResponseRedirect(reverse('nodeshot_edit_node', args=[node_id, node.password]))
+    # if password is not correct value of authenticated is 2
+    elif raw_password and not node.check_password(raw_password):
+        authenticated = 2
+    # if password is being sent in encrypted format it means we are editing the form
+    
+    context = {
+        'node': node,
+        'authenticated': authenticated,
+    }
+    
+    return render_to_response(template, context, context_instance=RequestContext(request))
+    
+def edit_node(request, node_id, password):
+    """
+    Displays the form to edit a node.
+    """
+        
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/edit_node.html';
+    else:
+        template = 'edit_node.html';
+        
+    # get object or raise 404
+    try:
+        node = Node.objects.select_related().exclude(status='u').get(pk=node_id, password=password)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    # default value for "saved" and "error" variables
+    saved = False
+    error = False
+    
+    # if form has been submitted
+    if request.method == 'POST':
+        # init edit form with POST values
+        form = EditNodeForm(request.POST, instance=node)
+        
+        if form.is_valid():
+            # get a Node object but don't save yet
+            node = form.save(commit=False)
+            # get new password or False
+            new_password = request.POST.get('new_password', False)
+            # if new password has been set
+            if(new_password):
+                # encrypt the new password
+                node.password = new_password
+                node.set_password()
+                # encrypted_password now shall change to the new password
+                encrypted_password = node.password
+            # change slug
+            node.slug = slugify(node.name)
+            node.save()
+            # this tells the template that the form has saved in order to display a message to the user
+            saved = True
+        else:
+            error = True
+    else:
+        # init form
+        form = EditNodeForm(instance=node)
+    
+    context = {
+        'node': node,
+        'form' : form,
+        'saved': saved,
+        'error': error
+    }
+    
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+def device_form(request, node_id, password):
+    """
+    Displays the form to edit devices of a node
+    """
+    
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/device_form.html';
+    else:
+        template = 'device_form.html';
+        
+    # get object or raise 404
+    try:
+        # get only name, status and password columns
+        # don't consider unconfirmed or potential nodes
+        # get node only if password is correct
+        node = Node.objects.only('name', 'status', 'password').exclude(Q(status='u') & Q(status='p')).get(pk=node_id, password=password)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    # init inlineformset_factory
+    DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)
+    
+    # default value for "saved" and "error" variables
+    saved = False
+    error = False
+    # init formset
+    formset = DeviceInlineFormSet(instance=node, prefix='devices')
+    
+    # if form has been submitted
+    if request.method == "POST":
+        # populate
+        formset = DeviceInlineFormSet(request.POST, instance=node, prefix='devices')
+        # if form is valid
+        if formset.is_valid():
+            # print a nice message in the template
+            saved = True
+            # loop through devices
+            formset.save()
+            # reset formset with new saved values
+            formset = DeviceInlineFormSet(instance=node, prefix='devices')
+        else:
+            # print a nice message in the template
+            error = True
+    
+    context = {
+        'formset': formset,
+        'length': len(formset),
+        'node': node,
+        'node_id': node_id,
+        'saved': saved,
+        'error': error
+    }
+    
+    # set response with an empty form
+    return render_to_response(template, context, context_instance=RequestContext(request))
+    
+def configuration(request, node_id, password, type):
+    """
+    Displays form to edit interfaces or HNA4.
+    type argument is set at url config level.
+    """
+    
+    # if request is sent with ajax
+    if request.is_ajax():
+        template = 'ajax/%s_form.html' % type;
+    else:
+        template = '%s_form.html' % type;
+        
+    # get object or raise 404
+    try:
+        # get only name, status and password columns
+        # don't consider unconfirmed or potential nodes
+        # get node only if password is correct
+        node = Node.objects.only('name', 'status', 'password').exclude(Q(status='u') & Q(status='p')).get(pk=node_id, password=password)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    # retrieve devices
+    devices = Device.objects.filter(node=node_id)
+    # determine which model to pass to inlineformset_favtory
+    model = Interface if type == 'interface' else HNAv4
+    # init formset factory
+    modelFormSet = inlineformset_factory(Device, model, extra=1)
+    
+    saved = False
+    error = False
+    # init variables for the loops
+    objects = []
+    # init counter
+    i = 1
+    
+    # if submitting the form
+    if request.method == "POST":
+        # loop through devices
+        for device in devices:
+            # if this cycle has the device we submitted
+            formset = modelFormSet(request.POST, instance=device, prefix='%s%s'%(type,i))
+            if formset.is_valid():
+                # loop through devices
+                formset.save()
+                # reload formset so it will show changes
+                formset = modelFormSet(instance=device, prefix='%s%s'%(type,i))
+            else:
+                error = True
+            objects += [{'device': device, 'formset': formset }]
+            i+=1
+        # if no errors
+        if not error:
+            # print a nice message in the template
+            saved = True
+    else:
+        # just load initial data
+        for device in devices:
+            objects += [{'device': device, 'formset': modelFormSet(instance=device, prefix='%s%s'%(type,i))}]
+            i+=1
+    
+    context = {
+        'node': node,
+        'type': type,
+        'objects': objects,
+        'saved': saved,
+        'error': error
+    }    
+    
+    return render_to_response(template, context, context_instance=RequestContext(request) )
+
 def delete_node(request, node_id, password):
-    ''' Delete node view '''
+    """
+    Deletes a node, requires password.
+    """
         
     # if request is sent with ajax
     if request.is_ajax():
@@ -529,14 +807,44 @@ def delete_node(request, node_id, password):
     
     return render_to_response(template, context, context_instance=RequestContext(request))
     
-def recover_password(request, node_id):
+def report_abuse(request, node_id, email):
+    """
+    Checks if a node with specified id and email exist:
+    if yes sends an email to the administrators to report the abuse;
+    else returns a 404 http status code;
+    """
+    
+    # retrieve object or return 404 error
+    node = get_object_or_404(Node, pk=node_id)
+    if(node.email != email and node.email2 != email and node.email3 != email):
+        raise Http404
+
+    context = {
+        'email': email,
+        'node': node,
+        'site': SITE
+    }
+    notify_admins(node, 'Abuso segnalato su %s' % SITE['name'], 'email_notifications/report_abuse.txt', context)
+    
+    # message that will be displayed to the user 
+    messages.add_message(request, messages.INFO, u'Grazie per aver segnalato l\'abuso. Controlleremo e ti ricontatteremo il prima possibile.')
+    
+    return HttpResponseRedirect(reverse('nodeshot_index'))
+    
+def reset_password(request, node_id):
+    """
+    Displays a form to reset the password of a node.
+    Requires email address (can be either node.email, node.email1 or node.email2).
+    New password is sent via email to all the owners of the node.
+    """
+    
     # if request is sent with ajax
     if request.is_ajax():
         # just load the fragment
-        template = 'ajax/recover_password.html'
+        template = 'ajax/reset_password.html'
     # otherwise if request is sent normally
     else:
-        template = 'recover_password.html'
+        template = 'reset_password.html'
     
     # retrieve object or return 404 error
     try:
@@ -577,194 +885,14 @@ def recover_password(request, node_id):
     
     return render_to_response(template, context, context_instance=RequestContext(request))
 
-def confirm_node(request, node_id, activation_key):
-    ''' Confirm node view '''
-    # retrieve object or return 404 error
-    node = get_object_or_404(Node, pk=node_id)
-    # redirect to url default
-    redirect_to = reverse('nodeshot_index')
-
-    if(node.activation_key != '' and node.activation_key != None):
-        if(node.activation_key == activation_key):
-            if(node.added + timedelta(days=NODESHOT_ACTIVATION_DAYS) > datetime.now()):
-                # confirm node
-                node.confirm()
-                message = u'Il nodo è stato confermato con successo.'
-                redirect_to = reverse('nodeshot_select', args=[node.slug])
-            else:
-                message = u'La chiave di attivazione è scaduta.'
-        else:
-            # wrong activation key
-            message = u'La chiave di attivazione non è corretta.'
-    else:
-        # node has been already confirmed
-        message = u'Il nodo è già stato confermato in precedenza.'
-        redirect_to = reverse('nodeshot_select', args=[node.slug])
-    
-    # message that will be displayed to the user 
-    messages.add_message(request, messages.INFO, message)
-        
-    return HttpResponseRedirect(redirect_to)
-
-def generate_kml(request):
-    data = '''<kml xmlns="http://earth.google.com/kml/2.0">
-    <Document>
-    <name>%s</name>
-    <description>%s Wireless Community</description>
-    <LookAt>
-        <longitude>12.48</longitude>
-        <latitude>41.89</latitude>
-        <range>100000</range>
-        <tilt>0</tilt>
-        <heading>0</heading>
-    </LookAt>
-    <Style id="activeNodeStyle">
-        <IconStyle id="activeNodeIconStyle">
-            <Icon>
-                <href>%simages/marker_active.png</href>
-            </Icon>
-        </IconStyle>
-    </Style>
-    <Style id="potentialNodeStyle">
-        <IconStyle id="potentialNodeIconStyle">
-            <Icon>
-                <href>%simages/marker_potential.png</href>
-            </Icon>
-        </IconStyle>
-    </Style>
-    <Style id="hotspotNodeStyle">
-        <IconStyle id="hotspotNodeIconStyle">
-            <Icon>
-                <href>%simages/marker_hotspot.png</href>
-            </Icon>
-        </IconStyle>
-    </Style>
-
-    <Style id="Link1Style">
-        <LineStyle>
-            <color>7f00ff00</color>
-            <width>4</width>
-        </LineStyle>
-    </Style>
-    <Style id="Link2Style">
-        <LineStyle>
-            <color>7f00ffff</color>
-            <width>4</width>
-        </LineStyle>
-    </Style>
-    <Style id="Link3Style">
-        <LineStyle>
-            <color>7f0000ff</color>
-            <width>4</width>
-        </LineStyle>
-    </Style>''' % (settings.ORGANIZATION, settings.ORGANIZATION, settings.MEDIA_URL, settings.MEDIA_URL, settings.MEDIA_URL )
-
-    data += '''<Folder>
-        <name>Active Nodes</name>
-        <description>Nodes that are up and running</description>'''
-    # active nodes
-    for n in Node.objects.filter(status = 'a'):
-        data = data + '''
-            <Placemark>
-                <name>''' + n.name + '''</name>
-                <styleUrl>#activeNodeStyle</styleUrl>
-                <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
-            </Placemark>
-        '''
-    data += '</Folder>'
-
-    data += '''<Folder>
-        <name>Potential Nodes</name>
-        <description>Potential node locations</description>'''
-    # potential node
-    for n in Node.objects.filter(status = 'p'):
-        data = data + '''
-            <Placemark>
-                <name>''' + n.name + '''</name>
-                <styleUrl>#potentialNodeStyle</styleUrl>
-                <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
-            </Placemark>
-        '''
-    data += '</Folder>'
-
-    data += '''<Folder>
-        <name>Potential Nodes</name>
-        <description>Potential node locations</description>'''
-    # hotspot node
-    for n in Node.objects.filter(status = 'h'):
-        data = data + '''
-            <Placemark>
-                <name>''' + n.name + '''</name>
-                <styleUrl>#hotspotNodeStyle</styleUrl>
-                <Point><coordinates>''' + str(n.lng) + ',' + str(n.lat) + '''</coordinates></Point>
-            </Placemark>
-        '''
-    data += '</Folder>'
-
-    data += '''<Folder>
-        <name>Links</name>
-        <description>Radio Wireless Links and their quality</description>'''
-    # links
-    for l in Link.objects.all():
-        quality = 0
-        if 0 < l.etx < 1.5:
-           quality = 1
-        elif l.etx < 3:
-           quality = 2
-        else:
-           quality = 3
-
-        data = data + '''
-        <Placemark>
-        <name>''' + l.from_interface.device.node.name + '-' + l.to_interface.device.node.name + ' ETX ' + str(l.etx) + '''</name>
-        <styleUrl>#Link''' + str(quality) + '''Style</styleUrl>
-            <LineString>
-              <coordinates>''' + str(l.from_interface.device.node.lng) + ',' + str(l.from_interface.device.node.lat) + ' ' + str(l.to_interface.device.node.lng) + ',' + str(l.to_interface.device.node.lat) + '''</coordinates>
-            </LineString>
-        </Placemark>
-        '''
-    data += '</Folder>'
-
-    data += '''
-        </Document>
-    </kml>'''
-    return HttpResponse(data)
-
-def report_abuse(request, node_id, email):
-    '''
-    Checks if a node with specified id and email exist
-    if yes sends an email to the administrators to report the abuse
-    if not returns a 404 http status code
-    '''
-    # retrieve object or return 404 error
-    node = get_object_or_404(Node, pk=node_id)
-    if(node.email != email and node.email2 != email and node.email3 != email):
-        raise Http404
-
-    try:
-        from settings import NODESHOT_SITE
-    except ImportError:
-        raise ImproperlyConfigured('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.')
-
-    context = {
-        'email': email,
-        'node': node,
-        'site': NODESHOT_SITE
-    }
-    notify_admins(node, 'email_notifications/report_abuse_subject.txt', 'email_notifications/report_abuse_body.txt', context)
-    
-    # message that will be displayed to the user 
-    messages.add_message(request, messages.INFO, u'Grazie per aver segnalato l\'abuso. Controlleremo e ti ricontatteremo il prima possibile.')
-    
-    return HttpResponseRedirect(reverse('nodeshot_index'))
-
 def purge_expired(request):
-    '''
-    Purge all the nodes that have not been confirmed older than settings.NODESHOT_ACTIVATION_DAYS.
+    """
+    Purge all the nodes that have not been confirmed older than settings.ACTIVATION_DAYS.
     This view might be called with a cron so the purging can be done automatically.
-    '''
-    # select unconfirmed nodes which are older than NODESHOT_ACTIVATION_DAYS
-    nodes = Node.objects.filter(status='u', added__lt=datetime.now() - timedelta(days=NODESHOT_ACTIVATION_DAYS))
+    """
+    
+    # select unconfirmed nodes which are older than ACTIVATION_DAYS
+    nodes = Node.objects.filter(status='u', added__lt=datetime.now() - timedelta(days=ACTIVATION_DAYS))
     # if any old unconfirmed node is found
     if len(nodes)>0:
         # prepare empty list that will contain the purged nodes

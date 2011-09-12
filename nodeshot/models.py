@@ -20,43 +20,7 @@ try:
 except ImportError:
     from nodeshot.utils import make_password, check_password
 
-try:
-    from settings import NODESHOT_ROUTING_PROTOCOLS as ROUTING_PROTOCOLS, NODESHOT_DEFAULT_ROUTING_PROTOCOL as DEFAULT_ROUTING_PROTOCOL
-except ImportError:
-    ROUTING_PROTOCOLS = (
-        ('aodv','AODV'),
-        ('batman','B.A.T.M.A.N.'),
-        ('dsdv','DSDV'),
-        ('dsr','DSR'),
-        ('hsls','HSLS'),
-        ('iwmp','IWMP'),
-        ('olsr','OLSR'),
-        ('oorp','OORP'),
-        ('ospf','OSPF'),
-        ('tora','TORA'),
-    )
-    DEFAULT_ROUTING_PROTOCOL = 'olsr'
-
-try:
-    from settings import NODESHOT_ACTIVATION_DAYS as ACTIVATION_DAYS
-except ImportError:
-    ACTIVATION_DAYS = 7
-    
-try:
-    from settings import DEFAULT_FROM_EMAIL
-except ImportError:
-    raise ImproperlyConfigured('DEFAULT_FROM_EMAIL is not defined in your settings.py. See settings.example.py for reference.')
-    
-try:
-    from settings import NODESHOT_SITE as SITE
-except ImportError:
-    raise ImproperlyConfigured('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.')
-
-# IMPORTING is a variable that must be inserted dinamically in scripts that might import this file in order to perform automatic imports from other map servers (for example WNMAP)
-try:
-    from settings import IMPORTING
-except ImportError:
-    IMPORTING = False
+from settings import ROUTING_PROTOCOLS, DEFAULT_ROUTING_PROTOCOL, ACTIVATION_DAYS, DEFAULT_FROM_EMAIL, SITE
 
 NODE_STATUS = (
     ('a', 'active'),
@@ -77,33 +41,33 @@ INTERFACE_STATUS = (
 )
 
 WIRELESS_MODE = (
-    ('sta', 'sta'),    
-    ('ap', 'ap'),    
-    ('adhoc', 'adhoc'),    
+    ('sta', 'sta'),
+    ('ap', 'ap'),
+    ('adhoc', 'adhoc'),
 )
 
 WIRELESS_POLARITY = (
-        ('h', 'horizontal'),
-        ('v', 'vertical'),
-        ('c', 'circular'),
-        ('a', 'auto'),
+    ('h', 'horizontal'),
+    ('v', 'vertical'),
+    ('c', 'circular'),
+    ('a', 'auto'),
 )
 
 WIRELESS_CHANNEL = (
-    ('2412', '2.4Ghz Ch  1 (2412 Mhz'), 
-    ('2417', '2.4Ghz Ch  2 (2417 Mhz'), 
-    ('2422', '2.4Ghz Ch  3 (2422 Mhz'), 
-    ('2427', '2.4Ghz Ch  4 (2427 Mhz'), 
-    ('2427', '2.4Ghz Ch  5 (2432 Mhz'), 
-    ('2437', '2.4Ghz Ch  6 (2437 Mhz'), 
-    ('2442', '2.4Ghz Ch  7 (2442 Mhz'), 
-    ('2447', '2.4Ghz Ch  8 (2447 Mhz'), 
-    ('2452', '2.4Ghz Ch  9 (2452 Mhz'), 
-    ('2457', '2.4Ghz Ch  10 (2457 Mhz'), 
-    ('2462', '2.4Ghz Ch  11 (2462 Mhz'), 
-    ('2467', '2.4Ghz Ch  12 (2467 Mhz'), 
-    ('2472', '2.4Ghz Ch  13 (2472 Mhz'), 
-    ('2484', '2.4Ghz Ch  14 (2484 Mhz'), 
+    ('2412', '2.4Ghz Ch  1 (2412 Mhz'),
+    ('2417', '2.4Ghz Ch  2 (2417 Mhz'),
+    ('2422', '2.4Ghz Ch  3 (2422 Mhz'),
+    ('2427', '2.4Ghz Ch  4 (2427 Mhz'),
+    ('2427', '2.4Ghz Ch  5 (2432 Mhz'),
+    ('2437', '2.4Ghz Ch  6 (2437 Mhz'),
+    ('2442', '2.4Ghz Ch  7 (2442 Mhz'),
+    ('2447', '2.4Ghz Ch  8 (2447 Mhz'),
+    ('2452', '2.4Ghz Ch  9 (2452 Mhz'),
+    ('2457', '2.4Ghz Ch  10 (2457 Mhz'),
+    ('2462', '2.4Ghz Ch  11 (2462 Mhz'),
+    ('2467', '2.4Ghz Ch  12 (2467 Mhz'),
+    ('2472', '2.4Ghz Ch  13 (2472 Mhz'),
+    ('2484', '2.4Ghz Ch  14 (2484 Mhz'),
     ('4915', '5Ghz Ch 183 (4915 Mhz)'),
     ('4920', '5Ghz Ch 184 (4920 Mhz)'),
     ('4925', '5Ghz Ch 185 (4925 Mhz)'),
@@ -167,6 +131,14 @@ class Node(models.Model):
     added = models.DateTimeField('aggiunto il', auto_now_add=True)
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
+    def get_lat(self):
+        """ returns latitude as string (avoid django converting the dot . into a comma , in certain language sets) """
+        return str(self.lat)
+        
+    def get_lng(self):
+        """ returns longitude as string (avoid django converting the dot . into a comma , in certain language sets) """
+        return str(self.lng)    
+    
     def set_password(self):
         """
         Encrypts node.password with salt and sha1.
@@ -212,49 +184,18 @@ class Node(models.Model):
         self.activation_key = sha_constructor(salt+self.name).hexdigest()
         return self.activation_key
     
-    def send_confirmation_mail(self):
-        ''' send activation link to main email and notify the other 2 emails if specified '''
+    def send_activation_mail(self):
+        """
+        Sends activation link to node owners
+        """
         # prepare context for email template
         context = {
             'node': self,
             'expiration_days': ACTIVATION_DAYS,
             'site': SITE,
         }
-        # parse subjects
-        subject = render_to_string('email_notifications/confirmation_subject.txt',context)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        # parse message
-        message = render_to_string('email_notifications/confirmation_body.txt',context)
-        # send email to main email
-        send_mail(subject, message, DEFAULT_FROM_EMAIL, [self.email])
-        
-        # if specified, send notifications to the other two email addresses 
-        if(self.email2 != '' and self.email2 != None) or (self.email3 != '' and self.email3 != None):
-            # prepare context for email template
-            context = {
-                'node': self,
-                'site': SITE
-            }
-            # parse subject (same for both)
-            subject = render_to_string('email_notifications/notify-added-emals_subject.txt',context)
-            # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())            
-            # initialize an empty list
-            recipient_list = []
-            # add email2 to the list
-            if self.email2 != '' and self.email2 != None:
-                recipient_list += [self.email2]
-            # add email3 to the list
-            if self.email3 != '' and self.email3 != None:
-                recipient_list += [self.email3]
-            # loop over recipient_list
-            for recipient in recipient_list:
-                # insert current email in the body text
-                context['email'] = recipient
-                message = render_to_string('email_notifications/notify-added-emals_body.txt',context)
-                # send mail
-                send_mail(subject, message, DEFAULT_FROM_EMAIL, (recipient,))
+        # send mail to owners
+        email_owners(self, 'Conferma nuovo nodo su %s' % SITE['name'], 'email_notifications/confirmation.txt', context)
         
     def send_success_mail(self, raw_password):
         ''' send success emails '''
@@ -265,9 +206,9 @@ class Node(models.Model):
             'site': SITE
         }
         # send email to owners
-        email_owners(self, 'Nodo confermato con successo su %s' % SITE['name'], 'email_notifications/success_body.txt', context)
+        email_owners(self, 'Nodo confermato con successo su %s' % SITE['name'], 'email_notifications/success.txt', context)
         # notify admins that want to receive notifications
-        notify_admins(self, 'email_notifications/new-node-admin_subject.txt', 'email_notifications/new-node-admin_body.txt', context, skip=True)
+        notify_admins(self, 'Dettagli nuovo nodo su %s' % SITE['name'], 'email_notifications/new-node-admin.txt', context, skip=True)
         
     def confirm(self):
         '''
@@ -293,7 +234,7 @@ class Node(models.Model):
             self.set_activation_key()
             super(Node, self).save()
             # confirmation email is sent afterwards so we can send the ID
-            self.send_confirmation_mail()
+            self.send_activation_mail()
         else:
             super(Node, self).save()
     
@@ -349,6 +290,24 @@ class Link(models.Model):
     sync_tx = models.IntegerField(default=0)
     sync_rx = models.IntegerField(default=0)
     
+    def get_quality(self, type='etx'):
+        """ used to determine color of links"""
+        if type == 'etx':
+            if 0 < self.etx < 1.5:
+               quality = 1
+            elif self.etx < 3:
+               quality = 2
+            else:
+                quality = 3
+        elif type == 'dbm':
+            if -60 < self.dbm < 0:
+                quality = 1
+            elif self.dbm > -75:
+                quality = 2
+            else:
+                quality = 3
+        return quality
+    
     def __unicode__(self):
         return u'%s %s » %s %s' % (self.from_interface.ipv4_address, self.from_interface.device, self.to_interface.ipv4_address, self.to_interface.device)
     
@@ -386,97 +345,15 @@ class Contact(models.Model):
         verbose_name_plural = 'Log Contatti'
     
 class UserProfile(models.Model):
-    '''
+    """
     Extending django's user model so we can have an additional field
     where we can specify if admins should receive notifications or not
     
     https://docs.djangoproject.com/en/dev/topics/auth/#storing-additional-information-about-users
-    '''
+    """
+    
     user = models.OneToOneField(User)
     receive_notifications = models.BooleanField('Notifiche via email', help_text='Attiva/disattiva le notifiche email riguardanti la gestione dei nodi (aggiunta, cancellazione, abusi, ecc).')
-
-# signals
-from django.db.models.signals import post_delete, post_save
-from settings import DEBUG
-from datetime import datetime, timedelta
-
-def notify_on_delete(sender, instance, using, **kwargs):
-    ''' Notify admins when nodes are deleted. Only for production use '''
-    # if in testing mode don't send emails
-    if DEBUG or IMPORTING:
-        return False
-    # if purging old unconfirmed nodes don't send emails
-    if instance.status == 'u' and instance.added + timedelta(days=ACTIVATION_DAYS) < datetime.now():
-        return False
-    # prepare context
-    context = {
-        'node': instance,
-        'site': SITE
-    }
-    # notify admins that want to receive notifications
-    notify_admins(instance, 'Nodo cancellato su %s' % SITE.get('name'), 'email_notifications/node-deleted-admin.txt', context, skip=False)
-
-post_delete.connect(notify_on_delete, sender=Node)
-
-from utils import distance
-from django.db.models import Q, Count
-
-def update_statistics(sender, instance, using, **kwargs):
-    ''' Adds a new record in the statistic table if needed. Called by signals '''
-    if IMPORTING:
-        return False
-    # retrieve links, select_related() reduces the number of queries, only() selects only the fields we need
-    links = Link.objects.all().select_related().only(
-        'from_interface__device__node__lat', 'from_interface__device__node__lng',
-        'to_interface__device__node__lat', 'to_interface__device__node__lng'
-    )
     
-    # get counts of the active nodes, potential nodes, hotspots and group the results
-    # Count() is a function provided by django.db.models
-    nodes = Node.objects.values('status').annotate(count=Count('status')).filter(Q(status='a') | Q(status='h') | Q(status='p')).order_by('status')
-    # evaluate queryset to avoid repeating the same query
-    nodes = list(nodes)
-    
-    # active nodes
-    active_nodes = nodes[0].get('count')
-    # hotspots
-    hotspots = nodes[1].get('count')
-    # potential nodes
-    potential_nodes = nodes[2].get('count')
-    # number of links
-    link_count = Link.objects.count()
-    
-    # calculate total km of the links
-    km = 0
-    for l in links:
-        km += distance((l.from_interface.device.node.lat,l.from_interface.device.node.lng), (l.to_interface.device.node.lat, l.to_interface.device.node.lng))
-    km = '%0.3f' % km
-    
-    # retrieve last statistic
-    try:
-        last = Statistic.objects.all().order_by('-pk')[:1][0]
-    # no statistics in the database yet
-    except IndexError:
-        last = False
-    
-    # compare last statistic with data we have now (km are converted to string in order to avoid django to mess the comparation caused by float field)
-    if last and last.active_nodes == active_nodes and last.hotspots == hotspots and last.potential_nodes == potential_nodes and last.links == link_count and str(last.km) == str(km):
-        # if data is the same there's no need to add a new record
-        return False
-    else:
-        # if we got different numbers it means something has changed and we need to insert a new record in the statistics
-        new = Statistic(active_nodes=active_nodes, potential_nodes=potential_nodes, hotspots=hotspots, links=link_count, km=km)
-        new.save()
-
-# signals to update statistics every time something is modified or deleted
-post_delete.connect(update_statistics, sender=Node)
-#post_delete.connect(update_statistics, sender=Device)
-#post_delete.connect(update_statistics, sender=Interface)
-post_delete.connect(update_statistics, sender=Link)
-#post_delete.connect(update_statistics, sender=HNAv4)
-
-post_save.connect(update_statistics, sender=Node)
-#post_save.connect(update_statistics, sender=Device)
-#post_save.connect(update_statistics, sender=Interface)
-post_save.connect(update_statistics, sender=Link)
-#post_save.connect(update_statistics, sender=HNAv4)
+# init nodeshot signals
+import signals

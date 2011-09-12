@@ -16,6 +16,6 @@
         <input type="submit" value="Entra" id="submit" class="button submit" />
         <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
     </p>
-    <p class="clear alignright"><a href="{% url nodeshot_recover_password node.id %}">Hai dimenticato la password?</a></p>
+    <p class="clear alignright"><a href="{% url nodeshot_reset_password node.id %}">Hai dimenticato la password?</a></p>
 </div>
 {% endblock %}

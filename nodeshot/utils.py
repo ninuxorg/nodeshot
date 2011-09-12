@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import math
-import hashlib
-
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_str
 from django.utils.crypto import constant_time_compare
-from django.template import TemplateDoesNotExist
 
-try:
-    from settings import DEFAULT_FROM_EMAIL
-except ImportError:
-    raise ImproperlyConfigured('DEFAULT_FROM_EMAIL is not defined in your settings.py. See settings.example.py for reference.')
+import math
+import hashlib
+
+from settings import DEFAULT_FROM_EMAIL
 
 def distance(origin, destination):
     'Haversine formula'
@@ -56,19 +52,22 @@ def email_owners(node, subject, body_template, context, reply_to=False):
         send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
     
 def notify_admins(node, subject, body_template, context, skip=False):
-    ''' todo: comment this '''
+    """
+    Sends an email to admins.
+    subject can either be a string or a template to be parsed.
+    """
     admins = User.objects.filter(is_staff=True, userprofile__receive_notifications=True).exclude(email='').select_related().order_by('pk')
     if(len(admins)>0):
         # parse subject (which is the same for every admin)
         try:
             subject = render_to_string(subject,context)
-        except TemplateDoesNotExist:
+        except:
             pass
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
         # loop over admins
         for admin in admins:
-            # if skip is True and admin is one of the owners do not break his balls again please
+            # if skip is True and admin is one of the owners do not notify him twice
             if skip and admin.email == node.email or admin.email == node.email2 or admin.email == node.email3:
                 continue
             # include user information in context

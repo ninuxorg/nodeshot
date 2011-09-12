@@ -5,7 +5,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^', include('nodeshot.urls')),
-
     (r'^admin/', include(admin.site.urls)),
 )
 

@@ -12,8 +12,6 @@ from django.template import RequestContext
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.html import escape
 
-# Nodeshot specific
-
 class NodeAdmin(admin.ModelAdmin):
     list_display  = ('name', 'owner', 'status', 'added', 'updated')
     list_filter   = ('status', 'added', 'updated')
@@ -30,7 +28,6 @@ class NodeAdmin(admin.ModelAdmin):
     )
     
     # customizations needed for password field
-    #form = UserChangeForm
     change_password_template = None
     change_password_form = AdminPasswordChangeForm
     
