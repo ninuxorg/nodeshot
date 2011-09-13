@@ -12,6 +12,10 @@ from django.template import RequestContext
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.html import escape
 
+class DeviceInline(admin.TabularInline):
+    model = Device
+    extra = 0
+
 class NodeAdmin(admin.ModelAdmin):
     list_display  = ('name', 'owner', 'status', 'added', 'updated')
     list_filter   = ('status', 'added', 'updated')
@@ -20,6 +24,7 @@ class NodeAdmin(admin.ModelAdmin):
     date_hierarchy = 'added'
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
+    inlines = [ DeviceInline ]
     
     fieldsets = (
         (None, {'fields': ('status', 'name', 'slug', 'owner', 'description', 'postal_code', 'email', 'email2', 'email3', 'password', 'lat', 'lng', 'alt' )}),
@@ -70,6 +75,14 @@ class NodeAdmin(admin.ModelAdmin):
             'show_save': True,
             #'root_path': self.admin_site.root_path,
         }, context_instance=RequestContext(request))
+        
+class InterfaceInline(admin.TabularInline):
+    model = Interface
+    extra = 0
+
+class Hna4Inline(admin.TabularInline):
+    model = HNAv4
+    extra = 0
 
 class DeviceAdmin(admin.ModelAdmin):
     list_display  = ('name', 'node', 'type', 'added', 'updated')
@@ -77,6 +90,7 @@ class DeviceAdmin(admin.ModelAdmin):
     search_fields = ('name', 'type')
     save_on_top = True
     date_hierarchy = 'added'
+    inlines = [InterfaceInline, Hna4Inline]
     
 class InterfaceAdmin(admin.ModelAdmin):
     list_display  = ('ipv4_address', 'type', 'device', 'added', 'updated')

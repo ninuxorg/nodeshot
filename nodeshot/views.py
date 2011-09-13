@@ -153,7 +153,7 @@ def jstree(request):
                 'title': a['name'],
                 'attr': {
                     'class': 'child',
-                    'href': "javascript:nodeshot.gmap.goToNode(nodeshot.nodes.active.%s)" % jslugify(a['slug'])
+                    'href': 'javascript:nodeshot.gmap.goToNode(nodeshot.nodes.active.%s)' % jslugify(a['slug'])
                 }
             }
         })
@@ -162,7 +162,7 @@ def jstree(request):
             'data': 'Nodi Attivi',
             'state': 'open',
             'attr': {
-                'class': 'active_nodes'
+                'class': 'active_nodes',
             },
             'children': list(active_list)
         })
@@ -173,7 +173,7 @@ def jstree(request):
                 'title': h['name'],
                 'attr': {
                     'class': 'child',
-                    'href': "javascript:nodeshot.gmap.goToNode(nodeshot.nodes.hotspot.%s)" % jslugify(h['slug'])
+                    'href': 'javascript:nodeshot.gmap.goToNode(nodeshot.nodes.hotspot.%s)' % jslugify(h['slug'])
                 }
             }
         })
@@ -193,7 +193,7 @@ def jstree(request):
                 'title': p['name'],
                 'attr': {
                     'class': 'child',
-                    'href': "javascript:nodeshot.gmap.goToNode(nodeshot.nodes.potential.%s)" % jslugify(p['slug'])
+                    'href': 'javascript:nodeshot.gmap.goToNode(nodeshot.nodes.potential.%s)' % jslugify(p['slug'])
                 }
             }
         })

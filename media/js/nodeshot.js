@@ -23,6 +23,9 @@ var nodeshot = {
         media: ''        
     },
     
+    // cache for jquery autocomplete search
+    searchCache: [],
+    
     /*
      * nodeshot.init()
      * inits nodeshot
@@ -151,7 +154,7 @@ var nodeshot = {
             }
             // set nodeTreeContainer height if not too short
             var newTreeHeight = this.$container.height()-this.$header.height()-(this.$nodeTreeContainer.position()).top;
-            if(newTreeHeight > 200){
+            if(newTreeHeight > 100){
                 this.$nodeTreeContainer.height(newTreeHeight);
             }
         }, // nodeshot.setFullScreen()
@@ -364,8 +367,6 @@ var nodeshot = {
         * initialize jquery autocomplete for the main search (nodes, ip, ecc.)
         */
         initMainSearch: function(){
-            // prepare cache
-            nodeshot.mainSearchCache = [];
             this.bindFocusBlur(this.$search);
             this.$search.autocomplete({
                 // minimum length of keyword to start querying the database
@@ -375,15 +376,15 @@ var nodeshot = {
                     // store term in a local var
                     var term = request.term;
                     // check if term has already requested before
-                    if (term in nodeshot.mainSearchCache) {
+                    if (term in nodeshot.searchCache) {
                         // if has been found return the term in the cache
-                        response(nodeshot.mainSearchCache[term]);
+                        response(nodeshot.searchCache[term]);
                         return;
                     }
                     // if term has not been found in the cache go ahead with a new request
-                    lastXhr = $.getJSON("search/"+request.term+'/', function(data, status, xhr) {
+                    lastXhr = $.getJSON(nodeshot.url.index+'search/'+request.term+'/', function(data, status, xhr) {
                         // cache the term
-                        nodeshot.mainSearchCache[term];
+                        nodeshot.searchCache[term];
                         if (xhr === lastXhr && data != null && data.length > 0){
                             response(data);
                         }
@@ -435,7 +436,7 @@ var nodeshot = {
         * initialize add node button
         */
         initAddNode: function(){
-            this.$addNode.click(function() {
+            this.$addNode.click(function(e) {
                 // TODO: translate
                 nodeshot.dialog.open('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
                 nodeshot.gmap.clickListener = google.maps.event.addListener(nodeshot.gmap.map, 'click', function(e) {
@@ -490,6 +491,8 @@ var nodeshot = {
                     nodeshot.gmap.init();
                     nodeshot.remember();
                     nodeshot.layout.setFullScreen();
+                    nodeshot.overlay.hideLoading();
+                    nodeshot.overlay.hideMask();
                 // if switching to info
                 } else if (choice == 'info') {
                     // unload gmap if necessary
@@ -582,16 +585,7 @@ var nodeshot = {
                 'themes' : {'theme' : 'classic'},
                 'plugins' : [ 'themes', 'json_data' ]
             });
-        }, // nodeshot.layout.initNodeTree()
-        
-        /*
-        * nodeshot.layout.switchContent(choice:string, callback:function)
-        * actions performed when clicking on buttonset eg: "Map, Info, OLSR, VPN"
-        * these actions are also performed in other cases
-        */
-        //switchContent: function(choice){
-        //    
-        //} // nodeshot.layout.switchContent()
+        } // nodeshot.layout.initNodeTree()
     },
     
     /*
@@ -646,16 +640,6 @@ var nodeshot = {
             // fadeOut and remove the mask
             mask.fadeOut(500);
         }, // nodeshot.overlay.hideMask()
-        
-        ///*
-        //* nodeshot.overlay.appendLoading()
-        //* append Loading gif to the body
-        //*/
-        //appendLoading: function(){
-        //     preload ajax-loader.gif
-        //    $('body').append('<img src="'+nodeshot.url.media+'images/ajax-loader.gif" alt="" id="nodeshot-ajaxloader" />');
-        //    nodeshot.layout.$loading = $('#nodeshot-ajaxloader');
-        //}, // nodeshot.overlay.appendLoading()
         
         /*
         * nodeshot.overlay.showLoading()
@@ -822,15 +806,18 @@ var nodeshot = {
                 // fade in
                 opacity: 1
             }, 500);
-            // bind key press event
-            nodeshot.layout.$body.bind('keyup', function(e) {
-                var code = (e.keyCode ? e.keyCode : e.which);
-                // if pressing enter
-                if (code == 13 || code == 27){
-                    nodeshot.dialog.close(callback);
-                    nodeshot.layout.$body.unbind('keyup');
-                }
-            });
+            // bind key press event with some delay to avoid holding enter and not seeing the dialog for enough time
+            setTimeout(function(){
+                nodeshot.layout.$body.bind('keyup', function(e) {
+                    var code = (e.keyCode ? e.keyCode : e.which);
+                    // if pressing ENTER or ESC
+                    if (code == 13 || code == 27){
+                        nodeshot.dialog.close(callback);
+                        nodeshot.layout.$body.unbind('keyup');
+                    }
+                });
+            }, 500);
+            
             // bind close event
             $('#nodeshot-modal-close').click(function(){
                 nodeshot.dialog.close(callback);
@@ -841,11 +828,13 @@ var nodeshot = {
         * nodeshot.dialog.close([callback: function])
         */
         close: function(callback){
-            // fade out and remove
-            nodeshot.layout.$dialog.fadeOut(500, function(){
-                nodeshot.layout.$dialog.remove();
-                nodeshot.layout.$dialog = false;
-            });
+            if(nodeshot.layout.$dialog){
+                // fade out and remove
+                nodeshot.layout.$dialog.fadeOut(500, function(){
+                    nodeshot.layout.$dialog.remove();
+                    nodeshot.layout.$dialog = false;
+                });
+            }
             nodeshot.overlay.hideMask();
             // execute callback if any
             if(callback){
@@ -943,6 +932,7 @@ var nodeshot = {
                 // prevent link default behaviour
                 e.preventDefault();
                 nodeshot.contact.init(this.href);
+                return false;
             });
         } // nodeshot.contact.link()
     },
@@ -1368,12 +1358,7 @@ var nodeshot = {
                     }
                 }
             }, 200);
-            // remove loading gif and mask if necessary
-            if(nodeshot.layout.$loading){
-                nodeshot.overlay.hideMask();
-                nodeshot.overlay.hideLoading();
-                nodeshot.layout.setFullScreen();
-            }
+            nodeshot.layout.setFullScreen();
         }, // nodeshot.gmap.init()
         
         /*
@@ -1602,8 +1587,6 @@ var nodeshot = {
                         nodeshot.contact.link();
                         var search_input = $('#distance-search');
                         nodeshot.layout.bindFocusBlur(search_input);
-                        // here we'll store cached searches
-                        nodeshot.distanceSearchCache = [];
                         // Implements the search function
                         search_input.autocomplete({
                             minLength: 3,
@@ -1612,15 +1595,15 @@ var nodeshot = {
                                 // store term in a local var
                                 var term = request.term;
                                 // check if term has already requested before
-                                if (term in nodeshot.distanceSearchCache) {
+                                if (term in nodeshot.searchCache) {
                                     // if has been found return the term in the cache
-                                    response(nodeshot.distanceSearchCache[term]);
+                                    response(nodeshot.searchCache[term]);
                                     return;
                                 }
                                 // if term has not been found in the cache go ahead with a new request
-                                lastXhr = $.getJSON("search/"+request.term+'/', function(data, status, xhr) {
+                                lastXhr = $.getJSON(nodeshot.url.index+'search/'+request.term+'/', function(data, status, xhr) {
                                     // cache the term
-                                    nodeshot.distanceSearchCache[term];
+                                    nodeshot.searchCache[term];
                                     if (xhr === lastXhr && data != null && data.length > 0){
                                         response(data);
                                     }
@@ -1729,6 +1712,11 @@ var nodeshot = {
         drawDistanceLink: function(data, saved){
             // if data is not right stop here
             if(!data){
+                return false;
+            }
+            if(data.from_slug==data.to_slug){
+                // TODO: translate
+                nodeshot.dialog.open('La destinazione selezionata non è valida.');
                 return false;
             }
             // ensure coords are float type

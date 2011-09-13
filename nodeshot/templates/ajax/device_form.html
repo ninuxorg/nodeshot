@@ -26,7 +26,7 @@
         </div>
         {% endif %}
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-name">Nome: <big>*</big><label>
+            <label for="id_devices-{{ forloop.counter0 }}-name">Nome: <big>*</big></label>
             {% if form.name.errors %}
                 <div class="ui-state-error">
                     {{ form.name.errors }}
@@ -34,19 +34,9 @@
             {% endif %}
             {{ form.name }}
         </div>
-
-        <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo:<label>
-            {% if form.type.errors %}
-                <div class="ui-state-error">
-                    {{ form.type.errors }}
-                </div>
-            {% endif %}
-            {{ form.type }}
-        </div>
         
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-description">Descrizione:<label>
+            <label for="id_devices-{{ forloop.counter0 }}-description">Descrizione:</label>
             {% if form.description.errors %}
                 <div class="ui-state-error">
                     {{ form.description.errors }}
@@ -56,7 +46,18 @@
         </div>
 
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">Protocollo di routing:<label>
+            <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo:</label>
+            {% if form.type.errors %}
+                <div class="ui-state-error">
+                    {{ form.type.errors }}
+                </div>
+            {% endif %}
+            {{ form.type }}
+        </div>       
+        
+
+        <div class="field-wrapper">
+            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">Protocollo di routing:</label>
             {% if form.olsr_version.errors %}
                 <div class="ui-state-error">
                     {{ form.routing_protocol.errors }}
@@ -66,7 +67,7 @@
         </div>
         
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Versione protocollo di routing:<label>
+            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Versione protocollo di routing:</label>
             {% if form.olsr_version.errors %}
                 <div class="ui-state-error">
                     {{ form.routing_protocol_versopm.errors }}

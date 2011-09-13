@@ -4,8 +4,7 @@
     <meta charset="utf-8" />
     <title>Nodeshot Open Source Map Server</title>
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/tablesorter/style.css" />
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" />
+    <!--<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" />-->
     <!--[if lte IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <base href="{% url nodeshot.views.index %}" />
     <meta name="robots" content="{{ settings.META_ROBOTS }}" />
@@ -25,10 +24,10 @@
                 {% endif %}
             </p>
             <div id="head-controls">
-                <input id="search" class="defaultText text ui-corner-all" value="Cerca un un nodo, device, IP, MAC" />                
-                {% if settings.SHOW_KML_LINK %}<a href="{% url nodeshot_generate_kml %}" title="KML Feed"><img src="{{ MEDIA_URL }}images/icons/Rss.png" class="top-icon" alt="KML Feed" /></a>{% endif %}
-                {% if settings.HELP_URL %}<a href="{{ settings.HELP_URL }}" title="Help"><img src="{{ MEDIA_URL }}images/icons/Lifesaver.png" alt="Help" class="top-icon" /></a>{% endif %}
-                {% if settings.SHOW_ADMIN_LINK %}<a href="{% url admin:index %}" title="Administration"><img src="{{ MEDIA_URL }}images/icons/Config.png" class="top-icon" alt="Admin" /></a>{% endif %}
+                <input id="search" class="ui-corner-all" value="Cerca un un nodo, device, IP, MAC" />
+                {% if settings.SHOW_ADMIN_LINK %}<a href="{% url admin:index %}" title="Administration" id="admin-link">admin</a>{% endif %}
+                {% if settings.HELP_URL %}<a href="{{ settings.HELP_URL }}" title="Help" id="help-link">help</a>{% endif %}
+                {% if settings.SHOW_KML_LINK %}<a href="{% url nodeshot_generate_kml %}" title="KML Feed" id="kml-link">kml</a>{% endif %}
             </div>
         </header>
         <section id="content-container">
@@ -38,12 +37,12 @@
             </article>
             <aside id="aside">
                 <div class="wrapper">
-                    <menu id="choices">
+                    <nav id="choices">
                         <input type="radio" id="radio1" name="view-radio" value="map" checked="checked" /><label for="radio1">Mappa</label>
                         <input type="radio" id="radio2" name="view-radio" value="info" /><label for="radio2">Info</label>
                         {% if settings.TAB3 %}<input type="radio" id="radio3" name="view-radio" value="tab3" /><label for="radio3">{{ settings.TAB3 }}</label>{% endif %}
                         {% if settings.TAB4 %}<input type="radio" id="radio4" name="view-radio" value="tab4" /><label for="radio4">{{ settings.TAB4 }}</label>{% endif %}
-                    </menu>
+                    </nav>
                     <p>{{ settings.WELCOME_TEXT }}</p>
                     <button id="addnode" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
                         <span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>
@@ -51,21 +50,19 @@
                     </button>
                     
                     <div class="inner">
-                        <menu id="other-controls">
-                            <ul>
-                                <li><a id="hide-side">Nascondi questa colonna</a></li>
-                                <li class="maponly"><a id="search-address">Cerca un indirizzo</a></li>
-                                <li class="last maponly"><input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label></li>
-                            </ul>
-                        </menu>
+                        <ul id="other-controls">
+                            <li><a id="hide-side">Nascondi questa colonna</a></li>
+                            <li class="maponly"><a id="search-address">Cerca un indirizzo</a></li>
+                            <li class="last maponly"><input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label></li>
+                        </ul>
                         
-                        <menu id="link-quality" class="maponly">
+                        <div id="link-quality" class="maponly">
                             Visualizza la qualità dei collegamenti:
                             <ul>
                                 <li><input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /> <label for="etx">Pacchetti persi (ETX)</label></li>
                                 <li id="dbmli"><input type="radio" id="dbm" name="link-quality-selector" value="dbm" /> <label for="dbm">Segnale ricevuto (DBm)</label></li>
                             </ul>
-                        </menu>
+                        </div>
                     </div>
                     
                     <h3 class="maponly">Lista dei nodi</h3>
@@ -76,8 +73,11 @@
             </aside>
         </section>
     </div>
-        
     <script src="{{MEDIA_URL}}js/jquery.js"></script>
+    <!--[if lte IE 7]>
+    <script src="{{MEDIA_URL}}js/ie6/warning.js"></script>
+    <script>$(function(){('{{MEDIA_URL}}js/ie6/')})</script>
+    <![endif]-->
     <script src="{{MEDIA_URL}}js/jquery-ui.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false" type="text/javascript"></script>
     <script src="{{MEDIA_URL}}js/jquery.jstree.js"></script>
@@ -86,7 +86,6 @@
     <script src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
     <script src="{{MEDIA_URL}}js/jquery.progressbar.js"></script>
     <script src="{{MEDIA_URL}}js/nodeshot.js"></script>
-    <!--<script src="{{MEDIA_URL}}js/compressed/nodeshot.js"></script>-->
     <script>
         nodeshot.url.index = '{% url nodeshot.views.index %}';
         nodeshot.url.media = '{{ MEDIA_URL }}';
@@ -97,7 +96,7 @@
             lng: '{{ gmap_center.lng }}'
         };
         
-        // on dom ready
+        // when dom ready
         $(function() {
             nodeshot.init();
             nodeshot.layout.setElementDimensions();
@@ -109,8 +108,9 @@
         $(window).load(function(){
             nodeshot.layout.setElementDimensions();
             nodeshot.layout.setFullScreen();
+            nodeshot.layout.$mask.removeClass('initial')
             if(!nodeshot.layout.$dialog){
-                nodeshot.layout.$mask.removeClass('initial').hide();
+                nodeshot.layout.$mask.hide();
             }
             nodeshot.layout.$loading.hide();
         // update dimensions on resize

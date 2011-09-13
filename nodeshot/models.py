@@ -20,7 +20,7 @@ try:
 except ImportError:
     from nodeshot.utils import make_password, check_password
 
-from settings import ROUTING_PROTOCOLS, DEFAULT_ROUTING_PROTOCOL, ACTIVATION_DAYS, DEFAULT_FROM_EMAIL, SITE
+from settings import ROUTING_PROTOCOLS, DEFAULT_ROUTING_PROTOCOL, ACTIVATION_DAYS, DEFAULT_FROM_EMAIL, SITE, IMPORTING
 
 NODE_STATUS = (
     ('a', 'active'),
