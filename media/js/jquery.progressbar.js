@@ -29,12 +29,12 @@ this script was modified to be used in nodeshot and differs slightly with the or
 				width			: 120,											// Width of the progressbar - don't forget to adjust your image too!!!												// Image to use in the progressbar. Can be a single image too: 'images/progressbg_green.gif'
 				height			: 12,											// Height of the progressbar - don't forget to adjust your image too!!!
 				callback		: null,											// Calls back with the config object that has the current percentage, target percentage, current image, etc
-				boxImage		: nodeshot.url.media+'/images/progressbar.gif',						// boxImage : image around the progress bar
+				boxImage		: '/images/progressbar.gif',						// boxImage : image around the progress bar
 				barImage		: {
-									0:	nodeshot.url.media+'/images/progressbg_red.gif',
-									30: nodeshot.url.media+'/images/progressbg_orange.gif',
-                                    45: nodeshot.url.media+'/images/progressbg_yellow.gif',
-									70: nodeshot.url.media+'/images/progressbg_green.gif'
+									0:	'/images/progressbg_red.gif',
+									30: '/images/progressbg_orange.gif',
+                                    45: '/images/progressbg_yellow.gif',
+									70: '/images/progressbg_green.gif'
 								},
 				
 				// Internal use
@@ -176,8 +176,9 @@ this script was modified to be used in nodeshot and differs slightly with the or
 						$bar.attr('title', getText(config));
 						$text.html(getText(config));
 						
-						if (config.callback != null && typeof(config.callback) == 'function')
+						if (config.callback != null && typeof(config.callback) == 'function'){
 							config.callback(config);
+						}
 						
 						pb.config = config;
 					}, config.stepDuration); 

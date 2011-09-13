@@ -101,6 +101,8 @@ var nodeshot = {
         */
         cacheObjects: function(){
             this.$body = $('body');
+            this.$mask = $('#nodeshot-mask');
+            this.$loading = $('#loading');
             this.$container = $('#container');
             this.$header = $('#header');
             this.$content = $('#content');
@@ -144,7 +146,7 @@ var nodeshot = {
                 // set map canvas height
                 this.$map.height($window.height()-this.$header.height());
             }
-            else{
+            else if(this.$infoWrapper){
                 this.$infoWrapper.height($window.height()-this.$header.height());
             }
             // set nodeTreeContainer height if not too short
@@ -253,7 +255,7 @@ var nodeshot = {
                     // close it
                     nodeshot.gmap.infoWindow.close()
                 }
-                nodeshot.overlay.addMask();
+                nodeshot.overlay.showMask();
                 // TODO: translation needed
                 var data = '<div id="nodeshot-overlay-inner" class="content narrower"><div id="gmap-search"><h3>Cerca un indirizzo</h3><p>Inserisci l\'indirizzo completo</p><p><input type="text" class="text" id="gmap-address" /><input class="button" type="submit" value="Cerca" id="gmap-submit" /></p></div></div>';
                 nodeshot.overlay.open(data, false, nodeshot.gmap.removeNewMarker);
@@ -452,39 +454,73 @@ var nodeshot = {
             // default settings
             document.getElementById('radio1').checked=true;
             document.getElementById('radio2').checked=false;
-            document.getElementById('radio3').checked=false;
-            document.getElementById('radio4').checked=false;
+            if(document.getElementById('radio3')){
+                document.getElementById('radio3').checked=false;    
+            }
+            if(document.getElementById('radio4')){
+                document.getElementById('radio4').checked=false;
+            }
             this.$choices.buttonset('refresh');
             // bind change event
             this.$choices.find('input').change(function(){
                 var choice = this.value;
+                // if unloading map
+                if(choice != 'map'){
+                    if(!nodeshot.layout.$aside.maponly){
+                        // fadeOut some functionalities that work for the map tab only
+                        nodeshot.layout.$aside.find('#addnode, .maponly').fadeOut(500);
+                        nodeshot.layout.$aside.maponly = true;
+                    }
+                }
+                // if switching back to map
                 if (choice == 'map') {
+                    // if controls are hidden
+                    if(nodeshot.layout.$aside.maponly){
+                        // fadeOut some functionalities that work for the map tab only
+                        nodeshot.layout.$aside.find('#addnode, .maponly').fadeIn(500);
+                        delete nodeshot.layout.$aside.maponly;
+                    }
                     // unload infoTab if necessary
                     if(nodeshot.layout.$infoTable){
                         nodeshot.infoTab.unload();
                     }
-                    nodeshot.overlay.addMask(0.7);
+                    nodeshot.overlay.showMask(0.7);
                     nodeshot.overlay.showLoading();
                     nodeshot.layout.$content.html('<div id="map_canvas"></div><div id="side-links"></div>');
                     nodeshot.gmap.init();
                     nodeshot.remember();
+                    nodeshot.layout.setFullScreen();
+                // if switching to info
                 } else if (choice == 'info') {
-                    nodeshot.gmap.unload();
-                    nodeshot.overlay.addMask(0.7);
+                    // unload gmap if necessary
+                    if(nodeshot.layout.$map){
+                        nodeshot.gmap.unload();   
+                    }
+                    nodeshot.overlay.showMask(0.7);
                     nodeshot.overlay.showLoading();
                     nodeshot.layout.$content.load(nodeshot.url.index+'overview/' , function() {
                         nodeshot.infoTab.init();
                         nodeshot.layout.setFullScreen();
-                        nodeshot.overlay.removeMask();
+                        nodeshot.overlay.hideMask();
                         nodeshot.overlay.hideLoading();
                     });
                 }
-                // TODO: improve (improve also unload)
-                else if (choice == 'olsr') {
-                    nodeshot.layout.$content.html("<img src='http://tuscolomesh.ninux.org/images/topology.png' width='100%' height='700px' />"); 
-                }
-                else if (choice == 'vpn') {
-                    nodeshot.layout.$content.html("<img src='http://zioproto.ninux.org/download/file.png' width='100%' height='700px' />");
+                // if switching to one of the other two possible buttons
+                else if (choice == 'tab3' || choice == 'tab4') {
+                    // unload gmap and infotable if necessary                
+                    nodeshot.overlay.showMask(0.7);
+                    nodeshot.overlay.showLoading();
+                    if(nodeshot.layout.$map){
+                        nodeshot.gmap.unload();   
+                    }
+                    if(nodeshot.layout.$infoTable){
+                        nodeshot.infoTab.unload();
+                    }
+                    nodeshot.layout.$content.load(nodeshot.url.index+choice+'/', function(){
+                        nodeshot.layout.setFullScreen();
+                        nodeshot.overlay.hideMask();
+                        nodeshot.overlay.hideLoading();
+                    });
                 }
             });
         }, // nodeshot.layout.initChoices()
@@ -546,7 +582,16 @@ var nodeshot = {
                 'themes' : {'theme' : 'classic'},
                 'plugins' : [ 'themes', 'json_data' ]
             });
-        } // nodeshot.layout.initNodeTree()
+        }, // nodeshot.layout.initNodeTree()
+        
+        /*
+        * nodeshot.layout.switchContent(choice:string, callback:function)
+        * actions performed when clicking on buttonset eg: "Map, Info, OLSR, VPN"
+        * these actions are also performed in other cases
+        */
+        //switchContent: function(choice){
+        //    
+        //} // nodeshot.layout.switchContent()
     },
     
     /*
@@ -556,23 +601,21 @@ var nodeshot = {
     overlay: {
         
         /*
-        * nodeshot.overlay.addMask(opacity:float [, closeOnClick:boolean])
+        * nodeshot.overlay.showMask(opacity:float [, closeOnClick:boolean])
         * adds a mask over the <body>
         */
-        addMask: function(opacity, closeOnClick){
+        showMask: function(opacity, closeOnClick){
             // do not add more than one mask
-            if(document.getElementById('nodeshot-modal-mask') != null){
-                return false;
-            }
+            //if(document.getElementById('nodeshot-mask') != null){
+            //    return false;
+            //}
             // if opacity is not specified
             if(!opacity){
                 // set default value
                 opacity = 0.5
             }
-            // append mask HTML element
-            $('body').append('<div id="nodeshot-modal-mask"></div>');
             // initially not visible, but fades in
-            var mask = $('#nodeshot-modal-mask');
+            var mask = nodeshot.layout.$mask;
             mask.css({
                 opacity: 0,
                 display: 'block'
@@ -582,49 +625,48 @@ var nodeshot = {
             // if closeOnClick == true bind click event that closes javascript stuff
             if(closeOnClick){
                 mask.click(function(e){
-                    nodeshot.overlay.removeMask();
+                    nodeshot.overlay.hideMask();
                     // if dialog is open close it
                     if(nodeshot.layout.$dialog){
                         nodeshot.dialog.close();
                     }
                 })
             }
-        }, // nodeshot.overlay.addMask()
+        }, // nodeshot.overlay.showMask()
         
         /*
-        * nodeshot.overlay.removeMask()
+        * nodeshot.overlay.hideMask()
         * rermoves the mask
         */
-        removeMask: function(){
+        hideMask: function(){
             // cache jquery object
-            var mask = $('#nodeshot-modal-mask');
+            var mask = nodeshot.layout.$mask;
             // stop here if no mask
-            if(mask.length < 1){ return false }
+            //if(this.mask.length < 1){ return false }
             // fadeOut and remove the mask
-            mask.fadeOut(500, function(){
-                mask.remove();
-            });
-        }, // nodeshot.overlay.removeMask()
+            mask.fadeOut(500);
+        }, // nodeshot.overlay.hideMask()
         
-        /*
-        * nodeshot.overlay.appendLoading()
-        * append Loading gif to the body
-        */
-        appendLoading: function(){
-            // preload ajax-loader.gif
-            $('body').append('<img src="'+nodeshot.url.media+'images/ajax-loader.gif" alt="" id="nodeshot-ajaxloader" />');
-            nodeshot.layout.$loading = $('#nodeshot-ajaxloader');
-        }, // nodeshot.overlay.appendLoading()
+        ///*
+        //* nodeshot.overlay.appendLoading()
+        //* append Loading gif to the body
+        //*/
+        //appendLoading: function(){
+        //     preload ajax-loader.gif
+        //    $('body').append('<img src="'+nodeshot.url.media+'images/ajax-loader.gif" alt="" id="nodeshot-ajaxloader" />');
+        //    nodeshot.layout.$loading = $('#nodeshot-ajaxloader');
+        //}, // nodeshot.overlay.appendLoading()
         
         /*
         * nodeshot.overlay.showLoading()
         * shows hidden loading gif appended previously
         */
         showLoading: function(){
-            nodeshot.layout.$loading.css({
-                left: nodeshot.layout.horizontalCenter(nodeshot.layout.$loading),
-                top: nodeshot.layout.verticalCenter(nodeshot.layout.$loading)
-            });
+            //nodeshot.layout.$loading.css({
+            //    left: nodeshot.layout.horizontalCenter(nodeshot.layout.$loading),
+            //    top: nodeshot.layout.verticalCenter(nodeshot.layout.$loading)
+            //});
+            nodeshot.layout.$loading.show();
         }, // nodeshot.overlay.showLoading()
         
         /*
@@ -632,7 +674,8 @@ var nodeshot = {
         * hides Loading gif
         */
         hideLoading: function(){
-            nodeshot.layout.$loading.css('top', '-9999px');
+            //nodeshot.layout.$loading.css('top', '-9999px');
+            nodeshot.layout.$loading.hide();
         }, // nodeshot.overlay.hideLoading()
         
         /*
@@ -733,7 +776,7 @@ var nodeshot = {
         * binds actions to the submit event of an overlay
         */
         close: function(){
-            nodeshot.overlay.removeMask();
+            nodeshot.overlay.hideMask();
             nodeshot.layout.$overlay.remove();
             nodeshot.layout.$overlay = false;
             nodeshot.layout.$overlayInner = false;
@@ -768,7 +811,7 @@ var nodeshot = {
             // cache jquery object
             nodeshot.layout.$dialog = $('#nodeshot-modal');
             // add mask after $container has been cached
-            nodeshot.overlay.addMask(0.5, true);
+            nodeshot.overlay.showMask(0.5, true);
             // set to the center of the window
             nodeshot.layout.$dialog.css({
                 opacity: 0,
@@ -803,7 +846,7 @@ var nodeshot = {
                 nodeshot.layout.$dialog.remove();
                 nodeshot.layout.$dialog = false;
             });
-            nodeshot.overlay.removeMask();
+            nodeshot.overlay.hideMask();
             // execute callback if any
             if(callback){
                 callback();
@@ -823,7 +866,7 @@ var nodeshot = {
         * opens an overlay with the form to contact a node and binds the submit and cancel buttons
         */
         init: function(url){
-            nodeshot.overlay.addMask(0.7);
+            nodeshot.overlay.showMask(0.7);
             nodeshot.overlay.showLoading();
             // ajax get
             $.get(url, function(data) {
@@ -844,7 +887,7 @@ var nodeshot = {
         submit: function(url, form){
             nodeshot.overlay.showLoading();
             // block the form by raising mask z-index and decreasing overlay z-index
-            $('#nodeshot-modal-mask').css({
+            $('#nodeshot-mask').css({
                 zIndex: 11,
                 opacity: 0.7
             });
@@ -857,7 +900,7 @@ var nodeshot = {
                 // if valiadtion errors
                 if ($(data).find('#success').length < 1) {
                     // unblock
-                    $('#nodeshot-modal-mask').css({
+                    $('#nodeshot-mask').css({
                         zIndex: 10,
                         opacity: 0.5
                     });
@@ -915,7 +958,7 @@ var nodeshot = {
         * opens a new overlay with the form to add a new node
         */
         add: function(){
-            nodeshot.overlay.addMask();
+            nodeshot.overlay.showMask();
             nodeshot.overlay.showLoading();
             // do ajax get to new node form
             $.get(nodeshot.url.index+'node/add/', function(data) {
@@ -941,7 +984,7 @@ var nodeshot = {
         submit: function(form){
             nodeshot.overlay.showLoading();
             // block form
-            $('#nodeshot-modal-mask').css({
+            $('#nodeshot-mask').css({
                 zIndex: 11,
                 opacity: 0.7
             });
@@ -954,7 +997,7 @@ var nodeshot = {
                 // if validation errors
                 if (data.length >= 10) {
                     // unblock form
-                    $('#nodeshot-modal-mask').css({
+                    $('#nodeshot-mask').css({
                         zIndex: 10,
                         opacity: 0.5
                     });
@@ -1327,7 +1370,7 @@ var nodeshot = {
             }, 200);
             // remove loading gif and mask if necessary
             if(nodeshot.layout.$loading){
-                nodeshot.overlay.removeMask();
+                nodeshot.overlay.hideMask();
                 nodeshot.overlay.hideLoading();
                 nodeshot.layout.setFullScreen();
             }
@@ -1506,7 +1549,7 @@ var nodeshot = {
                     // close it first
                     nodeshot.overlay.close();
                 }
-                nodeshot.overlay.addMask(0.7);
+                nodeshot.overlay.showMask(0.7);
                 nodeshot.overlay.showLoading();
                 $.get(nodeshot.url.index+'node/info/'+node.id+'/', function(data) {
                     // remove listener in case it has already been set
@@ -1542,7 +1585,7 @@ var nodeshot = {
                             // advanced tab
                             select: function(e, ui){
                                 if(ui.tab.id=='advanced-link'){
-                                    nodeshot.overlay.addMask(0.8, true);
+                                    nodeshot.overlay.showMask(0.8, true);
                                     nodeshot.overlay.showLoading();
                                     $.get($(ui.tab).attr('data-url'), function(data) {
                                         // open overlay, closeOnClick = true
@@ -1644,7 +1687,7 @@ var nodeshot = {
                     nodeshot.overlay.hideLoading();
                     // remove mask only if there isn't any dialog
                     if(!nodeshot.layout.$dialog){
-                        nodeshot.overlay.removeMask();
+                        nodeshot.overlay.hideMask();
                     }
                 });
             };
@@ -1749,7 +1792,7 @@ var nodeshot = {
                     // if address has been found
                     if (status == google.maps.GeocoderStatus.OK) {
                         // remove mask
-                        nodeshot.overlay.removeMask();
+                        nodeshot.overlay.hideMask();
                         // save actions in this function that will be executed later
                         var moveMap = function(results){
                             var latlng = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
@@ -1844,7 +1887,16 @@ var nodeshot = {
                 var obj = nodeshot.layout.$signalbar.eq(ilen-len);
                 var value = obj.attr('data-value');
                 // init progress bar
-                obj.progressBar(value);
+                var defaults = {
+                    boxImage: nodeshot.url.media+'/images/progressbar.gif',
+                    barImage: {
+                        0:	nodeshot.url.media+'/images/progressbg_red.gif',
+                        30: nodeshot.url.media+'/images/progressbg_orange.gif',
+                        45: nodeshot.url.media+'/images/progressbg_yellow.gif',
+                        70: nodeshot.url.media+'/images/progressbg_green.gif'
+                    }
+                }
+                obj.progressBar(value, defaults);
             }
         }, // nodeshot.infoTab.init()
         

@@ -12,6 +12,8 @@ urlpatterns = patterns('',
     url(r'^overview/', 'nodeshot.views.overview', name='nodeshot_overview'), # INFO button on sidebar
     url(r'^node/advanced/(?P<node_id>\d+)/$', 'nodeshot.views.advanced', name='nodeshot_node_advanced'),
     url(r'^node/contact/(?P<node_id>\d+)/$', 'nodeshot.views.contact', name='nodeshot_contact_node'),
+    url(r'^tab3/', 'nodeshot.views.extra_tab', {'tab': 3}, name='nodeshot_tab3'),
+    url(r'^tab4/', 'nodeshot.views.extra_tab', {'tab': 4}, name='nodeshot_tab3'),
     url(r'^nodes.kml', 'nodeshot.views.generate_kml', name='nodeshot_generate_kml'),
     # this might be implemented in a future version
     #url(r'^generate_rrd', 'nodeshot.views.generate_rrd', name='nodeshot_generate_rrd'),

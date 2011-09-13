@@ -78,6 +78,13 @@ class DeviceAdmin(admin.ModelAdmin):
     save_on_top = True
     date_hierarchy = 'added'
     
+class InterfaceAdmin(admin.ModelAdmin):
+    list_display  = ('ipv4_address', 'type', 'device', 'added', 'updated')
+    list_filter   = ('type', 'status', 'wireless_mode', 'wireless_polarity', 'wireless_channel')
+    list_select_related = True
+    save_on_top = True
+    search_fields = ('ipv4_address', 'ipv6_address', 'mac_address', 'ssid')
+    
 class StatisticAdmin(admin.ModelAdmin):
     list_display  = ('date', 'active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
     ordering = ('-id',)
@@ -92,16 +99,11 @@ class ContactAdmin(admin.ModelAdmin):
     readonly_fields = ('from_name', 'from_email', 'message', 'ip', 'user_agent', 'http_referer', 'accept_language')
     actions = None
     
-class InterfaceAdmin(admin.ModelAdmin):
-    list_select_related = True
-    
 class LinkAdmin(admin.ModelAdmin):
     list_select_related = True
-    #list_display  = ('from_interface__device', 'from_email', 'node', 'date')
+    #list_display  = ('from_interface', 'to_interface')
     #ordering = ('-id',)
     #actions = []
-    #date_hierarchy = 'date'
-    #readonly_fields = ('from_name', 'from_email', 'message', 'ip', 'user_agent', 'http_referer', 'accept_language')
     #actions = None
 
 admin.site.register(Node, NodeAdmin)

@@ -8,35 +8,32 @@
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" />
     <!--[if lte IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <base href="{% url nodeshot.views.index %}" />
+    <meta name="robots" content="{{ settings.META_ROBOTS }}" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <!-- TODO: add robots -->
 </head>
 <body>
+    <div id="nodeshot-mask" class="initial"><div id="loading"><noscript>Per utilizzare questo sito web è necessario abilitare Javascript.</noscript></div></div>
     <div id="container">
         <header id="header">                
-            <h1>
-                Nodeshot
-            </h1>
+            <h1>{{ settings.SITE_NAME }}</h1>
             <p id="network-stat">
-                {% if stat %}
+                {% if stat and settings.SHOW_STATISTICS %}
                 <span><strong>Nodi Attivi:</strong> {{ stat.active_nodes }}</span>
                 <span><strong>Hotspots:</strong> {{ stat.hotspots }}</span>
                 <span><strong>Nodi Potenziali:</strong> {{ stat.potential_nodes }}</span>
                 <span><strong>Link attivi:</strong> {{ stat.links }} ({{ stat.km }} km)</span>
                 {% endif %}
             </p>
-            <div id="head-controls" class="ui-widget">
-                <input id="search" class="defaultText text ui-corner-all" value="Cerca un un nodo, IP, MAC o SSID" />
-                <a href="{% url admin:index %}"><img src="{{ MEDIA_URL }}images/icons/Config.png" class="top-icon" alt="Admin" /></a>
-                <a href="{% url nodeshot_generate_kml %}"><img src="{{ MEDIA_URL }}images/icons/Rss.png" class="top-icon" alt="KML Feed" /></a>
-                <a href="http://wiki.ninux.org/UsareMapserver"><img src="{{ MEDIA_URL }}images/icons/Lifesaver.png" alt="Help" class="top-icon" /></a>
+            <div id="head-controls">
+                <input id="search" class="defaultText text ui-corner-all" value="Cerca un un nodo, device, IP, MAC" />                
+                {% if settings.SHOW_KML_LINK %}<a href="{% url nodeshot_generate_kml %}" title="KML Feed"><img src="{{ MEDIA_URL }}images/icons/Rss.png" class="top-icon" alt="KML Feed" /></a>{% endif %}
+                {% if settings.HELP_URL %}<a href="{{ settings.HELP_URL }}" title="Help"><img src="{{ MEDIA_URL }}images/icons/Lifesaver.png" alt="Help" class="top-icon" /></a>{% endif %}
+                {% if settings.SHOW_ADMIN_LINK %}<a href="{% url admin:index %}" title="Administration"><img src="{{ MEDIA_URL }}images/icons/Config.png" class="top-icon" alt="Admin" /></a>{% endif %}
             </div>
         </header>
         <section id="content-container">
             <article id="content">
-                <div id="map_canvas">
-                    <noscript>Per utilizzare questa applicazione è necessario abilitare Javascript.</noscript>
-                </div>
+                <div id="map_canvas"></div>
                 <div id="side-links"></div>
             </article>
             <aside id="aside">
@@ -44,25 +41,25 @@
                     <menu id="choices">
                         <input type="radio" id="radio1" name="view-radio" value="map" checked="checked" /><label for="radio1">Mappa</label>
                         <input type="radio" id="radio2" name="view-radio" value="info" /><label for="radio2">Info</label>
-                        <input type="radio" id="radio3" name="view-radio" value="olsr" /><label for="radio3">OLSR</label>
-                        <input type="radio" id="radio4" name="view-radio" value="vpn" /><label for="radio4">VPN</label>
+                        {% if settings.TAB3 %}<input type="radio" id="radio3" name="view-radio" value="tab3" /><label for="radio3">{{ settings.TAB3 }}</label>{% endif %}
+                        {% if settings.TAB4 %}<input type="radio" id="radio4" name="view-radio" value="tab4" /><label for="radio4">{{ settings.TAB4 }}</label>{% endif %}
                     </menu>
-                    <p>Open Source Network Map Server</p>
+                    <p>{{ settings.WELCOME_TEXT }}</p>
                     <button id="addnode" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
                         <span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>
-                        <span class="ui-button-text">Aggiungi un nuovo nodo</span>
+                        <span class="ui-button-text maponly">Aggiungi un nuovo nodo</span>
                     </button>
                     
                     <div class="inner">
                         <menu id="other-controls">
                             <ul>
                                 <li><a id="hide-side">Nascondi questa colonna</a></li>
-                                <li><a id="search-address">Cerca un indirizzo</a></li>
-                                <li class="last"><input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label></li>
+                                <li class="maponly"><a id="search-address">Cerca un indirizzo</a></li>
+                                <li class="last maponly"><input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label></li>
                             </ul>
                         </menu>
                         
-                        <menu id="link-quality">
+                        <menu id="link-quality" class="maponly">
                             Visualizza la qualità dei collegamenti:
                             <ul>
                                 <li><input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /> <label for="etx">Pacchetti persi (ETX)</label></li>
@@ -71,8 +68,8 @@
                         </menu>
                     </div>
                     
-                    <h3>Lista dei nodi</h3>
-                    <div id="node-tree-container" class="widget-content">
+                    <h3 class="maponly">Lista dei nodi</h3>
+                    <div id="node-tree-container" class="widget-content maponly">
                         <div id="node-tree"></div>
                     </div>
                 </div>
@@ -83,13 +80,11 @@
     <script src="{{MEDIA_URL}}js/jquery.js"></script>
     <script src="{{MEDIA_URL}}js/jquery-ui.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false" type="text/javascript"></script>
-	<!--<script src="http://www.google.com/jsapi"></script>-->
-    <script src="{{MEDIA_URL}}js/jstree/jquery.jstree.js"></script>
+    <script src="{{MEDIA_URL}}js/jquery.jstree.js"></script>
     <script src="{{MEDIA_URL}}js/jquery.formset.min.js"></script>
-    <!-- TODO: with some delay (will need to check that nodeshot.infoTab.init() will work correctly -->
     <script src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script>
-    <!--<script src="{{MEDIA_URL}}js/jquery.tablesorter.pager.js"></script>-->
     <script src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
+    <script src="{{MEDIA_URL}}js/jquery.progressbar.js"></script>
     <script src="{{MEDIA_URL}}js/nodeshot.js"></script>
     <!--<script src="{{MEDIA_URL}}js/compressed/nodeshot.js"></script>-->
     <script>
@@ -104,16 +99,20 @@
         
         // on dom ready
         $(function() {
-            nodeshot.overlay.appendLoading();
-            nodeshot.init();            
-        });
-        // when content has been loaded
-        $(window).load(function(){
-            nodeshot.layout.setFullScreen();
-            nodeshot.layout.setElementDimensions();            
+            nodeshot.init();
+            nodeshot.layout.setElementDimensions();
             {% if messages %}
             nodeshot.dialog.open("{% for message in messages %}{{ message }}{% endfor %}");
             {% endif %}
+        });
+        // when content has been downloaded
+        $(window).load(function(){
+            nodeshot.layout.setElementDimensions();
+            nodeshot.layout.setFullScreen();
+            if(!nodeshot.layout.$dialog){
+                nodeshot.layout.$mask.removeClass('initial').hide();
+            }
+            nodeshot.layout.$loading.hide();
         // update dimensions on resize
         }).resize(function(){
             nodeshot.layout.setFullScreen();
@@ -121,6 +120,5 @@
             nodeshot.layout.$body.css("overflow-x", "hidden");
         });
     </script>
-    <script src="{{MEDIA_URL}}js/jquery.progressbar.js"></script>    
 </body>
 </html>
