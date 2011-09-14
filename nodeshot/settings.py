@@ -36,9 +36,20 @@ del FRONTEND_SETTINGS
 
 # IMPORTING is a variable that must be inserted dinamically in scripts that might import this file in order to perform automatic imports from other map servers (for example WNMAP)
 IMPORTING = getattr(settings, 'IMPORTING', False)
+# similar to the previous one, with the difference that if it's true is telling us that the code is being executed by a script executed with a cronjob
+IS_CRON = getattr(settings, 'IS_CRON', False)
 # general
 DEBUG = getattr(settings, 'DEBUG', True)
 DEFAULT_FROM_EMAIL = getattr(settings, 'DEFAULT_FROM_EMAIL', False)
+
+if 'staticgenerator.middleware.StaticGeneratorMiddleware' in settings.MIDDLEWARE_CLASSES:
+    STATIC_GENERATOR = True
+    try:
+        WEB_ROOT = settings.WEB_ROOT
+    except:
+        raise ImproperlyConfigured('You must define WEB_ROOT in yout settings.py if you want staticgenerator to function properly.')
+else:
+    STATIC_GENERATOR = False
 
 if not SITE:
     raise ImproperlyConfigured('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.')

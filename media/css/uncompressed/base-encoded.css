@@ -316,7 +316,7 @@ a.button{ color: #fff !important }
 .red{ background: #d50000 !important }
 .purple{ color: #5f0060; }
 
-.button:hover,.button:focus
+.button:hover,.button:focus,
 #nodeshot-overlay .text:focus,
 #nodeshot-form .formset-form-container input:focus,
 #nodeshot-form .formset-form-container select:focus,

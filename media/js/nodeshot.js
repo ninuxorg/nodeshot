@@ -383,12 +383,13 @@ var nodeshot = {
                     }
                     // if term has not been found in the cache go ahead with a new request
                     lastXhr = $.getJSON(nodeshot.url.index+'search/'+request.term+'/', function(data, status, xhr) {
-                        // cache the term
-                        nodeshot.searchCache[term];
+                        // cache the term                        
                         if (xhr === lastXhr && data != null && data.length > 0){
+                            nodeshot.searchCache[term] = data;
                             response(data);
                         }
                         else{
+                            nodeshot.searchCache[term] = '';
                             response('');
                         }
                     });
@@ -1603,11 +1604,12 @@ var nodeshot = {
                                 // if term has not been found in the cache go ahead with a new request
                                 lastXhr = $.getJSON(nodeshot.url.index+'search/'+request.term+'/', function(data, status, xhr) {
                                     // cache the term
-                                    nodeshot.searchCache[term];
                                     if (xhr === lastXhr && data != null && data.length > 0){
+                                        nodeshot.searchCache[term] = data;
                                         response(data);
                                     }
                                     else{
+                                        nodeshot.searchCache[term] = '';
                                         response('');
                                     }
                                 });
@@ -1662,7 +1664,10 @@ var nodeshot = {
                                 to_status: to_status
                             });
                         });
+                        // readjust dimensions
                         nodeshot.layout.setFullScreen();
+                        // this is a fix needed for certain cases
+                        setTimeout(function(){nodeshot.layout.setFullScreen()}, 300);
                     });
                     nodeshot.gmap.infoWindow.setContent(data);
                     nodeshot.gmap.infoWindow.maxWidth = 500;

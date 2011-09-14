@@ -256,7 +256,7 @@ class Device(models.Model):
     updated = models.DateTimeField('aggiornato il', auto_now=True)
     
     def __unicode__(self):
-        return u'%s (%s)' % (self.name, self.node.name )
+        return self.name
 
 class HNAv4(models.Model):
     device = models.ForeignKey(Device)
@@ -280,7 +280,7 @@ class Interface(models.Model):
     updated = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return u'IP: %s - Node: %s - Device: %s' % (self.ipv4_address, self.device.node.name, self.device.name)
+        return self.ipv4_address
 
 class Link(models.Model):
     from_interface = models.ForeignKey(Interface, related_name='from_interface')

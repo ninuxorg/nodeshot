@@ -1,7 +1,7 @@
 # signals
 from django.db.models.signals import post_delete, post_save
 from nodeshot.models import *
-from settings import DEBUG, IMPORTING
+from settings import DEBUG, IMPORTING, IS_CRON, STATIC_GENERATOR, WEB_ROOT
 from datetime import datetime, timedelta
 
 def notify_on_delete(sender, instance, using, **kwargs):
@@ -89,3 +89,36 @@ post_delete.connect(update_statistics, sender=Node)
 post_delete.connect(update_statistics, sender=Link)
 post_save.connect(update_statistics, sender=Node)
 post_save.connect(update_statistics, sender=Link)
+
+if STATIC_GENERATOR and not IS_CRON:
+    from staticgenerator import quick_delete
+    import shutil
+    def clear_cache(sender, instance, using, **kwargs):
+        quick_delete('/')
+        quick_delete('nodes.json')
+        quick_delete('jstree.json')
+        quick_delete('nodes.kml')
+        quick_delete('overview/')
+        quick_delete('tab3/')
+        quick_delete('tab4/')
+        try:
+            shutil.rmtree('%s/select/' % WEB_ROOT)
+        except OSError:
+            pass
+        try:
+            shutil.rmtree('%s/node/' % WEB_ROOT)
+        except OSError:
+            pass
+        try:
+            shutil.rmtree('%s/search/' % WEB_ROOT)
+        except OSError:
+            pass
+        
+    post_delete.connect(clear_cache, sender=Node)
+    post_save.connect(clear_cache, sender=Node)
+    post_delete.connect(clear_cache, sender=Link)
+    post_save.connect(clear_cache, sender=Link)
+    post_delete.connect(clear_cache, sender=Device)
+    post_save.connect(clear_cache, sender=Device)
+    post_save.connect(clear_cache, sender=Interface)
+    post_delete.connect(clear_cache, sender=Interface)
