@@ -1,7 +1,7 @@
-{% load i18n %}Ciao {% if admin.first_name != '' %}{{ admin.first_name }}{% else %}{{ admin.username }}{% endif %},
+{% load i18n %}{% trans 'Hi' %} {% if admin.first_name != '' %}{{ admin.first_name }}{% else %}{{ admin.username }}{% endif %},
     
-Il nodo {{ node.name }} è stato appena cancellato.
+{% blocktrans with node=node.name %}The node {{ node }} has been deleted.{% endblocktrans %}
 
-Ricevi questa email perchè sei tra gli amministratori del sito {{ site.name }} ed hai scelto di ricevere notifiche riguardanti la gestione dei nodi.
-Se non vuoi più ricevere notifiche modifica il tuo profilo in:
+{% blocktrans with site=site.name %}You are receiving this email because you are an administrator of {{ site.name }} and you chose to receive notifications regarding the management of the nodes.
+If you don't want to receive notifications anymore edit your user profile on:{% endblocktrans %}
 http://{{ site.domain }}{% url admin:auth_user_change admin.id %}

@@ -1,12 +1,12 @@
-{% extends 'ajax/base_form.html' %}
-{% block h1 %}Elimina il nodo {{ node.name }}{% endblock %}
+{% extends 'ajax/base_form.html' %}{% load i18n %}
+{% block h1 %}{% blocktrans with node=node.name %}Delete "{{ node }}"{% endblocktrans %}{% endblock %}
 {% block menu %}{% endblock %}
 {% block form_content %}
-<p>Sei sicuro di voler eliminare questo nodo?</p>
+<p>{% trans 'Are you sure you want to delete this node?' %}</p>
 <fieldset>
     <p class="button-wrapper">
-        <input type="submit" value="Sono sicuro" id="submit" class="button submit" />
-        <a id="cancel" class="button cancel" href="{% url nodeshot_edit_node node.id node.password %}" />Annulla</a>
+        <input type="submit" value="{% trans 'Yes, I am sure' %}" id="submit" class="button submit" />
+        <a id="cancel" class="button cancel" href="{% url nodeshot_edit_node node.id node.password %}" />{% trans 'Cancel' %}</a>
     </p>
 </fieldset>
 {% endblock %}

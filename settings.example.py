@@ -156,6 +156,19 @@ NODESHOT_ACTIVATION_DAYS = 7
 # log messages sent with contact form
 NODESHOT_LOG_CONTACTS = False
 
+_ = lambda s: s
+
+NODESHOT_FRONTEND_SETTINGS = {
+    'META_ROBOTS': 'noindex,nofollow',
+    'SHOW_STATISTICS': True,
+    'SHOW_KML_LINK': True,
+    'HELP_URL': 'http://wiki.ninux.org/UsareMapserver',
+    'SHOW_ADMIN_LINK': True,
+    'TAB3': 'OLSR',
+    'TAB4': 'VPN',
+    'WELCOME_TEXT': _('Welcome to Nodeshot!')
+}
+
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'youremail@gmail.com'
@@ -166,4 +179,20 @@ DEFAULT_FROM_EMAIL = 'youremail@gmail.com'
 # captcha settings
 MATH_CAPTCHA_NUMBERS = range(1,9)
 MATH_CAPTCHA_OPERATORS = '+'
-MATH_CAPTCHA_QUESTION = 'Domanda antispam: quanto fa'
+MATH_CAPTCHA_QUESTION = _('Antispam question: what is the sum of')
+
+# static generator
+# to activate static generator follow instructions here http://superjared.com/projects/static-generator/
+WEB_ROOT = '/var/www/nodeshot/' # you need to change this with your public folder
+STATIC_GENERATOR_URLS = (
+    r'^/$',
+    r'^/overview/$',
+    r'^/select',
+    r'^/nodes.json$',
+    r'^/jstree.json$',
+    r'^/search',
+    r'^/node/info',
+    r'^/node/advanced',
+    r'^/tab',
+    r'^/nodes.kml$',
+)

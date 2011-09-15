@@ -1,21 +1,21 @@
-{% extends 'ajax/base_form.html' %}
-{% block h1 %}Modifica device di "{{ node.name }}"{% endblock %}
+{% extends 'ajax/base_form.html' %}{% load i18n %}
+{% block h1 %}{% blocktrans with node=node.name %}Edit devices of "{{ node }}"{% endblocktrans %}{% endblock %}
 {% block device_link_extra %} class="active"{% endblock %}
 {% block delete_node_link %}{% endblock %}
 {% block form_content %}
 <fieldset>
     {% if saved %}
     <div class="success">
-        Device salvati correttamente.
+        {% trans 'Changes saved successfully.' %}
     </div>
     {% endif %}
     {% if error %}
     <div class="ui-state-error extramarginbottom">
-        Alcuni campi non sono stati riempiti correttamente.
+        {% trans 'Some fields are not valid.' %}
     </div>
     {% endif %}
     {% if formset.forms|length < 2 %}
-        <p>Non ci sono devices per questo nodo.</p>
+        <p>{% trans 'There are no devices for this node yet.' %}</p>
     {% endif %}
     {{ formset.management_form }}
     {% for form in formset.forms %}
@@ -26,7 +26,7 @@
         </div>
         {% endif %}
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-name">Nome: <big>*</big></label>
+            <label for="id_devices-{{ forloop.counter0 }}-name">{% trans 'Name' %}: <big>*</big></label>
             {% if form.name.errors %}
                 <div class="ui-state-error">
                     {{ form.name.errors }}
@@ -36,7 +36,7 @@
         </div>
         
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-description">Descrizione:</label>
+            <label for="id_devices-{{ forloop.counter0 }}-description">{% trans 'Description' %}:</label>
             {% if form.description.errors %}
                 <div class="ui-state-error">
                     {{ form.description.errors }}
@@ -46,7 +46,7 @@
         </div>
 
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-type">Tipo di dispositivo:</label>
+            <label for="id_devices-{{ forloop.counter0 }}-type">{% trans 'Device type' %}:</label>
             {% if form.type.errors %}
                 <div class="ui-state-error">
                     {{ form.type.errors }}
@@ -57,7 +57,7 @@
         
 
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">Protocollo di routing:</label>
+            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol">{% trans 'Routing protocol' %}:</label>
             {% if form.olsr_version.errors %}
                 <div class="ui-state-error">
                     {{ form.routing_protocol.errors }}
@@ -67,7 +67,7 @@
         </div>
         
         <div class="field-wrapper">
-            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">Versione protocollo di routing:</label>
+            <label for="id_devices-{{ forloop.counter0 }}-routing_protocol_version">{% trans 'Routing protocol version' %}:</label>
             {% if form.olsr_version.errors %}
                 <div class="ui-state-error">
                     {{ form.routing_protocol_versopm.errors }}
@@ -76,8 +76,8 @@
             {{ form.routing_protocol_version }}
         </div>
         
-        <a href="{% url nodeshot_edit_interfaces node.id node.password %}#device{{ forloop.counter }}-interface-tab" class="edit-configuration" title="Modifica le interfacce di questo device">Interfacce</a>
-        <a href="{% url nodeshot_edit_hna4s node.id node.password %}#device{{ forloop.counter }}-hna4-tab" class="edit-configuration" title="Modifica gli Hna4 di questo device">Hna4</a>
+        <a href="{% url nodeshot_edit_interfaces node.id node.password %}#device{{ forloop.counter }}-interface-tab" class="edit-configuration" title="{% trans 'Edit interfaces of this device' %}">{% trans 'Interfaces' %}</a>
+        <a href="{% url nodeshot_edit_hna4s node.id node.password %}#device{{ forloop.counter }}-hna4-tab" class="edit-configuration" title="{% trans 'Edit hna4 of this device' %}">{% trans 'Hna4' %}</a>
         
         {{ form.node }}
         {% if form.id.value %}
@@ -87,8 +87,8 @@
     </div>
 {% endfor %}
     <p class="button-wrapper extrapaddingtop">
-        <input type="submit" value="Salva" id="submit" class="button submit" />
-        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
+        <input type="submit" value="{% trans 'Save' %}" id="submit" class="button submit" />
+        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />{% trans 'Cancel' %}</a>
     </p>
 </fieldset>
 
@@ -99,8 +99,8 @@
             // remove edit interface link
             $(row).find('.edit-configuration').remove();
         },
-        addText: 'Aggiungi',
-        deleteText: 'Rimuovi'
+        addText: '{% trans 'Add' %}',
+        deleteText: '{% trans 'Remove' %}'
     });
 </script>
 {% endblock %}

@@ -13,6 +13,8 @@ from nodeshot.forms import *
 from nodeshot.utils import signal_to_bar, distance, email_owners, jslugify
 from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 
 from settings import *
 
@@ -21,7 +23,7 @@ if DEBUG:
 
 def index(request, slug=False):
     """
-    Home of the map-server app with Google Maps and all that stuff ;-)
+    Home of the map-server. Google Maps and all that stuff ;-)
     """
     # retrieve statistics
     try:
@@ -53,7 +55,7 @@ def index(request, slug=False):
         'stat': stat,
         'gmap_center': gmap_center,
         'settings': {
-            'SITE_NAME': SITE['name'],
+            'HTML_TITLE_INDEX': HTML_TITLE_INDEX,
             'META_ROBOTS': META_ROBOTS,
             'SHOW_STATISTICS': SHOW_STATISTICS,
             'SHOW_KML_LINK': SHOW_KML_LINK,
@@ -159,7 +161,7 @@ def jstree(request):
         })
     if len(active_list) > 0:
         data.append({
-            'data': 'Nodi Attivi',
+            'data': ugettext('Active Nodes'),
             'state': 'open',
             'attr': {
                 'class': 'active_nodes',
@@ -179,7 +181,7 @@ def jstree(request):
         })
     if len(hotspot_list) > 0:
         data.append({
-            'data': 'Nodi Hotspots',
+            'data': ugettext('Hotspots'),
             'state': 'open',
             'attr': {
                 'class': 'hotspot_nodes'
@@ -199,7 +201,7 @@ def jstree(request):
         })
     if len(potential_list) > 0:
         data.append({
-            'data': 'Nodi Potenziali',
+            'data': ugettext('Potential Nodes'),
             'state': 'open',
             'attr': {
                 'class': 'potential_nodes'
@@ -421,7 +423,7 @@ def contact(request, node_id):
                 'site': SITE
             }
             # email owners
-            email_owners(node, 'Richiesta di contatto da %s - %s' % (context['sender']['from_name'], SITE['name']), 'email_notifications/contact-node-owners.txt', context, reply_to=request.POST.get('from_name'))
+            email_owners(node, _('Contact request from %(sender)s - %(site)s') % {'sender':context['sender']['from_name'], 'site':SITE['name']}, 'email_notifications/contact-node-owners.txt', context, reply_to=request.POST.get('from_name'))
             # set sent to true
             sent = True
             # if enabled from settings
@@ -540,16 +542,16 @@ def confirm_node(request, node_id, activation_key):
             if(node.added + timedelta(days=ACTIVATION_DAYS) > datetime.now()):
                 # confirm node
                 node.confirm()
-                message = u'Il nodo è stato confermato con successo.'
+                message = _(u'Your new node has been confirmed successfully.')
                 redirect_to = reverse('nodeshot_select', args=[node.slug])
             else:
-                message = u'La chiave di attivazione è scaduta.'
+                message = _(u'The activation key has expired.')
         else:
             # wrong activation key
-            message = u'La chiave di attivazione non è corretta.'
+            message = _(u'The activation key is wrong.')
     else:
         # node has been already confirmed
-        message = u'Il nodo è già stato confermato in precedenza.'
+        message = _(u'Your new node has already been confirmed.')
         redirect_to = reverse('nodeshot_select', args=[node.slug])
     
     # message that will be displayed to the user 
@@ -811,8 +813,8 @@ def delete_node(request, node_id, password):
             'node': node,
             'site': SITE
         }
-        email_owners(node, 'Nodo %s cancellato' % node.name, 'email_notifications/node-deleted-owners.txt', email_context)
-        messages.add_message(request, messages.INFO, u'Il nodo %s è stato cancellato con successo.' % node.name)
+        email_owners(node, _('Node %(node)s deleted') % {'node':node.name}, 'email_notifications/node-deleted-owners.txt', email_context)
+        messages.add_message(request, messages.INFO, u'Il nodo %(node)s è stato cancellato con successo.' % {'node':node.name})
         node.delete()
         
         return HttpResponseRedirect(reverse('nodeshot_index'))
@@ -840,10 +842,10 @@ def report_abuse(request, node_id, email):
         'node': node,
         'site': SITE
     }
-    notify_admins(node, 'Abuso segnalato su %s' % SITE['name'], 'email_notifications/report_abuse.txt', context)
+    notify_admins(node, _('Abuse reported for %(node)s') % {'node':SITE['name']}, 'email_notifications/report_abuse.txt', context)
     
     # message that will be displayed to the user 
-    messages.add_message(request, messages.INFO, u'Grazie per aver segnalato l\'abuso. Controlleremo e ti ricontatteremo il prima possibile.')
+    messages.add_message(request, messages.INFO, _(u"Thank you for reporting the abuse. We'll verify and come back to you as soon as possible."))
     
     return HttpResponseRedirect(reverse('nodeshot_index'))
     
@@ -917,7 +919,7 @@ def purge_expired(request):
         for node in nodes:
             response += '%s<br />' % node.name
             node.delete()
-        response = 'The following nodes have been purged:<br /><br />' + response
+        response = 'The following unconfirmed nodes have been purged:<br /><br />' + response
     else:
         response = 'There are no old nodes to purge.'
 

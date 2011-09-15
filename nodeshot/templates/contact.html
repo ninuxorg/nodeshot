@@ -1,5 +1,5 @@
-{% extends 'overlay.html' %}
-{% block title %}Contatta nodo {{ node.name }} - Nodeshot{% endblock %}
+{% extends 'overlay.html' %}{% load i18n %}
+{% block title %}{% blocktrans with node=node.name %}Contact owners of {{ node }}{% endblocktrans %} - {{ SITE.name }}{% endblock %}
 {% block content %}
     {% include 'ajax/contact.html' %}
 {% endblock %}

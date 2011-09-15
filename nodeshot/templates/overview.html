@@ -1,5 +1,5 @@
-{% extends 'overlay.html' %}
-{% block title %}Network Overview - Nodeshot{% endblock %}
+{% extends 'overlay.html' %}{% load i18n %}
+{% block title %}{% trans 'Network Overview' %} - {{ SITE.name }}{% endblock %}
 {% block content %}
     {% include 'ajax/overview.html' %}
 {% endblock %}

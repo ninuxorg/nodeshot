@@ -1,9 +1,9 @@
-{% load i18n %}Il tuo nodo su {{ site.name }} è stato confermato con successo.
+{% load i18n %}{% blocktrans with site=site.name %}Your node on {{ site }} has been confirmed successfully.{% endblocktrans %}
 
-La password per effettuare modifiche è: {{ password }}
+{% trans 'The password to edit the node is' %}: {{ password }}
 
-Di seguito i dettagli del nodo:
+{% trans 'Details of the node' %}:
 
 {% include 'email_notifications/node_details_fragment.txt' %}
 
-Grazie per la tua partecipazione nella nostra community.
+{% trans 'Thank you for your participation in our community.' %}

@@ -1,0 +1,1265 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-09-15 19:09+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: settings.example.py:182 settings.py:191
+msgid "Antispam question: what is the sum of"
+msgstr "Domanda antispam: quanto fa"
+
+#: settings.py:176 nodeshot/settings.py:36
+msgid "Welcome to Nodeshot!"
+msgstr "Benvenuti su Nodeshot!"
+
+#: nodeshot/admin.py:31
+msgid "Other"
+msgstr "Altro"
+
+#: nodeshot/admin.py:32 nodeshot/templates/ajax/node_info.html:5
+msgid "Advanced"
+msgstr "Avanzate"
+
+#: nodeshot/admin.py:53
+msgid "Password changed successfully."
+msgstr "Password modificata correttamente."
+
+#: nodeshot/admin.py:63
+#, python-format
+msgid "Change password: %s"
+msgstr "Cambia password: %s"
+
+#: nodeshot/forms.py:48 nodeshot/forms.py:70 nodeshot/forms.py:120
+msgid "The two password fields didn't match."
+msgstr "I due campi password non corrispondono."
+
+#: nodeshot/forms.py:100
+msgid "The inserted email doesn't match any of the node owners' emails"
+msgstr ""
+"L'email inserita non corrisponde a nessuna delle email dei responsabili del "
+"nodo."
+
+#: nodeshot/forms.py:108 nodeshot/templates/ajax/edit_node.html:69
+msgid "Password"
+msgstr "Password"
+
+#: nodeshot/forms.py:109
+msgid "Password (again)"
+msgstr "Ripeti la password"
+
+#: nodeshot/forms.py:178
+msgid "Error 500"
+msgstr "Errore 500"
+
+#: nodeshot/models.py:26
+msgid "active"
+msgstr "attivo"
+
+#: nodeshot/models.py:27
+msgid "potential"
+msgstr "potenziale"
+
+#: nodeshot/models.py:28
+msgid "hotspot"
+msgstr "hotspot"
+
+#: nodeshot/models.py:29
+msgid "unconfirmed"
+msgstr "non confermato"
+
+#: nodeshot/models.py:33
+msgid "wifi"
+msgstr "wifi"
+
+#: nodeshot/models.py:34
+msgid "ethernet"
+msgstr "ethernet"
+
+#: nodeshot/models.py:35
+msgid "vpn"
+msgstr "vpn"
+
+#: nodeshot/models.py:39
+msgid "reachable"
+msgstr "raggiungibile"
+
+#: nodeshot/models.py:40
+msgid "unreachable"
+msgstr "irraggiungibile"
+
+#: nodeshot/models.py:44
+msgid "sta"
+msgstr "sta"
+
+#: nodeshot/models.py:45
+msgid "ap"
+msgstr "ap"
+
+#: nodeshot/models.py:46
+msgid "adhoc"
+msgstr "adhoc"
+
+#: nodeshot/models.py:50
+msgid "horizontal"
+msgstr "orizzontale"
+
+#: nodeshot/models.py:51
+msgid "vertical"
+msgstr "verticale"
+
+#: nodeshot/models.py:52
+msgid "circular"
+msgstr "circolare"
+
+#: nodeshot/models.py:53
+msgid "auto"
+msgstr "auto"
+
+#: nodeshot/models.py:116 nodeshot/models.py:249 nodeshot/models.py:331
+msgid "name"
+msgstr "nome"
+
+#: nodeshot/models.py:118
+msgid "owner"
+msgstr "responsabile"
+
+#: nodeshot/models.py:119 nodeshot/models.py:250
+msgid "description"
+msgstr "descrizione"
+
+#: nodeshot/models.py:120
+msgid "postal code"
+msgstr "cap"
+
+#: nodeshot/models.py:124
+msgid ""
+"Use \"[algo]$[salt]$[hexdigest]\" or use the  <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"Per cambiare la password usa il <a href=\"password/\">form di cambio "
+"password</a>"
+
+#: nodeshot/models.py:125
+msgid "latitude"
+msgstr "latitudine"
+
+#: nodeshot/models.py:126
+msgid "longitude"
+msgstr "longitudine"
+
+#: nodeshot/models.py:127
+msgid "altitude"
+msgstr "altitudine"
+
+#: nodeshot/models.py:128 nodeshot/models.py:278
+msgid "status"
+msgstr "stato"
+
+#: nodeshot/models.py:129
+msgid "activation key"
+msgstr "chiave di attivazione"
+
+#: nodeshot/models.py:129
+msgid ""
+"Key needed for activation of the node. It's deleted once the node is "
+"activated."
+msgstr ""
+"Chiave per la conferma via mail del nodo. Viene cancellata una volta che il "
+"nodo è stato attivato."
+
+#: nodeshot/models.py:130
+msgid "notes"
+msgstr "note"
+
+#: nodeshot/models.py:131 nodeshot/models.py:255
+msgid "added on"
+msgstr "aggiunto il"
+
+#: nodeshot/models.py:132 nodeshot/models.py:256
+msgid "updated on"
+msgstr "aggiornato il"
+
+#: nodeshot/models.py:178
+#, python-format
+msgid "New password for node %(name)s"
+msgstr "Nuova password per il nodo %(name)s"
+
+#: nodeshot/models.py:198
+#, python-format
+msgid "Node confirmation required on %(site)s"
+msgstr "Conferma nuovo nodo su %(site)s"
+
+#: nodeshot/models.py:209
+#, python-format
+msgid "Node confirmed successfully on %(site)s"
+msgstr "Nodo confermato con successo su %(site)s"
+
+#: nodeshot/models.py:251
+msgid "type"
+msgstr "tipo"
+
+#: nodeshot/models.py:252
+msgid "node"
+msgstr "nodo"
+
+#: nodeshot/models.py:253
+msgid "routing protocol"
+msgstr "protocollo di routing"
+
+#: nodeshot/models.py:254
+msgid "routing protocol version"
+msgstr "versione protocollo di routing"
+
+#: nodeshot/models.py:269
+msgid "ipv4 address"
+msgstr "indirizzo ipv4"
+
+#: nodeshot/models.py:270
+msgid "ipv6 address"
+msgstr "indirizzo ipv6"
+
+#: nodeshot/models.py:315
+msgid "active nodes"
+msgstr "nodi attivi"
+
+#: nodeshot/models.py:316
+msgid "potential nodes"
+msgstr "nodi potenziali"
+
+#: nodeshot/models.py:317
+msgid "hotspots"
+msgstr "hotspot"
+
+#: nodeshot/models.py:318
+msgid "active links"
+msgstr "link attivi"
+
+#: nodeshot/models.py:319
+msgid "Km"
+msgstr "Km"
+
+#: nodeshot/models.py:320
+msgid "Added on"
+msgstr "Aggiunto il"
+
+#: nodeshot/models.py:326
+msgid "Statistic"
+msgstr "Statistica"
+
+#: nodeshot/models.py:327
+msgid "Statistics"
+msgstr "Statistiche"
+
+#: nodeshot/models.py:332
+msgid "email"
+msgstr "email"
+
+#: nodeshot/models.py:333
+msgid "message"
+msgstr "messaggio"
+
+msgid "Message"
+msgstr "Messaggio"
+
+#: nodeshot/models.py:334
+msgid "ip address"
+msgstr "indirizzo ip"
+
+#: nodeshot/models.py:341
+#, python-format
+msgid "Message from %(from)s to %(to)s"
+msgstr "Messaggio da %(from)s a %(to)s"
+
+#: nodeshot/models.py:344
+msgid "Contact Log"
+msgstr "Log contatto"
+
+#: nodeshot/models.py:345
+msgid "Contact Logs"
+msgstr "Log contatti"
+
+#: nodeshot/models.py:356
+msgid "Email notifications"
+msgstr "Email di notifica"
+
+#: nodeshot/models.py:356
+msgid ""
+"Activate/deactivate email notifications about the management of the map "
+"server (added nodes, deleted nodes, abuses, ecc)."
+msgstr ""
+"Attiva/disattiva le notifiche email riguardanti la gestione dei nodi "
+"(aggiunta, cancellazione, abusi, ecc)."
+
+#: nodeshot/settings.py:28
+msgid "Nodeshot, Open Source Map Server"
+msgstr "Nodeshot, Map Server Open Source"
+
+#: nodeshot/settings.py:52
+msgid ""
+"You must define WEB_ROOT in yout settings.py if you want staticgenerator to "
+"function properly."
+msgstr ""
+"Devi definire WEB_ROOT nel tuo file settings.py se vuoi che staticgenerator "
+"funzioni correttamente."
+
+#: nodeshot/settings.py:57
+msgid ""
+"NODESHOT_SITE is not defined in your settings.py. See settings.example.py "
+"for reference."
+msgstr ""
+"NODESHOT_SITE non è definito nel tuo file settings.py. Prendi settings."
+"exampple.py come riferimento."
+
+#: nodeshot/settings.py:60
+msgid ""
+"NODESHOT_KML is not defined in your settings.py. See settings.example.py for "
+"reference."
+msgstr ""
+"NODESHOT_KML non è definito nel tuo file settings.py. Prendi settings."
+"exampple.py come riferimento."
+
+#: nodeshot/settings.py:63
+msgid ""
+"DEFAULT_FROM_EMAIL is not defined in your settings.py. See settings.example."
+"py for reference."
+msgstr ""
+"DEFAULT_FROM_EMAIL non è definito nel tuo file settings.py. Prendi settings."
+"exampple.py come riferimento."
+
+#: nodeshot/settings.py:66
+msgid ""
+"AUTH_PROFILE_MODULE is not defined in your settings.py. See settings.example."
+"py for reference."
+msgstr ""
+"AUTH_PROFILE_MODULE non è definito nel tuo file settings.py. Prendi settings."
+"exampple.py come riferimento."
+
+#: nodeshot/settings.py:69
+msgid ""
+"EMAIL_HOST is not defined in your settings.py. See settings.example.py for "
+"reference."
+msgstr ""
+"EMAIL_HOST non è definito nel tuo file settings.py. Prendi settings.exampple."
+"py come riferimento."
+
+#: nodeshot/settings.py:72
+msgid ""
+"EMAIL_HOST_USER is not defined in your settings.py. See settings.example.py "
+"for reference."
+msgstr ""
+"EMAIL_HOST_USER non è definito nel tuo file settings.py. Prendi settings."
+"exampple.py come riferimento."
+
+#: nodeshot/settings.py:75 nodeshot/settings.py:78
+msgid ""
+"EMAIL_HOST_PASSWORD is not defined in your settings.py. See settings.example."
+"py for reference."
+msgstr ""
+"EMAIL_HOST_PASSWORD non è definito nel tuo file settings.py. Prendi settings."
+"exampple.py come riferimento."
+
+#: nodeshot/signals.py:28
+#, python-format
+msgid "Nodo deleted on %s"
+msgstr "Nodo cancellato su %s"
+
+#: nodeshot/views.py:164 nodeshot/templates/index.html:21
+#: nodeshot/templates/kml.xml:53 nodeshot/templates/ajax/node_info.html:57
+msgid "Active Nodes"
+msgstr "Nodi Attivi"
+
+#: nodeshot/views.py:184
+msgid "Hotspots"
+msgstr "Hotspots"
+
+#: nodeshot/views.py:204 nodeshot/templates/index.html:23
+#: nodeshot/templates/kml.xml:75 nodeshot/templates/ajax/node_info.html:65
+msgid "Potential Nodes"
+msgstr "Nodi Potenziali"
+
+#: nodeshot/views.py:426
+#, python-format
+msgid "Contact request from %(sender)s - %(site)s"
+msgstr "Richiesta di contatto da %(sender)s - %(site)s"
+
+#: nodeshot/views.py:545
+msgid "Your new node has been confirmed successfully."
+msgstr "Il tuo nodo è stato confermato con successo."
+
+#: nodeshot/views.py:548
+msgid "The activation key has expired."
+msgstr "La chiave di attivazione è scaduta."
+
+#: nodeshot/views.py:551
+msgid "The activation key is wrong."
+msgstr "La chiave di attivazione non è corretta."
+
+#: nodeshot/views.py:554
+msgid "Your new node has already been confirmed."
+msgstr "Il tuo nodo è stato confermato con successo."
+
+#: nodeshot/views.py:816
+#, python-format
+msgid "Node %(node)s deleted"
+msgstr "Il nodo %(node)s è stato cancellato"
+
+#: nodeshot/views.py:845
+#, python-format
+msgid "Abuse reported for %(node)s"
+msgstr "Abuso segnalato su %(node)s"
+
+#: nodeshot/views.py:848
+msgid ""
+"Thank you for reporting the abuse. We'll verify and come back to you as soon "
+"as possible."
+msgstr ""
+"Grazie per aver segnalato l'abuso. Controlleremo e ti ricontatteremo il "
+"prima possibile."
+
+#: nodeshot/templates/add_node.html:2 nodeshot/templates/index.html:50
+#: nodeshot/templates/ajax/add_node.html:3
+msgid "Add a new node"
+msgstr "Aggiungi un nuovo nodo"
+
+#: nodeshot/templates/advanced.html:2
+#, python-format
+msgid "Advanced information about %(node)s"
+msgstr "Informazioni avanzate su %(node)s"
+
+#: nodeshot/templates/auth_node.html:2
+#, python-format
+msgid "Authentication required to edit %(node)s"
+msgstr "Autenticazione per %(node)s"
+
+#: nodeshot/templates/contact.html:2
+#, python-format
+msgid "Contact owners of %(node)s"
+msgstr "Contatta %(node)s"
+
+#: nodeshot/templates/delete_node.html:2
+#, python-format
+msgid "Delete node %(node)s"
+msgstr "Cancella il nodo %(node)s"
+
+#: nodeshot/templates/device_form.html:2
+#, python-format
+msgid "Add devices to %(node)s"
+msgstr "Aggiungi apparati a %(node)s"
+
+#: nodeshot/templates/edit_node.html:2
+#, python-format
+msgid "Edit node %(node)s"
+msgstr "Modifica il nodo %(node)s"
+
+#: nodeshot/templates/hnav4_form.html:2
+#, python-format
+msgid "Edit Hna4 for node %(node)s"
+msgstr "Modifica gli Hna4 di %(node)s"
+
+#: nodeshot/templates/index.html:15
+msgid "Javascript enabled is reqired for this website."
+msgstr "Per utilizzare questo sito web è necessario abilitare Javascript."
+
+#: nodeshot/templates/index.html:22
+msgid "Hotspots: "
+msgstr "Hotspots"
+
+#: nodeshot/templates/index.html:24
+msgid "Active Links"
+msgstr "Link Attivi"
+
+#: nodeshot/templates/index.html:28
+msgid "Search for a node, device, IP, MAC"
+msgstr "Cerca un un nodo, device, IP, MAC"
+
+#: nodeshot/templates/index.html:29
+msgid "Administration"
+msgstr "Amministrazione"
+
+#: nodeshot/templates/index.html:30
+msgid "Help"
+msgstr "Aiuto"
+
+#: nodeshot/templates/index.html:31
+msgid "KML Feed"
+msgstr "Feed KML"
+
+#: nodeshot/templates/index.html:42
+msgid "Map"
+msgstr "Mappa"
+
+#: nodeshot/templates/index.html:43 nodeshot/templates/ajax/node_info.html:3
+msgid "Info"
+msgstr "Info"
+
+#: nodeshot/templates/index.html:55
+msgid "Hide this column"
+msgstr "Nascondi questa colonna"
+
+#: nodeshot/templates/index.html:56
+msgid "Search for an address"
+msgstr "Cerca un'indirizzo"
+
+#: nodeshot/templates/index.html:57
+msgid "Show potential nodes"
+msgstr "Visualizza nodi potenziali"
+
+#: nodeshot/templates/index.html:61
+msgid "Link quality calculation"
+msgstr "Visualizza la qualità dei collegamenti"
+
+#: nodeshot/templates/index.html:63
+msgid "Lost packets (ETX)"
+msgstr "Pacchetti persi (ETX)"
+
+#: nodeshot/templates/index.html:64
+msgid "Received signal (DBm)"
+msgstr "Segnale ricevuto (DBm)"
+
+#: nodeshot/templates/index.html:69
+msgid "Node list"
+msgstr "Lista dei nodi"
+
+#: nodeshot/templates/index.html:81
+msgid "Did you know that your Internet Explorer is out of date?"
+msgstr "La tua versione di Internet Explorer è obsoleta"
+
+#: nodeshot/templates/index.html:82
+msgid ""
+"To get the best possible experience using our website we recommend that you "
+"upgrade to a newer version of Internet Explorer or even better another web "
+"browser. A list of the most popular web browsers can be found below."
+msgstr ""
+"Per utilizzare questo sito è necessario aggiornare Internet Explorer oppure "
+"cambiare browser (scelta consigliata). Di seguito ecco una lista dei browser "
+"maggiormente usati."
+
+#: nodeshot/templates/index.html:83
+msgid "Just click on the icons to get to the download page"
+msgstr ""
+"Clicca sulle icone per aprire la pagina di download del browser che "
+"preferisci."
+
+#: nodeshot/templates/index.html:106
+msgid ""
+"Click on the map to indicate where you want to place your new node. Try to "
+"be accurate :)"
+msgstr ""
+"Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di "
+"essere preciso :)"
+
+#: nodeshot/templates/index.html:107
+msgid ""
+"Thank you for inserting a new potential node, we sent you an email "
+"containing the activation link."
+msgstr ""
+"Grazie per aver inserito un nuovo nodo potenziale, ti abbiamo inviato "
+"un'email con il link di conferma."
+
+#: nodeshot/templates/index.html:108 nodeshot/templates/ajax/add_node.html:128
+#: nodeshot/templates/ajax/auth_node.html:17
+#: nodeshot/templates/ajax/contact.html:66
+#: nodeshot/templates/ajax/delete_node.html:9
+#: nodeshot/templates/ajax/device_form.html:91
+#: nodeshot/templates/ajax/edit_node.html:134
+#: nodeshot/templates/ajax/hna4_form.html:59
+#: nodeshot/templates/ajax/interface_form.html:138
+#: nodeshot/templates/ajax/reset_password.html:30
+msgid "Cancel"
+msgstr "Annulla"
+
+#: nodeshot/templates/index.html:109
+msgid "- info"
+msgstr "- info"
+
+#: nodeshot/templates/index.html:110 nodeshot/templates/ajax/advanced.html:47
+msgid "+ info"
+msgstr "+ info"
+
+#: nodeshot/templates/index.html:111
+msgid "Did you place me well?"
+msgstr "Mi hai posizionato bene?"
+
+#: nodeshot/templates/index.html:112
+msgid "yes"
+msgstr "sì"
+
+#: nodeshot/templates/index.html:113
+msgid "no"
+msgstr "no"
+
+#: nodeshot/templates/index.html:114
+msgid "The selected destination is not valid."
+msgstr "La destinazione selezionata non è valida."
+
+#: nodeshot/templates/index.html:115
+msgid "Search address"
+msgstr "Cerca un indirizzo"
+
+#: nodeshot/templates/index.html:116
+msgid "Enter the full address"
+msgstr "Inserisci l'indirizzo completo"
+
+#: nodeshot/templates/index.html:117
+msgid "Search"
+msgstr "Cerca"
+
+#: nodeshot/templates/index.html:118
+msgid "Ok"
+msgstr "Ok"
+
+#: nodeshot/templates/index.html:119 nodeshot/templates/ajax/contact.html:71
+msgid "Message sent successfully."
+msgstr "Messaggio inviato con successo."
+
+#: nodeshot/templates/index.html:120
+msgid "show"
+msgstr "mostra"
+
+#: nodeshot/templates/index.html:121
+msgid "hide"
+msgstr "nascondi"
+
+#: nodeshot/templates/index.html:122
+msgid "save"
+msgstr "salva"
+
+#: nodeshot/templates/index.html:123
+msgid "delete"
+msgstr "elimina"
+
+#: nodeshot/templates/interface_form.html:2
+#, python-format
+msgid "Edit Interfaces for node %(node)s"
+msgstr "Modifica le interfacce del nodo %(node)s"
+
+#: nodeshot/templates/kml.xml:54
+msgid "Nodes that are up and running"
+msgstr "Nodi attivi e funzionanti"
+
+#: nodeshot/templates/kml.xml:64
+msgid "Hotspot Nodes"
+msgstr "Hotspots"
+
+#: nodeshot/templates/kml.xml:65
+msgid "Hotspot locations"
+msgstr "Ubicazione degli hotspots (punti d'accesso wireless)"
+
+#: nodeshot/templates/kml.xml:76
+msgid "Potential node locations"
+msgstr "Ubicazione dei nodi potenziali"
+
+#: nodeshot/templates/kml.xml:86
+msgid "Links"
+msgstr "Links"
+
+#: nodeshot/templates/kml.xml:87
+msgid "Wireless links and respective quality"
+msgstr "Collegamenti wireless con rispettiva qualità"
+
+#: nodeshot/templates/overview.html:2
+msgid "Network Overview"
+msgstr "Panoramica della rete"
+
+#: nodeshot/templates/reset_password.html:2
+#, python-format
+msgid "Password reset for %(node)s"
+msgstr "Password reset per %(node)s"
+
+#: nodeshot/templates/admin/nodeshot/statistic/change_form.html:34
+msgid "Go Back"
+msgstr "Torna Indietro"
+
+#: nodeshot/templates/ajax/add_node.html:6
+#: nodeshot/templates/ajax/edit_node.html:5
+msgid "Fields marked with an asterisk are required."
+msgstr "I campi contrassegnati con un asterisco sono obbligatori."
+
+#: nodeshot/templates/ajax/add_node.html:16
+#: nodeshot/templates/ajax/edit_node.html:23
+msgid "Node name"
+msgstr "Nome del nodo"
+
+#: nodeshot/templates/ajax/add_node.html:31
+#: nodeshot/templates/ajax/advanced.html:21
+#: nodeshot/templates/ajax/device_form.html:39
+#: nodeshot/templates/ajax/edit_node.html:38
+#: nodeshot/templates/ajax/node_info.html:16
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:2
+msgid "Description"
+msgstr "Descrizione"
+
+#: nodeshot/templates/ajax/add_node.html:35
+#: nodeshot/templates/ajax/edit_node.html:42
+msgid "Who's in charge?"
+msgstr "Responsabile/i"
+
+#: nodeshot/templates/ajax/add_node.html:44
+#: nodeshot/templates/ajax/edit_node.html:51
+#: nodeshot/templates/ajax/node_info.html:25
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:4
+msgid "Postal code"
+msgstr "CAP"
+
+#: nodeshot/templates/ajax/add_node.html:53
+#: nodeshot/templates/ajax/edit_node.html:60
+msgid "Main E-mail address"
+msgstr "Indirizzo E-mail principale"
+
+#: nodeshot/templates/ajax/add_node.html:62
+msgid "Password to edit this node"
+msgstr "Password per modificare questo nodo"
+
+#: nodeshot/templates/ajax/add_node.html:71
+#: nodeshot/templates/ajax/edit_node.html:79
+msgid "Verify password"
+msgstr "Verifica password"
+
+#: nodeshot/templates/ajax/add_node.html:80
+#: nodeshot/templates/ajax/edit_node.html:88
+msgid "E-mail address 2"
+msgstr "E-mail address 2"
+
+#: nodeshot/templates/ajax/add_node.html:89
+#: nodeshot/templates/ajax/edit_node.html:97
+msgid "E-mail address 3"
+msgstr "E-mail address 3"
+
+#: nodeshot/templates/ajax/add_node.html:98
+#: nodeshot/templates/ajax/edit_node.html:106
+#: nodeshot/templates/ajax/node_info.html:31
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:8
+msgid "Longitude"
+msgstr "Longitudine"
+
+#: nodeshot/templates/ajax/add_node.html:107
+#: nodeshot/templates/ajax/edit_node.html:115
+#: nodeshot/templates/ajax/node_info.html:28
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:9
+msgid "Latitude"
+msgstr "Latitudine"
+
+#: nodeshot/templates/ajax/add_node.html:116
+#: nodeshot/templates/ajax/edit_node.html:124
+#: nodeshot/templates/ajax/node_info.html:35
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:10
+msgid "Altitude"
+msgstr "Altitudine"
+
+#: nodeshot/templates/ajax/add_node.html:127
+msgid "Save node"
+msgstr "Salva nodo"
+
+#: nodeshot/templates/ajax/advanced.html:3
+msgid ""
+"Advanced information about devices, interfaces and hna4 for expert users."
+msgstr ""
+"Informazioni avanzate su apparati, interfacce e hna4 destinate ad utenti "
+"esperti"
+
+#: nodeshot/templates/ajax/advanced.html:26
+#: nodeshot/templates/ajax/device_form.html:60
+msgid "Routing protocol"
+msgstr "Protocollo di routing"
+
+#: nodeshot/templates/ajax/advanced.html:32
+msgid "Interface"
+msgstr "Interfacce"
+
+#: nodeshot/templates/ajax/advanced.html:42
+#: nodeshot/templates/ajax/interface_form.html:118
+#: nodeshot/templates/ajax/overview.html:6
+msgid "Status"
+msgstr "Stato"
+
+#: nodeshot/templates/ajax/advanced.html:55
+msgid "Wireless mode"
+msgstr "Wireless mode"
+
+#: nodeshot/templates/ajax/advanced.html:58
+msgid "Wireless channel"
+msgstr "Canale"
+
+#: nodeshot/templates/ajax/advanced.html:61
+msgid "Wireless polarity"
+msgstr "Polarizzazione"
+
+#: nodeshot/templates/ajax/advanced.html:68
+msgid "MAC address"
+msgstr "MAC address"
+
+#: nodeshot/templates/ajax/advanced.html:79
+msgid "Hna4 route"
+msgstr "Hna4 route"
+
+#: nodeshot/templates/ajax/advanced.html:88
+msgid "This node does not have any device yet."
+msgstr "Non ci sono devices per questo nodo."
+
+#: nodeshot/templates/ajax/auth_node.html:3
+#, fuzzy, python-format
+msgid "Authentication required to edit \"%(node)s\""
+msgstr "Autenticazione per %(node)s"
+
+#: nodeshot/templates/ajax/auth_node.html:7
+#, fuzzy
+msgid "Enter the node password"
+msgstr "Inserisci l'indirizzo completo"
+
+#: nodeshot/templates/ajax/auth_node.html:10
+msgid "Wrong password"
+msgstr "La password non è corretta"
+
+#: nodeshot/templates/ajax/auth_node.html:16
+#: nodeshot/templates/ajax/reset_password.html:29
+msgid "Submit"
+msgstr "Invia"
+
+#: nodeshot/templates/ajax/auth_node.html:19
+msgid "Password forgotten?"
+msgstr "Hai dimenticato la password?"
+
+#: nodeshot/templates/ajax/base_form.html:7
+msgid "Node"
+msgstr "Nodo"
+
+#: nodeshot/templates/ajax/base_form.html:9
+msgid "Devices"
+msgstr "Apparati"
+
+#: nodeshot/templates/ajax/base_form.html:10
+#: nodeshot/templates/ajax/device_form.html:79
+msgid "Interfaces"
+msgstr "Interfacce"
+
+#: nodeshot/templates/ajax/base_form.html:11
+msgid "HNA4"
+msgstr "HNA4"
+
+#: nodeshot/templates/ajax/base_form.html:13
+msgid "Delete node"
+msgstr "Elimina nodo"
+
+#: nodeshot/templates/ajax/contact.html:5
+#, python-format
+msgid "Contact %(node)s"
+msgstr "Contatta %(node)s"
+
+#: nodeshot/templates/ajax/contact.html:7
+msgid "Message sent"
+msgstr "Messaggio inviato"
+
+#: nodeshot/templates/ajax/contact.html:13
+msgid "All fields are required."
+msgstr "Tutti i campi sono obbligatori"
+
+#: nodeshot/templates/ajax/contact.html:23
+msgid "Your name"
+msgstr "Tuo nome"
+
+#: nodeshot/templates/ajax/contact.html:33
+#: nodeshot/templates/email_notifications/contact-node-owners.txt:4
+msgid "E-mail"
+msgstr "E-mail"
+
+#: nodeshot/templates/ajax/contact.html:65
+msgid "Send"
+msgstr "Invia"
+
+#: nodeshot/templates/ajax/delete_node.html:2
+#, python-format
+msgid "Delete \"%(node)s\""
+msgstr "Elimina \"%(node)s\""
+
+#: nodeshot/templates/ajax/delete_node.html:5
+msgid "Are you sure you want to delete this node?"
+msgstr "Sei sicuro di voler cancellare questo nodo?"
+
+#: nodeshot/templates/ajax/delete_node.html:8
+msgid "Yes, I am sure"
+msgstr "Sì, sono sicuro"
+
+#: nodeshot/templates/ajax/device_form.html:2
+#, python-format
+msgid "Edit devices of \"%(node)s\""
+msgstr "Modifica gli apparati di \"%(node)s\""
+
+#: nodeshot/templates/ajax/device_form.html:9
+#: nodeshot/templates/ajax/edit_node.html:14
+#: nodeshot/templates/ajax/hna4_form.html:9
+#: nodeshot/templates/ajax/interface_form.html:9
+msgid "Changes saved successfully."
+msgstr "Modifiche salvate correttamente."
+
+#: nodeshot/templates/ajax/device_form.html:14
+#: nodeshot/templates/ajax/edit_node.html:19
+#: nodeshot/templates/ajax/hna4_form.html:14
+#: nodeshot/templates/ajax/interface_form.html:14
+msgid "Some fields are not valid."
+msgstr "Alcuni campi non sono stati riempiti correttamente."
+
+#: nodeshot/templates/ajax/device_form.html:18
+msgid "There are no devices for this node yet."
+msgstr "Non ci sono apparati per questo nodo."
+
+#: nodeshot/templates/ajax/device_form.html:29
+#: nodeshot/templates/ajax/node_info.html:12
+#: nodeshot/templates/email_notifications/contact-node-owners.txt:3
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:1
+msgid "Name"
+msgstr "Nome"
+
+#: nodeshot/templates/ajax/device_form.html:49
+msgid "Device type"
+msgstr "Tipo apparato"
+
+#: nodeshot/templates/ajax/device_form.html:70
+msgid "Routing protocol version"
+msgstr "Versione protocollo di routing"
+
+#: nodeshot/templates/ajax/device_form.html:79
+msgid "Edit interfaces of this device"
+msgstr "Modifica le interfacce di questo apparato"
+
+#: nodeshot/templates/ajax/device_form.html:80
+msgid "Edit hna4 of this device"
+msgstr "Modifica hna4 di questo apparato"
+
+#: nodeshot/templates/ajax/device_form.html:80
+msgid "Hna4"
+msgstr "Hna4"
+
+#: nodeshot/templates/ajax/device_form.html:90
+#: nodeshot/templates/ajax/edit_node.html:133
+#: nodeshot/templates/ajax/hna4_form.html:58
+#: nodeshot/templates/ajax/interface_form.html:137
+msgid "Save"
+msgstr "Salva"
+
+#: nodeshot/templates/ajax/device_form.html:103
+#: nodeshot/templates/ajax/hna4_form.html:97
+#: nodeshot/templates/ajax/interface_form.html:174
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: nodeshot/templates/ajax/edit_node.html:2
+#, python-format
+msgid "Edit node \"%(node)s\""
+msgstr "Modifica il nodo \"%(node)s\""
+
+#: nodeshot/templates/ajax/edit_node.html:69
+msgid "change"
+msgstr "cambia"
+
+#: nodeshot/templates/ajax/hna4_form.html:3
+#, python-format
+msgid "Edit Hna4 of \"%(node)s\""
+msgstr "Modifica Hna4 di \"%(node)s\""
+
+#: nodeshot/templates/ajax/hna4_form.html:27
+msgid "There are no announced Hna4 for this device yet."
+msgstr "Non ci sono ancora Hna4 annunciati per questo device."
+
+#: nodeshot/templates/ajax/hna4_form.html:39
+msgid "HNA4 Route"
+msgstr "HNA4 Route"
+
+#: nodeshot/templates/ajax/interface_form.html:3
+#, python-format
+msgid "Edit Interfaces of \"%(node)s\""
+msgstr "Modifica interfacce di \"%(node)s\""
+
+#: nodeshot/templates/ajax/interface_form.html:28
+msgid "There are no interfaces for this device yet."
+msgstr "Non ci sono ancora interfacce per questo device."
+
+#: nodeshot/templates/ajax/interface_form.html:48
+msgid "IPv4 Address"
+msgstr "Indirizzo IPv4"
+
+#: nodeshot/templates/ajax/interface_form.html:58
+msgid "IPv6 Address"
+msgstr "Indirizzo IPv6"
+
+#: nodeshot/templates/ajax/interface_form.html:68
+msgid "Wireless Mode"
+msgstr "Wireless Mode"
+
+#: nodeshot/templates/ajax/interface_form.html:78
+msgid "Channel"
+msgstr "Canale"
+
+#: nodeshot/templates/ajax/interface_form.html:88
+msgid "Polarization"
+msgstr "Polarizzazione"
+
+#: nodeshot/templates/ajax/interface_form.html:98
+msgid "MAC Address"
+msgstr "MAC Address"
+
+#: nodeshot/templates/ajax/node_info.html:4
+msgid "Distance"
+msgstr "Distanza"
+
+#: nodeshot/templates/ajax/node_info.html:9
+msgid "General information about the node"
+msgstr "Informazioni generali sul nodo"
+
+#: nodeshot/templates/ajax/node_info.html:21
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:3
+msgid "In charge"
+msgstr "Responsabile"
+
+#: nodeshot/templates/ajax/node_info.html:35
+msgid "metres"
+msgstr "metri"
+
+#: nodeshot/templates/ajax/node_info.html:39
+msgid "Contact"
+msgstr "Contatta"
+
+#: nodeshot/templates/ajax/node_info.html:40
+msgid "Permalink"
+msgstr "Permalink"
+
+#: nodeshot/templates/ajax/node_info.html:41
+msgid "Edit node"
+msgstr "Modifica nodo"
+
+#: nodeshot/templates/ajax/node_info.html:45
+msgid "Distance calculation"
+msgstr "Calcolo della distanza"
+
+#: nodeshot/templates/ajax/node_info.html:46
+#, python-format
+msgid ""
+"Calculate the distance between \"%(node)s\" and another node of your choice."
+msgstr "Calcola la distanza tra \"%(node)s\" e un'altro nodo a tuo piacimento."
+
+#: nodeshot/templates/ajax/node_info.html:49
+msgid "Search node"
+msgstr "Cerca un nodo"
+
+#: nodeshot/templates/ajax/node_info.html:53
+msgid "Select node"
+msgstr "Seleziona un nodo"
+
+#: nodeshot/templates/ajax/node_info.html:61
+msgid "Hotspot"
+msgstr "Hotspot"
+
+#: nodeshot/templates/ajax/node_info.html:73
+msgid "Result"
+msgstr "Risultato"
+
+#: nodeshot/templates/ajax/node_info.html:73
+msgid "km"
+msgstr "km"
+
+#: nodeshot/templates/ajax/overview.html:7
+msgid "Device name (Node)"
+msgstr "Nome apparato (nodo)"
+
+#: nodeshot/templates/ajax/overview.html:9
+msgid "IP"
+msgstr "IP"
+
+#: nodeshot/templates/ajax/reset_password.html:5
+msgid "New password sent successfully."
+msgstr "Password inviata con successo"
+
+#: nodeshot/templates/ajax/reset_password.html:7
+#, python-format
+msgid "Reset password for \"%(node)s\""
+msgstr "Password reset per \"%(node)s\""
+
+#: nodeshot/templates/ajax/reset_password.html:14
+msgid "A new password has been sent via email to the owners of the node."
+msgstr ""
+"Abbiamo inviato un'email ai responsabili del nodo contenente la nuova "
+"password."
+
+#: nodeshot/templates/ajax/reset_password.html:16
+msgid "Generate a new password that will be sent via email to the node owners."
+msgstr ""
+"Utilizzando questo form verrà generata una nuova password che verrà inviata "
+"via email ai responsabili del nodo."
+
+#: nodeshot/templates/ajax/reset_password.html:19
+msgid "Your E-mail address"
+msgstr "Il tuo indirizzo E-mail"
+
+#: nodeshot/templates/email_notifications/confirmation.txt:1
+#, python-format
+msgid ""
+"Thank you for your interest in %(site)s!\n"
+"\n"
+"Please confirm your new potential node by clicking the following link "
+"(valid for %(expiration_days)s days)"
+msgstr "Grazie per il tuo interesse in %(site)s!\n"
+"\n"
+"Conferma il tuo nuovo nodo potenziale cliccando sul link seguente "
+"(il link è valido per%(expiration_days)s giorni)"
+
+#: nodeshot/templates/email_notifications/confirmation.txt:7
+#, python-format
+msgid ""
+"If you did NOT request the insertion of a new potential node on %(site)s "
+"you can report an abuse by clicking on the following link:"
+msgstr "Se NON hai richiesto l'inserimento di un nuovo nodo potenziale su %(site)s "
+"segnala un'abuso cliccando sul link seguente:"
+
+#: nodeshot/templates/email_notifications/contact-node-owners.txt:1
+#, python-format
+msgid ""
+"A \"%(site.name)s\" user would like to get in touch with the people in "
+"charge of the node \"%(node.name)s\"."
+msgstr "Un utente di \"%(site.name)s\" vuole entrare in contatto con "
+"i responsabili del nodo \"%(node.name)s\"."
+
+#: nodeshot/templates/email_notifications/contact-node-owners.txt:10
+msgid "This email has been sent to"
+msgstr "Quest'email è stata spedita a"
+
+#: nodeshot/templates/email_notifications/contact-node-owners.txt:10
+msgid "and"
+msgstr "e"
+
+#: nodeshot/templates/email_notifications/contact-node-owners.txt:11
+msgid ""
+"If you answer to this email we suggest you to include also the other people "
+"in charge of the node in the CC field."
+msgstr "Se risponderai a questa email ti consigliamo di includere "
+"anche gli altri responsabili del nodo nel campo CC."
+
+#: nodeshot/templates/email_notifications/new-node-admin.txt:1
+#: nodeshot/templates/email_notifications/node-deleted-admin.txt:1
+#: nodeshot/templates/email_notifications/report_abuse.txt:1
+msgid "Hi"
+msgstr "Ciao"
+
+#: nodeshot/templates/email_notifications/new-node-admin.txt:3
+msgid "A new node has been added on %(site)s."
+msgstr "Il tuo nodo è stato confermato con successo."
+
+#: nodeshot/templates/email_notifications/new-node-admin.txt:7
+msgid "You can edit the node in the backend"
+msgstr "Puoi moderare i dettagli del nodo nel backend"
+
+#: nodeshot/templates/email_notifications/new-node-admin.txt:10
+#: nodeshot/templates/email_notifications/node-deleted-admin.txt:5
+#: nodeshot/templates/email_notifications/report_abuse.txt:11
+#, python-format
+msgid ""
+"You are receiving this email because you are an administrator of "
+"%(site.name)s and you chose to receive notifications regarding the "
+"management of the nodes.\n"
+"If you don't want to receive notifications anymore edit your user profile on:"
+msgstr "Ricevi questa email perchè sei tra gli amministratori del sito "
+"%(site.name)s ed hai scelto di ricevere notifiche riguardanti "
+"la gestione dei nodi.\n"
+"Se non vuoi più ricevere notifiche modifica il tuo profilo in:"
+
+#: nodeshot/templates/email_notifications/node-deleted-admin.txt:3
+msgid "The node %(node)s has been deleted."
+msgstr "Il nodo %(node)s è stato cancellato"
+
+#: nodeshot/templates/email_notifications/node-deleted-owners.txt:1
+#, python-format
+msgid "The node %(node)s has been deleted successfully."
+msgstr "Il nodo %(node)s è stato cancellato con successo."
+
+#: nodeshot/templates/email_notifications/node-deleted-owners.txt:3
+msgid "Thank you for having used our map-server."
+msgstr "Grazie per aver utilizzato il nostro map-server."
+
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:5
+msgid "Main E-mail"
+msgstr "Indirizzo E-mail principale"
+
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:6
+msgid "E-mail 2"
+msgstr "E-mail"
+
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:7
+msgid "E-mail 3"
+msgstr "E-mail"
+
+#: nodeshot/templates/email_notifications/node_details_fragment.txt:12
+msgid "You can see your new node by clicking on the following link"
+msgstr "Puoi vedere il nodo sulla mappa cliccando su questo link"
+
+#: nodeshot/templates/email_notifications/password_recovery.txt:1
+#, python-format
+msgid ""
+"One of the owners of the node %(node)s has requested a password reset on "
+"%(site)s"
+msgstr "Uno dei responsabili del nodo %(node)s ha richiesto "
+"il reset della password su %(site)s"
+
+#: nodeshot/templates/email_notifications/password_recovery.txt:3
+msgid "The new password is"
+msgstr "La nuova password è: %s"
+
+#: nodeshot/templates/email_notifications/password_recovery.txt:4
+msgid "Password reset has been requested by"
+msgstr "La password è stata richiesta da"
+
+#: nodeshot/templates/email_notifications/password_recovery.txt:6
+msgid "The new password has been generated automatically."
+msgstr "La nuova password è stata generata automaticamente."
+
+#: nodeshot/templates/email_notifications/password_recovery.txt:8
+msgid "Edit your node here:"
+msgstr "Modifica il tuo nodo qui:"
+
+#: nodeshot/templates/email_notifications/report_abuse.txt:3
+#, python-format
+msgid ""
+"One of the people in charge of the node %(node)s has reported an abuse.\n"
+"His email %(email)s has been added in one of the email fields without his "
+"consent."
+msgstr "Uno dei responsabili del nodo %(node)s ha segnalato un abuso.\n"
+"La sua email %(email)s è stata aggiunta in uno dei campi email senza il "
+"suo consenso."
+
+#: nodeshot/templates/email_notifications/report_abuse.txt:6
+msgid ""
+"It would be good to delete his email and notify him the resolution of the "
+"problem."
+msgstr "Sarebbe opportuno cancellare la sua email ed eventualmente ricontattarlo "
+"per confermargli la risoluzione del problema."
+
+#: nodeshot/templates/email_notifications/report_abuse.txt:7
+msgid "His email can be deleted here:"
+msgstr "La sua email può essere cancellata dal seguente link"
+
+#: nodeshot/templates/email_notifications/success.txt:1
+msgid "Your node on %(site)s has been confirmed successfully."
+msgstr "Il tuo nodo su %(site)s è stato confermato con successo."
+
+#: nodeshot/templates/email_notifications/success.txt:3
+msgid "The password to edit the node is"
+msgstr "La password per modificare questo nodo è"
+
+#: nodeshot/templates/email_notifications/success.txt:5
+msgid "Details of the node"
+msgstr "Di seguito i dettagli del nodo"
+
+#: nodeshot/templates/email_notifications/success.txt:9
+msgid "Thank you for your participation in our community."
+msgstr "Grazie per la tua partecipazione nella nostra community."

@@ -1,5 +1,5 @@
-{% extends 'overlay.html' %}
-{% block title %}Aggiungi nuovi devices - Nodeshot{% endblock %}
+{% extends 'overlay.html' %}{% load i18n %}
+{% block title %}{% blocktrans with node=node.name %}Add devices to {{ node }}{% endblocktrans %} - {{ SITE.name }}{% endblock %}
 {% block content %}
     {% include 'ajax/device_form.html' %}
 {% endblock %}

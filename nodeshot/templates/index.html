@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!DOCTYPE html>{% load i18n %}
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Nodeshot Open Source Map Server</title>
+    <title>{{ settings.HTML_TITLE_INDEX }}</title>
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />
     <!--<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" />-->
     <!--[if lte IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -11,23 +11,24 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 </head>
 <body>
-    <div id="nodeshot-mask" class="initial"><div id="loading"><noscript>Per utilizzare questo sito web è necessario abilitare Javascript.</noscript></div></div>
+    <div id="loading"></div>
+    <div id="nodeshot-mask" class="initial"><noscript>{% trans 'Javascript enabled is reqired for this website.' %}</noscript></div>
     <div id="container">
         <header id="header">                
-            <h1>{{ settings.SITE_NAME }}</h1>
+            <h1>{{ SITE.name }}</h1>
             <p id="network-stat">
                 {% if stat and settings.SHOW_STATISTICS %}
-                <span><strong>Nodi Attivi:</strong> {{ stat.active_nodes }}</span>
-                <span><strong>Hotspots:</strong> {{ stat.hotspots }}</span>
-                <span><strong>Nodi Potenziali:</strong> {{ stat.potential_nodes }}</span>
-                <span><strong>Link attivi:</strong> {{ stat.links }} ({{ stat.km }} km)</span>
+                <span><strong>{% trans 'Active Nodes' %}:</strong> {{ stat.active_nodes }}</span>
+                <span><strong>{% trans 'Hotspots: ' %}</strong> {{ stat.hotspots }}</span>
+                <span><strong>{% trans 'Potential Nodes' %}:</strong> {{ stat.potential_nodes }}</span>
+                <span><strong>{% trans 'Active Links' %}:</strong> {{ stat.links }} ({{ stat.km }} km)</span>
                 {% endif %}
             </p>
             <div id="head-controls">
-                <input id="search" class="ui-corner-all" value="Cerca un un nodo, device, IP, MAC" />
-                {% if settings.SHOW_ADMIN_LINK %}<a href="{% url admin:index %}" title="Administration" id="admin-link">admin</a>{% endif %}
-                {% if settings.HELP_URL %}<a href="{{ settings.HELP_URL }}" title="Help" id="help-link">help</a>{% endif %}
-                {% if settings.SHOW_KML_LINK %}<a href="{% url nodeshot_generate_kml %}" title="KML Feed" id="kml-link">kml</a>{% endif %}
+                <input id="search" class="ui-corner-all" value="{% trans 'Search for a node, device, IP, MAC' %}" />
+                {% if settings.SHOW_ADMIN_LINK %}<a href="{% url admin:index %}" title="{% trans 'Administration' %}" id="admin-link">admin</a>{% endif %}
+                {% if settings.HELP_URL %}<a href="{{ settings.HELP_URL }}" title="{% trans 'Help' %}" id="help-link">help</a>{% endif %}
+                {% if settings.SHOW_KML_LINK %}<a href="{% url nodeshot_generate_kml %}" title="{% trans 'KML Feed' %}" id="kml-link">kml</a>{% endif %}
             </div>
         </header>
         <section id="content-container">
@@ -38,34 +39,34 @@
             <aside id="aside">
                 <div class="wrapper">
                     <nav id="choices">
-                        <input type="radio" id="radio1" name="view-radio" value="map" checked="checked" /><label for="radio1">Mappa</label>
-                        <input type="radio" id="radio2" name="view-radio" value="info" /><label for="radio2">Info</label>
+                        <input type="radio" id="radio1" name="view-radio" value="map" checked="checked" /><label for="radio1">{% trans 'Map' %}</label>
+                        <input type="radio" id="radio2" name="view-radio" value="info" /><label for="radio2">{% trans 'Info' %}</label>
                         {% if settings.TAB3 %}<input type="radio" id="radio3" name="view-radio" value="tab3" /><label for="radio3">{{ settings.TAB3 }}</label>{% endif %}
                         {% if settings.TAB4 %}<input type="radio" id="radio4" name="view-radio" value="tab4" /><label for="radio4">{{ settings.TAB4 }}</label>{% endif %}
                     </nav>
                     <p>{{ settings.WELCOME_TEXT }}</p>
                     <button id="addnode" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
                         <span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>
-                        <span class="ui-button-text maponly">Aggiungi un nuovo nodo</span>
+                        <span class="ui-button-text maponly">{% trans 'Add a new node' %}</span>
                     </button>
                     
                     <div class="inner">
                         <ul id="other-controls">
-                            <li><a id="hide-side">Nascondi questa colonna</a></li>
-                            <li class="maponly"><a id="search-address">Cerca un indirizzo</a></li>
-                            <li class="last maponly"><input type="checkbox" id="potential" checked="checked" /><label for="potential">Visualizza nodi potenziali</label></li>
+                            <li><a id="hide-side">{% trans 'Hide this column' %}</a></li>
+                            <li class="maponly"><a id="search-address">{% trans 'Search for an address' %}</a></li>
+                            <li class="last maponly"><input type="checkbox" id="potential" checked="checked" /><label for="potential">{% trans 'Show potential nodes' %}</label></li>
                         </ul>
                         
                         <div id="link-quality" class="maponly">
-                            Visualizza la qualità dei collegamenti:
+                            {% trans 'Link quality calculation' %}:
                             <ul>
-                                <li><input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /> <label for="etx">Pacchetti persi (ETX)</label></li>
-                                <li id="dbmli"><input type="radio" id="dbm" name="link-quality-selector" value="dbm" /> <label for="dbm">Segnale ricevuto (DBm)</label></li>
+                                <li><input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /> <label for="etx">{% trans 'Lost packets (ETX)' %}</label></li>
+                                <li id="dbmli"><input type="radio" id="dbm" name="link-quality-selector" value="dbm" /> <label for="dbm">{% trans 'Received signal (DBm)' %}</label></li>
                             </ul>
                         </div>
                     </div>
                     
-                    <h3 class="maponly">Lista dei nodi</h3>
+                    <h3 class="maponly">{% trans 'Node list' %}</h3>
                     <div id="node-tree-container" class="widget-content maponly">
                         <div id="node-tree"></div>
                     </div>
@@ -73,19 +74,24 @@
             </aside>
         </section>
     </div>
-    <script src="{{MEDIA_URL}}js/jquery.js"></script>
+    <script src="{{ MEDIA_URL }}js/jquery.js"></script>
     <!--[if lte IE 7]>
-    <script src="{{MEDIA_URL}}js/ie6/warning.js"></script>
-    <script>$(function(){('{{MEDIA_URL}}js/ie6/')})</script>
+    <script src="{{ MEDIA_URL }}js/ie6/warning.js"></script>
+    <script>
+        var msg1 = "{% trans 'Did you know that your Internet Explorer is out of date?' %}";
+        var msg2 = "{% trans 'To get the best possible experience using our website we recommend that you upgrade to a newer version of Internet Explorer or even better another web browser. A list of the most popular web browsers can be found below.' %}";
+        var msg3 = "{% trans 'Just click on the icons to get to the download page' %}";
+        $(function(){e('{{ MEDIA_URL }}js/ie6/')});
+    </script>
     <![endif]-->
-    <script src="{{MEDIA_URL}}js/jquery-ui.js"></script>
+    <script src="{{ MEDIA_URL }}js/jquery-ui.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false" type="text/javascript"></script>
-    <script src="{{MEDIA_URL}}js/jquery.jstree.js"></script>
-    <script src="{{MEDIA_URL}}js/jquery.formset.min.js"></script>
-    <script src="{{MEDIA_URL}}js/jquery.tablesorter.min.js"></script>
-    <script src="{{MEDIA_URL}}js/jquery.cookie.js"></script>
-    <script src="{{MEDIA_URL}}js/jquery.progressbar.js"></script>
-    <script src="{{MEDIA_URL}}js/nodeshot.js"></script>
+    <script src="{{ MEDIA_URL }}js/jquery.jstree.js"></script>
+    <script src="{{ MEDIA_URL }}js/jquery.formset.min.js"></script>
+    <script src="{{ MEDIA_URL }}js/jquery.tablesorter.min.js"></script>
+    <script src="{{ MEDIA_URL }}js/jquery.cookie.js"></script>
+    <script src="{{ MEDIA_URL }}js/jquery.progressbar.js"></script>
+    <script src="{{ MEDIA_URL }}js/nodeshot.js"></script>
     <script>
         nodeshot.url.index = '{% url nodeshot.views.index %}';
         nodeshot.url.media = '{{ MEDIA_URL }}';
@@ -95,7 +101,7 @@
             lat: '{{ gmap_center.lat }}',
             lng: '{{ gmap_center.lng }}'
         };
-        
+        {% include 'i18n_fragment.html' %}   
         // when dom ready
         $(function() {
             nodeshot.init();

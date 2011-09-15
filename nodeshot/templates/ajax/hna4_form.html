@@ -1,17 +1,17 @@
-{% extends 'ajax/base_form.html' %}
+{% extends 'ajax/base_form.html' %}{% load i18n %}
 {% block extra_class %} larger{% endblock %}
-{% block h1 %}Modifica Hna4 di {{ node.name }}{% endblock %}
+{% block h1 %}{% blocktrans with node=node.name %}Edit Hna4 of "{{ node }}"{% endblocktrans %}{% endblock %}
 {% block hna4_link_extra %} class="active"{% endblock %}
 {% block delete_node_link %}{% endblock %}
 {% block form_content %}
     {% if saved %}
         <div class="success">
-            HNA4 salvate correttamente.
+            {% trans 'Changes saved successfully.' %}
         </div>
     {% endif %}
     {% if error %}
     <div class="ui-state-error extramarginbottom">
-        Alcuni campi non sono stati riempiti correttamente.
+        {% trans 'Some fields are not valid.' %}
     </div>
     {% endif %}
     <div id="tabs">
@@ -24,7 +24,7 @@
         {% for object in objects %}
             <div id="device{{ forloop.counter }}-hna4" class="tab">
                 {% if object.formset.forms|length < 2 %}
-                    <p class="extramarginbottom">Non ci sono ancora Hna4 annunciati per questo device.</p>
+                    <p class="extramarginbottom">{% trans 'There are no announced Hna4 for this device yet.' %}</p>
                 {% endif %}
                 {{ object.formset.management_form }}
                 <fieldset id="device{{ forloop.counter }}-formset">
@@ -36,7 +36,7 @@
                         </p>
                         {% endif %}
                         <div class="field-wrapper">                            
-                            <label for="id_route">HNA:</label>
+                            <label for="id_route">{% trans 'HNA4 Route' %}:</label>
                             {% if form.route.errors %}
                                 <div class="ui-state-error">
                                     {{ form.route.errors }}
@@ -55,8 +55,8 @@
             </div>
         {% endfor %}
             <p class="button-wrapper tabbed">
-                <input type="submit" value="Salva" id="submit" class="button submit" />
-                <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
+                <input type="submit" value="{% trans 'Save' %}" id="submit" class="button submit" />
+                <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />{% trans 'Cancel' %}</a>
             </p>
         </form>
     </div>
@@ -93,8 +93,8 @@
     {% for object in objects %}
     $("div.formset-form-container", "#device{{ forloop.counter }}-formset").formset({
         prefix: '{{ type }}{{ forloop.counter }}',
-        addText: 'Aggiungi',
-        deleteText: 'Rimuovi'
+        addText: '{% trans 'Add' %}',
+        deleteText: '{% trans 'Remove' %}'
     });
     {% endfor %}
 </script>

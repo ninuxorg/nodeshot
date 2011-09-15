@@ -20,37 +20,37 @@ try:
 except ImportError:
     from nodeshot.utils import make_password, check_password
 
-from settings import ROUTING_PROTOCOLS, DEFAULT_ROUTING_PROTOCOL, ACTIVATION_DAYS, DEFAULT_FROM_EMAIL, SITE, IMPORTING
+from settings import ROUTING_PROTOCOLS, DEFAULT_ROUTING_PROTOCOL, ACTIVATION_DAYS, DEFAULT_FROM_EMAIL, SITE, IMPORTING, _
 
 NODE_STATUS = (
-    ('a', 'active'),
-    ('p', 'potential'),
-    ('h', 'hotspot'),
-    ('u', 'unconfirmed') # nodes that have not been confirmed via email yet
+    ('a', _('active')),
+    ('p', _('potential')),
+    ('h', _('hotspot')),
+    ('u', _('unconfirmed')) # nodes that have not been confirmed via email yet
 )
 
 INTERFACE_TYPE = (
-    ('w', 'wifi'),
-    ('e', 'ethernet'),
-    ('v', 'vpn')
+    ('w', _('wifi')),
+    ('e', _('ethernet')),
+    ('v', _('vpn'))
 )
 
 INTERFACE_STATUS = (
-    ('r', 'reachable'),
-    ('u', 'unreachable')
+    ('r', _('reachable')),
+    ('u', _('unreachable'))
 )
 
 WIRELESS_MODE = (
-    ('sta', 'sta'),
-    ('ap', 'ap'),
-    ('adhoc', 'adhoc'),
+    ('sta', _('sta')),
+    ('ap', _('ap')),
+    ('adhoc', _('adhoc')),
 )
 
 WIRELESS_POLARITY = (
-    ('h', 'horizontal'),
-    ('v', 'vertical'),
-    ('c', 'circular'),
-    ('a', 'auto'),
+    ('h', _('horizontal')),
+    ('v', _('vertical')),
+    ('c', _('circular')),
+    ('a', _('auto')),
 )
 
 WIRELESS_CHANNEL = (
@@ -113,23 +113,23 @@ WIRELESS_CHANNEL = (
 )
 
 class Node(models.Model):
-    name = models.CharField('nome', max_length=50, unique=True)
+    name = models.CharField(_('name'), max_length=50, unique=True)
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
-    owner = models.CharField('proprietario', max_length=50, blank=True, null=True)
-    description = models.CharField('descrizione', max_length=200, blank=True, null=True)
-    postal_code = models.CharField('CAP', max_length=10)
+    owner = models.CharField(_('owner'), max_length=50, blank=True, null=True)
+    description = models.CharField(_('description'), max_length=200, blank=True, null=True)
+    postal_code = models.CharField(_('postal code'), max_length=10)
     email = models.EmailField()
     email2 = models.EmailField(blank=True, null=True)
     email3 = models.EmailField(blank=True, null=True)
-    password =  models.CharField(max_length=255, help_text='Per cambiare la password usa il <a href=\"password/\">form di cambio password</a>.')
-    lat = models.FloatField('latitudine')
-    lng = models.FloatField('longitudine') 
-    alt = models.FloatField('altitudine', blank=True, null=True)
-    status = models.CharField('stato', max_length=1, choices=NODE_STATUS, default='p')
-    activation_key = models.CharField('chiave di attivazione', max_length=40, blank=True, null=True, help_text='Chiave per la conferma via mail del nodo. Viene cancellata una volta che il nodo è stato attivato.')
-    notes = models.TextField('note', blank=True, null=True)
-    added = models.DateTimeField('aggiunto il', auto_now_add=True)
-    updated = models.DateTimeField('aggiornato il', auto_now=True)
+    password =  models.CharField(max_length=255, help_text=_('Use "[algo]$[salt]$[hexdigest]" or use the  <a href="password/">change password form</a>.'))
+    lat = models.FloatField(_('latitude'))
+    lng = models.FloatField(_('longitude')) 
+    alt = models.FloatField(_('altitude'), blank=True, null=True)
+    status = models.CharField(_('status'), max_length=1, choices=NODE_STATUS, default='p')
+    activation_key = models.CharField(_('activation key'), max_length=40, blank=True, null=True, help_text=_('Key needed for activation of the node. It\'s deleted once the node is activated.'))
+    notes = models.TextField(_('notes'), blank=True, null=True)
+    added = models.DateTimeField(_('added on'), auto_now_add=True)
+    updated = models.DateTimeField(_('updated on'), auto_now=True)
     
     def get_lat(self):
         """ returns latitude as string (avoid django converting the dot . into a comma , in certain language sets) """
@@ -175,7 +175,7 @@ class Node(models.Model):
             'site': SITE
         }
         # send mail
-        email_owners(self, 'Nuova password per il nodo %s' % self.name, 'email_notifications/password_recovery.txt', context)
+        email_owners(self, _('New password for node %(name)s') % {'name':self.name}, 'email_notifications/password_recovery.txt', context)
         return raw_password
     
     def set_activation_key(self):
@@ -195,7 +195,7 @@ class Node(models.Model):
             'site': SITE,
         }
         # send mail to owners
-        email_owners(self, 'Conferma nuovo nodo su %s' % SITE['name'], 'email_notifications/confirmation.txt', context)
+        email_owners(self, _('Node confirmation required on %(site)s') % {'site':SITE['name']}, 'email_notifications/confirmation.txt', context)
         
     def send_success_mail(self, raw_password):
         ''' send success emails '''
@@ -206,9 +206,9 @@ class Node(models.Model):
             'site': SITE
         }
         # send email to owners
-        email_owners(self, 'Nodo confermato con successo su %s' % SITE['name'], 'email_notifications/success.txt', context)
+        email_owners(self, _('Node confirmed successfully on %(site)s') % {'site':SITE['name']}, 'email_notifications/success.txt', context)
         # notify admins that want to receive notifications
-        notify_admins(self, 'Dettagli nuovo nodo su %s' % SITE['name'], 'email_notifications/new-node-admin.txt', context, skip=True)
+        notify_admins(self, 'New node details on %(site)s' % {'site':SITE['name']}, 'email_notifications/new-node-admin.txt', context, skip=True)
         
     def confirm(self):
         '''
@@ -246,14 +246,14 @@ class Node(models.Model):
         verbose_name_plural = 'nodi'
 
 class Device(models.Model):
-    name = models.CharField('nome', max_length=50)
-    description = models.CharField('descrizione', max_length=255, blank=True, null=True)
-    type = models.CharField('tipo', max_length=50, blank=True, null=True) 
-    node = models.ForeignKey(Node, verbose_name='nodo')
-    routing_protocol = models.CharField('protocollo di routing', max_length=20, choices=ROUTING_PROTOCOLS, default=DEFAULT_ROUTING_PROTOCOL)
-    routing_protocol_version = models.CharField('versione protocollo di routing', max_length=10, blank=True, null=True)
-    added = models.DateTimeField('aggiunto il', auto_now_add=True)
-    updated = models.DateTimeField('aggiornato il', auto_now=True)
+    name = models.CharField(_('name'), max_length=50)
+    description = models.CharField(_('description'), max_length=255, blank=True, null=True)
+    type = models.CharField(_('type'), max_length=50, blank=True, null=True) 
+    node = models.ForeignKey(Node, verbose_name=_('node'))
+    routing_protocol = models.CharField(_('routing protocol'), max_length=20, choices=ROUTING_PROTOCOLS, default=DEFAULT_ROUTING_PROTOCOL)
+    routing_protocol_version = models.CharField(_('routing protocol version'), max_length=10, blank=True, null=True)
+    added = models.DateTimeField(_('added on'), auto_now_add=True)
+    updated = models.DateTimeField(_('updated on'), auto_now=True)
     
     def __unicode__(self):
         return self.name
@@ -266,8 +266,8 @@ class HNAv4(models.Model):
         return u'%s' % (self.route)
 
 class Interface(models.Model):
-    ipv4_address = models.IPAddressField(verbose_name='indirizzo ipv4', unique=True)
-    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name='indirizzo ipv6', blank=True, null=True)
+    ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), unique=True)
+    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True)
     type = models.CharField(max_length=1, choices=INTERFACE_TYPE)
     device = models.ForeignKey(Device)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
@@ -275,7 +275,7 @@ class Interface(models.Model):
     wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
     mac_address = models.CharField(max_length=17, blank=True, null=True)
     ssid = models.CharField(max_length=50, null=True, blank=True)
-    status = models.CharField('stato', max_length=1, choices=INTERFACE_STATUS, default='r')
+    status = models.CharField(_('status'), max_length=1, choices=INTERFACE_STATUS, default='r')
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
@@ -312,37 +312,37 @@ class Link(models.Model):
         return u'%s %s » %s %s' % (self.from_interface.ipv4_address, self.from_interface.device, self.to_interface.ipv4_address, self.to_interface.device)
     
 class Statistic(models.Model):
-    active_nodes = models.IntegerField('nodi attivi')
-    potential_nodes = models.IntegerField('nodi potenziali')
-    hotspots = models.IntegerField('hotspots')
-    links = models.IntegerField('Link attivi')
-    km = models.FloatField('Km')
-    date = models.DateTimeField(auto_now_add=True)
+    active_nodes = models.IntegerField(_('active nodes'))
+    potential_nodes = models.IntegerField(_('potential nodes'))
+    hotspots = models.IntegerField(_('hotspots'))
+    links = models.IntegerField(_('active links'))
+    km = models.FloatField(_('Km'))
+    date = models.DateTimeField(_('Added on'), auto_now_add=True)
     
     def __unicode__(self):
         return u'%s' % (self.date)
     
     class Meta:
-        verbose_name = 'Statistica'
-        verbose_name_plural = 'Statistiche'
+        verbose_name = _('Statistic')
+        verbose_name_plural = _('Statistics')
 
 class Contact(models.Model):
     node = models.ForeignKey(Node)
-    from_name = models.CharField('nome', max_length=50)
-    from_email = models.EmailField('email', max_length=50)
-    message = models.CharField('messaggio', max_length=2000)
-    ip = models.GenericIPAddressField(verbose_name='indirizzo ip')
+    from_name = models.CharField(_('name'), max_length=50)
+    from_email = models.EmailField(_('email'), max_length=50)
+    message = models.CharField(_('message'), max_length=2000)
+    ip = models.GenericIPAddressField(verbose_name=_('ip address'))
     user_agent = models.CharField(max_length=200, blank=True)
     http_referer = models.CharField(max_length=200, blank=True)
     accept_language = models.CharField(max_length=30, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     
     def __unicode__(self):
-        return u'Message from %s to %s' % (self.from_name, self.node.name)
+        return _(u'Message from %(from)s to %(to)s') % ({'from':self.from_name, 'to':self.node.name})
     
     class Meta:
-        verbose_name = 'Log contatto'
-        verbose_name_plural = 'Log Contatti'
+        verbose_name = _('Contact Log')
+        verbose_name_plural = _('Contact Logs')
     
 class UserProfile(models.Model):
     """
@@ -353,7 +353,7 @@ class UserProfile(models.Model):
     """
     
     user = models.OneToOneField(User)
-    receive_notifications = models.BooleanField('Notifiche via email', help_text='Attiva/disattiva le notifiche email riguardanti la gestione dei nodi (aggiunta, cancellazione, abusi, ecc).')
+    receive_notifications = models.BooleanField(_('Email notifications'), help_text=_('Activate/deactivate email notifications about the management of the map server (added nodes, deleted nodes, abuses, ecc).'))
     
 # init nodeshot signals
 import signals

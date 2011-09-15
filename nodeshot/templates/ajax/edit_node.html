@@ -1,8 +1,8 @@
-{% extends 'ajax/base_form.html' %}
-{% block h1 %}Modifica il nodo {{ node.name }}{% endblock %}
+{% extends 'ajax/base_form.html' %}{% load i18n %}
+{% block h1 %}{% blocktrans with node=node.name %}Edit node "{{ node }}"{% endblocktrans %}{% endblock %}
 {% block node_link_extra %} class="active"{% endblock %}
 {% block form_content %}
-<p>I campi contrassegnati con un asterisco sono obbligatori.</p>
+<p>{% trans 'Fields marked with an asterisk are required.' %}</p>
 <fieldset>
     {% if form.non_field_errors %}
         <div class="ui-state-error" id="non-field-errors">
@@ -11,16 +11,16 @@
     {% endif %}
     {% if saved %}
         <div class="success">
-            Nodo salvato correttamente.
+            {% trans 'Changes saved successfully.' %}
         </div>
     {% endif %}
     {% if error %}
     <div class="ui-state-error">
-        Alcuni campi non sono stati riempiti correttamente.
+        {% trans 'Some fields are not valid.' %}
     </div>
     {% endif %}
     <div class="field-wrapper">
-        <label for="id_name">Nome del nodo: <big>*</big></label>
+        <label for="id_name">{% trans 'Node name' %}: <big>*</big></label>
         {% if form.name.errors %}
             <div class="ui-state-error">
                 {{ form.name.errors }}
@@ -35,11 +35,11 @@
                 {{ form.description.errors }}
             </div>
         {% endif %}
-        <label for="id_description">Descrizione:</label>
+        <label for="id_description">{% trans 'Description' %}:</label>
         {{ form.description}}
     </div>
     <div class="field-wrapper">
-        <label for="id_owner">Responsabile/i:</label>
+        <label for="id_owner">{% trans "Who's in charge?" %}</label>
         {% if form.owner.errors %}
             <div class="ui-state-error">
                 {{ form.owner.errors }}
@@ -48,7 +48,7 @@
         {{ form.owner }}
     </div>
     <div class="field-wrapper">
-        <label for="id_postal_code">CAP: <big>*</big></label>
+        <label for="id_postal_code">{% trans 'Postal code' %}: <big>*</big></label>
         {% if form.postal_code.errors %}
             <div class="ui-state-error">
                 {{ form.postal_code.errors }}
@@ -57,7 +57,7 @@
         {{ form.postal_code }}
     </div>
     <div class="field-wrapper">
-        <label for="id_email">Indirizzo E-Mail principale: <big>*</big></label>
+        <label for="id_email">{% trans 'Main E-mail address' %}: <big>*</big></label>
         {% if form.email.errors %}
             <div class="ui-state-error">
                 {{ form.email.errors }}
@@ -66,7 +66,7 @@
         {{ form.email }}
     </div>
     <div class="field-wrapper">
-        <label>Password: <a id="change-password">change</a></label>
+        <label>{% trans 'Password' %}: <a id="change-password">{% trans 'change' %}</a></label>
         {% if form.password.errors %}
             <div class="ui-state-error">
                 {{ form.password.errors }}
@@ -76,7 +76,7 @@
         <input type="password" id="id_new_password" name="new_password" value="" class="hidden text" />
     </div>
     <div class="field-wrapper hidden" id="verify-password">
-        <label for="id_new_password2">Verifica Password:</label>
+        <label for="id_new_password2">{% trans 'Verify password' %}:</label>
         {% if form.password2.errors %}
             <div class="ui-state-error">
                 {{ form.password2.errors }}
@@ -85,7 +85,7 @@
         <input type="password" id="id_new_password2" name="new_password2" value="" class="text ui-widget-content ui-corner-all" />
     </div>
     <div class="field-wrapper">
-        <label for="id_email2">Indirizzo E-Mail 2:</label>
+        <label for="id_email2">{% trans 'E-mail address 2' %}:</label>
         {% if form.email2.errors %}
             <div class="ui-state-error">
                 {{ form.email2.errors }}
@@ -94,7 +94,7 @@
         {{ form.email2 }}
     </div>
     <div class="field-wrapper">
-        <label for="id_email3">Indirizzo E-Mail 3: </label>
+        <label for="id_email3">{% trans 'E-mail address 3' %}: </label>
         {% if form.email3.errors %}
             <div class="ui-state-error">
                 {{ form.email3.errors }}
@@ -103,7 +103,7 @@
         {{ form.email3 }}
     </div>
     <div class="field-wrapper">
-        <label for="id_lng">Longitudine: <big>*</big></label>
+        <label for="id_lng">{% trans 'Longitude' %}: <big>*</big></label>
         {% if form.lng.errors %}
             <div class="ui-state-error">
                 {{ form.lng.errors }}
@@ -112,7 +112,7 @@
         {{ form.lng}}
     </div>
     <div class="field-wrapper">
-        <label for="id_lat">Latitudine: <big>*</big></label>
+        <label for="id_lat">{% trans 'Latitude' %}: <big>*</big></label>
         {% if form.lat.errors %}
             <div class="ui-state-error">
                 {{ form.lat.errors }}
@@ -121,18 +121,21 @@
         {{ form.lat}}
     </div>
     <div class="field-wrapper">
-        <label for="id_alt">Altitudine:</label>
+        <label for="id_alt">{% trans 'Altitude' %}:</label>
         {% if form.alt.errors %}
             <div class="ui-state-error">
                 {{ form.alt.errors }}
             </div>
         {% endif %}
-        {{ form.alt}}
+        {{ form.alt }}
     </div>
     <p class="button-wrapper">
-        <input type="submit" value="Salva" id="submit" class="button submit" />
-        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
+        <input type="submit" value="{% trans 'Save' %}" id="submit" class="button submit" />
+        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />{% trans 'Cancel' %}</a>
     </p>
 </fieldset>
-<script>nodeshot.node.bindChangePassword()</script>
+<script>
+    {% include 'i18n_fragment.html' %}
+    nodeshot.node.bindChangePassword()
+</script>
 {% endblock %}

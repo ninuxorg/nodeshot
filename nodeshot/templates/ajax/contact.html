@@ -1,16 +1,16 @@
-{% extends 'ajax/base_form.html' %}
+{% extends 'ajax/base_form.html' %}{% load i18n %}
 {% block extra_class %} narrower{% endblock %}
 {% block h1 %}
     {% if not sent %}
-        Contatta il nodo {{ node.name }}
+        {% blocktrans with node=node.name %}Contact {{ node }}{% endblocktrans %}
     {% else %}
-        Messaggio inviato
+        {% trans 'Message sent' %}
     {% endif %}
 {% endblock %}
 {% block menu %}{% endblock %}
 {% block form_content %}
     {% if not sent %}
-        <p>Tutti i campi sono obbligatori.</p>
+        <p>{% trans 'All fields are required.' %}</p>
         <fieldset>
             {% csrf_token %}
             {% if form.non_field_errors %}
@@ -20,7 +20,7 @@
             {% endif %}
     
             <div class="field-wrapper">
-                <label for="id_name">Tuo nome:</label>
+                <label for="id_name">{% trans 'Your name' %}:</label>
                 {% if form.from_name.errors %}
                     <div class="ui-state-error">
                         {{ form.from_name.errors }}
@@ -30,7 +30,7 @@
             </div>
             
             <div class="field-wrapper">
-                <label for="id_email">Email:</label>
+                <label for="id_email">{% trans 'E-mail' %}:</label>
                 {% if form.from_email.errors %}
                     <div class="ui-state-error">
                         {{ form.from_email.errors }}
@@ -40,7 +40,7 @@
             </div>
             
             <div class="field-wrapper">
-                <label for="id_text">Testo:</label>
+                <label for="id_text">{% trans 'Message' %}:</label>
                 {% if form.message.errors %}
                     <div class="ui-state-error">
                         {{ form.message.errors }}
@@ -62,13 +62,13 @@
             <input type="checkbox" name="honeypot" class="accessibility" />
             
             <p class="button-wrapper">
-                <input type="submit" value="Invia" id="submit" class="button submit" />
-                <input type="button" value="Annulla" id="cancel" class="button cancel" />
+                <input type="submit" value="{% trans 'Send' %}" id="submit" class="button submit" />
+                <input type="button" value="{% trans 'Cancel' %}" id="cancel" class="button cancel" />
             </p>
         </fieldset>
     {% else %}
         <div id="success">
-            <p>Richiesta di contatto inviata con successo.</p>
+            <p>{% trans 'Message sent successfully.' %}</p>
         </div>
     {% endif %}
 {% endblock %}

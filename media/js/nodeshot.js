@@ -259,8 +259,7 @@ var nodeshot = {
                     nodeshot.gmap.infoWindow.close()
                 }
                 nodeshot.overlay.showMask();
-                // TODO: translation needed
-                var data = '<div id="nodeshot-overlay-inner" class="content narrower"><div id="gmap-search"><h3>Cerca un indirizzo</h3><p>Inserisci l\'indirizzo completo</p><p><input type="text" class="text" id="gmap-address" /><input class="button" type="submit" value="Cerca" id="gmap-submit" /></p></div></div>';
+                var data = '<div id="nodeshot-overlay-inner" class="content narrower"><div id="gmap-search"><h3>'+i18n.SEARCH_ADDRESS+'</h3><p>'+i18n.SEARCH_HINT+'</p><p><input type="text" class="text" id="gmap-address" /><input class="button" type="submit" value="'+i18n.SEARCH+'" id="gmap-submit" /></p></div></div>';
                 nodeshot.overlay.open(data, false, nodeshot.gmap.removeNewMarker);
                 // cache input
                 var input = $('#gmap-address');
@@ -438,8 +437,7 @@ var nodeshot = {
         */
         initAddNode: function(){
             this.$addNode.click(function(e) {
-                // TODO: translate
-                nodeshot.dialog.open('Fai click sul punto della mappa dove vorresti mettere il tuo nodo. Cerca di essere preciso :)');
+                nodeshot.dialog.open(i18n.ADDNODE_DIALOG);
                 nodeshot.gmap.clickListener = google.maps.event.addListener(nodeshot.gmap.map, 'click', function(e) {
                     nodeshot.gmap.newNodeMarker(e.latLng);
                 });
@@ -634,12 +632,7 @@ var nodeshot = {
         * rermoves the mask
         */
         hideMask: function(){
-            // cache jquery object
-            var mask = nodeshot.layout.$mask;
-            // stop here if no mask
-            //if(this.mask.length < 1){ return false }
-            // fadeOut and remove the mask
-            mask.fadeOut(500);
+            nodeshot.layout.$mask.fadeOut(500);
         }, // nodeshot.overlay.hideMask()
         
         /*
@@ -647,10 +640,6 @@ var nodeshot = {
         * shows hidden loading gif appended previously
         */
         showLoading: function(){
-            //nodeshot.layout.$loading.css({
-            //    left: nodeshot.layout.horizontalCenter(nodeshot.layout.$loading),
-            //    top: nodeshot.layout.verticalCenter(nodeshot.layout.$loading)
-            //});
             nodeshot.layout.$loading.show();
         }, // nodeshot.overlay.showLoading()
         
@@ -659,7 +648,6 @@ var nodeshot = {
         * hides Loading gif
         */
         hideLoading: function(){
-            //nodeshot.layout.$loading.css('top', '-9999px');
             nodeshot.layout.$loading.hide();
         }, // nodeshot.overlay.hideLoading()
         
@@ -792,7 +780,7 @@ var nodeshot = {
         */
         open: function(message, callback){
             // add HTML elements
-            $('body').append('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">ok</a></div>');
+            $('body').append('<div id="nodeshot-modal"><div id="nodeshot-modal-message">'+message+'</div><a class="button green" id="nodeshot-modal-close">'+i18n.OK+'</a></div>');
             // cache jquery object
             nodeshot.layout.$dialog = $('#nodeshot-modal');
             // add mask after $container has been cached
@@ -914,7 +902,7 @@ var nodeshot = {
                     $('#nodeshot-overlay-inner').fadeOut(500, function(){
                         // send a message to the user
                         // TODO: needs translation
-                        nodeshot.dialog.open('Messaggio inviato con successo.', nodeshot.overlay.close);
+                        nodeshot.dialog.open(i18n.MESSAGE_SENT, nodeshot.overlay.close);
                     });
                 }
                 // reset sending
@@ -1011,8 +999,7 @@ var nodeshot = {
                     // fade out overlay
                     nodeshot.layout.$overlayInner.fadeOut(500, function(){
                         // send a nice message to the user
-                        // TODO: translate
-                        nodeshot.dialog.open('Grazie per aver inserito un nuovo nodo potenziale, ti abbiamo inviato un\'email con il link di conferma.', nodeshot.overlay.close);
+                        nodeshot.dialog.open(i18n.THANKYOU_NEWNODE_DIALOG, nodeshot.overlay.close);
                     });
                 }
                 nodeshot.layout.setFullScreen();
@@ -1041,8 +1028,7 @@ var nodeshot = {
                         status: 1
                     });
                     // change text of link
-                    // TODO: translate
-                    $this.text('annulla');
+                    $this.text(i18n.CANCEL);
                     // clear new password value if necessary
                     $('#id_new_password2').val('');
                     // hide fake password field
@@ -1120,8 +1106,7 @@ var nodeshot = {
                     // +info green button becomes -info red button
                     $this.removeClass('green');
                     $this.addClass('red');
-                    // TODO: translate
-                    $this.text('– info');
+                    $this.text(i18n.LESSINFO);
                 },
                 // hide
                 function(){
@@ -1135,8 +1120,7 @@ var nodeshot = {
                     // -info red button becomes +info green button
                     $this.removeClass('red');
                     $this.addClass('green');
-                    // TODO: translate
-                    $this.text('+ info');
+                    $this.text(i18n.MOREINFO);
                 }
             )
         } // nodeshot.advanced.init()
@@ -1270,12 +1254,12 @@ var nodeshot = {
             var to_link = '<a class="link-node" href="javascript:nodeshot.gmap.goToNode(\''+toNode+'\')">'+data.to_name+'</a>';
             // prepare html to insert
             var html = '<div id="distance-link'+index+'" class="distance-link"><span>'+from_link+' - '+to_link+': <b>'+distance+' km</b> ';
-            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].show()" class="link-show">mostra</a>';
-            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].hide()" class="link-hide">nascondi</a>';
+            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].show()" class="link-show">'+i18n.SHOW+'</a>';
+            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].hide()" class="link-hide">'+i18n.HIDE+'</a>';
             if(!saved){
-                html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].save()" class="link-save">salva</a>';
+                html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].save()" class="link-save">'+i18n.SAVE+'</a>';
             }
-            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].remove()" class="link-remove">elimina</a>';
+            html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].remove()" class="link-remove">'+i18n.DELETE+'</a>';
             html =html+'</span></div>';
             // inject HTML link info (hidden)
             nodeshot.layout.$sideLinks.prepend(html);
@@ -1489,10 +1473,9 @@ var nodeshot = {
                 icon: nodeshot.url.media+'images/marker_new.png'
             });
             // prepare HTML for infoWindow
-            // TODO: translate
-            var contentString = '<div id="confirm-new"><h2>Mi hai posizionato bene?</h2>'+
-                '<a href="javascript:nodeshot.node.add()" class="green">Si</a>'+
-                '<a href="javascript:nodeshot.gmap.removeNewMarker()" class="red">No</a></div>'
+            var contentString = '<div id="confirm-new"><h2>'+i18n.NEWNODE_INFOWINDOW_TITLE+'</h2>'+
+                '<a href="javascript:nodeshot.node.add()" class="green">'+i18n.YES+'</a>'+
+                '<a href="javascript:nodeshot.gmap.removeNewMarker()" class="red">'+i18n.NO+'</a></div>'
             // set content of infoWindow
             nodeshot.gmap.infoWindow = new google.maps.InfoWindow({
                 content: contentString
@@ -1720,8 +1703,7 @@ var nodeshot = {
                 return false;
             }
             if(data.from_slug==data.to_slug){
-                // TODO: translate
-                nodeshot.dialog.open('La destinazione selezionata non è valida.');
+                nodeshot.dialog.open(i18n.DESTINATION_NOTVALID);
                 return false;
             }
             // ensure coords are float type
@@ -1919,6 +1901,7 @@ var nodeshot = {
             // if target not found return a message
             else{
                 setTimeout(function(){
+                    // TODO: translate
                     nodeshot.dialog.open('Il nodo selezionato non è presente in questa lista.')
                 }, 300);
             }

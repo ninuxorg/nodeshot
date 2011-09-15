@@ -1,5 +1,5 @@
 {% extends 'overlay.html' %}
-{% block title %}Informazioni sul nodo {{ node.name }} - Nodeshot{% endblock %}
+{% block title %}{{ node }} - {{ SITE.name }}{% endblock %}
 {% block content %}{% include 'ajax/node_info.html' %}{% endblock %}
 {% block script %}
 <!--TODO:<script></script>-->

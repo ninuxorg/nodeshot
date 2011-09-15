@@ -1,5 +1,5 @@
-{% extends 'overlay.html' %}
-{% block title %}Informazioni avanzate sul nodo {{ node.name }} - Nodeshot{% endblock %}
+{% extends 'overlay.html' %}{% load i18n %}
+{% block title %}{% blocktrans with node=node.name %}Advanced information about {{ node }}{% endblocktrans %} - {{ SITE.name }}{% endblock %}
 {% block content %}{% include 'ajax/advanced.html' %}{% endblock %}
 {% block script %}
 <script>nodeshot.advanced.init()</script>

@@ -45,7 +45,7 @@ class AddNodeForm(BaseNodeForm):
         password2 = self.cleaned_data.get('password2')
         # password and password2 must be the same
         if password != password2:
-            raise forms.ValidationError('I due campi password non corrispondono.')
+            raise forms.ValidationError(_('The two password fields didn\'t match.'))
         else:
             return self.cleaned_data
 
@@ -67,7 +67,7 @@ class EditNodeForm(BaseNodeForm):
 
         # password and password2 must be the same
         if new_password != new_password2:
-            raise forms.ValidationError('I due campi password non corrispondono.')
+            raise forms.ValidationError(_('The two password fields didn\'t match.'))
         else:
             return self.cleaned_data
     
@@ -97,7 +97,7 @@ class PasswordResetForm(forms.Form):
         
         # check email submitted is one of the node owners, the check is case insensitive
         if email != node.email.lower() and email != node.email2.lower() and email != node.email3.lower():
-            raise forms.ValidationError('L\'email inserita non corrisponde a nessuna delle email dei responsabili del nodo.')
+            raise forms.ValidationError(_("The inserted email doesn't match any of the node owners' emails"))
         
         return email
 

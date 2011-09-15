@@ -1,13 +1,13 @@
-<div id="info-wrapper">
+<div id="info-wrapper">{% load i18n %}
     <div id="table-wrapper" class="ui-corner-all">
         <table id="info-table" class="tablesorter"> 
             <thead> 
                 <tr> 
-                    <th style="width: 10%">Status</th> 
-                    <th style="width: 15%">Nome Device (Nodo)</th> 
-                    <th style="width: 10%">Apparato</th> 
-                    <th style="width: 10%">IP</th> 
-                    <th style="width: 35%">Segnale</th> 
+                    <th style="width: 10%">{% trans 'Status' %}</th> 
+                    <th style="width: 15%">{% trans 'Device name (Node)' %}</th> 
+                    <th style="width: 10%">{% trans 'Type' %}</th> 
+                    <th style="width: 10%">{% trans 'IP' %}</th> 
+                    <th style="width: 35%">{% trans 'Signal' %}</th> 
                 </tr> 
             </thead> 
             <tbody> 

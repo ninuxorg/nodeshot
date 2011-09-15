@@ -50,8 +50,8 @@
         </LineStyle>
     </Style>
     <Folder>
-        <name>Active Nodes</name>
-        <description>Nodes that are up and running</description>
+        <name>{% trans 'Active Nodes' %}</name>
+        <description>{% trans 'Nodes that are up and running' %}</description>
         {% for node in active %}
         <Placemark>
             <name>{{ node.name }}</name>
@@ -61,8 +61,8 @@
         {% endfor %}
     </Folder>
     <Folder>
-        <name>Hotspot Nodes</name>
-        <description>Hotspot locations</description>
+        <name>{% trans 'Hotspot Nodes' %}</name>
+        <description>{% trans 'Hotspot locations' %}</description>
         {% for node in hotspot %}
         <Placemark>
             <name>{{ node.name }}</name>
@@ -72,8 +72,8 @@
         {% endfor %}
     </Folder>
     <Folder>
-        <name>Potential Nodes</name>
-        <description>Potential node locations</description>
+        <name>{% trans 'Potential Nodes' %}</name>
+        <description>{% trans 'Potential node locations' %}</description>
         {% for node in potential %}
         <Placemark>
             <name>{{ node.name }}</name>
@@ -83,8 +83,8 @@
         {% endfor %}
     </Folder>
     <Folder>
-        <name>Links</name>
-        <description>Radio Wireless Links and their quality</description>
+        <name>{% trans 'Links' %}</name>
+        <description>{% trans 'Wireless links and respective quality' %}</description>
         {% for link in links %}
         <Placemark>
             <name>{{ link.from_interface.device.node.name }}-{{ link.to_interface.device.node.name }} ETX {{ link.etx }}</name>

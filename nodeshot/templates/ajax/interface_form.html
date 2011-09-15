@@ -1,17 +1,17 @@
-{% extends 'ajax/base_form.html' %}
+{% extends 'ajax/base_form.html' %}{% load i18n %}
 {% block extra_class %} larger{% endblock %}
-{% block h1 %}Modifica interfacce di "{{ node.name }}"{% endblock %}
+{% block h1 %}{% blocktrans with node=node.name %}Edit Interfaces of "{{ node }}"{% endblocktrans %}{% endblock %}
 {% block interface_link_extra %} class="active"{% endblock %}
 {% block delete_node_link %}{% endblock %}
 {% block form_content %}
 {% if saved %}
 <div class="success">
-    Interfacce salvate correttamente.
+    {% trans 'Changes saved successfully.' %}
 </div>
 {% endif %}
 {% if error %}
     <div class="ui-state-error extramarginbottom">
-        Alcuni campi non sono stati riempiti correttamente.
+        {% trans 'Some fields are not valid.' %}
     </div>
 {% endif %}
 <div id="tabs">
@@ -25,7 +25,7 @@
         {{ object.formset.management_form }}
         <fieldset id="device{{ forloop.counter }}-formset">
             {% if object.formset.forms|length < 2 %}
-                <p class="extramarginbottom">Non ci sono ancora interfacce per questo device.</p>
+                <p class="extramarginbottom">{% trans 'There are no interfaces for this device yet.' %}</p>
             {% endif %}
         {% for form in object.formset.forms %}
             <div class="formset-form-container{% if not form.id.value and not form.errors %} hidden{% endif %}">
@@ -35,7 +35,7 @@
                 </p>
                 {% endif %}
                 <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-type">Tipo di interfaccia: <big>*</big></label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-type">{% trans 'Type' %}: <big>*</big></label>
                     {% if form.type.errors %}
                         <div class="ui-state-error">
                             {{ form.type.errors }}
@@ -45,7 +45,7 @@
                 </div>
                 
                 <div class="field-wrapper">                    
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv4_address">Indirizzo IPv4: <big>*</big></label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv4_address">{% trans 'IPv4 Address' %}: <big>*</big></label>
                     {% if form.ipv4_address.errors %}
                         <div class="ui-state-error">
                             {{ form.ipv4_address.errors }}
@@ -55,7 +55,7 @@
                 </div>
 
                 <div class="field-wrapper">                    
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv6_address">Indirizzo IPv6:</label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv6_address">{% trans 'IPv6 Address' %}:</label>
                     {% if form.ipv6_address.errors %}
                         <div class="ui-state-error">
                             {{ form.ipv6_address.errors }}
@@ -65,7 +65,7 @@
                 </div>
 
                 <div class="field-wrapper">                    
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_mode">Wireless mode:</label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_mode">{% trans 'Wireless Mode' %}:</label>
                     {% if form.wireless_mode.errors %}
                         <div class="ui-state-error">
                             {{ form.wireless_mode.errors }}
@@ -75,7 +75,7 @@
                 </div>
 
                 <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_channel">Canale:</label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_channel">{% trans 'Channel' %}:</label>
                     {% if form.wireless_channel.errors %}
                         <div class="ui-state-error">
                             {{ form.wireless_channel.errors }}
@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_polarization">Polarizzazione:</label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_polarization">{% trans 'Polarization' %}:</label>
                     {% if form.wireless_polarity.errors %}
                         <div class="ui-state-error">
                             {{ form.wireless_polarity.errors }}
@@ -95,7 +95,7 @@
                 </div>
 
                 <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-mac_address">Indirizzo MAC:</label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-mac_address">{% trans 'MAC Address' %}:</label>
                     {% if form.mac_address.errors %}
                         <div class="ui-state-error">
                             {{ form.mac_address.errors }}
@@ -115,7 +115,7 @@
                 </div>
                 
                 <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-status">Status:</label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-status">{% trans 'Status' %}:</label>
                     {% if form.status.errors %}
                         <div class="ui-state-error">
                             {{ form.status.errors }}
@@ -134,8 +134,8 @@
     </div>
     {% endfor %}
     <p class="button-wrapper tabbed">
-        <input type="submit" value="Salva" id="submit" class="button submit" />
-        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />Annulla</a>
+        <input type="submit" value="{% trans 'Save' %}" id="submit" class="button submit" />
+        <a id="cancel" class="button cancel" href="{% url nodeshot_index %}" />{% trans 'Cancel' %}</a>
     </p>
 </div>
 
@@ -170,8 +170,8 @@
     {% for object in objects %}
     $("div.formset-form-container", "#device{{ forloop.counter }}-formset").formset({
         prefix: '{{ type }}{{ forloop.counter }}',
-        addText: 'Aggiungi',
-        deleteText: 'Rimuovi'
+        addText: '{% trans 'Add' %}',
+        deleteText: '{% trans 'Remove' %}'
     });
     {% endfor %}
 </script>
