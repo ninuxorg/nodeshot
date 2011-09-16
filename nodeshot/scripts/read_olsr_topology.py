@@ -8,6 +8,7 @@ parent = os.path.abspath(os.path.join(directory, os.path.pardir, os.path.pardir)
 sys.path.append(parent)
 
 import settings
+settings.IS_CRON = True
 from django.core.management import setup_environ 
 setup_environ(settings)
 from nodeshot.models import *

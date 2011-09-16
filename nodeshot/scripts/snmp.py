@@ -10,6 +10,7 @@ sys.path.append(parent)
 
 from django.core.management import setup_environ
 import settings
+settings.IS_CRON = True
 setup_environ(settings)
 
 from django.db import IntegrityError, DatabaseError
