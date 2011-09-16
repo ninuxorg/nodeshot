@@ -64,7 +64,8 @@ def index(request, slug=False):
             'TAB3': TAB3,
             'TAB4': TAB4,
             'WELCOME_TEXT': WELCOME_TEXT,
-        }
+        },
+        'DEBUG': DEBUG
     }
 
     return render_to_response('index.html', context, context_instance=RequestContext(request))
@@ -814,7 +815,7 @@ def delete_node(request, node_id, password):
             'site': SITE
         }
         email_owners(node, _('Node %(node)s deleted') % {'node':node.name}, 'email_notifications/node-deleted-owners.txt', email_context)
-        messages.add_message(request, messages.INFO, u'Il nodo %(node)s è stato cancellato con successo.' % {'node':node.name})
+        messages.add_message(request, messages.INFO, _(u'The node %(node)s has been deleted successfully.') % {'node':node.name})
         node.delete()
         
         return HttpResponseRedirect(reverse('nodeshot_index'))

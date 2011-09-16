@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <title>{{ settings.HTML_TITLE_INDEX }}</title>
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />
-    <!--<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/ui-darkness/jquery-ui-1.8.11.custom.css" />-->
+    {% if DEBUG %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base-uncompressed.css" />{% else %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />{% endif %}
     <!--[if lte IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <base href="{% url nodeshot.views.index %}" />
     <meta name="robots" content="{{ settings.META_ROBOTS }}" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="shortcut icon" href="{{ MEDIA_URL }}images/favicon.png" />
 </head>
 <body>
     <div id="loading"></div>
@@ -74,7 +74,11 @@
             </aside>
         </section>
     </div>
+    {% if DEBUG %}
     <script src="{{ MEDIA_URL }}js/jquery.js"></script>
+    {% else %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    {% endif %}
     <!--[if lte IE 7]>
     <script src="{{ MEDIA_URL }}js/ie6/warning.js"></script>
     <script>
@@ -84,14 +88,14 @@
         $(function(){e('{{ MEDIA_URL }}js/ie6/')});
     </script>
     <![endif]-->
-    <script src="{{ MEDIA_URL }}js/jquery-ui.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false" type="text/javascript"></script>
-    <script src="{{ MEDIA_URL }}js/jquery.jstree.js"></script>
-    <script src="{{ MEDIA_URL }}js/jquery.formset.min.js"></script>
-    <script src="{{ MEDIA_URL }}js/jquery.tablesorter.min.js"></script>
+    {% if DEBUG %}
+    <script src="{{ MEDIA_URL }}js/jquery-ui.js"></script>
     <script src="{{ MEDIA_URL }}js/jquery.cookie.js"></script>
-    <script src="{{ MEDIA_URL }}js/jquery.progressbar.js"></script>
     <script src="{{ MEDIA_URL }}js/nodeshot.js"></script>
+    {% else %}
+    <script src="{{ MEDIA_URL }}js/compressed/nodeshot.js"></script>
+    {% endif %}
     <script>
         nodeshot.url.index = '{% url nodeshot.views.index %}';
         nodeshot.url.media = '{{ MEDIA_URL }}';
@@ -119,6 +123,7 @@
                 nodeshot.layout.$mask.hide();
             }
             nodeshot.layout.$loading.hide();
+            nodeshot.layout.$body.append('<script src="{{ MEDIA_URL }}js\/compressed\/jquery.jstree.js"><\/script>');
         // update dimensions on resize
         }).resize(function(){
             nodeshot.layout.setFullScreen();

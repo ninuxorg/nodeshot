@@ -1,4 +1,4 @@
-{% load i18n %}{% blocktrans with site=site.name node=node.name %}A "{{ site.name }}" user would like to get in touch with the people in charge of the node "{{ node.name }}".{% endblocktrans %}
+{% load i18n %}{% blocktrans with site=site.name node=node.name %}A "{{ site }}" user would like to get in touch with the people in charge of the node "{{ node }}".{% endblocktrans %}
 
 {% trans 'Name' %}: {{ sender.from_name }}
 {% trans 'E-mail' %}: {{ sender.from_email }}

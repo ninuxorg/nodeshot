@@ -42,7 +42,6 @@ var nodeshot = {
         nodeshot.layout.initChoices()
         nodeshot.layout.initPotential();
         nodeshot.layout.initLinkQuality();
-        nodeshot.layout.initNodeTree();        
         nodeshot.easterEgg();
     }, // nodeshot.init()
     
@@ -568,6 +567,7 @@ var nodeshot = {
         /*
         * nodeshot.layout.initNodeTree()
         * initializes jstree plugin
+        * this method is called at the end of media/js/compressed/jquery.jstree.js
         */
         initNodeTree: function(){
             this.$nodeTree.jstree({
@@ -802,7 +802,6 @@ var nodeshot = {
                     // if pressing ENTER or ESC
                     if (code == 13 || code == 27){
                         nodeshot.dialog.close(callback);
-                        nodeshot.layout.$body.unbind('keyup');
                     }
                 });
             }, 500);
@@ -829,6 +828,8 @@ var nodeshot = {
             if(callback){
                 callback();
             }
+            // unbind keyup event
+            nodeshot.layout.$body.unbind('keyup');
         } // nodeshot.dialog.close()
         
     }, // nodeshot.dialog
@@ -1093,7 +1094,7 @@ var nodeshot = {
                 }
             });
             // toggle +info or -info
-            $('.toggle-info', '#advanced-info').toggle(
+            var $info = $('.toggle-info', '#advanced-info').toggle(
                 // show
                 function(){
                     // cache $(this) object
@@ -1123,6 +1124,13 @@ var nodeshot = {
                     $this.text(i18n.MOREINFO);
                 }
             )
+            // if no additional info don't show the + info button
+            var length = $info.length;
+            for(var i=0; i<length; i++){
+                if($info.eq(i).parent().parent().parent().parent().find('.additional tr').length < 1){
+                    $info.eq(i).hide();
+                }
+            }
         } // nodeshot.advanced.init()
         
     }, // nodeshot.advanced
@@ -1854,6 +1862,15 @@ var nodeshot = {
             nodeshot.layout.$infoWrapper = $('#info-wrapper');
             nodeshot.layout.$tableWrapper = $('#table-wrapper');
             nodeshot.layout.$signalbar = $(".signalbar");
+            nodeshot.layout.$body.append('<script src="'+nodeshot.url.media+'js/compressed/overview.js"></script>')
+        }, // nodeshot.infoTab.init()
+        
+        /*
+        * nodeshot.infoTab.init2()
+        * inits tablesorter and progressbar
+        * it's called after an additional javascript file has been downloaded
+        */
+        init2: function(){
             nodeshot.layout.$infoTable.tablesorter();
             // up count negative while loop is more performant on modern browsers
             len = nodeshot.layout.$signalbar.length + 1;
@@ -1873,7 +1890,7 @@ var nodeshot = {
                 }
                 obj.progressBar(value, defaults);
             }
-        }, // nodeshot.infoTab.init()
+        }, // nodeshot.infoTab.init2()
         
         /*
         * nodeshot.infoTab.scrollTo(name:string)
@@ -1895,7 +1912,7 @@ var nodeshot = {
                     // then change it back to white background
                     setTimeout(function(){
                         row.css('background-color', '#fff');
-                    }, 2500)
+                    }, 3000)
                 });
             }
             // if target not found return a message

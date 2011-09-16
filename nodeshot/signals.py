@@ -25,7 +25,7 @@ def notify_on_delete(sender, instance, using, **kwargs):
     }
     
     # notify admins that want to receive notifications
-    notify_admins(instance, _('Nodo deleted on %s') % SITE.get('name'), 'email_notifications/node-deleted-admin.txt', context, skip=False)
+    notify_admins(instance, _('Node deleted on %s') % SITE.get('name'), 'email_notifications/node-deleted-admin.txt', context, skip=False)
 
 post_delete.connect(notify_on_delete, sender=Node)
 

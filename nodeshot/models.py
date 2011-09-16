@@ -208,7 +208,7 @@ class Node(models.Model):
         # send email to owners
         email_owners(self, _('Node confirmed successfully on %(site)s') % {'site':SITE['name']}, 'email_notifications/success.txt', context)
         # notify admins that want to receive notifications
-        notify_admins(self, 'New node details on %(site)s' % {'site':SITE['name']}, 'email_notifications/new-node-admin.txt', context, skip=True)
+        notify_admins(self, _('New node details on %(site)s') % {'site':SITE['name']}, 'email_notifications/new-node-admin.txt', context, skip=True)
         
     def confirm(self):
         '''

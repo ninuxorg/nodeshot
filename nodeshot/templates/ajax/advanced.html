@@ -35,9 +35,11 @@
                         <tr>
                             <td class="key">IPv4:</td><td class="value">{{ interface.ipv4_address }}</td>
                         </tr>
+                        {% if interface.ipv6_address %}
                         <tr>
                             <td class="key">IPv6:</td><td class="value">{{ interface.ipv6_address }}</td>
-                        </tr>                  
+                        </tr>
+                        {% endif %}
                         <tr>
                             <td class="key">{% trans 'Status' %}:</td><td class="value">{{ interface.get_status_display }}</td>
                         </tr>
@@ -51,22 +53,32 @@
                     </tbody>
                     <tbody class="additional hidden">
                         {% if interface.type == 'w' %}
+                        {% if interface.wireless_mode %}
                         <tr>
-                            <td class="key">{% trans 'Wireless mode' %}:</td><td class="value">{{ interface.wireless_mode }}</td>
+                            <td class="key">{% trans 'Wireless mode' %}:</td><td class="value">{{ interface.get_wireless_mode_display }}</td>
                         </tr>
+                        {% endif %}
+                        {% if interface.wireless_channel %}
                         <tr>
-                            <td class="key">{% trans 'Wireless channel' %}:</td><td class="value">{{ interface.wireless_channel }}</td>
+                            <td class="key">{% trans 'Wireless channel' %}:</td><td class="value">{{ interface.get_wireless_channel_display }}</td>
                         </tr>
+                        {% endif %}
+                        {% if interface.wireless_polarity %}
                         <tr>
-                            <td class="key">{% trans 'Wireless polarity' %}:</td><td class="value">{{ interface.wireless_polarity }}</td>
+                            <td class="key">{% trans 'Wireless polarity' %}:</td><td class="value">{{ interface.get_wireless_polarity_display }}</td>
                         </tr>
+                        {% endif %}
+                        {% if interface.ssid %}
                         <tr>
                             <td class="key">SSID:</td><td class="value">{{ interface.ssid }}</td>
                         </tr>
                         {% endif %}
+                        {% if interface.mac_address %}
                         <tr>
                             <td class="key">{% trans 'MAC address' %}:</td><td class="value">{{ interface.mac_address }}</td>
                         </tr>
+                        {% endif %}
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
