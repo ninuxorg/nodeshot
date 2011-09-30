@@ -51,7 +51,7 @@ if 'staticgenerator.middleware.StaticGeneratorMiddleware' in settings.MIDDLEWARE
     except:
         raise ImproperlyConfigured(_('You must define WEB_ROOT in yout settings.py if you want staticgenerator to function properly.'))
 else:
-    STATIC_GENERATOR = False
+    STATIC_GENERATOR, WEB_ROOT = False, False
 
 if not SITE:
     raise ImproperlyConfigured(_('NODESHOT_SITE is not defined in your settings.py. See settings.example.py for reference.'))
