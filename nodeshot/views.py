@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
+from django.utils.safestring import mark_safe
 
 from settings import *
 
@@ -419,7 +420,7 @@ def contact(request, node_id):
                 'sender': {
                     'from_name': request.POST.get('from_name'),
                     'from_email': request.POST.get('from_email'),
-                    'message': request.POST.get('message'),
+                    'message': mark_safe(request.POST.get('message')),
                 },
                 'site': SITE
             }
