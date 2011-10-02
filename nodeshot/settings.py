@@ -36,10 +36,8 @@ TAB4 = FRONTEND_SETTINGS.get('TAB4', 'VPN')
 WELCOME_TEXT = FRONTEND_SETTINGS.get('WELCOME_TEXT', _('Welcome to Nodeshot!'))
 del FRONTEND_SETTINGS
 
-# IMPORTING is a variable that must be inserted dinamically in scripts that might import this file in order to perform automatic imports from other map servers (for example WNMAP)
-IMPORTING = getattr(settings, 'IMPORTING', False)
-# similar to the previous one, with the difference that if it's true is telling us that the code is being executed by a script executed with a cronjob
-IS_CRON = getattr(settings, 'IS_CRON', False)
+# this setting must be set to True by scripts in nodeshot/scripts/
+#IS_SCRIPT = getattr(__builtins__, 'IS_SCRIPT', False)
 # general
 DEBUG = getattr(settings, 'DEBUG', True)
 DEFAULT_FROM_EMAIL = getattr(settings, 'DEFAULT_FROM_EMAIL', False)

@@ -42,6 +42,7 @@ def email_owners(node, subject, body_template, context, reply_to=False):
         recipient_list += [node.email2]
     if node.email3 != '' and node.email3 != None:
         recipient_list += [node.email3]
+        
     # send mail
     if reply_to:
         from django.core.mail import EmailMessage

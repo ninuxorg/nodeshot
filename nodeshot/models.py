@@ -20,7 +20,13 @@ try:
 except ImportError:
     from nodeshot.utils import make_password, check_password
 
-from settings import ROUTING_PROTOCOLS, DEFAULT_ROUTING_PROTOCOL, ACTIVATION_DAYS, DEFAULT_FROM_EMAIL, SITE, IMPORTING, _
+from settings import ROUTING_PROTOCOLS, DEFAULT_ROUTING_PROTOCOL, ACTIVATION_DAYS, DEFAULT_FROM_EMAIL, SITE, _
+
+# IS_SCRIPT is defined in management scripts to avoid sending notifications
+try:
+    IS_SCRIPT
+except:
+    IS_SCRIPT = False
 
 NODE_STATUS = (
     ('a', _('active')),
@@ -230,7 +236,7 @@ class Node(models.Model):
         if self.slug == '':
             self.slug = slugify(self.name)
         # if saving a new object
-        if self.pk is None and not IMPORTING:
+        if self.pk is None and not IS_SCRIPT:
             self.set_activation_key()
             super(Node, self).save()
             # confirmation email is sent afterwards so we can send the ID
@@ -242,11 +248,11 @@ class Node(models.Model):
         return u'%s' % (self.name)
     
     class Meta:
-        verbose_name = 'nodo'
-        verbose_name_plural = 'nodi'
+        verbose_name = _('node')
+        verbose_name_plural = _('nodes')
 
 class Device(models.Model):
-    name = models.CharField(_('name'), max_length=50)
+    name = models.CharField(_('name'), max_length=50, unique=True)
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
     type = models.CharField(_('type'), max_length=50, blank=True, null=True) 
     node = models.ForeignKey(Node, verbose_name=_('node'))
@@ -257,6 +263,10 @@ class Device(models.Model):
     
     def __unicode__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = _('device')
+        verbose_name_plural = _('devices')
 
 class HNAv4(models.Model):
     device = models.ForeignKey(Device)
@@ -264,16 +274,20 @@ class HNAv4(models.Model):
     
     def __unicode__(self):
         return u'%s' % (self.route)
+        
+    class Meta:
+        verbose_name = _('HNA4')
+        verbose_name_plural = _('HNA4')
 
 class Interface(models.Model):
     ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), unique=True)
-    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True)
+    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, unique=True, default=None)
     type = models.CharField(max_length=1, choices=INTERFACE_TYPE)
     device = models.ForeignKey(Device)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
     wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
     wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
-    mac_address = models.CharField(max_length=17, blank=True, null=True)
+    mac_address = models.CharField(max_length=17, blank=True, null=True, unique=True, default=None)
     ssid = models.CharField(max_length=50, null=True, blank=True)
     status = models.CharField(_('status'), max_length=1, choices=INTERFACE_STATUS, default='r')
     added = models.DateTimeField(auto_now_add=True)
@@ -281,6 +295,10 @@ class Interface(models.Model):
     
     def __unicode__(self):
         return self.ipv4_address
+    
+    class Meta:
+        verbose_name = _('Interface')
+        verbose_name_plural = _('Interfaces')
 
 class Link(models.Model):
     from_interface = models.ForeignKey(Interface, related_name='from_interface')
@@ -310,6 +328,10 @@ class Link(models.Model):
     
     def __unicode__(self):
         return u'%s %s » %s %s' % (self.from_interface.ipv4_address, self.from_interface.device, self.to_interface.ipv4_address, self.to_interface.device)
+        
+    class Meta:
+        verbose_name = _('Link')
+        verbose_name_plural = _('Links')
     
 class Statistic(models.Model):
     active_nodes = models.IntegerField(_('active nodes'))

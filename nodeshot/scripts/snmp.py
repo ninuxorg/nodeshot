@@ -10,8 +10,8 @@ sys.path.append(parent)
 
 from django.core.management import setup_environ
 import settings
-settings.IS_CRON = True
 setup_environ(settings)
+__builtins__.IS_SCRIPT = True
 
 from django.db import IntegrityError, DatabaseError
 from nodeshot.models import *
@@ -21,7 +21,6 @@ pingcmd = "ping -c 1 %s > /dev/null"
 MAX_THREAD_N = 1
 interface_list = []
 mutex = threading.Lock()
-
 
 oids = {'device_name': {'oid': (1,3,6,1,2,1,1,5,0), 'query_type': 'get',  'pos' : (3,0,1) },
         'device_type': {'oid': (1,2,840,10036,3,1,2,1,3,7), 'query_type': 'get',  'pos' : (3,0,1) },
@@ -89,9 +88,10 @@ class SNMPBugger(threading.Thread):
             inf = interface_list.pop() 
             mutex.release()
             ip = inf.ipv4_address
-            if Interface.objects.filter(ipv4_address = ip).count() > 2:
-                print "Error! DUPLICATE IP ADDRESS FOR IP: %s" % ip
-                raise Exception
+            # this is not necessary as is taken care at model level by django (is not possible to insert two interfaces with same IPv4 or IPv6)
+            #if Interface.objects.filter(ipv4_address = ip).count() > 2:
+            #    print "Error! DUPLICATE IP ADDRESS FOR IP: %s" % ip
+            #    raise Exception
             # check via ping if device is up
             ping_status = os.system(pingcmd % ip) # 0-> up , >1 down
             try:
@@ -104,19 +104,21 @@ class SNMPBugger(threading.Thread):
 
             if ping_status == 0: #node answers to the ping
                 mac = get_mac(ip)
-                if mac and Interface.objects.filter(mac_address = mac).count() > 1:
-                    print "Error! MULTIPLE INTERFACE WITH THE SAME MAC ADDRESS"
-                    continue
-                elif mac and Interface.objects.filter(mac_address = mac).count() == 1:
-                    # in case this mac is associated to another interface (strange situation, should not occour!)
-                    i = Interface.objects.filter(mac_address = mac).select_related().get()
-                    device = i.device
-                    node = i.device.node
-                else:
-                    i = inf
+                # same as before - duplicate are avoided by django, no need to check
+                #if mac and Interface.objects.filter(mac_address = mac).count() > 1:
+                #    print "Error! MULTIPLE INTERFACE WITH THE SAME MAC ADDRESS"
+                #    continue
+                #if mac:
+                #    # in case this mac is associated to another interface (strange situation, should not occour!)
+                #    i = Interface.objects.filter(mac_address = mac).select_related().get()
+                #    device = i.device
+                #    node = i.device.node
+                #else:
+                i = inf
 
-                if node:
-                    node.status = 'a'
+                # status of the node shall not be changed
+                #if node:
+                #    node.status = 'a'
                 if device:
                     mac_signals = get_signal(ip)
                     # populate the signal information for each link
@@ -170,12 +172,13 @@ class SNMPBugger(threading.Thread):
                     print mac
                     print "Node %s is up with mac %s" % ( ip, mac )
                 else:
-                    i.mac_address = ''
+                    i.mac_address = None
                     print "Node %s is up but couldn't retrieve mac via snmp" % ip
                 i.save() #save
             else:
                 # interface does not answer to ping
                 print "Node %s is down" % ip
+                inf.status = 'u'
                 # don't change status
                 #node.status = 'd'
                 
@@ -186,9 +189,14 @@ def main():
     for i in Interface.objects.all():
         interface_list.append(i)
 
-
     for i in range(0, MAX_THREAD_N):
-            SNMPBugger(i, ).start()
+        SNMPBugger(i, ).start()
+            
+    try:
+        from nodeshot.signals import clear_cache
+        clear_cache()
+    except:
+        pass
 
 if __name__ == "__main__":
         main()
