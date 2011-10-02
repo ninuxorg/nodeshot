@@ -8,9 +8,9 @@ parent = os.path.abspath(os.path.join(directory, os.path.pardir, os.path.pardir)
 sys.path.append(parent)
 
 import settings
-settings.IS_CRON = True
 from django.core.management import setup_environ 
 setup_environ(settings)
+__builtins__.IS_SCRIPT = True
 from nodeshot.models import *
 from django.db.models import Q
 
@@ -134,33 +134,39 @@ class TopologyParser(object):
 
 
 if __name__ == "__main__":
-        TOPOLOGY_URL="http://127.0.0.1:2006/all"
-        tp = TopologyParser(TOPOLOGY_URL)
-        tp.parse()
-        tp.process()
-        print tp.linkdict
-        for v in tp.linkdict.values():
-            ipsA, ipsB, etx = v
-            found = False
-            if len(ipsA) <= 0 and len(ipsB) <=0:
-                continue
-            for a in range(0,len(ipsA)):
-                for b in range(0,len(ipsB)):
-                    if not found:
-                        ipA, ipB = ipsA[a], ipsB[b]
+    TOPOLOGY_URL="http://127.0.0.1:2006/all"
+    tp = TopologyParser(TOPOLOGY_URL)
+    tp.parse()
+    tp.process()
+    print tp.linkdict
+    for v in tp.linkdict.values():
+        ipsA, ipsB, etx = v
+        found = False
+        if len(ipsA) <= 0 and len(ipsB) <=0:
+            continue
+        for a in range(0,len(ipsA)):
+            for b in range(0,len(ipsB)):
+                if not found:
+                    ipA, ipB = ipsA[a], ipsB[b]
 
-                        saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
-                        if saved_links.count() > 0:
-                            l = saved_links[0]
-                            l.etx = etx
-                            l.save()
-                            found = True
-                        else:
-                            fi = Interface.objects.filter(ipv4_address = ipA)
-                            to = Interface.objects.filter(ipv4_address = ipB)
-                            if fi.count() == 1 and to.count() == 1:
-                                if fi.get().device.node != to.get().device.node:
-                                    Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
-                                    found = True
+                    saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
+                    if saved_links.count() > 0:
+                        l = saved_links[0]
+                        l.etx = etx
+                        l.save()
+                        found = True
+                    else:
+                        fi = Interface.objects.filter(ipv4_address = ipA)
+                        to = Interface.objects.filter(ipv4_address = ipB)
+                        if fi.count() == 1 and to.count() == 1:
+                            if fi.get().device.node != to.get().device.node:
+                                Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
+                                found = True
+    
+    try:
+        from nodeshot.signals import clear_cache
+        clear_cache()
+    except:
+        pass
 
 

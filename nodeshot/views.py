@@ -215,7 +215,7 @@ def jstree(request):
     
 def search(request, what):
     data = []
-    data = data + [{'label': n.name, 'value': jslugify(n.slug), 'slug': n.slug, 'name': n.name, 'lat': n.lat, 'lng': n.lng, 'status': n.status }  for n in Node.objects.filter(name__icontains=what).only('name','slug','lat','lng','status')]
+    data = data + [{'label': n.name, 'value': jslugify(n.slug), 'slug': n.slug, 'name': n.name, 'lat': n.lat, 'lng': n.lng, 'status': n.status }  for n in Node.objects.filter(name__icontains=what).exclude(status='u').only('name','slug','lat','lng','status')]
     data = data + [{'label': d.name, 'value': jslugify(d.node.slug), 'slug': d.node.slug, 'name': d.node.name, 'lat': d.node.lat, 'lng': d.node.lng, 'status': d.node.status }  for d in Device.objects.filter(name__icontains=what).only('name','node__name','node__slug','node__lat','node__lng','node__status')]
     data = data + [{'label': i.ipv4_address , 'value': jslugify(i.device.node.slug), 'slug': i.device.node.slug, 'name': i.device.node.name, 'lat': i.device.node.lat, 'lng': i.device.node.lng, 'status': i.device.node.status }  for i in Interface.objects.filter(ipv4_address__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng','status')]
     data = data + [{'label': i.mac_address , 'value': jslugify(i.device.node.slug), 'slug': i.device.node.slug, 'name': i.device.node.name, 'lat': i.device.node.lat, 'lng': i.device.node.lng, 'status': i.device.node.status }  for i in Interface.objects.filter(mac_address__icontains=what).only('device__node__name','device__node__slug','device__node__lat','device__node__lng','status')]
