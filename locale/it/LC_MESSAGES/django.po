@@ -916,3 +916,27 @@ msgstr "wifi"
 
 msgid "yes"
 msgstr "sì"
+
+msgid "Go back to map"
+msgstr "Torna alla mappa"
+
+msgid "500 Internal Server Error"
+msgstr "500 Internal Server Error"
+
+msgid "..Ops! 500 Internal Server Error"
+msgstr "..Ops! 500 Internal Server Error"
+
+msgid "We'are <strong>experiencing technical problems</strong>, probably we are working on the website for mantainance or an unplanned event has happened."
+msgstr "Stiamo avendo dei <strong>problemi tecnici</strong>, probabilmente stiamo lavorando alla manutenzione del sito oppure è accaduto un evento inaspettato."
+
+msgid "We apologize for the inconvenient, we are working to fix this problem as soon as possible."
+msgstr "Ci scusiamo per il problema, stiamo lavorando per risolvere questo problema il più presto possibile."
+
+msgid "404 Page Not Found"
+msgstr "404 Page Not Found"
+
+msgid "..Ops! 404 Page not found"
+msgstr "..Ops! 404 Pagina non trovata"
+
+msgid "The page you were looking for was not found on this website."
+msgstr "La pagina che cercavi non è stata trovata su questo sito web."

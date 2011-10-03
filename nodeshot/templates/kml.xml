@@ -1,4 +1,4 @@
-<kml xmlns="http://earth.google.com/kml/2.0">
+<kml xmlns="http://earth.google.com/kml/2.0">{% load i18n %}
 <Document>
     <name>{{ KML.name }}</name>
     <description>{{ KML.description }}</description>
