@@ -12,9 +12,6 @@ USAGE:
 	$("#progressbar").progressBar(45);							// percentage
 	$("#progressbar").progressBar({showText: false });			// percentage with config
 	$("#progressbar").progressBar(45, {showText: false });		// percentage with config
-    
-WARNING:
-this script was modified to be used in nodeshot and differs slightly with the original plugin
 */
 (function($) {
 	$.extend({
@@ -22,32 +19,32 @@ this script was modified to be used in nodeshot and differs slightly with the or
 
 			this.defaults = {
 				steps			: 20,											// steps taken to reach target
-				stepDuration	: 20,											
+				stepDuration	: 20,
 				max				: 100,											// Upon 100% i'd assume, but configurable
-				showText		: false,											// show text with percentage in next to the progressbar? - default : true
+				showText		: true,											// show text with percentage in next to the progressbar? - default : true
 				textFormat		: 'percentage',									// Or otherwise, set to 'fraction'
 				width			: 120,											// Width of the progressbar - don't forget to adjust your image too!!!												// Image to use in the progressbar. Can be a single image too: 'images/progressbg_green.gif'
 				height			: 12,											// Height of the progressbar - don't forget to adjust your image too!!!
 				callback		: null,											// Calls back with the config object that has the current percentage, target percentage, current image, etc
-				boxImage		: '/images/progressbar.gif',						// boxImage : image around the progress bar
+				boxImage		: 'images/progressbar.gif',						// boxImage : image around the progress bar
 				barImage		: {
-									0:	'/images/progressbg_red.gif',
-									30: '/images/progressbg_orange.gif',
-                                    45: '/images/progressbg_yellow.gif',
-									70: '/images/progressbg_green.gif'
+									0:	'images/progressbg_red.gif',
+									30: 'images/progressbg_orange.gif',
+									70: 'images/progressbg_green.gif'
 								},
-				
+
+
 				// Internal use
 				running_value	: 0,
 				value			: 0,
 				image			: null
 			};
-			
+
 			/* public methods */
 			this.construct = function(arg1, arg2) {
 				var argvalue	= null;
 				var argconfig	= null;
-				
+
 				if (arg1 != null) {
 					if (!isNaN(arg1)) {
 						argvalue = arg1;
@@ -55,14 +52,14 @@ this script was modified to be used in nodeshot and differs slightly with the or
 							argconfig = arg2;
 						}
 					} else {
-						argconfig = arg1; 
+						argconfig = arg1;
 					}
 				}
-				
+
 				return this.each(function(child) {
 					var pb		= this;
 					var config	= this.config;
-					
+
 					if (argvalue != null && this.bar != null && this.config != null) {
 						this.config.value 		= parseInt(argvalue)
 						if (argconfig != null)
@@ -72,25 +69,25 @@ this script was modified to be used in nodeshot and differs slightly with the or
 						var $this				= $(this);
 						var config				= $.extend({}, $.progressBar.defaults, argconfig);
 						config.id				= $this.attr('id') ? $this.attr('id') : Math.ceil(Math.random() * 100000);	// random id, if none provided
-						
+
 						if (argvalue == null)
 							argvalue	= $this.html().replace("%","")	// parse percentage
-						
+
 						config.value			= parseInt(argvalue);
 						config.running_value	= 0;
 						config.image			= getBarImage(config);
-						
+
 						var numeric = ['steps', 'stepDuration', 'max', 'width', 'height', 'running_value', 'value'];
-						for (var i=0; i<numeric.length; i++) 
+						for (var i=0; i<numeric.length; i++)
 							config[numeric[i]] = parseInt(config[numeric[i]]);
-						
+
 						$this.html("");
 						var bar					= document.createElement('img');
 						var text				= document.createElement('span');
 						var $bar				= $(bar);
 						var $text				= $(text);
 						pb.bar					= $bar;
-						
+
 						$bar.attr('id', config.id + "_pbImage");
 						$text.attr('id', config.id + "_pbText");
 						$text.html(getText(config));
@@ -118,12 +115,12 @@ this script was modified to be used in nodeshot and differs slightly with the or
 							for (var i in config.barImage) {
 								if (config.running_value >= parseInt(i)) {
 									image = config.barImage[i];
-								} else { break }
+								} else { break; }
 							}
 						}
 						return image;
 					}
-					
+
 					function getText(config) {
 						if (config.showText) {
 							if (config.textFormat == 'percentage') {
@@ -132,20 +129,17 @@ this script was modified to be used in nodeshot and differs slightly with the or
 								return " " + config.running_value + '/' + config.max;
 							}
 						}
-                        return false;
 					}
-					
+
 					config.increment = Math.round((config.value - config.running_value)/config.steps);
-					if (config.increment < 0){
+					if (config.increment < 0)
 						config.increment *= -1;
-					}
-					if (config.increment < 1){
+					if (config.increment < 1)
 						config.increment = 1;
-					}
-					
+
 					var t = setInterval(function() {
 						var pixels	= config.width / 100;			// Define how many pixels go into 1%
-						
+
 						if (config.running_value > config.value) {
 							if (config.running_value - config.increment  < config.value) {
 								config.running_value = config.value;
@@ -160,11 +154,10 @@ this script was modified to be used in nodeshot and differs slightly with the or
 								config.running_value += config.increment;
 							}
 						}
-						
-						if (config.running_value == config.value){
+
+						if (config.running_value == config.value)
 							clearInterval(t);
-						}
-						
+
 						var $bar	= $("#" + config.id + "_pbImage");
 						var $text	= $("#" + config.id + "_pbText");
 						var image	= getBarImage(config);
@@ -175,20 +168,19 @@ this script was modified to be used in nodeshot and differs slightly with the or
 						$bar.css("background-position", (((config.width * -1)) + (getPercentage(config) * pixels)) + 'px 50%');
 						$bar.attr('title', getText(config));
 						$text.html(getText(config));
-						
-						if (config.callback != null && typeof(config.callback) == 'function'){
+
+						if (config.callback != null && typeof(config.callback) == 'function')
 							config.callback(config);
-						}
-						
+
 						pb.config = config;
-					}, config.stepDuration); 
+					}, config.stepDuration);
 				});
 			};
 		}
 	});
-		
+
 	$.fn.extend({
         progressBar: $.progressBar.construct
 	});
-	
+
 })(jQuery);

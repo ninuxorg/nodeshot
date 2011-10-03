@@ -59,7 +59,7 @@ var nodeshot = {
      * nodeshot.remember()
      * remembers configurations of the user (show potential nodes, link quality, sidebar, distances)
      */
-    remember: function(){        
+    remember: function(){
         // remember potential nodes checkbox
         if($.cookie('nodeshot_potential_nodes')=='false'){
             nodeshot.layout.$potential[0].checked = false;
@@ -311,11 +311,10 @@ var nodeshot = {
                     // be sure $aside is hidden
                     nodeshot.layout.$aside.hide();
                     nodeshot.layout.$aside.hidden = true;
-                });
-                // enlarge the content with an animation
-                nodeshot.layout.$content.animate({width: nodeshot.layout.$header.width()},500,function(){
                     nodeshot.layout.$showColumn.show(500);
                 });
+                // enlarge the content with an animation
+                nodeshot.layout.$content.animate({width: nodeshot.layout.$header.width()},500);
                 // reset dimensions and re-enable scrollbar with some delay
                 setTimeout(function(){
                     nodeshot.layout.setFullScreen();
@@ -1682,17 +1681,22 @@ var nodeshot = {
             var color = [
                 null, // skip 0
                 '#00ff00', // quality == 1: Good
-                '#ffff00', // quality == 2: Medium
+                '#fcfd00', // quality == 2: Medium
                 '#ee0000', // quality == 3: Bad
                 '#5f0060'  // quality == 4: used for distance calculations
-            ];         
+            ];
+            var opacity = 0.5;
+            // if link color is yellow increase opacity
+            if(quality==2){
+                opacity = 0.9;
+            }
             // draw link on gmap
             var link = new google.maps.Polyline({
                 // coordinates
                 path: [new google.maps.LatLng(from_lat, from_lng),new google.maps.LatLng(to_lat, to_lng)],
                 // line features
                 strokeColor: color[quality], // quality can be 1,2,3 or 4
-                strokeOpacity: 0.4,
+                strokeOpacity: opacity,
                 strokeWeight: 5 
             });
             // show link on gmap
@@ -1880,6 +1884,7 @@ var nodeshot = {
                 var value = obj.attr('data-value');
                 // init progress bar
                 var defaults = {
+                    showText: false,
                     boxImage: nodeshot.url.media+'/images/progressbar.gif',
                     barImage: {
                         0:	nodeshot.url.media+'/images/progressbg_red.gif',

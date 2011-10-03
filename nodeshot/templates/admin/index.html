@@ -46,7 +46,7 @@
         <table>
         <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></caption>
         {% for model in app.models %}
-            {% if model.admin_url != 'contact/' and model.admin_url != 'statistic/' and model.admin_url != 'nodeshot/contact/' and model.admin_url != 'nodeshot/statistic/'  %}
+            {% if model.admin_url != 'contact/' and model.admin_url != 'statistic/' and model.admin_url != 'nodeshot/contact/' and model.admin_url != 'nodeshot/statistic/' and model.admin_url != '/admin/nodeshot/contact/' and model.admin_url != '/admin/nodeshot/statistic/' %}
             <tr>
             {% if model.perms.change %}
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
@@ -74,7 +74,7 @@
         <table>
         <caption><a href="{{ app.app_url }}" class="section">Logs</a></caption>
         {% for model in app.models %}
-            {% if model.admin_url == 'contact/' or model.admin_url == 'statistic/' or model.admin_url == 'nodeshot/contact/' or model.admin_url == 'nodeshot/statistic/'  %}
+            {% if model.admin_url == 'contact/' or model.admin_url == 'statistic/' or model.admin_url == 'nodeshot/contact/' or model.admin_url == 'nodeshot/statistic/' or model.admin_url == '/admin/nodeshot/contact/' or model.admin_url == '/admin/nodeshot/statistic/' %}
             <tr>
             {% if model.perms.change %}
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>

@@ -181,7 +181,8 @@ class SNMPBugger(threading.Thread):
                 # interface does not answer to ping
                 print "Node %s is down" % ip
                 inf.status = 'u'
-                # don't change status
+                inf.save()
+                # don't change node status
                 #node.status = 'd'
                 
             if node:

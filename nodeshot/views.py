@@ -224,7 +224,7 @@ def search(request, what):
     if len(data) > 0:
         return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     else:
-        return HttpResponse('', mimetype='application/json')
+        return HttpResponse('{}', mimetype='application/json')
 
 def overview(request):
     """
