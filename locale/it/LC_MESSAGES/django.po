@@ -165,6 +165,9 @@ msgstr "Nome apparato (nodo)"
 msgid "Device type"
 msgstr "Tipo apparato"
 
+msgid "Device"
+msgstr "Apparato"
+
 msgid "Devices"
 msgstr "Apparati"
 
@@ -344,7 +347,7 @@ msgid "Info"
 msgstr "Info"
 
 msgid "Interface"
-msgstr "Interfacce"
+msgstr "Interfaccia"
 
 msgid "Interfaces"
 msgstr "Interfacce"
@@ -447,6 +450,9 @@ msgstr "Password inviata con successo"
 
 msgid "Node"
 msgstr "Nodo"
+
+msgid "Nodes"
+msgstr "Nodi"
 
 msgid "Node %(node)s deleted"
 msgstr "Il nodo %(node)s è stato cancellato"
