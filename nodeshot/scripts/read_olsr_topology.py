@@ -37,6 +37,7 @@ class AliasManager(object):
                     ipid = self.aliasdict[alias] 
                     self.aliasdict.update({ip: ipid})
             else:
+                    # if a link already exists, update
                     # we need a new id
                     newid = self.idcounter
                     self.idcounter -= 1
@@ -148,18 +149,20 @@ if __name__ == "__main__":
             for b in range(0,len(ipsB)):
                 if not found:
                     ipA, ipB = ipsA[a], ipsB[b]
-
                     saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
                     if saved_links.count() > 0:
+                        # if a link already exists, update
                         l = saved_links[0]
                         l.etx = etx
                         l.save()
                         found = True
                     else:
+                        # otherwise create a new link
                         fi = Interface.objects.filter(ipv4_address = ipA)
                         to = Interface.objects.filter(ipv4_address = ipB)
                         if fi.count() == 1 and to.count() == 1:
                             if fi.get().device.node != to.get().device.node:
+                                # create a link if the neighbors are NOT on the same node
                                 Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
                                 found = True
     
