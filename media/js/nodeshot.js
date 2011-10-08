@@ -1133,7 +1133,26 @@ var nodeshot = {
         } // nodeshot.advanced.init()
         
     }, // nodeshot.advanced
-    
+
+    /*
+     * nodeshot.azimuth
+     * azimuth calculation stuff
+     */
+    azimuth: {
+        // Calculate azimuth between two points
+        calculate: function(from_lat, from_lng, to_lat, to_lng) {
+            var dLat = (to_lat-from_lat).toRad();
+            var dLon = (to_lng-from_lng).toRad();
+            var lat1 = from_lat.toRad();
+            var lat2 = to_lat.toRad();
+            var y = Math.sin(dLon) * Math.cos(lat2);
+            var x = Math.cos(lat1)*Math.sin(lat2) -
+                    Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+            var brng = Math.atan2(y, x).toDeg();      
+            alert(brng);
+            return brng;
+           }
+    },
     /*
      * nodeshot.distance
      * distance calculation stuff
@@ -1732,10 +1751,14 @@ var nodeshot = {
             var link = nodeshot.gmap.drawLink(data.from_lat, data.from_lng, data.to_lat, data.to_lng, 4);
             // calculate distance
             var distance = nodeshot.distance.calculate(data.from_lat, data.from_lng, data.to_lat, data.to_lng, "K");
+            // calculate azimuth
+            var azimuth = nodeshot.azimuth.calculate(data.from_lat, data.from_lng, data.to_lat, data.to_lng);
             // round distance 2 decimals
             distance = Math.round(distance*Math.pow(10,2))/Math.pow(10,2);
             // innerHTML
             $('#result').html(distance);
+            alert('polulating azim');
+            $('#azimuth').html(azimuth);
             // show result
             $('#result-row').fadeIn(500);
             // add distance link controls
