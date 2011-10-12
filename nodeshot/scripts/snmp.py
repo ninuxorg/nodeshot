@@ -21,6 +21,7 @@ pingcmd = "ping -c 1 %s > /dev/null"
 MAX_THREAD_N = 1
 interface_list = []
 mutex = threading.Lock()
+mac_string = "%02X:%02X:%02X:%02X:%02X:%02X"
 
 oids = {'device_name': {'oid': (1,3,6,1,2,1,1,5,0), 'query_type': 'get',  'pos' : (3,0,1) },
         'device_type': {'oid': (1,2,840,10036,3,1,2,1,3,7), 'query_type': 'get',  'pos' : (3,0,1) },
@@ -36,7 +37,7 @@ def get_mac(ip):
     res = cmdgen.CommandGenerator().getCmd(community, transport, oid_mac)
     try:
         m = struct.unpack('BBBBBB', str(res[3][0][1]) )
-        return "%X:%X:%X:%X:%X:%X" % m  
+        return mac_string % m
     except:
         return None
 
@@ -53,7 +54,7 @@ def get_signal(ip):
         for i in res[3]:
             dbm = i[0][1]
             mac_addr_str = i[0][0][-7:-1]
-            mac_addr = "%X:%X:%X:%X:%X:%X" % tuple([int(i.strip()) for i in str(mac_addr_str)[1:-1].split(',')])
+            mac_addr = mac_string % tuple([int(i.strip()) for i in str(mac_addr_str)[1:-1].split(',')])
             print "got signal:", mac_addr, dbm
             ret.append( (mac_addr, dbm) )
         return ret
