@@ -70,7 +70,8 @@
             </tr>
         </table>    
         <p id="result-row" class="hidden">
-        {% trans 'Result' %}: <b><span id="result"></span>{% trans 'km' %}</b> - Azimuth <span id="azimuth"></span>
+        {% trans 'Distance' %}: <b><span id="result"></span>{% trans 'km' %}</b>
+        <br />{% trans 'Azimuth' %}: <b><span id="azimuth"></span> °</b>
         </p>
     </div>
     {% if node.status != 'p' %}<div id="tab-advanced"></div>{% endif %}

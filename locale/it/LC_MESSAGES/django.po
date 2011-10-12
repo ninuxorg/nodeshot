@@ -18,6 +18,9 @@ msgstr "+ info"
 msgid "- info"
 msgstr "- info"
 
+msgid "Azimuth"
+msgstr "Azimut"
+
 msgid ""
 "A \"%(site)s\" user would like to get in touch with the people in charge of "
 "the node \"%(node)s\"."

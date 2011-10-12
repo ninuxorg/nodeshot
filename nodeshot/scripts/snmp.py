@@ -169,7 +169,10 @@ class SNMPBugger(threading.Thread):
                     if frequency:
                         print "FREQUENCY = " + frequency 
                         i.wireless_channel = frequency
-                    device.save() #save
+                    try:
+                        device.save() #save
+                    except IntegrityError:
+                        print 'Integrity error for device %s' % device.name
                 if mac:
                     i.mac_address = mac 
                     print mac
@@ -177,7 +180,11 @@ class SNMPBugger(threading.Thread):
                 else:
                     i.mac_address = None
                     print "Node %s is up but couldn't retrieve mac via snmp" % ip
-                i.save() #save
+                i.status = 'r'
+                try:
+                    i.save() #save
+                except IntegrityError:
+                    print 'Integrity error for interface %s of device %s' % (i, device.name)
             else:
                 # interface does not answer to ping
                 print "Node %s is down" % ip

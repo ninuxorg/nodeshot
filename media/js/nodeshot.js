@@ -5,6 +5,20 @@ Array.prototype.remove = function(from, to) {
   return this.push.apply(this, rest);
 };
 
+// Converts numeric degrees to radians
+if (typeof(Number.prototype.toRad) === "undefined") {
+    Number.prototype.toRad = function() {
+        return this * Math.PI / 180;
+    }
+}
+
+// Converts to degrees
+if (typeof(Number.prototype.toDeg) === "undefined") {
+    Number.prototype.toDeg = function() {
+        return this * Math.PI / 180;
+    }
+}
+
 var nodeshot = {
     
     // here we'll store the nodes (retrieved with nodeshot.getNodes())
@@ -1146,12 +1160,12 @@ var nodeshot = {
             var lat1 = from_lat.toRad();
             var lat2 = to_lat.toRad();
             var y = Math.sin(dLon) * Math.cos(lat2);
-            var x = Math.cos(lat1)*Math.sin(lat2) -
-                    Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
-            var brng = Math.atan2(y, x).toDeg();      
-            alert(brng);
+            var x = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+            var brng = Math.atan2(y, x).toDeg();
+            // round distance 4 decimals
+            brng = Math.round(brng*Math.pow(10,5))/Math.pow(10,5);
             return brng;
-           }
+        }
     },
     /*
      * nodeshot.distance
@@ -1178,6 +1192,8 @@ var nodeshot = {
             if (unit=="K") { dist = dist * 1.609344 };
             // I would like to know if this is to calculate the miles?
             if (unit=="N") { dist = dist * 0.8684 };
+            // round distance 2 decimals
+            dist = Math.round(dist*Math.pow(10,2))/Math.pow(10,2);
             return dist;
         }, // nodeshot.distance.calculate()
         
@@ -1753,11 +1769,8 @@ var nodeshot = {
             var distance = nodeshot.distance.calculate(data.from_lat, data.from_lng, data.to_lat, data.to_lng, "K");
             // calculate azimuth
             var azimuth = nodeshot.azimuth.calculate(data.from_lat, data.from_lng, data.to_lat, data.to_lng);
-            // round distance 2 decimals
-            distance = Math.round(distance*Math.pow(10,2))/Math.pow(10,2);
             // innerHTML
             $('#result').html(distance);
-            alert('polulating azim');
             $('#azimuth').html(azimuth);
             // show result
             $('#result-row').fadeIn(500);

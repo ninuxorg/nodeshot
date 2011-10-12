@@ -165,11 +165,5 @@ if __name__ == "__main__":
                                 # create a link if the neighbors are NOT on the same node
                                 Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
                                 found = True
-    
-    try:
-        from nodeshot.signals import clear_cache
-        clear_cache()
-    except:
-        pass
 
 

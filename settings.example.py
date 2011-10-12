@@ -54,13 +54,7 @@ MEDIA_ROOT = '%s/media/' % os.path.dirname(os.path.realpath(__file__))
 # for django 1.4
 STATIC_ROOT = MEDIA_ROOT
 
-# If you use the django development server set this to true if you want django to serve static files (check urls.py)
-DEVELOPMENT_SERVER = True
-
-if DEVELOPMENT_SERVER:
-	SITE_URL = "http://localhost:8000/"
-else:
-	SITE_URL = "http://nodeshot.peertoport.com/"
+SITE_URL = "http://localhost:8000/"
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -129,6 +123,9 @@ INSTALLED_APPS = (
 
 # additional information about administrators
 AUTH_PROFILE_MODULE = 'nodeshot.UserProfile'
+
+# If you use the django development server set this to true if you want django to serve static files (check urls.py)
+DEVELOPMENT_SERVER = True
 
 # google map center for nodeshot
 NODESHOT_GMAP_CENTER = {

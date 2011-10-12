@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from nodeshot.utils import notify_admins, email_owners
+from django.core.exceptions import ValidationError
 
 # for UserProfile
 from django.contrib.auth.models import User
@@ -248,8 +249,8 @@ class Node(models.Model):
         return u'%s' % (self.name)
     
     class Meta:
-        verbose_name = _('node')
-        verbose_name_plural = _('nodes')
+        verbose_name = _('Node')
+        verbose_name_plural = _('Nodes')
 
 class Device(models.Model):
     name = models.CharField(_('name'), max_length=50, unique=True)
@@ -265,8 +266,8 @@ class Device(models.Model):
         return self.name
     
     class Meta:
-        verbose_name = _('device')
-        verbose_name_plural = _('devices')
+        verbose_name = _('Device')
+        verbose_name_plural = _('Devices')
 
 class HNAv4(models.Model):
     device = models.ForeignKey(Device)
@@ -280,23 +281,41 @@ class HNAv4(models.Model):
         verbose_name_plural = _('HNA4')
 
 class Interface(models.Model):
-    ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), unique=True)
-    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, unique=True, default=None)
+    #ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), blank=True, null=True, unique=True, default=None)
+    #ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, unique=True, default=None)
+    ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), blank=True, null=True, default=None)
+    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, default=None)
     type = models.CharField(max_length=1, choices=INTERFACE_TYPE)
     device = models.ForeignKey(Device)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
     wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
     wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
-    mac_address = models.CharField(max_length=17, blank=True, null=True, unique=True, default=None)
-    ssid = models.CharField(max_length=50, null=True, blank=True)
-    status = models.CharField(_('status'), max_length=1, choices=INTERFACE_STATUS, default='r')
+    mac_address = models.CharField(max_length=17, blank=True, null=True, default=None)
+    ssid = models.CharField(max_length=50, null=True, blank=True, default=None)
+    status = models.CharField(_('status'), max_length=1, choices=INTERFACE_STATUS, default='u')
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return self.ipv4_address
+        if self.ipv4_address:
+            value = self.ipv4_address
+        elif self.ipv6_address:
+            value = self.ipv6_address
+        elif self.mac_address:
+            value = 'MAC: %s' % self.mac_address
+        else:
+            value = self.device.name
+        return value
+    
+    #def clean(self):
+    #    """
+    #    Require at least one of ipv4 or ipv6 to be set
+    #    """
+    #    if not (self.ipv4_address or self.ipv6_address):
+    #        raise ValidationError(_('An ipv4 or ipv6 address is required'))
     
     class Meta:
+        #unique_together = (('ipv4_address', 'mac_address'), ('ipv6_address', 'mac_address'))
         verbose_name = _('Interface')
         verbose_name_plural = _('Interfaces')
 
