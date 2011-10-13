@@ -63,6 +63,16 @@
                     {% endif %}
                     {{ form.ipv6_address }}
                 </div>
+                
+                <div class="field-wrapper">
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-mac_address">{% trans 'MAC Address' %}:</label>
+                    {% if form.mac_address.errors %}
+                        <div class="ui-state-error">
+                            {{ form.mac_address.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.mac_address }}
+                </div>
 
                 <div class="field-wrapper">                    
                     <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_mode">{% trans 'Wireless Mode' %}:</label>
@@ -92,17 +102,7 @@
                         </div>
                     {% endif %}
                     {{ form.wireless_polarity }}
-                </div>
-
-                <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-mac_address">{% trans 'MAC Address' %}:</label>
-                    {% if form.mac_address.errors %}
-                        <div class="ui-state-error">
-                            {{ form.mac_address.errors }}
-                        </div>
-                    {% endif %}
-                    {{ form.mac_address }}
-                </div>
+                </div>                
 
                 <div class="field-wrapper">
                     <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ssid">SSID:</label>

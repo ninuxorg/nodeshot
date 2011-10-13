@@ -39,8 +39,10 @@ NODE_STATUS = (
 INTERFACE_TYPE = (
     ('w', _('wifi')),
     ('e', _('ethernet')),
-    ('v', _('vpn')),
-    ('b', _('bat'))
+    ('vpn', _('vpn')),
+    ('batman', _('batman')),
+    ('bridge', _('bridge')),
+    ('vwifi', _('virtual-wifi'))
 )
 
 INTERFACE_STATUS = (
@@ -62,20 +64,20 @@ WIRELESS_POLARITY = (
 )
 
 WIRELESS_CHANNEL = (
-    ('2412', '2.4Ghz Ch  1 (2412 Mhz'),
-    ('2417', '2.4Ghz Ch  2 (2417 Mhz'),
-    ('2422', '2.4Ghz Ch  3 (2422 Mhz'),
-    ('2427', '2.4Ghz Ch  4 (2427 Mhz'),
-    ('2427', '2.4Ghz Ch  5 (2432 Mhz'),
-    ('2437', '2.4Ghz Ch  6 (2437 Mhz'),
-    ('2442', '2.4Ghz Ch  7 (2442 Mhz'),
-    ('2447', '2.4Ghz Ch  8 (2447 Mhz'),
-    ('2452', '2.4Ghz Ch  9 (2452 Mhz'),
-    ('2457', '2.4Ghz Ch  10 (2457 Mhz'),
-    ('2462', '2.4Ghz Ch  11 (2462 Mhz'),
-    ('2467', '2.4Ghz Ch  12 (2467 Mhz'),
-    ('2472', '2.4Ghz Ch  13 (2472 Mhz'),
-    ('2484', '2.4Ghz Ch  14 (2484 Mhz'),
+    ('2412', '2.4Ghz Ch  1 (2412 Mhz)'),
+    ('2417', '2.4Ghz Ch  2 (2417 Mhz)'),
+    ('2422', '2.4Ghz Ch  3 (2422 Mhz)'),
+    ('2427', '2.4Ghz Ch  4 (2427 Mhz)'),
+    ('2427', '2.4Ghz Ch  5 (2432 Mhz)'),
+    ('2437', '2.4Ghz Ch  6 (2437 Mhz)'),
+    ('2442', '2.4Ghz Ch  7 (2442 Mhz)'),
+    ('2447', '2.4Ghz Ch  8 (2447 Mhz)'),
+    ('2452', '2.4Ghz Ch  9 (2452 Mhz)'),
+    ('2457', '2.4Ghz Ch  10 (2457 Mhz)'),
+    ('2462', '2.4Ghz Ch  11 (2462 Mhz)'),
+    ('2467', '2.4Ghz Ch  12 (2467 Mhz)'),
+    ('2472', '2.4Ghz Ch  13 (2472 Mhz)'),
+    ('2484', '2.4Ghz Ch  14 (2484 Mhz)'),
     ('4915', '5Ghz Ch 183 (4915 Mhz)'),
     ('4920', '5Ghz Ch 184 (4920 Mhz)'),
     ('4925', '5Ghz Ch 185 (4925 Mhz)'),
@@ -347,7 +349,7 @@ class Link(models.Model):
         return quality
     
     def __unicode__(self):
-        return u'%s %s » %s %s' % (self.from_interface.ipv4_address, self.from_interface.device, self.to_interface.ipv4_address, self.to_interface.device)
+        return u'%s » %s' % (self.from_interface.device, self.to_interface.device)
         
     class Meta:
         verbose_name = _('Link')

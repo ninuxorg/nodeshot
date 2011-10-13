@@ -32,9 +32,11 @@
                 <h3>{% trans 'Interface' %} {{ interface.get_type_display }}</h3>
                 <table class="list-values">
                     <tbody class="essential">
+                        {% if interface.ipv4_address %}
                         <tr>
                             <td class="key">IPv4:</td><td class="value">{{ interface.ipv4_address }}</td>
                         </tr>
+                        {% endif %}
                         {% if interface.ipv6_address %}
                         <tr>
                             <td class="key">IPv6:</td><td class="value">{{ interface.ipv6_address }}</td>
@@ -43,6 +45,11 @@
                         <tr>
                             <td class="key">{% trans 'Status' %}:</td><td class="value">{{ interface.get_status_display }}</td>
                         </tr>
+                        {% if interface.mac_address %}
+                        <tr>
+                            <td class="key">{% trans 'MAC address' %}:</td><td class="value">{{ interface.mac_address }}</td>
+                        </tr>
+                        {% endif %}
                         {% if interface.type != 'v' %}
                         <tr>
                             <td colspan="2">
@@ -72,12 +79,7 @@
                         <tr>
                             <td class="key">SSID:</td><td class="value">{{ interface.ssid }}</td>
                         </tr>
-                        {% endif %}
-                        {% if interface.mac_address %}
-                        <tr>
-                            <td class="key">{% trans 'MAC address' %}:</td><td class="value">{{ interface.mac_address }}</td>
-                        </tr>
-                        {% endif %}
+                        {% endif %}                        
                         {% endif %}
                     </tbody>
                 </table>
