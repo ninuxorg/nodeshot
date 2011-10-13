@@ -39,7 +39,8 @@ NODE_STATUS = (
 INTERFACE_TYPE = (
     ('w', _('wifi')),
     ('e', _('ethernet')),
-    ('v', _('vpn'))
+    ('v', _('vpn')),
+    ('b', _('bat'))
 )
 
 INTERFACE_STATUS = (
