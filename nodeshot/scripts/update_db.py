@@ -19,6 +19,7 @@ update_statistics()
 # clear static cache if necessary
 try:
     from nodeshot.signals import clear_cache
+    from staticgenerator import quick_publish
     clear_cache()
     # regenerate main pages
     quick_publish('/', 'nodes.json', 'jstree.json', 'nodes.kml', 'overview/')
