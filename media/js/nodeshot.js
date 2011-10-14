@@ -1153,18 +1153,11 @@ var nodeshot = {
      * azimuth calculation stuff
      */
     azimuth: {
-        // Calculate azimuth between two points
+        /*
+        * nodeshot.azimuth.calculate(from_lat:float, from_lng:float, to_lat:float, to_lng:float)
+        * Calculate azimuth between two points
+        */
         calculate: function(from_lat, from_lng, to_lat, to_lng) {
-            //var dLat = (to_lat-from_lat).toRad();
-            //var dLon = (to_lng-from_lng).toRad();
-            //var lat1 = from_lat.toRad();
-            //var lat2 = to_lat.toRad();
-            //var y = Math.sin(dLon) * Math.cos(lat2);
-            //var x = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
-            //var brng = Math.atan2(y, x).toDeg();
-            // round distance 4 decimals
-            //brng = Math.round(brng*Math.pow(10,5))/Math.pow(10,5);
-            //return brng;
             var fromLatlng = new google.maps.LatLng(from_lat, from_lng);
             var toLatlng = new google.maps.LatLng(to_lat, to_lng);
             return google.maps.geometry.spherical.computeHeading(fromLatlng, toLatlng);
@@ -1727,6 +1720,10 @@ var nodeshot = {
             // if link color is yellow increase opacity
             if(quality==2){
                 opacity = 0.9;
+            }
+            // if link color is red decrease opacity
+            else if(quality==3){
+                opacity = 0.3;
             }
             // draw link on gmap
             var link = new google.maps.Polyline({

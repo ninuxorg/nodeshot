@@ -29,7 +29,7 @@ msgstr ""
 "nodo \"%(node)s\"."
 
 msgid "A new node has been added on %(site)s."
-msgstr "Un nuovo nodo è stato aggiunto su %(site)saltrotest."
+msgstr "Un nuovo nodo è stato aggiunto su %(site)s."
 
 msgid "A new password has been sent via email to the owners of the node."
 msgstr "La nuova password è stata inviata via email ai responsabili del nodo."
