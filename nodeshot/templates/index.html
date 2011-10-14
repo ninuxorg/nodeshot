@@ -119,9 +119,7 @@
             nodeshot.layout.setElementDimensions();
             nodeshot.layout.setFullScreen();
             nodeshot.layout.$mask.removeClass('initial')
-            if(!nodeshot.layout.$dialog){
-                nodeshot.layout.$mask.hide();
-            }
+            if(!nodeshot.layout.$dialog){nodeshot.layout.$mask.hide();}
             nodeshot.layout.$loading.hide();
             nodeshot.layout.$body.append('<script src="{{ MEDIA_URL }}js\/compressed\/jquery.jstree.js"><\/script>');
         // update dimensions on resize
