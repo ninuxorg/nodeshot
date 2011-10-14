@@ -1160,7 +1160,10 @@ var nodeshot = {
         calculate: function(from_lat, from_lng, to_lat, to_lng) {
             var fromLatlng = new google.maps.LatLng(from_lat, from_lng);
             var toLatlng = new google.maps.LatLng(to_lat, to_lng);
-            return google.maps.geometry.spherical.computeHeading(fromLatlng, toLatlng);
+            var brng = google.maps.geometry.spherical.computeHeading(fromLatlng, toLatlng);
+            // round distance 4 decimals
+            brng = Math.round(brng*Math.pow(10,5))/Math.pow(10,5);
+            return brng;
         }
     },
     /*
