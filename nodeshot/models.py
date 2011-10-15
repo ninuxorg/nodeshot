@@ -340,9 +340,9 @@ class Link(models.Model):
             else:
                 quality = 3
         elif type == 'dbm':
-            if -60 < self.dbm < 0:
+            if -78 < self.dbm < 0:
                 quality = 1
-            elif self.dbm > -75:
+            elif self.dbm > -87:
                 quality = 2
             else:
                 quality = 3
