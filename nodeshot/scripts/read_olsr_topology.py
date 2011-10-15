@@ -135,6 +135,7 @@ class TopologyParser(object):
 
 
 if __name__ == "__main__":
+    #Link.objects.all().delete()
     TOPOLOGY_URL="http://127.0.0.1:2006/all"
     tp = TopologyParser(TOPOLOGY_URL)
     tp.parse()
