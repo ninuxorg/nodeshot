@@ -140,6 +140,8 @@ if __name__ == "__main__":
     tp = TopologyParser(TOPOLOGY_URL)
     tp.parse()
     tp.process()
+    old_links = dict([ (l.id, False) for l in Link.objects.all()])
+    exit  
     print tp.linkdict
     for v in tp.linkdict.values():
         ipsA, ipsB, etx = v
@@ -156,6 +158,7 @@ if __name__ == "__main__":
                         l = saved_links[0]
                         l.etx = etx
                         l.save()
+                        old_links[l.id] = True
                         found = True
                         print "Updated link: %s" % l
                     else:
@@ -163,11 +166,14 @@ if __name__ == "__main__":
                         fi = Interface.objects.filter(ipv4_address = ipA)
                         to = Interface.objects.filter(ipv4_address = ipB)
                         if fi.count() == 1 and to.count() == 1:
-                          #this is broken!!!breaks
                           # create a link if the neighbors are NOT on the same node
-                          print fi, to
-                          print fi.get().id, to.get().id
+                          print fi, fi.get().id, to, to.get().id
                           if fi.get().device.node != to.get().device.node:
                             l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
                             print "Saved new link: %s" % l
                             found = True
+    for l,v in old_links.iteritems() :
+        if not v:
+            #Link.objects.get(id=l).delete()
+            print "Deleted link %d" % l
+        
