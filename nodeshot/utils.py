@@ -27,7 +27,7 @@ def distance(origin, destination):
 
 def signal_to_bar(signal):
     if signal < 0:
-        return min(100, max(0, int( 100-( (-signal -50) * 10/4 ) ) ) ) 
+        return min(100, max(0, int( 100-( (-signal -65) * 10/4 ) ) ) ) 
     else:
         return 0
     

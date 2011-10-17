@@ -449,6 +449,7 @@ var nodeshot = {
         */
         initAddNode: function(){
             this.$addNode.click(function(e) {
+                nodeshot.layout.$addNode.blur();
                 nodeshot.dialog.open(i18n.ADDNODE_DIALOG);
                 nodeshot.gmap.clickListener = google.maps.event.addListener(nodeshot.gmap.map, 'click', function(e) {
                     nodeshot.gmap.newNodeMarker(e.latLng);
@@ -810,7 +811,7 @@ var nodeshot = {
             }, 500);
             // bind key press event with some delay to avoid holding enter and not seeing the dialog for enough time
             setTimeout(function(){
-                nodeshot.layout.$body.bind('keyup', function(e) {
+                $(document).bind('keyup', function(e) {
                     var code = (e.keyCode ? e.keyCode : e.which);
                     // if pressing ENTER or ESC
                     if (code == 13 || code == 27){
@@ -921,6 +922,10 @@ var nodeshot = {
                 }
                 // reset sending
                 nodeshot.sending = false;
+            }).error(function(xhr, options, error){
+                nodeshot.overlay.hideLoading();
+                alert('Error: ' + xhr.status + ' ' + error);
+                nodeshot.overlay.close();
             });
             // return false to prevent default form behaviour
             return false;
@@ -985,7 +990,7 @@ var nodeshot = {
             // get values to send
             var form_data = form.serialize();
             // do ajax POST
-            $.post(nodeshot.url.index+'node/add/', form_data, function(data) {                
+            $.post(nodeshot.url.index+'node/add/', form_data, function(data){
                 nodeshot.overlay.hideLoading();
                 // if validation errors
                 if (data.length >= 10) {
@@ -1018,6 +1023,10 @@ var nodeshot = {
                 }
                 nodeshot.layout.setFullScreen();
                 nodeshot.sending = false;
+            }).error(function(xhr, options, error){
+                nodeshot.overlay.hideLoading();
+                alert('Error: ' + xhr.status + ' ' + error);
+                nodeshot.overlay.close();
             });
         }, // nodeshot.node.submit()
         
@@ -1163,8 +1172,9 @@ var nodeshot = {
             var brng = google.maps.geometry.spherical.computeHeading(fromLatlng, toLatlng);
             // round distance 4 decimals
             brng = Math.round(brng*Math.pow(10,5))/Math.pow(10,5);
-            if (brng < 0)
+            if (brng < 0){
                 brng = 360 + brng;
+            }
             return brng;
         }
     },
@@ -1930,8 +1940,9 @@ var nodeshot = {
                     barImage: {
                         0:	nodeshot.url.media+'/images/progressbg_red.gif',
                         30: nodeshot.url.media+'/images/progressbg_orange.gif',
-                        45: nodeshot.url.media+'/images/progressbg_yellow.gif',
-                        70: nodeshot.url.media+'/images/progressbg_green.gif'
+                        50: nodeshot.url.media+'/images/progressbg_yellow.gif',
+                        63: nodeshot.url.media+'/images/progressbg_green.gif',
+                        80: nodeshot.url.media+'/images/progressbg_teal.png'
                     }
                 }
                 obj.progressBar(value, defaults);

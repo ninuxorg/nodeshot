@@ -12,7 +12,6 @@
     {% if not sent %}
         <p>{% trans 'All fields are required.' %}</p>
         <fieldset>
-            {% csrf_token %}
             {% if form.non_field_errors %}
                 <div class="ui-state-error">
                 {{ form.non_field_errors }}

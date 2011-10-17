@@ -37,12 +37,13 @@ NODE_STATUS = (
 )
 
 INTERFACE_TYPE = (
-    ('w', _('wifi')),
-    ('e', _('ethernet')),
+    ('wifi', _('wifi')),
+    ('eth', _('ethernet')),
     ('vpn', _('vpn')),
     ('batman', _('batman')),
     ('bridge', _('bridge')),
-    ('vwifi', _('virtual-wifi'))
+    ('vwifi', _('virtual-wifi')),
+    ('veth', _('virtual-ethernet'))
 )
 
 INTERFACE_STATUS = (
@@ -288,7 +289,7 @@ class Interface(models.Model):
     #ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, unique=True, default=None)
     ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), blank=True, null=True, default=None)
     ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, default=None)
-    type = models.CharField(max_length=1, choices=INTERFACE_TYPE)
+    type = models.CharField(max_length=10, choices=INTERFACE_TYPE)
     device = models.ForeignKey(Device)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
     wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
@@ -340,13 +341,17 @@ class Link(models.Model):
             else:
                 quality = 3
         elif type == 'dbm':
-            if -78 < self.dbm < 0:
+            if -83 < self.dbm < 0:
                 quality = 1
-            elif self.dbm > -87:
+            elif self.dbm > -88:
                 quality = 2
             else:
                 quality = 3
         return quality
+    
+    def get_etx(self):
+        """ return etx as a string to avoid dot to comma conversion (it happens only with certain LANGUAGE_CODEs like IT)"""
+        return str(self.etx)
     
     def __unicode__(self):
         return u'%s » %s' % (self.from_interface.device, self.to_interface.device)

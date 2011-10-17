@@ -16,6 +16,7 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.utils.safestring import mark_safe
+from django.views.decorators.csrf import csrf_exempt
 
 from settings import *
 
@@ -373,6 +374,7 @@ def advanced(request, node_id):
     
     return render_to_response(template, context, context_instance=RequestContext(request))
 
+@csrf_exempt
 def contact(request, node_id):
     """
     Displays a form to contact node owners
@@ -490,7 +492,8 @@ def generate_kml(request):
 #        return  render_to_response('rrd.html', {'filename' : ip + '.png' } ,context_instance=RequestContext(request))
 #    else:
 #        return HttpResponse('Error')
-   
+
+@csrf_exempt
 def add_node(request):
     """
     Displays form to add a new node.
@@ -560,7 +563,7 @@ def confirm_node(request, node_id, activation_key):
     messages.add_message(request, messages.INFO, message)
         
     return HttpResponseRedirect(redirect_to)
-    
+
 def auth_node(request, node_id):
     """
     Authenticates user to edit a node.
@@ -850,7 +853,8 @@ def report_abuse(request, node_id, email):
     messages.add_message(request, messages.INFO, _(u"Thank you for reporting the abuse. We'll verify and come back to you as soon as possible."))
     
     return HttpResponseRedirect(reverse('nodeshot_index'))
-    
+
+@csrf_exempt  
 def reset_password(request, node_id):
     """
     Displays a form to reset the password of a node.
