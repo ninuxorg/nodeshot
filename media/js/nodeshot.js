@@ -1163,6 +1163,8 @@ var nodeshot = {
             var brng = google.maps.geometry.spherical.computeHeading(fromLatlng, toLatlng);
             // round distance 4 decimals
             brng = Math.round(brng*Math.pow(10,5))/Math.pow(10,5);
+            if (brng < 0)
+                brng = 360 + brng;
             return brng;
         }
     },
