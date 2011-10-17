@@ -157,14 +157,17 @@ if __name__ == "__main__":
                         l.etx = etx
                         l.save()
                         found = True
+                        print "Updated link: %s" % l
                     else:
                         # otherwise create a new link
                         fi = Interface.objects.filter(ipv4_address = ipA)
                         to = Interface.objects.filter(ipv4_address = ipB)
                         if fi.count() == 1 and to.count() == 1:
-                            if fi.get().device.node != to.get().device.node:
-                                # create a link if the neighbors are NOT on the same node
-                                Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()	
-                                found = True
-
-
+                          #this is broken!!!breaks
+                          # create a link if the neighbors are NOT on the same node
+                          print fi, to
+                          print fi.get().id, to.get().id
+                          if fi.get().device.node != to.get().device.node:
+                            l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
+                            print "Saved new link: %s" % l
+                            found = True
