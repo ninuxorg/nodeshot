@@ -30,10 +30,10 @@
                 <fieldset id="device{{ forloop.counter }}-formset">
                 {% for form in object.formset.forms %}
                     <div class="formset-form-container{% if not form.id.value and not form.errors %} hidden{% endif %}">
-                        {% if forms.non_field_errors %}
-                        <p class="ui-state-error">
+                        {% if form.non_field_errors %}
+                        <ul class="ui-state-error">
                             {{ form.non_field_errors }}
-                        </p>
+                        </ul>
                         {% endif %}
                         <div class="field-wrapper">                            
                             <label for="id_route">{% trans 'HNA4 Route' %}:</label>
