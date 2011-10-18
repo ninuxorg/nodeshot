@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-import sys, os, struct, threading
+import sys, os, re, struct, threading
 
 # determine directory automatically
 directory = os.path.dirname(os.path.realpath(__file__))
@@ -18,7 +18,7 @@ from nodeshot.models import *
 
 community = cmdgen.CommunityData('my-agent', 'public', 0)
 pingcmd = "ping -c 1 %s > /dev/null"
-MAX_THREAD_N = 1
+MAX_THREAD_N = 10
 interface_list = []
 mutex = threading.Lock()
 mac_string = "%02X:%02X:%02X:%02X:%02X:%02X"
@@ -94,7 +94,12 @@ class SNMPBugger(threading.Thread):
             #    print "Error! DUPLICATE IP ADDRESS FOR IP: %s" % ip
             #    raise Exception
             # check via ping if device is up
-            ping_status = os.system(pingcmd % ip) # 0-> up , >1 down
+            patt_ip = re.compile(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
+            if ip and len(ip) > 0 and patt_ip.match(ip):
+                ping_status = os.system(pingcmd % ip) # 0-> up , >1 down
+            else:
+                ping_status = 1 #invalid ip, maybe ipv6 or just mac
+
             try:
                 device = inf.device
                 node = inf.device.node
