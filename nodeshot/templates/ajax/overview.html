@@ -20,8 +20,8 @@
                     <td>
                         {% for signal in device.links %}
                         <div>
-                            <div class="signalbar" data-value="{{ signal.signal_bar }}"></div>
-                            {{ signal.dbm }} dBm - {{ signal.get_etx }} etx &raquo; <a href="javascript:nodeshot.infoTab.scrollTo('{{ signal.destination.slug }}')">{{ signal.destination.name }}</a>
+                            {% if signal.dbm < 0 %}<div class="signalbar" data-value="{{ signal.signal_bar }}"></div> {{ signal.dbm }} dBm - {% endif %}
+                            {{ signal.get_etx }} etx &raquo; <a href="javascript:nodeshot.infoTab.scrollTo('{{ signal.destination.slug }}')">{{ signal.destination.name }}</a>
                         </div>
                         {% endfor %}
                     </td>

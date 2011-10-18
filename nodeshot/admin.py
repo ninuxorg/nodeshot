@@ -76,7 +76,10 @@ class NodeAdmin(admin.ModelAdmin):
             #'root_path': self.admin_site.root_path,
         }, context_instance=RequestContext(request))
         
+from nodeshot.forms import InterfaceForm
+
 class InterfaceInline(admin.TabularInline):
+    form = InterfaceForm
     model = Interface
     extra = 0
 
@@ -93,7 +96,8 @@ class DeviceAdmin(admin.ModelAdmin):
     inlines = [InterfaceInline, Hna4Inline]
     
 class InterfaceAdmin(admin.ModelAdmin):
-    list_display  = ('ipv4_address', 'type', 'device', 'added', 'updated')
+    form = InterfaceForm
+    list_display  = ('__unicode__', 'type', 'device', 'added', 'updated')
     list_filter   = ('type', 'status', 'wireless_mode', 'wireless_polarity', 'wireless_channel')
     list_select_related = True
     save_on_top = True

@@ -448,12 +448,31 @@ var nodeshot = {
         * initialize add node button
         */
         initAddNode: function(){
+            // shortcut
+            var addNode = nodeshot.layout.$addNode;
+            // shortcut
+            var button = addNode.find('span.maponly');
             this.$addNode.click(function(e) {
-                nodeshot.layout.$addNode.blur();
-                nodeshot.dialog.open(i18n.ADDNODE_DIALOG);
-                nodeshot.gmap.clickListener = google.maps.event.addListener(nodeshot.gmap.map, 'click', function(e) {
-                    nodeshot.gmap.newNodeMarker(e.latLng);
-                });
+                // if clicking on add new node
+                if(button.text()!=i18n.ADDNODE_CANCEL){
+                    // blur focus from button in firefox (avoid an issue that causes opening another overlay when pressing enter to close the current overlay)
+                    addNode.blur();
+                    // store original "Add new node" text in current language
+                    i18n.ADDNODE = button.text()
+                    // open dialog and callback to change the text of the button when OK is pressed
+                    nodeshot.dialog.open(i18n.ADDNODE_DIALOG, function(){button.text(i18n.ADDNODE_CANCEL)});
+                    // new gmap marker
+                    nodeshot.gmap.clickListener = google.maps.event.addListener(nodeshot.gmap.map, 'click', function(e) {
+                        nodeshot.gmap.newNodeMarker(e.latLng);
+                    });
+                }
+                // if clicking on cancel operation
+                else{
+                    // restore "Add new node" text
+                    button.text(i18n.ADDNODE);
+                    // remove marker
+                    nodeshot.gmap.removeNewMarker();
+                }
             });
         }, // nodeshot.layout.initAddNode()
         

@@ -29,6 +29,19 @@
             {% endif %}
         {% for form in object.formset.forms %}
             <div class="formset-form-container{% if not form.id.value and not form.errors %} hidden{% endif %}">
+                {# this sequence is needed to add non field errors to formsets #}
+                {# first we place the errors in the correct interface with "forloop.counter == forloop.parentloop.counter" #}
+                {# then add "dict.values|length > 0" to avoid displaying yellow boxes with nothing inside #}
+                {# then we loop all the errors and display them #}
+                {% for dict in object.formset.errors %}
+                    {% if forloop.counter == forloop.parentloop.counter and dict.values|length > 0 %}
+                        <ul class="ui-state-error">
+                        {% for error in dict.values %}
+                            {{ error }}
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
                 {% if forms.non_field_errors %}
                 <p class="ui-state-error">
                     {{ form.non_field_errors }}

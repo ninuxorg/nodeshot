@@ -285,19 +285,18 @@ class HNAv4(models.Model):
         verbose_name_plural = _('HNA4')
 
 class Interface(models.Model):
-    #ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), blank=True, null=True, unique=True, default=None)
-    #ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, unique=True, default=None)
-    ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), blank=True, null=True, default=None)
-    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, default=None)
+    ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), blank=True, null=True, unique=True, default=None)
+    ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, unique=True, default=None)
     type = models.CharField(max_length=10, choices=INTERFACE_TYPE)
     device = models.ForeignKey(Device)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
     wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
     wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
-    mac_address = models.CharField(max_length=17, blank=True, null=True, default=None)
+    mac_address = models.CharField(max_length=17, blank=True, null=True, unique=True, default=None)
     ssid = models.CharField(max_length=50, null=True, blank=True, default=None)
+    #bssid = models.CharField(max_length=50, null=True, blank=True, default=None)
     status = models.CharField(_('status'), max_length=1, choices=INTERFACE_STATUS, default='u')
-    added = models.DateTimeField(auto_now_add=True)
+    added = models.DateTimeField(auto_now_add=True,)
     updated = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
@@ -311,15 +310,22 @@ class Interface(models.Model):
             value = self.device.name
         return value
     
-    #def clean(self):
-    #    """
-    #    Require at least one of ipv4 or ipv6 to be set
-    #    """
-    #    if not (self.ipv4_address or self.ipv6_address):
-    #        raise ValidationError(_('An ipv4 or ipv6 address is required'))
+    def clean(self):
+        """
+        Require at least one of ipv4 or ipv6 to be set
+        """
+        if not (self.ipv4_address or self.ipv6_address or self.mac_address):
+            raise ValidationError(_('At least one of the following field is necessary: IPv4, IPv6 or Mac address.'))
+
+    #def save(self):
+    #    ''' Override the save method to replace empty strings with NULL for ipv4_address, ipv6_address and mac_address'''
+    #    self.ipv4_address = self.ipv4_address or None
+    #    self.ipv6_address = self.ipv6_address or None
+    #    if(self.mac_address==''):
+    #        self.mac_address = None
+    #    super(Interface, self).save()
     
     class Meta:
-        #unique_together = (('ipv4_address', 'mac_address'), ('ipv6_address', 'mac_address'))
         verbose_name = _('Interface')
         verbose_name_plural = _('Interfaces')
 
