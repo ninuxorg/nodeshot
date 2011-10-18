@@ -93,6 +93,10 @@ msgstr "Domanda antispam: quanto fa"
 msgid "Are you sure you want to delete this node?"
 msgstr "Sei sicuro di voler cancellare questo nodo?"
 
+msgid "At least one of the following field is necessary: IPv4, IPv6 or Mac address."
+msgstr "Almeno uno dei seguenti campi è necessario: IPv4, IPv6 o Mac address."
+
+
 msgid "Authentication required to edit \"%(node)s\""
 msgstr "Autenticazione per %(node)s"
 
@@ -105,6 +109,9 @@ msgstr "Calcola la distanza tra \"%(node)s\" e un'altro nodo a tuo piacimento."
 
 msgid "Cancel"
 msgstr "Annulla"
+
+msgid "Cancel operation"
+msgstr "Annulla inserimento"
 
 msgid "Change password: %s"
 msgstr "Cambia password: %s"
@@ -483,6 +490,10 @@ msgstr "Nodeshot, Map Server Open Source"
 
 msgid "Nodo deleted on %s"
 msgstr "Nodo cancellato su %s"
+
+msgid "No ip specified"
+msgstr "Nessun ip specificato"
+
 
 msgid "Ok"
 msgstr "Ok"

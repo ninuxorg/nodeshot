@@ -130,6 +130,54 @@ class AdminPasswordChangeForm(forms.Form):
             self.node.save()
         return self.node
     
+class InterfaceForm(forms.ModelForm):
+    class Meta:
+        model = Interface
+
+    def clean_ipv4_address(self):
+        """
+        Return None instead of empty string
+        """
+        return self.cleaned_data.get('ipv4_address') or None
+    
+    def clean_ipv6_address(self):
+        """
+        Return None instead of empty string
+        """
+        return self.cleaned_data.get('ipv6_address') or None
+        
+    def clean_mac_address(self):
+        """
+        Return None instead of empty string
+        """
+        return self.cleaned_data.get('mac_address') or None
+        
+from django.forms.models import BaseInlineFormSet
+
+class InterfaceInlineFormset(BaseInlineFormSet):
+    def clean(self):
+        for form in self.forms:
+            def clean_ipv4_address(self):
+                """
+                Return None instead of empty string
+                """
+                return self.cleaned_data.get('ipv4_address') or None
+            
+            def clean_ipv6_address(self):
+                """
+                Return None instead of empty string
+                """
+                return self.cleaned_data.get('ipv6_address') or None
+                
+            def clean_mac_address(self):
+                """
+                Return None instead of empty string
+                """
+                return self.cleaned_data.get('mac_address') or None
+            #raise forms.ValidationError("Test")
+            # your custom formset validation
+            #pass
+    
 from math_captcha import MathCaptchaModelForm
 
 class ContactForm(MathCaptchaModelForm):

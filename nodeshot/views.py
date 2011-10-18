@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.db.models import Q
 from django.template import RequestContext
 from django.forms.models import inlineformset_factory
+from nodeshot.forms import InterfaceInlineFormset
 from django.utils import simplejson
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -262,7 +263,12 @@ def overview(request):
         ip_list = []
         macs_list = []
         for interface in interfaces:
-            ip_list.append(interface.ipv4_address)
+            if interface.ipv4_address:
+                ip_list.append(interface.ipv4_address)
+            if interface.ipv6_address:
+                ip_list.append(interface.ipv6_address)
+            if not (interface.ipv4_address or interface.ipv6_address):
+                ip_list.append(_('No ip specified'))
             if interface.mac_address != None and interface.mac_address != '':
                 macs_list.append(interface.mac_address)
         entry['ips'] = ip_list
@@ -747,10 +753,12 @@ def configuration(request, node_id, password, type):
 
     # retrieve devices
     devices = Device.objects.filter(node=node_id)
-    # determine which model to pass to inlineformset_favtory
-    model = Interface if type == 'interface' else HNAv4
+
     # init formset factory
-    modelFormSet = inlineformset_factory(Device, model, extra=1)
+    if type == 'interface':
+        modelFormSet = inlineformset_factory(Device, Interface, formset=InterfaceInlineFormset, extra=1)
+    else:
+        modelFormSet = inlineformset_factory(Device, HNAv4, extra=1)
     
     saved = False
     error = False
