@@ -2,16 +2,16 @@
 {% load i18n admin_static admin_modify %}
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static "css/admin-customizations.css" %}" />{% endblock %}
-{% block content %}<div id="content-main">
+{% block content %}
 {{ block.super }}
     <script>
         // edit selected
-        jQuery("select+a.add-another").each(function(){
-            var $this = jQuery(this);
+        django.jQuery("select+a.add-another").each(function(){
+            var $this = django.jQuery(this);
             $this.before("&nbsp;<a class='changelink' href='#' title='{% trans 'Edit slected item' %}'><\/a>");
             $this.prev().click(function(e){
                 e.preventDefault();
-                var $this = jQuery(this);
+                var $this = django.jQuery(this);
                 var $prev_prev = $this.prev();
                 if($prev_prev.attr('value')=='') return false;
                 var link = ($this.next().attr('href')+'../'+$prev_prev.attr('value'));
@@ -19,5 +19,6 @@
                 win.focus();
             });
         });
+        {% block extrajs %}{% endblock %}
     </script>
 {% endblock %}

@@ -792,19 +792,16 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
 .ui-tabs .ui-tabs-hide { display: none !important; }
 
-.status-on {
+.status-on, .status-off {
     width: 15px;    
     height: 15px;    
     background : transparent url('../images/onoffstatus.gif') no-repeat -15px 0px scroll;
     margin: auto;
+    text-indent:-100px;
+    overflow: hidden;
 }
 
-.status-off {
-    width: 15px;    
-    height: 15px;    
-    background : transparent url('../images/onoffstatus.gif') no-repeat 0px 0px scroll;
-    margin: auto;
-}
+.status-off { background-position: 0px 0px }
 
 .jstree-classic li, .jstree-classic ins, #vakata-dragged.jstree-classic .jstree-ok,
 #vakata-dragged.jstree-classic .jstree-invalid, #jstree-marker.jstree-classic{

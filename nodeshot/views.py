@@ -433,7 +433,7 @@ def contact(request, node_id):
                 'site': SITE
             }
             # email owners
-            email_owners(node, _('Contact request from %(sender)s - %(site)s') % {'sender':context['sender']['from_name'], 'site':SITE['name']}, 'email_notifications/contact-node-owners.txt', context, reply_to=request.POST.get('from_name'))
+            email_owners(node, _('Contact request from %(sender)s - %(site)s') % {'sender':context['sender']['from_name'], 'site':SITE['name']}, 'email_notifications/contact-node-owners.txt', context, reply_to=request.POST.get('from_email'))
             # set sent to true
             sent = True
             # if enabled from settings
@@ -756,7 +756,8 @@ def configuration(request, node_id, password, type):
 
     # init formset factory
     if type == 'interface':
-        modelFormSet = inlineformset_factory(Device, Interface, formset=InterfaceInlineFormset, extra=1)
+        #modelFormSet = inlineformset_factory(Device, Interface, formset=InterfaceInlineFormset, extra=1)
+        modelFormSet = inlineformset_factory(Device, Interface, extra=1)
     else:
         modelFormSet = inlineformset_factory(Device, HNAv4, extra=1)
     
@@ -779,6 +780,9 @@ def configuration(request, node_id, password, type):
                 # reload formset so it will show changes
                 formset = modelFormSet(instance=device, prefix='%s%s'%(type,i))
             else:
+                if DEBUG:
+                    import logging
+                    logging.log(1, dir(formset))
                 error = True
             objects += [{'device': device, 'formset': formset }]
             i+=1

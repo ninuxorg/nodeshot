@@ -4,6 +4,40 @@
 {% block interface_link_extra %} class="active"{% endblock %}
 {% block delete_node_link %}{% endblock %}
 {% block form_content %}
+<script>
+    // show wireless related fields only if necessary
+    // check/uncheck draw_links
+    // disable possibility of checking draw_link if type is VPN
+    interfaceForm = function(context){
+        var t = context.find(".type_ select");
+        var originalVal = t.val();
+        var wifi = context.find(".wifionly");
+        var cb = context.find(".draw_link_ input");
+        t.change(function(e){
+            var val = t.val();
+            if(val=='eth' || val=='vpn'){
+                cb[0].checked=false;
+            }
+            else{
+                cb[0].checked=true;
+            }                            
+            if(val=='wifi' || val=='batman' || val=='virtual-wifi'){
+                wifi.show(300);
+            }
+            else{
+                wifi.hide(300);
+            }
+        });
+        cb.change(function(e){
+           if(t.val()=='vpn'){
+                cb[0].checked=false;
+           }
+        });
+        if(originalVal=='wifi' || originalVal=='batman' || originalVal=='virtual-wifi'){
+            wifi.show();
+        }
+    }
+</script>
 {% if saved %}
 <div class="success">
     {% trans 'Changes saved successfully.' %}
@@ -28,13 +62,13 @@
                 <p class="extramarginbottom">{% trans 'There are no interfaces for this device yet.' %}</p>
             {% endif %}
         {% for form in object.formset.forms %}
-            <div class="formset-form-container{% if not form.id.value and not form.errors %} hidden{% endif %}">
+            <div class="formset-form-container{% if not form.id.value and not form.errors %} hidden{% endif %}" id="interface-{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}">
                 {% if form.non_field_errors %}
                 <ul class="ui-state-error">    
                     {{ form.non_field_errors }}
                 </ul>
                 {% endif %}
-                <div class="field-wrapper">
+                <div class="field-wrapper type_">
                     <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-type">{% trans 'Type' %}: <big>*</big></label>
                     {% if form.type.errors %}
                         <div class="ui-state-error">
@@ -44,8 +78,18 @@
                     {{ form.type }}
                 </div>
                 
+                <div class="field-wrapper draw_link_">
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-draw_link">{% trans 'Draw links from/to this interface (not valid for VPN interfaces)' %}:</label>
+                    {% if form.draw_link.errors %}
+                        <div class="ui-state-error">
+                            {{ form.draw_link.errors }}
+                        </div>
+                    {% endif %}
+                    <input style="width:auto"; checked="checked" type="checkbox" name="interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-draw_link" id="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-draw_link" />
+                </div>                
+                
                 <div class="field-wrapper">                    
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv4_address">{% trans 'IPv4 Address' %}: <big>*</big></label>
+                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ipv4_address">{% trans 'IPv4 Address' %}: </label>
                     {% if form.ipv4_address.errors %}
                         <div class="ui-state-error">
                             {{ form.ipv4_address.errors }}
@@ -72,47 +116,59 @@
                         </div>
                     {% endif %}
                     {{ form.mac_address }}
-                </div>
-
-                <div class="field-wrapper">                    
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_mode">{% trans 'Wireless Mode' %}:</label>
-                    {% if form.wireless_mode.errors %}
-                        <div class="ui-state-error">
-                            {{ form.wireless_mode.errors }}
-                        </div>
-                    {% endif %}
-                    {{ form.wireless_mode }}
-                </div>
-
-                <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_channel">{% trans 'Channel' %}:</label>
-                    {% if form.wireless_channel.errors %}
-                        <div class="ui-state-error">
-                            {{ form.wireless_channel.errors }}
-                        </div>
-                    {% endif %}
-                    {{ form.wireless_channel }}
-                </div>
-
-                <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_polarization">{% trans 'Polarization' %}:</label>
-                    {% if form.wireless_polarity.errors %}
-                        <div class="ui-state-error">
-                            {{ form.wireless_polarity.errors }}
-                        </div>
-                    {% endif %}
-                    {{ form.wireless_polarity }}
-                </div>                
-
-                <div class="field-wrapper">
-                    <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-ssid">SSID:</label>
-                    {% if form.ssid.errors %}
-                        <div class="ui-state-error">
-                            {{ form.ssid.errors }}
-                        </div>
-                    {% endif %}
-                    {{ form.ssid }}
-                </div>
+                </div>              
+                
+                <div class="wifionly" style="display:none">
+                    <div class="field-wrapper">                    
+                        <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_mode">{% trans 'Wireless Mode' %}:</label>
+                        {% if form.wireless_mode.errors %}
+                            <div class="ui-state-error">
+                                {{ form.wireless_mode.errors }}
+                            </div>
+                        {% endif %}
+                        {{ form.wireless_mode }}
+                    </div>
+    
+                    <div class="field-wrapper">
+                        <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_channel">{% trans 'Channel' %}:</label>
+                        {% if form.wireless_channel.errors %}
+                            <div class="ui-state-error">
+                                {{ form.wireless_channel.errors }}
+                            </div>
+                        {% endif %}
+                        {{ form.wireless_channel }}
+                    </div>
+    
+                    <div class="field-wrapper">
+                        <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-wireless_polarization">{% trans 'Polarization' %}:</label>
+                        {% if form.wireless_polarity.errors %}
+                            <div class="ui-state-error">
+                                {{ form.wireless_polarity.errors }}
+                            </div>
+                        {% endif %}
+                        {{ form.wireless_polarity }}
+                    </div>                
+    
+                    <div class="field-wrapper">
+                        <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-essid">ESSID:</label>
+                        {% if form.essid.errors %}
+                            <div class="ui-state-error">
+                                {{ form.essid.errors }}
+                            </div>
+                        {% endif %}
+                        {{ form.essid }}
+                    </div>
+                    
+                    <div class="field-wrapper">
+                        <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-essid">BSSID:</label>
+                        {% if form.bssid.errors %}
+                            <div class="ui-state-error">
+                                {{ form.bssid.errors }}
+                            </div>
+                        {% endif %}
+                        {{ form.bssid }}
+                    </div>
+                </div>              
                 
                 <div class="field-wrapper">
                     <label for="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-status">{% trans 'Status' %}:</label>
@@ -129,6 +185,7 @@
                     {{ form.DELETE }}
                 {% endif %}
             </div>
+            <script>interfaceForm($("#interface-{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}"))</script>
         {% endfor %}
         </fieldset>
     </div>
@@ -166,13 +223,17 @@
                 window.location.hash = newHash;
             }
         }
-    });
+    }); 
+    
     {% for object in objects %}
     $("div.formset-form-container", "#device{{ forloop.counter }}-formset").formset({
         prefix: '{{ type }}{{ forloop.counter }}',
         addText: '{% trans 'Add' %}',
-        deleteText: '{% trans 'Remove' %}'
-    });
+        deleteText: '{% trans 'Remove' %}',
+        added: function(row){
+            interfaceForm(row);
+        }
+    });    
     {% endfor %}
 </script>
 {% endblock %}
