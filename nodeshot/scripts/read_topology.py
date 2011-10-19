@@ -194,10 +194,13 @@ if __name__ == "__main__":
                     print "Anomaly: 2 links retrieved."
                 elif link_count < 1:
                     # otherwise create the new link
-                    fi = Interface.objects.filter(mac_address = macA)
-                    to = Interface.objects.filter(mac_address = macB)
+                    fi = Interface.objects.filter(mac_address = macA).exclude(type='vpn')
+                    to = Interface.objects.filter(mac_address = macB).exclude(type='vpn')
                     fi_count = len(fi)
                     to_count = len(to)
+                    if fi_count > 2 or to_count > 2:
+                        print "Anomality detected, two interface with same mac"
+                        print fi, to
                     if 0 < fi_count < 2 and 0 < to_count < 2:
                         if fi.get().device.node != to.get().device.node:
                             # create a link if the neighbors are NOT on the same node
