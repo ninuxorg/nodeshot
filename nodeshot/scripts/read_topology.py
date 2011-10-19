@@ -104,7 +104,7 @@ class TopologyParser(object):
                 line = self.topologylines[i]
 
             #debug
-            print self.linklist
+            #print self.linklist
 
         def process(self):
             "should be called after calling parse()"
@@ -134,7 +134,7 @@ class TopologyParser(object):
                 else:
                     self.linkdict.update({k: (iplist1, iplist2, etx)} )
 
-
+#OLSR
 if __name__ == "__main__":
     #Link.objects.all().delete()
     TOPOLOGY_URL="http://127.0.0.1:2006/all"
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     tp.parse()
     tp.process()
     old_links = dict([ (l.id, False) for l in Link.objects.all()])
-    print tp.linkdict
+    #print tp.linkdict
     for v in tp.linkdict.values():
         ipsA, ipsB, etx = v
         found = False
@@ -163,15 +163,19 @@ if __name__ == "__main__":
                         print "Updated link: %s" % l
                     else:
                         # otherwise create a new link
-                        fi = Interface.objects.filter(ipv4_address = ipA)
-                        to = Interface.objects.filter(ipv4_address = ipB)
+                        fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn')
+                        to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn')
                         if fi.count() == 1 and to.count() == 1:
                           # create a link if the neighbors are NOT on the same node
-                          print fi, fi.get().id, to, to.get().id
+                          #print fi, fi.get().id, to, to.get().id
                           if fi.get().device.node != to.get().device.node:
                             l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
                             print "Saved new link: %s" % l
                             found = True
+                        elif fi.count() > 1 or to.count() >1:
+                            print "Anomaly: More than one interface for ip address"
+                            print fi, to
+    # BATMAN
     for topology_url in TOPOLOGY_URLS:
         topologylines = urllib2.urlopen(topology_url).readlines()
         for line in topologylines:
