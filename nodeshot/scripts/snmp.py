@@ -29,10 +29,17 @@ oids = {'device_name': {'oid': (1,3,6,1,2,1,1,5,0), 'query_type': 'get',  'pos' 
         'frequency': {'oid': (1,3,6,1,4,1,14988,1,1,1,1,1,7), 'query_type': 'next',  'pos' : (3,0,0,1) },
         }
 
-def get_mac(ip):
+def get_mac(ip, i_type):
     'return the wifi mac of the device, else None'
     global community
-    oid_mac = 1,3,6,1,2,1,2,2,1,6,7 # mac of ath0 
+    if i_type == "wifi" or i_type == "w": #db is dirty, both wifi and w occurrence
+        oid_mac = 1,3,6,1,2,1,2,2,1,6,7 # mac of ath0 
+    elif i_type == "eth" or i_type == "e":
+        oid_mac = 1,3,6,1,2,1,2,2,1,6,5 # mac of eth0
+    else:
+        print "--> Unknown interface type %s" , i_type
+        return None
+
     transport = cmdgen.UdpTransportTarget((ip, 161))
     res = cmdgen.CommandGenerator().getCmd(community, transport, oid_mac)
     try:
@@ -109,17 +116,7 @@ class SNMPBugger(threading.Thread):
                 device = None
 
             if ping_status == 0: #node answers to the ping
-                mac = get_mac(ip)
-                # same as before - duplicate are avoided by django, no need to check
-                #if mac and Interface.objects.filter(mac_address = mac).count() > 1:
-                #    print "Error! MULTIPLE INTERFACE WITH THE SAME MAC ADDRESS"
-                #    continue
-                #if mac:
-                #    # in case this mac is associated to another interface (strange situation, should not occour!)
-                #    i = Interface.objects.filter(mac_address = mac).select_related().get()
-                #    device = i.device
-                #    node = i.device.node
-                #else:
+                mac = get_mac(ip, inf.type)
                 i = inf
 
                 # status of the node shall not be changed
