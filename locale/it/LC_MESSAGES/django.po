@@ -963,3 +963,6 @@ msgstr "..Ops! 404 Pagina non trovata"
 
 msgid "The page you were looking for was not found on this website."
 msgstr "La pagina che cercavi non è stata trovata su questo sito web."
+
+msgid "Draw links from/to this interface (not valid for VPN interfaces)"
+msgstr "Disegna link da/a questa interfaccia (escluse interfacce VPN)"
