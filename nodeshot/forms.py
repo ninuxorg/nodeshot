@@ -154,10 +154,7 @@ class InterfaceForm(forms.ModelForm):
         
 from django.forms.models import BaseInlineFormSet
 
-class InterfaceInlineFormset(BaseInlineFormSet):
-    
-    #draw_link = forms.BooleanField(required=False, initial=True)
-    
+class InterfaceInlineFormset(BaseInlineFormSet):    
     def clean(self):
         for form in self.forms:
             def clean_ipv4_address(self):

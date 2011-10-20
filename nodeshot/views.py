@@ -756,8 +756,7 @@ def configuration(request, node_id, password, type):
 
     # init formset factory
     if type == 'interface':
-        #modelFormSet = inlineformset_factory(Device, Interface, formset=InterfaceInlineFormset, extra=1)
-        modelFormSet = inlineformset_factory(Device, Interface, extra=1)
+        modelFormSet = inlineformset_factory(Device, Interface, formset=InterfaceInlineFormset, extra=1)
     else:
         modelFormSet = inlineformset_factory(Device, HNAv4, extra=1)
     
