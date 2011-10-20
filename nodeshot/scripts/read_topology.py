@@ -156,6 +156,8 @@ if __name__ == "__main__":
                     if saved_links.count() > 0:
                         # if a link already exists, update
                         l = saved_links[0]
+                        if not l.from_interface.draw_link or not l.to_interface.draw_link:
+                            continue
                         l.etx = etx
                         l.save()
                         old_links[l.id] = True
@@ -163,8 +165,8 @@ if __name__ == "__main__":
                         print "Updated link: %s" % l
                     else:
                         # otherwise create a new link
-                        fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn')
-                        to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn')
+                        fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn').exclude(draw_link=False)
+                        to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn').exclude(draw_link=False)
                         if fi.count() == 1 and to.count() == 1:
                           # create a link if the neighbors are NOT on the same node
                           #print fi, fi.get().id, to, to.get().id
@@ -189,6 +191,8 @@ if __name__ == "__main__":
                 link_count = len(saved_links)
                 if 0 < link_count < 2:
                     l = saved_links[0]
+                    if not l.from_interface.draw_link or not l.to_interface.draw_link:
+                        continue
                     # if a link already exists, just update
                     l.etx = cost
                     old_links[l.id] = True
@@ -198,8 +202,8 @@ if __name__ == "__main__":
                     print "Anomaly: 2 links retrieved."
                 elif link_count < 1:
                     # otherwise create the new link
-                    fi = Interface.objects.filter(mac_address = macA).exclude(type='vpn')
-                    to = Interface.objects.filter(mac_address = macB).exclude(type='vpn')
+                    fi = Interface.objects.filter(mac_address = macA).exclude(type='vpn').exclude(draw_link=False)
+                    to = Interface.objects.filter(mac_address = macB).exclude(type='vpn').exclude(draw_link=False)
                     fi_count = len(fi)
                     to_count = len(to)
                     if fi_count > 2 or to_count > 2:
