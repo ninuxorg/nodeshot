@@ -1,6 +1,6 @@
 <div id="nodeshot-overlay-inner" class="content larger">{% load i18n %}
     {% if devices|length > 0 %}
-    <p class="nomargintop">{% trans 'Advanced information about devices, interfaces and hna4 for expert users.' %}</p>
+    <p class="nomargintop">{% trans 'Advanced information about devices, interfaces and hna for expert users.' %}</p>
     <div id="advanced-info" class="ui-tabs ui-widget ui-widget-content ui-corner-all">        
         
         <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
@@ -50,16 +50,18 @@
                             <td class="key">{% trans 'MAC address' %}:</td><td class="value">{{ interface.mac_address }}</td>
                         </tr>
                         {% endif %}
-                        {% if interface.type != 'v' %}
+                        {% if interface.type == 'wifi' or interface.type == 'batman' or interface.type == 'vwifi' %}
+                        {% if interface.wireless_mode or interface.wireless_channel or interface.wireless_polarity or interface.essid or interface.bssid %}
                         <tr>
                             <td colspan="2">
                                 <a class="toggle-info green">{% trans '+ info' %}</a>
                             </td>
                         </tr>
                         {% endif %}
+                        {% endif %}
                     </tbody>
                     <tbody class="additional hidden">
-                        {% if interface.type == 'w' %}
+                        {% if interface.type == 'wifi' or interface.type == 'batman' or interface.type == 'vwifi' %}
                         {% if interface.wireless_mode %}
                         <tr>
                             <td class="key">{% trans 'Wireless mode' %}:</td><td class="value">{{ interface.get_wireless_mode_display }}</td>
@@ -75,22 +77,27 @@
                             <td class="key">{% trans 'Wireless polarity' %}:</td><td class="value">{{ interface.get_wireless_polarity_display }}</td>
                         </tr>
                         {% endif %}
-                        {% if interface.ssid %}
+                        {% if interface.essid %}
                         <tr>
-                            <td class="key">SSID:</td><td class="value">{{ interface.ssid }}</td>
+                            <td class="key">ESSID:</td><td class="value">{{ interface.essid }}</td>
                         </tr>
-                        {% endif %}                        
+                        {% endif %}
+                        {% if interface.bssid %}
+                        <tr>
+                            <td class="key">BSSID:</td><td class="value">{{ interface.bssid }}</td>
+                        </tr>
+                        {% endif %} 
                         {% endif %}
                     </tbody>
                 </table>
             </div>
             {% endfor %}
-            {% for hna4 in device.hnav4_set.all %}
+            {% for hna in device.hna_set.all %}
             <div class="configuration">
-                <h3>Hna4</h3>
+                <h3>Hna</h3>
                 <table class="hna4 list-values">
                     <tr>
-                        <td class="key">{% trans 'Hna4 route' %}:</td><td class="value">{{ hna4.route }}</td>
+                        <td class="key">{% trans 'Hna route' %}:</td><td class="value">{{ hna.route }}</td>
                     </tr>
                 </table>
             </div>

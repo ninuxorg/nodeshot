@@ -83,8 +83,8 @@ class InterfaceInline(admin.TabularInline):
     model = Interface
     extra = 0
 
-class Hna4Inline(admin.TabularInline):
-    model = HNAv4
+class HnaInline(admin.TabularInline):
+    model = Hna
     extra = 0
 
 class DeviceAdmin(admin.ModelAdmin):
@@ -93,7 +93,7 @@ class DeviceAdmin(admin.ModelAdmin):
     search_fields = ('name', 'type')
     save_on_top = True
     date_hierarchy = 'added'
-    inlines = [InterfaceInline, Hna4Inline]
+    inlines = [InterfaceInline, HnaInline]
     
 class InterfaceAdmin(admin.ModelAdmin):
     form = InterfaceForm
@@ -127,7 +127,7 @@ class LinkAdmin(admin.ModelAdmin):
 admin.site.register(Node, NodeAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Interface, InterfaceAdmin)
-admin.site.register(HNAv4)
+admin.site.register(Hna)
 admin.site.register(Link, LinkAdmin)
 admin.site.register(Statistic, StatisticAdmin)
 admin.site.register(Contact, ContactAdmin)

@@ -273,7 +273,7 @@ class Device(models.Model):
         verbose_name = _('Device')
         verbose_name_plural = _('Devices')
 
-class HNAv4(models.Model):
+class Hna(models.Model):
     device = models.ForeignKey(Device)
     route = models.CharField(max_length=20)
     
@@ -281,8 +281,8 @@ class HNAv4(models.Model):
         return u'%s' % (self.route)
         
     class Meta:
-        verbose_name = _('HNA4')
-        verbose_name_plural = _('HNA4')
+        verbose_name = _('Hna')
+        verbose_name_plural = _('Hna')
 
 class Interface(models.Model):
     ipv4_address = models.IPAddressField(verbose_name=_('ipv4 address'), blank=True, null=True, unique=True, default=None)
@@ -317,14 +317,6 @@ class Interface(models.Model):
         """
         if not (self.ipv4_address or self.ipv6_address or self.mac_address):
             raise ValidationError(_('At least one of the following field is necessary: IPv4, IPv6 or Mac address.'))
-
-    #def save(self):
-    #    ''' Override the save method to replace empty strings with NULL for ipv4_address, ipv6_address and mac_address'''
-    #    self.ipv4_address = self.ipv4_address or None
-    #    self.ipv6_address = self.ipv6_address or None
-    #    if(self.mac_address==''):
-    #        self.mac_address = None
-    #    super(Interface, self).save()
     
     class Meta:
         verbose_name = _('Interface')
@@ -337,6 +329,7 @@ class Link(models.Model):
     dbm = models.IntegerField(default=0)
     sync_tx = models.IntegerField(default=0)
     sync_rx = models.IntegerField(default=0)
+    hide = models.BooleanField(_('Hide from map'), default=False)
     
     def get_quality(self, type='etx'):
         """ used to determine color of links"""

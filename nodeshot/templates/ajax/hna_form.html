@@ -1,7 +1,7 @@
 {% extends 'ajax/base_form.html' %}{% load i18n %}
 {% block extra_class %} larger{% endblock %}
-{% block h1 %}{% blocktrans with node=node.name %}Edit Hna4 of "{{ node }}"{% endblocktrans %}{% endblock %}
-{% block hna4_link_extra %} class="active"{% endblock %}
+{% block h1 %}{% blocktrans with node=node.name %}Edit Hna of "{{ node }}"{% endblocktrans %}{% endblock %}
+{% block hna_link_extra %} class="active"{% endblock %}
 {% block delete_node_link %}{% endblock %}
 {% block form_content %}
     {% if saved %}
@@ -17,14 +17,14 @@
     <div id="tabs">
         <ul>
         {% for object in objects %}
-            <li><a href="#device{{ forloop.counter }}-hna4">{{ object.device.name }}</a></li>
+            <li><a href="#device{{ forloop.counter }}-hna">{{ object.device.name }}</a></li>
         {% endfor %}
         </ul>
-        <form id="hna4-form" class="inline-formset" method="post" action="">
+        <form id="hna-form" class="inline-formset" method="post" action="">
         {% for object in objects %}
-            <div id="device{{ forloop.counter }}-hna4" class="tab">
+            <div id="device{{ forloop.counter }}-hna" class="tab">
                 {% if object.formset.forms|length < 2 %}
-                    <p class="extramarginbottom">{% trans 'There are no announced Hna4 for this device yet.' %}</p>
+                    <p class="extramarginbottom">{% trans 'There are no announced Hna for this device yet.' %}</p>
                 {% endif %}
                 {{ object.formset.management_form }}
                 <fieldset id="device{{ forloop.counter }}-formset">
@@ -36,7 +36,7 @@
                         </ul>
                         {% endif %}
                         <div class="field-wrapper">                            
-                            <label for="id_route">{% trans 'HNA4 Route' %}:</label>
+                            <label for="id_route">{% trans 'Hna Route' %}:</label>
                             {% if form.route.errors %}
                                 <div class="ui-state-error">
                                     {{ form.route.errors }}

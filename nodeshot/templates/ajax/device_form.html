@@ -77,7 +77,7 @@
         </div>
         
         <a href="{% url nodeshot_edit_interfaces node.id node.password %}#device{{ forloop.counter }}-interface-tab" class="edit-configuration" title="{% trans 'Edit interfaces of this device' %}">{% trans 'Interfaces' %}</a>
-        <a href="{% url nodeshot_edit_hna4s node.id node.password %}#device{{ forloop.counter }}-hna4-tab" class="edit-configuration" title="{% trans 'Edit hna4 of this device' %}">{% trans 'Hna4' %}</a>
+        <a href="{% url nodeshot_edit_hna node.id node.password %}#device{{ forloop.counter }}-hna-tab" class="edit-configuration" title="{% trans 'Edit hna of this device' %}">{% trans 'Hna' %}</a>
         
         {{ form.node }}
         {% if form.id.value %}

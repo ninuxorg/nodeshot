@@ -86,7 +86,7 @@ def nodes(request):
     # retrieve links, select_related() reduces the number of queries,
     # only() selects only the fields we need
     # double underscore __ indicates that we are following a foreign key
-    link_queryset = Link.objects.all().select_related().only(
+    link_queryset = Link.objects.all().exclude(hide=True).select_related().only(
         'from_interface__device__node__lat', 'from_interface__device__node__lng',
         'to_interface__device__node__lat', 'to_interface__device__node__lng',
         'to_interface__device__node__name', 'to_interface__device__node__name',
@@ -732,7 +732,7 @@ def device_form(request, node_id, password):
     
 def configuration(request, node_id, password, type):
     """
-    Displays form to edit interfaces or HNA4.
+    Displays form to edit interfaces or HNA.
     type argument is set at url config level.
     """
     
@@ -758,7 +758,7 @@ def configuration(request, node_id, password, type):
     if type == 'interface':
         modelFormSet = inlineformset_factory(Device, Interface, formset=InterfaceInlineFormset, extra=1)
     else:
-        modelFormSet = inlineformset_factory(Device, HNAv4, extra=1)
+        modelFormSet = inlineformset_factory(Device, Hna, extra=1)
     
     saved = False
     error = False

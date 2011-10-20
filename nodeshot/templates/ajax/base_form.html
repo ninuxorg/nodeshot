@@ -8,7 +8,7 @@
             {% if node.status != 'p' %}
             <li><a href="{% url nodeshot_edit_devices node.id node.password%}"{% block device_link_extra %}{% endblock %}>{% trans 'Devices' %}</a></li>
             <li><a href="{% url nodeshot_edit_interfaces node.id node.password %}"{% block interface_link_extra %}{% endblock %}>{% trans 'Interfaces' %}</a></li>
-            <li><a href="{% url nodeshot_edit_hna4s node.id node.password %}"{% block hna4_link_extra %}{% endblock %}>{% trans 'HNA4' %}</a></li>
+            <li><a href="{% url nodeshot_edit_hna node.id node.password %}"{% block hna_link_extra %}{% endblock %}>{% trans 'Hna' %}</a></li>
             {% endif %}
             {% block delete_node_link %}<li id="delete-node-link"><a href="{% url nodeshot_delete_node node.id node.password %}" class="red{% block delete_link_extra %}{% endblock %}">{% trans 'Delete node' %}</a></li>{% endblock %}
         </ul>

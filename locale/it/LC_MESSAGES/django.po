@@ -76,9 +76,9 @@ msgid "Advanced information about %(node)s"
 msgstr "Informazioni avanzate su %(node)s"
 
 msgid ""
-"Advanced information about devices, interfaces and hna4 for expert users."
+"Advanced information about devices, interfaces and hna for expert users."
 msgstr ""
-"Informazioni avanzate su apparati, interfacce e hna4 destinate ad utenti "
+"Informazioni avanzate su apparati, interfacce e hna destinate ad utenti "
 "esperti"
 
 msgid "All fields are required."
@@ -232,11 +232,11 @@ msgstr ""
 "EMAIL_HOST_USER non è definito nel tuo file settings.py. Prendi settings."
 "exampple.py come riferimento."
 
-msgid "Edit Hna4 for node %(node)s"
-msgstr "Modifica gli Hna4 di %(node)s"
+msgid "Edit Hna for node %(node)s"
+msgstr "Modifica gli Hna di %(node)s"
 
-msgid "Edit Hna4 of \"%(node)s\""
-msgstr "Modifica Hna4 di \"%(node)s\""
+msgid "Edit Hna of \"%(node)s\""
+msgstr "Modifica Hna di \"%(node)s\""
 
 msgid "Edit Interfaces for node %(node)s"
 msgstr "Modifica le interfacce del nodo %(node)s"
@@ -247,8 +247,8 @@ msgstr "Modifica interfacce di \"%(node)s\""
 msgid "Edit devices of \"%(node)s\""
 msgstr "Modifica gli apparati di \"%(node)s\""
 
-msgid "Edit hna4 of this device"
-msgstr "Modifica hna4 di questo apparato"
+msgid "Edit hna of this device"
+msgstr "Modifica hna di questo apparato"
 
 msgid "Edit interfaces of this device"
 msgstr "Modifica le interfacce di questo apparato"
@@ -291,11 +291,11 @@ msgstr ""
 msgid "Go Back"
 msgstr "Torna Indietro"
 
-msgid "HNA4"
-msgstr "HNA4"
+msgid "Hna"
+msgstr "Hna"
 
-msgid "HNA4 Route"
-msgstr "HNA4 Route"
+msgid "Hna Route"
+msgstr "Hna Route"
 
 msgid "Help"
 msgstr "Aiuto"
@@ -309,11 +309,8 @@ msgstr "Nascondi questa colonna"
 msgid "His email can be deleted here:"
 msgstr "La sua email può essere cancellata dal seguente link"
 
-msgid "Hna4"
-msgstr "Hna4"
-
-msgid "Hna4 route"
-msgstr "Hna4 route"
+msgid "Hna route"
+msgstr "Hna route"
 
 msgid "Hotspot"
 msgstr "Hotspot"
@@ -685,8 +682,8 @@ msgstr "La destinazione selezionata non è valida."
 msgid "The two password fields didn't match."
 msgstr "I due campi password non corrispondono."
 
-msgid "There are no announced Hna4 for this device yet."
-msgstr "Non ci sono ancora Hna4 annunciati per questo device."
+msgid "There are no announced Hna for this device yet."
+msgstr "Non ci sono ancora Hna annunciati per questo device."
 
 msgid "There are no devices for this node yet."
 msgstr "Non ci sono apparati per questo nodo."
@@ -966,3 +963,6 @@ msgstr "La pagina che cercavi non è stata trovata su questo sito web."
 
 msgid "Draw links from/to this interface (not valid for VPN interfaces)"
 msgstr "Disegna link da/a questa interfaccia (escluse interfacce VPN)"
+
+msgid "Hide from map"
+msgstr "Nascondi dalla mappa"
