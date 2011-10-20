@@ -101,7 +101,7 @@ class InterfaceAdmin(admin.ModelAdmin):
     list_filter   = ('type', 'status', 'wireless_mode', 'wireless_polarity', 'wireless_channel')
     list_select_related = True
     save_on_top = True
-    search_fields = ('ipv4_address', 'ipv6_address', 'mac_address', 'ssid')
+    search_fields = ('ipv4_address', 'ipv6_address', 'mac_address', 'bssid', 'essid')
     
 class StatisticAdmin(admin.ModelAdmin):
     list_display  = ('date', 'active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
