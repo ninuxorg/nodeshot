@@ -13,7 +13,7 @@
             <tbody> 
                 {% for device in devices %}
                 <tr class="{{device.node.slug }}"> 
-                    <td><div class="status-{{ device.status }}">{{ device.status }}</div></td> 
+                    <td><div class="status-{{ device.status }}">{{ device.status }}</div><span style="display: none">{{ device.status }}</span></td> 
                     <td>{{ device.name }} ({{ device.node.name }}) </td> 
                     <td>{{ device.device_type }}</td> 
                     <td>{% for ip in device.ips %} {{ip}} <br /> {% endfor %}</td> 
