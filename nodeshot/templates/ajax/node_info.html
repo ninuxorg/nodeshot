@@ -21,9 +21,11 @@
                 <td class="key">{% trans 'In charge' %}:</td><td class="value">{{ node.owner }}</td>
             </tr>
             {% endif %}
+            {% if node.postal_code %}    
             <tr>
                 <td class="key">{% trans 'Postal code' %}:</td><td class="value">{{ node.postal_code }}</td>
             </tr>
+            {% endif %}
             <tr>
                 <td class="key">{% trans 'Latitude' %}:</td><td class="value">{{ node.lat }}</td>
             </tr>
