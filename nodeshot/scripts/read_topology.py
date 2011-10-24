@@ -8,7 +8,7 @@ parent = os.path.abspath(os.path.join(directory, os.path.pardir, os.path.pardir)
 sys.path.append(parent)
 
 import settings
-from django.core.management import setup_environ 
+from django.core.management import setup_environ
 setup_environ(settings)
 __builtins__.IS_SCRIPT = True
 from nodeshot.models import *
@@ -31,11 +31,11 @@ class AliasManager(object):
             # all aliases of the same ip share the same unique id, stored as value of aliasdict.
             if self.aliasdict.has_key(ip):
                     # if we already have this ip, use the same id for the alias
-                    ipid = self.aliasdict[ip] 
+                    ipid = self.aliasdict[ip]
                     self.aliasdict.update({alias: ipid})
             elif self.aliasdict.has_key(alias):
                     # if we already have this alias, use the same id for the ip
-                    ipid = self.aliasdict[alias] 
+                    ipid = self.aliasdict[alias]
                     self.aliasdict.update({ip: ipid})
             else:
                     # if a link already exists, update
@@ -45,7 +45,7 @@ class AliasManager(object):
                     self.aliasdict.update({ip: newid, alias: newid})
         def getIdFromIP(self, ip):
             if self.aliasdict.has_key(ip):
-                return self.aliasdict[ip] 
+                return self.aliasdict[ip]
             else:
                 return 666
         def getAliasesFromIP(self, ipaddr):
@@ -63,7 +63,7 @@ class TopologyParser(object):
             print ("Retrieving topology...")
             try:
                 self.topologylines = urllib2.urlopen(TOPOLOGY_URL).readlines()
-            except Exception as e:
+            except Exception, e:
                 print "Got exception: ", e
             print ("Done...")
             self.linklist = list()
@@ -88,7 +88,7 @@ class TopologyParser(object):
                         pass
                 i+=1
                 line = self.topologylines[i]
-            
+
             # parse MID info
             print ("Parsing MID Information...")
             while line.find('Table: MID') == -1:
@@ -102,7 +102,7 @@ class TopologyParser(object):
                         ipaddr, alias = line.split()
                         self.aliasmanager.addalias(ipaddr, alias)
                 except ValueError:
-                        pass 
+                        pass
                 i+=1
                 line = self.topologylines[i]
 
@@ -133,7 +133,7 @@ class TopologyParser(object):
                 if self.linkdict.has_key(k):
                     etx0 = self.linkdict[k][2]
                     etxx = (etx0 + etx) * 0.5 # average
-                    self.linkdict.update({k: (iplist1, iplist2, etxx)} ) 
+                    self.linkdict.update({k: (iplist1, iplist2, etxx)} )
                 else:
                     self.linkdict.update({k: (iplist1, iplist2, etx)} )
 
@@ -146,7 +146,7 @@ if __name__ == "__main__":
         tp.parse()
         tp.process()
         values = tp.linkdict.values()
-    except Exception as e:
+    except Exception, e:
         print "Got exception: ", e
         values = False
     old_links = dict([ (l.id, False) for l in Link.objects.all()])
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     for topology_url in TOPOLOGY_URLS:
         try:
             topologylines = urllib2.urlopen(topology_url).readlines()
-        except Exception as e:
+        except Exception, e:
             print "Got exception: ", e
         for line in topologylines:
             row_elements = line.split()
@@ -234,4 +234,3 @@ if __name__ == "__main__":
         if not v:
             Link.objects.get(id=l).delete()
             print "Deleted link %d" % l
-        
