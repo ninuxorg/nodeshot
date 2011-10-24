@@ -179,7 +179,10 @@ if __name__ == "__main__":
                             print fi, to
     # BATMAN
     for topology_url in TOPOLOGY_URLS:
-        topologylines = urllib2.urlopen(topology_url).readlines()
+        try:
+            topologylines = urllib2.urlopen(topology_url).readlines()
+        except Exception as e:
+            print "Got exception: ", e
         for line in topologylines:
             row_elements = line.split()
             if len(row_elements) == 5:
