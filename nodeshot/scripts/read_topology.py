@@ -61,7 +61,10 @@ class AliasManager(object):
 class TopologyParser(object):
         def __init__(self, topology_url):
             print ("Retrieving topology...")
-            self.topologylines = urllib2.urlopen(TOPOLOGY_URL).readlines()
+            try:
+                self.topologylines = urllib2.urlopen(TOPOLOGY_URL).readlines()
+            except Exception, e:
+                print "Got exception: ", e
             print ("Done...")
             self.linklist = list()
             self.aliasmanager = AliasManager()
@@ -138,48 +141,57 @@ class TopologyParser(object):
 if __name__ == "__main__":
     #Link.objects.all().delete()
     TOPOLOGY_URL="http://127.0.0.1:2006/all"
-    tp = TopologyParser(TOPOLOGY_URL)
-    tp.parse()
-    tp.process()
+    try:
+        tp = TopologyParser(TOPOLOGY_URL)
+        tp.parse()
+        tp.process()
+        values = tp.linkdict.values()
+    except Exception, e:
+        print "Got exception: ", e
+        values = False
     old_links = dict([ (l.id, False) for l in Link.objects.all()])
     #print tp.linkdict
-    for v in tp.linkdict.values():
-        ipsA, ipsB, etx = v
-        found = False
-        if len(ipsA) <= 0 and len(ipsB) <=0:
-            continue
-        for a in range(0,len(ipsA)):
-            for b in range(0,len(ipsB)):
-                if not found:
-                    ipA, ipB = ipsA[a], ipsB[b]
-                    saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
-                    if saved_links.count() > 0:
-                        # if a link already exists, update
-                        l = saved_links[0]
-                        if not l.from_interface.draw_link or not l.to_interface.draw_link:
-                            continue
-                        l.etx = etx
-                        l.save()
-                        old_links[l.id] = True
-                        found = True
-                        print "Updated link: %s" % l
-                    else:
-                        # otherwise create a new link
-                        fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn').exclude(draw_link=False)
-                        to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn').exclude(draw_link=False)
-                        if fi.count() == 1 and to.count() == 1:
-                          # create a link if the neighbors are NOT on the same node
-                          #print fi, fi.get().id, to, to.get().id
-                          if fi.get().device.node != to.get().device.node:
-                            l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
-                            print "Saved new link: %s" % l
+    if values:
+        for v in values:
+            ipsA, ipsB, etx = v
+            found = False
+            if len(ipsA) <= 0 and len(ipsB) <=0:
+                continue
+            for a in range(0,len(ipsA)):
+                for b in range(0,len(ipsB)):
+                    if not found:
+                        ipA, ipB = ipsA[a], ipsB[b]
+                        saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
+                        if saved_links.count() > 0:
+                            # if a link already exists, update
+                            l = saved_links[0]
+                            if not l.from_interface.draw_link or not l.to_interface.draw_link:
+                                continue
+                            l.etx = etx
+                            l.save()
+                            old_links[l.id] = True
                             found = True
-                        elif fi.count() > 1 or to.count() >1:
-                            print "Anomaly: More than one interface for ip address"
-                            print fi, to
+                            print "Updated link: %s" % l
+                        else:
+                            # otherwise create a new link
+                            fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn').exclude(draw_link=False)
+                            to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn').exclude(draw_link=False)
+                            if fi.count() == 1 and to.count() == 1:
+                              # create a link if the neighbors are NOT on the same node
+                              #print fi, fi.get().id, to, to.get().id
+                              if fi.get().device.node != to.get().device.node:
+                                l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
+                                print "Saved new link: %s" % l
+                                found = True
+                            elif fi.count() > 1 or to.count() >1:
+                                print "Anomaly: More than one interface for ip address"
+                                print fi, to
     # BATMAN
     for topology_url in TOPOLOGY_URLS:
-        topologylines = urllib2.urlopen(topology_url).readlines()
+        try:
+            topologylines = urllib2.urlopen(topology_url).readlines()
+        except Exception, e:
+            print "Got exception: ", e
         for line in topologylines:
             row_elements = line.split()
             if len(row_elements) == 5:
