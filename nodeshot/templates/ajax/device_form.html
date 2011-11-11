@@ -36,6 +36,16 @@
         </div>
         
         <div class="field-wrapper">
+            <label for="id_devices-{{ forloop.counter0 }}-cname">{% trans 'CNAME for DNS resolution (leave empty to get a default value)' %}: </label>
+            {% if form.cname.errors %}
+                <div class="ui-state-error">
+                    {{ form.cname.errors }}
+                </div>
+            {% endif %}
+            {{ form.cname }}
+        </div>
+        
+        <div class="field-wrapper">
             <label for="id_devices-{{ forloop.counter0 }}-description">{% trans 'Description' %}:</label>
             {% if form.description.errors %}
                 <div class="ui-state-error">

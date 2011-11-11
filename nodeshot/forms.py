@@ -3,6 +3,7 @@ from django.conf import settings
 from django.forms.models import inlineformset_factory
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.forms.models import BaseInlineFormSet
 from settings import DEBUG
 
 # base NodeForm class
@@ -129,10 +130,52 @@ class AdminPasswordChangeForm(forms.Form):
         if commit:
             self.node.save()
         return self.node
+
+# admin
+class DeviceForm(forms.ModelForm):
+    class Meta:
+        model = Device
+
+    def clean_cname(self):
+        """
+        Empty cname defaults to slugify(name)
+        """
+        cname = self.cleaned_data.get('cname', False)
+        name = self.cleaned_data.get('name', False)
+        if not cname or cname == '':
+            cname = slugify(name)
+        return cname
     
+# frontend
+class DeviceInlineFormset(BaseInlineFormSet):
+    def clean(self):
+        for form in self.forms:
+            def clean_cname(self):
+                """
+                This does not really work and I can't understand the reason.
+                The default value for cname is set by the model's overwritten save() method.
+                This is necessary to avoid the validation error about the field not being unique if CNAME left empty
+                by Nemesis
+                """
+                cname = self.cleaned_data.get('cname', False)
+                name = self.cleaned_data.get('name', False)
+                if not cname or cname == '':
+                    cname = slugify(name)
+                return cname
+
+# admin
 class InterfaceForm(forms.ModelForm):
     class Meta:
         model = Interface
+        
+    def clean_cname(self):
+        """
+        Empty cname defaults to interface type
+        """
+        cname = self.cleaned_data.get('cname', False)
+        if not cname or cname == '':
+            cname = self.cleaned_data.get('type')
+        return cname
 
     def clean_ipv4_address(self):
         """
@@ -151,12 +194,12 @@ class InterfaceForm(forms.ModelForm):
         Return None instead of empty string
         """
         return self.cleaned_data.get('mac_address') or None
-        
-from django.forms.models import BaseInlineFormSet
 
+# frontend
 class InterfaceInlineFormset(BaseInlineFormSet):    
     def clean(self):
         for form in self.forms:
+                
             def clean_ipv4_address(self):
                 """
                 Return None instead of empty string
@@ -174,9 +217,6 @@ class InterfaceInlineFormset(BaseInlineFormSet):
                 Return None instead of empty string
                 """
                 return self.cleaned_data.get('mac_address') or None
-            #raise forms.ValidationError("Test")
-            # your custom formset validation
-            #pass
     
 from math_captcha import MathCaptchaModelForm
 

@@ -34,6 +34,7 @@ SHOW_ADMIN_LINK = FRONTEND_SETTINGS.get('SHOW_ADMIN_LINK', True)
 TAB3 = FRONTEND_SETTINGS.get('TAB3', 'OLSR')
 TAB4 = FRONTEND_SETTINGS.get('TAB4', 'VPN')
 WELCOME_TEXT = FRONTEND_SETTINGS.get('WELCOME_TEXT', _('Welcome to Nodeshot!'))
+LINK_QUALITY = FRONTEND_SETTINGS.get('LINK_QUALITY', 'etx')
 del FRONTEND_SETTINGS
 
 # this setting must be set to True by scripts in nodeshot/scripts/

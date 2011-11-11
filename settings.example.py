@@ -176,7 +176,8 @@ NODESHOT_FRONTEND_SETTINGS = {
     'SHOW_ADMIN_LINK': True,
     'TAB3': 'OLSR',
     'TAB4': 'VPN',
-    'WELCOME_TEXT': _('Welcome to Nodeshot!')
+    'WELCOME_TEXT': _('Welcome to Nodeshot!'),
+    'LINK_QUALITY': 'etx' # dbm, etx
 }
 
 EMAIL_USE_TLS = True

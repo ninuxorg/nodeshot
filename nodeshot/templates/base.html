@@ -60,8 +60,8 @@
                         <div id="link-quality" class="maponly">
                             {% trans 'Link quality calculation' %}:
                             <ul>
-                                <li><input type="radio" id="etx" name="link-quality-selector" value="etx" checked="checked" /> <label for="etx">{% trans 'Lost packets (ETX)' %}</label></li>
-                                <li id="dbmli"><input type="radio" id="dbm" name="link-quality-selector" value="dbm" /> <label for="dbm">{% trans 'Received signal (DBm)' %}</label></li>
+                                <li><input type="radio" id="etx" name="link-quality-selector" value="etx" {% if settings.LINK_QUALITY == 'etx' %}checked="checked"{% endif %} /> <label for="etx">{% trans 'Lost packets (ETX)' %}</label></li>
+                                <li id="dbmli"><input type="radio" id="dbm" name="link-quality-selector" value="dbm" {% if settings.LINK_QUALITY == 'dbm' %}checked="checked"{% endif %} /> <label for="dbm">{% trans 'Received signal (DBm)' %}</label></li>
                             </ul>
                         </div>
                     </div>

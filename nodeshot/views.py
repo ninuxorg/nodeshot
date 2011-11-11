@@ -67,6 +67,7 @@ def index(request, slug=False):
             'TAB3': TAB3,
             'TAB4': TAB4,
             'WELCOME_TEXT': WELCOME_TEXT,
+            'LINK_QUALITY': LINK_QUALITY
         },
         'DEBUG': DEBUG
     }
@@ -112,15 +113,6 @@ def nodes(request):
         }
         # append/push result into list
         links.append(entry)
-        
-    ## prepare data for json serialization
-    ## list() evaluates a queryset
-    #data = {
-    #    'hotspot': list(hotspot),
-    #    'active': list(active),
-    #    'potential': list(potential),
-    #    'links': links
-    #}
     
     #prepare data for json serialization
     active_nodes, hotspot_nodes, potential_nodes = {}, {}, {}
@@ -694,18 +686,18 @@ def device_form(request, node_id, password):
         raise Http404
     
     # init inlineformset_factory
-    DeviceInlineFormSet = inlineformset_factory(Node, Device, extra=1)
+    modelFormSet = inlineformset_factory(Node, Device, formset=DeviceInlineFormset, extra=1)
     
     # default value for "saved" and "error" variables
     saved = False
     error = False
     # init formset
-    formset = DeviceInlineFormSet(instance=node, prefix='devices')
+    formset = modelFormSet(instance=node, prefix='devices')
     
     # if form has been submitted
     if request.method == "POST":
         # populate
-        formset = DeviceInlineFormSet(request.POST, instance=node, prefix='devices')
+        formset = modelFormSet(request.POST, instance=node, prefix='devices')
         # if form is valid
         if formset.is_valid():
             # print a nice message in the template
@@ -713,7 +705,7 @@ def device_form(request, node_id, password):
             # loop through devices
             formset.save()
             # reset formset with new saved values
-            formset = DeviceInlineFormSet(instance=node, prefix='devices')
+            formset = modelFormSet(instance=node, prefix='devices')
         else:
             # print a nice message in the template
             error = True
@@ -774,7 +766,7 @@ def configuration(request, node_id, password, type):
             # if this cycle has the device we submitted
             formset = modelFormSet(request.POST, instance=device, prefix='%s%s'%(type,i))
             if formset.is_valid():
-                # loop through devices
+                # save
                 formset.save()
                 # reload formset so it will show changes
                 formset = modelFormSet(instance=device, prefix='%s%s'%(type,i))
@@ -788,7 +780,7 @@ def configuration(request, node_id, password, type):
         # if no errors
         if not error:
             # print a nice message in the template
-            saved = True
+            saved = True    
     else:
         # just load initial data
         for device in devices:

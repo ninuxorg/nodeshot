@@ -258,6 +258,8 @@ class Node(models.Model):
 
 class Device(models.Model):
     name = models.CharField(_('name'), max_length=50, unique=True)
+    # TODO: add translation
+    cname = models.SlugField(_('CNAME'), help_text=_('Name used for DNS resolution. Example: grid1 becomes grid1.nodename.domain.org. If left empty device name is used as default.'), max_length=30, blank=True, null=True)
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
     type = models.CharField(_('type'), max_length=50, blank=True, null=True) 
     node = models.ForeignKey(Node, verbose_name=_('node'))
@@ -266,10 +268,20 @@ class Device(models.Model):
     added = models.DateTimeField(_('added on'), auto_now_add=True)
     updated = models.DateTimeField(_('updated on'), auto_now=True)
     
+    def save(self):
+        """
+        defaults CNAME to slugify(name)
+        this is needed for the frontend. Backend is taken care by forms.py
+        """
+        if not self.cname or self.cname == '':
+            self.cname = slugify(self.name)
+        super(Device, self).save()
+    
     def __unicode__(self):
         return self.name
     
     class Meta:
+        unique_together = (('node', 'cname'),)
         verbose_name = _('Device')
         verbose_name_plural = _('Devices')
 
@@ -289,6 +301,8 @@ class Interface(models.Model):
     ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, unique=True, default=None)
     mac_address = models.CharField(max_length=17, blank=True, null=True, unique=True, default=None)
     type = models.CharField(max_length=10, choices=INTERFACE_TYPE)
+    # TODO: add translation
+    cname = models.SlugField(_('cname'), help_text=_('Name used for DNS resolution. Example: eth0 becomes eth0.devicecname.nodename.domain.org. If left empty the interface type is used as default.'), max_length=30, blank=True, null=True)
     device = models.ForeignKey(Device)
     draw_link = models.BooleanField(_('Draw links'), help_text=_('Draw links from/to this interface (not valid for VPN interfaces)'), default=True, blank=True)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
@@ -317,8 +331,47 @@ class Interface(models.Model):
         """
         if not (self.ipv4_address or self.ipv6_address or self.mac_address):
             raise ValidationError(_('At least one of the following field is necessary: IPv4, IPv6 or Mac address.'))
+        
+        # double check needed - don't know why
+        if self.mac_address == '':
+            self.mac_address = None
+        
+        if self.ipv4_address == '':
+            self.ipv4_address = None
+            
+        if self.ipv6_address == '':
+            self.ipv6_address = None
+            
+    def save(self):
+        """
+        defaults CNAME to interface type (eth, wifi, ecc.)
+        this is needed for the frontend. Backend is taken care by forms.py
+        """
+        # if cname hasn't been filled
+        if not self.cname or self.cname == '':
+            # try to default to interface type
+            try:
+                self.cname = self.type
+                super(Interface, self).save()
+            # if there's another interface with same type we'll get an exception that we are catching now
+            except:
+                # add a number to the cname
+                i = 2
+                # loop until we find a number which won't cause the error. Example: eth2, eth3, eth4
+                while True:
+                    self.cname = '%s%s' % (self.type, i)
+                    try:
+                        # try to save
+                        super(Interface, self).save()
+                        break
+                    except:
+                        # if still getting error increment and retry
+                        i = i+1
+        else:
+            super(Interface, self).save()
     
     class Meta:
+        unique_together = (('device', 'cname'),)
         verbose_name = _('Interface')
         verbose_name_plural = _('Interfaces')
 

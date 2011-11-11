@@ -12,9 +12,59 @@ from django.template import RequestContext
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.html import escape
 
+from nodeshot.forms import InterfaceForm, DeviceForm
+
 class DeviceInline(admin.TabularInline):
+    form = DeviceForm
     model = Device
     extra = 0
+
+class InterfaceInline(admin.StackedInline):
+    form = InterfaceForm
+    model = Interface
+    extra = 0
+
+class HnaInline(admin.TabularInline):
+    model = Hna
+    extra = 0
+
+class DeviceAdmin(admin.ModelAdmin):
+    form = DeviceForm
+    list_display  = ('name', 'node', 'type', 'added', 'updated')
+    list_filter   = ('added', 'updated', 'node')
+    search_fields = ('name', 'type')
+    save_on_top = True
+    date_hierarchy = 'added'
+    inlines = [InterfaceInline, HnaInline]
+    
+class InterfaceAdmin(admin.ModelAdmin):
+    form = InterfaceForm
+    list_display  = ('__unicode__', 'type', 'device', 'added', 'updated')
+    list_filter   = ('type', 'status', 'wireless_mode', 'wireless_polarity', 'wireless_channel')
+    list_select_related = True
+    save_on_top = True
+    search_fields = ('ipv4_address', 'ipv6_address', 'mac_address', 'bssid', 'essid')
+    
+class StatisticAdmin(admin.ModelAdmin):
+    list_display  = ('date', 'active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
+    ordering = ('-id',)
+    date_hierarchy = 'date'
+    readonly_fields = ('active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
+    actions = None
+    
+class ContactAdmin(admin.ModelAdmin):
+    list_display  = ('from_name', 'from_email', 'node', 'date')
+    ordering = ('-id',)
+    date_hierarchy = 'date'
+    readonly_fields = ('from_name', 'from_email', 'message', 'ip', 'user_agent', 'http_referer', 'accept_language')
+    actions = None
+    
+class LinkAdmin(admin.ModelAdmin):
+    list_select_related = True
+    #list_display  = ('from_interface', 'to_interface')
+    #ordering = ('-id',)
+    #actions = []
+    #actions = None
 
 class NodeAdmin(admin.ModelAdmin):
     list_display  = ('name', 'owner', 'status', 'added', 'updated')
@@ -75,54 +125,6 @@ class NodeAdmin(admin.ModelAdmin):
             'show_save': True,
             #'root_path': self.admin_site.root_path,
         }, context_instance=RequestContext(request))
-        
-from nodeshot.forms import InterfaceForm
-
-class InterfaceInline(admin.TabularInline):
-    form = InterfaceForm
-    model = Interface
-    extra = 0
-
-class HnaInline(admin.TabularInline):
-    model = Hna
-    extra = 0
-
-class DeviceAdmin(admin.ModelAdmin):
-    list_display  = ('name', 'node', 'type', 'added', 'updated')
-    list_filter   = ('added', 'updated', 'node')
-    search_fields = ('name', 'type')
-    save_on_top = True
-    date_hierarchy = 'added'
-    inlines = [InterfaceInline, HnaInline]
-    
-class InterfaceAdmin(admin.ModelAdmin):
-    form = InterfaceForm
-    list_display  = ('__unicode__', 'type', 'device', 'added', 'updated')
-    list_filter   = ('type', 'status', 'wireless_mode', 'wireless_polarity', 'wireless_channel')
-    list_select_related = True
-    save_on_top = True
-    search_fields = ('ipv4_address', 'ipv6_address', 'mac_address', 'bssid', 'essid')
-    
-class StatisticAdmin(admin.ModelAdmin):
-    list_display  = ('date', 'active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
-    ordering = ('-id',)
-    date_hierarchy = 'date'
-    readonly_fields = ('active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
-    actions = None
-    
-class ContactAdmin(admin.ModelAdmin):
-    list_display  = ('from_name', 'from_email', 'node', 'date')
-    ordering = ('-id',)
-    date_hierarchy = 'date'
-    readonly_fields = ('from_name', 'from_email', 'message', 'ip', 'user_agent', 'http_referer', 'accept_language')
-    actions = None
-    
-class LinkAdmin(admin.ModelAdmin):
-    list_select_related = True
-    #list_display  = ('from_interface', 'to_interface')
-    #ordering = ('-id',)
-    #actions = []
-    #actions = None
 
 admin.site.register(Node, NodeAdmin)
 admin.site.register(Device, DeviceAdmin)
