@@ -45,9 +45,12 @@ class AliasManager(object):
                     self.aliasdict.update({ip: newid, alias: newid})
         def getIdFromIP(self, ip):
             if self.aliasdict.has_key(ip):
-                return self.aliasdict[ip]
+                    return self.aliasdict[ip]
             else:
-                return 666
+                    self.idcounter -= 1
+                    newid = self.idcounter
+                    self.aliasdict.update({ip: newid})
+                    return newid
         def getAliasesFromIP(self, ipaddr):
             id = self.getIdFromIP(ipaddr)
             r = [ip for ip in self.aliasdict.keys() if self.aliasdict[ip] == id]
@@ -234,3 +237,4 @@ if __name__ == "__main__":
         if not v:
             Link.objects.get(id=l).delete()
             print "Deleted link %d" % l
+
