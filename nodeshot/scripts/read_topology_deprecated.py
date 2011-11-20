@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# DEPRECATED!!! DO NOT USE!!
+# use read_topology_hna.py instead
 
 import urllib2, sys, os
 
