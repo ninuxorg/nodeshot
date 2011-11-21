@@ -43,6 +43,7 @@ def email_owners(node, subject, body_template, context, reply_to=False):
     if node.email3 != '' and node.email3 != None:
         recipient_list += [node.email3]
         
+    #try:
     # send mail
     if reply_to:
         from django.core.mail import EmailMessage
@@ -51,6 +52,10 @@ def email_owners(node, subject, body_template, context, reply_to=False):
     else:
         from django.core.mail import send_mail
         send_mail(subject, message, DEFAULT_FROM_EMAIL, recipient_list)
+    #except:
+        # smtp is offline
+        # TODO: return a nice message to the user
+        #pass
     
 def notify_admins(node, subject, body_template, context, skip=False):
     """
@@ -75,8 +80,13 @@ def notify_admins(node, subject, body_template, context, skip=False):
             context['admin'] = admin
             # parse message
             message = render_to_string(body_template,context)
-            # send email
-            admin.email_user(subject, message)
+            try:
+                # send email
+                admin.email_user(subject, message)
+            except:
+                # smtp is offline
+                # TODO: maybe this case should be logged?
+                pass
 
 def jslugify(slug):
     """

@@ -966,3 +966,9 @@ msgstr "Disegna link da/a questa interfaccia (escluse interfacce VPN)"
 
 msgid "Hide from map"
 msgstr "Nascondi dalla mappa"
+
+msgid "Name used for DNS resolution. Example: eth0 becomes eth0.devicecname.nodename.domain.org. If left empty the interface type is used as default."
+msgstr "Nome usato per la risoluzione DNS. Esempio: eth0 diventa eth0.nomeapparato.nomenodo.dominio.org. Se lasciato vuoto viene utilizzato il tipo interfaccia come default."
+
+msgid "Name used for DNS resolution. Example: grid1 becomes grid1.nodename.domain.org. If left empty device name is used as default."
+msgstr "Nome usato per la risoluzione DNS. Esempio: grid1 diventa grid1.nomenodo.dominio.org. Se lasciato vuoto viene utilizzato il nome dell'apparato come valore di default."
