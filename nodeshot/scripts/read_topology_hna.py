@@ -106,7 +106,7 @@ class TopologyParser(object):
                 while not line.isspace():
                     try:
                             hna, announcer = line.split()
-                            self.hnalist.update((announcer, hna))
+                            self.hnalist.append((announcer, hna))
                     except ValueError:
                             pass
                     i+=1
