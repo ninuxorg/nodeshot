@@ -93,33 +93,40 @@ class TopologyParser(object):
                 i+=1
                 line = self.topologylines[i]
 
+            j = i
             # parse HNA info
             print ("Parsing HNA Information...")
-            while line.find('Table: HNA') == -1:
+            while i < self.topologylines and line.find('Table: HNA') == -1:
                 i += 1
                 line = self.topologylines[i]
 
-            i += 1 # skip the heading line
-            line = self.topologylines[i]
-            while not line.isspace():
-                try:
-                        hna, announcer = line.split()
-                        self.hnalist.update((announcer, hna))
-                except ValueError:
-                        pass
-                i+=1
+            if i < self.topologylines:
+                i += 1 # skip the heading line
                 line = self.topologylines[i]
+                while not line.isspace():
+                    try:
+                            hna, announcer = line.split()
+                            self.hnalist.update((announcer, hna))
+                    except ValueError:
+                            pass
+                    i+=1
+                    line = self.topologylines[i]
+            else:
+                i = j
 
 
             # parse MID info
             print ("Parsing MID Information...")
-            while line.find('Table: MID') == -1:
+            while i < self.topologylines and line.find('Table: MID') == -1:
                 i += 1
                 line = self.topologylines[i]
 
+            if i >= self.topologylines:
+                return
+
             i += 1 # skip the heading line
             line = self.topologylines[i]
-            while not line.isspace():
+            while i < self.topologylines and not line.isspace():
                 try:
                         ipaddr, alias = line.split()
                         self.aliasmanager.addalias(ipaddr, alias)
