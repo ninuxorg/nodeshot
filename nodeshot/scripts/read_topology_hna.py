@@ -71,7 +71,7 @@ class TopologyParser(object):
             print ("Done...")
             self.linklist = list()
             self.aliasmanager = AliasManager()
-            self.hnadict = dict()
+            self.hnalist = list()
         def parse(self):
             "parse the txtinfo plugin output and make two lists: a link list and an alias (MID) list"
             # parse Topology info
@@ -104,7 +104,7 @@ class TopologyParser(object):
             while not line.isspace():
                 try:
                         hna, announcer = line.split()
-                        self.hnadict.update({announcer: hna})
+                        self.hnalist.update((announcer, hna))
                 except ValueError:
                         pass
                 i+=1
@@ -160,7 +160,7 @@ class TopologyParser(object):
                     self.linkdict.update({k: (iplist1, iplist2, etx)} )
 
             self.hnainfo = list()
-            for ipaddress, hna in self.hnadict.iteritems():
+            for ipaddress, hna in self.hnalist:
                 iplist = self.aliasmanager.getAliasesFromIP(ipaddress)
                 self.hnainfo.append( (iplist, hna) )
 
@@ -220,7 +220,6 @@ if __name__ == "__main__":
                                 print "Anomaly: More than one interface for ip address"
                                 print fi, to
     # record hnas
-    #old_hnas = Hna.objects.all()
     old_hnas = dict([ (h.id, False) for h in Hna.objects.all()])
 
     for ips,hna in hnas:
