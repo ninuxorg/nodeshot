@@ -141,8 +141,8 @@ class SNMPBugger(threading.Thread):
                                 l = Link.objects.get(from_interface = link_to, to_interface = link_from)
                                 l.dbm = s 
                                 l.save()
-                            else:
-                                Link(from_interface = link_from, to_interface = link_to, dbm = s).save()
+                            #else:
+                            #    Link(from_interface = link_from, to_interface = link_to, dbm = s).save()
                         else:
                             print "<-> Can not find an interface with mac %s" % m
 
@@ -195,8 +195,8 @@ class SNMPBugger(threading.Thread):
                 # don't change node status
                 #node.status = 'd'
                 
-            if node:
-                node.save() #save
+            #if node:
+            #    node.save() #save
 
 def main():
     for i in Interface.objects.all():
