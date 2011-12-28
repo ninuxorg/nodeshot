@@ -2,7 +2,7 @@ from django import forms
 from fields import MathField
 from util import encode, decode
 import settings
-
+from django.utils.translation import ugettext_lazy as _
 
 class NullWidget(forms.widgets.HiddenInput):
     def render(self, *a, **kw):
@@ -27,9 +27,9 @@ def math_clean(form):
     
     if encode(question) != form.cleaned_data['math_captcha_question']:
         # security problem, hack attempt
-        raise forms.ValidationError('Invalid token')
+        raise forms.ValidationError(_('Invalid token'))
     if eval(question) != value:
-        raise forms.ValidationError('Wrong answer, try again')
+        raise forms.ValidationError(_('Wrong answer, try again'))
         
 
 class MathCaptchaModelForm(forms.ModelForm):

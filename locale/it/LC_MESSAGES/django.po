@@ -972,3 +972,12 @@ msgstr "Nome usato per la risoluzione DNS. Esempio: eth0 diventa eth0.nomeappara
 
 msgid "Name used for DNS resolution. Example: grid1 becomes grid1.nodename.domain.org. If left empty device name is used as default."
 msgstr "Nome usato per la risoluzione DNS. Esempio: grid1 diventa grid1.nomenodo.dominio.org. Se lasciato vuoto viene utilizzato il nome dell'apparato come valore di default."
+
+msgid "Wrong answer, try again"
+msgstr "Risposta antispam sbagliata, controlla in fondo."
+
+msgid "Invalid token"
+msgstr "Token non valido"
+
+msgid "CNAME for DNS resolution (leave empty to get a default value)"
+msgstr "CNAME per la risoluzione DNS (lasciando vuoto si ottiene il valore di default)"

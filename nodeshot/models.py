@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from nodeshot.utils import notify_admins, email_owners
 from django.core.exceptions import ValidationError
+from django.db.models import permalink
 
 # for UserProfile
 from django.contrib.auth.models import User
@@ -255,6 +256,10 @@ class Node(models.Model):
     class Meta:
         verbose_name = _('Node')
         verbose_name_plural = _('Nodes')
+        
+    @permalink
+    def get_absolute_url(self):
+        return('nodeshot_select', None, {'slug': self.slug})
 
 class Device(models.Model):
     name = models.CharField(_('name'), max_length=50, unique=True)
@@ -284,6 +289,10 @@ class Device(models.Model):
         unique_together = (('node', 'cname'),)
         verbose_name = _('Device')
         verbose_name_plural = _('Devices')
+        
+    @permalink
+    def get_absolute_url(self):
+        return('nodeshot_select', None, {'slug': self.node.slug})
 
 class Hna(models.Model):
     device = models.ForeignKey(Device)
@@ -369,6 +378,10 @@ class Interface(models.Model):
                         i = i+1
         else:
             super(Interface, self).save()
+            
+    @permalink
+    def get_absolute_url(self):
+        return('nodeshot_select', None, {'slug': self.device.node.slug})
     
     class Meta:
         unique_together = (('device', 'cname'),)
