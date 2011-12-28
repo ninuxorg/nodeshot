@@ -36,6 +36,7 @@ class DeviceAdmin(admin.ModelAdmin):
     save_on_top = True
     date_hierarchy = 'added'
     inlines = [InterfaceInline, HnaInline]
+    ordering = ('-id',)
     
 class InterfaceAdmin(admin.ModelAdmin):
     form = InterfaceForm
@@ -44,6 +45,7 @@ class InterfaceAdmin(admin.ModelAdmin):
     list_select_related = True
     save_on_top = True
     search_fields = ('ipv4_address', 'ipv6_address', 'mac_address', 'bssid', 'essid')
+    ordering = ('-id',)
     
 class StatisticAdmin(admin.ModelAdmin):
     list_display  = ('date', 'active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')

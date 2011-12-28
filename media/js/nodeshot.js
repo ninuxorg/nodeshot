@@ -1753,7 +1753,7 @@ var nodeshot = {
             var opacity = 0.5;
             // if link color is yellow increase opacity
             if(quality==2){
-                opacity = 0.9;
+                opacity = 0.7;
             }
             // if link color is red decrease opacity
             else if(quality==3){
