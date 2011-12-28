@@ -32,21 +32,40 @@ oids = {'device_name': {'oid': (1,3,6,1,2,1,1,5,0), 'query_type': 'get',  'pos' 
 def get_mac(ip, i_type):
     'return the wifi mac of the device, else None'
     global community
+    transport = cmdgen.UdpTransportTarget((ip, 161))
+    oid_mac = None
     if i_type == "wifi" or i_type == "w": #db is dirty, both wifi and w occurrence
-        oid_mac = 1,3,6,1,2,1,2,2,1,6,7 # mac of ath0 
+        try:
+            if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,6)  )[3][0][1] == "ath0":
+                oid_mac = 1,3,6,1,2,1,2,2,1,6,6 # mac of ath0 
+            elif cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,7)  )[3][0][1] == "ath0":
+                oid_mac = 1,3,6,1,2,1,2,2,1,6,7 # mac of ath0
+            elif cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,8)  )[3][0][1] == "ath0":
+                oid_mac = 1,3,6,1,2,1,2,2,1,6,8 # mac of ath0
+        except:
+            pass 
     elif i_type == "eth" or i_type == "e":
-        oid_mac = 1,3,6,1,2,1,2,2,1,6,5 # mac of eth0
+        try:
+            if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,4)  )[3][0][1] == "eth0":
+                oid_mac = 1,3,6,1,2,1,2,2,1,6,4 # mac of eth0 
+            elif cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,5)  )[3][0][1] == "eth0":
+                oid_mac = 1,3,6,1,2,1,2,2,1,6,5 # mac of eth0
+            elif cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,6)  )[3][0][1] == "eth0":
+                oid_mac = 1,3,6,1,2,1,2,2,1,6,6 # mac of eth0
+        except:
+            pass 
     else:
         print "--> Unknown interface type %s" , i_type
         return None
-
-    transport = cmdgen.UdpTransportTarget((ip, 161))
+    if not oid_mac:
+        return None
     res = cmdgen.CommandGenerator().getCmd(community, transport, oid_mac)
     try:
         m = struct.unpack('BBBBBB', str(res[3][0][1]) )
         return mac_string % m
     except:
         return None
+
 
 
 def get_signal(ip):
@@ -181,7 +200,7 @@ class SNMPBugger(threading.Thread):
                     print "Node %s is up with mac %s" % ( ip, mac )
                 else:
                     i.mac_address = None
-                    print "Node %s is up but couldn't retrieve mac via snmp" % ip
+                    print "Node %s is up but couldn't retrieve mac via snmp (interface type %s)" % (ip,inf.type)
                 i.status = 'r'
                 try:
                     i.save() #save
