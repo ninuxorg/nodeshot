@@ -75,7 +75,6 @@ def get_signal(ip):
     oid_dbm = 1,3,6,1,4,1,14988,1,1,1,2,1,3
     #get connected mac and their dbm
     res = cmdgen.CommandGenerator().nextCmd(community, transport, oid_dbm)
-    print res
     ret = []
     try:
         for i in res[3]:
