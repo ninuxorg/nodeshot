@@ -21,7 +21,7 @@ pingcmd = "ping -c 1 %s > /dev/null"
 MAX_THREAD_N = 10
 interface_list = []
 mutex = threading.Lock()
-mac_string = "%02X:%02X:%02X:%02X:%02X:%02X"
+mac_format = "%02X:%02X:%02X:%02X:%02X:%02X"
 
 oids = {'device_name': {'oid': (1,3,6,1,2,1,1,5,0), 'query_type': 'get',  'pos' : (3,0,1) },
         'device_type': {'oid': (1,2,840,10036,3,1,2,1,3,7), 'query_type': 'get',  'pos' : (3,0,1) },
@@ -34,6 +34,7 @@ def get_mac(ip, i_type):
     global community
     transport = cmdgen.UdpTransportTarget((ip, 161))
     oid_mac = None
+    # search for the right oid
     if i_type == "wifi" or i_type == "w": #db is dirty, both wifi and w occurrence
         try:
             if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,6)  )[3][0][1] == "ath0":
@@ -55,21 +56,21 @@ def get_mac(ip, i_type):
         except:
             pass 
     else:
-        print "--> Unknown interface type %s" , i_type
+        print "ERROR: Unknown interface type %s" , i_type
         return None
     if not oid_mac:
         return None
     res = cmdgen.CommandGenerator().getCmd(community, transport, oid_mac)
     try:
         m = struct.unpack('BBBBBB', str(res[3][0][1]) )
-        return mac_string % m
+        return mac_format % m
     except:
         return None
 
 
 
 def get_signal(ip):
-    'return a tuple of all the mac address associated and their signal'
+    'return a tuple of all the mac address of stations associated to that host and their signal'
     global community
     transport = cmdgen.UdpTransportTarget((ip, 161))
     oid_dbm = 1,3,6,1,4,1,14988,1,1,1,2,1,3
@@ -80,8 +81,7 @@ def get_signal(ip):
         for i in res[3]:
             dbm = i[0][1]
             mac_addr_str = i[0][0][-7:-1]
-            mac_addr = mac_string % tuple([int(i.strip()) for i in str(mac_addr_str).split('.')])
-            print "IP %s: got signal:" % ip, mac_addr, dbm
+            mac_addr = mac_format % tuple([int(i.strip()) for i in str(mac_addr_str).split('.')])
             ret.append( (mac_addr, dbm) )
         return ret
     except:
@@ -89,7 +89,9 @@ def get_signal(ip):
 
 
 def get_simple_values(ip):
-    'Get simple string values from smnp from the uid, return a dictionary'
+    '''Get simple string values from smnp from the uid, return a dictionary
+       The list of oid, type of query (get or next) and the position of the result
+       is contained in the oid dictionary'''
     global community, oids_get, oids_next
     transport = cmdgen.UdpTransportTarget((ip, 161))
     ret = {}
@@ -111,117 +113,91 @@ class SNMPBugger(threading.Thread):
         threading.Thread.__init__(self, name="ComputeThread-%d" % (id,))
     def run(self):
         while len(interface_list) > 0:
+            # for each interface in interface_list ...
             mutex.acquire()
             inf = interface_list.pop() 
             mutex.release()
             ip = inf.ipv4_address
-            # this is not necessary as is taken care at model level by django (is not possible to insert two interfaces with same IPv4 or IPv6)
-            #if Interface.objects.filter(ipv4_address = ip).count() > 2:
-            #    print "Error! DUPLICATE IP ADDRESS FOR IP: %s" % ip
-            #    raise Exception
-            # check via ping if device is up
-            patt_ip = re.compile(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
-            if ip and len(ip) > 0 and patt_ip.match(ip):
+            # 1. check via ping if device is up
+            ip_regexp = re.compile(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
+            if ip and len(ip) > 0 and ip_regexp.match(ip):
                 ping_status = os.system(pingcmd % ip) # 0-> up , >1 down
             else:
                 ping_status = 1 #invalid ip, maybe ipv6 or just mac
-
-            try:
-                device = inf.device
-                node = inf.device.node
-            except:
-                # why?
-                node = None 
-                device = None
+            device = inf.device
+            node = inf.device.node
 
             if ping_status == 0: #node answers to the ping
+                # 2. retrieve the mac address
                 mac = get_mac(ip, inf.type)
-                i = inf
-
-                # status of the node shall not be changed
-                #if node:
-                #    node.status = 'a'
-                if device:
-                    mac_signals = get_signal(ip)
-                    # populate the signal information for each link
-                    for m,s in mac_signals:
-                        print 'macsignal:',m,s,i.ipv4_address
-                        try:
-                            link_to = Interface.objects.filter(mac_address = m).get()
-                        except:
-                            link_to = None
-                        link_from = i 
-                        if link_to:
-                            if Link.objects.filter(from_interface = link_from, to_interface = link_to).count() == 1:
-                                l = Link.objects.get(from_interface = link_from, to_interface = link_to)
-                                l.dbm = s 
-                                l.save()
-                            elif Link.objects.filter(from_interface = link_to, to_interface = link_from).count() == 1:
-                                l = Link.objects.get(from_interface = link_to, to_interface = link_from)
-                                l.dbm = s 
-                                l.save()
-                            #else:
-                            #    Link(from_interface = link_from, to_interface = link_to, dbm = s).save()
-                        else:
-                            print "<-> Can not find an interface with mac %s" % m
-
-                        # calculate the maximum signal (maybe useless?)
-                        #signals = [s[1] for s in mac_signals] 
-                        #m_max = max(signals) if len(signals) else 0  
-                        #print "-------- Max signal is %d" % m_max
-                        #if m_max > device.max_signal or device.max_signal == 0:
-                        #    device.max_signal = m_max 
-
-                    # populate device name, type, ssid and frequency    
-                    smtp_values = get_simple_values(ip)
-                    device_name =  smtp_values['device_name'] #get device name
-                    device_type = smtp_values['device_type'] #get device type 
-                    ssid = smtp_values['ssid'] #get ssid 
-                    frequency = smtp_values['frequency'] #get frequency 
-                    if device_name:
-                        device.name = device_name
-                        print "Device name: " + device_name
-                    if device_type:
-                        device.type = device_type
-                        print "Device type: " + device_type
-                    if ssid:
-                        print "SSID = " + ssid
-                        i.ssid = ssid
-                    if frequency:
-                        print "FREQUENCY = " + frequency 
-                        i.wireless_channel = frequency
-                    try:
-                        device.save() #save
-                    except IntegrityError:
-                        print 'Integrity error for device %s' % device.name
                 if mac:
-                    i.mac_address = mac 
-                    print mac
-                    print "Node %s is up with mac %s" % ( ip, mac )
+                    inf.mac_address = mac 
+                    print "OK: Node %s is up with mac %s" % ( ip, mac )
                 else:
-                    i.mac_address = None
-                    print "Node %s is up but couldn't retrieve mac via snmp (interface type %s)" % (ip,inf.type)
-                i.status = 'r'
+                    inf.mac_address = None
+                    print "KO: Node %s is up but couldn't retrieve mac via snmp (interface type is %s)" % (ip,inf.type)
+                inf.status = 'r'
                 try:
-                    i.save() #save
+                    inf.save() #save
                 except IntegrityError:
-                    print 'Integrity error for interface %s of device %s' % (i, device.name)
-            else:
-                # interface does not answer to ping
-                print "Node %s is down" % ip
-                inf.status = 'u'
-                inf.save()
-                # don't change node status
-                #node.status = 'd'
-                
-            #if node:
-            #    node.save() #save
+                    print 'ERROR: Integrity error for interface %s of device %s' % (inf, device.name)
+
+
+                # 3. for each signal this node receives, set the dbm in the Link model
+                mac_signals = get_signal(ip)
+                for m,s in mac_signals:
+                    print 'OK: SIGNAL of %s - %s dbm from %s' % ( ip, s, m )
+                    try:
+                        link_to = Interface.objects.filter(mac_address = m).get()
+                    except:
+                        link_to = None
+
+                    if link_to:
+                        if Link.objects.filter(from_interface = inf, to_interface = link_to).count() == 1:
+                            l = Link.objects.get(from_interface = inf, to_interface = link_to)
+                            l.dbm = s 
+                            l.save()
+                        elif Link.objects.filter(from_interface = link_to, to_interface = inf).count() == 1:
+                            l = Link.objects.get(from_interface = link_to, to_interface = inf)
+                            l.dbm = s 
+                            l.save()
+                    else:
+                        print "KO: There are %d interfaces with mac %s" % (Interface.objects.filter(mac_address = m).len(), m)
+
+                # 4. populate device name, type, ssid and frequency    
+                smtp_values = get_simple_values(ip)
+                device_name = smtp_values['device_name'] #get device name
+                device_type = smtp_values['device_type'] #get device type 
+                ssid = smtp_values['ssid'] #get ssid 
+                frequency = smtp_values['frequency'] #get frequency 
+                if device_name:
+                    device.name = device_name
+                    print "OK: Device name of " + ip + " : " + device_name
+                if device_type:
+                    device.type = device_type
+                    print "OK: Device type of " + ip + " : " + device_type
+                if ssid:
+                    print "OK: SSID of " + ip + " : " + ssid
+                    inf.ssid = ssid
+                if frequency:
+                    print "OK: Frequency of " + ip + " : " + frequency 
+                    inf.wireless_channel = frequency
+                try:
+                    device.save() #save
+                except IntegrityError:
+                    print 'ERROR: Integrity error for device %s' % device.name
+                else:
+                    # interface does not answer to ping
+                    print "KO: Interface %s is down" % ip
+                    inf.status = 'u'
+                    inf.save()
 
 def main():
     for i in Interface.objects.all():
         interface_list.append(i)
 
     for i in range(0, MAX_THREAD_N):
+        # launch MAX_THREAD_N threads to bug the network
         SNMPBugger(i, ).start()
             
     try:
