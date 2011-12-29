@@ -75,13 +75,14 @@ def get_signal(ip):
     oid_dbm = 1,3,6,1,4,1,14988,1,1,1,2,1,3
     #get connected mac and their dbm
     res = cmdgen.CommandGenerator().nextCmd(community, transport, oid_dbm)
+    print res
     ret = []
     try:
         for i in res[3]:
             dbm = i[0][1]
             mac_addr_str = i[0][0][-7:-1]
-            mac_addr = mac_string % tuple([int(i.strip()) for i in str(mac_addr_str)[1:-1].split(',')])
-            print "got signal:", mac_addr, dbm
+            mac_addr = mac_string % tuple([int(i.strip()) for i in str(mac_addr_str).split('.')])
+            print "IP %s: got signal:" % ip, mac_addr, dbm
             ret.append( (mac_addr, dbm) )
         return ret
     except:
