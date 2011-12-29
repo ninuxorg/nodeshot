@@ -15,6 +15,8 @@ __builtins__.IS_SCRIPT = True
 
 from django.db import IntegrityError, DatabaseError
 from nodeshot.models import *
+from django.core.exceptions import ObjectDoesNotExist
+
 
 community = cmdgen.CommunityData('my-agent', 'public', 0)
 pingcmd = "ping -c 1 %s > /dev/null"
@@ -56,7 +58,7 @@ def get_mac(ip, i_type):
         except:
             pass 
     else:
-        print "ERROR: Unknown interface type %s" , i_type
+        print "KO: Unknown interface type %s not eth or wifi" , i_type
         return None
     if not oid_mac:
         return None
@@ -124,10 +126,12 @@ class SNMPBugger(threading.Thread):
                 ping_status = os.system(pingcmd % ip) # 0-> up , >1 down
             else:
                 ping_status = 1 #invalid ip, maybe ipv6 or just mac
-            device = inf.device
-            node = inf.device.node
+            if not ip or len(ip) <= 0:
+                print "KO: Interface %d without ip (batman?)" % inf.id
 
             if ping_status == 0: #node answers to the ping
+                device = inf.device
+                node = inf.device.node
                 # 2. retrieve the mac address
                 mac = get_mac(ip, inf.type)
                 if mac:
@@ -162,7 +166,7 @@ class SNMPBugger(threading.Thread):
                             l.dbm = s 
                             l.save()
                     else:
-                        print "KO: There are %d interfaces with mac %s" % (Interface.objects.filter(mac_address = m).len(), m)
+                        print "KO: There are %d interfaces with mac %s" % (Interface.objects.filter(mac_address = m).count(), m)
 
                 # 4. populate device name, type, ssid and frequency    
                 smtp_values = get_simple_values(ip)
@@ -186,11 +190,11 @@ class SNMPBugger(threading.Thread):
                     device.save() #save
                 except IntegrityError:
                     print 'ERROR: Integrity error for device %s' % device.name
-                else:
-                    # interface does not answer to ping
-                    print "KO: Interface %s is down" % ip
-                    inf.status = 'u'
-                    inf.save()
+            else:
+                # interface does not answer to ping
+                print "KO: Interface %s is down" % ip
+                inf.status = 'u'
+                inf.save()
 
 def main():
     for i in Interface.objects.all():
