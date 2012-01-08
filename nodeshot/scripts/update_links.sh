@@ -7,4 +7,3 @@ DJANGO_SETTINGS_MODULE=settings /home/ninux/nodeshot/venv/bin/python /home/ninux
 #DJANGO_SETTINGS_MODULE=settings /home/ninux/nodeshot/venv/bin/python /home/ninux/nodeshot/nodeshot/scripts/read_batman_topology.py
 #poll nodes to get or update information through snmp
 DJANGO_SETTINGS_MODULE=settings /home/ninux/nodeshot/venv/bin/python /home/ninux/nodeshot/nodeshot/scripts/update_db.py
-#daje mentor!!!!! LOL ho aggiornato il mio locale :D:D
