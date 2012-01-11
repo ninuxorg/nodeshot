@@ -1015,6 +1015,7 @@ var nodeshot = {
             // remove marker
             nodeshot.gmap.removeNewMarker();
             google.maps.event.removeListener(nodeshot.gmap.clickListener);
+            console.log('qui');
         }, // nodeshot.node.cancelAdd()
         
         /*
@@ -1049,7 +1050,7 @@ var nodeshot = {
                     // vertically center overlay
                     nodeshot.overlay.centerVertically();                    
                     // bind events again because we are not using $.live()
-                    nodeshot.overlay.initClose();
+                    nodeshot.overlay.initClose(nodeshot.node.cancelAdd);
                     //nodeshot.overlay.bindCancelButton();
                     nodeshot.overlay.bindSubmitForm(function(form){
                         nodeshot.node.submit(form);
