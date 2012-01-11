@@ -345,7 +345,9 @@ var nodeshot = {
                 },
                 // mouse-out
                 function(){
-                    nodeshot.layout.$showColumn.fadeTo(250, 0.5);
+                    if(nodeshot.layout.$aside.hidden){ // fix issue 50 on github - https://github.com/ninuxorg/nodeshot/issues/50
+                        nodeshot.layout.$showColumn.fadeTo(250, 0.5);
+                    }
                 }
             ).click(function(){
                 // disable scrollbar
@@ -468,10 +470,7 @@ var nodeshot = {
                 }
                 // if clicking on cancel operation
                 else{
-                    // restore "Add new node" text
-                    button.text(i18n.ADDNODE);
-                    // remove marker
-                    nodeshot.gmap.removeNewMarker();
+                    nodeshot.node.cancelAdd()
                 }
             });
         }, // nodeshot.layout.initAddNode()
@@ -685,10 +684,10 @@ var nodeshot = {
         }, // nodeshot.overlay.hideLoading()
         
         /*
-        * nodeshot.overlay.open(data:string [, closeOnClick: boolean])
+        * nodeshot.overlay.open(data:string [, closeOnClick: boolean, closeCallback: function])
         * opens overlay with data and positions to the center of the window
         */
-        open: function(data, closeOnClick){
+        open: function(data, closeOnClick, closeCallback){
             this.hideLoading();
             // check if overlay is not already open
             if(nodeshot.layout.$overlay){
@@ -702,7 +701,7 @@ var nodeshot = {
             // cache inner object
             nodeshot.layout.$overlayInner = $('#nodeshot-overlay-inner');
             // close button
-            this.initClose();
+            this.initClose(closeCallback);
             // center overlay to window
             this.centerVertically();
             // update layout dimensions
@@ -710,22 +709,25 @@ var nodeshot = {
             // if closeOnClick bind click event with a function that closes the overlay
             if(closeOnClick){
                 nodeshot.layout.$overlay.click(function(e){
-                    nodeshot.overlay.close();
+                    nodeshot.overlay.close(closeCallback);
                 });
                 nodeshot.layout.$overlayInner.click(function(){ return false });
             }
         }, // nodeshot.overlay.open()
         
         /*
-        * nodeshot.overlay.initClose()
+        * nodeshot.overlay.initClose([closeCallback: function])
         * insert close button to overlay
         */
-        initClose: function(){
+        initClose: function(closeCallback){
             // insert close button to overlay
             nodeshot.layout.$overlayInner.prepend('<a class="close"></a>');
             // bind onclick event to close button
             nodeshot.layout.$overlayInner.find('.close').click(function(){
-                nodeshot.overlay.close();
+                nodeshot.overlay.close(closeCallback);
+            });
+            $('#cancel').click(function(){
+                nodeshot.overlay.close(closeCallback);
             });
         }, // nodeshot.overlay.initClose()
         
@@ -752,11 +754,11 @@ var nodeshot = {
         * nodeshot.overlay.bindCancelButton()
         * binds actions to the cancel button of an overlay
         */
-        bindCancelButton: function(){
-            $('#cancel').click(function(){
-                nodeshot.overlay.close();
-            });
-        }, // nodeshot.overlay.bindCancelButton()
+        //bindCancelButton: function(){
+        //    $('#cancel').click(function(){
+        //        nodeshot.overlay.close();
+        //    });
+        //}, // nodeshot.overlay.bindCancelButton()
         
         /*
         * nodeshot.overlay.bindSubmitForm(action:function)
@@ -778,10 +780,10 @@ var nodeshot = {
         }, // nodeshot.overlay.bindSubmitForm()
         
         /*
-        * nodeshot.overlay.close()
+        * nodeshot.overlay.close([closeCallback: function])
         * binds actions to the submit event of an overlay
         */
-        close: function(){
+        close: function(closeCallback){
             nodeshot.overlay.hideMask();
             nodeshot.layout.$overlay.remove();
             nodeshot.layout.$overlay = false;
@@ -796,6 +798,9 @@ var nodeshot = {
             // delete any address marker
             if(nodeshot.gmap.addressMarker){
                 nodeshot.gmap.removeAddressMarker();                
+            }
+            if(closeCallback){
+                closeCallback();
             }
         } // nodeshot.overlay.close()
         
@@ -863,6 +868,7 @@ var nodeshot = {
             }
             // unbind keyup event
             nodeshot.layout.$body.unbind('keyup');
+            $(document).unbind('keyup');
         } // nodeshot.dialog.close()
         
     }, // nodeshot.dialog
@@ -885,7 +891,7 @@ var nodeshot = {
                 nodeshot.overlay.hideLoading();
                 nodeshot.overlay.open(data)
                 // remember: we are not using $.live() for performance reasons so we need to rebind events
-                nodeshot.overlay.bindCancelButton();
+                //nodeshot.overlay.bindCancelButton();
                 nodeshot.overlay.bindSubmitForm(function(form){
                     nodeshot.contact.submit(url, form);
                 });
@@ -925,7 +931,7 @@ var nodeshot = {
                     nodeshot.overlay.centerVertically();
                     // rebind events because we are not using $.live()
                     nodeshot.overlay.initClose();
-                    nodeshot.overlay.bindCancelButton();
+                    //nodeshot.overlay.bindCancelButton();
                     nodeshot.overlay.bindSubmitForm(function(form){
                         nodeshot.contact.submit(url, form);
                     });
@@ -943,7 +949,12 @@ var nodeshot = {
                 nodeshot.sending = false;
             }).error(function(xhr, options, error){
                 nodeshot.overlay.hideLoading();
-                alert('Error: ' + xhr.status + ' ' + error);
+                if(xhr.status==500){
+                    alert(i18n.SMTP_ERROR); 
+                }
+                else{
+                    alert('Error: ' + xhr.status + ' ' + error);
+                }
                 nodeshot.overlay.close();
             });
             // return false to prevent default form behaviour
@@ -979,7 +990,7 @@ var nodeshot = {
             nodeshot.overlay.showLoading();
             // do ajax get to new node form
             $.get(nodeshot.url.index+'node/add/', function(data) {
-                nodeshot.overlay.open(data);
+                nodeshot.overlay.open(data, false, nodeshot.node.cancelAdd);
                 if (nodeshot.gmap.newMarker) {
                     // put lat and lng values of temporary gmap marker in the add node form
                     $("#id_lat").val(nodeshot.gmap.newMarker.getPosition().lat());
@@ -987,12 +998,24 @@ var nodeshot = {
                     nodeshot.gmap.removeNewMarker();
                 }
                 // we are not using $.live() for performance reasons
-                nodeshot.overlay.bindCancelButton();
+                //nodeshot.overlay.bindCancelButton();
                 nodeshot.overlay.bindSubmitForm(function(form){
                     nodeshot.node.submit(form);
                 });
             });
         }, // nodeshot.node.add()
+        
+        /*
+        * nodeshot.node.cancelAdd()
+        * cancel operation of adding a new node
+        */
+        cancelAdd: function(){
+            // restore "Add new node" text
+            nodeshot.layout.$addNode.find('span.maponly').text(i18n.ADDNODE);
+            // remove marker
+            nodeshot.gmap.removeNewMarker();
+            google.maps.event.removeListener(nodeshot.gmap.clickListener);
+        }, // nodeshot.node.cancelAdd()
         
         /*
         * nodeshot.node.submit(form:jQuery)
@@ -1027,7 +1050,7 @@ var nodeshot = {
                     nodeshot.overlay.centerVertically();                    
                     // bind events again because we are not using $.live()
                     nodeshot.overlay.initClose();
-                    nodeshot.overlay.bindCancelButton();
+                    //nodeshot.overlay.bindCancelButton();
                     nodeshot.overlay.bindSubmitForm(function(form){
                         nodeshot.node.submit(form);
                     });
@@ -1044,7 +1067,12 @@ var nodeshot = {
                 nodeshot.sending = false;
             }).error(function(xhr, options, error){
                 nodeshot.overlay.hideLoading();
-                alert('Error: ' + xhr.status + ' ' + error);
+                if(xhr.status==500){
+                    alert(i18n.SMTP_ERROR); 
+                }
+                else{
+                    alert('Error: ' + xhr.status + ' ' + error);
+                }
                 nodeshot.overlay.close();
             });
         }, // nodeshot.node.submit()
@@ -1634,7 +1662,7 @@ var nodeshot = {
                                         // init controls
                                         nodeshot.advanced.init();
                                         // we are not using $.live() for performance reasons
-                                        nodeshot.overlay.bindCancelButton();
+                                        //nodeshot.overlay.bindCancelButton();
                                     });
                                     return false
                                 }                                
@@ -1757,7 +1785,7 @@ var nodeshot = {
             }
             // if link color is red decrease opacity
             else if(quality==3){
-                opacity = 0.3;
+                opacity = 0.4;
             }
             // draw link on gmap
             var link = new google.maps.Polyline({

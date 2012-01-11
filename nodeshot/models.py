@@ -129,7 +129,7 @@ class Node(models.Model):
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
     owner = models.CharField(_('owner'), max_length=50, blank=True, null=True)
     description = models.CharField(_('description'), max_length=200, blank=True, null=True)
-    postal_code = models.CharField(_('postal code'), max_length=10)
+    postal_code = models.CharField(_('postal code'), max_length=10, blank=True)
     email = models.EmailField()
     email2 = models.EmailField(blank=True, null=True)
     email3 = models.EmailField(blank=True, null=True)
@@ -296,7 +296,7 @@ class Device(models.Model):
 
 class Hna(models.Model):
     device = models.ForeignKey(Device)
-    route = models.CharField(max_length=20)
+    route = models.CharField(max_length=43)
     
     def __unicode__(self):
         return u'%s' % (self.route)

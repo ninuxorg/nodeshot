@@ -11,7 +11,6 @@
 
 {% block content %}
 <div id="content-main">
-
 {% if app_list %}
     {% for app in app_list %}
         {% if app.name != 'Nodeshot' %}
@@ -46,7 +45,7 @@
         <table>
         <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></caption>
         {% for model in app.models %}
-            {% if model.admin_url != 'contact/' and model.admin_url != 'statistic/' and model.admin_url != 'nodeshot/contact/' and model.admin_url != 'nodeshot/statistic/' and model.admin_url != '/admin/nodeshot/contact/' and model.admin_url != '/admin/nodeshot/statistic/' %}
+            {% if '/contact/' not in model.admin_url and '/statistic/' not in model.admin_url %}
             <tr>
             {% if model.perms.change %}
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
@@ -74,7 +73,7 @@
         <table>
         <caption><a href="{{ app.app_url }}" class="section">Logs</a></caption>
         {% for model in app.models %}
-            {% if model.admin_url == 'contact/' or model.admin_url == 'statistic/' or model.admin_url == 'nodeshot/contact/' or model.admin_url == 'nodeshot/statistic/' or model.admin_url == '/admin/nodeshot/contact/' or model.admin_url == '/admin/nodeshot/statistic/' %}
+            {% if '/contact/' in model.admin_url and '/statistic/' in model.admin_url %}
             <tr>
             {% if model.perms.change %}
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>

@@ -516,6 +516,8 @@ table.list-values{
 	clear: both;
 }
 
+#tab-dist #result-row{ margin: 0 !important }
+
 table.list-values td{
 	padding: 2px 0;
 }
