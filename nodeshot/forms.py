@@ -97,8 +97,13 @@ class PasswordResetForm(forms.Form):
         node = self.node
         
         # check email submitted is one of the node owners, the check is case insensitive
-        if email != node.email.lower() and email != node.email2.lower() and email != node.email3.lower():
-            raise forms.ValidationError(_("The inserted email doesn't match any of the node owners' emails"))
+        try:
+            if email != node.email.lower() and email != node.email2.lower() and email != node.email3.lower():
+                raise forms.ValidationError(_("The inserted email doesn't match any of the node owners' emails"))
+        # this is for the cases in which email2 or email3 fields are NULL (eg: in the case the database was imported)
+        except:
+            if email != node.email.lower() and email != node.email2 and email != node.email3: #
+                raise forms.ValidationError(_("The inserted email doesn't match any of the node owners' emails"))
         
         return email
 
