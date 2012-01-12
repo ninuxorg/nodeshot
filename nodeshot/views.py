@@ -81,8 +81,9 @@ def nodes(request):
     """
     # retrieve nodes in 3 different objects depending on the status
     active = Node.objects.filter(status = 'a').values('name', 'slug', 'id', 'lng', 'lat', 'status')
+    # status ah (active & hotspot) will fall in the hotspot group, having the hotspot icon
+    hotspot = Node.objects.filter(Q(status = 'h') | Q(status = 'ah')).values('name', 'slug', 'id', 'lng', 'lat', 'status')
     potential = Node.objects.filter(status = 'p').values('name', 'slug', 'id', 'lng', 'lat', 'status')
-    hotspot = Node.objects.filter(status = 'h').values('name', 'slug', 'id', 'lng', 'lat', 'status')
 
     # retrieve links, select_related() reduces the number of queries,
     # only() selects only the fields we need
@@ -139,19 +140,26 @@ def jstree(request):
     Populates jquery.jstree plugin
     """
     # retrieve nodes in 3 different objects depending on the status
-    active = Node.objects.filter(status = 'a').values('name', 'slug', 'lng', 'lat').order_by('name')
-    hotspot = Node.objects.filter(status = 'h').values('name', 'slug', 'lng', 'lat').order_by('name')
+    active = Node.objects.filter(Q(status = 'a') | Q(status = 'ah')).values('name', 'slug', 'lng', 'lat', 'status').order_by('name') # status is necessary to link "active & hotspot" nodes correctly
+    hotspot = Node.objects.filter(Q(status = 'h') | Q(status = 'ah')).values('name', 'slug', 'lng', 'lat').order_by('name')
     potential = Node.objects.filter(status = 'p').values('name', 'slug', 'lng', 'lat').order_by('name')
     # prepare empty lists
     data, active_list, hotspot_list, potential_list = [], [], [], []
 
     for a in active:
+        # distinguish "active" from "active & hotspot"
+        if a['status'] == 'a':
+            status = 'active'
+        elif a['status'] == 'ah':
+            # treat "active & hotspot" like hotspots
+            status = 'hotspot'
+        
         active_list.append({
             'data': {
                 'title': a['name'],
                 'attr': {
                     'class': 'child',
-                    'href': 'javascript:nodeshot.gmap.goToNode(nodeshot.nodes.active.%s)' % jslugify(a['slug'])
+                    'href': 'javascript:nodeshot.gmap.goToNode(nodeshot.nodes.%s.%s)' % (status, jslugify(a['slug']))
                 }
             }
         })

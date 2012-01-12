@@ -984,3 +984,9 @@ msgstr "CNAME per la risoluzione DNS (lasciando vuoto si ottiene il valore di de
 
 msgid "The message cannot be sent because the outgoing email server is temporarily unavailable. Try again later. We apologize for the inconvenience."
 msgstr "Non è stato possibile inviare il messaggio perchè il server di posta in uscita è temporaneamente irraggiungibile. Si prega di riprovare più tardi. Ci scusiamo per l'inconveniente."
+
+msgid "active & hotspot"
+msgstr "attivo e hotspot"
+
+msgid "The node does not exist"
+msgstr "Il nodo non esiste"

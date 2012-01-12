@@ -53,16 +53,18 @@ def update_statistics():
 
     # get counts of the active nodes, potential nodes, hotspots and group the results
     # Count() is a function provided by django.db.models
-    nodes = Node.objects.values('status').annotate(count=Count('status')).filter(Q(status='a') | Q(status='h') | Q(status='p')).order_by('status')
+    nodes = Node.objects.values('status').annotate(count=Count('status')).filter(Q(status='a') | Q(status='ah') | Q(status='h') | Q(status='p')).order_by('status')
     # evaluate queryset to avoid repeating the same query
     nodes = list(nodes)
 
+    # active & hotspot
+    active_and_hotspots = nodes[1].get('count')
     # active nodes
-    active_nodes = nodes[0].get('count')
+    active_nodes = nodes[0].get('count') + active_and_hotspots
     # hotspots
-    hotspots = nodes[1].get('count')
+    hotspots = nodes[2].get('count') + active_and_hotspots
     # potential nodes
-    potential_nodes = nodes[2].get('count')
+    potential_nodes = nodes[3].get('count')
     # number of links
     link_count = Link.objects.count()
 

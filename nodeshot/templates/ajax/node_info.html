@@ -57,11 +57,11 @@
                     <select id="distance-select" class="text">
                         <option></option>
                         <optgroup label="{% trans 'Active Nodes' %}">
-                            {% for node in nodes %}{% if node.status == 'a' %}<option value="{{ node.lat }};{{ node.lng }};{{ node.slug|jslugify }};{{ node.status }}">{{ node.name }}</option>{% endif %}{% endfor %}
+                            {% for node in nodes %}{% if node.status == 'a' or node.status == 'ah' %}<option value="{{ node.lat }};{{ node.lng }};{{ node.slug|jslugify }};{{ node.status }}">{{ node.name }}</option>{% endif %}{% endfor %}
                         </optgroup>
                         
                         <optgroup label="{% trans 'Hotspot' %}">
-                            {% for node in nodes %}{% if node.status == 'h' %}<option value="{{ node.lat }};{{ node.lng }};{{ node.slug }};{{ node.status }}">{{ node.name }}</option>{% endif %}{% endfor %}
+                            {% for node in nodes %}{% if node.status == 'h' or node.status == 'ah' %}<option value="{{ node.lat }};{{ node.lng }};{{ node.slug }};{{ node.status }}">{{ node.name }}</option>{% endif %}{% endfor %}
                         </optgroup>
                         
                         <optgroup label="{% trans 'Potential Nodes' %}">

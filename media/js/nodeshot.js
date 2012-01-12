@@ -28,7 +28,8 @@ var nodeshot = {
     status_choices: {
         a: 'active',
         h: 'hotspot',
-        p: 'potential'
+        p: 'potential',
+        ah: 'hotspot' // "active & hotspot" status points to hotspot
     },
     
     // here we'll store some urls
@@ -1015,7 +1016,6 @@ var nodeshot = {
             // remove marker
             nodeshot.gmap.removeNewMarker();
             google.maps.event.removeListener(nodeshot.gmap.clickListener);
-            console.log('qui');
         }, // nodeshot.node.cancelAdd()
         
         /*
@@ -1540,12 +1540,12 @@ var nodeshot = {
         * center map to specified node, zoom a little bit and trigger click on the marker
         */
         goToNode: function(node) {
-            // if destination is a potential node and $potential is unchecked show potential nodes
-            nodeshot.gmap.check$potential(nodeshot.status_choices[node.status]);
             // if node is a string it means we have to evaluate the string to get the object
             if(typeof(node)=='string'){
                 node = eval(node);
             }
+            // if destination is a potential node and $potential is unchecked show potential nodes
+            nodeshot.gmap.check$potential(nodeshot.status_choices[node.status]);
             // check if there is a google.maps.Marker object
             if (node.marker) {
                 // trigger click event
@@ -1556,7 +1556,7 @@ var nodeshot = {
                 nodeshot.gmap.map.setZoom(13);
             } else {
                 // node not found
-                nodeshot.dialog.open('Il nodo non esiste.');
+                nodeshot.dialog.open(i18n.NODE_DOESNT_EXIST);
             }
         }, // nodeshot.gmap.goToNode()
         
@@ -1741,7 +1741,7 @@ var nodeshot = {
                                 from_lat: nodeshot.nodes[nodeshot.status_choices[node.status]][node.jslug].lat,
                                 from_lng: nodeshot.nodes[nodeshot.status_choices[node.status]][node.jslug].lng,
                                 from_status: nodeshot.nodes[nodeshot.status_choices[node.status]][node.jslug].status,
-                                to_name: $this.find('option[value="'+$this.val()+'"]').text(),
+                                to_name: $this.find('option[value="'+$this.val()+'"]').eq(0).text(), // eq(0) is necessary because nodes with status "active and hotspot" are present twice - without eq(0) the name of the node would be repeated twice
                                 to_slug: to_slug,
                                 to_lat: to_lat,
                                 to_lng: to_lng,
@@ -1822,8 +1822,6 @@ var nodeshot = {
             data.to_lat = parseFloat(data.to_lat);
             data.to_lng = parseFloat(data.to_lng);
             // if destination is a potential node and $potential is unchecked show potential nodes
-            nodeshot.gmap.check$potential(nodeshot.status_choices[data.to_status])
-            // check potentail checkbox if needed
             this.check$potential(nodeshot.status_choices[data.from_status]);            
             this.check$potential(nodeshot.status_choices[data.to_status]);
             // draw link on map and save it in a local variable

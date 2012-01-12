@@ -31,10 +31,12 @@ except:
     IS_SCRIPT = False
 
 NODE_STATUS = (
-    ('a', _('active')),
     ('p', _('potential')),
+    ('a', _('active')),
     ('h', _('hotspot')),
-    ('u', _('unconfirmed')) # nodes that have not been confirmed via email yet
+    ('ah', _('active & hotspot')),
+    ('u', _('unconfirmed')), # nodes that have not been confirmed via email yet
+    #('i', _('inactive')),
 )
 
 INTERFACE_TYPE = (
@@ -53,8 +55,8 @@ INTERFACE_STATUS = (
 )
 
 WIRELESS_MODE = (
-    ('sta', _('sta')),
-    ('ap', _('ap')),
+    ('sta', _('station')),
+    ('ap', _('access point')),
     ('adhoc', _('adhoc')),
 )
 
@@ -137,7 +139,7 @@ class Node(models.Model):
     lat = models.FloatField(_('latitude'))
     lng = models.FloatField(_('longitude')) 
     alt = models.FloatField(_('altitude'), blank=True, null=True)
-    status = models.CharField(_('status'), max_length=1, choices=NODE_STATUS, default='p')
+    status = models.CharField(_('status'), max_length=3, choices=NODE_STATUS, default='p')
     activation_key = models.CharField(_('activation key'), max_length=40, blank=True, null=True, help_text=_('Key needed for activation of the node. It\'s deleted once the node is activated.'))
     notes = models.TextField(_('notes'), blank=True, null=True)
     added = models.DateTimeField(_('added on'), auto_now_add=True)
