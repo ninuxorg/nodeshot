@@ -77,7 +77,7 @@ def get_mac(ip, i_type):
                 oid_mac = 1,3,6,1,2,1,2,2,1,6,6 # mac of ath0 
             elif query_snmp(ip, (1,3,6,1,2,1,2,2,1,2,7)  )[3][0][1] == "ath0":
                 oid_mac = 1,3,6,1,2,1,2,2,1,6,7 # mac of ath0
-            elif query_snmp( (1,3,6,1,2,1,2,2,1,2,8)  )[3][0][1] == "ath0":
+            elif query_snmp(ip, (1,3,6,1,2,1,2,2,1,2,8)  )[3][0][1] == "ath0":
                 oid_mac = 1,3,6,1,2,1,2,2,1,6,8 # mac of ath0
         except:
             pass 
@@ -92,13 +92,14 @@ def get_mac(ip, i_type):
         except:
             pass 
     else:
-        print "KO: Unknown interface type %s not eth or wifi" , i_type
+        print "KO: Unknown interface type %s not eth or wifi" % i_type
         return None
     if not oid_mac:
         return None
     res = query_snmp(ip, oid_mac)
     try:
         m = struct.unpack('BBBBBB', str(res[3][0][1]) )
+        print "MAC IS: ", m
         return mac_format % m
     except:
         return None
@@ -159,7 +160,7 @@ class SNMPBugger(threading.Thread):
                 ping_status = query_ping(ip) #os.system(pingcmd % ip) # 0-> up , >1 down
             elif ip_type(inf.ipv6_address): #not none so valid ipv6
                 ip = inf.ipv6_address
-                print "----------------> Node %s have only IPV6 Address!!!!" % (ip)
+                # print "----------------> Node %s have only IPV6 Address!!!!" % (ip)
                 ping_status = query_ping(ip) #os.system(pingcmd % ip) # 0-> up , >1 down
             else:
                 ip = None
