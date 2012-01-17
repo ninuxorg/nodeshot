@@ -23,5 +23,5 @@ try:
     clear_cache()
     # regenerate main pages
     quick_publish('/', 'nodes.json', 'jstree.json', 'nodes.kml', 'overview/')
-except:
+except Exception, e:
     print 'Error', e
