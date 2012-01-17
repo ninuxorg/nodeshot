@@ -24,4 +24,4 @@ try:
     # regenerate main pages
     quick_publish('/', 'nodes.json', 'jstree.json', 'nodes.kml', 'overview/')
 except:
-    pass
+    print 'Error', e
