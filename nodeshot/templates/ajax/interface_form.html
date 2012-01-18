@@ -85,7 +85,7 @@
                             {{ form.draw_link.errors }}
                         </div>
                     {% endif %}
-                    <input style="width:auto"; checked="checked" type="checkbox" name="interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-draw_link" id="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-draw_link" />
+                    <input style="width:auto" {% if form.draw_link.value %}checked="checked" {% endif %}type="checkbox" name="interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-draw_link" id="id_interface{{ forloop.parentloop.counter }}-{{ forloop.counter0 }}-draw_link" />
                 </div>                
                 
                 <div class="field-wrapper">                    
@@ -242,7 +242,8 @@
         deleteText: '{% trans 'Remove' %}',
         added: function(row){
             interfaceForm(row);
-        }
+        },
+        formContainerClass: 'tab'
     });    
     {% endfor %}
 </script>

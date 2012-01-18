@@ -94,7 +94,8 @@
     $("div.formset-form-container", "#device{{ forloop.counter }}-formset").formset({
         prefix: '{{ type }}{{ forloop.counter }}',
         addText: '{% trans 'Add' %}',
-        deleteText: '{% trans 'Remove' %}'
+        deleteText: '{% trans 'Remove' %}',
+        formContainerClass: 'tab'
     });
     {% endfor %}
 </script>
