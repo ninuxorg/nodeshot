@@ -38,6 +38,11 @@ class DeviceAdmin(admin.ModelAdmin):
     inlines = [InterfaceInline, HnaInline]
     ordering = ('-id',)
     
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'node':
+            kwargs['queryset'] = Node.objects.order_by('name')
+        return super(DeviceAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    
 class InterfaceAdmin(admin.ModelAdmin):
     form = InterfaceForm
     list_display  = ('__unicode__', 'type', 'device', 'added', 'updated')
@@ -46,6 +51,11 @@ class InterfaceAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('ipv4_address', 'ipv6_address', 'mac_address', 'bssid', 'essid')
     ordering = ('-id',)
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'device':
+            kwargs['queryset'] = Device.objects.order_by('name')
+        return super(InterfaceAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     
 class StatisticAdmin(admin.ModelAdmin):
     list_display  = ('date', 'active_nodes', 'hotspots', 'potential_nodes', 'links', 'km')
