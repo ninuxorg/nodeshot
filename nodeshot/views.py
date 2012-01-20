@@ -238,12 +238,9 @@ def overview(request):
     if request.is_ajax():
         # just load the fragment
         template = 'ajax/overview.html'
-    # otherwise if request is sent normally and DEBUG is true
-    elif DEBUG:
-        # debuggin template
-        template = 'overview.html'
+    # otherwise if request is sent normally
     else:
-        raise Http404
+        template = 'overview.html'
     
     devices = Device.objects.all().order_by('node__name', 'added').select_related().only('name', 'type', 'node__name', 'node__status', 'node__slug');
     new_devices = []
