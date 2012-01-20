@@ -22,6 +22,6 @@ try:
     from staticgenerator import quick_publish
     clear_cache()
     # regenerate main pages
-    quick_publish('/', 'nodes.json', 'jstree.json', 'nodes.kml', 'overview/')
+    quick_publish('/', '/nodes.json', '/jstree.json', '/nodes.kml', '/overview/')
 except Exception, e:
     print 'Error', e
