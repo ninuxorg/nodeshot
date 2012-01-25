@@ -66,12 +66,3 @@ if not settings.AUTH_PROFILE_MODULE:
     
 if not settings.EMAIL_HOST:
     raise ImproperlyConfigured(_('EMAIL_HOST is not defined in your settings.py. See settings.example.py for reference.'))
-    
-if not settings.EMAIL_HOST_USER:
-    raise ImproperlyConfigured(_('EMAIL_HOST_USER is not defined in your settings.py. See settings.example.py for reference.'))
-    
-if not settings.EMAIL_HOST_PASSWORD:
-    raise ImproperlyConfigured(_('EMAIL_HOST_PASSWORD is not defined in your settings.py. See settings.example.py for reference.'))
-    
-if not settings.EMAIL_PORT:
-    raise ImproperlyConfigured(_('EMAIL_HOST_PASSWORD is not defined in your settings.py. See settings.example.py for reference.'))
