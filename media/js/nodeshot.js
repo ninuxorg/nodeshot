@@ -1058,6 +1058,8 @@ var nodeshot = {
                 }
                 // if success
                 else {
+                    // restore "Add new node" text
+                    nodeshot.layout.$addNode.find('span.maponly').text(i18n.ADDNODE);
                     // fade out overlay
                     nodeshot.layout.$overlayInner.fadeOut(500, function(){
                         // send a nice message to the user

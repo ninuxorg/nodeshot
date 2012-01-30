@@ -234,13 +234,8 @@ def overview(request):
     Overview about the wireless network. Device status and link performance for the entire network.
     This is quite database expensive. Use with caution. Needs caching.
     """
-    # if request is sent with ajax
-    if request.is_ajax():
-        # just load the fragment
-        template = 'ajax/overview.html'
-    # otherwise if request is sent normally
-    else:
-        template = 'overview.html'
+    # load always frament only
+    template = 'ajax/overview.html'
     
     devices = Device.objects.all().order_by('node__name', 'added').select_related().only('name', 'type', 'node__name', 'node__status', 'node__slug');
     new_devices = []
