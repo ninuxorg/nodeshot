@@ -63,9 +63,10 @@ class AliasManager(object):
 
 class TopologyParser(object):
         def __init__(self, topology_url):
+	    self.topology_url = topology_url
             print ("Retrieving topology...")
             try:
-                self.topologylines = urllib2.urlopen(TOPOLOGY_URL).readlines()
+                self.topologylines = urllib2.urlopen(self.topology_url).readlines()
             except Exception, e:
                 print "Got exception: ", e
             print ("Done...")
@@ -174,81 +175,82 @@ class TopologyParser(object):
 #OLSR
 if __name__ == "__main__":
     #Link.objects.all().delete()
-    TOPOLOGY_URL="http://127.0.0.1:2006/all"
-    hnas = None
-    try:
-        tp = TopologyParser(TOPOLOGY_URL)
-        tp.parse()
-        tp.process()
-        values = tp.linkdict.values()
-        # values is a list of tuples with two ip lists
-        # example is: ([1.2.3.4,5.6.7.8],[9.10.11.12]) 
-        # first list contains all the addresses of a node
-        # second list contains all the addresses the node of the other endpoint of a link 
-        hnas = tp.hnainfo # list of tuples "ip list" , "hna"
-    except Exception, e:
-        print "Got exception: ", e
-        values = False
-    old_links = dict([ (l.id, False) for l in Link.objects.all()])
-    #print tp.linkdict
-    # record nodes
-    if values:
-        for v in values:
-            ipsA, ipsB, etx = v
-            found = False
-            if len(ipsA) <= 0 and len(ipsB) <=0:
-                continue
-            for a in range(0,len(ipsA)):
-                for b in range(0,len(ipsB)):
-                    if not found:
-                        ipA, ipB = ipsA[a], ipsB[b]
-                        saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
-                        if saved_links.count() > 0:
-                            # if a link already exists, update
-                            l = saved_links[0]
-                            if not l.from_interface.draw_link or not l.to_interface.draw_link:
-                                continue
-                            l.etx = etx
-                            l.save()
-                            old_links[l.id] = True
-                            found = True
-                            print "Updated link: %s" % l
-                        else:
-                            # otherwise create a new link
-                            fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn').exclude(draw_link=False)
-                            to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn').exclude(draw_link=False)
-                            if fi.count() == 1 and to.count() == 1:
-                              # create a link if the neighbors are NOT on the same node
-                              #print fi, fi.get().id, to, to.get().id
-                              if fi.get().device.node != to.get().device.node:
-                                l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
-                                print "Saved new link: %s" % l
+    OLSR_URLS=["http://127.0.0.1:2006/all",]# "http://www.ihteam.net/olsrd_viterbo.txt"]
+    for OLSR_URL in OLSR_URLS:
+	hnas = None
+        try:
+            tp = TopologyParser(OLSR_URL)
+            tp.parse()
+            tp.process()
+            values = tp.linkdict.values()
+            # values is a list of tuples with two ip lists
+            # example is: ([1.2.3.4,5.6.7.8],[9.10.11.12])
+            # first list contains all the addresses of a node
+            # second list contains all the addresses the node of the other endpoint of a link
+            hnas = tp.hnainfo # list of tuples "ip list" , "hna"
+        except Exception, e:
+            print "Got exception: ", e
+            values = False
+        old_links = dict([ (l.id, False) for l in Link.objects.all()])
+        #print tp.linkdict
+        # record nodes
+        if values:
+            for v in values:
+                ipsA, ipsB, etx = v
+                found = False
+                if len(ipsA) <= 0 and len(ipsB) <=0:
+                    continue
+                for a in range(0,len(ipsA)):
+                    for b in range(0,len(ipsB)):
+                        if not found:
+                            ipA, ipB = ipsA[a], ipsB[b]
+                            saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
+                            if saved_links.count() > 0:
+                                # if a link already exists, update
+                                l = saved_links[0]
+                                if not l.from_interface.draw_link or not l.to_interface.draw_link:
+                                    continue
+                                l.etx = etx
+                                l.save()
+                                old_links[l.id] = True
                                 found = True
-                            elif fi.count() > 1 or to.count() >1:
-                                print "Anomaly: More than one interface for ip address"
-                                print fi, to
-    # record hnas
-    old_hnas = dict([ (h.id, False) for h in Hna.objects.all()])
+                                print "Updated link: %s" % l
+                            else:
+                                # otherwise create a new link
+                                fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn').exclude(draw_link=False)
+                                to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn').exclude(draw_link=False)
+                                if fi.count() == 1 and to.count() == 1:
+                                  # create a link if the neighbors are NOT on the same node
+                                  #print fi, fi.get().id, to, to.get().id
+                                  if fi.get().device.node != to.get().device.node:
+                                    l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
+                                    print "Saved new link: %s" % l
+                                    found = True
+                                elif fi.count() > 1 or to.count() >1:
+                                    print "Anomaly: More than one interface for ip address"
+                                    print fi, to
+        # record hnas
+        old_hnas = dict([ (h.id, False) for h in Hna.objects.all()])
 
-    for ips,hna in hnas:
-        found_device,i  = None, None 
-        for ip in ips:
-            if not found_device: 
-                i = Interface.objects.filter(ipv4_address = ip)
-                found_device = i.count() > 0
-        if found_device:
-            h = Hna.objects.filter(device = i.get().device).filter(route = hna)
-            if h.count() <= 0:
-                new_hna = Hna(device = i.get().device, route = hna) 
-                new_hna.save()
-            else: 
-                old_hnas[h.get().id] = True
-        
-    #delete old hnas
-    for h,v in old_hnas.iteritems() :
-        if not v:
-            Hna.objects.get(id=h).delete()
-            print "Deleted hna %d" % h
+        for ips,hna in hnas:
+            found_device,i  = None, None
+            for ip in ips:
+                if not found_device:
+                    i = Interface.objects.filter(ipv4_address = ip)
+                    found_device = i.count() > 0
+            if found_device:
+                h = Hna.objects.filter(device = i.get().device).filter(route = hna)
+                if h.count() <= 0:
+                    new_hna = Hna(device = i.get().device, route = hna)
+                    new_hna.save()
+                else:
+                    old_hnas[h.get().id] = True
+
+        #delete old hnas
+        for h,v in old_hnas.iteritems() :
+            if not v:
+                Hna.objects.get(id=h).delete()
+                print "Deleted hna %d" % h
 
     # BATMAN
     for topology_url in TOPOLOGY_URLS:
@@ -282,9 +284,8 @@ if __name__ == "__main__":
                     to = Interface.objects.filter(mac_address = macB).exclude(type='vpn').exclude(draw_link=False)
                     fi_count = len(fi)
                     to_count = len(to)
-                    if fi_count > 2 or to_count > 2:
-                        print "Anomality detected, two interface with same mac"
-                        print fi, to
+                    if fi_count >= 2 or to_count >= 2:
+                        print "Anomality detected, two interface with same mac: " + macA + " (" + str(fi_count) + ") , " + macB + " (" + str(to_count) +")"
                     if 0 < fi_count < 2 and 0 < to_count < 2:
                         if fi.get().device.node != to.get().device.node:
                             # create a link if the neighbors are NOT on the same node
@@ -293,6 +294,13 @@ if __name__ == "__main__":
                                 print 'Saved new link %s' % l
                             except:
                                 print 'Error while saving link from %s to %s' % (fi.device.node, to.device.node)
+                    else:
+                        macA_debug =  Interface.objects.filter(mac_address = macA)
+                        macB_debug =  Interface.objects.filter(mac_address = macB)
+                        if len(macA_debug) == 0 or len(macB_debug) == 0:
+                            print "Anomality detected: links between %s <-> %s: number of interfaces found %s <-> %s" % ( macA, macB, str(len(macA_debug)), str(len(macB_debug)) )
+                        else:
+                            print "Anomality detected: links between %s <-> %s: vpn?, draw_link? : %s, %s <-> %s, %s" % ( macA, macB, macA_debug[0].type, macA_debug[0].draw_link, macB_debug[0].type, macB_debug[0].draw_link)
 
     for l,v in old_links.iteritems() :
         if not v:
