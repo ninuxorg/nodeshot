@@ -195,7 +195,7 @@ class Node(models.Model):
     def set_activation_key(self):
         ''' Set the activation key, generate it from a combinatin of the ''Node''s name and a random salt '''
         salt = sha_constructor(str(random.random())).hexdigest()[:5]
-        self.activation_key = sha_constructor(salt+self.name).hexdigest()
+        self.activation_key = sha_constructor(salt+self.slug).hexdigest()
         return self.activation_key
     
     def send_activation_mail(self):
