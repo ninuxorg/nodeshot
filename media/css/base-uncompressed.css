@@ -433,6 +433,7 @@ h3 {
 #link-quality input{ position: relative; bottom: -2px }
 #link-quality label{ cursor: pointer }
 #dbmli{ background: transparent url(../images/dbm.png) no-repeat scroll 0 0 !important }
+#nometricli{ background: transparent url(../images/disabled.png) no-repeat scroll 2px 1px !important }
 
 #head-controls a{
 	float: right;

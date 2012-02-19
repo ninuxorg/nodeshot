@@ -80,9 +80,17 @@ var nodeshot = {
             nodeshot.layout.$potential[0].checked = false;
         }
         // remember link quality selection
-        if($.cookie('nodeshot_link_quality')=='dbm'){
-            // don't need to cache this object as this is the only time we need it
-            $('#dbm')[0].checked = true;
+        switch($.cookie('nodeshot_link_quality')){
+            case 'dbm':
+                // don't need to cache this object as this is the only time we need it
+                $('#dbm')[0].checked = true;
+                break;
+            case 'etx':
+                $('#etx')[0].checked = true;
+                break;
+            case 'nometric':
+                $('#nometric')[0].checked = true;
+                break;
         }
         // remember if sidebar is shown or not
         if($.cookie('nodeshot_sidebar')=='false'){
@@ -1493,7 +1501,8 @@ var nodeshot = {
                     is the same as writing
                         link.dbm
                     */
-                    link.gmap = nodeshot.gmap.drawLink(link.from_lat, link.from_lng, link.to_lat, link.to_lng, link[quality]);
+                    var link_quality = (quality != 'nometric') ? link[quality] : 1; // this means: if metric is disabled display only green links
+                    link.gmap = nodeshot.gmap.drawLink(link.from_lat, link.from_lng, link.to_lat, link.to_lng, link_quality);
                 }
             }
         }, // nodeshot.gmap.drawNodes()

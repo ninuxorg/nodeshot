@@ -60,6 +60,7 @@
                         <div id="link-quality" class="maponly">
                             {% trans 'Link quality calculation' %}:
                             <ul>
+                                <li id="nometricli"><input type="radio" id="nometric" name="link-quality-selector" value="nometric" {% if settings.LINK_QUALITY == 'nometric' %}checked="checked"{% endif %} /> <label for="nometric">{% trans 'Disabled' %}</label></li>
                                 <li><input type="radio" id="etx" name="link-quality-selector" value="etx" {% if settings.LINK_QUALITY == 'etx' %}checked="checked"{% endif %} /> <label for="etx">{% trans 'Lost packets (ETX)' %}</label></li>
                                 <li id="dbmli"><input type="radio" id="dbm" name="link-quality-selector" value="dbm" {% if settings.LINK_QUALITY == 'dbm' %}checked="checked"{% endif %} /> <label for="dbm">{% trans 'Received signal (DBm)' %}</label></li>
                             </ul>
