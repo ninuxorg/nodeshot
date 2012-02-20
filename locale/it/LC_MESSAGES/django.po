@@ -990,3 +990,6 @@ msgstr "attivo e hotspot"
 
 msgid "The node does not exist"
 msgstr "Il nodo non esiste"
+
+msgid "Disabled"
+msgstr "Disabilitato"
