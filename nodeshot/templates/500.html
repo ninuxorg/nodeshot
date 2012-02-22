@@ -6,9 +6,13 @@
 	<title>{% trans '500 Internal Server Error' %}</title>
 	<style type="text/css">
 	    body { background: #000; font: normal 14px/20px "Arial", "Helvetica", "FreeSans", "Utkal", "Garuda", "Nimbus Sans NL", sans-serif; }
-	    #container{ width: 600px; margin: 40px auto 0; padding: 40px 40px 30px; background-color: white; text-align: left }
-	    h1 { margin: 0 0 25px; font: bold 30px/15px "Georgia", "Nimbus Roman No9 L", "Century Schoolbook L", "Norasi", "Rekha", serif; color: #000 }
-	    p { margin: 10px 0 }
+	    #container{ width: 600px; margin: 40px auto 0; text-align: left }
+	    h1 { margin: 0 0 25px; font: bold 30px/15px "Georgia", "Nimbus Roman No9 L", "Century Schoolbook L", "Norasi", "Rekha", serif; color: #fff }
+	    p { margin: 10px 0; color: white }
+        .goback{ text-align: center; font-size: 16px }
+        .goback a{ font-weight: bold }
+        .credits{ margin-top: 80px; text-align: right; font-size: 11px }
+        a{ color: #fff }
 	</style>
 </head>
 <body>
@@ -16,6 +20,10 @@
         <h1>{% trans "..Ops! 500 Internal Server Error" %}</h1>
         <p>{% trans "We'are <strong>experiencing technical problems</strong>, probably we are working on the website for mantainance or an unplanned event has happened." %}</p>
         <p>{% trans "We apologize for the inconvenient, we are working to fix this problem as soon as possible." %}</p>
+        <p>{% trans "If this problem persists, please contact the administrators of this server." %}</p>
+        <p style="text-align:center;margin-top: 40px"><img src="{{ MEDIA_URL }}/images/500.png" alt="" /></p>
+        <p class="goback"><a href="{% url nodeshot.views.index %}">{% trans "Go back to the homepage" %}</a></p>
     </div>
+    <p class="credits">Illustration by <a href="http://theoatmeal.com/" target="_blank">The Oatmeal</a></p>
 </body>
 </html>

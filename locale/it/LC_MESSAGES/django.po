@@ -950,7 +950,13 @@ msgid "We'are <strong>experiencing technical problems</strong>, probably we are 
 msgstr "Stiamo avendo dei <strong>problemi tecnici</strong>, probabilmente stiamo lavorando alla manutenzione del sito oppure è accaduto un evento inaspettato."
 
 msgid "We apologize for the inconvenient, we are working to fix this problem as soon as possible."
-msgstr "Ci scusiamo per il problema, stiamo lavorando per risolvere questo problema il più presto possibile."
+msgstr "Ci scusiamo per l'inconveniente, stiamo lavorando per risolvere questo problema il più presto possibile."
+
+msgid "If this problem persists, please contact the administrators of this server."
+msgstr "Se questo problema persiste ti preghiamo di comunicarlo agli amministratori del server."
+
+msgid "Go back to the homepage"
+msgstr "Torna all'homepage"
 
 msgid "404 Page Not Found"
 msgstr "404 Page Not Found"

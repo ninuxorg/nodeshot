@@ -1267,10 +1267,10 @@ var nodeshot = {
         }, // nodeshot.distance.calculate()
         
         /*
-        * nodeshot.distance.add(link:object, data:object, distance:string, saved:boolean)
+        * nodeshot.distance.add(link:object, data:object, distance:string, azimuth:string, saved:boolean)
         * add a new calculated distance link
         */
-        add: function(link, data, distance, saved){
+        add: function(link, data, distance, azimuth, saved){
             // push object into nodeshot.distance.links and store the index
             var index = this.links.push({
                 // google.maps.Polyline object
@@ -1364,7 +1364,7 @@ var nodeshot = {
             var from_link = '<a class="link-node" href="javascript:nodeshot.gmap.goToNode(\''+fromNode+'\')">'+data.from_name+'</a>';
             var to_link = '<a class="link-node" href="javascript:nodeshot.gmap.goToNode(\''+toNode+'\')">'+data.to_name+'</a>';
             // prepare html to insert
-            var html = '<div id="distance-link'+index+'" class="distance-link"><span>'+from_link+' - '+to_link+': <b>'+distance+' km</b> ';
+            var html = '<div id="distance-link'+index+'" class="distance-link"><span>'+from_link+' - '+to_link+': <b>'+distance+' km</b> - <b class="azm">'+azimuth+'°</b>';
             html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].show()" class="link-show">'+i18n.SHOW+'</a>';
             html = html +   '<a href="javascript:nodeshot.distance.links['+index+'].hide()" class="link-hide">'+i18n.HIDE+'</a>';
             if(!saved){
@@ -1385,9 +1385,9 @@ var nodeshot = {
     }, // nodeshot.distance
     
     /*
-    * nodeshot.distance.add(link:object, data:object, distance:string, saved:boolean)
-    * add a new calculated distance link
-    */
+     * nodeshot.gmap
+     * google map stuff
+     */
     gmap: {
         
         // here we'll store new nodes marker and listener
@@ -1502,7 +1502,7 @@ var nodeshot = {
                         link.dbm
                     */
                     var link_quality = (quality != 'nometric') ? link[quality] : 1; // this means: if metric is disabled display only green links
-                    link.gmap = nodeshot.gmap.drawLink(link.from_lat, link.from_lng, link.to_lat, link.to_lng, link_quality);
+                    link.gmap = nodeshot.gmap.drawLink(link.from_lat, link.from_lng, link.to_lat, link.to_lng, link_quality, link.retx, link.rdbm);
                 }
             }
         }, // nodeshot.gmap.drawNodes()
@@ -1777,10 +1777,10 @@ var nodeshot = {
         }, // nodeshot.gmap.clickMarker()
         
         /*
-        * nodeshot.gmap.drawLink(from_lat:float, from_lng:float, to_lat:float, to_lng:float, quality:int)
+        * nodeshot.gmap.drawLink(from_lat:float, from_lng:float, to_lat:float, to_lng:float, quality:int, etx:string, dbm:string)
         * draws a link on google map
         */
-        drawLink: function(from_lat, from_lng, to_lat, to_lng, quality) {
+        drawLink: function(from_lat, from_lng, to_lat, to_lng, quality, etx, dbm) {
             // determine color depending on link quality
             // instead of using a switch or a concatenation of if/else, we'll use an array to save space ;-)
             var color = [
@@ -1799,14 +1799,25 @@ var nodeshot = {
             else if(quality==3){
                 opacity = 0.4;
             }
+            // start latitude and longitude object
+            var startLatLng = new google.maps.LatLng(from_lat, from_lng);
+            // end latitude and longitude object
+            var endLatLng = new google.maps.LatLng(to_lat, to_lng);  
             // draw link on gmap
             var link = new google.maps.Polyline({
                 // coordinates
-                path: [new google.maps.LatLng(from_lat, from_lng),new google.maps.LatLng(to_lat, to_lng)],
+                path: [startLatLng, endLatLng],
                 // line features
                 strokeColor: color[quality], // quality can be 1,2,3 or 4
                 strokeOpacity: opacity,
                 strokeWeight: 5 
+            });
+            // click event for polyline
+            link.clickListener = google.maps.event.addListener(link, 'click',  function(event){
+                nodeshot.gmap.infoWindow.setContent('<b>etx</b>: '+etx+'<br /><b>dBm</b>: '+dbm);
+                nodeshot.gmap.infoWindow.maxWidth = 50;
+                nodeshot.gmap.infoWindow.position = event.latLng;
+                nodeshot.gmap.infoWindow.open(nodeshot.gmap.map);
             });
             // show link on gmap
             link.setMap(nodeshot.gmap.map);
@@ -1847,7 +1858,7 @@ var nodeshot = {
             // show result
             $('#result-row').fadeIn(500);
             // add distance link controls
-            nodeshot.distance.add(link, data, distance, saved);
+            nodeshot.distance.add(link, data, distance, azimuth, saved);
             return true;
         }, // nodeshot.gmap.drawDistanceLink()
         

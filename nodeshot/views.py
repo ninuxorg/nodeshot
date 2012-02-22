@@ -109,6 +109,10 @@ def nodes(request):
             'from_lat': l.from_interface.device.node.lat,
             'to_lng': l.to_interface.device.node.lng,
             'to_lat': l.to_interface.device.node.lat,
+            # raw values
+            'retx': l.etx,
+            'rdbm': l.dbm,
+            # interpreted values (link quality, can be 1, 2 or 3)
             'etx': etx,
             'dbm': dbm
         }

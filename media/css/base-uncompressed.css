@@ -557,6 +557,10 @@ select option{ background-color: #262626 }
 
 #side-links b{
 	color: #ffb11e;
+}
+
+#side-links b.azm{
+	color: #fff;
 	margin-right: 6px
 }
 

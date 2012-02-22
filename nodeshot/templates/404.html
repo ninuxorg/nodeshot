@@ -6,15 +6,22 @@
 	<title>{% trans '404 Page Not Found' %}</title>
 	<style type="text/css">
 	    body { background: #000; font: normal 14px/20px "Arial", "Helvetica", "FreeSans", "Utkal", "Garuda", "Nimbus Sans NL", sans-serif; }
-	    #container{ width: 600px; margin: 40px auto 0; padding: 40px 40px 30px; background-color: white; text-align: left }
-	    h1 { margin: 0 0 25px; font: bold 30px/15px "Georgia", "Nimbus Roman No9 L", "Century Schoolbook L", "Norasi", "Rekha", serif; color: #000 }
-	    p { margin: 10px 0 }
+	    #container{ width: 600px; margin: 40px auto 0; text-align: left }
+	    h1 { margin: 0 0 25px; font: bold 30px/15px "Georgia", "Nimbus Roman No9 L", "Century Schoolbook L", "Norasi", "Rekha", serif; color: #fff }
+	    p { margin: 10px 0; color: white }
+        .goback{ text-align: center; font-size: 16px }
+        .goback a{ font-weight: bold }
+        .credits{ margin-top: 80px; text-align: right; font-size: 11px }
+        a{ color: #fff }
 	</style>
 </head>
 <body>
     <div id="container">
-        <h1>{% trans '..Ops! 404 Page not found' %}</h1>
+        <h1>{% trans '..Ops! 404 Page not found' %}</h1>        
         <p>{% trans 'The page you were looking for was not found on this website.' %}</p>
-    </div>
+        <p style="text-align:center;margin: 40px 0 30px"><img src="{{ MEDIA_URL }}/images/404.png" alt="404" /></p>
+        <p class="goback"><a href="{% url nodeshot.views.index %}">{% trans "Go back to the homepage" %}</a></p>
+    </div>    
+    <p class="credits">Illustration by <a href="http://theoatmeal.com/" target="_blank">The Oatmeal</a></p>
 </body>
 </html>
