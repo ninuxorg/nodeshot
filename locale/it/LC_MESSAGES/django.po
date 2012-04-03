@@ -1002,3 +1002,6 @@ msgstr "Il nodo non esiste"
 
 msgid "Disabled"
 msgstr "Disabilitato"
+
+msgid "The selected node is not available in this list"
+msgstr "Il nodo selezionato non è presente in questa lista"

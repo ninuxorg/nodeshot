@@ -2052,7 +2052,7 @@ var nodeshot = {
             else{
                 setTimeout(function(){
                     // TODO: translate
-                    nodeshot.dialog.open('Il nodo selezionato non è presente in questa lista.')
+                    nodeshot.dialog.open(i18n.NODE_NOT_IN_LIST)
                 }, 300);
             }
         }, // nodeshot.infoTab.scrollTo()
