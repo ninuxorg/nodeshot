@@ -157,6 +157,9 @@ msgstr ""
 msgid "dBm not available"
 msgstr "dBm non disponibile"
 
+msgid "not available"
+msgstr "non disponibile"
+
 msgid "Delete \"%(node)s\""
 msgstr "Elimina \"%(node)s\""
 

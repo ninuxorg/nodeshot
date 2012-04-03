@@ -1812,13 +1812,21 @@ var nodeshot = {
                 strokeOpacity: opacity,
                 strokeWeight: 5 
             });
-            // click event for polyline
-            link.clickListener = google.maps.event.addListener(link, 'click',  function(event){
-                nodeshot.gmap.infoWindow.setContent('<b>etx</b>: '+etx+'<br /><b>dBm</b>: '+dbm);
-                nodeshot.gmap.infoWindow.maxWidth = 50;
-                nodeshot.gmap.infoWindow.position = event.latLng;
-                nodeshot.gmap.infoWindow.open(nodeshot.gmap.map);
-            });
+            // if not a distance calculation link
+            if(quality!=4){
+                // if dBm info is not available
+                if(dbm==0){
+                    // write something human readable instead of 0    
+                    dbm = i18n.NOT_AVAILABLE 
+                }
+                // add an onclick event for the link which shows etx and dBm
+                link.clickListener = google.maps.event.addListener(link, 'click',  function(event){
+                    nodeshot.gmap.infoWindow.setContent('<b>etx</b>: '+etx+'<br /><b>dBm</b>: '+dbm);
+                    nodeshot.gmap.infoWindow.maxWidth = 50;
+                    nodeshot.gmap.infoWindow.position = event.latLng;
+                    nodeshot.gmap.infoWindow.open(nodeshot.gmap.map);
+                });   
+            }
             // show link on gmap
             link.setMap(nodeshot.gmap.map);
             // return link object - needed by nodeshot.distance.add()
