@@ -21,3 +21,10 @@ It rises from the ashes of WNMap (http://sourceforge.net/projects/wnmap/),
 powered by django (https://www.djangoproject.com/), released
 under GPLv3 and tested inside the Ninux wireless community network
 (http://wiki.ninux.org/).
+
+
+How to install:
+A basic guide on how to setup nodeshot for your community is available here:
+http://wiki.ninux.org/InstallNodeshot
+
+If you have any question, please feel free to contact us at contatti@ninux.org
