@@ -58,13 +58,29 @@ def update_statistics():
     nodes = list(nodes)
 
     # active & hotspot
-    active_and_hotspots = nodes[1].get('count')
+    try:
+    	active_and_hotspots = nodes[1].get('count')
+    # in case there are no nodes with this status we'll get an exception
+    except:
+        active_and_hotspots = 0
     # active nodes
-    active_nodes = nodes[0].get('count') + active_and_hotspots
+    try:
+        active_nodes = nodes[0].get('count') + active_and_hotspots
+    # in case there are no nodes with this status we'll get an exception
+    except:
+        active_nodes = 0
     # hotspots
-    hotspots = nodes[2].get('count') + active_and_hotspots
+    try:
+        hotspots = nodes[2].get('count') + active_and_hotspots
+    # in case there are no nodes with this status we'll get an exception
+    except:
+        hotspots = 0 + active_and_hotspots
     # potential nodes
-    potential_nodes = nodes[3].get('count')
+    try:
+        potential_nodes = nodes[3].get('count')
+    # in case there are no nodes with this status we'll get an exception
+    except:
+        potential_nodes = 0
     # number of links
     link_count = Link.objects.count()
 
