@@ -20,6 +20,7 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_exempt
 
 from settings import *
+from django.conf import settings
 
 if DEBUG:
     import logging
@@ -37,7 +38,7 @@ def index(request, slug=False):
         stat = False
 
     # default case for next code block
-    gmap_center = GMAP_CENTER
+    gmap_center = GMAP_CENTER 
     # if node is in querystring we want to center the map somewhere else
     if slug:
         try:
@@ -56,6 +57,7 @@ def index(request, slug=False):
     # prepare context
     context = {
         'stat': stat,
+        'default_zoom': settings.NODESHOT_DEFAULT_ZOOM,
         'gmap_center': gmap_center,
         'settings': {
             'HTML_TITLE_INDEX': HTML_TITLE_INDEX,

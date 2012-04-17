@@ -133,6 +133,9 @@ NODESHOT_GMAP_CENTER = {
     'lng': '12.4960'
 }
 
+# google map defaut level for nodeshot
+NODESHOT_DEFAULT_ZOOM_LEVEL = 12
+
 # site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
 NODESHOT_SITE = {
     'name': 'Nodeshot',

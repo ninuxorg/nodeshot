@@ -1401,6 +1401,7 @@ var nodeshot = {
         * nodeshot.gmap.init()
         * initializes google map
         */
+       
         init: function(){
             // cache jquery objects
             nodeshot.layout.$map = $('#map_canvas');
@@ -1456,6 +1457,13 @@ var nodeshot = {
             }, 200);
             nodeshot.layout.setFullScreen();
         }, // nodeshot.gmap.init()
+        
+       /*
+        * Set new zoom level for the map
+        */
+       setZoomLevel: function(zoom_level){
+            nodeshot.gmap.map.setZoom(zoom_level);
+       }, // nodeshot.gmap.setZoomLevel(zoom_level)
         
         /*
         * nodeshot.gmap.drawNodes(status:string)

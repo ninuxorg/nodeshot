@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>{{ settings.HTML_TITLE_INDEX }}</title>
+    <title>{{ settings.HTML_TITLE_INDEX }}   {{default_zoom}}</title>
     {% if DEBUG %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base-uncompressed.css" />{% else %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}css/base.css" />{% endif %}
     <!--[if lte IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <base href="{% url nodeshot.views.index %}" />
@@ -110,6 +110,7 @@
         // when dom ready
         $(function() {
             nodeshot.init();
+            nodeshot.gmap.setZoomLevel({{default_zoom}});
             nodeshot.layout.setElementDimensions();
             {% if messages %}
             nodeshot.dialog.open("{% for message in messages %}{{ message }}{% endfor %}");
