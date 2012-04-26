@@ -128,13 +128,11 @@ AUTH_PROFILE_MODULE = 'nodeshot.UserProfile'
 DEVELOPMENT_SERVER = True
 
 # google map center for nodeshot
-NODESHOT_GMAP_CENTER = {
+NODESHOT_GMAP_CONFIG = {
     'lat': '41.8934',
-    'lng': '12.4960'
+    'lng': '12.4960',
+    'zoom': '12'
 }
-
-# google map defaut level for nodeshot
-NODESHOT_DEFAULT_ZOOM_LEVEL = 12
 
 # site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
 NODESHOT_SITE = {

@@ -1408,9 +1408,10 @@ var nodeshot = {
             nodeshot.layout.$sideLinks = $('#side-links');
             // init latlng object with coordinates specified in settings.py
             var latlng = new google.maps.LatLng(nodeshot.gmap.map_center.lat, nodeshot.gmap.map_center.lng);
+            var default_zoom = parseInt(nodeshot.gmap.zoom);
             // init gmpap 
             nodeshot.gmap.map = new google.maps.Map(document.getElementById('map_canvas'), {
-                zoom: 12,
+                zoom: default_zoom,
                 center: latlng,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             });
@@ -1457,13 +1458,6 @@ var nodeshot = {
             }, 200);
             nodeshot.layout.setFullScreen();
         }, // nodeshot.gmap.init()
-        
-       /*
-        * Set new zoom level for the map
-        */
-       setZoomLevel: function(zoom_level){
-            nodeshot.gmap.map.setZoom(zoom_level);
-       }, // nodeshot.gmap.setZoomLevel(zoom_level)
         
         /*
         * nodeshot.gmap.drawNodes(status:string)

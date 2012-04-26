@@ -20,7 +20,6 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_exempt
 
 from settings import *
-from django.conf import settings
 
 if DEBUG:
     import logging
@@ -38,12 +37,12 @@ def index(request, slug=False):
         stat = False
 
     # default case for next code block
-    gmap_center = GMAP_CENTER 
+    gmap_config = GMAP_CONFIG
     # if node is in querystring we want to center the map somewhere else
     if slug:
         try:
             node = Node.objects.only('lat', 'lng', 'slug','status').get(slug=slug)
-            gmap_center = {
+            gmap_config = {
                 'is_default': 'false',
                 'node': '%s;%s' % (jslugify(node.slug), node.status),
                 # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
@@ -57,8 +56,7 @@ def index(request, slug=False):
     # prepare context
     context = {
         'stat': stat,
-        'default_zoom': settings.NODESHOT_DEFAULT_ZOOM,
-        'gmap_center': gmap_center,
+        'gmap_config': gmap_config,
         'settings': {
             'HTML_TITLE_INDEX': HTML_TITLE_INDEX,
             'META_ROBOTS': META_ROBOTS,
@@ -479,7 +477,7 @@ def generate_kml(request):
     
     context = {
         'KML': KML,
-        'GMAP_CENTER': GMAP_CENTER,
+        'GMAP_CONFIG': GMAP_CONFIG,
         'active': active,
         'hotspot': hotspot,
         'potential': potential,
