@@ -462,7 +462,7 @@ def generate_kml(request):
     
     # retrieve nodes in 3 different objects depending on the status
     active = Node.objects.filter(status = 'a').only('name', 'lng', 'lat')
-    hotspot = Node.objects.filter(status = 'h').only('name', 'lng', 'lat')
+    hotspot = Node.objects.filter(Q(status = 'h') | Q(status = 'ah')).only('name', 'lng', 'lat')
     potential = Node.objects.filter(status = 'p').only('name', 'lng', 'lat')
 
     # retrieve links, select_related() reduces the number of queries,
