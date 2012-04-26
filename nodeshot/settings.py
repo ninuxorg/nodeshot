@@ -4,8 +4,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 
-GMAP_CENTER = getattr(settings, 'NODESHOT_GMAP_CENTER', {'lat': '41.8934','lng': '12.4960'})
-GMAP_CENTER['is_default'] = 'true'
+GMAP_CONFIG = getattr(settings, 'NODESHOT_GMAP_CONFIG', {'lat': '41.8934','lng': '12.4960'})
+GMAP_CONFIG['is_default'] = 'true'
 SITE = getattr(settings, 'NODESHOT_SITE', False)
 KML = getattr(settings, 'NODESHOT_KML', False)
 ROUTING_PROTOCOLS = getattr(settings, 'NODESHOT_ROUTING_PROTOCOLS', (

@@ -100,11 +100,12 @@
     <script>
         nodeshot.url.index = '{% url nodeshot.views.index %}';
         nodeshot.url.media = '{{ MEDIA_URL }}';
+        nodeshot.gmap.zoom = '{{ gmap_config.zoom }}';
         nodeshot.gmap.map_center = {
-            is_default: {{ gmap_center.is_default }},
-            {% if gmap_center.is_default == 'false' %}node: '{{ gmap_center.node }}',{% endif %}
-            lat: '{{ gmap_center.lat }}',
-            lng: '{{ gmap_center.lng }}'
+            is_default: {{ gmap_config.is_default }},
+            {% if gmap_config.is_default == 'false' %}node: '{{ gmap_config.node }}',{% endif %}
+            lat: '{{ gmap_config.lat }}',
+            lng: '{{ gmap_config.lng }}'
         };
         {% include 'i18n_fragment.html' %}   
         // when dom ready
