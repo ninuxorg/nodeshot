@@ -1401,15 +1401,17 @@ var nodeshot = {
         * nodeshot.gmap.init()
         * initializes google map
         */
+       
         init: function(){
             // cache jquery objects
             nodeshot.layout.$map = $('#map_canvas');
             nodeshot.layout.$sideLinks = $('#side-links');
             // init latlng object with coordinates specified in settings.py
             var latlng = new google.maps.LatLng(nodeshot.gmap.map_center.lat, nodeshot.gmap.map_center.lng);
+            var default_zoom = parseInt(nodeshot.gmap.zoom);
             // init gmpap 
             nodeshot.gmap.map = new google.maps.Map(document.getElementById('map_canvas'), {
-                zoom: 12,
+                zoom: default_zoom,
                 center: latlng,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             });
