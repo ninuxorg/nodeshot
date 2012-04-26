@@ -131,7 +131,7 @@ DEVELOPMENT_SERVER = True
 NODESHOT_GMAP_CONFIG = {
     'lat': '41.8934',
     'lng': '12.4960',
-    'zoom': '12'
+    'zoom': 12
 }
 
 # site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework

@@ -1407,12 +1407,11 @@ var nodeshot = {
             nodeshot.layout.$map = $('#map_canvas');
             nodeshot.layout.$sideLinks = $('#side-links');
             // init latlng object with coordinates specified in settings.py
-            var latlng = new google.maps.LatLng(nodeshot.gmap.map_center.lat, nodeshot.gmap.map_center.lng);
-            var default_zoom = parseInt(nodeshot.gmap.zoom);
+            var latlng = new google.maps.LatLng(nodeshot.gmap.config.lat, nodeshot.gmap.config.lng);
             // init gmpap 
             nodeshot.gmap.map = new google.maps.Map(document.getElementById('map_canvas'), {
-                zoom: default_zoom,
                 center: latlng,
+                zoom: parseInt(nodeshot.gmap.config.zoom),
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             });
             // init geocoder
@@ -1431,7 +1430,7 @@ var nodeshot = {
                         nodeshot.gmap.drawNodes(nodeshot.status_choices.p);
                     }                    
                     // if map center is not the default one
-                    if(!nodeshot.gmap.map_center.is_default){                        
+                    if(!nodeshot.gmap.config.is_default){                        
                         /*
                         split value in two variables, one for slug and one for status
                         example:
@@ -1448,7 +1447,7 @@ var nodeshot = {
                             which is the same as
                                 nodeshot.nodes.active.sephiroth
                         */
-                        var bits = nodeshot.gmap.map_center.node.split(';');
+                        var bits = nodeshot.gmap.config.node.split(';');
                         var slug = bits[0];
                         var status = nodeshot.status_choices[bits[1]];
                         // center map and open the node
