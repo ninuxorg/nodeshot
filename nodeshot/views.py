@@ -42,13 +42,11 @@ def index(request, slug=False):
     if slug:
         try:
             node = Node.objects.only('lat', 'lng', 'slug','status').get(slug=slug)
-            gmap_config = {
-                'is_default': 'false',
-                'node': '%s;%s' % (jslugify(node.slug), node.status),
-                # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
-                'lat': str(node.lat),
-                'lng': str(node.lng)
-            }
+            gmap_config['is_default'] = 'false'
+            gmap_config['node'] = '%s;%s' % (jslugify(node.slug), node.status)
+            # convert to string otherwise django might format the decimal separator with a comma, which would break gmap
+            gmap_config['lat'] = str(node.lat)
+            gmap_config['lng'] = str(node.lng)
         except ObjectDoesNotExist:
             # if node requested doesn't exist return 404
             raise Http404
