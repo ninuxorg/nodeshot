@@ -35,7 +35,7 @@ To run some test just type:
  git clone git://github.com/ninuxorg/nodeshot.git mapserver
  cd mapserver
  cp settings.example.py settings.py
- ./manager.py syncdb && ./manager.py runserver
+ ./manage.py syncdb && ./manage.py runserver
 
 Enjoy on http://localhost:8000 !
 
