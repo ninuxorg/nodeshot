@@ -23,8 +23,22 @@ under GPLv3 and tested inside the Ninux wireless community network
 (http://wiki.ninux.org/).
 
 
-How to install:
-A basic guide on how to setup nodeshot for your community is available here:
+INSTALLATION
+---------------
+For a complete installation guide please refer to installation guide
+available here:
 http://wiki.ninux.org/InstallNodeshot
 
-If you have any question, please feel free to contact us at contatti@ninux.org
+To run some test just type:
+
+ sudo pip install Django django-extensions
+ git clone git://github.com/ninuxorg/nodeshot.git mapserver
+ cd mapserver
+ cp settings.example.py settings.py
+ ./manage.py syncdb && ./manage.py runserver
+
+Enjoy on http://localhost:8000 !
+
+
+If you have any question, please feel free to contact us:
+    contatti@ninux.org
