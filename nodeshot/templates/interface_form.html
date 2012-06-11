@@ -1,5 +1,0 @@
-{% extends 'overlay.html' %}{% load i18n %}
-{% block title %}{% blocktrans with node=node.name %}Edit Interfaces for node {{ node }}{% endblocktrans %} - {{ SITE.name }}{% endblock %}
-{% block content %}
-    {% include 'ajax/interface_form.html' %}
-{% endblock %}

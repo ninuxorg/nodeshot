@@ -1,8 +1,0 @@
-{% load i18n %}{% blocktrans with site=site.name%}Thank you for your interest in {{ site }}!
-
-Please confirm your new potential node by clicking the following link (valid for {{ expiration_days }} days){% endblocktrans %}:
-
-http://{{ site.domain }}{% url nodeshot_confirm_node node.id node.activation_key %}
-
-{% blocktrans with site=site.name%}If you did NOT request the insertion of a new potential node on {{ site }} you can report an abuse by clicking on the following link:{% endblocktrans %}:
-http://{{ site.domain }}{% url nodeshot_report_abuse node.id node.email as abuse %}{{ abuse|urlencode }}

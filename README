@@ -19,26 +19,12 @@ It is super-fast, nice and easy to use.
 
 It rises from the ashes of WNMap (http://sourceforge.net/projects/wnmap/),
 powered by django (https://www.djangoproject.com/), released
-under GPLv3 and tested inside the Ninux wireless community network
+under GPLv3 and tested in the Ninux wireless community network
 (http://wiki.ninux.org/).
 
 
-INSTALLATION
----------------
-For a complete installation guide please refer to installation guide
-available here:
+How to install:
+A basic guide on how to setup nodeshot for your community is available here:
 http://wiki.ninux.org/InstallNodeshot
 
-To run some test just type:
-
- sudo pip install Django django-extensions
- git clone git://github.com/ninuxorg/nodeshot.git mapserver
- cd mapserver
- cp settings.example.py settings.py
- ./manage.py syncdb && ./manage.py runserver
-
-Enjoy on http://localhost:8000 !
-
-
-If you have any question, please feel free to contact us:
-    contatti@ninux.org
+If you have any question, please feel free to contact us at contatti@ninux.org

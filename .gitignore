@@ -1,4 +1,0 @@
-#ignore the follow paths
-*.pyc
-db/
-settings.py
