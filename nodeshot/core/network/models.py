@@ -40,6 +40,9 @@ class Ip(BaseAccessLevel):
 class Ethernet(Interface):
     standard = models.CharField(_('type'), max_length=15, choices=ETHERNET_STANDARDS)
     duplex = models.CharField(_('type'), max_length=15, choices=DUPLEX_CHOICES)
+    
+    class Meta:
+        db_table = 'network_interface_ethernet'
 
 class Wireless(Interface):
     wireless_mode = models.CharField(max_length=5)
@@ -49,24 +52,40 @@ class Wireless(Interface):
     transmitpower = models.IntegerField(null=True, blank=True)
     dbm = models.IntegerField(_('dBm'), null=True, default=None)
     noise = models.IntegerField(_('noise'), null=True, default=None)
+    
+    class Meta:
+        db_table = 'network_interface_wireless'
 
 class Bridge(Interface):
-    interfaces = models.ManyToManyField(Interface, verbose_name=_('interfaces'), related_name='bridged_interfaces')
+    interfaces = models.ManyToManyField(Interface, verbose_name=_('interfaces'), related_name='bridge_interfaces')
+    
+    class Meta:
+        db_table = 'network_interface_bridge'
 
 class Tunnel(Interface):
     sap = models.CharField(max_length=10, null=True, blank=True)
     protocol = models.CharField(max_length=10) # GRE, ... ecc
     endpoint = models.ForeignKey('Ip', verbose_name=_('ip address'))
     
-class WirelessCredential(BaseDate):
+    class Meta:
+        db_table = 'network_interface_tunnel'
+
+class Vlan(Interface):
+    tag = models.CharField(max_length=10)
+    
+    class Meta:
+        db_table = 'network_interface_vlan'
+    
+class Vap(BaseDate):
     interface = models.ForeignKey(Wireless, verbose_name='interface')
     essid = models.CharField(max_length=50)
     bssid = models.CharField(max_length=50, null=True, blank=True)
     encryption = models.CharField(max_length=50, null=True, blank=True)
     key = models.CharField(max_length=100, null=True, blank=True)
+    auth_server = models.CharField(max_length=50, null=True, blank=True)
+    auth_port = models.IntegerField(null=True, blank=True)
+    accounting_server = models.CharField(max_length=50, null=True, blank=True)
+    accounting_port = models.IntegerField(null=True, blank=True)
     
     class Meta:
-        db_table = 'network_wireless_credential'
-
-class Vlan(Interface):
-    tag = models.CharField(max_length=10)
+        db_table = 'network_interface_vap'
