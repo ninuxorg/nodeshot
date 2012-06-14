@@ -13,8 +13,10 @@ ACCESS_LEVELS = (
     ('manager', _('manager'))
 )
 
-#Domain PowerDNS table
 
+"""
+    Domain PowerDNS table
+"""
 class Domain(BaseDate):
     name            = models.CharField(_('name'), max_length=255, unique=True, db_index=True)
     type            = models.CharField(_('type'),max_length=6, choices=((x,x) for x in ('NATIVE', 'MASTER', 'SLAVE', 'SUPERSLAVE')))
@@ -30,8 +32,9 @@ class Domain(BaseDate):
     def __unicode__(self):
         return self.name
 
-#Record PowerDNS table
-
+"""
+    Record PowerDNS table
+"""
 class Record(BaseDate):
     domain      = models.ForeignKey('Domain', verbose_name=_('domain'))
     name        = models.CharField(_('name'), max_length=255, db_index=True)
@@ -49,8 +52,9 @@ class Record(BaseDate):
     def __unicode__(self):
         return self.name
 
-#Supermaster PowerDNS table (deprecated)
-
+"""
+    Supermaster PowerDNS table (deprecated)
+"""
 class Supermaster(BaseDate):
     nameserver = models.CharField(max_length=255, db_index=True)
     account    = models.CharField(max_length=40, null=True, blank=True, db_index=True)
@@ -63,18 +67,9 @@ class Supermaster(BaseDate):
     def __unicode__(self):
         return self.nameserver
 
-
-# Nodeshot
-
-class DomainPolicy(BaseDate):
-    domain              = models.ForeignKey(Domain, verbose_name='domain', blank=True, null=True)
-    name                = models.CharField(_('name'), max_length=255, unique=True)
-    is_automatized      = models.BooleanField(default=False)
-    can_request         = models.IntegerField(default=0)
-    needs_confirmation  = models.BooleanField(default=False)
-    managers            = models.ManyToManyField(User, through='DomainManager', verbose_name=_('name'))
-
-
+"""
+    OneToOne tables for customize automatic DNS names
+"""
 class ZoneToDns(BaseDate):
     zone                = models.OneToOneField(Zone, primary_key=True)
     value               = models.SlugField(_('value'), max_length=20)
@@ -91,6 +86,14 @@ class InterfaceToDns(BaseDate):
     zone                = models.OneToOneField(Interface, primary_key=True)
     value               = models.SlugField(_('value'), max_length=20)
 
+
+class DomainPolicy(BaseDate):
+    domain              = models.ForeignKey(Domain, verbose_name='domain', blank=True, null=True)
+    name                = models.CharField(_('name'), max_length=255, unique=True)
+    is_automatized      = models.BooleanField(default=False)
+    can_request         = models.IntegerField(default=0)
+    needs_confirmation  = models.BooleanField(default=False)
+    managers            = models.ManyToManyField(User, through='DomainManager', verbose_name=_('name'))
 
 class DomainManager(BaseDate):
     user                = models.ForeignKey(User)
