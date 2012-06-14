@@ -5,13 +5,15 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from nodeshot.core.base.models import BaseDate
+from nodeshot.core.nodes.models import Zone, Node
+from nodeshot.core.network.models import Device, Interface
 
 ACCESS_LEVELS = (
     ('owner', _('owner')),
     ('manager', _('manager'))
 )
 
-# Power DNS
+#Domain PowerDNS table
 
 class Domain(BaseDate):
     name            = models.CharField(_('name'), max_length=255, unique=True, db_index=True)
@@ -27,6 +29,8 @@ class Domain(BaseDate):
 
     def __unicode__(self):
         return self.name
+
+#Record PowerDNS table
 
 class Record(BaseDate):
     domain      = models.ForeignKey('Domain', verbose_name=_('domain'))
@@ -45,6 +49,8 @@ class Record(BaseDate):
     def __unicode__(self):
         return self.name
 
+#Supermaster PowerDNS table (deprecated)
+
 class Supermaster(BaseDate):
     nameserver = models.CharField(max_length=255, db_index=True)
     account    = models.CharField(max_length=40, null=True, blank=True, db_index=True)
@@ -57,24 +63,39 @@ class Supermaster(BaseDate):
     def __unicode__(self):
         return self.nameserver
 
+
 # Nodeshot
 
 class DomainPolicy(BaseDate):
-    domain          = models.ForeignKey(Domain, verbose_name='domain', blank=True, null=True)
-    name            = models.CharField(_('name'), max_length=255, unique=True)
-    is_automatized = models.BooleanField(default=False)
-    can_request = models.IntegerField(default=0)
-    needs_confirmation = models.BooleanField(default=False)
-    managers = models.ManyToManyField(User, through='DomainManager', verbose_name=_('name'))
+    domain              = models.ForeignKey(Domain, verbose_name='domain', blank=True, null=True)
+    name                = models.CharField(_('name'), max_length=255, unique=True)
+    is_automatized      = models.BooleanField(default=False)
+    can_request         = models.IntegerField(default=0)
+    needs_confirmation  = models.BooleanField(default=False)
+    managers            = models.ManyToManyField(User, through='DomainManager', verbose_name=_('name'))
 
-class Network2Dns(BaseDate):
-    rel = generic.GenericForeignKey('content_type', 'object_id')
-    value = models.SlugField(_('value'), max_length=20)
+
+class ZoneToDns(BaseDate):
+    zone                = models.OneToOneField(Zone, primary_key=True)
+    value               = models.SlugField(_('value'), max_length=20)
+
+class NodeToDns(BaseDate):
+    zone                = models.OneToOneField(Node, primary_key=True)
+    value               = models.SlugField(_('value'), max_length=20)
+
+class DeviceToDns(BaseDate):
+    zone                = models.OneToOneField(Device, primary_key=True)
+    value               = models.SlugField(_('value'), max_length=20)
+
+class InterfaceToDns(BaseDate):
+    zone                = models.OneToOneField(Interface, primary_key=True)
+    value               = models.SlugField(_('value'), max_length=20)
+
 
 class DomainManager(BaseDate):
-    user = models.ForeignKey(User)
-    domain = models.ForeignKey(DomainPolicy)
-    access_level = models.CharField(_('access level'), max_length=10, choices=ACCESS_LEVELS)
+    user                = models.ForeignKey(User)
+    domain              = models.ForeignKey(DomainPolicy)
+    access_level        = models.CharField(_('access level'), max_length=10, choices=ACCESS_LEVELS)
     
     class Meta:
         unique_together = ('user', 'domain')
