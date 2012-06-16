@@ -14,7 +14,7 @@ __builtins__.IS_SCRIPT = True
 from nodeshot.models import *
 from django.db.models import Q
 
-TOPOLOGY_URLS=["http://eigenlab.org/battxtinfo.php", "http://coppermine.eigenlab.org/battxtinfo.php"]
+TOPOLOGY_URLS=["http://eigenlab.org/battxtinfo.php", "http://coppermine.eigenlab.org/battxtinfo.php", "http://static.nemesisdesign.net/vittoria.txt"]
 
 # Take all ips of a node with MID olsr, for any couple of node composing a link, so [ip1A,ip2A,ip3A] <--> [ip1B,ip2B]
 # query db for existing link from one ip of A to one ip of B (break ties randomly). Else create a new one
@@ -90,6 +90,7 @@ class TopologyParser(object):
                         ipaddr1, ipaddr2, lq, nlq, etx = line.split()
                         self.linklist.append((ipaddr1, ipaddr2, float(etx)))
                 except ValueError:
+                        print ("wrong line: %s" % line)
                         pass
                 i+=1
                 line = self.topologylines[i]
@@ -255,9 +256,12 @@ if __name__ == "__main__":
     # BATMAN
     for topology_url in TOPOLOGY_URLS:
         try:
+            print ("Opening URL %s" % topology_url)
             topologylines = urllib2.urlopen(topology_url).readlines()
         except Exception, e:
-            print "Got exception: ", e
+            print ("A problem occurred: %s" % e)
+            print ("Skipping to the next topology URL.")
+            continue
         for line in topologylines:
             row_elements = line.split()
             if len(row_elements) == 5:
@@ -304,6 +308,9 @@ if __name__ == "__main__":
 
     for l,v in old_links.iteritems() :
         if not v:
-            Link.objects.get(id=l).delete()
+            try:
+                Link.objects.get(id=l).delete()
+            except Exception, e:
+                print ("A problem occurred: %s" % e)
             print "Deleted link %d" % l
 
