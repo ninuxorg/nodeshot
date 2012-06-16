@@ -451,7 +451,7 @@ class Contact(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('ip address'))
     user_agent = models.CharField(max_length=200, blank=True)
     http_referer = models.CharField(max_length=200, blank=True)
-    accept_language = models.CharField(max_length=30, blank=True)
+    accept_language = models.CharField(max_length=60, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     
     def __unicode__(self):
