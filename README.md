@@ -31,11 +31,11 @@ http://wiki.ninux.org/InstallNodeshot
 
 To run some test just type:
 
- sudo pip install Django django-extensions
- git clone git://github.com/ninuxorg/nodeshot.git mapserver
- cd mapserver
- cp settings.example.py settings.py
- ./manage.py syncdb && ./manage.py runserver
+    sudo pip install Django django-extensions
+    git clone git://github.com/ninuxorg/nodeshot.git mapserver
+    cd mapserver
+    cp settings.example.py settings.py
+    ./manage.py syncdb && ./manage.py runserver
 
 Enjoy on http://localhost:8000 !
 
