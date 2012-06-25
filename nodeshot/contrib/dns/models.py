@@ -13,13 +13,51 @@ ACCESS_LEVELS = (
     ('manager', _('manager'))
 )
 
+DOMAIN_TYPE = (
+    'NATIVE',
+    'MASTER',
+    'SLAVE',
+    'SUPERSLAVE'
+)
 
-"""
-    Domain PowerDNS table
-"""
+RECORD_TYPE = ( #Can be implemented into a table with USER_RECORD_TYPE  
+    'A',
+    'AAAA',
+    'AFSDB',
+    'CERT',
+    'CNAME',
+    'DNSKEY',
+    'DS',
+    'HINFO',
+    'KEY',
+    'LOC',
+    'MX',
+    'NAPTR',
+    'NS',
+    'NSEC',
+    'PTR',
+    'RP',
+    'RRSIG',
+    'SOA',
+    'SPF',
+    'SSHFP',
+    'SRV',
+    'TXT'
+)
+
+USER_RECORD_TYPE = (
+    'A',
+    'AAAA',
+    'CNAME',
+    'MX'
+)
+
 class Domain(BaseDate):
+    """
+    Domain PowerDNS table
+    """
     name            = models.CharField(_('name'), max_length=255, unique=True, db_index=True)
-    type            = models.CharField(_('type'),max_length=6, choices=((x,x) for x in ('NATIVE', 'MASTER', 'SLAVE', 'SUPERSLAVE')))
+    type            = models.CharField(_('type'),max_length=6, choices=((x,x) for x in DOMAIN_TYPE))
     notified_serial = models.PositiveIntegerField(_('notified serial'), null=True, blank=True, default=None)
     master          = models.CharField(_('master'),max_length=128, null=True,blank=True, default=None)
     last_check      = models.PositiveIntegerField(_('last check'), null=True, blank=True, default=None)
@@ -32,13 +70,14 @@ class Domain(BaseDate):
     def __unicode__(self):
         return self.name
 
-"""
-    Record PowerDNS table
-"""
+
 class Record(BaseDate):
+    """
+    Record PowerDNS table
+    """
     domain      = models.ForeignKey('Domain', verbose_name=_('domain'))
     name        = models.CharField(_('name'), max_length=255, db_index=True)
-    type        = models.CharField(_('type'),max_length=6, db_index=True, choices=((x,x) for x in ('A', 'AAAA', 'AFSDB', 'CERT', 'CNAME', 'DNSKEY', 'DS', 'HINFO', 'KEY', 'LOC', 'MX', 'NAPTR', 'NS', 'NSEC', 'PTR', 'RP', 'RRSIG', 'SOA', 'SPF', 'SSHFP', 'SRV', 'TXT')))
+    type        = models.CharField(_('type'),max_length=6, db_index=True, choices=((x,x) for x in RECORD_TYPE))
     content     = models.CharField(_('content'),max_length=255)
     ttl         = models.PositiveIntegerField()
     prio        = models.PositiveIntegerField(_('priority'), null=True, blank=True)
@@ -52,10 +91,11 @@ class Record(BaseDate):
     def __unicode__(self):
         return self.name
 
-"""
-    Supermaster PowerDNS table (deprecated)
-"""
+
 class Supermaster(BaseDate):
+    """
+    Supermaster PowerDNS table (deprecated)
+    """
     nameserver = models.CharField(max_length=255, db_index=True)
     account    = models.CharField(max_length=40, null=True, blank=True, db_index=True)
 
@@ -68,37 +108,65 @@ class Supermaster(BaseDate):
         return self.nameserver
 
 """
-    OneToOne tables for customize automatic DNS names
+OneToOne tables for customize automatic DNS names
 """
-class ZoneToDns(BaseDate):
-    zone                = models.OneToOneField(Zone, primary_key=True)
+class ZoneToDns(models.Model):
+    zone                = models.OneToOneField(Zone, db_index=True, unique=True)
     value               = models.SlugField(_('value'), max_length=20)
 
-class NodeToDns(BaseDate):
-    zone                = models.OneToOneField(Node, primary_key=True)
+class NodeToDns(models.Model):
+    zone                = models.OneToOneField(Node, db_index=True, unique=True)
     value               = models.SlugField(_('value'), max_length=20)
 
-class DeviceToDns(BaseDate):
-    zone                = models.OneToOneField(Device, primary_key=True)
+class DeviceToDns(models.Model):
+    zone                = models.OneToOneField(Device, db_index=True, unique=True)
     value               = models.SlugField(_('value'), max_length=20)
 
-class InterfaceToDns(BaseDate):
-    zone                = models.OneToOneField(Interface, primary_key=True)
+class InterfaceToDns(models.Model):
+    zone                = models.OneToOneField(Interface, db_index=True)
     value               = models.SlugField(_('value'), max_length=20)
+
 
 
 class DomainPolicy(BaseDate):
-    domain              = models.ForeignKey(Domain, verbose_name='domain', blank=True, null=True)
-    name                = models.CharField(_('name'), max_length=255, unique=True)
+    """
+    Domains and Subdomains restrictions and policies for users
+    """
+    domain              = models.ForeignKey(Domain)
+    name                = models.CharField(max_length=255, db_index=True)
     is_automatized      = models.BooleanField(default=False)
     can_request         = models.IntegerField(default=0)
     needs_confirmation  = models.BooleanField(default=False)
     managers            = models.ManyToManyField(User, through='DomainManager', verbose_name=_('name'))
 
 class DomainManager(BaseDate):
+    """
+    ManyToMany relation between users and (sub)domains
+    """
     user                = models.ForeignKey(User)
     domain              = models.ForeignKey(DomainPolicy)
     access_level        = models.CharField(_('access level'), max_length=10, choices=ACCESS_LEVELS)
     
     class Meta:
         unique_together = ('user', 'domain')
+
+class UserRecord(BaseDate):
+    """
+    User's Records table
+        name is the domain without the extension
+    """
+    name                = models.CharField(_('name'), max_length=255)
+    domain              = models.ForeignKey(DomainPolicy)
+    type                = models.CharField(_('type'),max_length=6, db_index=True, choices=((x,x) for x in USER_RECORD_TYPE))
+    content             = models.CharField(_('content'),max_length=255)
+    user                = models.ForeignKey(User)
+
+class DNSScriptCache(models.Model):
+    """
+    DNS Script Caching table
+        name is the domain without the extension
+        content is the IPv4/IPv6 Address
+    """
+    name                = models.CharField(_('name'), max_length=255)
+    content             = models.CharField(max_length=29)
+

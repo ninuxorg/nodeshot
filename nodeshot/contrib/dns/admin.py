@@ -38,6 +38,7 @@ class RecordAdmin(BaseAdmin):
 
 
 
+
 class DomainPolicyAdmin(BaseAdmin):
     list_display = ['name']
     list_filter = ('domain',)
@@ -45,8 +46,19 @@ class DomainPolicyAdmin(BaseAdmin):
     search_fields = ['name']    
 
 
+class UserRecordAdmin(BaseAdmin):
+    """
+    User generated Record administration model   
+    """
+    list_display = ['name', 'type', 'content']
+    list_filter = ('domain',)
+
+    search_fields = ['name', 'content']
+
+
 admin.site.register(dns.models.Domain, DomainAdmin)
 admin.site.register(dns.models.Record, RecordAdmin)
 admin.site.register(dns.models.DomainPolicy, DomainPolicyAdmin)
+admin.site.register(dns.models.UserRecord, UserRecordAdmin)
 
 
