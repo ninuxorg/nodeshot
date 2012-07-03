@@ -177,10 +177,10 @@ LINK_STATUS = (
 )
 
 LINK_TYPE = (
-    ('radio', _('radio')), 
-    ('ethernet', _('ethernet')),
-    ('fiber', _('fiber')),
-    ('virtual', _('virtual')),
+    (1, _('radio')), 
+    (2, _('ethernet')),
+    (3, _('fiber')),
+    (4, _('virtual')),
 )
 
 METRIC_TYPES = (
