@@ -37,8 +37,6 @@ class RecordAdmin(BaseAdmin):
     readonly_fields = ['added', 'updated', 'domain', 'name', 'type', 'content', 'ttl', 'prio', 'change_date']
 
 
-
-
 class DomainPolicyAdmin(BaseAdmin):
     list_display = ['name']
     list_filter = ('domain',)
@@ -50,15 +48,21 @@ class UserRecordAdmin(BaseAdmin):
     """
     User generated Record administration model   
     """
-    list_display = ['name', 'type', 'content']
+    list_display = ['name', 'domain', 'type', 'content']
     list_filter = ('domain',)
 
     search_fields = ['name', 'content']
+
+    fieldsets = [
+        ('record',   {'fields': ['name', 'domain', 'type', 'content'], 'classes': ['wide']}),
+        (None,       {'fields': ['user']}),
+    ]
 
 
 admin.site.register(dns.models.Domain, DomainAdmin)
 admin.site.register(dns.models.Record, RecordAdmin)
 admin.site.register(dns.models.DomainPolicy, DomainPolicyAdmin)
 admin.site.register(dns.models.UserRecord, UserRecordAdmin)
+#admin.site.register(dns.models.DomainManager)
 
 

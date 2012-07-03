@@ -132,12 +132,15 @@ class DomainPolicy(BaseDate):
     """
     Domains and Subdomains restrictions and policies for users
     """
+    name                = models.CharField(max_length=255, db_index=True, unique=True)
     domain              = models.ForeignKey(Domain)
-    name                = models.CharField(max_length=255, db_index=True)
     is_automatized      = models.BooleanField(default=False)
     can_request         = models.IntegerField(default=0)
     needs_confirmation  = models.BooleanField(default=False)
     managers            = models.ManyToManyField(User, through='DomainManager', verbose_name=_('name'))
+
+    def __unicode__(self):
+        return u'%s' % self.domain.name
 
 class DomainManager(BaseDate):
     """
