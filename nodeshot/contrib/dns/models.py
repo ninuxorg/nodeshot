@@ -8,6 +8,8 @@ from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Zone, Node
 from nodeshot.core.network.models import Device, Interface
 
+import hashlib
+
 ACCESS_LEVELS = (
     ('owner', _('owner')),
     ('manager', _('manager'))
@@ -82,6 +84,8 @@ class Record(BaseDate):
     ttl         = models.PositiveIntegerField()
     prio        = models.PositiveIntegerField(_('priority'), null=True, blank=True)
     change_date = models.PositiveIntegerField(_('change date'), null=True, blank=True)
+    is_automatized = models.BooleanField(_('is automatized'), default=False)
+    md5hash     = models.CharField(_('hash'), max_length=32, null=True, blank=True)
 
     class Meta:
         db_table = 'records'
@@ -90,6 +94,13 @@ class Record(BaseDate):
 
     def __unicode__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        id_hash = hashlib.md5(self.name + self.type + self.content).hexdigest()
+        self.md5hash = id_hash
+        super(Record, self).save(*args, **kwargs)
+
+
 
 
 class Supermaster(BaseDate):
@@ -153,16 +164,12 @@ class DomainManager(BaseDate):
     class Meta:
         unique_together = ('user', 'domain')
 
-class UserRecord(BaseDate):
+class UserRecord(Record):
     """
     User's Records table
-        name is the domain without the extension
     """
-    name                = models.CharField(_('name'), max_length=255)
-    domain              = models.ForeignKey(DomainPolicy)
-    type                = models.CharField(_('type'),max_length=6, db_index=True, choices=((x,x) for x in USER_RECORD_TYPE))
-    content             = models.CharField(_('content'),max_length=255)
-    user                = models.ForeignKey(User)
+
+    user                 = models.ForeignKey(User)
 
 class DNSScriptCache(models.Model):
     """
