@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import utc
 from datetime import datetime
 from nodeshot.core.base.choices import ACCESS_LEVELS
 
@@ -10,14 +11,14 @@ class BaseDate(models.Model):
         * an updated field which updates itself automatically
     We don't use django's autoaddnow=True because that makes the fields not visible in the admin.
     """
-    added = models.DateTimeField(_('created on'), default=datetime.now)
-    updated = models.DateTimeField(_('updated on'))
+    added = models.DateTimeField(_('created on'), default=datetime.utcnow().replace(tzinfo=utc))
+    updated = models.DateTimeField(_('updated on'), default=datetime.utcnow().replace(tzinfo=utc))
 
     def save(self, *args, **kwargs):
         """
         automatically update updated date field
         """
-        self.updated = datetime.now()
+        self.updated = datetime.utcnow().replace(tzinfo=utc)
         super(BaseDate, self).save(*args, **kwargs)
 
     class Meta:

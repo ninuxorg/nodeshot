@@ -7,7 +7,7 @@ from nodeshot.core.network.models import Interface
 class Link(BaseAccessLevel):
     interface_a = models.ForeignKey(Interface, related_name='interface_a')
     interface_b = models.ForeignKey(Interface, related_name='interface_b')
-    type = models.SmallInteger(_('type'), max_length=10, choices=LINK_TYPE, default=LINK_TYPE[0][0])
+    type = models.SmallIntegerField(_('type'), max_length=10, choices=LINK_TYPE, default=LINK_TYPE[0][0])
     metric_type = models.CharField(_('metric type'), max_length=6, choices=METRIC_TYPES, default=METRIC_TYPES[0][0])
     metric_value = models.FloatField(_('metric value'))
     tx_rate = models.IntegerField(_('TX rate average'), null=True, default=None)

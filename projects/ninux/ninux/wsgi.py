@@ -14,9 +14,8 @@ framework.
 
 """
 import os
-
 import sys
-sys.path.append("/home/nodeshot/nodeshot/projects/ninux/")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ninux.settings")
 

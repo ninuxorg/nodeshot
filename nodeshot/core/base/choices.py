@@ -135,7 +135,7 @@ INTERFACE_TYPE = (
     #(6, _('batman')),
 )
 
-WIRELESS_STANDARD = (
+WIRELESS_STANDARDS = (
     ('802.11a', '802.11a'),
     ('802.11b', '802.11b'),
     ('802.11g', '802.11g'),

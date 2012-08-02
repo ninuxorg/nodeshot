@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.models import BaseDate, BaseAccessLevel
 from nodeshot.core.nodes.models import Node
-from nodeshot.core.base.choices import ROUTING_PROTOCOLS, DEVICE_STATUS, DEVICE_TYPES, INTERFACE_TYPE, IP_PROTOCOLS, ETHERNET_STANDARDS, DUPLEX_CHOICES
+from nodeshot.core.base.choices import ROUTING_PROTOCOLS, DEVICE_STATUS, DEVICE_TYPES, INTERFACE_TYPE, IP_PROTOCOLS, ETHERNET_STANDARDS, WIRELESS_STANDARDS, DUPLEX_CHOICES
 
 class RoutingProtocol(BaseDate):
     name = models.CharField(_('name'), max_length=50, choices=ROUTING_PROTOCOLS)
@@ -21,6 +21,7 @@ class Device(BaseAccessLevel):
     firmware = models.CharField(_('firmware'), max_length=20, blank=True, null=True)
     os = models.CharField(_('operating system'), max_length=20, blank=True, null=True)
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
+    #notes = models.TextField(_('notes'), blank=True, null=True)
 
 class Interface(BaseAccessLevel):
     device = models.ForeignKey(Device)
@@ -46,7 +47,7 @@ class Ethernet(Interface):
 
 class Wireless(Interface):
     wireless_mode = models.CharField(max_length=5)
-    wireless_standard = models.CharField(max_length=7)
+    wireless_standard = models.CharField(max_length=7, choices=WIRELESS_STANDARDS)
     wireless_channel = models.CharField(max_length=4, blank=True, null=True)
     channel_width = models.CharField(max_length=6, blank=True, null=True)
     transmitpower = models.IntegerField(null=True, blank=True)
@@ -77,7 +78,7 @@ class Vlan(Interface):
         db_table = 'network_interface_vlan'
     
 class Vap(BaseDate):
-    interface = models.ForeignKey(Wireless, verbose_name='interface')
+    interface = models.ForeignKey(Wireless, verbose_name='wireless interface')
     essid = models.CharField(max_length=50)
     bssid = models.CharField(max_length=50, null=True, blank=True)
     encryption = models.CharField(max_length=50, null=True, blank=True)
