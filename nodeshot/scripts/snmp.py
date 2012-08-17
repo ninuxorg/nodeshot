@@ -39,22 +39,16 @@ def get_mac(ip, i_type):
     # search for the right oid
     if i_type == "wifi" or i_type == "w": #db is dirty, both wifi and w occurrence
         try:
-            if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,6)  )[3][0][1] == "ath0":
-                oid_mac = 1,3,6,1,2,1,2,2,1,6,6 # mac of ath0 
-            elif cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,7)  )[3][0][1] == "ath0":
-                oid_mac = 1,3,6,1,2,1,2,2,1,6,7 # mac of ath0
-            elif cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,8)  )[3][0][1] == "ath0":
-                oid_mac = 1,3,6,1,2,1,2,2,1,6,8 # mac of ath0
+	    for i in range(0,10):
+            	if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,i)  )[3][0][1] == "ath0":
+                	oid_mac = 1,3,6,1,2,1,2,2,1,6,i # mac of ath0
         except:
             pass 
     elif i_type == "eth" or i_type == "e":
         try:
-            if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,4)  )[3][0][1] == "eth0":
-                oid_mac = 1,3,6,1,2,1,2,2,1,6,4 # mac of eth0 
-            elif cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,5)  )[3][0][1] == "eth0":
-                oid_mac = 1,3,6,1,2,1,2,2,1,6,5 # mac of eth0
-            elif cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,6)  )[3][0][1] == "eth0":
-                oid_mac = 1,3,6,1,2,1,2,2,1,6,6 # mac of eth0
+            for i in range(0,10):
+            	if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,i)  )[3][0][1] == "eth0":
+                	oid_mac = 1,3,6,1,2,1,2,2,1,6,i # mac of eth0
         except:
             pass 
     else:
