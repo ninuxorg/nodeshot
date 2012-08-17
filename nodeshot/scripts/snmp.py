@@ -42,6 +42,7 @@ def get_mac(ip, i_type):
 	    for i in range(0,10):
             	if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,i)  )[3][0][1] == "ath0":
                 	oid_mac = 1,3,6,1,2,1,2,2,1,6,i # mac of ath0
+                	break
         except:
             pass 
     elif i_type == "eth" or i_type == "e":
@@ -49,6 +50,7 @@ def get_mac(ip, i_type):
             for i in range(0,10):
             	if cmdgen.CommandGenerator().getCmd(community, transport, (1,3,6,1,2,1,2,2,1,2,i)  )[3][0][1] == "eth0":
                 	oid_mac = 1,3,6,1,2,1,2,2,1,6,i # mac of eth0
+                	break
         except:
             pass 
     else:
