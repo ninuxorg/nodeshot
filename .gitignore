@@ -2,5 +2,5 @@
 *.pyc
 .komodotools/
 projects/ninux/ninux/settings.py
-MyProject.komodoproject
-.DS_Store
+*.komodoproject
+*.DS_Store
