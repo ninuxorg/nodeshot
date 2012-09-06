@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 from nodeshot.core.base.models import BaseDate
-from nodeshot.core.nodes.models import Zone, Node
 from nodeshot.core.network.models import Device, Interface
 
 import hashlib
@@ -122,11 +121,11 @@ class Supermaster(BaseDate):
 OneToOne tables for customize automatic DNS names
 """
 class ZoneToDns(models.Model):
-    zone                = models.OneToOneField(Zone, db_index=True, unique=True)
+    zone                = models.OneToOneField('zones.Zone', db_index=True, unique=True)
     value               = models.SlugField(_('value'), max_length=20)
 
 class NodeToDns(models.Model):
-    zone                = models.OneToOneField(Node, db_index=True, unique=True)
+    zone                = models.OneToOneField('nodes.Node', db_index=True, unique=True)
     value               = models.SlugField(_('value'), max_length=20)
 
 class DeviceToDns(models.Model):

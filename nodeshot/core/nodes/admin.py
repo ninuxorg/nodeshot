@@ -1,13 +1,13 @@
 from django.contrib import admin
-from nodeshot.core.nodes.models import Node, Zone
+from nodeshot.core.nodes.models import Node, Image
 from nodeshot.core.network.models import Device
-from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
+from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline, BaseTabularInline
 
 class DeviceInline(BaseStackedInline):
     model = Device
 
-class ZoneAdmin(BaseAdmin):
-    pass
+class ImageInline(BaseTabularInline):
+    model = Image
 
 class NodeAdmin(BaseAdmin):
     list_display  = ('name', 'user', 'status', 'added', 'updated')
@@ -15,7 +15,6 @@ class NodeAdmin(BaseAdmin):
     date_hierarchy = 'added'
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
-    inlines = (DeviceInline,)
+    inlines = (DeviceInline, ImageInline)
 
-admin.site.register(Zone, ZoneAdmin)
 admin.site.register(Node, NodeAdmin)
