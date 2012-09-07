@@ -29,3 +29,4 @@ class Node(BaseAccessLevel):
     class Meta:
         db_table = 'nodes_node'
         app_label= 'nodes'
+        permissions = (('can_view_nodes', 'Can view nodes'),)

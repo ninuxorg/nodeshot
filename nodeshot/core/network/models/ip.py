@@ -11,3 +11,4 @@ class Ip(BaseAccessLevel):
     
     class Meta:
         app_label= 'network'
+        permissions = (('can_view_ip', 'Can view ip'),)

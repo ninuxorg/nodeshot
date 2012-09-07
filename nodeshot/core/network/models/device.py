@@ -16,3 +16,4 @@ class Device(BaseAccessLevel):
     
     class Meta:
         app_label= 'network'
+        permissions = (('can_view_devices', 'Can view devices'),)

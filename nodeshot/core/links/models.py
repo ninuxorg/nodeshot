@@ -13,6 +13,9 @@ class Link(BaseAccessLevel):
     tx_rate = models.IntegerField(_('TX rate average'), null=True, default=None)
     rx_rate = models.IntegerField(_('RX rate average'), null=True, default=None)
     status = models.SmallIntegerField(_('status'), choices=LINK_STATUS, default=LINK_STATUS[0][0])
+    
+    class Meta:
+        permissions = (('can_view_links', 'Can view links'),)
 
 class LinkRadio(Link):
     dbm = models.IntegerField(_('dBm average'), null=True, default=None)

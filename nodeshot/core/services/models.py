@@ -21,6 +21,9 @@ class Service(BaseAccessLevel):
     documentation_url = models.URLField(_('documentation url'), blank=True, null=True)
     status = models.SmallIntegerField(_('status'), choices=SERVICE_STATUS)
     is_active = models.BooleanField(_('active'), default=True)
+    
+    class Meta:
+        permissions = (('can_view_services', 'Can view services'),)
 
 class ServicePort(BaseDate):
     service = models.ForeignKey(Service, verbose_name=_('service'))
@@ -30,8 +33,7 @@ class ServicePort(BaseDate):
     class Meta:
         db_table = 'services_service_port'
 
-class ServiceLogin(BaseDate):
-    access_level = models.CharField(_('type'), max_length=10, choices=ACCESS_LEVELS, default=ACCESS_LEVELS[1][0])
+class ServiceLogin(BaseAccessLevel):
     service = models.ForeignKey(Service, verbose_name=_('service'))
     type = models.CharField(_('type'), max_length=10, choices=LOGIN_TYPES, default=LOGIN_TYPES[0][0])
     username = models.CharField(_('username'), max_length=30) # space should not be allowed
@@ -41,3 +43,4 @@ class ServiceLogin(BaseDate):
     
     class Meta:
         db_table = 'services_login'
+        permissions = (('can_view_service_login', 'Can view service logins'),)

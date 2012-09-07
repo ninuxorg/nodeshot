@@ -14,3 +14,4 @@ class Interface(BaseAccessLevel):
     
     class Meta:
         app_label= 'network'
+        permissions = (('can_view_interfaces', 'Can view interfaces'),)

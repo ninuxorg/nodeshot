@@ -159,7 +159,8 @@ ETHERNET_STANDARDS = (
 
 ACCESS_LEVELS = (
     ('public', _('public')),
-    ('community', _('community')),
+    (1, _('registered')),
+    (2, _('community')),
     ('private', _('private')),
 )
 

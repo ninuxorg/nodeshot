@@ -164,3 +164,7 @@ LOGGING = {
         },
     }
 }
+
+FIXTURE_DIRS = (
+    '%s/fixtures/' % os.path.dirname(os.path.realpath(nodeshot.__file__))
+)

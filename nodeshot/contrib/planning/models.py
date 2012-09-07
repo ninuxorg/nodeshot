@@ -9,3 +9,4 @@ class PlannedNode(Node):
     
     class Meta:
         db_table = 'planned_node'
+        permissions = (('can_view_planned_nodes', 'Can view planned nodes'),)
