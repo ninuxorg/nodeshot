@@ -7,7 +7,7 @@ class Interface(BaseAccessLevel):
     device = models.ForeignKey('network.Device')
     type = models.CharField(_('type'), max_length=10, choices=INTERFACE_TYPE)
     name = models.CharField(_('name'), max_length=10, blank=True, null=True)
-    mac = models.CharField(_('mac_address'), max_length=17, unique=True, default=None)
+    mac = models.CharField(_('mac address'), max_length=17, unique=True, default=None)
     mtu = models.IntegerField(_('MTU (Maximum Trasmission Unit)'), blank=True, null=True)
     tx_rate = models.IntegerField(_('TX Rate'), null=True, default=None)
     rx_rate = models.IntegerField(_('RX Rate'), null=True, default=None)
