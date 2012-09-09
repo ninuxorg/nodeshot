@@ -35,7 +35,7 @@ TIME_ZONE = 'Europe/Rome'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'it-IT'
+LANGUAGE_CODE = 'en-EN'
 
 SITE_ID = 1
 
@@ -52,7 +52,7 @@ USE_L10N = True
 MEDIA_ROOT = '%s/media/' % os.path.dirname(os.path.realpath(__file__))
 
 # for django 1.4
-STATIC_ROOT = MEDIA_ROOT
+STATIC_ROOT = '%s/static/' % os.path.dirname(os.path.realpath(__file__))
 
 SITE_URL = "http://localhost:8000/"
 
@@ -62,12 +62,13 @@ SITE_URL = "http://localhost:8000/"
 MEDIA_URL = '%smedia/' % SITE_URL
 
 # for django 1.4
-STATIC_URL = MEDIA_URL
+STATIC_URL = '%sstatic/' % SITE_URL
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '%sadmin/' % MEDIA_URL
+# DEPRECATED
+#ADMIN_MEDIA_PREFIX = '%sadmin/' % MEDIA_URL
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '(i+!)&s9crw*eg^!)(uudsdr%+*+g)(d$fs32eh7a3*z-dd3'
@@ -116,6 +117,7 @@ INSTALLED_APPS = (
     #'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
+    'django.contrib.staticfiles',
     'nodeshot',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',

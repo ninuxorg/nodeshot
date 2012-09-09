@@ -23,23 +23,30 @@ under GPLv3 and tested inside the Ninux wireless community network
 (http://wiki.ninux.org/).
 
 
-INSTALLATION
+DEVELOPMENT INSTALLATION
 ---------------
+If you want to do a quick install to play with nodeshot just follow this routine:
+
+    git clone git://github.com/ninuxorg/nodeshot.git mapserver
+    cd mapserver
+    pip install -r requirements.txt
+    cp settings.example.py settings.py
+    
+    ./manage.py syncdb && ./manage.py collectstatic && ./manage.py runserver
+
+Enjoy on http://localhost:8000/ !
+Admin site is at http://localhost:8000/admin/
+
+PRODUCTION INSTALLATION
+---------------
+To install for production you'll need to install the python connectors for your database of choice (mysql-python or postgres_psycopg2), setup a virtual host in your web server and bind it to mod_wsgi.
+
 For a complete installation guide please refer to installation guide
 available here:
 http://wiki.ninux.org/InstallNodeshot
 
-To run some test just type:
-
-    sudo pip install Django django-extensions
-    git clone git://github.com/ninuxorg/nodeshot.git mapserver
-    cd mapserver
-    cp settings.example.py settings.py
-    ./manage.py syncdb && ./manage.py runserver
-
-Enjoy on http://localhost:8000 !
-
-
+QUESTIONS
+---------------
 If you have any question, please feel free to contact us:
     contatti@ninux.org
 
