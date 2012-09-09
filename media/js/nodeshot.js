@@ -569,7 +569,7 @@ var nodeshot = {
         
         /*
         * nodeshot.layout.initLinkQuality()
-        * dispaly link color depending on ETX values or dbm values
+        * display link color depending on ETX values or dbm values
         */
         initLinkQuality: function(){
             // bind change event to the radios
