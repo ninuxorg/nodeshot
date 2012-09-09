@@ -176,6 +176,7 @@ NODESHOT_LOG_CONTACTS = False
 _ = lambda s: s
 
 NODESHOT_FRONTEND_SETTINGS = {
+    'HTML_TITLE_INDEX': 'Nodeshot, Open Source Map Server',
     'META_ROBOTS': 'noindex,nofollow',
     'SHOW_STATISTICS': True,
     'SHOW_KML_LINK': True,
