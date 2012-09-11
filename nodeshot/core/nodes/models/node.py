@@ -9,7 +9,7 @@ class Node(BaseAccessLevel):
     Nodes of a network, can be assigned to 'Zones' and should belong to 'Users'
     """
     name = models.CharField(_('name'), max_length=50, unique=True)
-    status = models.SmallIntegerField(_('status'), max_length=3, choices=NODE_STATUS, default=1)
+    status = models.SmallIntegerField(_('status'), max_length=3, choices=NODE_STATUS, default=0) # todo: default status configurable
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
     
     # zone might need to be able to be blank, would require custom validation
