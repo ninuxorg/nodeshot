@@ -6,15 +6,16 @@ NODE_STATUS = (
     (1, _('planned')),
     (2, _('testing')),
     (3, _('active')),
+    (4, _('mantainance')),
 )
 
 ROUTING_PROTOCOLS = (
-    ('batman','B.A.T.M.A.N.'),
-    ('babel','Babel'),
-    ('olsr','OLSR'),
-    ('bgp','BGP'),
-    ('static',_('Static Routing')),
-    ('none',_('None')),
+    ('batman', 'B.A.T.M.A.N.'),
+    ('babel', 'Babel'),
+    ('olsr', 'OLSR'),
+    ('bgp', 'BGP'),
+    ('static', _('Static Routing')),
+    ('none', _('None')),
 )
 
 DEVICE_TYPES = (
@@ -220,4 +221,9 @@ PLANNED_STATUS = (
 DUPLEX_CHOICES = (
     ('full', 'full-duplex'),
     ('half', 'half-duplex')
+)
+
+# from 0 to 18
+MAP_ZOOM = (
+    [(n, n) for n in range(0, 19)]
 )
