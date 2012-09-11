@@ -168,3 +168,18 @@ LOGGING = {
 FIXTURE_DIRS = (
     '%s/fixtures/' % os.path.dirname(os.path.realpath(nodeshot.__file__))
 )
+
+NODESHOT = {
+    'DEFAULTS': {
+        # default map zoom level when creating new zones
+        'MAP_ZOOM': 12,
+        'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
+        'NODE_STATUS': 0
+    },
+    'SETTINGS': {
+        'NODE_ACL_EDITABLE': True # TODO: ?
+    },
+    'API': {
+        'APPS_ENABLED': ['nodeshot.core.nodes']#, 'nodeshot.core.zones'],
+    }
+}
