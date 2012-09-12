@@ -180,6 +180,6 @@ NODESHOT = {
         'NODE_ACL_EDITABLE': True # TODO: ?
     },
     'API': {
-        'APPS_ENABLED': ['nodeshot.core.nodes']#, 'nodeshot.core.zones'],
+        'APPS_ENABLED': ['nodeshot.core.zones', 'nodeshot.core.nodes'],
     }
 }
