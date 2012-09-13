@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'grappelli',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'nodeshot.core.zones',
@@ -183,3 +184,6 @@ NODESHOT = {
         'APPS_ENABLED': ['nodeshot.core.zones', 'nodeshot.core.nodes'],
     }
 }
+
+if 'grappelli' in INSTALLED_APPS:
+    GRAPPELLI_ADMIN_TITLE = 'Nodeshot Admin'
