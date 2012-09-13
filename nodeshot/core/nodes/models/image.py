@@ -15,3 +15,4 @@ class Image(BaseOrdered):
         db_table = 'nodes_image'
         app_label= 'nodes'
         permissions = (('can_view_image', 'Can view images'),)
+        ordering = ['order']
