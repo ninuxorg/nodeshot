@@ -49,7 +49,7 @@ class BaseOrdered(BaseAccessLevel):
                 self.order = self.__class__.objects.all().order_by("-order")[0].order + 1
             except IndexError:
                 self.order = 1
-        super(OrderedModel, self).save()
+        super(BaseOrdered, self).save()
 
     def order_link(self):
         """
