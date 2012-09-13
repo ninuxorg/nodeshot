@@ -17,12 +17,12 @@ for app_path in settings.NODESHOT['API']['APPS_ENABLED']:
     
     # determine import path for api module of the current app
     # eg: nodeshot.core.nodes will become nodeshot.core.nodes.api
-    api_path = '%s.api' % app_path
+    resources_path = '%s.resources' % app_path
     
     # import api
-    api = import_module(api_path);          # eg: app = import_module('nodeshot.core.nodes.api')
+    resources = import_module(resources_path);  # eg: app = import_module('nodeshot.core.nodes.api')
     # retrieve attributes of api module
-    attrs = dir(api)                        # eg: dir(api)
+    attrs = dir(resources)                      # eg: dir(api)
     
     # loop over attributes and determine which resources will be imported
     for attr in attrs:
@@ -30,7 +30,7 @@ for app_path in settings.NODESHOT['API']['APPS_ENABLED']:
         if 'Resource' in attr and attr != 'ModelResource':
             # register resource
             # eg: v1_api.register(NodeResource())
-            v1_api.register(getattr(api, attr)())
+            v1_api.register(getattr(resources, attr)())
 
 urlpatterns = patterns('',
     # The normal jazz here then...

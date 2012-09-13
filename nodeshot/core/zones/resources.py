@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from tastypie.resources import ModelResource
 from tastypie.http import HttpGone, HttpMultipleChoices
 from models import Zone, ZoneExternal
-from nodeshot.core.nodes.api import NodeResource
+from nodeshot.core.nodes.resources import NodeResource
 
 class ZoneResource(ModelResource):
     
