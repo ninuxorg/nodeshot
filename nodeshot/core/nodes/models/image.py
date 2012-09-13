@@ -8,7 +8,7 @@ class Image(BaseOrdered):
     Images of a 'Node'
     """
     node = models.ForeignKey(Node, verbose_name=_('node'))
-    file = models.ImageField(upload_to='/nodes/', verbose_name=_('image'))
+    file = models.ImageField(upload_to='nodes/', verbose_name=_('image'))
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
     
     class Meta:
