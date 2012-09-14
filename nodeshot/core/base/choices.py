@@ -202,8 +202,10 @@ PORT_PROTOCOLS = (
 )
 
 DEVICE_STATUS = (
-    (1, 'reachable'),
-    (2, 'not reachable'),
+    (-2, _('archived')),
+    (-1, _('unplugged')),
+    (0, _('not reachable')),
+    (1, _('reachable')),
 )
 
 SERVICE_STATUS = (
