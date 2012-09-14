@@ -11,6 +11,7 @@ class ZoneResource(ModelResource):
         queryset = Zone.objects.all().select_related()
         resource_name = 'zones'
         include_resource_uri = False
+        limit = 0
         excludes = ['added', 'updated']
     
     def override_urls(self):

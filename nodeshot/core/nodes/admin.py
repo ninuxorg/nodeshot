@@ -7,6 +7,9 @@ from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline, BaseTabularIn
 
 class DeviceInline(BaseStackedInline):
     model = Device
+    
+    if 'grappelli' in settings.INSTALLED_APPS:
+        classes = ('grp-collapse grp-open', )
 
 class ImageInline(BaseTabularInline):
     model = Image

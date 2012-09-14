@@ -4,8 +4,8 @@ from nodeshot.core.network.models import Interface
 from nodeshot.core.base.choices import ETHERNET_STANDARDS, DUPLEX_CHOICES
 
 class Ethernet(Interface):
-    standard = models.CharField(_('type'), max_length=15, choices=ETHERNET_STANDARDS)
-    duplex = models.CharField(_('type'), max_length=15, choices=DUPLEX_CHOICES)
+    standard = models.CharField(_('standard'), max_length=15, choices=ETHERNET_STANDARDS)
+    duplex = models.CharField(_('duplex?'), max_length=15, choices=DUPLEX_CHOICES)
     
     class Meta:
         db_table = 'network_interface_ethernet'

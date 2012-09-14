@@ -30,3 +30,6 @@ class Node(BaseAccessLevel):
         db_table = 'nodes_node'
         app_label= 'nodes'
         permissions = (('can_view_nodes', 'Can view nodes'),)
+    
+    def __unicode__(self):
+        return '%s' % self.name

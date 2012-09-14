@@ -11,3 +11,6 @@ class RoutingProtocol(BaseDate):
     class Meta:
         db_table = 'network_routing_protocol'
         app_label= 'network'
+    
+    def __unicode__(self):
+        return '%s %s' % (self.name, self.version)

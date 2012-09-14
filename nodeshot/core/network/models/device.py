@@ -8,7 +8,7 @@ class Device(BaseAccessLevel):
     node = models.ForeignKey('nodes.Node', verbose_name=_('node'))
     type = models.CharField(_('type'), max_length=50, choices=DEVICE_TYPES)
     routing_protocols = models.ManyToManyField('network.RoutingProtocol', blank=True)
-    status = models.CharField(_('status'), max_length=1, choices=DEVICE_STATUS, default=DEVICE_STATUS[1][0])
+    status = models.SmallIntegerField(_('status'), max_length=2, choices=DEVICE_STATUS, default=DEVICE_STATUS[1][0])
     firmware = models.CharField(_('firmware'), max_length=20, blank=True, null=True)
     os = models.CharField(_('operating system'), max_length=20, blank=True, null=True)
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
@@ -17,3 +17,6 @@ class Device(BaseAccessLevel):
     class Meta:
         app_label= 'network'
         permissions = (('can_view_devices', 'Can view devices'),)
+        
+    def __unicode__(self):
+        return '%s' % self.name

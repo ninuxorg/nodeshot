@@ -2,8 +2,20 @@ from django.contrib import admin
 from nodeshot.core.network.models import Device, Interface, Ethernet, Wireless, Bridge, Tunnel, Vap, Vlan, RoutingProtocol, Ip
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
 
-class InterfaceInline(BaseStackedInline):
-    model = Interface
+class EthernetInline(BaseStackedInline):
+    model = Ethernet
+
+class WirelessInline(BaseStackedInline):
+    model = Wireless
+    
+class BridgeInline(BaseStackedInline):
+    model = Bridge
+
+class TunnelInline(BaseStackedInline):
+    model = Tunnel
+
+class VlanInline(BaseStackedInline):
+    model = Vlan
 
 class IpInline(BaseStackedInline):
     model = Ip
@@ -15,7 +27,7 @@ class DeviceAdmin(BaseAdmin):
     list_filter   = ('added', 'updated', 'node')
     list_display  = ('name', 'node', 'type', 'added', 'updated')
     search_fields = ('name', 'type')
-    inlines = (InterfaceInline,)
+    inlines = (EthernetInline, WirelessInline, BridgeInline, TunnelInline, VlanInline)
 
 class InterfaceAdmin(BaseAdmin):
     list_display  = ('mac', 'name', 'type', 'device', 'added', 'updated')
