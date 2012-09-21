@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from tastypie.http import HttpNotFound
 from tastypie.resources import ModelResource, ALL
 from tastypie import fields
+from tastypie.utils.urls import trailing_slash
 from models import Node, Image
 
 #from tastypie.paginator import Paginator
@@ -21,7 +22,7 @@ class NodeResource(ModelResource):
         limit = 0
         include_resource_uri = False
             
-        excludes = ['user', 'description', 'notes', 'added', 'updated', 'access_level']
+        excludes = ['notes', 'updated', 'access_level']
         # = TestPaginator
         
         filtering = {
@@ -35,15 +36,22 @@ class NodeResource(ModelResource):
         ]
     
     def dehydrate(self, bundle):
-        # if list view
+        # detail view
         if self.get_resource_uri(bundle) == bundle.request.path:
             bundle.data['user'] = bundle.obj.user.username
-            bundle.data['description'] = bundle.obj.description
-            bundle.data['added'] = bundle.obj.added
-        
+            # zone slug instead of URI to save bandwidth
+            bundle.data['zone'] = bundle.obj.zone.slug
+        bundle.data['user'] = bundle.obj.user.username
         # zone slug instead of URI to save bandwidth
         bundle.data['zone'] = bundle.obj.zone.slug
-    
+        # if list view
+        #bundle.data['yoyo'] = self.get_resource_uri(bundle)
+        #else:
+        #    #del bundle.data['user']
+        #    del bundle.data['description']
+        #    del bundle.data['added']
+        #    del bundle.data['zone']
+        
         return bundle
 
 class ImageResource(ModelResource):
@@ -59,7 +67,7 @@ class ImageResource(ModelResource):
         resource_name = 'images'
         include_resource_uri = False
         limit = 0
-        excludes = ['added', 'updated', 'access_level', 'id']
+        excludes = ['added', 'updated', 'access_level']
         
         filtering = {
             'node': ALL,

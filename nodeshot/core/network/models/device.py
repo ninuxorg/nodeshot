@@ -9,7 +9,7 @@ class Device(BaseAccessLevel):
     type = models.CharField(_('type'), max_length=50, choices=DEVICE_TYPES)
     routing_protocols = models.ManyToManyField('network.RoutingProtocol', blank=True)
     status = models.SmallIntegerField(_('status'), max_length=2, choices=DEVICE_STATUS, default=DEVICE_STATUS[1][0])
-    firmware = models.CharField(_('firmware'), max_length=20, blank=True, null=True)
+    firmware = models.CharField(_('firmware'), max_length=40, blank=True, null=True)
     os = models.CharField(_('operating system'), max_length=20, blank=True, null=True)
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
     notes = models.TextField(_('notes'), blank=True, null=True)

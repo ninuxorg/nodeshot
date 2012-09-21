@@ -38,10 +38,12 @@ class WirelessAdmin(InterfaceAdmin):
     inlines = (IpInline,VapInline)   
 
 class RoutingProtocolAdmin(BaseAdmin):
-    pass
+    list_display   = ('name', 'version', 'url')
 
 class IpAdmin(BaseAdmin):
-    pass
+    list_display   = ('address', 'netmask', 'protocol', 'added', 'updated')
+    list_filter   = ('protocol', 'added', 'updated')
+    search_fields = ('address',)
 
 admin.site.register(Device, DeviceAdmin)
 #admin.site.register(Interface, InterfaceAdmin)

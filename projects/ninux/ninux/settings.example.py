@@ -170,18 +170,31 @@ FIXTURE_DIRS = (
     '%s/fixtures/' % os.path.dirname(os.path.realpath(nodeshot.__file__))
 )
 
+CACHES = {
+    'default': {
+        #'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'LOCATION': '%s/cache' % os.path.dirname(os.path.realpath(__file__)),
+        'TIMEOUT': 172800 if not DEBUG else 300,
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
+
 NODESHOT = {
     'DEFAULTS': {
         # default map zoom level when creating new zones
         'MAP_ZOOM': 12,
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
-        'NODE_STATUS': 0
+        'NODE_STATUS': 0,
+        'NODE_AVATARS': True,
     },
     'SETTINGS': {
         'NODE_ACL_EDITABLE': True # TODO: ?
     },
     'API': {
-        'APPS_ENABLED': ['nodeshot.core.zones', 'nodeshot.core.nodes'],
+        'APPS_ENABLED': ['nodeshot.core.zones', 'nodeshot.core.nodes', 'nodeshot.core.network', 'nodeshot.core.links', 'nodeshot.core.services']
     }
 }
 

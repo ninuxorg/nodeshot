@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.choices import NODE_STATUS
-from django.utils.translation import ugettext_lazy as _
 
 class Node(BaseAccessLevel):
     """
@@ -24,6 +25,10 @@ class Node(BaseAccessLevel):
     
     is_hotspot = models.BooleanField(_('is it a hotspot?'), default=False)
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
+    
+    if settings.NODESHOT['DEFAULTS']['NODE_AVATARS']:
+        avatar = models.ImageField(_('avatar'), upload_to='nodes/', blank=True, null=True)
+    
     notes = models.TextField(_('notes'), blank=True, null=True)
     
     class Meta:

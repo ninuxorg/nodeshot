@@ -10,7 +10,7 @@ NODE_STATUS = (
 )
 
 ROUTING_PROTOCOLS = (
-    ('batman', 'B.A.T.M.A.N.'),
+    ('batman', 'Batman-adv'),
     ('babel', 'Babel'),
     ('olsr', 'OLSR'),
     ('bgp', 'BGP'),
@@ -160,8 +160,8 @@ ETHERNET_STANDARDS = (
 
 ACCESS_LEVELS = (
     ('public', _('public')),
-    (1, _('registered')),
-    (2, _('community')),
+    ('1', _('registered')),
+    ('2', _('community')),
     ('private', _('private')),
 )
 
@@ -171,11 +171,12 @@ IP_PROTOCOLS = (
 )
 
 LINK_STATUS = (
-    (-1, _('aborted')),
-    (0, _('disconnected')),
-    (1, _('operational')), 
-    (2, _('planned')),
-    (3, _('released')),
+    (-3, _('archived')),
+    (-2, _('disconnected')),
+    (-1, _('down')),
+    (0, _('planned')),
+    (1, _('testing')),
+    (2, _('active')), 
 )
 
 LINK_TYPE = (
