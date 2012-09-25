@@ -45,6 +45,9 @@ class ServicePort(BaseDate):
         db_table = 'services_service_port'
         verbose_name = _('port')
         verbose_name_plural = _('ports')
+    
+    def __unicode__(self):
+        return '%s' % self.port 
 
 class ServiceLogin(BaseAccessLevel):
     service = models.ForeignKey(Service, verbose_name=_('service'))

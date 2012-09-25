@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.conf import settings
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline#, BaseTabularInline
 from models import ServiceCategory, Service, ServiceLogin, ServicePort
+from nodeshot.core.network.models import Ip
 
 class ServiceCategoryAdmin(BaseAdmin):
     list_display  = ('name', 'description', 'added', 'updated')
@@ -20,6 +21,18 @@ class ServiceAdmin(BaseAdmin):
     filter_horizontal = ['ips']
     search_fields = ('name', 'description', 'uri', 'documentation_url')
     inlines = (PortInline, LoginInline,)
+    
+    def get_object(self, request, object_id):
+        """
+        Hook obj for use in formfield_for_manytomany
+        """
+        self.obj = super(ServiceAdmin, self).get_object(request, object_id)
+        return self.obj
+    
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "ips" and getattr(self, 'obj', None):
+            kwargs["queryset"] = Ip.objects.select_related().filter(interface__device=self.obj.device)
+        return super(ServiceAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 admin.site.register(ServiceCategory, ServiceCategoryAdmin)
 admin.site.register(Service, ServiceAdmin)
