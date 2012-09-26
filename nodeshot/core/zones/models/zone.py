@@ -13,6 +13,9 @@ class Zone(BaseDate):
     lng = models.FloatField(_('center longitude'))
     zoom = models.SmallIntegerField(_('default zoom level'), choices=MAP_ZOOM, default=12) #TODO: default configurable
     is_external = models.BooleanField()
+    mantainers = models.CharField(_('mantainers'), help_text=_('Organizations like Ninux, Freifunk or people like Alice and Bob'), max_length=255)
+    email = models.EmailField(_('email'), help_text=_('possibly an email address that delivers messages to all the active participants'))
+    website = models.URLField(_('Website'), blank=True, null=True)
     
     def __unicode__(self):
         return '%s' % self.name
