@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 NODE_STATUS = (
     (-1, _('archived')),
@@ -158,12 +159,9 @@ ETHERNET_STANDARDS = (
     ('10/100/1000', '10/100/1000 Gigabit Ethernet'),
 )
 
-ACCESS_LEVELS = (
-    ('public', _('public')),
-    ('1', _('registered')),
-    ('2', _('community')),
-    ('private', _('private')),
-)
+ACCESS_LEVELS = [('public', _('public'))]
+ACCESS_LEVELS += [group for group in settings.NODESHOT['CHOICES']['ACCESS_LEVELS']]
+ACCESS_LEVELS += [('private', _('private'))]
 
 IP_PROTOCOLS = (
     ('ipv4', 'ipv4'),
