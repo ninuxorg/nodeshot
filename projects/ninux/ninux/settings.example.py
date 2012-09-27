@@ -166,6 +166,8 @@ LOGGING = {
     }
 }
 
+import nodeshot
+
 FIXTURE_DIRS = (
     '%s/fixtures/' % os.path.dirname(os.path.realpath(nodeshot.__file__))
 )
@@ -182,21 +184,47 @@ CACHES = {
     }
 }
 
+# https://docs.djangoproject.com/en/dev/topics/i18n/translation/
+# look for (ctrl + f) 'lambda' and you'll find why the following is needed
+_ = lambda s: s
+
 NODESHOT = {
+    'SETTINGS': {
+        'NODE_ACL_EDITABLE': True, # TODO: ?
+        'CONTACT_INWARD_MAXLENGTH': 2000,
+        'CONTACT_OUTWARD_MAXLENGTH': 9999,
+    },
+    'CHOICES': {
+        'AVAILABLE_CRONJOBS': (
+            ('00', _('midnight')),
+            ('04', _('04:00 AM')),
+        ),
+        'ACCESS_LEVELS': [
+            ('1', _('registered')),
+            ('2', _('community')),
+        ]
+    },
+    # default values for the application or new database objects
     'DEFAULTS': {
         # default map zoom level when creating new zones
         'MAP_ZOOM': 12,
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
         'NODE_STATUS': 0,
         'NODE_AVATARS': True,
-    },
-    'SETTINGS': {
-        'NODE_ACL_EDITABLE': True # TODO: ?
+        'MAILING_SCHEDULE_OUTWARD': False
     },
     'API': {
-        'APPS_ENABLED': ['nodeshot.core.zones', 'nodeshot.core.nodes', 'nodeshot.core.network', 'nodeshot.core.links', 'nodeshot.core.services']
+        'APPS_ENABLED': [
+            'nodeshot.core.zones',
+            'nodeshot.core.nodes',
+            'nodeshot.core.network',
+            'nodeshot.core.links',
+            'nodeshot.core.services'
+        ]
     }
 }
+
+NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
 
 if 'grappelli' in INSTALLED_APPS:
     GRAPPELLI_ADMIN_TITLE = 'Nodeshot Admin'
