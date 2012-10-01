@@ -34,7 +34,7 @@ TIME_ZONE = 'Europe/Rome'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-gb'
 
-SITE_ID = 1
+#SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -47,7 +47,9 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-BASE_URL = 'http://YOUR_URL_HERE'
+SITE_NAME = 'Ninux.org'
+SITE_DOMAIN = 'localhost'
+BASE_URL = 'http://%s/' % SITE_DOMAIN
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -118,7 +120,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.sites',
+    #'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'grappelli',
@@ -232,6 +234,14 @@ NODESHOT = {
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
+
+# use the command 'python -m -smtpd -n -c DebuggingServer localhost:1025' if you want a dummy SMTP server that logs outgoing emails but doesn't actually send them
+#EMAIL_USE_TLS = True
+EMAIL_HOST = 'localhost'
+#EMAIL_HOST_USER = 'your@email.org'
+#EMAIL_HOST_PASSWORD = '***********'
+EMAIL_PORT = 1025 # 1025 if you are debugging
+DEFAULT_FROM_EMAIL = 'your@email.org'
 
 if 'grappelli' in INSTALLED_APPS:
     GRAPPELLI_ADMIN_TITLE = 'Nodeshot Admin'

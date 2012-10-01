@@ -18,9 +18,14 @@ class Zone(BaseDate):
     website = models.URLField(_('Website'), blank=True, null=True)
     is_external = models.BooleanField()
     
-    def __unicode__(self):
-        return '%s' % self.name
-    
     class Meta:
         db_table = 'zones_zone'
         app_label= 'zones'
+    
+    def __unicode__(self):
+        return '%s' % self.name
+        
+    if 'grappelli' in settings.INSTALLED_APPS:
+        @staticmethod
+        def autocomplete_search_fields():
+            return ('name__icontains', 'slug__icontains')

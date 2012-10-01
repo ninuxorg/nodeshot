@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.conf import settings
+from django.contrib.auth.models import User
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline#, BaseTabularInline
 from models import Inward, Outward
 
@@ -7,7 +8,10 @@ class InwardAdmin(BaseAdmin):
     #list_display  = ('name', 'description', 'added', 'updated')
     #ordering = ('name',)
     #search_fields = ('name', 'description')
-    pass
+    # define the autocomplete_lookup_fields
+    autocomplete_lookup_fields = {
+        'generic': [['content_type', 'object_id']],
+    }
 
 class OutwardAdmin(BaseAdmin):
     #list_display  = ('name', 'device', 'category', 'access_level', 'status', 'is_published', 'added', 'updated')
@@ -31,3 +35,4 @@ class OutwardAdmin(BaseAdmin):
 
 admin.site.register(Inward, InwardAdmin)
 admin.site.register(Outward, OutwardAdmin)
+

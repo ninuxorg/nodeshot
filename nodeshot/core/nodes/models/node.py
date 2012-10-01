@@ -38,3 +38,8 @@ class Node(BaseAccessLevel):
     
     def __unicode__(self):
         return '%s' % self.name
+    
+    if 'grappelli' in settings.INSTALLED_APPS:
+        @staticmethod
+        def autocomplete_search_fields():
+            return ('name__icontains',)
