@@ -11,6 +11,7 @@ class Port(BaseDate):
     
     class Meta:
         db_table = 'services_service_port'
+        app_label = 'services'
         verbose_name = _('port')
         verbose_name_plural = _('ports')
     

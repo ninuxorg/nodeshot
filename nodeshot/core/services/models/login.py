@@ -13,6 +13,7 @@ class Login(BaseAccessLevel):
     
     class Meta:
         db_table = 'services_login'
+        app_label = 'services'
         permissions = (('can_view_service_login', 'Can view service logins'),)
         verbose_name = _('login')
         verbose_name_plural = _('logins')

@@ -30,7 +30,7 @@ class ServiceAdmin(BaseAdmin):
         return self.obj
     
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name == "ips" and getattr(self, 'obj', None):
+        if db_field.name == "ips" and getattr(self, 'obj', False):
             kwargs["queryset"] = Ip.objects.select_related().filter(interface__device=self.obj.device)
         return super(ServiceAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 

@@ -190,7 +190,9 @@ _ = lambda s: s
 
 NODESHOT = {
     'SETTINGS': {
-        'NODE_ACL_EDITABLE': True, # TODO: ?
+        'ACL_GLOBAL_EDITABLE': True,
+        # the following is an example of possible granular ACL setting that is available
+        #'ACL_NODES_NODE_EDITABLE': False,
         'CONTACT_INWARD_MAXLENGTH': 2000,
         'CONTACT_OUTWARD_MAXLENGTH': 9999,
     },
@@ -211,7 +213,12 @@ NODESHOT = {
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
         'NODE_STATUS': 0,
         'NODE_AVATARS': True,
-        'MAILING_SCHEDULE_OUTWARD': False
+        'ZONE_TIME': 'GMT+1',
+        'ZONE_ZOOM': 12,
+        'MAILING_SCHEDULE_OUTWARD': False,
+        'ACL_GLOBAL': 'public',
+        # default access_level value for app: services, model: Login
+        'ACL_SERVICES_LOGIN': '2',
     },
     'API': {
         'APPS_ENABLED': [
