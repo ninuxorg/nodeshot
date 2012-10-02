@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from nodeshot.core.base.models import BaseDate
-from nodeshot.core.services.models.choices import APPLICATION_PROTOCOLS, TRANSPORT_PROTOCOLS
+from choices import APPLICATION_PROTOCOLS, TRANSPORT_PROTOCOLS
 
 class Url(BaseDate):
     service = models.ForeignKey('services.Service', verbose_name=_('service'))

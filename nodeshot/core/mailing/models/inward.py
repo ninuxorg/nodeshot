@@ -7,13 +7,8 @@ from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.core.mail import EmailMessage
 from django.conf import settings
 from nodeshot.core.base.models import BaseDate
+from choices import INWARD_STATUS
 
-INWARD_STATUS = (
-    (-1, _('Error')),
-    (0, _('Not sent yet')),
-    (1, _('Sent')),
-    (2, _('Cancelled')),
-)
 
 # inward
 class Inward(BaseDate):
@@ -39,11 +34,15 @@ class Inward(BaseDate):
         verbose_name = _('Inward message')
         verbose_name_plural = _('Inward messages')
         app_label= 'mailing'
+        ordering = ['-status']
     
     def __unicode__(self):
         return _(u'Message from %(from)s to %(to)s') % ({'from':self.from_name, 'to':self.content_type})
     
     def send(self):
+        """
+        Sends the email to the recipient
+        """
         if self.content_type.name == 'node':
             to = self.to.user.email
         else:
@@ -64,9 +63,17 @@ class Inward(BaseDate):
         email.send()
     
     def save(self, *args, **kwargs):
+        """
+        Custom save method
+        """
         if self.status < 1:
-            self.send()
-            self.status = 1
+            try:
+                self.send()
+                self.status = 1
+            except Exception, e:
+                from logging import error
+                error('nodeshot.core.mailing.inward.save(): %s' % e)
+                self.status = -1
         
         if settings.NODESHOT['SETTINGS']['CONTACT_INWARD_LOG']:
             super(Inward, self).save(*args, **kwargs)

@@ -195,6 +195,7 @@ NODESHOT = {
         'ACL_GLOBAL_EDITABLE': True,
         # the following is an example of possible granular ACL setting that is available
         #'ACL_NODES_NODE_EDITABLE': False,
+        'CONTACT_INWARD_LOG': True,
         'CONTACT_INWARD_MAXLENGTH': 2000,
         'CONTACT_OUTWARD_MAXLENGTH': 9999,
     },
