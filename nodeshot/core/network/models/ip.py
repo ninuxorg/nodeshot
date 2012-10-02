@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from nodeshot.core.base.models import BaseAccessLevel
 from nodeshot.core.base.choices import IP_PROTOCOLS
 
@@ -17,3 +18,8 @@ class Ip(BaseAccessLevel):
     
     def __unicode__(self):
         return '%s: %s' % (self.protocol, self.address)
+    
+    if 'grappelli' in settings.INSTALLED_APPS:
+        @staticmethod
+        def autocomplete_search_fields():
+            return ('address__icontains',)

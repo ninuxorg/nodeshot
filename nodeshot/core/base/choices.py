@@ -195,11 +195,6 @@ LOGIN_TYPES = (
     (2, _('write')),
 )
 
-PORT_PROTOCOLS = (
-    ('tcp', 'TCP'),
-    ('udp', 'UDP'),
-)
-
 DEVICE_STATUS = (
     (-2, _('archived')),
     (-1, _('unplugged')),
