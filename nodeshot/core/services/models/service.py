@@ -6,11 +6,9 @@ from category import Category
 
 class Service(BaseAccessLevel):
     device = models.ForeignKey('network.Device', verbose_name=_('device'))
-    ips = models.ManyToManyField('network.Ip', verbose_name=_('ip addresses'))
     name = models.CharField(_('name'), max_length=30)
     category = models.ForeignKey(Category, verbose_name=_('category') )
     description = models.TextField(_('description'), blank=True, null=True)
-    uri = models.CharField(_('URI'), max_length=255, blank=True, null=True)
     documentation_url = models.URLField(_('documentation url'), blank=True, null=True)
     status = models.SmallIntegerField(_('status'), choices=SERVICE_STATUS)
     is_published = models.BooleanField(_('published'), default=True)
@@ -22,4 +20,4 @@ class Service(BaseAccessLevel):
         app_label = 'services'
     
     def __unicode__(self):
-        return '%s (%s)' % (self.name, self.device.name)
+        return '%s' % self.name

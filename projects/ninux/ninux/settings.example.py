@@ -206,7 +206,15 @@ NODESHOT = {
         'ACCESS_LEVELS': [
             ('1', _('registered')),
             ('2', _('community')),
-        ]
+        ],
+        'APPLICATION_PROTOCOLS': (
+            ('http', 'http'),
+            ('https', 'https'),
+            ('ftp', 'FTP'),
+            ('smb', 'Samba'),
+            ('afp', 'Apple File Protocol'),
+            ('git', 'Git'),
+        )
     },
     # default values for the application or new database objects
     'DEFAULTS': {
