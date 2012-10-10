@@ -44,9 +44,15 @@ class Inward(BaseDate):
         Sends the email to the recipient
         """
         if self.content_type.name == 'node':
-            to = self.to.user.email
+            to = [self.to.user.email]
+        elif self.content_type.name == 'zone':
+            to = [self.to.email]
+            # zone case is slightly special, mantainers need to be notified as well
+            # TODO: consider making the mantainers able to switch off notifications
+            for mantainer in self.to.mantainers.all().only('email'):
+                to += [mantainer.email]
         else:
-            to = self.to.email
+            to = [self.to.email]
 
         email = EmailMessage(
             # subject
@@ -56,7 +62,7 @@ class Inward(BaseDate):
             # from
             settings.DEFAULT_FROM_EMAIL,
             # to
-            [to],
+            to,
             # reply-to header
             headers = {'Reply-To': self.from_email}
         )
@@ -66,14 +72,19 @@ class Inward(BaseDate):
         """
         Custom save method
         """
+        # if not sent yet
         if self.status < 1:
+            # try sending email
             try:
                 self.send()
                 self.status = 1
+            # if error
             except Exception, e:
+                # log error and fail mark record with the error state
                 from logging import error
                 error('nodeshot.core.mailing.inward.save(): %s' % e)
                 self.status = -1
         
+        # save in the database unless explicitly stated in the settings file
         if settings.NODESHOT['SETTINGS']['CONTACT_INWARD_LOG']:
             super(Inward, self).save(*args, **kwargs)
