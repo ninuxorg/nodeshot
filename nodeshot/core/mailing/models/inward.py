@@ -42,6 +42,7 @@ class Inward(BaseDate):
     def send(self):
         """
         Sends the email to the recipient
+        If the sending fails will set the status of the instance to "error" and will log the error according to your project's django-logging configuration
         """
         if self.content_type.name == 'node':
             to = [self.to.user.email]
@@ -66,7 +67,20 @@ class Inward(BaseDate):
             # reply-to header
             headers = {'Reply-To': self.from_email}
         )
-        email.send()
+        
+        import socket
+        # try sending email
+        try:
+            email.send()            
+            self.status = 1
+        # if error
+        except socket.error as e:
+            # log the error
+            import logging
+            log = logging.getLogger(__name__)
+            log.error('nodeshot.core.mailing.models.inward.send(): %s' % e)
+            # set status of the instance as "error"
+            self.status = -1
     
     def save(self, *args, **kwargs):
         """
@@ -74,17 +88,9 @@ class Inward(BaseDate):
         """
         # if not sent yet
         if self.status < 1:
-            # try sending email
-            try:
-                self.send()
-                self.status = 1
-            # if error
-            except Exception, e:
-                # log error and fail mark record with the error state
-                from logging import error
-                error('nodeshot.core.mailing.inward.save(): %s' % e)
-                self.status = -1
+            # tries sending email (will modify self.status!)
+            self.send()
         
-        # save in the database unless explicitly stated in the settings file
+        # save in the database unless logging is explicitly turned off in the settings file
         if settings.NODESHOT['SETTINGS']['CONTACT_INWARD_LOG']:
             super(Inward, self).save(*args, **kwargs)
