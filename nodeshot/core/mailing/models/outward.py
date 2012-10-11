@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.core.validators import MaxLengthValidator, MinLengthValidator
+from django.core.mail import EmailMessage
 from nodeshot.core.base.models import BaseDate
 from nodeshot.dependencies.fields import MultiSelectField
 from choices import *
@@ -33,3 +34,55 @@ class Outward(BaseDate):
     
     def __unicode__(self):
         return '%s' % self.subject
+    
+    def send(self):
+        """
+        Sends the email to the recipients
+        """
+        # determine recipients
+        to = []
+        
+        # draft: simplest cases, send to all
+        users = User.objects.filter(is_active=True)
+        for user in users:
+            to += [user.email]
+        
+        # TODO:
+        if self.recipient_types:
+            pass
+        
+        # prepare email object
+        email = EmailMessage(
+            # subject
+            self.subject,
+            # message
+            self.message,
+            # from
+            settings.DEFAULT_FROM_EMAIL,
+            # to
+            to,
+        )
+        
+        import socket
+        # try sending email
+        try:
+            email.send()
+            self.status = 2
+        # if error
+        except socket.error as e:
+            # log the error
+            from logging import error
+            error('nodeshot.core.mailing.models.outward.send(): %s' % e)
+            # set status of the instance as "error"
+            self.status = -1
+    
+    def save(self, *args, **kwargs):
+        """
+        Custom save method
+        """
+        # if not sent yet and is not scheduled to be sent by a cron
+        if self.status < 2 and not self.is_scheduled:
+            # tries sending email (will modify self.status!)
+            self.send()
+        
+        super(Outward, self).save(*args, **kwargs)
