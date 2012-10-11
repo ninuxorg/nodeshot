@@ -15,9 +15,9 @@ SCHEDULE_CHOICES = (
 )
 
 RECIPIENT_TYPES = (
-    ('all', _('all users indistinctively')),
-    ('zones', _('all the users which have a node in one of the selected zones')),
-    ('users', _('chosen users')),
+    (1, _('all users indistinctively')),
+    (2, _('all the users which have a node in one of the selected zones')),
+    (3, _('chosen users')),
 )
 
 OUTWARD_STATUS = (
