@@ -4,5 +4,4 @@
 projects/ninux/ninux/settings.py
 *.komodoproject
 *.DS_Store
-projects/ninux/ninux/static/*
 projects/ninux/ninux/media/*
