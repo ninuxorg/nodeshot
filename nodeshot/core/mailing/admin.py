@@ -15,8 +15,8 @@ class InwardAdmin(BaseAdmin):
         }
 
 class OutwardAdmin(BaseAdmin):
-    #list_display  = ('name', 'device', 'category', 'access_level', 'status', 'is_published', 'added', 'updated')
-    #list_filter   = ('category', 'status', 'is_published')
+    list_display  = ('subject', 'status', 'is_scheduled', 'added', 'updated')
+    list_filter   = ('status', 'is_scheduled')
     #filter_horizontal = ['ips']
     #search_fields = ('name', 'description', 'uri', 'documentation_url')
     #inlines = (PortInline, LoginInline,)
@@ -32,7 +32,12 @@ class OutwardAdmin(BaseAdmin):
     #    if db_field.name == "ips" and getattr(self, 'obj', None):
     #        kwargs["queryset"] = Ip.objects.select_related().filter(interface__device=self.obj.device)
     #    return super(ServiceAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
-    pass
+    if 'grappelli' in settings.INSTALLED_APPS:
+        class Media:
+            js = [
+                '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
+                '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
+            ]
 
 admin.site.register(Inward, InwardAdmin)
 admin.site.register(Outward, OutwardAdmin)
