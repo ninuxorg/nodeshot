@@ -1,0 +1,55 @@
+[
+    {
+        "model": "zones.Zone",
+        "pk": 1,
+        "fields": {
+            "name": "Rome",
+            "slug": "rome",
+            "is_external": false,
+            "time_zone": "GMT+1",
+            "description": "Rome test zone",
+            "lat": "38.1154075129",
+            "lng": "12.5107643008",
+            "zoom": 12,
+            "organization": "Ninux.org",
+            "website": "http://ninux.org",
+            "email": "nodi-roma@ml.ninux.org",
+            "mantainers": [8]
+        }
+    },
+    {
+        "model": "zones.Zone",
+        "pk": 2,
+        "fields": {
+            "name": "Pisa",
+            "slug": "pisa",
+            "is_external": false,
+            "time_zone": "GMT+1",
+            "description": "Pisa test zone",
+            "lat": "43.7219513025",
+            "lng": "10.4080197215",
+            "zoom": 12,
+            "organization": "EigenLab",
+            "website": "http://eigenlab.org",
+            "email": "info@eigenlab.org",
+            "mantainers": [7]
+        }
+    },
+    {
+        "model": "zones.Zone",
+        "pk": 3,
+        "fields": {
+            "name": "Viterbo",
+            "slug": "viterbo",
+            "is_external": false,
+            "time_zone": "GMT+1",
+            "description": "Viterbo test zone",
+            "lat": "42.4193749624",
+            "lng": "12.1111955426",
+            "zoom": 12,
+            "organization": "TuLug",
+            "website": "http://www.tulug.it",
+            "email": "info@tulug.it"
+        }
+    }
+]

@@ -1,0 +1,107 @@
+[
+    {
+        "model": "nodes.Node",
+        "pk": 1,
+        "fields": {
+            "access_level": "public",
+            "name": "Fusolab Rome",
+            "status": 3,
+            "slug": "fusolab",
+            "zone": 1,
+            "user": 4,
+            "lat": "41.8720419277",
+            "lng": "12.5822391919",
+            "elev": "80",
+            "is_hotspot": true,
+            "description": "Fusolab",
+            "notes": ""
+        }
+    },
+    {
+        "model": "nodes.Node",
+        "pk": 2,
+        "fields": {
+            "access_level": "public",
+            "name": "EigenLab",
+            "status": 3,
+            "slug": "eigenlab",
+            "zone": 2,
+            "user": 5,
+            "lat": "43.7219513025",
+            "lng": "10.4080197215",
+            "elev": "80",
+            "is_hotspot": true,
+            "description": "EigenLab",
+            "notes": ""
+        }
+    },
+    {
+        "model": "nodes.Node",
+        "pk": 3,
+        "fields": {
+            "access_level": "public",
+            "name": "Tulug",
+            "status": 3,
+            "slug": "tulug",
+            "zone": 3,
+            "user": 6,
+            "lat": "42.4193749624",
+            "lng": "12.1111955426",
+            "elev": "25.0",
+            "is_hotspot": false,
+            "description": "House",
+            "notes": ""
+        }
+    },
+    {
+        "model": "nodes.Node",
+        "pk": 4,
+        "fields": {
+            "access_level": "public",
+            "name": "Potenziale Romano",
+            "status": 0,
+            "slug": "potenziale-romano",
+            "zone": 1,
+            "user": 4,
+            "lat": "41.8720419277",
+            "lng": "12.5822391919",
+            "elev": "80",
+            "is_hotspot": false,
+            "description": "Test record Rome"
+        }
+    },
+    {
+        "model": "nodes.Node",
+        "pk": 5,
+        "fields": {
+            "access_level": "public",
+            "name": "Potenziale Pisano",
+            "status": 0,
+            "slug": "potenziale-pisano",
+            "zone": 2,
+            "user": 5,
+            "lat": "43.7219513025",
+            "lng": "10.4080197215",
+            "elev": "80",
+            "is_hotspot": false,
+            "description": "Test record Pisa"
+        }
+    },
+    {
+        "model": "nodes.Node",
+        "pk": 6,
+        "fields": {
+            "access_level": "public",
+            "name": "Potenziale Viterbo",
+            "status": 0,
+            "slug": "potenziale-viterbo",
+            "zone": 3,
+            "user": 6,
+            "lat": "42.4193749624",
+            "lng": "12.1111955426",
+            "elev": "25.0",
+            "is_hotspot": false,
+            "description": "Test record Viterbo"
+        }
+    }
+]
