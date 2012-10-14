@@ -14,9 +14,14 @@ SCHEDULE_CHOICES = (
     (1, _('Schedule')),
 )
 
-RECIPIENT_TYPES = (
-    (1, _('all users indistinctively')),
-    (2, _('all the users which have a node in one of the selected zones')),
+FILTERING_CHOICES = (
+    (0, _('Send to all')),
+    (1, _('Send accordingly to selected filters')),
+)
+
+FILTERS = (
+    (1, _('users of the selected groups')),
+    (2, _('users which have a node in one of the selected zones')),
     (3, _('chosen users')),
 )
 
@@ -28,8 +33,14 @@ OUTWARD_STATUS = (
     (3, _('cancelled'))
 )
 
-RECIPIENT_GROUPS = settings.NODESHOT['CHOICES']['ACCESS_LEVELS']
-RECIPIENT_GROUPS += [('superusers', _('super users'))]
+GROUPS = []
+DEFAULT_GROUPS = ''
+# convert strings to integers
+for group in settings.NODESHOT['CHOICES']['ACCESS_LEVELS']:
+    GROUPS += [(int(group[0]), group[1])]
+    DEFAULT_GROUPS += '%s,' % group[0]
+GROUPS += [(0, _('super users'))]
+DEFAULT_GROUPS += '0'
 
 INWARD_STATUS = (
     (-1, _('Error')),

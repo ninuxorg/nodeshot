@@ -2,10 +2,12 @@ from django.contrib import admin
 from django.conf import settings
 from django.contrib.auth.models import User
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline#, BaseTabularInline
+from nodeshot.core.zones.models import Zone
 from models import Inward, Outward
 
 class InwardAdmin(BaseAdmin):
     list_display  = ('from_email', 'from_name', 'to',  'status', 'added', 'updated')
+    search_fields = ('from_email', 'from_name')
     #ordering = ('name',)
     #search_fields = ('name', 'description')
     # define the autocomplete_lookup_fields
@@ -17,21 +19,16 @@ class InwardAdmin(BaseAdmin):
 class OutwardAdmin(BaseAdmin):
     list_display  = ('subject', 'status', 'is_scheduled', 'added', 'updated')
     list_filter   = ('status', 'is_scheduled')
-    #filter_horizontal = ['ips']
-    #search_fields = ('name', 'description', 'uri', 'documentation_url')
-    #inlines = (PortInline, LoginInline,)
+    filter_horizontal = ['zones', 'users']
+    search_fields = ('subject',)
     
-    #def get_object(self, request, object_id):
-    #    """
-    #    Hook obj for use in formfield_for_manytomany
-    #    """
-    #    self.obj = super(ServiceAdmin, self).get_object(request, object_id)
-    #    return self.obj
-    #
-    #def formfield_for_manytomany(self, db_field, request, **kwargs):
-    #    if db_field.name == "ips" and getattr(self, 'obj', None):
-    #        kwargs["queryset"] = Ip.objects.select_related().filter(interface__device=self.obj.device)
-    #    return super(ServiceAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == 'zones':
+            kwargs['queryset'] = Zone.objects.filter(is_external=False)
+        if db_field.name == 'users':
+            kwargs['queryset'] = User.objects.filter(is_active=True)
+        return super(OutwardAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+    
     if 'grappelli' in settings.INSTALLED_APPS:
         class Media:
             js = [
