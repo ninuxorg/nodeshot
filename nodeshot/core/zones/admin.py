@@ -16,11 +16,12 @@ class ZoneExternalInline(admin.StackedInline):
     fk_name = 'zone'
 
 class ZoneAdmin(BaseAdmin):
-    list_display = ('name', 'description', 'is_external', 'organization', 'email', 'time_zone')
-    prepopulated_fields = {'slug': ('name',)}
+    list_display = ('name', 'description', 'organization', 'email', 'is_external', 'added', 'updated')
     list_filter   = ('is_external',)
+    search_fields = ('name', 'description', 'organization', 'email')
+    filter_horizontal = ('mantainers',)
+    prepopulated_fields = {'slug': ('name',)}
     inlines = [ZonePointInline, ZoneExternalInline]
-    filter_horizontal = ['mantainers']
 
 
 admin.site.register(Zone, ZoneAdmin)

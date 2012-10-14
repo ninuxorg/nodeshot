@@ -18,8 +18,9 @@ class ImageInline(BaseTabularInline):
         classes = ('grp-collapse grp-open', )
 
 class NodeAdmin(BaseAdmin):
-    list_display  = ('name', 'user', 'status', 'added', 'updated')
-    list_filter   = ('status', 'added')
+    list_display  = ('name', 'user', 'status', 'is_hotspot', 'added', 'updated')
+    list_filter   = ('status', 'is_hotspot', 'added')
+    search_fields = ('name',)
     date_hierarchy = 'added'
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}

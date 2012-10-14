@@ -13,8 +13,10 @@ class Node(BaseAccessLevel):
     status = models.SmallIntegerField(_('status'), max_length=3, choices=NODE_STATUS, default=settings.NODESHOT['DEFAULTS']['NODE_STATUS']) # todo: default status configurable
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
     
-    # zone might need to be able to be blank, would require custom validation
-    zone = models.ForeignKey('zones.Zone', blank=True)
+    if 'nodeshot.core.zones' in settings.INSTALLED_APPS:
+        # zone might need to be able to be blank, would require custom validation
+        zone = models.ForeignKey('zones.Zone', blank=True)
+    
     # nodes might be assigned to a foreign zone, therefore user can be left blank, requires custom validation
     user = models.ForeignKey(User, blank=True, null=True)
     
