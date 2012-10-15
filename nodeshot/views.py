@@ -936,3 +936,39 @@ def purge_expired(request):
         response = 'There are no old nodes to purge.'
 
     return HttpResponse(response)
+
+def statistics(request):
+    """
+    Returns a json file with statistic info
+    Supports "start" and "end" GET params in the querystring to filter date ranges
+    Example: http://map.ninux.org/stats.json?start=2012-01-01&end=2012-01-05
+    """
+    # retrieve statistics
+    start = request.GET.get('start', False)
+    end = request.GET.get('end', False)
+    raw_stats = Statistic.objects.all()
+    if(start and end):
+        raw_stats = raw_stats.filter(date__range=[start, end])
+    
+    # keep just one record for each day
+    # init empty lists that will be filled with the stuff we need
+    dates = [] # this is an auxiliary list
+    stats = []
+    # loop over statistics
+    for record in raw_stats:
+        if record.date.strftime('%d-%m-%Y') not in dates:
+            dates.append(record.date.strftime('%d-%m-%Y'))
+            stats.append({
+                'date': record.date.strftime('%d-%m-%Y'),
+                'active': record.active_nodes,
+                'hotspot': record.hotspots,
+                'potential': record.potential_nodes,
+                'links': record.links,
+                'km': record.km
+            })
+    
+    data = {
+        'info': stats
+    }
+    # return json
+    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
