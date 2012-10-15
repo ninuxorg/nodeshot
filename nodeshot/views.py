@@ -946,6 +946,7 @@ def statistics(request):
     # retrieve statistics
     start = request.GET.get('start', False)
     end = request.GET.get('end', False)
+    callback = request.GET.get('callback', False)
     raw_stats = Statistic.objects.all()
     if(start and end):
         raw_stats = raw_stats.filter(date__range=[start, end])
@@ -970,5 +971,10 @@ def statistics(request):
     data = {
         'info': stats
     }
+    # convert python to json
+    json = simplejson.dumps(data)
+    # support JSONP
+    if callback:
+        json = '%s(%s)' % (callback, json)
     # return json
-    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    return HttpResponse(json, mimetype='application/json')
