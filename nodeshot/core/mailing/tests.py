@@ -118,7 +118,7 @@ class OutwardTest(TestCase):
             nodes = Node.objects.filter(q)
             # zones id list
             message.zones = [int(zone) for zone in zones]
-            # retrieve recipients according to code
+            # retrieve recipients according to model code
             recipients = message.get_recipients()
             # retrieve list of emails
             emails = []
@@ -168,3 +168,62 @@ class OutwardTest(TestCase):
             # fail if user emails are not in recipients
             for user in users:
                 self.assertTrue(user.email in recipients)
+    
+    def test_group_and_zone_filtering(self):
+        """
+        Test group & zone filtering in multiple combinations
+        """
+        combinations = [
+            { 'groups': '1', 'zones': '1' },
+            { 'groups': '2', 'zones': '2' },
+            { 'groups': '1,2', 'zones': '1' },
+            { 'groups': '1,2,3', 'zones': '1,2' },
+            { 'groups': '1,2', 'zones': '1,2,3' },
+            { 'groups': '3', 'zones': '1,2,3' }
+        ]
+        # prepare record
+        message = self.message
+        message.is_filtered=True
+        message.filters = '1,2'
+        
+        for combo in combinations:
+            groups = combo['groups'].split(',')
+            zones = combo['zones'].split(',')
+            
+            # GROUPS
+            q1 = Q()
+            for group in groups:
+                # if not superuser case
+                if group != '0':
+                    # add another group to the Q
+                    q1 = q1 | Q(user__groups=group)
+                # superuser case
+                else:
+                    # group 0 wouldn't be correct, therefore we use is_superuser=True 
+                    q1 = q1 | Q(user__is_superuser=True)
+            # and is_active = True
+            q1 = q1 & Q(user__is_active=True)
+            
+            # ZONES
+            q2 = Q()
+            for zone in zones:
+                q2 = q2 | Q(zone=zone)
+            # retrieve nodes
+            nodes = Node.objects.filter(q1 & q2).select_related()
+            
+            # message group & zones
+            message.groups = combo['groups']
+            message.zones = [int(zone) for zone in zones]
+            
+            # retrieve recipients according to model code
+            recipients = message.get_recipients()
+            # retrieve list of emails
+            emails = []
+            for node in nodes:
+                if not node.user.email in emails:
+                    emails += [node.user.email]
+            # fail if recipient list length and user list length differ
+            self.assertEqual(len(recipients), len(emails))
+            # fail if user emails are not in recipients
+            for email in emails:
+                self.assertTrue(email in recipients)
