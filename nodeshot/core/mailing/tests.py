@@ -227,3 +227,65 @@ class OutwardTest(TestCase):
             # fail if user emails are not in recipients
             for email in emails:
                 self.assertTrue(email in recipients)
+    
+    def test_user_and_zone_filtering(self):
+        """
+        Test recipient filtering by user & zones
+        """
+        combinations = [
+            { 'users': '1', 'zones': '1' },
+            { 'users': '2', 'zones': '2' },
+            { 'users': '1,2', 'zones': '1' },
+            { 'users': '1,2,3', 'zones': '1,2' },
+            { 'users': '1,2', 'zones': '1,2,3' },
+            { 'users': '3', 'zones': '1,2,3' },
+            { 'users': '3,4,5,6,7', 'zones': '1' }
+        ]
+        # prepare record
+        message = self.message
+        message.is_filtered=True
+        message.filters = '2,3'
+        
+        for combo in combinations:
+            users = combo['users'].split(',')
+            zones = combo['zones'].split(',')
+            
+            # ZONES
+            q1 = Q()
+            for zone in zones:
+                q1 = q1 | Q(zone=zone)
+            # retrieve nodes
+            nodes = Node.objects.filter(q1).select_related()
+            
+            # prepare Q object for user query
+            q2 = Q()
+            for user in users:
+                q2 = q2 | Q(pk=user)
+            q2 = q2 & Q(is_active=True)
+            
+            # message users & zones
+            message.users = [int(user) for user in users]
+            message.zones = [int(zone) for zone in zones]
+            
+            # retrieve chosen users
+            users = User.objects.filter(q2)
+            
+            # retrieve recipients according to model code
+            recipients = message.get_recipients()
+            
+            # retrieve list of emails
+            emails = []
+            for node in nodes:
+                if not node.user.email in emails:
+                    emails.append(node.user.email)
+            
+            # add emails of selected users if necessary
+            for user in users:
+                if not user.email in emails:
+                    emails.append(user.email)
+            
+            # fail if recipient list length and user list length differ
+            self.assertEqual(len(recipients), len(emails))
+            # fail if user emails are not in recipients
+            for email in emails:
+                self.assertTrue(email in recipients)
