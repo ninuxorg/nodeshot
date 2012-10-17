@@ -25,13 +25,22 @@ FILTERS = (
     (3, _('chosen users')),
 )
 
-OUTWARD_STATUS = (
+OUTWARD_STATUS_CHOICES = (
     (-1, _('error')),
     (0, _('draft')),
     (1, _('scheduled')),
     (2, _('sent')),
     (3, _('cancelled'))
 )
+
+# this is just for convenience and readability
+OUTWARD_STATUS = {
+    'error': OUTWARD_STATUS_CHOICES[0][0],
+    'draft': OUTWARD_STATUS_CHOICES[1][0],
+    'scheduled': OUTWARD_STATUS_CHOICES[2][0],
+    'sent': OUTWARD_STATUS_CHOICES[3][0],
+    'cancelled': OUTWARD_STATUS_CHOICES[4][0]
+}
 
 GROUPS = []
 DEFAULT_GROUPS = ''
@@ -42,7 +51,7 @@ for group in settings.NODESHOT['CHOICES']['ACCESS_LEVELS']:
 GROUPS += [(0, _('super users'))]
 DEFAULT_GROUPS += '0'
 
-INWARD_STATUS = (
+INWARD_STATUS_CHOICES = (
     (-1, _('Error')),
     (0, _('Not sent yet')),
     (1, _('Sent')),

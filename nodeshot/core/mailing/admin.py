@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline#, BaseTabularInline
 from nodeshot.core.zones.models import Zone
 from models import Inward, Outward
@@ -16,11 +18,23 @@ class InwardAdmin(BaseAdmin):
             'generic': [['content_type', 'object_id']],
         }
 
+def send_now(modeladmin, request, queryset):
+    """
+    Send now action available in change list
+    """
+    objects = queryset
+    for object in objects:
+        object.send()
+    send_now.short_description = _('Send selected messages now')
+    # show message in the admin
+    messages.info(request, _('Message sent successfully'))
+
 class OutwardAdmin(BaseAdmin):
     list_display  = ('subject', 'status', 'is_scheduled', 'added', 'updated')
     list_filter   = ('status', 'is_scheduled')
     filter_horizontal = ['zones', 'users']
     search_fields = ('subject',)
+    actions = [send_now]
     
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == 'zones':

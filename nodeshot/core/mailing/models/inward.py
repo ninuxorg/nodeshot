@@ -7,13 +7,16 @@ from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.core.mail import EmailMessage
 from django.conf import settings
 from nodeshot.core.base.models import BaseDate
-from choices import INWARD_STATUS
+from choices import INWARD_STATUS_CHOICES
 
 
-# inward
 class Inward(BaseDate):
+    """
+    Incoming messages from users
+    TODO: dynamic limit
+    """
     # could be a node, an user or a zone
-    status = models.IntegerField(_('status'), choices=INWARD_STATUS, default=INWARD_STATUS[1][0])
+    status = models.IntegerField(_('status'), choices=INWARD_STATUS_CHOICES, default=INWARD_STATUS_CHOICES[1][0])
     limit = models.Q(app_label = 'nodes', model = 'Node') | models.Q(app_label = 'auth', model = 'User') | models.Q(app_label = 'zones', model = 'Zone')
     content_type = models.ForeignKey(ContentType, limit_choices_to = limit)
     object_id = models.PositiveIntegerField()
