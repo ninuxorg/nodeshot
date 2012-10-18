@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ImproperlyConfigured
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline#, BaseTabularInline
 from nodeshot.core.zones.models import Zone
 from models import Inward, Outward
@@ -20,7 +21,7 @@ class InwardAdmin(BaseAdmin):
 
 def send_now(modeladmin, request, queryset):
     """
-    Send now action available in change list
+    Send now action available in change outward list
     """
     objects = queryset
     for object in objects:
@@ -43,7 +44,9 @@ class OutwardAdmin(BaseAdmin):
             kwargs['queryset'] = User.objects.filter(is_active=True)
         return super(OutwardAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
     
-    if 'grappelli' in settings.INSTALLED_APPS:
+    if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True: 
+        if 'grappelli' not in settings.INSTALLED_APPS:
+            raise ImproperlyConfigured(_("settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is set to True but grappelli is not in settings.INSTALLED_APPS"))
         class Media:
             js = [
                 '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,

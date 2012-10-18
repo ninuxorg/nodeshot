@@ -289,3 +289,9 @@ class OutwardTest(TestCase):
             # fail if user emails are not in recipients
             for email in emails:
                 self.assertTrue(email in recipients)
+    
+    def test_outward_plaintext(self):
+        self.assertEqual(False, 'write a test that verifies email is correctly sent as plain text')
+    
+    def test_outward_html(self):
+        self.assertEqual(False, 'write a test that verifies email is correctly sent both as plain text and HTML')

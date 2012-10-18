@@ -199,6 +199,9 @@ NODESHOT = {
         'CONTACT_INWARD_MAXLENGTH': 2000,
         'CONTACT_OUTWARD_MAXLENGTH': 9999,
         'CONTACT_OUTWARD_MINLENGTH': 50,
+        'CONTACT_OUTWARD_STEP': 20,
+        'CONTACT_OUTWARD_DELAY': 10,
+        'CONTACT_OUTWARD_HTML': True, # grappelli must be in INSTALLED_APPS, otherwise it won't work
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (

@@ -2,17 +2,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.core.validators import MaxLengthValidator, MinLengthValidator
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db.models import Q
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
 from nodeshot.dependencies.fields import MultiSelectField
 from choices import *
-
-#class OutwardManager(models.Manager):
-#    def send(self):
-#            
-#        return
 
 
 class Outward(BaseDate):
@@ -163,24 +158,35 @@ class Outward(BaseDate):
         # init empty list that will contain django's email objects
         emails = []
         
+        # prepare text plain if necessary
+        if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True:
+            # store plain text in var
+            from lxml import html
+            html_content = self.message
+            message = html.fromstring(self.message).text_content()
+            # set EmailClass to EmailMultiAlternatives
+            EmailClass = EmailMultiAlternatives
+        else:
+            EmailClass = EmailMessage
+            message = self.message
+        
         # loop over recipients and fill "emails" list
         for recipient in recipients:
-            # prepare email object
-            emails.append(EmailMessage(
+            msg = EmailClass(
                 # subject
                 self.subject,
                 # message
-                self.message,
+                message,
                 # from
                 settings.DEFAULT_FROM_EMAIL,
                 # to
                 [recipient],
-            ))
-        
-        # TODO:
-        # add both HTML and plain text support?
-        if 'grappelli' in settings.INSTALLED_APPS:
-            pass#email.
+            )
+            if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True:
+                msg.attach_alternative(html_content, "text/html")
+            # prepare email object
+            emails.append(msg)
+            
         
         import socket, time
         # try sending email
