@@ -1,0 +1,93 @@
+{% extends "admin/change_form.html" %}
+
+<!-- LOADING -->
+{% load url from future %}
+{% load admin_static i18n admin_modify grp_tags %}
+
+<!-- JAVASCRIPTS -->
+{% block javascripts %}
+    {{ block.super }}
+    <script type="text/javascript" charset="utf-8">
+        (function($) {
+            $(document).ready(function() {
+                // nodeshot specific
+                var schedule_fields = $('.scheduled_date, .scheduled_time');
+                var schedule_select = $('#id_is_scheduled');
+                schedule_select.change(function(e){
+                    if($(this).val() == false){
+                        schedule_fields.fadeOut(300);
+                    }
+                    else{
+                        schedule_fields.fadeIn(300)
+                    }
+                });
+                if(schedule_select.val() == false){
+                    schedule_fields.hide();
+                }
+                
+                var get_filtering_fields = function(){
+                    // fields array
+                    var fields = ['groups', 'zones', 'users']
+                    // .filters is always in the selector
+                    var selector = '.filters';
+                    
+                    $('input[name=filters]').each(function(i, item){
+                        if(item.checked){
+                            selector += ', .' + fields[i]
+                        }
+                    });
+                    console.log(selector)
+                    return $(selector);
+                }
+                
+                $('.filters, .groups, .zones, .users').hide();
+                var filtered_select = $('#id_is_filtered');
+                filtered_select.change(function(e){
+                      
+                    fields = get_filtering_fields();
+                    if($(this).val() == false){
+                        fields.fadeOut(300);
+                    }
+                    else{
+                        fields.fadeIn(300)
+                    }
+                });
+                
+                if(filtered_select.val() == false){
+                    get_filtering_fields().hide();
+                }
+                else{
+                    get_filtering_fields().show();
+                }
+                
+                // toggle groups
+                $('#id_filters_0').change(function(e){
+                    if(this.checked){
+                        $('.groups').fadeIn(300);
+                    }
+                    else{
+                        $('.groups').fadeOut(300);
+                    }
+                });
+                
+                $('#id_filters_1').change(function(e){
+                    if(this.checked){
+                        $('.zones').fadeIn(300);
+                    }
+                    else{
+                        $('.zones').fadeOut(300);
+                    }
+                });
+                
+                $('#id_filters_2').change(function(e){
+                    if(this.checked){
+                        $('.users').fadeIn(300);
+                    }
+                    else{
+                        $('.users').fadeOut(300);
+                    }
+                });
+            });
+        })(grp.jQuery);
+    </script>
+{% endblock %}

@@ -110,7 +110,10 @@ ROOT_URLCONF = 'myproject.urls' # replace myproject with the name of your projec
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
+import nodeshot
+
 TEMPLATE_DIRS = (
+    '%s/core/mailing/templates' % os.path.dirname(os.path.realpath(nodeshot.__file__))
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -167,12 +170,6 @@ LOGGING = {
         },
     }
 }
-
-import nodeshot
-
-FIXTURE_DIRS = (
-    '%s/fixtures/' % os.path.dirname(os.path.realpath(nodeshot.__file__))
-)
 
 CACHES = {
     'default': {

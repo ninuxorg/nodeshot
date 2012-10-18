@@ -222,6 +222,8 @@ class Outward(BaseDate):
         """
         # change status to scheduled if necessary
         if self.is_scheduled and self.status is not OUTWARD_STATUS.get('scheduled'):
-            self.status = STATUS.get('scheduled')
+            self.status = OUTWARD_STATUS.get('scheduled')
         # call super.save()
         super(Outward, self).save(*args, **kwargs)
+    
+    # TODO: custom validation!!!
