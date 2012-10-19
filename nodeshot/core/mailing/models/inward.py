@@ -21,7 +21,7 @@ class Inward(BaseDate):
     content_type = models.ForeignKey(ContentType, limit_choices_to = limit)
     object_id = models.PositiveIntegerField()
     to = generic.GenericForeignKey('content_type', 'object_id')
-    user = models.ForeignKey(User, verbose_name=_('user'), blank=True)
+    user = models.ForeignKey(User, verbose_name=_('user'), blank=not settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH'], null=True)
     from_name = models.CharField(_('name'), max_length=50)
     from_email = models.EmailField(_('email'), max_length=50)
     message = models.TextField(_('message'), validators=[
@@ -97,3 +97,9 @@ class Inward(BaseDate):
         # save in the database unless logging is explicitly turned off in the settings file
         if settings.NODESHOT['SETTINGS']['CONTACT_INWARD_LOG']:
             super(Inward, self).save(*args, **kwargs)
+    
+    #def clean(self, *args, **kwargs):
+    #    """
+    #    Custom validation
+    #    """
+    #    pass
