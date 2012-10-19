@@ -2,12 +2,16 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.core.validators import MaxLengthValidator, MinLengthValidator
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db.models import Q
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
 from nodeshot.dependencies.fields import MultiSelectField
 from choices import *
+
+from datetime import datetime
+from django.utils.timezone import utc
 
 
 class Outward(BaseDate):
@@ -25,7 +29,7 @@ class Outward(BaseDate):
     scheduled_date = models.DateField(_('scheduled date'), blank=True, null=True)
     scheduled_time = models.CharField(_('scheduled time'), max_length=20, choices=AVAILABLE_CRONJOBS, default=settings.NODESHOT['DEFAULTS']['CRONJOB'], blank=True)
     is_filtered = models.SmallIntegerField(_('recipient filtering'), choices=FILTERING_CHOICES, default=0)
-    filters = MultiSelectField(max_length=255, choices=FILTERS, blank=True, help_text=_('specify recipient filters'))
+    filters = MultiSelectField(max_length=255, choices=FILTER_CHOICES, blank=True, help_text=_('specify recipient filters'))
     groups = MultiSelectField(max_length=255, choices=GROUPS, default=DEFAULT_GROUPS, blank=True, help_text=_('filter specific groups of users'))
     
     if 'nodeshot.core.zones' in settings.INSTALLED_APPS:
@@ -61,13 +65,6 @@ class Outward(BaseDate):
         # prepare email list
         emails = []
         
-        # more human readable stuff
-        filters = {
-            'groups': str(FILTERS[0][0]),
-            'zones': str(FILTERS[1][0]),
-            'users': str(FILTERS[2][0])
-        }
-        
         # the following code is a bit ugly. Considering the titanic amount of work required to build all the cools functionalities that I have in my mind, I can't be bothered to waste time on making it nicer right now.
         # if you have ideas on how to improve it to make it cleaner and less cluttered, please join in
         # this method has unit tests written for it, therefore if you try to change it be sure to check unit tests do not fail after your changes
@@ -84,7 +81,7 @@ class Outward(BaseDate):
                     emails += [user.email]
         else:
             # selected users
-            if filters.get('users') in self.filters:
+            if FILTERS.get('users') in self.filters:
                 # retrieve selected users
                 users = self.users.all().only('email')
                 # loop over selected users
@@ -99,7 +96,7 @@ class Outward(BaseDate):
             q2 = Q()
             
             # if group filtering is checked
-            if filters.get('groups') in self.filters:
+            if FILTERS.get('groups') in self.filters:
                 # loop over each group
                 for group in self.groups:
                     # if not superusers
@@ -117,7 +114,7 @@ class Outward(BaseDate):
             q = q & Q(is_active=True)
             
             # if zone filtering is checked
-            if filters.get('zones') in self.filters:
+            if FILTERS.get('zones') in self.filters:
                 # retrieve non-external zones
                 zones = self.zones.all().only('id')
                 # init empty q3
@@ -135,7 +132,7 @@ class Outward(BaseDate):
                     if not node.user.email in emails:
                         emails += [node.user.email]
             # else if group filterins is checked but not zones
-            elif filters.get('groups') in self.filters and not filters.get('zones')  in self.filters:
+            elif FILTERS.get('groups') in self.filters and not FILTERS.get('zones')  in self.filters:
                 # retrieve only email DB column of all active users
                 users = User.objects.filter(q).only('email')
                 # loop over users list
@@ -223,7 +220,24 @@ class Outward(BaseDate):
         # change status to scheduled if necessary
         if self.is_scheduled and self.status is not OUTWARD_STATUS.get('scheduled'):
             self.status = OUTWARD_STATUS.get('scheduled')
+        
         # call super.save()
         super(Outward, self).save(*args, **kwargs)
     
-    # TODO: custom validation!!!
+    def clean(self, *args, **kwargs):
+        """
+        Custom validation
+        """
+        if self.is_scheduled is 1 and (self.scheduled_date == '' or self.scheduled_date is None or self.scheduled_time == '' or self.scheduled_time is None):
+            raise ValidationError(_('If message is scheduled both fields "scheduled date" and "scheduled time" must be specified'))
+        
+        if self.is_scheduled is 1 and self.scheduled_date < datetime.utcnow().replace(tzinfo=utc).date():
+            raise ValidationError(_('The scheduled date is set to a past date'))
+        
+        if self.is_filtered is 1 and (len(self.filters) < 1 or self.filters == [''] or self.filters == [u''] or self.filters == '' or self.filters is None):
+            raise ValidationError(_('If "recipient filtering" is active one of the filtering options should be selected'))
+        
+        if self.is_filtered is 1 and FILTERS.get('groups') in self.filters and (len(self.groups) < 1 or self.groups == [''] or self.groups == [u''] or self.groups == '' or self.groups is None):
+            raise ValidationError(_('If group filtering is active at least one group of users should be selected'))
+        
+        # TODO: unfortunately zones and users can't be validated easily because they are a many2many field

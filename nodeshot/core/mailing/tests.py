@@ -4,13 +4,18 @@ nodeshot.core.mailing unit tests
 
 from django.utils import unittest
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 
 from django.db.models import Q
 from django.contrib.auth.models import User, Group
 from nodeshot.core.zones.models import Zone
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.mailing.models import Inward, Outward
-from nodeshot.core.mailing.models.choices import GROUPS
+from nodeshot.core.mailing.models.choices import GROUPS, FILTERS
+
+import datetime
+from django.utils.timezone import utc
+
 
 class OutwardTest(TestCase):
     
@@ -25,11 +30,14 @@ class OutwardTest(TestCase):
             is_scheduled=False,
             is_filtered=False
         )
+        self.msg = Outward(
+            status = 0,
+            subject = 'This is a test',
+            message = self.message.subject,
+        )
     
     def test_fixtures(self):
-        """
-        Tests fixtures have loaded properly.
-        """
+        """ *** Tests fixtures have loaded properly *** """
         zones = Zone.objects.all()
         nodes = Node.objects.all()
         users = User.objects.filter(is_active=True)
@@ -39,9 +47,7 @@ class OutwardTest(TestCase):
         self.assertEqual(len(users), 8)
     
     def test_no_filter(self):
-        """
-        Test no filtering, send to all
-        """
+        """ *** Test no filtering, send to all *** """
         # count users
         users = User.objects.filter(is_active=True)
         recipients = self.message.get_recipients()
@@ -54,9 +60,7 @@ class OutwardTest(TestCase):
             self.assertTrue(user.email in recipients)
         
     def test_group_filtering(self):
-        """
-        Test group filtering in multiple combinations
-        """
+        """ *** Test group filtering in multiple combinations *** """
         combinations = [
             '1','2','3','0',
             '1,2','1,3','1,0','2,3','2,0','3,0',
@@ -95,9 +99,7 @@ class OutwardTest(TestCase):
                 self.assertTrue(user.email in recipients)
     
     def test_zone_filtering(self):
-        """
-        Test zone filtering in multiple combinations
-        """
+        """ *** Test zone filtering in multiple combinations *** """
         combinations = [
             '1','2','3',
             '1,2','1,3','2,3',
@@ -132,9 +134,7 @@ class OutwardTest(TestCase):
                 self.assertTrue(email in recipients)
         
     def test_user_filtering(self):
-        """
-        Test recipient filtering by user
-        """
+        """ *** Test recipient filtering by user *** """
         combinations = [
             '1','2','3','4','5','6','7','8',
             '1,2','2,3','3,4','5,6'
@@ -170,9 +170,7 @@ class OutwardTest(TestCase):
                 self.assertTrue(user.email in recipients)
     
     def test_group_and_zone_filtering(self):
-        """
-        Test group & zone filtering in multiple combinations
-        """
+        """ *** Test group & zone filtering in multiple combinations *** """
         combinations = [
             { 'groups': '1', 'zones': '1' },
             { 'groups': '2', 'zones': '2' },
@@ -229,9 +227,7 @@ class OutwardTest(TestCase):
                 self.assertTrue(email in recipients)
     
     def test_user_and_zone_filtering(self):
-        """
-        Test recipient filtering by user & zones
-        """
+        """ *** Test recipient filtering by user & zones *** """
         combinations = [
             { 'users': '1', 'zones': '1' },
             { 'users': '2', 'zones': '2' },
@@ -290,8 +286,83 @@ class OutwardTest(TestCase):
             for email in emails:
                 self.assertTrue(email in recipients)
     
+    def test_outward_validation_scheduled1(self):
+        """ *** A scheduled message without any value for scheduled date and time should not pass validation *** """
+        self.msg.is_scheduled = 1
+        self.msg.scheduled_date = None
+        self.msg.scheduled_time = None        
+        self.assertRaises(ValidationError, self.msg.full_clean)
+    
+    def test_outward_validation_scheduled2(self):
+        """ *** A scheduled message without any value for scheduled time should not pass validation *** """
+        self.msg.is_scheduled = 1
+        self.msg.scheduled_time = None
+        self.msg.scheduled_date = datetime.datetime.utcnow().replace(tzinfo=utc).date() + datetime.timedelta(days=1)
+        self.assertRaises(ValidationError, self.msg.full_clean)
+    
+    def test_outward_validation_scheduled3(self):
+        """ *** A scheduled message without any value for scheduled date should not pass validation *** """
+        self.msg.is_scheduled = 1
+        self.msg.scheduled_date = None
+        self.msg.scheduled_time = '00'
+        self.assertRaises(ValidationError, self.msg.full_clean)
+    
+    def test_outward_validation_scheduled4(self):
+        """ *** A scheduled message with both date and time should pass validation *** """
+        self.msg.is_scheduled = 1
+        self.msg.scheduled_date = datetime.datetime.utcnow().replace(tzinfo=utc).date() + datetime.timedelta(days=1)
+        self.msg.scheduled_time = '00'
+        self.msg.full_clean()
+    
+    def test_outward_validate_scheduled5(self):
+        """ *** A new message with a past scheduled date should not pass validation *** """
+        self.msg.is_scheduled = 1
+        self.msg.scheduled_date = datetime.datetime.utcnow().replace(tzinfo=utc).date() - datetime.timedelta(days=1)
+        self.msg.scheduled_time = '00'
+        self.assertRaises(ValidationError, self.msg.full_clean)
+        
+    def test_outward_validate_filters1(self):
+        """ *** A new message with is_filtered == True and no selected filter should not pass validation *** """
+        self.msg.is_scheduled = 0
+        self.msg.scheduled_date = None
+        self.msg.scheduled_time = None
+        self.msg.is_filtered = 1
+        self.assertRaises(ValidationError, self.msg.full_clean)
+    
+    def test_outward_validate_filters2(self):
+        """ *** A new message with group filtering active but not selected group should not pass validation *** """
+        self.msg.is_scheduled = 0
+        self.msg.is_filtered = 1
+        self.msg.filters = '%s' % FILTERS.get('groups')
+        self.msg.groups = ''
+        self.assertRaises(ValidationError, self.msg.full_clean)
+    
+    # the following two validation routine require more cumbersome procedures ... can't be bothered right now!
+    # 
+    #def test_outward_validate_filters3(self):
+    #    """ *** A new message with user filtering active but not selected group should not pass validation *** """
+    #    self.msg.is_scheduled = 0
+    #    self.msg.is_filtered = 1
+    #    self.msg.filters = '%s' % FILTERS.get('users')
+    #    self.msg.users = []
+    #    self.assertRaises(ValidationError, self.msg.full_clean)
+    #
+    #def test_outward_validate_filters4(self):
+    #    """ *** A new message with zone filtering active but not selected group should not pass validation *** """
+    #    self.msg.is_scheduled = 0
+    #    self.msg.is_filtered = 1
+    #    self.msg.filters = '%s' % FILTERS.get('zones')
+    #    self.msg.zones = []
+    #    self.assertRaises(ValidationError, self.msg.full_clean)
+    
     def test_outward_plaintext(self):
-        self.assertEqual(False, 'write a test that verifies email is correctly sent as plain text')
+        """ *** TODO: write a test that verifies email is correctly sent as plain text *** """
+        self.assertEqual(False, True)
     
     def test_outward_html(self):
-        self.assertEqual(False, 'write a test that verifies email is correctly sent both as plain text and HTML')
+        """ *** TODO: write a test that verifies email is correctly sent both as plain text and HTML *** """
+        self.assertEqual(False, True)
+    
+    def test_inward_validate_require_auth(self):
+        """ *** TODO: write a test that verifies require auth for inward messages works correctly *** """
+        self.assertEqual(False, True)

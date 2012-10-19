@@ -19,11 +19,18 @@ FILTERING_CHOICES = (
     (1, _('Send accordingly to selected filters')),
 )
 
-FILTERS = (
+FILTER_CHOICES = (
     (1, _('users of the selected groups')),
     (2, _('users which have a node in one of the selected zones')),
     (3, _('chosen users')),
 )
+
+# this is just for convenience and readability
+FILTERS = {
+    'groups': str(FILTER_CHOICES[0][0]),
+    'zones': str(FILTER_CHOICES[1][0]),
+    'users': str(FILTER_CHOICES[2][0])
+}
 
 OUTWARD_STATUS_CHOICES = (
     (-1, _('error')),
