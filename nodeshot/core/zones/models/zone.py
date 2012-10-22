@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.base.choices import TIME_ZONES, MAP_ZOOM
 
@@ -19,6 +20,7 @@ class Zone(BaseDate):
     website = models.URLField(_('Website'), blank=True, null=True)
     email = models.EmailField(_('email'), help_text=_('possibly an email address that delivers messages to all the active participants; if you don\'t have such an email you can add specific users in the "mantainers" field'), blank=True)
     mantainers = models.ManyToManyField(User, verbose_name=_('mantainers'), help_text=_('you can specify the users who are mantaining this zone so they will receive emails from the system'), blank=True)
+    #points = models.CharField
     
     class Meta:
         db_table = 'zones_zone'
@@ -31,6 +33,20 @@ class Zone(BaseDate):
         @staticmethod
         def autocomplete_search_fields():
             return ('name__icontains', 'slug__icontains')
+    
+    def clean(self, *args, **kwargs):
+        """
+        Custom validation
+        """
+        
+        if self.is_external and self.parent:
+            raise ValidationError(_('External zones cannot have parents'))
+        
+        if self.parent and self.parent.is_external:
+            raise ValidationError(_('Zones cannot have parents flagged as "external"'))
+        
+        #if not self.email and not self.mantainers:
+        #    raise ValidationError(_('Either an email or some mantainers should be set'))
     
     # TODO:
     # requires custom validation, either an email or some mantainers should be set;
