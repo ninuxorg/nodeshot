@@ -215,7 +215,7 @@ class Outward(BaseDate):
     
     def save(self, *args, **kwargs):
         """
-        Besides saving the database record tries to send the email if status is either "error" or "sending"
+        Custom save method
         """
         # change status to scheduled if necessary
         if self.is_scheduled and self.status is not OUTWARD_STATUS.get('scheduled'):

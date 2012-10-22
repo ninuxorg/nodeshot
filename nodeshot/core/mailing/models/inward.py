@@ -10,15 +10,16 @@ from nodeshot.core.base.models import BaseDate
 from choices import INWARD_STATUS_CHOICES
 
 
+limit = models.Q(app_label = 'nodes', model = 'Node') | models.Q(app_label = 'auth', model = 'User') | models.Q(app_label = 'zones', model = 'Zone')
+
+
 class Inward(BaseDate):
     """
     Incoming messages from users
-    TODO: dynamic limit
     """
     # could be a node, an user or a zone
     status = models.IntegerField(_('status'), choices=INWARD_STATUS_CHOICES, default=INWARD_STATUS_CHOICES[1][0])
-    limit = models.Q(app_label = 'nodes', model = 'Node') | models.Q(app_label = 'auth', model = 'User') | models.Q(app_label = 'zones', model = 'Zone')
-    content_type = models.ForeignKey(ContentType, limit_choices_to = limit)
+    content_type = models.ForeignKey(ContentType, limit_choices_to=limit)
     object_id = models.PositiveIntegerField()
     to = generic.GenericForeignKey('content_type', 'object_id')
     user = models.ForeignKey(User, verbose_name=_('user'), blank=not settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH'], null=True)
@@ -90,16 +91,10 @@ class Inward(BaseDate):
         Custom save method
         """
         # if not sent yet
-        if self.status < 1:
+        if int(self.status) < 1:
             # tries sending email (will modify self.status!)
             self.send()
         
         # save in the database unless logging is explicitly turned off in the settings file
         if settings.NODESHOT['SETTINGS']['CONTACT_INWARD_LOG']:
             super(Inward, self).save(*args, **kwargs)
-    
-    #def clean(self, *args, **kwargs):
-    #    """
-    #    Custom validation
-    #    """
-    #    pass
