@@ -2,7 +2,6 @@
 nodeshot.core.mailing unit tests
 """
 
-from django.utils import unittest
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
@@ -42,7 +41,7 @@ class OutwardTest(TestCase):
         nodes = Node.objects.all()
         users = User.objects.filter(is_active=True)
         
-        self.assertEqual(len(zones), 3)
+        self.assertEqual(len(zones), 4)
         self.assertEqual(len(nodes), 6)
         self.assertEqual(len(users), 8)
     
