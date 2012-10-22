@@ -1,3 +1,4 @@
+import os
 from django.contrib import admin
 from django.conf import settings
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
@@ -22,6 +23,8 @@ class ZoneAdmin(BaseAdmin):
     filter_horizontal = ('mantainers',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ZonePointInline, ZoneExternalInline]
+    
+    change_form_template = '%s/templates/admin/zone_change_form.html' % os.path.dirname(os.path.realpath(__file__))
 
 
 admin.site.register(Zone, ZoneAdmin)
