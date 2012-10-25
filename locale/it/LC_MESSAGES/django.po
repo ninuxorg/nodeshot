@@ -1005,3 +1005,6 @@ msgstr "Disabilitato"
 
 msgid "The selected node is not available in this list"
 msgstr "Il nodo selezionato non è presente in questa lista"
+
+msgid "Search node, ip, mac, ssid"
+msgstr "Cerca nodo, ip, mac ,ssid"
