@@ -587,7 +587,7 @@ msgid "Search address"
 msgstr "Cerca un indirizzo"
 
 msgid "Search for a node, device, IP, MAC"
-msgstr "Cerca un un nodo, device, IP, MAC"
+msgstr "Cerca un nodo, device, IP, MAC"
 
 msgid "Search for an address"
 msgstr "Cerca un indirizzo"
@@ -1006,5 +1006,3 @@ msgstr "Disabilitato"
 msgid "The selected node is not available in this list"
 msgstr "Il nodo selezionato non è presente in questa lista"
 
-msgid "Search node, ip, mac, ssid"
-msgstr "Cerca nodo, ip, mac ,ssid"
