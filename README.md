@@ -45,8 +45,8 @@ For a complete installation guide please refer to installation guide
 available here:
 http://wiki.ninux.org/InstallNodeshot
 
-QUESTIONS
+QUESTIONS, CONTRIBUTIONS, DISCUSSION 
 ---------------
-If you have any question, please feel free to contact us:
-    contatti@ninux.org
+If you like this software and you are interested in contributing or you want to ask any question join our mailing list:
+http://ml.ninux.org/mailman/listinfo/nodeshot
 
