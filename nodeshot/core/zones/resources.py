@@ -1,26 +1,44 @@
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from tastypie.resources import ModelResource
+from django.core.urlresolvers import reverse
 from tastypie.http import HttpGone, HttpMultipleChoices
-from models import Zone, ZoneExternal
 from nodeshot.core.nodes.resources import NodeResource
+from nodeshot.core.base.resources import BaseSlugResource
+from models import Zone, ZoneExternal
 
-class ZoneResource(ModelResource):
-    
+class ZoneResource(BaseSlugResource):
+    """ Zone API description """
     class Meta:
-        queryset = Zone.objects.all().select_related()
+        # retrieves only published zones
+        queryset = Zone.objects.published().select_related()
         resource_name = 'zones'
         include_resource_uri = False
         limit = 0
-        excludes = ['added', 'updated']
+        excludes = ['added', 'updated', 'time_zone', 'email', 'is_published', 'id', 'slug']
     
-    def override_urls(self):
+    def dehydrate(self, bundle):
+        """ data preparation """
+        
+        # if in list of zones
+        if self.get_slug_detail_uri(bundle) != bundle.request.path:
+            bundle.data['details'] = self.get_slug_detail_uri(bundle)
+            del bundle.data['website']
+            del bundle.data['zoom']
+            del bundle.data['description']
+        
+        # add node list link
+        bundle.data['nodes'] = '%snodes/' % self.get_slug_detail_uri(bundle)
+
+        return bundle
+    
+    def prepend_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d_.-]+)/nodes/$" % self._meta.resource_name, self.wrap_view('get_zone_nodes'), name="api_get_zone_nodes"),
             url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
     
     def get_zone_nodes(self, request, **kwargs):
+        """ view that gets the nodes of a zone """
         try:
             obj = self.cached_obj_get(request=request, **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
@@ -34,4 +52,3 @@ class ZoneResource(ModelResource):
 
         child_resource = NodeResource()
         return child_resource.get_list(request)
-
