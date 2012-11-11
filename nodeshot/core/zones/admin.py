@@ -17,13 +17,13 @@ class ZoneExternalInline(admin.StackedInline):
     fk_name = 'zone'
 
 class ZoneAdmin(BaseAdmin):
-    list_display = ('name', 'description', 'organization', 'email', 'is_external', 'added', 'updated')
-    list_filter   = ('is_external',)
+    list_display = ('name', 'is_published', 'description', 'organization', 'email', 'is_external', 'added', 'updated')
+    list_filter   = ('is_external', 'is_published')
     search_fields = ('name', 'description', 'organization', 'email')
     filter_horizontal = ('mantainers',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ZonePointInline, ZoneExternalInline]
-    
+    # custom admin template
     change_form_template = '%s/templates/admin/zone_change_form.html' % os.path.dirname(os.path.realpath(__file__))
 
 
