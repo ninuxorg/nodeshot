@@ -240,9 +240,13 @@ NODESHOT = {
             'nodeshot.core.nodes',
             'nodeshot.core.network',
             'nodeshot.core.links',
-            'nodeshot.core.services'
+            'nodeshot.core.services',
+            'nodeshot.core.mailing'
         ]
-    }
+    },
+    'INTEROPERABILITY': [
+        ('nodeshot.extra.interoperability.GeoRSS', 'GeoRSS'),
+    ]
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]

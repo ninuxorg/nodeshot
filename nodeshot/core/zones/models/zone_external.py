@@ -1,21 +1,46 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 from zone import Zone
+import simplejson as json
+
+# choices
+INTEROPERABILITY = [
+    (False, _('Not interoperable'))
+] + settings.NODESHOT['INTEROPERABILITY']
 
 class ZoneExternal(models.Model):
     """
     External Zones, extend 'Zones' with additional files
-    These are the zones that are managed by local groups or other communities
+    These are the zones that are managed by local groups or other organizations
     """
-    #owners = models.CharField(_('zone owners, eg: ninux, freifunk'), max_length=25)
     zone = models.OneToOneField(Zone, verbose_name=_('zone'), parent_link=True, related_name='external')
-    map = models.URLField(_('map URL'))
-    api = models.URLField(_('API URL'))
-    #public_key = models.TextField(_('Public key'))
+    interoperability = models.CharField(_('interoperability'), max_length=128, choices=INTEROPERABILITY, default=False)
+    config = models.TextField(_('configuration'), blank=True, help_text=_('JSON format, will be parsed by the interoperability class to retrieve config keys'))
+    map = models.URLField(_('map URL'), blank=True)
     
     class Meta:
         db_table = 'zones_external'
         app_label= 'zones'
-        verbose_name = _('external zone info')
+        verbose_name = _('external zone')
         verbose_name_plural = _('external zones info')
+
+    def __unicode__(self):
+        return '%s additional data' % self.zone.name
+
+    def clean(self, *args, **kwargs):
+        """ Custom Validation """
+        
+        # if is interoperable some configuration needs to be specified
+        if self.interoperability is not False and not self.config:
+            raise ValidationError(_('Please specify the necessary configuration for the interoperation'))
+        
+        # configuration needs to be valid JSON
+        if self.interoperability is not False and self.config:
+            self.config = self.config.replace("'", '"')
+            try:
+                config = json.loads(self.config)
+            except json.decoder.JSONDecodeError:
+                raise ValidationError(_('The specified configuration is not valid JSON'))
