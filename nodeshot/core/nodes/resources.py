@@ -5,6 +5,7 @@ from tastypie.resources import ModelResource, ALL
 from tastypie import fields
 from tastypie.utils.urls import trailing_slash
 from models import Node, Image
+from nodeshot.core.base.resources import BaseSlugResource
 
 #from tastypie.paginator import Paginator
 #class TestPaginator(Paginator):
@@ -13,7 +14,7 @@ from models import Node, Image
 #        del output['meta']
 #        return output   
 
-class NodeResource(ModelResource):
+class NodeResource(BaseSlugResource):
     zone = fields.ForeignKey('nodeshot.core.zones.resources.ZoneResource', 'zone')
     
     class Meta:
@@ -21,13 +22,15 @@ class NodeResource(ModelResource):
         resource_name = 'nodes'
         limit = 0
         include_resource_uri = False
+        #paginator_class = TestPaginator
             
-        excludes = ['notes', 'updated', 'access_level']
+        excludes = ['id', 'slug', 'notes', 'updated', 'access_level']
         # = TestPaginator
         
         filtering = {
             'zone': ALL,
-            'status': ALL
+            'status': ALL,
+            'is_hotspot': ALL,
         }
     
     def override_urls(self):
@@ -36,21 +39,20 @@ class NodeResource(ModelResource):
         ]
     
     def dehydrate(self, bundle):
-        # detail view
-        if self.get_resource_uri(bundle) == bundle.request.path:
-            bundle.data['user'] = bundle.obj.user.username
-            # zone slug instead of URI to save bandwidth
-            bundle.data['zone'] = bundle.obj.zone.slug
+        # username
         bundle.data['user'] = bundle.obj.user.username
         # zone slug instead of URI to save bandwidth
         bundle.data['zone'] = bundle.obj.zone.slug
-        # if list view
-        #bundle.data['yoyo'] = self.get_resource_uri(bundle)
-        #else:
-        #    #del bundle.data['user']
-        #    del bundle.data['description']
-        #    del bundle.data['added']
-        #    del bundle.data['zone']
+        # status
+        #bundle.data['status'] = bundle.obj.get_status_display()
+        
+        # if in list of zones
+        if self.get_slug_detail_uri(bundle) != bundle.request.path:
+            del bundle.data['user']
+            del bundle.data['description']
+            del bundle.data['avatar']
+            del bundle.data['added']
+            bundle.data['details'] = self.get_slug_detail_uri(bundle)
         
         return bundle
 
