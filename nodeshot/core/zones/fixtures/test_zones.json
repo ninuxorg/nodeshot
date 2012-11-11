@@ -6,6 +6,7 @@
             "name": "Rome",
             "slug": "rome",
             "is_external": false,
+            "is_published": true,
             "time_zone": "GMT+1",
             "description": "Rome test zone",
             "lat": "38.1154075129",
@@ -24,6 +25,7 @@
             "name": "Pisa",
             "slug": "pisa",
             "is_external": false,
+            "is_published": true,
             "time_zone": "GMT+1",
             "description": "Pisa test zone",
             "lat": "43.7219513025",
@@ -42,6 +44,7 @@
             "name": "Viterbo",
             "slug": "viterbo",
             "is_external": false,
+            "is_published": true,
             "time_zone": "GMT+1",
             "description": "Viterbo test zone",
             "lat": "42.4193749624",
@@ -59,14 +62,15 @@
             "name": "Vienna",
             "slug": "vienna",
             "is_external": true,
+            "is_published": true,
             "time_zone": "GMT+1",
             "description": "Vienna external test zone",
             "lat": "42.4193749624",
             "lng": "12.1111955426",
             "zoom": 12,
-            "organization": "TuLug",
-            "website": "http://www.tulug.it",
-            "email": "info@tulug.it"
+            "organization": "FunkFeuer",
+            "website": "http://www.funkfeuer.at/",
+            "email": "info@funkfeuer.at"
         }
     }
 ]
