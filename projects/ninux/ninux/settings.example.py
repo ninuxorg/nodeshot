@@ -1,5 +1,7 @@
 # Django settings for nodeshot project.
 
+import os
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -105,10 +107,10 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'myproject.urls' # replace myproject with the name of your project. Default project is "ninux".
+ROOT_URLCONF = 'ninux.urls' # replace myproject with the name of your project. Default project is "ninux".
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'myproject.wsgi.application'
+WSGI_APPLICATION = 'ninux.wsgi.application'
 
 import nodeshot
 

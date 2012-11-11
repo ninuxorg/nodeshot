@@ -39,6 +39,7 @@ class ZoneExternal(models.Model):
         
         # configuration needs to be valid JSON
         if self.interoperability is not False and self.config:
+            # convert ' to "
             self.config = self.config.replace("'", '"')
             try:
                 config = json.loads(self.config)
