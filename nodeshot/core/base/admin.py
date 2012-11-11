@@ -9,9 +9,6 @@ class BaseAdmin(admin.ModelAdmin):
     save_on_top = True
     readonly_fields = ['added', 'updated']
 
-    #class Meta:
-    #    abstract = True
-
 class BaseStackedInline(admin.StackedInline):
     readonly_fields = ('added', 'updated')
     extra = 0
