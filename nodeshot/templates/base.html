@@ -19,7 +19,7 @@
             <p id="network-stat">
                 {% if stat and settings.SHOW_STATISTICS %}
                 <span><strong>{% trans 'Active Nodes' %}:</strong> {{ stat.active_nodes }}</span>
-                <span><strong>{% trans 'Hotspots: ' %}</strong> {{ stat.hotspots }}</span>
+                <span><strong>{% trans 'Hotspots' %}:</strong> {{ stat.hotspots }}</span>
                 <span><strong>{% trans 'Potential Nodes' %}:</strong> {{ stat.potential_nodes }}</span>
                 <span><strong>{% trans 'Active Links' %}:</strong> {{ stat.links }} ({{ stat.km }} km)</span>
                 {% endif %}

@@ -327,9 +327,6 @@ msgstr "Ubicazione degli hotspots (punti d'accesso wireless)"
 msgid "Hotspots"
 msgstr "Hotspots"
 
-msgid "Hotspots: "
-msgstr "Hotspots"
-
 msgid "IP"
 msgstr "IP"
 
