@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.base.choices import TIME_ZONES, MAP_ZOOM
-from nodeshot.core.base.managers import PublicManager
+from nodeshot.core.zones.managers import ZoneManager
 
 class Zone(BaseDate):
     name = models.CharField(_('name'), max_length=50, unique=True)
@@ -24,7 +24,7 @@ class Zone(BaseDate):
     mantainers = models.ManyToManyField(User, verbose_name=_('mantainers'), help_text=_('you can specify the users who are mantaining this zone so they will receive emails from the system'), blank=True)
     #points = models.CharField
     
-    objects = PublicManager()
+    objects = ZoneManager()
     
     class Meta:
         db_table = 'zones_zone'
