@@ -8,7 +8,7 @@ import simplejson as json
 
 # choices
 INTEROPERABILITY = [
-    (False, _('Not interoperable'))
+    ('None', _('Not interoperable'))
 ] + settings.NODESHOT['INTEROPERABILITY']
 
 class ZoneExternal(models.Model):
@@ -34,11 +34,11 @@ class ZoneExternal(models.Model):
         """ Custom Validation """
         
         # if is interoperable some configuration needs to be specified
-        if self.interoperability is not False and not self.config:
+        if self.interoperability != 'None' and not self.config:
             raise ValidationError(_('Please specify the necessary configuration for the interoperation'))
         
         # configuration needs to be valid JSON
-        if self.interoperability is not False and self.config:
+        if self.interoperability != 'None' and self.config:
             # convert ' to "
             self.config = self.config.replace("'", '"')
             try:

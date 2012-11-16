@@ -1,3 +1,4 @@
-from GeoRSS import GeoRSS
-
-__all__ = ['GeoRSS']
+#from GeoRSS import GeoRSS
+#from ProvinciaWIFI import ProvinciaWIFI
+#
+#__all__ = ['GeoRSS', 'ProvinciaWIFI']
