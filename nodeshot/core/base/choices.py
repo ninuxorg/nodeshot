@@ -10,6 +10,16 @@ NODE_STATUS = (
     (4, _('mantainance')),
 )
 
+# convenience for readability of the previous costant
+NODE_STATUS_NAME = {
+    'archived': NODE_STATUS[0][0],
+    'potential': NODE_STATUS[1][0],
+    'planned': NODE_STATUS[2][0],
+    'testing': NODE_STATUS[3][0],
+    'active': NODE_STATUS[4][0],
+    'mantainance': NODE_STATUS[5][0],
+}
+
 ROUTING_PROTOCOLS = (
     ('batman', 'Batman-adv'),
     ('babel', 'Babel'),

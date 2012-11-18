@@ -1,25 +1,39 @@
-from django.core.exceptions import ImproperlyConfigured
-import simplejson as json
-import urllib2
+from nodeshot.core.base.choices import NODE_STATUS_NAME
+from BaseInterop import BaseConverter
+import simplejson
 
 
-class ProvinciaWIFI:
-    """ ProvinciaWIFI interoperability class"""
+class ProvinciaWIFI(BaseConverter):
+    """ ProvinciaWIFI interoperability class """
     
-    mandatory = ['url']
-    
-    def __init__(self, config, *args, **kwargs):
-        self.config = json.loads(config)
-        self.validate()
-        self.process()
-    
-    def validate(self):
-        for field in self.mandatory:
-            if not self.config.get(field, False):
-                raise ImproperlyConfigured('Mandatory %s parameter missing from configuration' % field)
-    
-    def process(self):
-        pass
-    
-    def download_xml(self):
-        pass
+    def convert_nodes(self):
+        """ convert XML into a JSON file that can be read by nodeshot """
+        # retrieve all <AccessPoint> items
+        items = self.parsed_content.getElementsByTagName('AccessPoint')
+        # init empty list
+        nodes = []
+        # loop over all of them
+        for item in items:
+            node = {
+                'name': self.get_text(item, 'Denominazione'),
+                'status': NODE_STATUS_NAME.get('active'),
+                'lat': self.get_text(item, 'Latitudine'),
+                'lng': self.get_text(item, 'longitudine'),
+                'is_hotspot': True,
+                'description': 'Indirizzo: %s, %s; Tipologia: %s' % (
+                    self.get_text(item, 'Indirizzo'),
+                    self.get_text(item, 'Comune'),
+                    self.get_text(item, 'Tipologia')
+                )
+            }
+            # fill node list container
+            nodes.append(node)
+        # dictionary that will be converted to json 
+        json_dict = {
+            'meta': {
+                'total_count': len(items)
+            },
+            'objects': nodes
+        }
+        # return json formatted string
+        return simplejson.dumps(json_dict)

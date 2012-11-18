@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from tastypie.http import HttpGone, HttpMultipleChoices
 from nodeshot.core.nodes.resources import NodeResource
 from nodeshot.core.base.resources import BaseSlugResource
@@ -26,8 +27,11 @@ class ZoneResource(BaseSlugResource):
             del bundle.data['zoom']
             del bundle.data['description']
         
-        # add node list link
-        bundle.data['nodes'] = '%snodes/' % self.get_slug_detail_uri(bundle)
+        if not bundle.obj.is_external:
+            # add node list link
+            bundle.data['nodes'] = '%snodes/' % self.get_slug_detail_uri(bundle)
+        elif bundle.obj.external.interoperability != 'None':
+            bundle.data['nodes'] = '%sexternal/nodes/%s.json' % (settings.MEDIA_URL, bundle.obj.slug)
 
         return bundle
     

@@ -1,26 +1,48 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q
 from nodeshot.core.zones.models import Zone
 from importlib import import_module
 
 class Command(BaseCommand):
-    args = '<poll_id poll_id ...>'
+    args = '<zone_slug zone_slug ...>'
     help = 'Generates json with nodes of an external zone'
 
+    def retrieve_zones(self, *args, **options):
+        """ retrieves the zone objects """
+        
+        # empty Q
+        queryset = Q()
+        
+        # if arguments have been provided
+        if len(args) > 0: 
+            # loop over args
+            for zone_slug in args:
+                queryset = queryset | Q(slug=zone_slug)
+                # verify existence
+                try:
+                    # retrieve published external zones
+                    zone = Zone.objects.get(slug=zone_slug)
+                    
+                    # raise exception if zone is not external
+                    if not zone.is_external:
+                        raise CommandError('Zone "%s" is not an external zone\n\r' % zone_slug)
+                    
+                    # raise exception if zone is not published
+                    if not zone.is_published:
+                        raise CommandError('Zone "%s" is not published. Why are you trying to work on an unpublished zone?\n\r' % zone_slug)
+                    
+                # raise exception if one of the zone looked for doesn't exist
+                except Zone.DoesNotExist:
+                    raise CommandError('Zone "%s" does not exist\n\r' % zone_slug)
+        
+        # return published external zones
+        return Zone.objects.published().external().select_related().filter(queryset)
+
     def handle(self, *args, **options):
-        #for poll_id in args:
-        #    try:
-        #        poll = Poll.objects.get(pk=int(poll_id))
-        #    except Poll.DoesNotExist:
-        #        raise CommandError('Poll "%s" does not exist' % poll_id)
-        #
-        #    poll.opened = False
-        #    poll.save()
-        
-        # retrieve published external zones
-        zones = Zone.objects.published().external().select_related()
-        
         self.stdout.write('\r\n')
+        
+        zones = self.retrieve_zones(*args, **options)
         
         # loop over
         for zone in zones:
@@ -44,8 +66,14 @@ class Command(BaseCommand):
             
             # try running
             try:
-                instance = interop_class(zone.external.config)
+                instance = interop_class(zone)
+                self.stdout.write('Processing zone "%s"\r\n' % zone.slug)
+                messages = instance.process()
             except ImproperlyConfigured, e:
+                messages = []
                 self.stdout.write('Validation error: %s\r\n' % e)
+        
+            for message in messages:
+                self.stdout.write('%s\n\r' % message)
         
         self.stdout.write('\r\n')
