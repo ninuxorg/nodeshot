@@ -52,10 +52,11 @@ USE_TZ = True
 SITE_NAME = 'Ninux.org'
 SITE_DOMAIN = 'localhost'
 BASE_URL = 'http://%s/' % SITE_DOMAIN
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = '%s/media/' % os.path.dirname(os.path.realpath(__file__))
+MEDIA_ROOT = '%s/media/' % SITE_ROOT
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -66,7 +67,7 @@ MEDIA_URL = '%s/media/' % BASE_URL
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '%s/static/' % os.path.dirname(os.path.realpath(__file__))
+STATIC_ROOT = '%s/static/' % SITE_ROOT
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -140,7 +141,7 @@ INSTALLED_APPS = (
     'nodeshot.core.services',
     'nodeshot.contrib.hardware',
     'nodeshot.contrib.planning',
-    'nodeshot.contrib.dns',
+    'tastypie'
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -197,6 +198,7 @@ NODESHOT = {
         #'ACL_NODES_NODE_EDITABLE': False,
         'CONTACT_INWARD_LOG': True,
         'CONTACT_INWARD_MAXLENGTH': 2000,
+        'CONTACT_INWARD_MINLENGTH': 15,
         'CONTACT_INWARD_REQUIRE_AUTH': False,
         'CONTACT_OUTWARD_MAXLENGTH': 9999,
         'CONTACT_OUTWARD_MINLENGTH': 50,
@@ -212,6 +214,7 @@ NODESHOT = {
         'ACCESS_LEVELS': [
             ('1', _('registered')),
             ('2', _('community')),
+            ('3', _('trusted')),
         ],
         'APPLICATION_PROTOCOLS': (
             ('http', 'http'),
@@ -247,7 +250,9 @@ NODESHOT = {
         ]
     },
     'INTEROPERABILITY': [
+        ('nodeshot.extra.interoperability.NodeshotOld', 'Nodeshot 0.9'),
         ('nodeshot.extra.interoperability.GeoRSS', 'GeoRSS'),
+        ('nodeshot.extra.interoperability.ProvinciaWIFI', 'Provincia WiFi')
     ]
 }
 
