@@ -31,8 +31,9 @@ class Inward(BaseDate):
     ])
     ip = models.GenericIPAddressField(verbose_name=_('ip address'), blank=True, null=True)
     user_agent = models.CharField(max_length=255, blank=True)
-    http_referer = models.CharField(max_length=255, blank=True)
     accept_language = models.CharField(max_length=255, blank=True)
+    # who fucking cares
+    #http_referer = models.CharField(max_length=255, blank=True)
     
     class Meta:
         verbose_name = _('Inward message')

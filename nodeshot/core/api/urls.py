@@ -27,7 +27,7 @@ for app_path in settings.NODESHOT['API']['APPS_ENABLED']:
     # loop over attributes and determine which resources will be imported
     for attr in attrs:
         # select only attributes which are named SomethingResource except ModelResource wich is a base class
-        if 'Resource' in attr and attr != 'ModelResource':
+        if 'Resource' in attr and attr != 'ModelResource' and attr != 'Resource':
             # register resource
             # eg: v1_api.register(NodeResource())
             v1_api.register(getattr(resources, attr)())
