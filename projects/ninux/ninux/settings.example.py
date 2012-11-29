@@ -139,6 +139,7 @@ INSTALLED_APPS = (
     'nodeshot.core.links',
     'nodeshot.core.monitoring',
     'nodeshot.core.services',
+    'nodeshot.core.mailing',
     'nodeshot.contrib.hardware',
     'nodeshot.contrib.planning',
     'tastypie'
