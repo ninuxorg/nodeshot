@@ -47,7 +47,7 @@ class ServiceAdmin(BaseAdmin):
         class Media:
             js = [
                 '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
-                '%sgrappelli/tinymce_setup/tinymce_setup.js' % settings.STATIC_URL,
+                '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
             ]
 
 admin.site.register(Category, CategoryAdmin)
