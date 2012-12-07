@@ -27,7 +27,7 @@ class DeviceAdmin(BaseAdmin):
     list_filter   = ('added', 'updated', 'node')
     list_display  = ('name', 'node', 'type', 'added', 'updated')
     search_fields = ('name', 'type')
-    inlines = (EthernetInline, WirelessInline, BridgeInline, TunnelInline, VlanInline)
+    inlines = [EthernetInline, WirelessInline, BridgeInline, TunnelInline, VlanInline]
 
 class InterfaceAdmin(BaseAdmin):
     list_display  = ('mac', 'name', 'type', 'device', 'added', 'updated')
