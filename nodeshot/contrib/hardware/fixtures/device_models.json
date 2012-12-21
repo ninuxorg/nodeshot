@@ -70,5 +70,17 @@
             "cpu": "Atheros MIPS 24KC, 400 MHz",
             "ram": "33554432"
         }
+    },
+    {
+        "model": "hardware.DeviceModel",
+        "pk": 7,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Rocket M5",
+            "image": "devices/images/rocketM5.jpg",
+            "datasheet": "devices/datasheets/rocketM.pdf",
+            "cpu": "Atheros MIPS 24KC, 400 MHz",
+            "ram": "67108864"
+        }
     }
 ]

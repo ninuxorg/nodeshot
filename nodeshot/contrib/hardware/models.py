@@ -44,7 +44,7 @@ class DeviceModel(BaseDate):
     image = models.ImageField(_('image'), upload_to='devices/images/', blank=True)
     datasheet = models.FileField(_('datasheet'), upload_to='devices/datasheets/', blank=True)
     cpu = models.CharField(_('CPU'), max_length=255, blank=True)
-    ram = models.IntegerField(_('RAM'), blank=True)
+    ram = models.IntegerField(_('RAM'), blank=True, help_text=_('bytes'))
     
     class Meta:
         db_table = 'hardware_device_model'
@@ -58,7 +58,7 @@ class DeviceModel(BaseDate):
         return '%s%s' % (settings.MEDIA_URL, self.image) 
     
     def image_img_tag(self):
-        return '<img src="%s" alt="" style="width:80px" />' % self.image_url()
+        return '<img src="%s" alt="" style="width:80px" />' % self.image_url() if self.image != '' else _('No image available')
     
     image_img_tag.allow_tags = True
 
@@ -66,7 +66,7 @@ class Device2Model(models.Model):
     device = models.OneToOneField(Device, verbose_name=_('device'))
     model = models.ForeignKey(DeviceModel)
     cpu = models.CharField(_('CPU'), max_length=255, blank=True)
-    ram = models.IntegerField(_('RAM'), blank=True)
+    ram = models.IntegerField(_('RAM'), blank=True, help_text=_('bytes'))
     
     class Meta:
         verbose_name = _('Device Model Information')
@@ -77,42 +77,73 @@ class Device2Model(models.Model):
     
     def save(self, *args, **kwargs):
         """ when creating a new record fill CPU and RAM info if available """
-        if not self.id or (not self.cpu and not self.ram):
+        add_new_antenna = False
+        if not self.pk or (not self.cpu and not self.ram):
             # if self.model.cpu is not empty
             if self.model.cpu:
                 self.cpu = self.model.cpu
             # if self.model.ram is not empty
             if self.model.ram:
                 self.ram = self.model.ram
-            
+            # mark to add a new antenna
+            add_new_antenna = True
+        # perform save
         super(Device2Model, self).save(*args, **kwargs)
+        # after save
+        # if this model has an integrated antenna automatically add an antenna to the device
+        if add_new_antenna and self.model.antennamodel:
+            # create new Antenna object
+            antenna = Antenna(
+                device=self.device,
+                model=self.model.antennamodel
+            )
+            # retrieve wireless interfaces and assign it to the antenna object if possible
+            wireless_interfaces = self.device.interface_set.filter(type=2)
+            if len(wireless_interfaces) > 0:
+                antenna.radio = wireless_interfaces[0]
+            # save
+            antenna.save()
 
 class AntennaModel(BaseDate):
     name = models.CharField(_('name'), max_length=50, unique=True)
+    device_model = models.OneToOneField(DeviceModel, blank=True, null=True, help_text=_('specify only if it\'s an integrated antenna'))
     manufacturer = models.ForeignKey(Manufacturer)
-    gain = models.FloatField(_('gain'))
-    freq_range_lower = models.FloatField(_('Minimum Frequency'))
-    freq_range_higher = models.FloatField(_('Maximum Frequency'))
-    beamwidth_h = models.IntegerField(_('Hpol Beamwidth'))
-    beamwidth_v = models.IntegerField(_('Vpol Beamwidth'))
-    image = models.ImageField(_('image'), upload_to='devices/images/', blank=True, null=True)
-    specification = models.URLField(_('specification'), blank=True, null=True)
+    gain = models.DecimalField(_('gain'), max_digits=4, decimal_places=1, help_text=_('dBi'))
+    freq_range_lower = models.IntegerField(_('minimum Frequency'), help_text=_('MHz'))
+    freq_range_higher = models.IntegerField(_('maximum Frequency'), help_text=_('MHz'))
+    beamwidth_h = models.DecimalField(_('hpol Beamwidth'), max_digits=4, decimal_places=1, help_text=_('degrees'))
+    beamwidth_v = models.DecimalField(_('vpol Beamwidth'), max_digits=4, decimal_places=1, help_text=_('degrees'))
+    image = models.ImageField(_('image'), upload_to='antennas/images/', blank=True)
+    datasheet = models.FileField(_('datasheet'), upload_to='antennas/datasheets/', blank=True)
     
     class Meta:
         db_table = 'hardware_antenna_model'
+    
+    def __unicode__(self, *args, **kwargs):
+        return self.name
+    
+    def image_url(self):
+        return '%s%s' % (settings.MEDIA_URL, self.image) 
+    
+    def image_img_tag(self):
+        return '<img src="%s" alt="" style="width:80px" />' % self.image_url() if self.image != '' else _('No image available')
+    
+    image_img_tag.allow_tags = True
 
 class Antenna(BaseDate):
+    # device is redundant but it allows us to manage it easily in the django admin
+    device = models.ForeignKey(Device)
     model = models.ForeignKey(AntennaModel)
-    radio = models.ForeignKey(Interface)    
-    polarization = models.CharField(_('Polarization'), max_length='20', choices=POLARIZATIONS)
-    azimuth = models.FloatField(_('azimuth'))
-    elevation = models.FloatField(_('elevation'))
+    radio = models.ForeignKey(Interface, blank=True, null=True) #TODO: this should not be blank nor null    
+    polarization = models.CharField(_('Polarization'), max_length='20', choices=POLARIZATIONS, blank=True)
+    azimuth = models.FloatField(_('azimuth'), blank=True, null=True)
+    elevation = models.FloatField(_('elevation'), blank=True, null=True)
     inclination = models.FloatField(_('inclination'), blank=True, null=True)
 
 class RadiationPattern(BaseDate):
     antenna_model = models.ForeignKey(AntennaModel)
     type = models.CharField(_('type'), max_length=30)
-    image = models.ImageField(upload_to='radiation_patterns/', verbose_name=_('image'))
+    image = models.ImageField(upload_to='antennas/radiation_patterns/', verbose_name=_('image'))
     
     class Meta:
         db_table = 'hardware_radiation_pattern'
