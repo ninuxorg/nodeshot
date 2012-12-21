@@ -5,7 +5,9 @@ projects/ninux/ninux/settings.py
 projects/ninux/ninux/settings_test.py
 *.komodoproject
 *.DS_Store
-projects/ninux/ninux/media/*
+projects/ninux/ninux/media/nodes/*
+projects/ninux/ninux/media/external/*
 projects/ninux/ninux/debug.log
 *~
+._*
 nodeshot/core/zones/migrations/
