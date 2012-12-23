@@ -3,14 +3,15 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
-from nodeshot.core.base.choices import NODE_STATUS
+from choices import NODE_STATUS_CHOICES
+
 
 class Node(BaseAccessLevel):
     """
     Nodes of a network, can be assigned to 'Zones' and should belong to 'Users'
     """
     name = models.CharField(_('name'), max_length=50, unique=True)
-    status = models.SmallIntegerField(_('status'), max_length=3, choices=NODE_STATUS, default=settings.NODESHOT['DEFAULTS']['NODE_STATUS']) # todo: default status configurable
+    status = models.SmallIntegerField(_('status'), max_length=3, choices=NODE_STATUS_CHOICES, default=settings.NODESHOT['DEFAULTS']['NODE_STATUS']) # todo: default status configurable
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
     
     if 'nodeshot.core.zones' in settings.INSTALLED_APPS:

@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.models import BaseOrdered
 from node import Node
 
+
 class Image(BaseOrdered):
     """
     Images of a 'Node'

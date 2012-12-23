@@ -1,24 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-NODE_STATUS = (
-    (-1, _('archived')),
-    (0, _('potential')),
-    (1, _('planned')),
-    (2, _('testing')),
-    (3, _('active')),
-    (4, _('mantainance')),
-)
-
-# convenience for readability of the previous costant
-NODE_STATUS_NAME = {
-    'archived': NODE_STATUS[0][0],
-    'potential': NODE_STATUS[1][0],
-    'planned': NODE_STATUS[2][0],
-    'testing': NODE_STATUS[3][0],
-    'active': NODE_STATUS[4][0],
-    'mantainance': NODE_STATUS[5][0],
-}
 
 TIME_ZONES = (
     ('GMT-12', '(GMT-12:00) International Date Line West'),
