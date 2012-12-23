@@ -3,9 +3,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from nodeshot.core.base.models import BaseDate, BaseAccessLevel
 from nodeshot.core.network.models import Device, Interface
-from nodeshot.core.base.choices import POLARIZATIONS
+from choices import POLARIZATIONS, POLARIZATION_CHOICES
 
-class Manufacturer(BaseDate):    
+
+class Manufacturer(BaseDate):
+    """
+    Manufacturer Model
+    Eg: Ubiquiti, Mikrotic, Dlink, ecc.
+    """
     name = models.CharField(_('name'), max_length=50, unique=True)
     url = models.URLField(_('url'))
     logo = models.ImageField(_('logo'), blank=True, upload_to='manufacturers/')
@@ -30,7 +35,9 @@ class Manufacturer(BaseDate):
     url_tag.allow_tags = True
     logo_img_tag.allow_tags = True
 
+
 class MacPrefix(models.Model):
+    """ Mac prefix of a Manufacturer """
     manufacturer = models.ForeignKey(Manufacturer, verbose_name=_('manufacturer'))
     prefix = models.CharField(_('mac address prefix'), max_length=8, unique=True)
     
@@ -38,7 +45,12 @@ class MacPrefix(models.Model):
         verbose_name = _('MAC Prefix')
         verbose_name_plural = _('MAC Prefixes')
 
+
 class DeviceModel(BaseDate):
+    """
+    Device Type Model
+    Eg.: Nanostation M5, Rocket M2, ecc.
+    """
     manufacturer = models.ForeignKey(Manufacturer)
     name = models.CharField(_('name'), max_length=50, unique=True)
     image = models.ImageField(_('image'), upload_to='devices/images/', blank=True)
@@ -62,7 +74,9 @@ class DeviceModel(BaseDate):
     
     image_img_tag.allow_tags = True
 
+
 class Device2Model(models.Model):
+    """ OneToOne relationship between network.Device and hardware.DeviceModel """
     device = models.OneToOneField(Device, verbose_name=_('device'))
     model = models.ForeignKey(DeviceModel)
     cpu = models.CharField(_('CPU'), max_length=255, blank=True)
@@ -104,11 +118,17 @@ class Device2Model(models.Model):
             # save
             antenna.save()
 
+
 class AntennaModel(BaseDate):
+    """
+    Antenna Type Model
+    Eg: Airmax Sector, Rocket Dish, ecc.
+    """
     name = models.CharField(_('name'), max_length=50, unique=True)
     device_model = models.OneToOneField(DeviceModel, blank=True, null=True, help_text=_('specify only if it\'s an integrated antenna'))
     manufacturer = models.ForeignKey(Manufacturer)
     gain = models.DecimalField(_('gain'), max_digits=4, decimal_places=1, help_text=_('dBi'))
+    polarization = models.SmallIntegerField(_('Polarization'), choices=POLARIZATION_CHOICES, blank=True, null=True)
     freq_range_lower = models.IntegerField(_('minimum Frequency'), help_text=_('MHz'))
     freq_range_higher = models.IntegerField(_('maximum Frequency'), help_text=_('MHz'))
     beamwidth_h = models.DecimalField(_('hpol Beamwidth'), max_digits=4, decimal_places=1, help_text=_('degrees'))
@@ -130,20 +150,33 @@ class AntennaModel(BaseDate):
     
     image_img_tag.allow_tags = True
 
-class Antenna(BaseDate):
-    # device is redundant but it allows us to manage it easily in the django admin
-    device = models.ForeignKey(Device)
-    model = models.ForeignKey(AntennaModel)
-    radio = models.ForeignKey(Interface, blank=True, null=True) #TODO: this should not be blank nor null    
-    polarization = models.CharField(_('Polarization'), max_length='20', choices=POLARIZATIONS, blank=True)
-    azimuth = models.FloatField(_('azimuth'), blank=True, null=True)
-    elevation = models.FloatField(_('elevation'), blank=True, null=True)
-    inclination = models.FloatField(_('inclination'), blank=True, null=True)
 
 class RadiationPattern(BaseDate):
+    """ Radiation Pattern of an Antenna Model """
     antenna_model = models.ForeignKey(AntennaModel)
     type = models.CharField(_('type'), max_length=30)
     image = models.ImageField(upload_to='antennas/radiation_patterns/', verbose_name=_('image'))
     
     class Meta:
         db_table = 'hardware_radiation_pattern'
+
+
+class Antenna(BaseDate):
+    """ Antenna of a device. A device may have more than one antenna """
+    # device is redundant but it allows us to manage it easily in the django admin
+    device = models.ForeignKey(Device)
+    model = models.ForeignKey(AntennaModel)
+    radio = models.ForeignKey(Interface, blank=True, null=True) #TODO: this should not be blank nor null    
+    polarization = models.SmallIntegerField(_('Polarization'), choices=POLARIZATION_CHOICES, blank=True, null=True)
+    azimuth = models.FloatField(_('azimuth'), blank=True, null=True)
+    elevation = models.FloatField(_('elevation'), blank=True, null=True)
+    inclination = models.FloatField(_('inclination'), blank=True, null=True)
+    
+    def __unicode__(self):
+        return self.model.__unicode__()
+    
+    def save(self, *args, **kwargs):
+        """ set polarization according to model when creating a new antenna """
+        if not self.pk and self.model.polarization:
+            self.polarization = self.model.polarization
+        super(Antenna, self).save(*args, **kwargs)
