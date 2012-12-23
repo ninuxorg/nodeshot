@@ -3,7 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.network.models import Interface
 
+
 class Vap(BaseDate):
+    """ VAP interface, represents a virtual wireless interface """
     interface = models.ForeignKey('network.Wireless', verbose_name='wireless interface')
     essid = models.CharField(max_length=50)
     bssid = models.CharField(max_length=50, null=True, blank=True)
