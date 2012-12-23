@@ -10,9 +10,9 @@ class BaseAdmin(admin.ModelAdmin):
     readonly_fields = ['added', 'updated']
 
 class BaseStackedInline(admin.StackedInline):
-    readonly_fields = ('added', 'updated')
+    readonly_fields = ['added', 'updated']
     extra = 0
 
 class BaseTabularInline(admin.TabularInline):
-    readonly_fields = ('added', 'updated')
+    readonly_fields = ['added', 'updated']
     extra = 0
