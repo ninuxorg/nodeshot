@@ -177,12 +177,21 @@ class Antenna(BaseDate):
     azimuth = models.FloatField(_('azimuth'), blank=True, null=True)
     elevation = models.FloatField(_('elevation'), blank=True, null=True)
     inclination = models.FloatField(_('inclination'), blank=True, null=True)
+    lat = models.FloatField(_('latitude'), blank=True, null=True, help_text=_('automatically inherits the value of the node, specify a different value if needed'))
+    lng = models.FloatField(_('longitude'), blank=True, null=True, help_text=_('automatically inherits the value of the node, specify a different value if needed'))
     
     def __unicode__(self):
         return self.model.__unicode__()
     
     def save(self, *args, **kwargs):
-        """ set polarization according to model when creating a new antenna """
+        """
+            1. set polarization according to AntennaModel (self.model.polarization) when creating a new antenna
+            2. inherit latitude and longitude from node
+        """
         if not self.pk and self.model.polarization:
             self.polarization = self.model.polarization
+        if not self.lat:
+            self.lat = self.device.node.lat
+        if not self.lng:
+            self.lng = self.device.node.lng
         super(Antenna, self).save(*args, **kwargs)
