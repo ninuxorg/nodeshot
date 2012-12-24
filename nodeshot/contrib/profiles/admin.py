@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from nodeshot.core.base.admin import BaseStackedInline
-from nodeshot.core.profiles.models import Profile, Link, Stats, EmailNotification
+from nodeshot.contrib.profiles.models import Profile, Link, Stats, EmailNotification
 
 
 class ProfileInline(BaseStackedInline):
