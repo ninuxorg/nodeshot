@@ -91,7 +91,7 @@ class Device2Model(models.Model):
     
     def save(self, *args, **kwargs):
         """ when creating a new record fill CPU and RAM info if available """
-        add_new_antenna = False
+        adding_new = False
         if not self.pk or (not self.cpu and not self.ram):
             # if self.model.cpu is not empty
             if self.model.cpu:
@@ -100,12 +100,18 @@ class Device2Model(models.Model):
             if self.model.ram:
                 self.ram = self.model.ram
             # mark to add a new antenna
-            add_new_antenna = True
+            adding_new = True
         # perform save
         super(Device2Model, self).save(*args, **kwargs)
-        # after save
-        # if this model has an integrated antenna automatically add an antenna to the device
-        if add_new_antenna and self.model.antennamodel:
+        # after Device2Model object has been saved
+        try:
+            # does the device model have an integrated antenna?
+            antenna_model = self.model.antennamodel
+        except AntennaModel.DoesNotExist:
+            # if not antenna_model is False
+            antenna_model = False
+        # if we are adding a new device2model and the device model has an integrated antenna
+        if adding_new and antenna_model:
             # create new Antenna object
             antenna = Antenna(
                 device=self.device,
@@ -115,7 +121,7 @@ class Device2Model(models.Model):
             wireless_interfaces = self.device.interface_set.filter(type=2)
             if len(wireless_interfaces) > 0:
                 antenna.radio = wireless_interfaces[0]
-            # save
+            # save antenna
             antenna.save()
 
 
