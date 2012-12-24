@@ -41,28 +41,6 @@ ACCESS_LEVELS = [('public', _('public'))]
 ACCESS_LEVELS += [group for group in settings.NODESHOT['CHOICES']['ACCESS_LEVELS']]
 ACCESS_LEVELS += [('private', _('private'))]
 
-LINK_STATUS = (
-    (-3, _('archived')),
-    (-2, _('disconnected')),
-    (-1, _('down')),
-    (0, _('planned')),
-    (1, _('testing')),
-    (2, _('active')), 
-)
-
-LINK_TYPE = (
-    (1, _('radio')), 
-    (2, _('ethernet')),
-    (3, _('fiber')),
-    (4, _('virtual')),
-)
-
-METRIC_TYPES = (
-    ('etx', 'ETX'),
-    ('etc', 'ETC'),
-    ('hop', 'HOP')
-)
-
 LOGIN_TYPES = (
     (1, _('read-only')),
     (2, _('write')),

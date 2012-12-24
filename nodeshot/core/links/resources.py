@@ -1,6 +1,6 @@
 from tastypie.resources import ModelResource, ALL
 from tastypie import fields
-from models import Link, LinkRadio
+from models import Link
 
 class LinkResource(ModelResource):
     
