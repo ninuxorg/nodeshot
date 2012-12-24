@@ -103,10 +103,10 @@ class Stats(BaseDate):
         except Stats.DoesNotExist:
             stats = Stats(user=user).save()
         # calls stats.update() if objects == False
-        # else calls stats.update_<objects>()
+        # else calls stats.update_{objects}()
         method_name = 'update' if not objects else 'update_%s' % objects
-        method = getattr(stats, method_name)()
-        return stats
+        # return stats
+        return getattr(stats, method_name)()
 
 class EmailNotification(BaseDate):
     """
