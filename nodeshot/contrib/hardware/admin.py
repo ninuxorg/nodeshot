@@ -3,22 +3,25 @@ from django.conf import settings
 from django.db import models
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
 from nodeshot.dependencies.widgets import AdvancedFileInput
-from models import Manufacturer, MacPrefix, DeviceModel, Device2Model, AntennaModel, Antenna, RadiationPattern
+from models import Manufacturer, MacPrefix, DeviceModel, DeviceToModelRel, AntennaModel, Antenna, RadiationPattern
+
 
 class MacPrefixInline(admin.StackedInline):
     model = MacPrefix
     extra = 0
     inline_classes = ('grp-collapse grp-open',)
 
+
 class ManufacturerAdmin(BaseAdmin):
-    list_display  = ('name', 'logo_img_tag', 'url_tag', 'added', 'updated')
-    list_display_links = ('name', 'logo_img_tag')
+    list_display  = ('name', 'image_img_tag', 'url_tag', 'added', 'updated')
+    list_display_links = ('name', 'image_img_tag')
     search_fields = ('name',)
     inlines = [MacPrefixInline]
     
     formfield_overrides = {
         models.ImageField: {'widget': AdvancedFileInput(image_width=250)},
     }
+
 
 class DeviceModelAdmin(BaseAdmin):
     list_display  = ('name', 'image_img_tag', 'added', 'updated')
@@ -29,10 +32,12 @@ class DeviceModelAdmin(BaseAdmin):
         models.ImageField: {'widget': AdvancedFileInput(image_width=250)},
     }
 
+
 class RadiationPatternInline(BaseStackedInline):
     model = RadiationPattern
     extra = 0
     inline_classes = ('grp-collapse grp-open',)
+
 
 class AntennaModelAdmin(BaseAdmin):
     list_display  = ('name', 'image_img_tag', 'added', 'updated')
@@ -44,6 +49,7 @@ class AntennaModelAdmin(BaseAdmin):
         models.ImageField: {'widget': AdvancedFileInput(image_width=250)},
     }
 
+
 admin.site.register(Manufacturer, ManufacturerAdmin)
 admin.site.register(DeviceModel, DeviceModelAdmin)
 admin.site.register(AntennaModel, AntennaModelAdmin)
@@ -51,18 +57,22 @@ admin.site.register(AntennaModel, AntennaModelAdmin)
 from nodeshot.core.network.models import Device
 from nodeshot.core.network.admin import DeviceAdmin
 
-class Device2ModelInline(admin.StackedInline):
-    model = Device2Model
+
+class DeviceToModelRelInline(admin.StackedInline):
+    model = DeviceToModelRel
     inline_classes = ('grp-collapse grp-open',)
+
 
 class AntennaInline(BaseStackedInline):
     model = Antenna
     extra = 0
     inline_classes = ('grp-collapse grp-open',)
 
+
 class ExtendedDeviceAdmin(DeviceAdmin):
-    DeviceAdmin.inlines.insert(0, Device2ModelInline)
+    DeviceAdmin.inlines.insert(0, DeviceToModelRelInline)
     DeviceAdmin.inlines.insert(1, AntennaInline)
+
 
 admin.site.unregister(Device)
 admin.site.register(Device, DeviceAdmin)

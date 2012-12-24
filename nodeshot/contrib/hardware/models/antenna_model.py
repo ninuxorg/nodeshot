@@ -1,13 +1,13 @@
 from django.db import models
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.models import BaseDate
 from choices import POLARIZATIONS, POLARIZATION_CHOICES
+from base import BaseImage
 from device_model import DeviceModel
 from manufacturer import Manufacturer
 
 
-class AntennaModel(BaseDate):
+class AntennaModel(BaseDate, BaseImage):
     """
     Antenna Type Model
     Eg: Airmax Sector, Rocket Dish, ecc.
@@ -27,14 +27,3 @@ class AntennaModel(BaseDate):
     class Meta:
         app_label= 'hardware'
         db_table = 'hardware_antenna_model'
-    
-    def __unicode__(self, *args, **kwargs):
-        return self.name
-    
-    def image_url(self):
-        return '%s%s' % (settings.MEDIA_URL, self.image) 
-    
-    def image_img_tag(self):
-        return '<img src="%s" alt="" style="width:80px" />' % self.image_url() if self.image != '' else _('No image available')
-    
-    image_img_tag.allow_tags = True

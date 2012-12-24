@@ -1,11 +1,11 @@
 from django.db import models
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.models import BaseDate
+from base import BaseImage
 from manufacturer import Manufacturer
 
 
-class DeviceModel(BaseDate):
+class DeviceModel(BaseDate, BaseImage):
     """
     Device Type Model
     Eg.: Nanostation M5, Rocket M2, ecc.
@@ -22,14 +22,3 @@ class DeviceModel(BaseDate):
         db_table = 'hardware_device_model'
         verbose_name = _('Device Model')
         verbose_name_plural = _('Device Models')
-    
-    def __unicode__(self, *args, **kwargs):
-        return self.name
-    
-    def image_url(self):
-        return '%s%s' % (settings.MEDIA_URL, self.image) 
-    
-    def image_img_tag(self):
-        return '<img src="%s" alt="" style="width:80px" />' % self.image_url() if self.image != '' else _('No image available')
-    
-    image_img_tag.allow_tags = True

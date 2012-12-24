@@ -2,9 +2,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.network.models import Device
 from device_model import DeviceModel
+from antenna import Antenna
 
 
-class Device2Model(models.Model):
+class DeviceToModelRel(models.Model):
     """ OneToOne relationship between network.Device and hardware.DeviceModel """
     device = models.OneToOneField(Device, verbose_name=_('device'))
     model = models.ForeignKey(DeviceModel)
@@ -13,6 +14,7 @@ class Device2Model(models.Model):
     
     class Meta:
         app_label= 'hardware'
+        db_table = 'hardware_device_to_model'
         verbose_name = _('Device Model Information')
         verbose_name_plural = _('Device Model Information')
     
@@ -32,7 +34,7 @@ class Device2Model(models.Model):
             # mark to add a new antenna
             adding_new = True
         # perform save
-        super(Device2Model, self).save(*args, **kwargs)
+        super(DeviceToModelRel, self).save(*args, **kwargs)
         # after Device2Model object has been saved
         try:
             # does the device model have an integrated antenna?
