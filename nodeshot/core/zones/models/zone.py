@@ -7,7 +7,9 @@ from nodeshot.core.base.models import BaseDate
 from nodeshot.core.base.choices import TIME_ZONES, MAP_ZOOM
 from nodeshot.core.zones.managers import ZoneManager
 
+
 class Zone(BaseDate):
+    """ Zone Model """
     name = models.CharField(_('name'), max_length=50, unique=True)
     is_published = models.BooleanField(_('published'), default=True)
     is_external = models.BooleanField(_('is it external?'))

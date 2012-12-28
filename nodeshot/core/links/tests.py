@@ -1,16 +1,67 @@
 """
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
+nodeshot.core.links unit tests
 """
 
 from django.test import TestCase
+from django.core.exceptions import ValidationError
+
+from nodeshot.core.links.models import Link
+from nodeshot.core.links.choices import LINK_STATUS, LINK_TYPE
+from nodeshot.core.network.models import Interface
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+class LinkTest(TestCase):
+    
+    fixtures = [
+        'groups.json',
+        'test_users.json',
+        'test_zones.json',
+        'test_nodes.json',
+        'test_routing_protocols.json',
+        'test_devices.json',
+        'test_interfaces.json',
+        'test_ip_addresses.json'
+    ]
+    
+    def setUp(self):
+        l = Link()
+        l.interface_a = Interface.objects.get(pk=1)
+        l.interface_b = Interface.objects.get(pk=2)
+        l.type = LINK_TYPE.get('fiber')
+        l.status = LINK_STATUS.get('active')
+        l.dbm = -70
+        l.noise = -90
+        self.link = l
+    
+    def test_non_radio_shouldnt_have_radio_info(self):
+        """ *** A link of any type which is not "radio" should not have dBm or noise data *** """
+        self.assertRaises(ValidationError, self.link.full_clean)
+    
+    def test_save_radio_link(self):
+        """ *** It should be possible to save a new link *** """
+        l = self.link
+        l.type = LINK_TYPE.get('radio')
+        l.save()
+        # delete variable l
+        del l
+        # retrieve link again from DB
+        l = Link.objects.all()[0]
+        # check everything worked
+        self.assertTrue(l.type == 1 and l.dbm == -70 and l.noise == -90, "something went wrong while saving a new link")
+    
+    def test_null_interfaces(self):
+        """ *** An active link with null 'from interface' and 'to interface' fields should not be saved  *** """
+        l = Link(type=LINK_TYPE.get('radio'), status=LINK_TYPE.get('active'))
+        self.assertRaises(ValidationError, l.full_clean)
+    
+    def test_auto_fill_node_fields(self):
+        """ *** When a link with any type except for 'planned' is saved it should automatically fill the fields 'from node' and 'to node'  *** """
+        l = self.link
+        l.type = LINK_TYPE.get('radio')
+        l.save()
+        self.assertTrue(l.node_a != None and l.node_b != None, '"from node" and "to node" fields are null')
+    
+    def test_null_interface_and_node_fields(self):
+        """ *** It should not be possible to save a link which has void node and interface info  *** """
+        link = Link(type=LINK_TYPE.get('radio'), status=LINK_STATUS.get('planned'))
+        self.assertRaises(ValidationError, link.full_clean)

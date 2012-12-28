@@ -25,7 +25,7 @@ def new_user(sender, **kwargs):
         # create profile
         Profile(user=user).save()
         # create statistics
-        Stat(user=user).save()
+        Stats(user=user).save()
         # create notification settings
         EmailNotification(user=user).save()
         # add user to default group
