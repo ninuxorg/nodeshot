@@ -5,7 +5,8 @@ from tastypie.resources import ModelResource, ALL
 from tastypie import fields
 from tastypie.utils.urls import trailing_slash
 from models import Node, Image
-from nodeshot.core.base.resources import BaseSlugResource
+from nodeshot.core.base.resources import BaseSlugResource, BaseExtraResource
+from models.choices import NODE_STATUS
 
 #from tastypie.paginator import Paginator
 #class TestPaginator(Paginator):
@@ -14,7 +15,8 @@ from nodeshot.core.base.resources import BaseSlugResource
 #        del output['meta']
 #        return output   
 
-class NodeResource(BaseSlugResource):
+
+class NodeResource(BaseSlugResource, BaseExtraResource):
     zone = fields.ForeignKey('nodeshot.core.zones.resources.ZoneResource', 'zone')
     
     class Meta:
@@ -31,6 +33,10 @@ class NodeResource(BaseSlugResource):
             'zone': ALL,
             'status': ALL,
             'is_hotspot': ALL,
+        }
+        
+        extra = {
+            'status': NODE_STATUS
         }
     
     def override_urls(self):
