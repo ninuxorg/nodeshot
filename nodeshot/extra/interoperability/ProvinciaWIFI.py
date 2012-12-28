@@ -1,4 +1,4 @@
-from nodeshot.core.base.choices import NODE_STATUS_NAME
+from nodeshot.core.nodes.models.choices import NODE_STATUS
 from BaseInterop import BaseConverter
 import simplejson
 
@@ -16,7 +16,7 @@ class ProvinciaWIFI(BaseConverter):
         for item in items:
             node = {
                 'name': self.get_text(item, 'Denominazione'),
-                'status': NODE_STATUS_NAME.get('active'),
+                'status': NODE_STATUS.get('active'),
                 'lat': self.get_text(item, 'Latitudine'),
                 'lng': self.get_text(item, 'longitudine'),
                 'is_hotspot': True,
@@ -33,6 +33,7 @@ class ProvinciaWIFI(BaseConverter):
             'meta': {
                 'total_count': len(items)
             },
+            'status': NODE_STATUS,
             'objects': nodes
         }
         # return json formatted string

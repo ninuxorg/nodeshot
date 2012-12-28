@@ -7,8 +7,10 @@ from nodeshot.core.nodes.resources import NodeResource
 from nodeshot.core.base.resources import BaseSlugResource
 from models import Zone, ZoneExternal
 
+
 class ZoneResource(BaseSlugResource):
     """ Zone API description """
+    
     class Meta:
         # retrieves only published zones
         queryset = Zone.objects.published().select_related()
@@ -32,6 +34,9 @@ class ZoneResource(BaseSlugResource):
             bundle.data['nodes'] = '%snodes/' % self.get_slug_detail_uri(bundle)
         elif bundle.obj.external.interoperability != 'None':
             bundle.data['nodes'] = '%sexternal/nodes/%s.json' % (settings.MEDIA_URL, bundle.obj.slug)
+            # links for Nodeshot 0.9
+            if 'NodeshotOld' in bundle.obj.external.interoperability:
+                bundle.data['links'] = '%sexternal/links/%s.json' % (settings.MEDIA_URL, bundle.obj.slug)
 
         return bundle
     

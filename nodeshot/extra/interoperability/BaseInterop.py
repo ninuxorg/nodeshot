@@ -7,7 +7,7 @@ from xml.dom import minidom
 import simplejson
 
 
-class BaseConverter:
+class BaseConverter(object):
     """ Base interoperability class that converts an XML file to JSON format and saves it in ''{{ MEDIA_ROOT }}/external/nodes/<zone_slug>.json'' """
     
     mandatory = ['url']
@@ -27,7 +27,7 @@ class BaseConverter:
         self.retrieve_content()
         self.parse()
         json = self.convert_nodes()
-        message = self.save_nodes(json)
+        message = self.save_file(self.zone.slug, json)
         # return message as a list because more than one messages might be returned
         return [message]
     
@@ -39,12 +39,11 @@ class BaseConverter:
         """ parse XML data """
         self.parsed_content = minidom.parseString(self.content)
     
-    def save_nodes(self, content):
-        """ save node list file on server's hard drive """
-        # convenience variables for readability
-        file_name = '%s.json' % self.zone.slug
+    def save_file(self, name, content, resource_name='nodes'):
+        """ save json file on server's hard drive """
+        file_name = '%s.json' % name
         file_contents = ContentFile(content)
-        path = '%sexternal/nodes/%s' % (settings.MEDIA_ROOT, file_name)
+        path = '%sexternal/%s/%s' % (settings.MEDIA_ROOT, resource_name, file_name)
         # delete file if already exists
         if default_storage.exists(path):
             default_storage.delete(path)

@@ -1,4 +1,4 @@
-from nodeshot.core.base.choices import NODE_STATUS_NAME
+from nodeshot.core.nodes.models.choices import NODE_STATUS
 from BaseInterop import BaseConverter
 import simplejson
 from dateutil import parser
@@ -29,7 +29,7 @@ class GeoRSS(BaseConverter):
             
             node = {
                 'name': name,
-                'status': NODE_STATUS_NAME.get('active'),
+                'status': NODE_STATUS.get('active'),
                 'lat': lat,
                 'lng': lng,
                 'is_hotspot': True,
@@ -42,6 +42,7 @@ class GeoRSS(BaseConverter):
             'meta': {
                 'total_count': len(items)
             },
+            'status': NODE_STATUS,
             'objects': nodes
         }
         # return json formatted string
