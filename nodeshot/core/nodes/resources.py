@@ -1,9 +1,10 @@
 from django.conf.urls.defaults import url
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist
 from tastypie.http import HttpNotFound
 from tastypie.resources import ModelResource, ALL
 from tastypie import fields
-from tastypie.utils.urls import trailing_slash
+from tastypie.authentication import Authentication
+from tastypie.authorization import DjangoAuthorization
 from models import Node, Image
 from nodeshot.core.base.resources import BaseSlugResource, BaseExtraResource
 from models.choices import NODE_STATUS
@@ -28,6 +29,8 @@ class NodeResource(BaseSlugResource, BaseExtraResource):
         resource_name = 'nodes'
         limit = 0
         include_resource_uri = False
+        authentication = Authentication()
+        authorization = DjangoAuthorization()
         #paginator_class = TestPaginator
             
         excludes = ['id', 'slug', 'notes', 'updated', 'access_level']

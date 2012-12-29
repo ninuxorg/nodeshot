@@ -41,9 +41,9 @@ class OutwardTest(TestCase):
         nodes = Node.objects.all()
         users = User.objects.filter(is_active=True)
         
-        self.assertEqual(len(zones), 4)
-        self.assertEqual(len(nodes), 6)
-        self.assertEqual(len(users), 8)
+        self.assertEqual(len(zones), 4, 'zones')
+        self.assertEqual(len(nodes), 8, 'nodes')
+        self.assertEqual(len(users), 8, 'users')
     
     def test_no_filter(self):
         """ *** Test no filtering, send to all *** """

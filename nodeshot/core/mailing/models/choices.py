@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from nodeshot.core.base.utils import choicify_ordered
+
 
 try:
     AVAILABLE_CRONJOBS = settings.NODESHOT['CHOICES']['AVAILABLE_CRONJOBS']
@@ -52,7 +54,7 @@ OUTWARD_STATUS = {
 GROUPS = []
 DEFAULT_GROUPS = ''
 # convert strings to integers
-for group in settings.NODESHOT['CHOICES']['ACCESS_LEVELS']:
+for group in choicify_ordered(settings.NODESHOT['CHOICES']['ACCESS_LEVELS']):
     GROUPS += [(int(group[0]), group[1])]
     DEFAULT_GROUPS += '%s,' % group[0]
 GROUPS += [(0, _('super users'))]

@@ -3,7 +3,6 @@
         "model": "network.Device",
         "pk": 1,
         "fields": {
-            "access_level": "public",
             "node": 7,
             "name": "AGPomeziaRDP",
             "type": "radio",
@@ -15,7 +14,6 @@
         "model": "network.Device",
         "pk": 2,
         "fields": {
-            "access_level": "public",
             "node": 7,
             "name": "AGRPapaPomezia",
             "type": "radio",

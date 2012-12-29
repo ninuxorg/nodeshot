@@ -3,7 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import utc
 from django.conf import settings
 from datetime import datetime
-from nodeshot.core.base.choices import ACCESS_LEVELS
+from choices import ACCESS_LEVELS
+from utils import choicify_ordered
+
 
 class BaseDate(models.Model):
     """
@@ -24,6 +26,7 @@ class BaseDate(models.Model):
 
     class Meta:
         abstract = True
+
 
 class BaseAccessLevel(BaseDate):
     """
@@ -53,7 +56,7 @@ class BaseAccessLevel(BaseDate):
         For the cases in which no setting is specified the fallback setting NODESHOT['DEFAULTS']['ACL_GLOBAL_EDITABLE'] will be used.
     
     """
-    access_level = models.CharField(_('access level'), max_length=10, choices=ACCESS_LEVELS, default=ACCESS_LEVELS[0][0])
+    access_level = models.SmallIntegerField(_('access level'), choices=choicify_ordered(ACCESS_LEVELS), default=ACCESS_LEVELS.get('public'))
     
     class Meta:
         abstract = True
@@ -70,10 +73,10 @@ class BaseAccessLevel(BaseDate):
         try:
             # looks up in settings.py
             # example NODESHOT['DEFAULTS']['ACL_NETWORK_NODE']
-            ACL_DEFAULT = settings.NODESHOT['DEFAULTS']['ACL_%s' % app_descriptor]
+            ACL_DEFAULT = ACCESS_LEVELS.get(settings.NODESHOT['DEFAULTS']['ACL_%s' % app_descriptor])
         except KeyError:
             # if setting is not found use the global setting 
-            ACL_DEFAULT = settings.NODESHOT['DEFAULTS']['ACL_GLOBAL']
+            ACL_DEFAULT = ACCESS_LEVELS.get(settings.NODESHOT['DEFAULTS']['ACL_GLOBAL'])
         
         try:
             # looks up in settings.py
@@ -89,6 +92,7 @@ class BaseAccessLevel(BaseDate):
         
         # call super __init__
         super(BaseAccessLevel, self).__init__(*args, **kwargs)
+
 
 class BaseOrdered(BaseAccessLevel):
     """

@@ -213,11 +213,11 @@ NODESHOT = {
             ('00', _('midnight')),
             ('04', _('04:00 AM')),
         ),
-        'ACCESS_LEVELS': [
-            ('1', _('registered')),
-            ('2', _('community')),
-            ('3', _('trusted')),
-        ],
+        'ACCESS_LEVELS': {
+            'registered': 1,
+            'community': 2,
+            'trusted': 3
+        },
         'APPLICATION_PROTOCOLS': (
             ('http', 'http'),
             ('https', 'https'),
@@ -239,7 +239,7 @@ NODESHOT = {
         'MAILING_SCHEDULE_OUTWARD': False,
         'ACL_GLOBAL': 'public',
         # default access_level value for app: services, model: Login
-        'ACL_SERVICES_LOGIN': '2',
+        'ACL_SERVICES_LOGIN': 'community',
     },
     'API': {
         'APPS_ENABLED': [

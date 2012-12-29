@@ -3,7 +3,6 @@
         "model": "nodes.Node",
         "pk": 1,
         "fields": {
-            "access_level": "public",
             "name": "Fusolab Rome",
             "status": 3,
             "slug": "fusolab",
@@ -21,7 +20,6 @@
         "model": "nodes.Node",
         "pk": 2,
         "fields": {
-            "access_level": "public",
             "name": "EigenLab",
             "status": 3,
             "slug": "eigenlab",
@@ -39,7 +37,6 @@
         "model": "nodes.Node",
         "pk": 3,
         "fields": {
-            "access_level": "public",
             "name": "Tulug",
             "status": 3,
             "slug": "tulug",
@@ -57,7 +54,6 @@
         "model": "nodes.Node",
         "pk": 4,
         "fields": {
-            "access_level": "public",
             "name": "Potenziale Romano",
             "status": 0,
             "slug": "potenziale-romano",
@@ -74,7 +70,6 @@
         "model": "nodes.Node",
         "pk": 5,
         "fields": {
-            "access_level": "public",
             "name": "Potenziale Pisano",
             "status": 0,
             "slug": "potenziale-pisano",
@@ -91,7 +86,6 @@
         "model": "nodes.Node",
         "pk": 6,
         "fields": {
-            "access_level": "public",
             "name": "Potenziale Viterbo",
             "status": 0,
             "slug": "potenziale-viterbo",
@@ -108,7 +102,6 @@
         "model": "nodes.Node",
         "pk": 7,
         "fields": {
-            "access_level": "public",
             "name": "Pomezia",
             "status": 3,
             "slug": "pomezia",
@@ -126,7 +119,6 @@
         "model": "nodes.Node",
         "pk": 8,
         "fields": {
-            "access_level": "public",
             "name": "RDP",
             "status": 3,
             "slug": "rdp",

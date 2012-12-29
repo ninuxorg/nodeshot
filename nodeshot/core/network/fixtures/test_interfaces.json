@@ -3,7 +3,6 @@
         "model": "network.Interface",
         "pk": 1,
         "fields": {
-            "access_level": "public",
             "device": 1,
             "type": 2,
             "name": "ath0",
@@ -15,7 +14,6 @@
         "model": "network.Interface",
         "pk": 2,
         "fields": {
-            "access_level": "public",
             "device": 2,
             "type": 2,
             "name": "ath0",

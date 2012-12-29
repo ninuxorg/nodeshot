@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
+from nodeshot.core.base.managers import AccessLevelManager
 from choices import NODE_STATUS_CHOICES
 
 
@@ -33,6 +34,9 @@ class Node(BaseAccessLevel):
         avatar = models.ImageField(_('avatar'), upload_to='nodes/', blank=True, null=True)
     
     notes = models.TextField(_('notes'), blank=True, null=True)
+    
+    # manager
+    objects = AccessLevelManager()
     
     class Meta:
         db_table = 'nodes_node'
