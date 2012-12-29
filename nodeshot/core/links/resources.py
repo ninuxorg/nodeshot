@@ -3,6 +3,13 @@ from models import Link
 from choices import LINK_STATUS, LINK_TYPE
 from nodeshot.core.base.resources import BaseExtraResource
 from nodeshot.core.network.models import Interface
+from django.conf.urls import url
+from django.conf import settings
+
+if 'nodeshot.core.zones' in settings.INSTALLED_APPS:
+    from nodeshot.core.zones.models import Zone
+    from django.core.exceptions import ObjectDoesNotExist
+    from tastypie.http import HttpNotFound
 
 
 class LinkResource(BaseExtraResource):
@@ -48,3 +55,25 @@ class LinkResource(BaseExtraResource):
                 del bundle.data[field]
 
         return bundle
+    
+    # zone specific goodies
+    if 'nodeshot.core.zones' in settings.INSTALLED_APPS:
+        
+        def prepend_urls(self):
+            return [
+                url(r"^zones/(?P<zone_slug>[\w\d_.-]+)/(?P<resource_name>%s)/$" % self._meta.resource_name, self.wrap_view('get_zone_links'), name="api_get_zone_links"),
+            ]
+        
+        def get_zone_links(self, request, **kwargs):
+            """ view that gets the links of a zone """
+            zone_slug = kwargs.get('zone_slug')
+            
+            try:
+                obj = Zone.objects.only('id','slug').get(slug=zone_slug)
+            except ObjectDoesNotExist:
+                return HttpNotFound()
+            
+            links = Link.objects.zone(zone_slug)
+    
+            self._meta.queryset = links
+            return self.get_list(request)
