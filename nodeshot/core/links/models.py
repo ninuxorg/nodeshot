@@ -6,6 +6,7 @@ from nodeshot.core.base.utils import choicify
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.network.models import Interface
 from choices import METRIC_TYPES, LINK_STATUS, LINK_TYPE
+from managers import LinkManager
 
 
 class Link(BaseAccessLevel):
@@ -26,6 +27,9 @@ class Link(BaseAccessLevel):
     rx_rate = models.IntegerField(_('RX rate average'), null=True, default=None, blank=True)
     dbm = models.IntegerField(_('dBm average'), null=True, default=None, blank=True)
     noise = models.IntegerField(_('noise average'), null=True, default=None, blank=True)
+    
+    # manager
+    objects = LinkManager()
     
     class Meta:
         permissions = (('can_view_links', 'Can view links'),)
