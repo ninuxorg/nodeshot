@@ -4,6 +4,7 @@ from django.db.models import Q
 from nodeshot.core.zones.models import Zone
 from importlib import import_module
 
+
 class Command(BaseCommand):
     args = '<zone_slug zone_slug ...>'
     help = 'Generates json with nodes of an external zone'

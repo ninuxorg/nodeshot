@@ -1,11 +1,9 @@
 from django.conf.urls import url
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from tastypie.http import HttpGone, HttpMultipleChoices
 from nodeshot.core.nodes.resources import NodeResource
 from nodeshot.core.base.resources import BaseSlugResource
-from models import Zone, ZoneExternal
+from models import Zone
 
 
 class ZoneResource(BaseSlugResource):
@@ -42,22 +40,5 @@ class ZoneResource(BaseSlugResource):
     
     def prepend_urls(self):
         return [
-            url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d_.-]+)/nodes/$" % self._meta.resource_name, self.wrap_view('get_zone_nodes'), name="api_get_zone_nodes"),
             url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
-    
-    def get_zone_nodes(self, request, **kwargs):
-        """ view that gets the nodes of a zone """
-        try:
-            obj = self.cached_obj_get(request=request, **self.remove_api_resource_names(kwargs))
-        except ObjectDoesNotExist:
-            return HttpGone()
-        except MultipleObjectsReturned:
-            return HttpMultipleChoices(_('More than one zone is found at this URI.'))
-
-        filters = request.GET.copy()
-        filters['zone'] = obj.pk
-        request.GET = filters
-
-        child_resource = NodeResource()
-        return child_resource.get_list(request)
