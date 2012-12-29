@@ -7,6 +7,10 @@ from tastypie.utils.urls import trailing_slash
 from models import Node, Image
 from nodeshot.core.base.resources import BaseSlugResource, BaseExtraResource
 from models.choices import NODE_STATUS
+from django.conf import settings
+
+if 'nodeshot.core.zones' in settings.INSTALLED_APPS:
+    from nodeshot.core.zones.models import Zone
 
 #from tastypie.paginator import Paginator
 #class TestPaginator(Paginator):
@@ -27,7 +31,6 @@ class NodeResource(BaseSlugResource, BaseExtraResource):
         #paginator_class = TestPaginator
             
         excludes = ['id', 'slug', 'notes', 'updated', 'access_level']
-        # = TestPaginator
         
         filtering = {
             'zone': ALL,
@@ -49,8 +52,6 @@ class NodeResource(BaseSlugResource, BaseExtraResource):
         bundle.data['user'] = bundle.obj.user.username
         # zone slug instead of URI to save bandwidth
         bundle.data['zone'] = bundle.obj.zone.slug
-        # status
-        #bundle.data['status'] = bundle.obj.get_status_display()
         
         # if in list of zones
         if self.get_slug_detail_uri(bundle) != bundle.request.path:
@@ -61,6 +62,28 @@ class NodeResource(BaseSlugResource, BaseExtraResource):
             bundle.data['details'] = self.get_slug_detail_uri(bundle)
         
         return bundle
+    
+    # zone specific goodies
+    if 'nodeshot.core.zones' in settings.INSTALLED_APPS:
+        
+        def prepend_urls(self):
+            return [
+                url(r"^zones/(?P<zone_slug>[\w\d_.-]+)/(?P<resource_name>%s)/$" % self._meta.resource_name, self.wrap_view('get_zone_nodes'), name="api_get_zone_nodes"),
+            ]
+        
+        def get_zone_nodes(self, request, **kwargs):
+            """ view that gets the nodes of a zone """
+            zone_slug = kwargs.get('zone_slug')
+            # get object or 404
+            try:
+                zone = Zone.objects.only('id','slug').get(slug=zone_slug)
+            except ObjectDoesNotExist:
+                return HttpNotFound()
+            # change queryset
+            self._meta.queryset = Node.objects.filter(zone_id=zone.id)
+            # return list of nodes
+            return self.get_list(request)
+
 
 class ImageResource(ModelResource):
     node = fields.ForeignKey('nodeshot.core.nodes.api.NodeResource', 'node')
