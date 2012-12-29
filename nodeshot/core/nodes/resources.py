@@ -98,7 +98,7 @@ class ImageResource(ModelResource):
         resource_name = 'images'
         include_resource_uri = False
         limit = 0
-        excludes = ['added', 'updated', 'access_level']
+        excludes = ['added', 'updated', 'access_level', 'order']
         
         filtering = {
             'node': ALL,
@@ -109,18 +109,26 @@ class ImageResource(ModelResource):
         slug = kwargs.pop('node_slug')
         
         try:
-            node = Node.objects.get(slug=slug)
+            node = Node.objects.only('id', 'slug').get(slug=slug)
         except ObjectDoesNotExist:
             return HttpNotFound()
             
-        filters = request.GET.copy()
-        filters['node'] = node.pk
-        request.GET = filters
+        self._meta.queryset = Image.objects.filter(node_id=node.id)
 
         return self.get_list(request)
 
     def dehydrate(self, bundle):
-        # node slug instead of URI to save space
-        bundle.data['node'] = bundle.obj.node.slug
+        # if retrieving images of a node 
+        if '/nodes/' in bundle.request.path:
+            # del node slug as it's always the same for each image
+            del bundle.data['node']
+        # if retrieving all images
+        else:
+            # node slug instead of URI to save space
+            bundle.data['node'] = bundle.obj.node.slug
+        
+        # if description is empty
+        if bundle.data['description'] == '':
+            del bundle.data['description']
         
         return bundle

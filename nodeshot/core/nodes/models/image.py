@@ -17,3 +17,6 @@ class Image(BaseOrdered):
         app_label= 'nodes'
         permissions = (('can_view_image', 'Can view images'),)
         ordering = ['order']
+    
+    def __unicode__(self):
+        return self.file.name
