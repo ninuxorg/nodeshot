@@ -71,7 +71,8 @@ class Stats(BaseDate):
         try:
             stats = user.stats
         except Stats.DoesNotExist:
-            stats = Stats(user=user).save()
+            stats = Stats(user=user)
+            stats.save()
         # calls stats.update() if objects == False
         # else calls stats.update_{objects}()
         method_name = 'update' if not objects else 'update_%s' % objects
