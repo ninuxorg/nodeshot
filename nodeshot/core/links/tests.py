@@ -65,3 +65,12 @@ class LinkTest(TestCase):
         """ *** It should not be possible to save a link which has void node and interface info  *** """
         link = Link(type=LINK_TYPE.get('radio'), status=LINK_STATUS.get('planned'))
         self.assertRaises(ValidationError, link.full_clean)
+    
+    def test_link_manager(self):
+        """ test link manager """
+        self.link.save()
+        self.assertEqual(Link.objects.zone('rome').count(), 1, "LinkManager zone slug lookup failed for zone 'rome'")
+        self.assertEqual(Link.objects.zone(1).count(), 1, "LinkManager zone id lookup failed for zone 'rome'")
+        self.assertEqual(Link.objects.zone('rome')[0].dbm, -70, "LinkManager dbm assert equal failed")
+        self.assertEqual(Link.objects.zone('pisa').count(), 0, "LinkManager zone slug lookup failed for zone 'pisa'")
+        self.assertEqual(Link.objects.zone(2).count(), 0, "LinkManager zone id lookup failed for zone 'pisa'")
