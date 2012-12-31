@@ -34,16 +34,12 @@ class VapInline(BaseStackedInline):
 
 class DeviceAdmin(BaseAdmin):
     list_filter   = ('added', 'updated', 'node')
-    list_display  = ('name', 'node', 'type', 'added', 'updated')
+    list_display  = ('name', 'node', 'type', 'access_level', 'added', 'updated')
     search_fields = ('name', 'type')
     inlines = [EthernetInline, WirelessInline, BridgeInline, TunnelInline, VlanInline]
     
     if not settings.DEBUG:
         readonly_fields = BaseAdmin.readonly_fields + ['status']
-    
-    def queryset(self, request):
-        queryset = super(DeviceAdmin, self).queryset(request)
-        return queryset.include_private_of(request.user, 'node__user')
 
 
 class InterfaceAdmin(BaseAdmin):
@@ -61,8 +57,8 @@ class RoutingProtocolAdmin(BaseAdmin):
 
 
 class IpAdmin(BaseAdmin):
-    list_display   = ('address', 'netmask', 'protocol', 'added', 'updated')
-    list_filter   = ('protocol', 'added', 'updated')
+    list_display = ('address', 'netmask', 'protocol', 'added', 'updated')
+    list_filter = ('protocol', 'added', 'updated')
     search_fields = ('address',)
 
 

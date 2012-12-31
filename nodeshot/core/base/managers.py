@@ -27,8 +27,8 @@ class PublicManager(Manager):
 class AccessLevelQuerySet(QuerySet):
     """ custom queryset to filter depending on access level """
     
-    def accessible_to(self, access_level):
-        """ returns all items that are accessible to the specified access level """
+    def access_level_up_to(self, access_level):
+        """ returns all items that have an access level equal or lower than the one specified """
         # if access_level is number
         if isinstance(access_level, (int, long)):
             value = access_level
@@ -38,9 +38,21 @@ class AccessLevelQuerySet(QuerySet):
         # return queryset
         return self.filter(access_level__lte=value)
     
-    def not_private(self):
-        """ excludes all private records """
-        return self.exclude(access_level__exact=ACCESS_LEVELS.get('private'))
+    def accessible_to(self, user):
+        """
+        returns all the items that are accessible to the specified user
+        if user is not authenticated will return public items
+        """
+        
+        if user.is_superuser:
+            queryset = self
+        elif user.is_authenticated():
+            # get user group (higher id)
+            group = user.groups.all().order_by('-id')[0]
+            queryset = self.filter(access_level__lte=ACCESS_LEVELS.get(group.name))
+        else:
+            queryset = self.filter(access_level__lte=ACCESS_LEVELS.get('public'))
+        return queryset
     
     #def not_private(self):
     #    """ excludes all private records """
