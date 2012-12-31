@@ -3,7 +3,7 @@ from django.db import models
 from django.conf import settings
 from nodeshot.core.nodes.models import Node, Image
 from nodeshot.core.network.models import Device
-from nodeshot.core.base.admin import BaseAdmin, BaseAccessLevelAdmin, BaseStackedInline, BaseTabularInline
+from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline, BaseTabularInline
 from nodeshot.dependencies.widgets import AdvancedFileInput
 
 
@@ -34,10 +34,6 @@ class NodeAdmin(BaseAdmin):
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = (DeviceInline, ImageInline)
-    
-    def queryset(self, request):
-        queryset = super(NodeAdmin, self).queryset(request)
-        return queryset.include_private_of(request.user)
     
 
 admin.site.register(Node, NodeAdmin)

@@ -9,13 +9,13 @@ class BaseAdmin(admin.ModelAdmin):
     save_on_top = True
     readonly_fields = ['added', 'updated']
 
-class BaseAccessLevelAdmin(admin.ModelAdmin):
-    """
-    excludes private
-    """
-    def queryset(self, request):
-        q = super(BaseAccessLevelAdmin, self).queryset(request)
-        return q.not_private()
+#class BaseAccessLevelAdmin(admin.ModelAdmin):
+#    """
+#    excludes private
+#    """
+#    def queryset(self, request):
+#        q = super(BaseAccessLevelAdmin, self).queryset(request)
+#        return q.not_private()
 
 class BaseStackedInline(admin.StackedInline):
     readonly_fields = ['added', 'updated']

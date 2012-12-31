@@ -41,7 +41,7 @@ class BaseAccessLevel(BaseDate):
         where {APP_NAME} is the uppercase name of an app like "nodes" or "network"
         and {MODEL_NAME} is the uppercase name of a model like "Node" or "Device"
         The values will have to be one of the possible values specified in "nodeshot.core.base.choices.ACCESS_LEVELS"
-        The possible values are public, private or the id of the group saved in the database (default ones are 1 for registered and 2 for community)
+        The possible values are public or the id of the group saved in the database (default ones are 1 for registered, 2 for community and 3 for trusted)
         
         For the cases in which no setting is specified the fallback setting NODESHOT['DEFAULTS']['ACL_GLOBAL'] will be used.
     

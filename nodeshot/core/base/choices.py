@@ -37,12 +37,9 @@ TIME_ZONES = (
     ('GMT+12', '(GMT+12:00) Auckland, Wellington, Fiji, Kamchatka'),
 )
 
-#ACCESS_LEVELS = [(0, _('public'))]
-#ACCESS_LEVELS += [group for group in settings.NODESHOT['CHOICES']['ACCESS_LEVELS']]
-#ACCESS_LEVELS += [(99, _('private'))]
 ACCESS_LEVELS = settings.NODESHOT['CHOICES']['ACCESS_LEVELS'].copy()
 ACCESS_LEVELS['public'] = 0
-ACCESS_LEVELS['private'] = 99
+#ACCESS_LEVELS['private'] = 99
 
 LOGIN_TYPES = (
     (1, _('read-only')),
