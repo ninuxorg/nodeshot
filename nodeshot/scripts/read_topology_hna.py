@@ -14,8 +14,6 @@ __builtins__.IS_SCRIPT = True
 from nodeshot.models import *
 from django.db.models import Q
 
-TOPOLOGY_URLS=["http://eigenlab.org/battxtinfo.php", "http://coppermine.eigenlab.org/battxtinfo.php", "http://static.nemesisdesign.net/vittoria.txt"]
-
 # Take all ips of a node with MID olsr, for any couple of node composing a link, so [ip1A,ip2A,ip3A] <--> [ip1B,ip2B]
 # query db for existing link from one ip of A to one ip of B (break ties randomly). Else create a new one
 # write etx on the etx attribute of the Link object
@@ -63,10 +61,10 @@ class AliasManager(object):
 
 class TopologyParser(object):
         def __init__(self, topology_url):
-	    self.topology_url = topology_url
-            print ("Retrieving topology...")
+            self.topology_url = topology_url
+            print ("Retrieving topology from %s ..." % topology_url)
             try:
-                self.topologylines = urllib2.urlopen(self.topology_url).readlines()
+                self.topologylines = urllib2.urlopen(self.topology_url, data=None, timeout=settings.TOPOLOGY_URL_TIMEOUT).readlines()
             except Exception, e:
                 print "Got exception: ", e
             print ("Done...")
@@ -76,7 +74,7 @@ class TopologyParser(object):
         def parse(self):
             "parse the txtinfo plugin output and make two lists: a link list and an alias (MID) list"
             # parse Topology info
-            print ("Parsing Toplogy Information...")
+            print ("Parsing Topology Information of %s ..." % self.topology_url)
             i = 0
             line = self.topologylines[i]
             while line.find('Table: Topology') == -1:
@@ -90,7 +88,7 @@ class TopologyParser(object):
                         ipaddr1, ipaddr2, lq, nlq, etx = line.split()
                         self.linklist.append((ipaddr1, ipaddr2, float(etx)))
                 except ValueError:
-                        print ("wrong line: %s" % line)
+                        print ("wrong line or INFINITE ETX: %s" % line)
                         pass
                 i+=1
                 line = self.topologylines[i]
@@ -176,88 +174,88 @@ class TopologyParser(object):
 #OLSR
 if __name__ == "__main__":
     #Link.objects.all().delete()
-    OLSR_URLS=["http://127.0.0.1:2006/all",]# "http://www.ihteam.net/olsrd_viterbo.txt"]
-    for OLSR_URL in OLSR_URLS:
-	hnas = None
+    hnas = []
+    values = []
+    for OLSR_URL in settings.OLSR_URLS:
         try:
             tp = TopologyParser(OLSR_URL)
             tp.parse()
             tp.process()
-            values = tp.linkdict.values()
+            values += tp.linkdict.values()
             # values is a list of tuples with two ip lists
             # example is: ([1.2.3.4,5.6.7.8],[9.10.11.12])
             # first list contains all the addresses of a node
             # second list contains all the addresses the node of the other endpoint of a link
-            hnas = tp.hnainfo # list of tuples "ip list" , "hna"
+            hnas += tp.hnainfo # list of tuples "ip list" , "hna"
         except Exception, e:
             print "Got exception: ", e
-            values = False
+            #values = False
         old_links = dict([ (l.id, False) for l in Link.objects.all()])
         #print tp.linkdict
         # record nodes
-        if values:
-            for v in values:
-                ipsA, ipsB, etx = v
-                found = False
-                if len(ipsA) <= 0 and len(ipsB) <=0:
-                    continue
-                for a in range(0,len(ipsA)):
-                    for b in range(0,len(ipsB)):
-                        if not found:
-                            ipA, ipB = ipsA[a], ipsB[b]
-                            saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
-                            if saved_links.count() > 0:
-                                # if a link already exists, update
-                                l = saved_links[0]
-                                if not l.from_interface.draw_link or not l.to_interface.draw_link:
-                                    continue
-                                l.etx = etx
-                                l.save()
-                                old_links[l.id] = True
+    if values:
+        for v in values:
+            ipsA, ipsB, etx = v
+            found = False
+            if len(ipsA) <= 0 and len(ipsB) <=0:
+                continue
+            for a in range(0,len(ipsA)):
+                for b in range(0,len(ipsB)):
+                    if not found:
+                        ipA, ipB = ipsA[a], ipsB[b]
+                        saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
+                        if saved_links.count() > 0:
+                            # if a link already exists, update
+                            l = saved_links[0]
+                            if not l.from_interface.draw_link or not l.to_interface.draw_link:
+                                continue
+                            l.etx = etx
+                            l.save()
+                            old_links[l.id] = True
+                            found = True
+                            print "Updated link: %s" % l
+                        else:
+                            # otherwise create a new link
+                            fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn').exclude(draw_link=False)
+                            to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn').exclude(draw_link=False)
+                            if fi.count() == 1 and to.count() == 1:
+                              # create a link if the neighbors are NOT on the same node
+                              #print fi, fi.get().id, to, to.get().id
+                              if fi.get().device.node != to.get().device.node:
+                                l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
+                                print "Saved new link: %s" % l
                                 found = True
-                                print "Updated link: %s" % l
-                            else:
-                                # otherwise create a new link
-                                fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn').exclude(draw_link=False)
-                                to = Interface.objects.filter(ipv4_address = ipB).exclude(type='vpn').exclude(draw_link=False)
-                                if fi.count() == 1 and to.count() == 1:
-                                  # create a link if the neighbors are NOT on the same node
-                                  #print fi, fi.get().id, to, to.get().id
-                                  if fi.get().device.node != to.get().device.node:
-                                    l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
-                                    print "Saved new link: %s" % l
-                                    found = True
-                                elif fi.count() > 1 or to.count() >1:
-                                    print "Anomaly: More than one interface for ip address"
-                                    print fi, to
-        # record hnas
-        old_hnas = dict([ (h.id, False) for h in Hna.objects.all()])
+                            elif fi.count() > 1 or to.count() >1:
+                                print "Anomaly: More than one interface for ip address"
+                                print fi, to
+    # record hnas
+    old_hnas = dict([ (h.id, False) for h in Hna.objects.all()])
 
-        for ips,hna in hnas:
-            found_device,i  = None, None
-            for ip in ips:
-                if not found_device:
-                    i = Interface.objects.filter(ipv4_address = ip)
-                    found_device = i.count() > 0
-            if found_device:
-                h = Hna.objects.filter(device = i.get().device).filter(route = hna)
-                if h.count() <= 0:
-                    new_hna = Hna(device = i.get().device, route = hna)
-                    new_hna.save()
-                else:
-                    old_hnas[h.get().id] = True
+    for ips,hna in hnas:
+        found_device,i  = None, None
+        for ip in ips:
+            if not found_device:
+                i = Interface.objects.filter(ipv4_address = ip)
+                found_device = i.count() > 0
+        if found_device:
+            h = Hna.objects.filter(device = i.get().device).filter(route = hna)
+            if h.count() <= 0:
+                new_hna = Hna(device = i.get().device, route = hna)
+                new_hna.save()
+            else:
+                old_hnas[h.get().id] = True
 
-        #delete old hnas
-        for h,v in old_hnas.iteritems() :
-            if not v:
-                Hna.objects.get(id=h).delete()
-                print "Deleted hna %d" % h
+    #delete old hnas
+    for h,v in old_hnas.iteritems() :
+        if not v:
+            Hna.objects.get(id=h).delete()
+            print "Deleted hna %d" % h
 
     # BATMAN
-    for topology_url in TOPOLOGY_URLS:
+    for topology_url in settings.BATMAN_URLS:
         try:
             print ("Opening URL %s" % topology_url)
-            topologylines = urllib2.urlopen(topology_url).readlines()
+            topologylines = urllib2.urlopen(topology_url, data=None, timeout=settings.TOPOLOGY_URL_TIMEOUT).readlines()
         except Exception, e:
             print ("A problem occurred: %s" % e)
             print ("Skipping to the next topology URL.")

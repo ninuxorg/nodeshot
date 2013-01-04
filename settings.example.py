@@ -215,3 +215,9 @@ STATIC_GENERATOR_URLS = (
     r'^/tab',
     r'^/nodes.kml$',
 )
+
+# Settings for the read_topology_hna.py script
+# to retrieve topologies from remote islands
+TOPOLOGY_URL_TIMEOUT=30
+OLSR_URLS=["http://127.0.0.1:2006/all"]
+BATMAN_URLS=[]
