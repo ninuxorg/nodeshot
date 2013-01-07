@@ -131,5 +131,39 @@
             "description": "Piazza dell'erba",
             "notes": ""
         }
+    },
+    {
+        "model": "nodes.Node",
+        "pk": 9,
+        "fields": {
+            "access_level": 2,
+            "name": "Hidden Node Rome",
+            "status": 3,
+            "slug": "hidden-rome",
+            "zone": 1,
+            "user": 6,
+            "lat": "41.860799",
+            "lng": "12.809306",
+            "elev": "250.0",
+            "is_hotspot": false,
+            "description": "test"
+        }
+    },
+    {
+        "model": "nodes.Node",
+        "pk": 9,
+        "fields": {
+            "access_level": 1,
+            "name": "registered node",
+            "status": 3,
+            "slug": "registered-rome",
+            "zone": 1,
+            "user": 6,
+            "lat": "41.870799",
+            "lng": "12.829306",
+            "elev": "150.0",
+            "is_hotspot": false,
+            "description": "test"
+        }
     }
 ]

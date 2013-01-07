@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.managers import AccessLevelManager
+from nodeshot.core.nodes.signals import node_status_changed, hotspot_changed
 from choices import NODE_STATUS_CHOICES
 
 
@@ -31,12 +32,19 @@ class Node(BaseAccessLevel):
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
     
     if settings.NODESHOT['DEFAULTS']['NODE_AVATARS']:
+        #TODO: this doesn't make sense... really.. better to eliminate and leave only images of nodes and use those as avatars
         avatar = models.ImageField(_('avatar'), upload_to='nodes/', blank=True, null=True)
     
     notes = models.TextField(_('notes'), blank=True, null=True)
     
     # manager
     objects = AccessLevelManager()
+    
+    # this is needed to check if the status is changing
+    # explained here:
+    # http://stackoverflow.com/questions/1355150/django-when-saving-how-can-you-check-if-a-field-has-changed
+    _current_status = None
+    _current_hotspot = None
     
     class Meta:
         db_table = 'nodes_node'
@@ -45,6 +53,28 @@ class Node(BaseAccessLevel):
     
     def __unicode__(self):
         return '%s' % self.name
+    
+    def __init__(self, *args, **kwargs):
+        """ Fill __current_status """
+        super(Node, self).__init__(*args, **kwargs)
+        # set current status, but only if it is an existing node
+        if self.pk:
+            self._current_status = self.status
+            self._current_hotspot = self.is_hotspot
+    
+    def save(self, *args, **kwargs):
+        """ detect status change """
+        super(Node, self).save(*args, **kwargs)
+        # if status of a node changes
+        if self.status != self._current_status:
+            # send django signal
+            node_status_changed.send(sender=self, old_status=self._current_status, new_status=self.status)
+        # if value of is_hotspot changes
+        if self.is_hotspot != self._current_hotspot:
+            hotspot_changed.send(sender=self, old_value=self._current_hotspot, new_status=self.is_hotspot)
+        # update __current_status
+        self._current_status = self.status
+        self._current_hotspot = self.is_hotspot
     
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod

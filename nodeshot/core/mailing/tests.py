@@ -38,11 +38,11 @@ class OutwardTest(TestCase):
     def test_fixtures(self):
         """ *** Tests fixtures have loaded properly *** """
         zones = Zone.objects.all()
-        nodes = Node.objects.all()
+        #nodes = Node.objects.all()
         users = User.objects.filter(is_active=True)
         
         self.assertEqual(len(zones), 4, 'zones')
-        self.assertEqual(len(nodes), 8, 'nodes')
+        #self.assertEqual(len(nodes), 8, 'nodes') this is not really smart
         self.assertEqual(len(users), 8, 'users')
     
     def test_no_filter(self):
