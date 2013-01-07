@@ -15,6 +15,7 @@ from nodeshot.core.nodes.models import Node
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
+from nodeshot.core.nodes.signals import node_status_changed, hotspot_changed
 
 @receiver(post_save, sender=User)
 def new_user(sender, **kwargs):
@@ -60,3 +61,12 @@ def delete_node(sender, **kwargs):
     """ update user node count when a node is deleted """
     node = kwargs['instance']
     Stats.update_or_create(node.user, 'nodes')
+
+# email notifications
+@receiver(node_status_changed)
+def notify_status_changed(sender, **kwargs):
+    """ TODO: write desc """
+    node = kwargs['sender']
+    old_status = kwargs['old_status']
+    new_status = kwargs['new_status']
+    EmailNotification.notify_users(old_status, new_status)
