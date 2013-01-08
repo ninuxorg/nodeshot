@@ -53,23 +53,6 @@ class AccessLevelQuerySet(QuerySet):
         else:
             queryset = self.filter(access_level__lte=ACCESS_LEVELS.get('public'))
         return queryset
-    
-    #def not_private(self):
-    #    """ excludes all private records """
-    #    return self.exclude(access_level__exact=ACCESS_LEVELS.get('private'))
-    #
-    #def include_private_of(self, user, lookup='user'):
-    #    """
-    #    does not retrieve private records except for the user specified
-    #    if the user is not authenticated will just get the public items
-    #    """
-    #    if user.is_authenticated():
-    #        #where_clause = Q(access_level__lt=ACCESS_LEVELS.get('private')) | Q(**{lookup: user})
-    #        #return self.filter(where_clause)
-    #        where_clause = Q(access_level__lt=ACCESS_LEVELS.get('private')) | Q(**{lookup: user})
-    #        return self.filter(where_clause)
-    #    else:
-    #        return self.access_level_up_to('public')
 
 
 class AccessLevelManager(Manager):
