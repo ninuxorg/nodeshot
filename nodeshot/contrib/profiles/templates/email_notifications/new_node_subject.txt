@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktrans %}New node "{{ node }}" added on {{ site_name }}{% endblocktrans %}

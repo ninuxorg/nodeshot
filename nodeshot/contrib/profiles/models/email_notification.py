@@ -2,8 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.conf import settings
 from nodeshot.core.base.models import BaseDate
+from nodeshot.core.base.utils import get_key_by_value
 from nodeshot.core.nodes.models.choices import NODE_STATUS
 
 
@@ -34,24 +36,60 @@ class EmailNotification(BaseDate):
         return _(u'Email Notification Settings for %s') % self.user.username
     
     @staticmethod
-    def retrieve_recipients(node, old_status, new_status):
+    def determine_notification_type(old_status, new_status, sender='Node'):
+        if new_status == NODE_STATUS.get(settings.NODESHOT['DEFAULTS']['NODE_STATUS']) and old_status == None and sender == 'Node':
+            return 'new_node'
+        elif new_status == NODE_STATUS.get('active') and old_status != None and sender == 'Node':
+            return 'node_activated'
+        elif old_status != None and sender == 'Node':
+            return 'node_changing_status'
+        elif sender == 'Hotspot' and (old_status == False or old_status == None) and new_status == True:
+            return 'new_hotspot'
+        elif sender == 'Hotspot' and old_status == True and new_status == False:
+            return 'hotspot_removed'
+    
+    @staticmethod
+    def retrieve_recipients(notification_type, updated_node):
         """ TODO: write desc here """
         # retrieve recipients to notify for a new potential node
-        if new_status == NODE_STATUS.get('potential') and old_status == None:
+        if notification_type == 'new_node':
+            # TODO: needs cleanup, new_potential_node should be new_node
             return User.objects.select_related().filter(is_active=True, emailnotification__new_potential_node=True)#, emailnotification__new_potential_node_distance=0)
-        elif new_status == NODE_STATUS.get('active'):
+        elif notification_type == 'node_activated':
             return User.objects.select_related().filter(is_active=True, emailnotification__new_active_node=True)#, emailnotification__new_active_node_distance=0)
         else:
             # return empty list
             return []
     
     @staticmethod
-    def notify_users(old_status, new_status):
+    def notify_users(notification_type, updated_node):
         """ TODO: write desc here """
         # retrieve recipients
-        recipients = EmailNotification.retrieve_recipients(old_status, new_status)
+        users = EmailNotification.retrieve_recipients(notification_type, updated_node)
+        
+        # if no users return here
+        if not len(users) > 0:
+            return False
+        
+        # context that will be passed to render_to_string, these keys are the same for each iteration
+        context = {
+            'site_name': settings.SITE_NAME,
+            'site_url': settings.SITE_URL,
+            'node': updated_node,
+        }
+        
         # loop over recipients
-        for recipient in recipients:
-            subject = 'test subject'
-            message = 'test message'
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient.email])
+        for user in users:
+            # rare case but it could happen while testing
+            if not user.email:
+                continue
+            # obviously this part of the context is different for each user
+            context['user'] = user
+            # render subject
+            subject = render_to_string('email_notifications/%s_subject.txt' % notification_type, context)
+            # render message body
+            message = render_to_string('email_notifications/%s_body.txt' % notification_type, context)
+            # send mail
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+        # return notified users
+        return users

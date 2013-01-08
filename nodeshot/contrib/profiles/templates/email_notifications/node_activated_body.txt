@@ -1,0 +1,9 @@
+{% load i18n %}{% trans 'Hi' %} {% if user.first_name != '' %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %},
+    
+{% blocktrans %}The node {{ node }} has just been activated.{% endblocktrans %}
+
+{{ site_url }}/TODO
+
+{% blocktrans %}You are receiving this email because of your notification preferences on {{ site_name }}.
+If you wish to turn this notification off you can do it on your notification control panel at:{% endblocktrans %}
+{{ site_url }}/TODO
