@@ -232,7 +232,7 @@ NODESHOT = {
         # default map zoom level when creating new zones
         'MAP_ZOOM': 12,
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
-        'NODE_STATUS': 0,
+        'NODE_STATUS': 'potential',
         'NODE_AVATARS': True,
         'ZONE_TIME': 'GMT+1',
         'ZONE_ZOOM': 12,
