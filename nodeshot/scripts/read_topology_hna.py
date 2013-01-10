@@ -128,8 +128,9 @@ class TopologyParser(object):
             line = self.topologylines[i]
             while i < self.topologylines and not line.isspace():
                 try:
-                        ipaddr, alias = line.split()
-                        self.aliasmanager.addalias(ipaddr, alias)
+                        ipaddr, aliases = line.split()
+                        for alias in aliases.split(';'):
+                            self.aliasmanager.addalias(ipaddr, alias)
                 except ValueError:
                         pass
                 i+=1
