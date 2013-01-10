@@ -139,8 +139,8 @@ class TopologyParser(object):
             #debug
             #print self.linklist
 
-        def process(self):
-            "should be called after calling parse()"
+        def process(self, etx_threshold=23.0):
+            "should be called after calling parse(). etx_threshold is the ETX threshold above which links are excluded"
             self.linkdict = dict()
             for ipaddr1, ipaddr2, etx in self.linklist:
                 id1 = self.aliasmanager.getIdFromIP(ipaddr1)
@@ -163,9 +163,11 @@ class TopologyParser(object):
                 if self.linkdict.has_key(k):
                     etx0 = self.linkdict[k][2]
                     etxx = (etx0 + etx) * 0.5 # average
-                    self.linkdict.update({k: (iplist1, iplist2, etxx)} )
+                    finaletx = etxx
                 else:
-                    self.linkdict.update({k: (iplist1, iplist2, etx)} )
+                    finaletx = etx
+                if finaletx <= etx_threshold: # probably a vpn link
+                    self.linkdict.update({k: (iplist1, iplist2, finaletx)} )
 
             self.hnainfo = list()
             for ipaddress, hna in self.hnalist:
@@ -181,7 +183,7 @@ if __name__ == "__main__":
         try:
             tp = TopologyParser(OLSR_URL)
             tp.parse()
-            tp.process()
+            tp.process(etx_threshold=settings.ETX_THRESHOLD)
             values += tp.linkdict.values()
             # values is a list of tuples with two ip lists
             # example is: ([1.2.3.4,5.6.7.8],[9.10.11.12])
@@ -266,6 +268,12 @@ if __name__ == "__main__":
             if len(row_elements) == 5:
                 # this is a good row
                 macA, macB, cost = row_elements[0], row_elements[1], row_elements[4]
+                try:
+                    bat_etx = float(cost)
+                except ValueError:
+                    continue
+                if bat_etx > settings.ETX_THRESHOLD: # probably a vpn link
+                    continue
                 print macA + "<-->" + macB +" : " + cost
                 saved_links =  Link.objects.filter(Q(from_interface__mac_address=macA , to_interface__mac_address=macB ) |  Q(from_interface__mac_address=macB , to_interface__mac_address=macA ))
                 # I think is better to use len(saved_links) than saved_links.count() cos it results in less hits to the database
