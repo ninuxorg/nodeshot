@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Nodeshot stats</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script src="js/highstock.js"></script>
+<script src="js/modules/exporting.js"></script>
+<script>
+$(document).ready(function() {
+	var CONTAINER_ID = 'container';
+	var chart;
+
+	// set the allowed units for data grouping
+	var groupingUnits = [
+		[
+			'week',                         // unit name
+			[1]                             // allowed multiples
+		],
+		[
+			'month',
+			[1, 2, 3, 4, 6]
+		]
+	];
+
+	// parse a date in dd-mm-yyyy format
+	function parseDate(input) {
+		var parts = input.match(/(\d+)/g);
+		return new Date(parts[2], parts[1]-1, parts[0]);
+	}
+
+	$.getJSON('http://map.ninux.org/stats.json?callback=?', function(result) {
+		var data = { links: [], km: [], active: [], potential: [], hotspot: [] },
+			raw = result.info,
+			dataLength = raw.length;
+		for (i = 0; i < dataLength; i++) {
+			var date = parseDate(raw[i].date).valueOf();
+			$.each(data, function(key) {
+				data[key].push([ date, raw[i][key] ]);
+			});
+		}
+		chart = new Highcharts.StockChart({
+			chart: {
+				renderTo: CONTAINER_ID,
+				alignTicks: false
+			},
+			rangeSelector: { selected: 1 },
+			title: { text: 'Stats' },
+			yAxis: [
+				{
+					title: { text: 'Nodi' },
+					height: 200,
+					lineWidth: 2
+				},
+				{
+					title: { text: 'Link' },
+					top: 280,
+					height: 100,
+					offset: 0,
+					lineWidth: 2
+				},
+				{
+					title: { text: 'Km' },
+					top: 395,
+					height: 100,
+					offset: 0,
+					lineWidth: 2
+				}
+			],
+
+			series: [
+				{
+					type: 'line',
+					name: 'Attivi',
+					data: data.active,
+					dataGrouping: { units: groupingUnits }
+				},
+				{
+					type: 'line',
+					name: 'Potenziali',
+					data: data.potential,
+					dataGrouping: { units: groupingUnits }
+				},
+				{
+					type: 'line',
+					name: 'Hotspot',
+					data: data.hotspot,
+					dataGrouping: { units: groupingUnits }
+				},
+				{
+					type: 'line',
+					name: 'Link',
+					data: data.links,
+					yAxis: 1,
+					dataGrouping: { units: groupingUnits }
+				},
+				{
+					type: 'line',
+					name: 'KM',
+					data: data.km,
+					yAxis: 2,
+					dataGrouping: { units: groupingUnits }
+				}
+			]
+		});
+	});
+});
+</script>
+</head>
+<body>
+<div id="container" style="width: 100%; height: 600px"></div>
+</body>
+</html>
