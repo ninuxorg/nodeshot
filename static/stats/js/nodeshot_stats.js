@@ -33,6 +33,32 @@
 		this.data = { links: [], km: [], active: [], potential: [], hotspot: [] };
 		this.extremes = [(new Date()).valueOf() - 1000*60*60*24*30*3, (new Date()).valueOf()];
 
+		this.yAxis = [
+			{
+				title: { text: lang.nodeshot.yAxis[0] },
+				top: 35,
+				height: 200,
+				lineWidth: 2,
+				showEmpty: false
+			},
+			{
+				title: { text: lang.nodeshot.yAxis[1] },
+				top: 260,
+				height: 100,
+				offset: 0,
+				lineWidth: 2,
+				showEmpty: false
+			},
+			{
+				title: { text: lang.nodeshot.yAxis[2] },
+				top: 385,
+				height: 100,
+				offset: 0,
+				lineWidth: 2,
+				showEmpty: false
+			}
+		];
+
 		this.series = [
 			{
 				type: 'line',
@@ -97,28 +123,7 @@
 				alignTicks: false
 			},
 			rangeSelector: { buttons: [] },
-			//title: { text: 'Stats' },
-			yAxis: [
-				{
-					title: { text: lang.nodeshot.yAxis[0] },
-					height: 200,
-					lineWidth: 2
-				},
-				{
-					title: { text: lang.nodeshot.yAxis[1] },
-					top: 280,
-					height: 100,
-					offset: 0,
-					lineWidth: 2
-				},
-				{
-					title: { text: lang.nodeshot.yAxis[2] },
-					top: 395,
-					height: 100,
-					offset: 0,
-					lineWidth: 2
-				}
-			],
+			yAxis: this.yAxis,
 			series: this.series
 		});
 
@@ -176,15 +181,45 @@
 					return index;
 		}
 
+	/*
+		this._checkAxis = function() {
+			for (var i in this.highstock.yAxis)
+				this.highstock.yAxis[i].visible = false;
+			for (var i in this.highstock.series)
+				if (this.highstock.series[i].visible)
+					this.highstock.series[i].yAxis.visible = true;
+			for (var i = 0; i < this.highstock.yAxis.length; i++) {
+				if (!this.highstock.yAxis[i].visible) {
+					if (i == 0) {
+						var newh = this.highstock.yAxis[i].height;
+						for (var j = i+1; j < this.highstock.yAxis.length; j++) {
+							console.log(j, this.highstock.yAxis[j]);
+							if (!this.highstock.yAxis[j].visible)
+								newh = this.highstock.yAxis[j].height + this.highstock.yAxis[j].top;
+							else {
+								this.highstock.yAxis[j].top = 0;
+								this.highstock.yAxis[j].height = newh;
+								break;
+							}
+						}
+					}
+				}
+			}
+			this.highstock.redraw();
+		}
+		*/
+
 		this.showSerie = function(key) {
 			var serie = this._getSerie(key);
 			if (!serie) return;
 			this.highstock.series[serie].show();
+			//this._checkAxis();
 		}
 		this.hideSerie = function(key) {
 			var serie = this._getSerie(key);
 			if (!serie) return;
 			this.highstock.series[serie].hide();
+			//this._checkAxis();
 		}
 		this.toggleSerie = function(key) {
 			var serie = this._getSerie(key);
