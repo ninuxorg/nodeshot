@@ -102,24 +102,21 @@
 				{
 					title: { text: lang.nodeshot.yAxis[0] },
 					height: 200,
-					lineWidth: 2,
-					min: 0
+					lineWidth: 2
 				},
 				{
 					title: { text: lang.nodeshot.yAxis[1] },
 					top: 280,
 					height: 100,
 					offset: 0,
-					lineWidth: 2,
-					min: 0
+					lineWidth: 2
 				},
 				{
 					title: { text: lang.nodeshot.yAxis[2] },
 					top: 395,
 					height: 100,
 					offset: 0,
-					lineWidth: 2,
-					min: 0
+					lineWidth: 2
 				}
 			],
 			series: this.series
@@ -171,6 +168,31 @@
 				this.extremes[1] = extr.dataMax;
 			}
 			this.highstock.xAxis[0].setExtremes(this.extremes[0], this.extremes[1]);
+		}
+
+		this._getSerie = function(key) {
+			for (var index in this.series)
+				if (this.series[index].key == key)
+					return index;
+		}
+
+		this.showSerie = function(key) {
+			var serie = this._getSerie(key);
+			if (!serie) return;
+			this.highstock.series[serie].show();
+		}
+		this.hideSerie = function(key) {
+			var serie = this._getSerie(key);
+			if (!serie) return;
+			this.highstock.series[serie].hide();
+		}
+		this.toggleSerie = function(key) {
+			var serie = this._getSerie(key);
+			if (!serie) return;
+			if (this.highstock.series[serie].visible)
+				this.hideSerie(key);
+			else
+				this.showSerie(key);
 		}
 	}
 

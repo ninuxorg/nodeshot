@@ -16,6 +16,11 @@ $(document).ready(function() {
 		var $button = $(this);
 		stats.setExtremes($button.attr('data-from'), $button.attr('data-to'));
 	});
+
+	$('.toggleSerie').click(function(e) {
+		var $button = $(this);
+		stats.toggleSerie($button.attr('data-key'));
+	});
 });
 </script>
 </head>
@@ -27,6 +32,14 @@ $(document).ready(function() {
 <button class="rangeSelector" data-from="15379200" data-to="">6 mesi</button>
 <button class="rangeSelector" data-from="30758400" data-to="">1 anno</button>
 <button class="rangeSelector" data-from="" data-to="">tutto</button>
+
+<br>
+
+<button class="toggleSerie" data-key="potential">Potenziali</button>
+<button class="toggleSerie" data-key="active">Attivi</button>
+<button class="toggleSerie" data-key="hotspot">Hotspot</button>
+<button class="toggleSerie" data-key="links">Link</button>
+<button class="toggleSerie" data-key="km">Km</button>
 
 </body>
 </html>
