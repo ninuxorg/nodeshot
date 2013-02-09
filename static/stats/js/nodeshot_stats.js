@@ -102,21 +102,24 @@
 				{
 					title: { text: lang.nodeshot.yAxis[0] },
 					height: 200,
-					lineWidth: 2
+					lineWidth: 2,
+					min: 0
 				},
 				{
 					title: { text: lang.nodeshot.yAxis[1] },
 					top: 280,
 					height: 100,
 					offset: 0,
-					lineWidth: 2
+					lineWidth: 2,
+					min: 0
 				},
 				{
 					title: { text: lang.nodeshot.yAxis[2] },
 					top: 395,
 					height: 100,
 					offset: 0,
-					lineWidth: 2
+					lineWidth: 2,
+					min: 0
 				}
 			],
 			series: this.series

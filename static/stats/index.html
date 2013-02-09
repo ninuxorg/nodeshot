@@ -11,10 +11,22 @@
 $(document).ready(function() {
 	var stats = new NodeshotStats('container');
 	stats.refresh();
+
+	$('.rangeSelector').click(function(e) {
+		var $button = $(this);
+		stats.setExtremes($button.attr('data-from'), $button.attr('data-to'));
+	});
 });
 </script>
 </head>
 <body>
 <div id="container" style="width: 100%; height: 600px"></div>
+
+<button class="rangeSelector" data-from="2563200" data-to="">1 mese</button>
+<button class="rangeSelector" data-from="7689600" data-to="">3 mesi</button>
+<button class="rangeSelector" data-from="15379200" data-to="">6 mesi</button>
+<button class="rangeSelector" data-from="30758400" data-to="">1 anno</button>
+<button class="rangeSelector" data-from="" data-to="">tutto</button>
+
 </body>
 </html>
