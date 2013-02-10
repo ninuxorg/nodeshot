@@ -7,7 +7,7 @@ from antenna import Antenna
 
 class DeviceToModelRel(models.Model):
     """ OneToOne relationship between network.Device and hardware.DeviceModel """
-    device = models.OneToOneField(Device, verbose_name=_('device'))
+    device = models.OneToOneField(Device, verbose_name=_('device'), related_name='hardware')
     model = models.ForeignKey(DeviceModel)
     cpu = models.CharField(_('CPU'), max_length=255, blank=True)
     ram = models.IntegerField(_('RAM'), blank=True, help_text=_('bytes'))
