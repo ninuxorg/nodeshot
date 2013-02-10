@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.gis import admin as geoadmin
 from django.db import models
 from django.conf import settings
 from nodeshot.core.nodes.models import Node, Image
@@ -26,14 +27,18 @@ class ImageInline(BaseStackedInline):
         classes = ('grp-collapse grp-open', )
 
 
-class NodeAdmin(BaseAdmin):
-    list_display  = ('name', 'user', 'status', 'access_level', 'is_hotspot', 'added', 'updated')
+class NodeAdmin(geoadmin.OSMGeoAdmin, BaseAdmin):
+    list_display  = ('name', 'status', 'access_level', 'is_hotspot', 'added', 'updated')
     list_filter   = ('status', 'is_hotspot', 'access_level', 'added')
     search_fields = ('name',)
     date_hierarchy = 'added'
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = (DeviceInline, ImageInline)
-    
+    # default coordinates should be taken from settings
+    default_lat = 5145024.63201869
+    default_lon = 1391048.3569527462
+    default_zoom = '3'
+
 
 admin.site.register(Node, NodeAdmin)
