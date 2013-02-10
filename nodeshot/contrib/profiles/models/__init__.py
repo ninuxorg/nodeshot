@@ -31,8 +31,11 @@ def new_user(sender, **kwargs):
         EmailNotification(user=user).save()
         # add user to default group
         # TODO: make this configurable in settings
-        default_group = Group.objects.get(name='registered')
-        user.groups.add(default_group)
+        try:
+            default_group = Group.objects.get(name='registered')
+            user.groups.add(default_group)
+        except Group.DoesNotExist:
+            pass
         user.save()
 
 @receiver(post_save, sender=Device)
