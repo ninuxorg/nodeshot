@@ -2,4 +2,3 @@
 *.pyc
 db/
 settings.py
-nodeshot/templates/index.html
