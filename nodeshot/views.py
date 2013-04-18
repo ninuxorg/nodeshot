@@ -965,7 +965,7 @@ def statistics(request):
                 'hotspot': record.hotspots,
                 'potential': record.potential_nodes,
                 'links': record.links,
-                'km': record.km
+                'km': int(round(record.km))
             })
     
     data = {
@@ -981,8 +981,4 @@ def statistics(request):
 
 def statistics_graph(request):
     """ statistics graph """
-    
-    template = 'statistics_graph.html';
-    context = {}
-        
-    return render_to_response(template, context, context_instance=RequestContext(request))
+    return render_to_response('statistics_graph.html', context_instance=RequestContext(request))
