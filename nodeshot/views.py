@@ -978,3 +978,11 @@ def statistics(request):
         json = '%s(%s)' % (callback, json)
     # return json
     return HttpResponse(json, mimetype='application/json')
+
+def statistics_graph(request):
+    """ statistics graph """
+    
+    template = 'statistics_graph.html';
+    context = {}
+        
+    return render_to_response(template, context, context_instance=RequestContext(request))

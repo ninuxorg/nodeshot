@@ -420,6 +420,7 @@ h3 {
 	background: transparent url(../images/arrow_right.png) no-repeat scroll 0 50%;
 }
 #search-address{ background-image: url(../images/magnifier.png) !important }
+#stats-link{ background-image: url(../images/graph.png) !important }
 #addnode{ margin-top: 10px }
 
 #link-quality { display: block; margin: 10px 0 10px }

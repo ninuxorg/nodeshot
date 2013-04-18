@@ -1003,3 +1003,41 @@ msgstr "Disabilitato"
 msgid "The selected node is not available in this list"
 msgstr "Il nodo selezionato non è presente in questa lista"
 
+msgid "From"
+msgstr "Da"
+
+msgid "To"
+msgstr "A"
+
+msgid "month"
+msgstr "mese"
+
+msgid "months"
+msgstr "mesi"
+
+msgid "all"
+msgstr "tutti"
+
+msgid "Go back to map-server"
+msgstr "Torna al map-server"
+
+msgid "Download image in JPEG format"
+msgstr "Scarica immagine in formato JPEG"
+
+msgid "Download image in PDF format"
+msgstr "Scarica immagine in formato PDF"
+
+msgid "Download image in PNG format"
+msgstr "Scarica immagine in formato PNG"
+
+msgid "Download image in SVG format"
+msgstr "Scarica immagine in formato SVG"
+
+msgid "Export image"
+msgstr "Esporta immagine"
+
+msgid "Loading"
+msgstr "Caricamento"
+
+msgid "Print"
+msgstr "Stampa"
