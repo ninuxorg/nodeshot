@@ -144,7 +144,7 @@ INSTALLED_APPS = (
     'nodeshot.contrib.profiles',
     'nodeshot.contrib.hardware',
     'nodeshot.contrib.planning',
-    'tastypie'
+    #'tastypie'
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -242,16 +242,16 @@ NODESHOT = {
         # default access_level value for app: services, model: Login
         'ACL_SERVICES_LOGIN': 'community',
     },
-    'API': {
-        'APPS_ENABLED': [
-            'nodeshot.core.zones',
-            'nodeshot.core.nodes',
-            'nodeshot.core.network',
-            'nodeshot.core.links',
-            'nodeshot.core.services',
-            'nodeshot.core.mailing'
-        ]
-    },
+    #'API': {
+    #    'APPS_ENABLED': [
+    #        'nodeshot.core.zones',
+    #        'nodeshot.core.nodes',
+    #        'nodeshot.core.network',
+    #        'nodeshot.core.links',
+    #        'nodeshot.core.services',
+    #        'nodeshot.core.mailing'
+    #    ]
+    #},
     'INTEROPERABILITY': [
         ('nodeshot.extra.interoperability.NodeshotOld', 'Nodeshot 0.9'),
         ('nodeshot.extra.interoperability.GeoRSS', 'GeoRSS'),
