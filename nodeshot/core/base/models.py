@@ -5,7 +5,7 @@ from django.conf import settings
 from datetime import datetime
 from choices import ACCESS_LEVELS
 
-from utils import choicify_ordered
+from utils import choicify
 from utils import now
 
 
@@ -58,7 +58,7 @@ class BaseAccessLevel(BaseDate):
         For the cases in which no setting is specified the fallback setting NODESHOT['DEFAULTS']['ACL_GLOBAL_EDITABLE'] will be used.
     
     """
-    access_level = models.SmallIntegerField(_('access level'), choices=choicify_ordered(ACCESS_LEVELS), default=ACCESS_LEVELS.get('public'))
+    access_level = models.SmallIntegerField(_('access level'), choices=choicify(ACCESS_LEVELS), default=ACCESS_LEVELS.get('public'))
     
     class Meta:
         abstract = True

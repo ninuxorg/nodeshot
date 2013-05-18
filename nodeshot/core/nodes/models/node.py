@@ -2,26 +2,28 @@ from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.managers import AccessLevelManager
-from nodeshot.core.base.utils import choicify_ordered
+from nodeshot.core.base.utils import choicify
 from nodeshot.core.nodes.signals import node_status_changed, hotspot_changed
+
 from choices import NODE_STATUS
 
 
 class Node(BaseAccessLevel):
     """
-    Nodes of a network, can be assigned to 'Zones' and should belong to 'Users'
+    Nodes of a network, can be assigned to 'Layers' and should belong to 'Users'
     """
     name = models.CharField(_('name'), max_length=50, unique=True)
-    status = models.SmallIntegerField(_('status'), max_length=3, choices=choicify_ordered(NODE_STATUS), default=NODE_STATUS.get(settings.NODESHOT['DEFAULTS']['NODE_STATUS'], 'potential'))
+    status = models.SmallIntegerField(_('status'), max_length=3, choices=choicify(NODE_STATUS), default=NODE_STATUS.get(settings.NODESHOT['DEFAULTS']['NODE_STATUS'], 'potential'))
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
     
-    if 'nodeshot.core.zones' in settings.INSTALLED_APPS:
-        # zone might need to be able to be blank, would require custom validation
-        zone = models.ForeignKey('zones.Zone', blank=True)
+    if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+        # layer might need to be able to be blank, would require custom validation
+        layer = models.ForeignKey('layers.Layer', blank=True)
     
-    # nodes might be assigned to a foreign zone, therefore user can be left blank, requires custom validation
+    # nodes might be assigned to a foreign layer, therefore user can be left blank, requires custom validation
     user = models.ForeignKey(User, blank=True, null=True)
     
     # positioning

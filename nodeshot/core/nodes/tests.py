@@ -11,9 +11,9 @@ from models import Node
 class NodeTest(TestCase):
     
     fixtures = [
-        'groups.json',
+        'initial_data.json',
         'test_users.json',
-        'test_zones.json',
+        'test_layers.json',
         'test_nodes.json',
         'test_images.json'
     ]
@@ -54,9 +54,9 @@ class NodeTest(TestCase):
     #    # olny 8 publicly accessible nodes
     #    self.failUnlessEqual(len(nodes), 8, 'amount of public nodes mismatch')
     #
-    #def test_api_nodes_zone_public(self):
-    #    """ test nodes api nodes of a zone """
-    #    url = '/api/v1/zones/rome/nodes/?format=json'
+    #def test_api_nodes_layer_public(self):
+    #    """ test nodes api nodes of a layer """
+    #    url = '/api/v1/layers/rome/nodes/?format=json'
     #    client = Client()
     #    response = client.get(url)
     #    self.failUnlessEqual(response.status_code, 200, 'nodes index unreachable: %s' % url)

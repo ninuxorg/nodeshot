@@ -2,17 +2,10 @@ from django.contrib import admin
 from django.contrib.gis import admin as geoadmin
 from django.db import models
 from django.conf import settings
+
 from nodeshot.core.nodes.models import Node, Image
-from nodeshot.core.network.models import Device
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline, BaseTabularInline
-from nodeshot.dependencies.widgets import AdvancedFileInput
-
-
-class DeviceInline(BaseStackedInline):
-    model = Device
-    
-    if 'grappelli' in settings.INSTALLED_APPS:
-        classes = ('grp-collapse grp-open', )
+from nodeshot.core.base.widgets import AdvancedFileInput
 
 
 class ImageInline(BaseStackedInline):
@@ -34,7 +27,7 @@ class NodeAdmin(geoadmin.OSMGeoAdmin, BaseAdmin):
     date_hierarchy = 'added'
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
-    inlines = (DeviceInline, ImageInline)
+    inlines = [ImageInline]
     # default coordinates should be taken from settings
     default_lat = 5145024.63201869
     default_lon = 1391048.3569527462
