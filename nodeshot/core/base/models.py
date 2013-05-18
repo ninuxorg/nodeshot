@@ -4,7 +4,9 @@ from django.utils.timezone import utc
 from django.conf import settings
 from datetime import datetime
 from choices import ACCESS_LEVELS
+
 from utils import choicify_ordered
+from utils import now
 
 
 class BaseDate(models.Model):
@@ -14,18 +16,18 @@ class BaseDate(models.Model):
         * an updated field which updates itself automatically
     We don't use django's autoaddnow=True because that makes the fields not visible in the admin.
     """
-    added = models.DateTimeField(_('created on'), default=datetime.utcnow().replace(tzinfo=utc))
-    updated = models.DateTimeField(_('updated on'), default=datetime.utcnow().replace(tzinfo=utc))
+    added = models.DateTimeField(_('created on'), default=now())
+    updated = models.DateTimeField(_('updated on'), default=now())
 
+    class Meta:
+        abstract = True
+    
     def save(self, *args, **kwargs):
         """
         automatically update updated date field
         """
-        self.updated = datetime.utcnow().replace(tzinfo=utc)
+        self.updated = now()
         super(BaseDate, self).save(*args, **kwargs)
-
-    class Meta:
-        abstract = True
 
 
 class BaseAccessLevel(BaseDate):
