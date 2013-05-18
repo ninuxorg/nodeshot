@@ -60,6 +60,8 @@ class IpAdmin(BaseAdmin):
     list_display = ('address', 'netmask', 'protocol', 'added', 'updated')
     list_filter = ('protocol', 'added', 'updated')
     search_fields = ('address',)
+    
+    readonly_fields = ['protocol'] + BaseAdmin.readonly_fields
 
 
 admin.site.register(Device, DeviceAdmin)

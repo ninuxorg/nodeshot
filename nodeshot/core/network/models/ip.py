@@ -1,16 +1,22 @@
-from django.db import models
+from django.db import models, DatabaseError, IntegrityError
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+
 from nodeshot.core.base.models import BaseAccessLevel
 from choices import IP_PROTOCOLS
+
+from netfields import InetAddressField, CidrAddressField, NetManager
 
 
 class Ip(BaseAccessLevel):
     """ IP Address Model """
     interface = models.ForeignKey('network.Interface', verbose_name=_('interface'))
-    address = models.GenericIPAddressField(verbose_name=_('ip address'), unique=True)
+    address = InetAddressField(verbose_name=_('ip address'), unique=True, db_index=True)
     protocol = models.CharField(_('IP Protocol Version'), max_length=4, choices=IP_PROTOCOLS, default=IP_PROTOCOLS[0][0], blank=True)
-    netmask = models.CharField(_('netmask / prefix'), max_length=100)
+    netmask = CidrAddressField(_('netmask (CIDR, eg: 10.40.0.0/24)'))
+    
+    objects = NetManager()
     
     class Meta:
         app_label= 'network'
@@ -21,14 +27,16 @@ class Ip(BaseAccessLevel):
     def __unicode__(self):
         return '%s: %s' % (self.protocol, self.address)
     
+    def full_clean(self, *args, **kwargs):
+        """ TODO """
+        pass
+    
     def save(self, *args, **kwargs):
         """ Determines ip protocol version automatically """
-        if '.' in self.address:
-            self.protocol = 'ipv4'
-        elif ':' in self.address:
-            self.protocol = 'ipv6'
+        self.protocol = 'ipv%d' % self.address.version
         # save
         super(Ip, self).save(*args, **kwargs)
+        
     
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod
