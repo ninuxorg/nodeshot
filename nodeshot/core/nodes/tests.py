@@ -21,11 +21,11 @@ class NodeTest(TestCase):
     #def setUp(self):
     #    pass
     
-    def test_current_status_and_hotspot(self):
+    def test_current_status(self):
         """ test that node._current_status is none for new nodes """
         n = Node()
         self.failUnlessEqual(n._current_status, None, 'new node _current_status private attribute is different than None')
-        self.failUnlessEqual(n._current_hotspot, None, 'new node _current_status private attribute is different than None')
+        #self.failUnlessEqual(n._current_hotspot, None, 'new node _current_status private attribute is different than None')
         n = Node.objects.all()[0]
         self.failUnlessEqual(n._current_status, n.status, 'new node _current_status private attribute is different than status')
         n.status = 2
@@ -35,13 +35,13 @@ class NodeTest(TestCase):
         n.status = 3
         n.save()
         # hotspot
-        self.failUnlessEqual(n._current_hotspot, n.is_hotspot, 'new node _current_hotspot private attribute is different than is_hotspot')
-        n.is_hotspot = False
-        self.failIfEqual(n._current_hotspot, n.is_hotspot, 'should not be equal because just changed')
-        n.save()
-        self.failUnlessEqual(n._current_hotspot, n.is_hotspot, 'should be equal again')
-        n.is_hotspot = True
-        n.save()
+        #self.failUnlessEqual(n._current_hotspot, n.is_hotspot, 'new node _current_hotspot private attribute is different than is_hotspot')
+        #n.is_hotspot = False
+        #self.failIfEqual(n._current_hotspot, n.is_hotspot, 'should not be equal because just changed')
+        #n.save()
+        #self.failUnlessEqual(n._current_hotspot, n.is_hotspot, 'should be equal again')
+        #n.is_hotspot = True
+        #n.save()
     
     #def test_api_nodes_public(self):
     #    """ test nodes api index and count publicly accessible nodes """

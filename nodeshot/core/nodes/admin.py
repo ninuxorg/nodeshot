@@ -21,17 +21,20 @@ class ImageInline(BaseStackedInline):
 
 
 class NodeAdmin(geoadmin.OSMGeoAdmin, BaseAdmin):
-    list_display  = ('name', 'status', 'access_level', 'is_hotspot', 'added', 'updated')
-    list_filter   = ('status', 'is_hotspot', 'access_level', 'added')
+    list_display  = ('name', 'status', 'access_level', 'is_published', 'added', 'updated')
+    list_filter   = ('status', 'access_level', 'added')
     search_fields = ('name',)
     date_hierarchy = 'added'
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ImageInline]
-    # default coordinates should be taken from settings
+    
+    # geodjango
     default_lat = 5145024.63201869
     default_lon = 1391048.3569527462
     default_zoom = '3'
+    
+    change_list_template = 'smuggler/change_list.html'
 
 
 admin.site.register(Node, NodeAdmin)

@@ -17,9 +17,8 @@ class ProvinciaWIFI(BaseConverter):
             node = {
                 'name': self.get_text(item, 'Denominazione'),
                 'status': NODE_STATUS.get('active'),
-                'lat': self.get_text(item, 'Latitudine'),
-                'lng': self.get_text(item, 'longitudine'),
-                'is_hotspot': True,
+                'center': "POINT (%s %s)" % (self.get_text(item, 'Latitudine'), self.get_text(item, 'longitudine')),
+                #'is_hotspot': True,
                 'description': 'Indirizzo: %s, %s; Tipologia: %s' % (
                     self.get_text(item, 'Indirizzo'),
                     self.get_text(item, 'Comune'),

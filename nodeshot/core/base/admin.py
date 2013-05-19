@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.gis import admin as gis_admin
 
 
 class BaseAdmin(admin.ModelAdmin):
@@ -9,6 +10,13 @@ class BaseAdmin(admin.ModelAdmin):
     """
     save_on_top = True
     readonly_fields = ['added', 'updated']
+
+
+class BaseGeoAdmin(BaseAdmin, gis_admin.OSMGeoAdmin):
+    """
+    BaseAdmin + Geodjango support
+    """
+    pass
 
 
 class BaseStackedInline(admin.StackedInline):

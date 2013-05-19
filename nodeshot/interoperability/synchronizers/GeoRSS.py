@@ -27,12 +27,12 @@ class GeoRSS(BaseConverter):
             # convert updated var to python datetime
             updated = parser.parse(updated)
             
+            # FIXME this is surely broken
             node = {
                 'name': name,
                 'status': NODE_STATUS.get('active'),
-                'lat': lat,
-                'lng': lng,
-                'is_hotspot': True,
+                'center': "POINT (%s %s)" % (lat, lng),
+                #'is_hotspot': True,
                 'description': description
             }
             # fill node list container

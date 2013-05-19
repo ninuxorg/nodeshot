@@ -49,9 +49,8 @@ class NodeshotOld(BaseConverter):
             node = {
                 'name': item.get('name'),
                 'status': STATUS.get(item.get('status'), 0),
-                'lat': item.get('lat'),
-                'lng': item.get('lng'),
-                'is_hotspot': True if 'h' in item.get('status') else False
+                'center': "POINT (%s %s)" % (lat, lng),
+                #'is_hotspot': True if 'h' in item.get('status') else False
             }
             # fill node list container
             nodes.append(node)

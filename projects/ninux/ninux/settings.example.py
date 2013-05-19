@@ -131,20 +131,29 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    
+    # adming
     'grappelli',
-    # Uncomment the next line to enable the admin:
     'django.contrib.admin',
-    'nodeshot.core.zones',
+    
+    # nodeshot
+    'nodeshot.core.api',
+    'nodeshot.core.layers',
     'nodeshot.core.nodes',
-    'nodeshot.core.network',
-    'nodeshot.core.links',
-    'nodeshot.core.monitoring',
-    'nodeshot.core.services',
-    'nodeshot.core.mailing',
-    'nodeshot.contrib.profiles',
-    'nodeshot.contrib.hardware',
-    'nodeshot.contrib.planning',
-    #'tastypie'
+    'nodeshot.interoperability',
+    'nodeshot.community.mailing',
+    'nodeshot.community.profiles',
+    'nodeshot.networking.net',
+    'nodeshot.networking.links',
+    'nodeshot.networking.services',
+    'nodeshot.networking.hardware',
+    'nodeshot.networking.planning',
+    'nodeshot.networking.monitor',
+    
+    # dependencies
+    'rest_framework',
+    'south',
+    'debug_toolbar',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -167,15 +176,57 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        #'file': {
+        #    'level': 'INFO',
+        #    'class': 'logging.FileHandler',
+        #    'formatter': 'verbose',
+        #    'filename': 'ninux.log'
+        #},
+        'logfile': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': SITE_ROOT + "/debug.log",
+            'maxBytes': 50000,
+            'backupCount': 2,
+            'formatter': 'custom',
+        },
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
+        #'django': {
+        #    'handlers':['logfile'],
+        #    'level':'DEBUG',
+        #    'propagate': True,
+        #},
+        #'django.request': {
+        #    'handlers': ['mail_admins', 'logfile'],
+        #    'level': 'DEBUG',
+        #    'propagate': True,
+        #},
+        'nodeshot.core.mailing': {
+            'handlers': ['logfile'],
+            'level': 'DEBUG',
         },
-    }
+        'nodeshot.core.zones': {
+            'handlers': ['logfile'],
+            'level': 'DEBUG',
+        },
+        'nodeshot.contrib.profiles': {
+            'handlers': ['logfile'],
+            'level': 'DEBUG',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+        'custom': {
+            'format': '%(levelname)s %(asctime)s\n%(message)s'
+        },
+    },
 }
 
 CACHES = {
@@ -196,6 +247,7 @@ _ = lambda s: s
 
 NODESHOT = {
     'SETTINGS': {
+        'API_PREFIX': '/api/v1',
         'ACL_GLOBAL_EDITABLE': True,
         # the following is an example of possible granular ACL setting that is available
         #'ACL_NODES_NODE_EDITABLE': False,
@@ -234,28 +286,26 @@ NODESHOT = {
         'MAP_ZOOM': 12,
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
         'NODE_STATUS': 'potential',
-        'NODE_AVATARS': True,
-        'ZONE_TIME': 'GMT+1',
+        'NODE_AREA': True,
+        'NODE_PUBLISHED': True,
         'ZONE_ZOOM': 12,
+        'ZONE_MINIMUM_DISTANCE': 0,
         'MAILING_SCHEDULE_OUTWARD': False,
         'ACL_GLOBAL': 'public',
         # default access_level value for app: services, model: Login
         'ACL_SERVICES_LOGIN': 'community',
     },
-    #'API': {
-    #    'APPS_ENABLED': [
-    #        'nodeshot.core.zones',
-    #        'nodeshot.core.nodes',
-    #        'nodeshot.core.network',
-    #        'nodeshot.core.links',
-    #        'nodeshot.core.services',
-    #        'nodeshot.core.mailing'
-    #    ]
-    #},
+    'API': {
+        'APPS_ENABLED': [
+            'nodeshot.core.nodes',
+            'nodeshot.core.layers',
+            'nodeshot.community.participation',
+        ]
+    },
     'INTEROPERABILITY': [
-        ('nodeshot.extra.interoperability.NodeshotOld', 'Nodeshot 0.9'),
-        ('nodeshot.extra.interoperability.GeoRSS', 'GeoRSS'),
-        ('nodeshot.extra.interoperability.ProvinciaWIFI', 'Provincia WiFi')
+        ('nodeshot.interoperability.synchronizers.NodeshotOld', 'Nodeshot 0.9'),
+        ('nodeshot.interoperability.synchronizers.GeoRSS', 'GeoRSS'),
+        ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
     ]
 }
 

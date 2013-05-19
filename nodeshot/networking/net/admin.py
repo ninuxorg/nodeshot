@@ -2,10 +2,14 @@ from django.contrib import admin
 from django.conf import settings
 
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
-from nodeshot.core.nodes.admin import NodeAdmin as BaseNodeAdmin
 from nodeshot.core.nodes.models import Node
 
 from .models import Device, Interface, Ethernet, Wireless, Bridge, Tunnel, Vap, Vlan, RoutingProtocol, Ip
+
+if 'nodeshot.community.participation' in settings.INSTALLED_APPS:
+    from nodeshot.community.participation.admin import NodeAdmin as BaseNodeAdmin
+else:
+    from nodeshot.core.nodes.admin import NodeAdmin as BaseNodeAdmin
 
 
 class DeviceInline(BaseStackedInline):

@@ -5,7 +5,7 @@ nodeshot.core.layers unit tests
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from nodeshot.core.layers.models import Layer
+from .models import Layer
 
 
 class LayerTest(TestCase):
@@ -18,22 +18,21 @@ class LayerTest(TestCase):
     ]
     
     def setUp(self):
-        z = Layer()
-        z.name = 'test layer'
-        z.time_zone = 'GMT+1'
-        z.slug = 'test-layer'
-        z.lat = '10'
-        z.lng = '10'
-        z.zoom = '12'
-        z.organization = 'ninux.org'
-        self.layer = z
+        pass
     
-    #def test_email_filled(self):
-    #    """ *** Either an email or some mantainers should be set *** """
-    #    self.assertRaises(ValidationError, self.layer.full_clean)
-    
-    def test_parent_is_not_external(self):
-        """ *** Layers cannot have parents which are flagged as "external" *** """
-        self.layer.is_external = False
-        self.layer.parent = Layer.objects.filter(is_external=True)[0]
-        self.assertRaises(ValidationError, self.layer.full_clean)
+    def test_layer_manager(self):
+        # published() method
+        layers_count = Layer.objects.all().count()
+        published_layers_count = Layer.objects.published().count()
+        self.assertEquals(published_layers_count, layers_count)
+        # after unpublishing one layer we should get 1 less layer in total
+        l = Layer.objects.get(pk=1)
+        l.is_published = False
+        l.save()
+        layers_count = Layer.objects.all().count()
+        published_layers_count = Layer.objects.published().count()
+        self.assertEquals(published_layers_count, layers_count-1)
+        
+        # external() method
+        self.assertEquals(Layer.objects.external().count(), Layer.objects.filter(is_external=True).count())
+        

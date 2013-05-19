@@ -28,7 +28,7 @@ application = get_wsgi_application()
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication
 # application = HelloWorldApplication(application)
-from ninux.settings import DEBUG
-if DEBUG:
-    from ninux import monitor
-    monitor.start(interval=1.0)
+#from ninux.settings import DEBUG
+#if DEBUG:
+#    from ninux import monitor
+#    monitor.start(interval=1.0)

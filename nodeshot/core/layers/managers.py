@@ -1,4 +1,4 @@
-from nodeshot.core.base.managers import PublicQuerySet, PublicManager
+from nodeshot.core.base.managers import PublicQuerySet, GeoPublicManager
 
 
 class LayerQuerySet(PublicQuerySet):
@@ -9,7 +9,7 @@ class LayerQuerySet(PublicQuerySet):
         return self.filter(is_external=True)
 
 
-class LayerManager(PublicManager):
+class LayerManager(GeoPublicManager):
     """ Layer manager extends PublicManager """
 
     def get_query_set(self): 

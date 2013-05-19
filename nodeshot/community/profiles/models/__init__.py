@@ -22,7 +22,7 @@ from nodeshot.core.nodes.models import Node
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
-from nodeshot.core.nodes.signals import node_status_changed, hotspot_changed
+from nodeshot.core.nodes.signals import node_status_changed
 
 @receiver(post_save, sender=User)
 def new_user(sender, **kwargs):

@@ -36,9 +36,9 @@ class ProfilesTest(TestCase):
         """ active nodes basic count test """
         self.assertEqual(self.fusolab.user.stats.active_nodes, 3)    
     
-    def test_hotspots(self):
-        """ potential nodes basic count test """
-        self.assertEqual(self.fusolab.user.stats.hotspots, 1)
+    #def test_hotspots(self):
+    #    """ potential nodes basic count test """
+    #    self.assertEqual(self.fusolab.user.stats.hotspots, 1)
     
     def test_devices(self):
         """ potential nodes basic count test """
@@ -68,13 +68,13 @@ class ProfilesTest(TestCase):
         new_node.save()
         self.assertEqual(new_node.user.stats.active_nodes, 4, "Active nodes increment count failed")
         self.assertEqual(new_node.user.stats.potential_nodes, 1, "Potential nodes decrement count failed")
-        new_node.is_hotspot = True
-        new_node.save()
-        self.assertEqual(new_node.user.stats.hotspots, 2, "Hotspot increment count failed")
+        #new_node.is_hotspot = True
+        #new_node.save()
+        #self.assertEqual(new_node.user.stats.hotspots, 2, "Hotspot increment count failed")
         new_node.delete()
         user = User.objects.get(username='romano')
         self.assertEqual(user.stats.active_nodes, 3, "Active nodes decrement count failed")
-        self.assertEqual(user.stats.hotspots, 1, "Hotspot decrement count failed")
+        #self.assertEqual(user.stats.hotspots, 1, "Hotspot decrement count failed")
     
     def test_device_count_change(self):
         """ when a device is added or deleted stats should change """

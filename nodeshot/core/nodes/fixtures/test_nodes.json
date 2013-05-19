@@ -10,7 +10,6 @@
             "user": 4,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "80",
-            "is_hotspot": true,
             "description": "Fusolab",
             "notes": ""
         }
@@ -26,7 +25,6 @@
             "user": 5,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "80",
-            "is_hotspot": true,
             "description": "EigenLab",
             "notes": ""
         }
@@ -42,7 +40,6 @@
             "user": 6,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "25.0",
-            "is_hotspot": false,
             "description": "House",
             "notes": ""
         }
@@ -58,7 +55,6 @@
             "user": 4,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "80",
-            "is_hotspot": false,
             "description": "Test record Rome"
         }
     },
@@ -73,7 +69,6 @@
             "user": 5,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "80",
-            "is_hotspot": false,
             "description": "Test record Pisa"
         }
     },
@@ -88,7 +83,6 @@
             "user": 6,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "25.0",
-            "is_hotspot": false,
             "description": "Test record Viterbo"
         }
     },
@@ -103,7 +97,6 @@
             "user": 4,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "160.0",
-            "is_hotspot": false,
             "description": "Pomezia",
             "notes": ""
         }
@@ -119,7 +112,6 @@
             "user": 4,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "650.0",
-            "is_hotspot": false,
             "description": "Piazza dell'erba",
             "notes": ""
         }
@@ -136,7 +128,6 @@
             "user": 6,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "250.0",
-            "is_hotspot": false,
             "description": "test"
         }
     },
@@ -152,7 +143,6 @@
             "user": 6,
             "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "150.0",
-            "is_hotspot": false,
             "description": "test"
         }
     }

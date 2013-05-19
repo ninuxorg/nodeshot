@@ -44,10 +44,10 @@ class EmailNotification(BaseDate):
             return 'node_activated'
         elif old_status != None and sender == 'Node':
             return 'node_changing_status'
-        elif sender == 'Hotspot' and (old_status == False or old_status == None) and new_status == True:
-            return 'new_hotspot'
-        elif sender == 'Hotspot' and old_status == True and new_status == False:
-            return 'hotspot_removed'
+        #elif sender == 'Hotspot' and (old_status == False or old_status == None) and new_status == True:
+        #    return 'new_hotspot'
+        #elif sender == 'Hotspot' and old_status == True and new_status == False:
+        #    return 'hotspot_removed'
     
     @staticmethod
     def retrieve_recipients(notification_type, updated_node):

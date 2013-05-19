@@ -19,7 +19,7 @@ class Stats(BaseDate):
     user = models.OneToOneField(User, verbose_name=_('user'))
     potential_nodes = models.IntegerField(_('potential nodes count'), default=0, help_text=_('status included: potential, planned'))
     active_nodes = models.IntegerField(_('active nodes count'), default=0, help_text=_('status included: active, testing, mantainance'))
-    hotspots = models.IntegerField(_('hotspot count'), default=0, help_text=_('only active nodes'))
+    #hotspots = models.IntegerField(_('hotspot count'), default=0, help_text=_('only active nodes'))
     devices = models.IntegerField(_('devices'), default=0)
     
     class Meta:
@@ -43,10 +43,10 @@ class Stats(BaseDate):
         self.potential_nodes = Node.objects.filter(user_id=self.user_id).filter(status_query).count()
         return self
     
-    def count_hotspots(self):
-        """ update user's hotspot count """
-        self.hotspots = Node.objects.filter(user_id=self.user_id).filter(is_hotspot=True).count()
-        return self
+    #def count_hotspots(self):
+    #    """ update user's hotspot count """
+    #    self.hotspots = Node.objects.filter(user_id=self.user_id).filter(is_hotspot=True).count()
+    #    return self
     
     def count_devices(self):
         """ update user device count """
@@ -55,7 +55,7 @@ class Stats(BaseDate):
     
     def update(self):
         """ update all user statistics """
-        self.count_active_nodes().count_potential_nodes().count_hotspots().count_devices().save()
+        self.count_active_nodes().count_potential_nodes().count_devices().save()
         return self
     
     def update_devices(self):
@@ -65,7 +65,7 @@ class Stats(BaseDate):
     
     def update_nodes(self):
         """ update only node statistics """
-        self.count_active_nodes().count_potential_nodes().count_hotspots().save()
+        self.count_active_nodes().count_potential_nodes().save()
         return self
     
     @staticmethod
