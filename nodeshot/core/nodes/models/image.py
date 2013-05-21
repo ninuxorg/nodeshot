@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from nodeshot.core.base.models import BaseOrdered
 from nodeshot.core.base.managers import AccessLevelManager
-from node import Node
+
+from . import Node
 
 
 class Image(BaseOrdered):
