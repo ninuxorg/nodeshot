@@ -6,12 +6,10 @@
             "name": "Fusolab Rome",
             "status": 3,
             "slug": "fusolab",
-            "zone": 1,
+            "layer": 1,
             "user": 4,
-            "lat": "41.8720419277",
-            "lng": "12.5822391919",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "80",
-            "is_hotspot": true,
             "description": "Fusolab",
             "notes": ""
         }
@@ -23,12 +21,10 @@
             "name": "EigenLab",
             "status": 3,
             "slug": "eigenlab",
-            "zone": 2,
+            "layer": 2,
             "user": 5,
-            "lat": "43.7219513025",
-            "lng": "10.4080197215",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "80",
-            "is_hotspot": true,
             "description": "EigenLab",
             "notes": ""
         }
@@ -40,12 +36,10 @@
             "name": "Tulug",
             "status": 3,
             "slug": "tulug",
-            "zone": 3,
+            "layer": 3,
             "user": 6,
-            "lat": "42.4193749624",
-            "lng": "12.1111955426",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "25.0",
-            "is_hotspot": false,
             "description": "House",
             "notes": ""
         }
@@ -57,12 +51,10 @@
             "name": "Potenziale Romano",
             "status": 0,
             "slug": "potenziale-romano",
-            "zone": 1,
+            "layer": 1,
             "user": 4,
-            "lat": "41.8720419277",
-            "lng": "12.5822391919",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "80",
-            "is_hotspot": false,
             "description": "Test record Rome"
         }
     },
@@ -73,12 +65,10 @@
             "name": "Potenziale Pisano",
             "status": 0,
             "slug": "potenziale-pisano",
-            "zone": 2,
+            "layer": 2,
             "user": 5,
-            "lat": "43.7219513025",
-            "lng": "10.4080197215",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "80",
-            "is_hotspot": false,
             "description": "Test record Pisa"
         }
     },
@@ -89,12 +79,10 @@
             "name": "Potenziale Viterbo",
             "status": 0,
             "slug": "potenziale-viterbo",
-            "zone": 3,
+            "layer": 3,
             "user": 6,
-            "lat": "42.4193749624",
-            "lng": "12.1111955426",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "25.0",
-            "is_hotspot": false,
             "description": "Test record Viterbo"
         }
     },
@@ -105,12 +93,10 @@
             "name": "Pomezia",
             "status": 3,
             "slug": "pomezia",
-            "zone": 1,
+            "layer": 1,
             "user": 4,
-            "lat": "41.668174",
-            "lng": "12.50453",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "160.0",
-            "is_hotspot": false,
             "description": "Pomezia",
             "notes": ""
         }
@@ -122,12 +108,10 @@
             "name": "RDP",
             "status": 3,
             "slug": "rdp",
-            "zone": 1,
+            "layer": 1,
             "user": 4,
-            "lat": "41.760799",
-            "lng": "12.709306",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "650.0",
-            "is_hotspot": false,
             "description": "Piazza dell'erba",
             "notes": ""
         }
@@ -140,12 +124,10 @@
             "name": "Hidden Node Rome",
             "status": 3,
             "slug": "hidden-rome",
-            "zone": 1,
+            "layer": 1,
             "user": 6,
-            "lat": "41.860799",
-            "lng": "12.809306",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "250.0",
-            "is_hotspot": false,
             "description": "test"
         }
     },
@@ -157,12 +139,10 @@
             "name": "registered node",
             "status": 3,
             "slug": "registered-rome",
-            "zone": 1,
+            "layer": 1,
             "user": 6,
-            "lat": "41.870799",
-            "lng": "12.829306",
+            "coords": "POINT (41.8720419277 12.5822391919)",
             "elev": "150.0",
-            "is_hotspot": false,
             "description": "test"
         }
     }

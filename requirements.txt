@@ -1,10 +1,48 @@
-Django==1.4.2
-MySQL-python==1.2.4c1
-PIL==1.1.7
-django-grappelli==2.4.3
--e git+https://github.com/toastdriven/django-tastypie@63055a7a3c8bf53eac1b879c3bebfd6898416721#egg=django_tastypie-dev
-mimeparse==0.1.3
-python-dateutil==2.1
-simplejson==2.6.2
-six==1.2.0
-wsgiref==0.1.2
+# Nodeshot dependencies
+# install python-virtualenv
+# create a virtual environment (be sure to include the system default psycpog2 db drivers)
+# run pip install -r requirements
+# psycopg2 implicit, difficult to install via PIP
+
+Django==1.5.1
+
+# python libraries
+PIL
+simplejson
+importlib
+pytz
+mimeparse
+python-dateutil
+six
+wsgiref
+vectorformats
+
+# better admin
+django-grappelli==2.4.4
+
+# RESTful API and API documentation
+djangorestframework==2.3.3
+markdown
+
+# networking
+netaddr
+django-netfields==0.2.1
+
+# asynchronous tasks
+kombu
+Celery
+django-celery
+django-celery-email
+
+# better shell
+bpython
+
+# fixture management
+# django-smuggler==0.4.1
+-e git+https://github.com/semente/django-smuggler#egg=django-smuggler
+
+# debugging
+django-debug-toolbar
+
+# migrations
+south

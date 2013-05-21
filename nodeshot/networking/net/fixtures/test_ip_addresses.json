@@ -1,0 +1,38 @@
+[
+    {
+        "model": "net.Ip",
+        "pk": 1,
+        "fields": {
+            "interface": 1,
+            "address": "172.16.40.31",
+            "netmask": "172.16.40.0/24"
+        }
+    },
+    {
+        "model": "net.Ip",
+        "pk": 2,
+        "fields": {
+            "interface": 1,
+            "address": "2001:4c00:893b:fede::3",
+            "netmask": "2001:4c00:893b:fede::0/64"
+        }
+    },
+    {
+        "model": "net.Ip",
+        "pk": 3,
+        "fields": {
+            "interface": 2,
+            "address": "172.16.40.22",
+            "netmask": "172.16.40.0/24"
+        }
+    },
+    {
+        "model": "net.Ip",
+        "pk": 4,
+        "fields": {
+            "interface": 2,
+            "address": "2001:4c00:893b:4030::6",
+            "netmask": "2001:4c00:893b:fede::0/64"
+        }
+    }
+]

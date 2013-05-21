@@ -1,5 +1,7 @@
 from django.db.models import Manager, Q
 from django.db.models.query import QuerySet
+from django.contrib.gis.db.models import GeoManager
+
 from nodeshot.core.base.choices import ACCESS_LEVELS
 
 
@@ -22,6 +24,11 @@ class PublicManager(Manager):
             return getattr(self.__class__, attr, *args)
         except AttributeError:
             return getattr(self.get_query_set(), attr, *args)
+
+
+class GeoPublicManager(PublicManager, GeoManager):
+    """ PublicManager and Geodjango manager in one """
+    pass
 
 
 class AccessLevelQuerySet(QuerySet):
@@ -66,3 +73,14 @@ class AccessLevelManager(Manager):
             return getattr(self.__class__, attr, *args)
         except AttributeError:
             return getattr(self.get_query_set(), attr, *args)
+
+
+class GeoAccessLevelManager(AccessLevelManager, GeoManager):
+    """ AccessLevelManager and Geodjango manager in one """
+    pass
+
+
+class GeoAccessLevelPublicManager(PublicManager, GeoAccessLevelManager):
+    """ AccessLevelManager, PublicManager and Geodjango manager in one """
+    pass
+    
