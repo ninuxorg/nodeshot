@@ -62,5 +62,5 @@ class NodeAdmin(BaseNodeAdmin):
         
     inlines = BaseNodeAdmin.inlines + additional_inlindes
 
-admin.site.unregister(Layer)
-admin.site.register(Layer, LayerAdmin)
+admin.site.unregister(Node)
+admin.site.register(Node, NodeAdmin)
