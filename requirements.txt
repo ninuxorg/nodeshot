@@ -2,14 +2,14 @@
 # install python-virtualenv
 # create a virtual environment (be sure to include the system default psycpog2 db drivers)
 # run pip install -r requirements
-# psycopg2 implicit, difficult to install via PIP
+psycopg2 
 
 Django==1.5.1
 
 # python libraries
 PIL
 simplejson
-importlib
+#importlib
 pytz
 mimeparse
 python-dateutil

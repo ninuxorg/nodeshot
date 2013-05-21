@@ -1,0 +1,6 @@
+body#tinymce {
+    margin: 0; padding: 10px 10px 10px 10px !important;
+    width: 620px;
+    background: #fff;
+    font-size: 14px;
+}
