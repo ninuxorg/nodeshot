@@ -10,7 +10,7 @@ def check_node(a,b):
     return
 
 def is_participated(node_id):
-    from participation.models import NodeRatingCount
+    from nodeshot.community.participation.models import NodeRatingCount
 
 
     n = Node.objects.get(pk=node_id)

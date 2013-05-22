@@ -16,7 +16,7 @@ class Comment(BaseDate):
     text = models.CharField(_('comment text'), max_length=255)
     
     def __unicode__(self):
-        return self.comment
+        return self.text
     
     def save(self,*args,**kwargs):
         super(Comment,self).save(*args, **kwargs)

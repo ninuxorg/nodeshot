@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.conf import settings
-
+from nodeshot.community.participation import urls
 # importlib is available since python 2.7
 from importlib import import_module
 
@@ -17,4 +17,9 @@ for app_path in settings.NODESHOT['API']['APPS_ENABLED']:
         url(r'^%s' % settings.NODESHOT['SETTINGS']['API_PREFIX'], include(module_path))
     )
 
+from nodeshot.community.participation.urls import urlpatterns as comunity_urlpatterns
+urlpatterns += comunity_urlpatterns
 
+urlpatterns += patterns('',
+        url(r'^%s' % settings.NODESHOT['SETTINGS']['API_PREFIX'], include('nodeshot.community.participation.urls'))
+    )

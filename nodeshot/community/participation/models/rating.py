@@ -13,7 +13,7 @@ class Rating(BaseDate):
     Rating model
     """
     # rating choices from 1 to 10
-    RATING_CHOICES = [('n', '%d' % n) for n in range(1, 11)]
+    RATING_CHOICES = [(n, '%d' % n) for n in range(1, 11)]
     
     node = models.ForeignKey(Node)
     user = models.ForeignKey(User)
@@ -26,7 +26,7 @@ class Rating(BaseDate):
         is_participated(self.node.id)
         n = self.node
         rating_count = n.rating_set.count()
-        rating_avg = n.rating_set.aggregate(rate=Avg('rate'))
+        rating_avg = n.rating_set.aggregate(rate=Avg('value'))
         rating_float = rating_avg['rate']
         nrc = n.noderatingcount
         nrc.rating_avg = rating_float
