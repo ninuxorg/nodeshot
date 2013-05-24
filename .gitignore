@@ -5,8 +5,10 @@ settings.py
 *.komodoproject
 *.DS_Store
 python/
-media/nodes/*
-media/external/*
+projects/ninux/ninux/media/nodes/
+projects/ninux/ninux/media/external/
+projects/georate/georate/media/nodes/
+projects/georate/georate/media/external/
 debug.log
 *~
 ._*
