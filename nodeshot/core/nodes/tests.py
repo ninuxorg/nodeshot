@@ -1,5 +1,5 @@
 """
-tests for nodeshot.core.nodes
+nodeshot.core.nodes unit tests
 """
 
 from django.test import TestCase
@@ -21,9 +21,6 @@ class ModelsTest(TestCase):
         'test_nodes.json',
         'test_images.json'
     ]
-    
-    #def setUp(self):
-    #    pass
     
     def test_current_status(self):
         """ test that node._current_status is none for new nodes """
@@ -102,20 +99,84 @@ class APITest(TestCase):
         'test_images.json'
     ]
     
-    def setup(self):
-        self.client.login(username='admin', password='tester')    
+    #def setup(self):
+    #    self.client.login(username='admin', password='tester')
     
-    def test_node_images(self):
-        """ test API node images method """
-        url = reverse('api_node_images', args=['fusolab'])
+    def test_node_list(self):
+        """ test node list """
+        url = reverse('api_node_list')
         
+        # GET: 200
+        response = self.client.get(url)
+        nodes = json.loads(response.content)
+        public_node_count = Node.objects.published().access_level_up_to('public').count()
+        self.assertEqual(public_node_count, len(nodes))
+        
+        # POST
+    
+    def test_node_geojson_list(self):
+        """ test node geojson list """
+        url = reverse('api_node_gejson_list')
+        
+        # GET: 200
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        # should find 3 images (see fixtures)
-        images = json.loads(response.content)
-        self.assertEqual(3, len(images))
+    
+    def test_node_details(self):
+        """ test node details """
+        url = reverse('api_node_details', args=['fusolab'])
         
-        # test 404
+        # GET: 200
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        node = json.loads(response.content)
+        images_url = reverse('api_node_images', args=['fusolab'])
+        # images_url in node['images']
+        self.assertIn(images_url, node['images'])
+        
+        # PUT
+        
+        # PATCH
+        
+        # CAN'T GET restricted if not authenticated
+        fusolab = Node.objects.get(slug='fusolab')
+        fusolab.access_level = 2
+        fusolab.save()
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+        
+        # Admin can get it
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        # unpublished will return 404
+        fusolab.is_published = False
+        fusolab.save()
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+    
+    def test_node_images(self):
+        """ test node images """
+        url = reverse('api_node_images', args=['fusolab'])
+        
+        # GET: 200
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        images = json.loads(response.content)
+        public_image_count = Image.objects.access_level_up_to('public').filter(node__slug='fusolab').count()
+        self.assertEqual(public_image_count, len(images))
+        # admin can get more images
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(url)
+        images = json.loads(response.content)
+        node_image_count = Image.objects.accessible_to(1).filter(node__slug='fusolab').count()
+        self.assertEqual(node_image_count, len(images))
+        
+        # GET: 404
         url = reverse('api_node_images', args=['idontexist'])
         response = self.client.get(url)
         self.assertEqual(404, response.status_code)
+        
+        # POST
+        # todo
