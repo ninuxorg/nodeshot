@@ -1,16 +1,22 @@
-from nodeshot.core.base.managers import PublicQuerySet, GeoPublicManager
+from nodeshot.core.base.managers import GeoPublicManager
+from nodeshot.core.base.managers import GeoPublicQuerySet
 
 
-class LayerQuerySet(PublicQuerySet):
-    """ Custom query set, make possible to chain custom filters """
+class ExternalMixin(object):
+    """ Add method external() to your custom queryset or manager model """
     
     def external(self):
-        """ return only exgternal layers """
+        """ return only external layers """
         return self.filter(is_external=True)
 
 
-class LayerManager(GeoPublicManager):
-    """ Layer manager extends PublicManager """
+class ExternalQueryset(GeoPublicQuerySet, ExternalMixin):
+    """ filter external layers """
+    pass
 
+
+class LayerManager(GeoPublicManager, ExternalMixin):
+    """ extends GeoPublicManager to add external method """
+    
     def get_query_set(self): 
-        return LayerQuerySet(self.model, using=self._db)
+        return ExternalQueryset(self.model, using=self._db)

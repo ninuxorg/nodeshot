@@ -27,7 +27,7 @@ class Layer(BaseDate):
     zoom = models.SmallIntegerField(_('default zoom level'), choices=MAP_ZOOM, default=settings.NODESHOT['DEFAULTS']['ZONE_ZOOM'])
     
     # organizational
-    organization = models.CharField(_('organization'), help_text=_('eg: Ninux, Freifunk, Alice, Bob, etc.'), max_length=255)
+    organization = models.CharField(_('organization'), help_text=_('Organization which is responsible to manage this layer'), max_length=255)
     website = models.URLField(_('Website'), blank=True, null=True)
     email = models.EmailField(_('email'), help_text=_('possibly an email address that delivers messages to all the active participants; if you don\'t have such an email you can add specific users in the "mantainers" field'), blank=True)
     mantainers = models.ManyToManyField(User, verbose_name=_('mantainers'), help_text=_('you can specify the users who are mantaining this layer so they will receive emails from the system'), blank=True)
@@ -37,7 +37,8 @@ class Layer(BaseDate):
                                            help_text=_('minimum distance between nodes, 0 means feature disabled'))
     write_access_level = models.SmallIntegerField(_('write access level'),
                                                   choices=choicify(ACCESS_LEVELS),
-                                                  default=ACCESS_LEVELS.get('public'))
+                                                  default=ACCESS_LEVELS.get('public'),
+                                                  help_text=_('minimum access level to insert new nodes in this layer'))
     # default manager
     objects = LayerManager()
     

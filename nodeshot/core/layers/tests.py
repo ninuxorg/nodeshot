@@ -36,3 +36,7 @@ class LayerTest(TestCase):
         # external() method
         self.assertEquals(Layer.objects.external().count(), Layer.objects.filter(is_external=True).count())
         
+        # mix external and published
+        count = Layer.objects.filter(is_external=True, is_published=True).count()
+        self.assertEquals(Layer.objects.external().published().count(), count)
+        self.assertEquals(Layer.objects.published().external().count(), count)

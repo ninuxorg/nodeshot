@@ -133,7 +133,7 @@
     },
     {
         "model": "nodes.Node",
-        "pk": 9,
+        "pk": 10,
         "fields": {
             "access_level": 1,
             "name": "registered node",

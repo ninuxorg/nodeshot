@@ -66,8 +66,8 @@ class ParticipationSerializer(serializers.ModelSerializer):
     #node= serializers.Field(source='node.name')
     
     class Meta:
-        model=NodeRatingCount
-        fields= ('likes','dislikes','rating_count','rating_avg','comment_count')
+        model = NodeRatingCount
+        fields= ('likes', 'dislikes', 'rating_count', 'rating_avg', 'comment_count')
 
     
 class NodeParticipationSerializer(serializers.ModelSerializer):
