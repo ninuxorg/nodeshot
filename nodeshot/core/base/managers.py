@@ -10,7 +10,7 @@ from nodeshot.core.base.choices import ACCESS_LEVELS
 ### ------ MIXINS ------ ###
 
 
-class PublicMixin(object):
+class PublishedMixin(object):
     """ adds published filter to queryset """
     
     def published(self):
@@ -70,13 +70,13 @@ class ExtendedManagerMixin(object):
 ### ------ QUERYSETS ------ ###
 
 
-class PublicQuerySet(QuerySet, PublicMixin):
+class PublishedQuerySet(QuerySet, PublishedMixin):
     """ Custom queryset to filter only published items """
     pass
 
 
-class GeoPublicQuerySet(GeoQuerySet, PublicMixin):
-    """ PublicQuerySet with GeoDjango queryset """
+class GeoPublishedQuerySet(GeoQuerySet, PublishedMixin):
+    """ PublishedQuerySet with GeoDjango queryset """
     pass
 
 
@@ -90,8 +90,8 @@ class AccessLevelQuerySet(QuerySet, ACLMixin):
 #    pass
 
 
-class GeoAccessLevelPublicQuerySet(GeoQuerySet, ACLMixin, PublicMixin):
-    """ AccessLevelQuerySet, PublicQuerySet with GeoDjango queryset """
+class GeoAccessLevelPublishedQuerySet(GeoQuerySet, ACLMixin, PublishedMixin):
+    """ AccessLevelQuerySet, PublishedQuerySet with GeoDjango queryset """
     pass
 
 
@@ -99,18 +99,18 @@ class GeoAccessLevelPublicQuerySet(GeoQuerySet, ACLMixin, PublicMixin):
 ### ------ MANAGERS ------ ###
 
 
-class PublicManager(Manager, ExtendedManagerMixin, PublicMixin):
+class PublishedManager(Manager, ExtendedManagerMixin, PublishedMixin):
     """ Returns published items """
     
     def get_query_set(self): 
-        return PublicQuerySet(self.model, using=self._db)
+        return PublishedQuerySet(self.model, using=self._db)
 
 
-class GeoPublicManager(GeoManager, ExtendedManagerMixin, PublicMixin):
-    """ PublicManager and GeoManager in one """
+class GeoPublishedManager(GeoManager, ExtendedManagerMixin, PublishedMixin):
+    """ PublishedManager and GeoManager in one """
     
     def get_query_set(self): 
-        return GeoPublicQuerySet(self.model, using=self._db)
+        return GeoPublishedQuerySet(self.model, using=self._db)
 
 
 #class GeoAccessLevelManager(AccessLevelManager, GeoManager):
@@ -125,12 +125,12 @@ class AccessLevelManager(Manager, ExtendedManagerMixin, ACLMixin):
         return AccessLevelQuerySet(self.model, using=self._db)
 
 
-class GeoAccessLevelPublicManager(GeoManager, ExtendedManagerMixin, ACLMixin, PublicMixin):
+class GeoAccessLevelPublishedManager(GeoManager, ExtendedManagerMixin, ACLMixin, PublishedMixin):
     """
-    GeoManager, AccessLeveManager and Publicmanager in one
+    GeoManager, AccessLeveManager and Publishedmanager in one
     """
     
     def get_query_set(self): 
-        return GeoAccessLevelPublicQuerySet(self.model, using=self._db)
+        return GeoAccessLevelPublishedQuerySet(self.model, using=self._db)
 
     

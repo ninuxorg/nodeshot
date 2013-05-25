@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
-from nodeshot.core.base.managers import GeoAccessLevelPublicManager
+from nodeshot.core.base.managers import GeoAccessLevelPublishedManager
 from nodeshot.core.base.utils import choicify
 from ..signals import node_status_changed
 
@@ -43,7 +43,7 @@ class Node(BaseAccessLevel):
     notes = models.TextField(_('notes'), blank=True, null=True)
     
     # manager
-    objects = GeoAccessLevelPublicManager()
+    objects = GeoAccessLevelPublishedManager()
     
     # this is needed to check if the status is changing
     # explained here:

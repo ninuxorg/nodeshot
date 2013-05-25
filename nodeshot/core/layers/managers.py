@@ -1,5 +1,5 @@
-from nodeshot.core.base.managers import GeoPublicManager
-from nodeshot.core.base.managers import GeoPublicQuerySet
+from nodeshot.core.base.managers import GeoPublishedManager
+from nodeshot.core.base.managers import GeoPublishedQuerySet
 
 
 class ExternalMixin(object):
@@ -10,13 +10,13 @@ class ExternalMixin(object):
         return self.filter(is_external=True)
 
 
-class ExternalQueryset(GeoPublicQuerySet, ExternalMixin):
+class ExternalQueryset(GeoPublishedQuerySet, ExternalMixin):
     """ filter external layers """
     pass
 
 
-class LayerManager(GeoPublicManager, ExternalMixin):
-    """ extends GeoPublicManager to add external method """
+class LayerManager(GeoPublishedManager, ExternalMixin):
+    """ extends GeoPublishedManager to add external method """
     
     def get_query_set(self): 
         return ExternalQueryset(self.model, using=self._db)
