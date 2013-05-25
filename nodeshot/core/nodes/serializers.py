@@ -41,9 +41,13 @@ class NodeListSerializer(serializers.ModelSerializer):
 class NodeDetailSerializer(serializers.ModelSerializer):
     """ node detail """
     
+    images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
+    
     class Meta:
         model = Node
         fields = ['layer', 'name', 'slug', 'user', 'coords', 'elev']
         
         if settings.NODESHOT['SETTINGS']['NODE_AREA']:
             fields += ['area']
+            
+        fields += ['images']

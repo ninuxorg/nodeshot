@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import permissions, authentication, generics
 from rest_framework.response import Response
 
+from nodeshot.core.base.views import ACLMixin
+
 from .models import Node, Image
 from .serializers import *
 
@@ -12,7 +14,7 @@ from vectorformats.Formats import Django, GeoJSON
 import simplejson as json
 
 
-class NodeList(generics.ListCreateAPIView):
+class NodeList(ACLMixin, generics.ListCreateAPIView):
     """
     ### GET
     
@@ -27,7 +29,7 @@ class NodeList(generics.ListCreateAPIView):
 node_list = NodeList.as_view()
     
     
-class NodeDetail(generics.RetrieveUpdateAPIView):
+class NodeDetail(ACLMixin, generics.RetrieveUpdateAPIView):
     """
     ### GET
     
@@ -56,7 +58,10 @@ class NodeGeojsonList(generics.RetrieveAPIView):
     model = Node
     
     def get(self, request, *args, **kwargs):
-        node = Node.objects.published()
+        """
+        TODO: improve readability and cleanup
+        """
+        node = Node.objects.published().accessible_to(request.user)
         dj = Django.Django(geodjango="coords", properties=['name', 'description'])
         geojson = GeoJSON.GeoJSON()
         string = geojson.encode(dj.decode(node))  
@@ -100,12 +105,11 @@ class NodeImageList(generics.ListCreateAPIView):
             # retrieve slug value from instance attribute kwargs, which is a dictionary
             slug_value = self.kwargs.get('slug', None)
             # get node, ensure is published
-            node = Node.objects.get(slug=slug_value, is_published=True)
+            node = Node.objects.published().get(slug=slug_value)
         except Exception:
             raise Http404(_('Node not found'))
         
-        # TODO: implement access_level
-        return node.image_set.all()
+        return node.image_set.accessible_to(self.request.user)
     
 
 node_images = NodeImageList.as_view()
