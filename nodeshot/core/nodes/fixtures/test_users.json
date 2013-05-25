@@ -4,7 +4,7 @@
         "pk": 1,
         "fields": {
             "username": "admin",
-            "password": "pbkdf2_sha256$10000$fKmA6mtxiyGs$rtBifPFsmfw8gGZYL3sycTLlH20Piqy82KL5NM34hyw=",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
             "first_name": "Admin",
             "last_name": "Admin",
             "email": "admin@admin.org",
@@ -19,7 +19,7 @@
         "pk": 2,
         "fields": {
             "username": "registered",
-            "password": "pbkdf2_sha256$10000$fKmA6mtxiyGs$rtBifPFsmfw8gGZYL3sycTLlH20Piqy82KL5NM34hyw=",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
             "first_name": "registered",
             "last_name": "registered",
             "email": "registered@registered.org",
@@ -34,7 +34,7 @@
         "pk": 3,
         "fields": {
             "username": "community",
-            "password": "pbkdf2_sha256$10000$fKmA6mtxiyGs$rtBifPFsmfw8gGZYL3sycTLlH20Piqy82KL5NM34hyw=",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
             "first_name": "community",
             "last_name": "community",
             "email": "community@community.org",
@@ -49,7 +49,7 @@
         "pk": 4,
         "fields": {
             "username": "romano",
-            "password": "pbkdf2_sha256$10000$fKmA6mtxiyGs$rtBifPFsmfw8gGZYL3sycTLlH20Piqy82KL5NM34hyw=",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
             "first_name": "romano",
             "last_name": "romano",
             "email": "romano@romano.org",
@@ -64,7 +64,7 @@
         "pk": 5,
         "fields": {
             "username": "pisano",
-            "password": "pbkdf2_sha256$10000$fKmA6mtxiyGs$rtBifPFsmfw8gGZYL3sycTLlH20Piqy82KL5NM34hyw=",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
             "first_name": "pisano",
             "last_name": "pisano",
             "email": "pisano@pisano.org",
@@ -79,7 +79,7 @@
         "pk": 6,
         "fields": {
             "username": "viterbese",
-            "password": "pbkdf2_sha256$10000$fKmA6mtxiyGs$rtBifPFsmfw8gGZYL3sycTLlH20Piqy82KL5NM34hyw=",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
             "first_name": "viterbese",
             "last_name": "viterbese",
             "email": "viterbese@viterbese.org",
@@ -94,7 +94,7 @@
         "pk": 7,
         "fields": {
             "username": "mantainer-pisa",
-            "password": "pbkdf2_sha256$10000$fKmA6mtxiyGs$rtBifPFsmfw8gGZYL3sycTLlH20Piqy82KL5NM34hyw=",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
             "first_name": "mantainer-pisa",
             "last_name": "mantainer-pisa",
             "email": "mantainer-pisa@mantainer-pisa.org",
@@ -109,7 +109,7 @@
         "pk": 8,
         "fields": {
             "username": "mantainer-roma",
-            "password": "pbkdf2_sha256$10000$fKmA6mtxiyGs$rtBifPFsmfw8gGZYL3sycTLlH20Piqy82KL5NM34hyw=",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
             "first_name": "mantainer-roma",
             "last_name": "mantainer-roma",
             "email": "mantainer-roma@mantainer-roma.org",
