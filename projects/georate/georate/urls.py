@@ -36,5 +36,3 @@ if settings.DEBUG:
     urlpatterns += patterns('django.contrib.staticfiles.views',
         url(r'^static/(?P<path>.*)$', 'serve'),
     )
-
-

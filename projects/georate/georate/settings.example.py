@@ -242,7 +242,7 @@ _ = lambda s: s
 
 NODESHOT = {
     'SETTINGS': {
-        'API_PREFIX': '/api/v1',
+        'API_PREFIX': 'api/v1', # it must not begin nor end with a slash
         'ACL_GLOBAL_EDITABLE': True,
         # the following is an example of possible granular ACL setting that is available
         #'ACL_NODES_NODE_EDITABLE': False,
