@@ -8,7 +8,7 @@ class LayerParticipationSettings(models.Model):
     """
     Layer settings regarding participation
     """
-    layer = models.OneToOneField(Layer)
+    layer = models.OneToOneField(Layer, related_name='layer_participation_settings')
     # settings
     voting_allowed = models.BooleanField(_('voting allowed?'), default=True)
     rating_allowed = models.BooleanField(_('rating allowed?'), default=True)

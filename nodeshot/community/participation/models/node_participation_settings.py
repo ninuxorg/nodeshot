@@ -8,7 +8,7 @@ class NodeParticipationSettings(models.Model):
     """
     Node Participation Settings
     """
-    node = models.OneToOneField(Node)
+    node = models.OneToOneField(Node, related_name='node_participation_settings')
     # settings
     voting_allowed = models.BooleanField(_('voting allowed?'), default=True)
     rating_allowed = models.BooleanField(_('rating allowed?'), default=True)

@@ -1,16 +1,104 @@
 """
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
+Unit tests for participation app
 """
 
 from django.test import TestCase
 
+from nodeshot.core.nodes.models import Node
+from .models import Comment, Rating, Vote
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+
+class ParticipationModelsTest(TestCase):
+    """ Models tests """
+    
+    fixtures = [
+        'initial_data.json',
+        'test_users.json',
+        'test_layers.json',
+        'test_nodes.json',
+        'test_images.json'
+    ]
+    
+    def test_added_methods(self):
+        node = Node.objects.get(pk=1)
+        # ensure noderatingcount related object is automatically created with signals
+        #node.noderatingcount
+        node.rating_count
+        node.participation_settings
+        node.layer.participation_settings
+    
+    def test_update_comment_count(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Comment count should be updated when a comment is created or deleted
         """
-        self.assertEqual(1 + 1, 2)
+        # ensure comment count is 0
+        node = Node.objects.get(pk=1)
+        self.assertEqual(0, node.rating_count.comment_count)
+        # create a new comment
+        comment = Comment(node_id=1, user_id=1, text='test comment')
+        comment.save()
+        # now should have incremented by 1
+        node = Node.objects.get(pk=1)
+        self.assertEqual(1, node.rating_count.comment_count)
+        
+        # delete comment and ensure the count gets back to 0
+        comment.delete()
+        node = Node.objects.get(pk=1)
+        self.assertEqual(0, node.rating_count.comment_count)
+    
+    def test_update_rating_count(self):
+        """
+        Rating count and average should be updated when a rating is created or deleted
+        """
+        # ensure rating count is 0
+        node = Node.objects.get(pk=1)
+        self.assertEqual(0, node.rating_count.rating_count)
+        self.assertEqual(0, node.rating_count.rating_avg)
+        # create a new rating
+        rating = Rating(node_id=1, user_id=1, value=10)
+        rating.save()
+        # now should have incremented by 1 and average should be 10
+        node = Node.objects.get(pk=1)
+        self.assertEqual(1, node.rating_count.rating_count)
+        self.assertEqual(10, node.rating_count.rating_avg)
+        
+        # delete rating and ensure the counts get back to 0
+        rating.delete()
+        node = Node.objects.get(pk=1)
+        self.assertEqual(0, node.rating_count.rating_count)
+        self.assertEqual(0, node.rating_count.rating_avg)
+    
+    def test_update_vote_count(self):
+        """
+        Likes and dislikes count should be updated when a vote is created or deleted
+        """
+        # ensure likes and dislikes count are 0
+        node = Node.objects.get(pk=1)
+        self.assertEqual(0, node.rating_count.likes)
+        self.assertEqual(0, node.rating_count.dislikes)
+        # create a new like
+        like = Vote(node_id=1, user_id=1, vote=1)
+        like.save()
+        # likes should have incremented by 1
+        node = Node.objects.get(pk=1)
+        self.assertEqual(1, node.rating_count.likes)
+        self.assertEqual(0, node.rating_count.dislikes)
+        # create a new dislike
+        dislike = Vote(node_id=1, user_id=2, vote=-1)
+        dislike.save()
+        # dislikes should have incremented by 1
+        node = Node.objects.get(pk=1)
+        self.assertEqual(1, node.rating_count.likes)
+        self.assertEqual(1, node.rating_count.dislikes)
+        
+        # delete like and count should get back to 0
+        like.delete()
+        node = Node.objects.get(pk=1)
+        self.assertEqual(0, node.rating_count.likes)
+        self.assertEqual(1, node.rating_count.dislikes)
+        
+        # delete dislike and count should get back to 0
+        dislike.delete()
+        node = Node.objects.get(pk=1)
+        self.assertEqual(0, node.rating_count.likes)
+        self.assertEqual(0, node.rating_count.dislikes)
