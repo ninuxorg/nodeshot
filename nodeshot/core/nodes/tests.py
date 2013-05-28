@@ -89,6 +89,9 @@ class ModelsTest(TestCase):
         self.assertEqual(Image.objects.all().count(), Image.objects.accessible_to(user=1).count())
 
 
+### ------ API tests ------ ###
+
+
 class APITest(TestCase):
     
     fixtures = [
