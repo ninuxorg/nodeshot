@@ -74,11 +74,11 @@ def delete_node(sender, **kwargs):
 
 # email notifications
 #@receiver(node_status_changed)
-def notify_status_changed(sender, **kwargs):
-    """ TODO: write desc """
-    node = sender
-    old_status = kwargs['old_status']
-    new_status = kwargs['new_status']
-    notification_type = EmailNotification.determine_notification_type(old_status, new_status, 'Node')
-    EmailNotification.notify_users(notification_type, node)
-node_status_changed.connect(notify_status_changed)
+#def notify_status_changed(sender, **kwargs):
+#    """ TODO: write desc """
+#    node = sender
+#    old_status = kwargs['old_status']
+#    new_status = kwargs['new_status']
+#    notification_type = EmailNotification.determine_notification_type(old_status, new_status, 'Node')
+#    EmailNotification.notify_users(notification_type, node)
+#node_status_changed.connect(notify_status_changed)
