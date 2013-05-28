@@ -91,11 +91,8 @@ class NodeCommentList(generics.ListCreateAPIView):
     
 node_comments = NodeCommentList.as_view()    
 
-class NodeRatingList(generics.ListCreateAPIView):
+class NodeRatingList(generics.CreateAPIView):
     """
-    ### GET
-    
-    Retrieve a **list** of ratings for the specified node
     
     ### POST
     

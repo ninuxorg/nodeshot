@@ -34,7 +34,7 @@ class Vote(BaseDate):
         likes = node.vote_set.filter(vote=1).count()
         dislikes = node.vote_set.filter(vote=-1).count()
         #Updates participation_node_counts
-        noderatingcount = n.noderatingcount
+        noderatingcount = node.noderatingcount
         noderatingcount.likes = likes
         noderatingcount.dislikes = dislikes
         noderatingcount.save()

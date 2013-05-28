@@ -31,7 +31,7 @@ class Rating(BaseDate):
         rating_avg = node.rating_set.aggregate(rate=Avg('value'))
         rating_float = rating_avg['rate']
         #Updates participation_node_counts
-        noderatingcount = n.node_rating_count
+        noderatingcount = node.noderatingcount
         noderatingcount.rating_avg = rating_float
         noderatingcount.rating_count = rating_count
         noderatingcount.save()
