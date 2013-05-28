@@ -24,19 +24,20 @@ class Vote(BaseDate):
     
     def __unicode__(self):
         return self.node.name
-    
+    #Custom save
     def save(self, *args, **kwargs):
         super(Vote,self).save(*args, **kwargs)
-        #node_id=self.node
-        #a=self.node.id
+        # If not exists, inserts node in participation_node_counts
         is_participated(self.node.id)
-        n = self.node
-        likes = n.vote_set.filter(vote=1).count()
-        dislikes = n.vote_set.filter(vote=-1).count()
-        nrc = n.noderatingcount
-        nrc.likes = likes
-        nrc.dislikes = dislikes
-        nrc.save()
+        #Counts node's votes
+        node = self.node
+        likes = node.vote_set.filter(vote=1).count()
+        dislikes = node.vote_set.filter(vote=-1).count()
+        #Updates participation_node_counts
+        noderatingcount = n.noderatingcount
+        noderatingcount.likes = likes
+        noderatingcount.dislikes = dislikes
+        noderatingcount.save()
     
     class Meta:
         app_label = 'participation'

@@ -8,6 +8,7 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.community.participation.utils import is_participated
 
 
+
 class Rating(BaseDate):
     """
     Rating model
@@ -19,19 +20,21 @@ class Rating(BaseDate):
     user = models.ForeignKey(User)
     value = models.IntegerField(_('rating value'), choices=RATING_CHOICES)
     
+    #Custom save
     def save(self, *args, **kwargs):
         super(Rating,self).save(*args, **kwargs)
-        #node_id=self.node
-        #a=self.node.id
+        # If not exists, inserts node in participation_node_counts
         is_participated(self.node.id)
-        n = self.node
-        rating_count = n.rating_set.count()
-        rating_avg = n.rating_set.aggregate(rate=Avg('value'))
+        #Counts node's ratings
+        node= self.node
+        rating_count = node.rating_set.count()
+        rating_avg = node.rating_set.aggregate(rate=Avg('value'))
         rating_float = rating_avg['rate']
-        nrc = n.noderatingcount
-        nrc.rating_avg = rating_float
-        nrc.rating_count = rating_count
-        nrc.save()
+        #Updates participation_node_counts
+        noderatingcount = n.node_rating_count
+        noderatingcount.rating_avg = rating_float
+        noderatingcount.rating_count = rating_count
+        noderatingcount.save()
     
     class Meta:
         app_label='participation'

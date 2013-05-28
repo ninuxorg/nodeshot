@@ -13,14 +13,31 @@ from node_participation_settings import NodeParticipationSettings
 from node_rating_count import NodeRatingCount
 
 __all__ = [
+    'NodeRatingCount',
     'Comment',
     'Vote',
     'Rating',
     'NodeParticipationSettings',
-    'NodeRatingCount'
 ]
 
 if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
     from layer_participation_settings import LayerParticipationSettings
     
     __all__ += ['LayerParticipationSettings']
+
+
+### SIGNALS ###
+
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from nodeshot.core.nodes.models import Node
+
+@receiver(post_save, sender=Node)
+def create_node_rating_counts(sender, **kwargs):
+    """ create node rating count """
+    created = kwargs['created']
+    node = kwargs['instance']
+    if created:
+        # create node_rating_count 
+        node_rating_count = NodeRatingCount(node=node)
+        node_rating_count.save()
