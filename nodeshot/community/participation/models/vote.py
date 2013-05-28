@@ -5,8 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
 
+from .base import UpdateCountsMixin
 
-class Vote(BaseDate):
+
+class Vote(UpdateCountsMixin, BaseDate):
     """
     Vote model
     Like or dislike feature
@@ -34,20 +36,3 @@ class Vote(BaseDate):
         node_rating_count.likes = self.node.vote_set.filter(vote=1).count()
         node_rating_count.dislikes = self.node.vote_set.filter(vote=-1).count()
         node_rating_count.save()
-    
-    def save(self, *args, **kwargs):
-        """ custom save method to update likes and dislikes count """
-        # the following lines determines if the comment is being created or not
-        # in case the comment exists the pk attribute is an int
-        created = type(self.pk) is not int
-        
-        super(Vote,self).save(*args, **kwargs)
-        
-        # this operation must be performed after the parent save
-        if created:
-            self.update_count()
-    
-    def delete(self, *args, **kwargs):
-        """ custom delete method to update likes and dislikes count """
-        super(Vote, self).delete(*args, **kwargs)
-        self.update_count()

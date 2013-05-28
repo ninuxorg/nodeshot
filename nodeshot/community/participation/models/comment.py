@@ -5,8 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
 
+from .base import UpdateCountsMixin
 
-class Comment(BaseDate):
+
+class Comment(UpdateCountsMixin, BaseDate):
     """
     Comment model
     """
@@ -25,20 +27,3 @@ class Comment(BaseDate):
         node_rating_count = self.node.rating_count
         node_rating_count.comment_count = self.node.comment_set.count()
         node_rating_count.save()
-    
-    def save(self, *args, **kwargs):
-        """ custom save method to update comments count """
-        # the following lines determines if the comment is being created or not
-        # in case the comment exists the pk attribute is an int
-        created = type(self.pk) is not int
-        
-        super(Comment, self).save(*args, **kwargs)
-        
-        # this operation must be performed after the parent save
-        if created:
-            self.update_count()
-    
-    def delete(self, *args, **kwargs):
-        """ custom delete method to update comments count """
-        super(Comment, self).delete(*args, **kwargs)
-        self.update_count()
