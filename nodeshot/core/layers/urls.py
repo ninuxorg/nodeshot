@@ -8,4 +8,4 @@ urlpatterns = patterns('nodeshot.core.layers.views',
     url(r'^/layers/(?P<slug>[-\w]+)/nodes/$', 'node_list', name='api_layer_nodes_details'),
 )
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+#urlpatterns = format_suffix_patterns(urlpatterns)

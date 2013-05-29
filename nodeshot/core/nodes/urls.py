@@ -11,4 +11,4 @@ urlpatterns = patterns('nodeshot.core.nodes.views',
     url(r'^/nodes/(?P<slug>[-\w]+)/images/$', 'node_images', name='api_node_images'),
 )
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+#urlpatterns = format_suffix_patterns(urlpatterns)
