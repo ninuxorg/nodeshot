@@ -10,11 +10,12 @@ urlpatterns = patterns('nodeshot.core.api.views',
 # loop over all the strings listed in settings.NODESHOT['API']['APPS_ENABLED]
 for app_path in settings.NODESHOT['API']['APPS_ENABLED']:
     
-    # determine import path for url patterns
-    module_path = '%s.urls' % app_path
+    # ensure enabled API module is listed in INSTALLED_APPS
+    if app_path in settings.INSTALLED_APPS:
     
-    urlpatterns += patterns('',
-        url(r'^%s' % settings.NODESHOT['SETTINGS']['API_PREFIX'], include(module_path))
-    )
-
-
+        # determine import path for url patterns
+        module_path = '%s.urls' % app_path
+        
+        urlpatterns += patterns('',
+            url(r'^%s' % settings.NODESHOT['SETTINGS']['API_PREFIX'], include(module_path))
+        )
