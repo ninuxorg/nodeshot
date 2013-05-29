@@ -14,11 +14,11 @@ from node_rating_count import NodeRatingCount
 from django.core.exceptions import ObjectDoesNotExist
 
 __all__ = [
+    'NodeRatingCount',
     'Comment',
     'Vote',
     'Rating',
     'NodeParticipationSettings',
-    'NodeRatingCount'
 ]
 
 
@@ -94,3 +94,21 @@ def _node_participation_settings(self):
         return node_participation_settings
 
 Node.participation_settings = _node_participation_settings
+
+
+### SIGNALS ###
+
+
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from nodeshot.core.nodes.models import Node
+
+@receiver(post_save, sender=Node)
+def create_node_rating_counts(sender, **kwargs):
+    """ create node rating count """
+    created = kwargs['created']
+    node = kwargs['instance']
+    if created:
+        # create node_rating_count 
+        node_rating_count = NodeRatingCount(node=node)
+        node_rating_count.save()

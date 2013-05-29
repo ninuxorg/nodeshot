@@ -1,50 +1,17 @@
-from rest_framework import generics
-from rest_framework.views import APIView
-from rest_framework import permissions
-from rest_framework import authentication
-
+from rest_framework import permissions, authentication, generics
+from django.contrib.auth.models import User, Permission
+from django.http import Http404
 from .models import NodeRatingCount, Rating, Vote, Comment
 from serializers import *
-
+from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.nodes.models import Node
 
 
-class RatingAdd(generics.CreateAPIView):
+class CommentCreate(generics.CreateAPIView):
     """
     ### POST
     
-    Add ratings 
-    """
-    model = Rating
-    serializer_class = RatingAddSerializer
-    authentication_classes = (authentication.SessionAuthentication)
-
-
-class VoteAdd(generics.CreateAPIView):
-    """
-    ### POST
-    
-    Add votes 
-    """
-    model = Vote
-    serializer_class= VoteAddSerializer
-
-
-class CommentAdd(generics.CreateAPIView):
-    """
-    ### POST
-    
-    Add comments 
-    """
-    model = Comment
-    serializer_class = CommentAddSerializer
-
-
-class CommentDetail(generics.RetrieveUpdateAPIView):
-    """
-    ### POST
-    
-    Edit comments 
+    create comments 
     """
     model = Comment
     serializer_class = CommentAddSerializer
@@ -56,50 +23,102 @@ class NodeParticipationDetail(generics.RetrieveAPIView):
     
     Retrieve participation details for a node
     """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Node
     serializer_class= NodeParticipationSerializer
     
+node_participation=NodeParticipationDetail.as_view()    
     
-class NodeParticipationList(generics.ListAPIView):
+class AllNodesParticipationList(generics.ListAPIView):
     """
     ### GET
     
     Retrieve participation details for all nodes
     """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Node
     serializer_class= NodeParticipationSerializer
 
-    
-class NodeCommentDetail(generics.RetrieveAPIView):
+all_nodes_participation= AllNodesParticipationList.as_view()
+   
+class AllNodesCommentList(generics.ListAPIView):
     """
     ### GET
     
-    Retrieve a **list** of comments for a node
+    Retrieve comments  for all nodes
     """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Node
     serializer_class= NodeCommentSerializer
     
+all_nodes_comments= AllNodesCommentList.as_view()
 
-class NodeCommentList(generics.ListAPIView):
+class NodeCommentList(generics.ListCreateAPIView):
     """
     ### GET
     
-    Retrieve a **list** of comments for all nodes
+    Retrieve a **list** of comments for the specified node
+    
+    ### POST
+    
+    Add a comment for the specified node
+
     """
-    model = Node
-    serializer_class= NodeCommentSerializer
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Comment
 
     
-#class CommentList(generics.RetrieveAPIView):
-#    """
-#    ### GET
-#    
-#    Retrieve a **list** of comments
-#    """
-#    model= Node
-#    serializer_class= NodeParticipationSerializer 
+    def get_queryset(self):
+        """
+        Get comments of specified existing and published node
+        or otherwise return 404
+        """
+        # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get node, ensure is published
+            node = Node.objects.published().get(slug=slug_value)
+        except Exception:
+            raise Http404(_('Node not found'))
+        
+        return node.comment_set.all()
+    
+    
+node_comments = NodeCommentList.as_view()    
+
+class NodeRatingList(generics.CreateAPIView):
+    """
+    
+    ### POST
+    
+    Add a rating for the specified node
+
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Rating
 
     
-#class CommentList(generics.RetrieveAPIView):
-#    model= Comment
-#    serializer_class= CommentListSerializer
+    def get_queryset(self):
+        """
+        Get ratings of specified existing and published node
+        or otherwise return 404
+        """
+        # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get node, ensure is published
+            node = Node.objects.published().get(slug=slug_value)
+        except Exception:
+            raise Http404(_('Node not found'))
+        
+        return node.rating_set.all()
+    
+    
+node_ratings = NodeRatingList.as_view()
