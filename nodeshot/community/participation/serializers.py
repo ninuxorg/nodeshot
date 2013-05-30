@@ -28,7 +28,7 @@ class CommentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Comment
-        fields = ('username', 'text')
+        fields = ('username', 'text','added')
 
 
 class NodeCommentSerializer(serializers.ModelSerializer):
