@@ -1,9 +1,12 @@
 from rest_framework import generics
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from .models import Layer
 from .serializers import *
 
+from vectorformats.Formats import Django, GeoJSON
+import simplejson as json
 
 class LayerList(generics.ListCreateAPIView):
     """
@@ -44,3 +47,39 @@ class LayerNodesList(generics.RetrieveAPIView):
     lookup_field = 'slug'
 
 node_list = LayerNodesList.as_view()
+
+
+class LayerAllNodesGeojsonList(generics.RetrieveAPIView):
+    """
+    ### GET
+    
+    Retrieve list of nodes of the specified layer in GeoJSON format.
+    """
+    
+    model = Layer
+    
+    def get(self, request, *args, **kwargs):
+        """
+        Get nodes of specified existing and published layer
+        or otherwise return 404
+        Outputs nodes in geojson format
+        TODO: improve readability and cleanup
+
+        """
+        # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get node, ensure is published
+            layer = Layer.objects.get(slug=slug_value)
+        except Exception:
+            raise Http404(_('Layer not found'))
+        node = layer.node_set.all()
+        dj = Django.Django(geodjango="coords", properties=['name', 'description'])
+        geojson = GeoJSON.GeoJSON()
+        string = geojson.encode(dj.decode(node))  
+        
+        return Response(json.loads(string))
+
+geojson_list = LayerAllNodesGeojsonList.as_view()
+
