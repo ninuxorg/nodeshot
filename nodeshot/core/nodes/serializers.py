@@ -41,7 +41,7 @@ class NodeListSerializer(serializers.ModelSerializer):
   
 class NodeDetailSerializer(serializers.ModelSerializer):
     """ node detail """
-    #Added user and layer so tht explicit names are displayed nstead of ID
+    #Added user and layer so tht explicit names are displayed instead of ID
     user= serializers.Field(source='user.username')
     layer = serializers.Field(source='layer.name')
     images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
