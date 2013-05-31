@@ -3,6 +3,7 @@ Unit tests for participation app
 """
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 
 from nodeshot.core.nodes.models import Node
 from .models import Comment, Rating, Vote
@@ -102,3 +103,29 @@ class ParticipationModelsTest(TestCase):
         node = Node.objects.get(pk=1)
         self.assertEqual(0, node.rating_count.likes)
         self.assertEqual(0, node.rating_count.dislikes)
+        
+    def test_layers_api(self,*args,**kwargs):
+        """
+        Participation endpoint should be reachable and return 404 if object is not found.
+        """
+        node = Node.objects.get(pk=1)
+        node_slug=node.slug
+        fake_node_slug="nonesisto"
+        # api's expecting slug in request,test with existing and fake slug
+        #
+        # api_node_comments
+        # GET
+        response = self.client.get(reverse('api_node_comments',args=[node_slug]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api_node_comments',args=[fake_node_slug]))
+        self.assertEqual(response.status_code, 404)
+        # api_node_participation
+        response = self.client.get(reverse('api_node_participation',args=[node_slug]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api_node_participation',args=[fake_node_slug]))
+        self.assertEqual(response.status_code, 404)
+        ## api_node_ratings
+        #response = self.client.get(reverse('api_node_ratings',args=[node_slug]))
+        #self.assertEqual(response.status_code, 200)
+        #response = self.client.get(reverse('api_node_ratings',args=[fake_node_slug]))
+        #self.assertEqual(response.status_code, 404)

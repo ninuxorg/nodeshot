@@ -24,7 +24,17 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Node
     serializer_class = NodeListSerializer
-    queryset = Node.objects.published().select_related('user', 'layer')
+    def get_queryset(self):
+        """
+        Optionally restricts the returned nodes
+        by filtering against a `search` query parameter in the URL.
+        """
+        queryset = Node.objects.published().select_related('user', 'layer')
+        search = self.request.QUERY_PARAMS.get('search', None)
+        if search is not None:
+            queryset = queryset.filter(name__icontains=search)
+        return queryset
+    
 
 node_list = NodeList.as_view()
     
