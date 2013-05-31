@@ -14,7 +14,7 @@ __all__ = [
 class LayerListSerializer(serializers.ModelSerializer):
     """ Layer list """
     details = serializers.HyperlinkedIdentityField(view_name='api_layer_details', slug_field='slug')
-    nodes = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_details', slug_field='slug')
+    nodes = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_list', slug_field='slug')
     geojson= serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_geojson', slug_field='slug')
     
     class Meta:

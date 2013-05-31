@@ -12,5 +12,7 @@ projects/georate/georate/media/external/
 debug.log
 *~
 ._*
-
+startshell
+activate
+runserver
 TODO.txt

@@ -2,6 +2,9 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from django.http import Http404
+from django.utils.translation import ugettext_lazy as _
+
 from .models import Layer
 from .serializers import *
 
@@ -46,7 +49,7 @@ class LayerNodesList(generics.RetrieveAPIView):
     queryset = Layer.objects.published()
     lookup_field = 'slug'
 
-node_list = LayerNodesList.as_view()
+nodes_list = LayerNodesList.as_view()
 
 
 class LayerAllNodesGeojsonList(generics.RetrieveAPIView):
@@ -81,5 +84,5 @@ class LayerAllNodesGeojsonList(generics.RetrieveAPIView):
         
         return Response(json.loads(string))
 
-geojson_list = LayerAllNodesGeojsonList.as_view()
+nodes_geojson_list = LayerAllNodesGeojsonList.as_view()
 
