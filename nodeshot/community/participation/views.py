@@ -70,7 +70,23 @@ class NodeCommentList(generics.ListCreateAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Comment
-
+    #serializer_class=CommentAddSerializer
+    
+    def get(self, request, *args, **kwargs):
+        self.serializer_class = CommentListSerializer
+        return self.list(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        self.serializer_class = CommentAddSerializer
+        # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get node, ensure is published
+            node = Node.objects.published().get(slug=slug_value)
+        except Exception:
+            raise Http404(_('Node not found'))
+        return self.create(request, *args, **kwargs)
     
     def get_queryset(self):
         """
@@ -102,7 +118,17 @@ class NodeRatingList(generics.CreateAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Rating
-
+    
+    def post(self, request, *args, **kwargs):
+        # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get node, ensure is published
+            node = Node.objects.published().get(slug=slug_value)
+        except Exception:
+            raise Http404(_('Node not found'))
+        return self.create(request, *args, **kwargs)
     
     def get_queryset(self):
         """
@@ -122,3 +148,45 @@ class NodeRatingList(generics.CreateAPIView):
     
     
 node_ratings = NodeRatingList.as_view()
+
+class NodeVotesList(generics.CreateAPIView):
+    """
+    
+    ### POST
+    
+    Add a vote for the specified node
+
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Vote
+    
+    def post(self, request, *args, **kwargs):
+    # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get node, ensure is published
+            node = Node.objects.published().get(slug=slug_value)
+        except Exception:
+            raise Http404(_('Node not found'))
+        return self.create(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        """
+        Get ratings of specified existing and published node
+        or otherwise return 404
+        """
+        # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get node, ensure is published
+            node = Node.objects.published().get(slug=slug_value)
+        except Exception:
+            raise Http404(_('Node not found'))
+        
+        return node.vote_set.all()
+    
+    
+node_votes = NodeVotesList.as_view()

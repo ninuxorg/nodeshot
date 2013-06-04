@@ -9,6 +9,7 @@ from .models import NodeRatingCount, Comment, Vote, Rating
 
 __all__ = [
     'CommentAddSerializer',
+    'CommentListSerializer',
     'CommentSerializer',
     'NodeCommentSerializer',
     'ParticipationSerializer',
@@ -19,17 +20,23 @@ __all__ = [
 class CommentAddSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = Comment
-   
-
-class CommentSerializer(serializers.ModelSerializer):
+        model = Comment       
+        fields= ('node','user','text',)
+        
+        
+class CommentListSerializer(serializers.ModelSerializer):
     node= serializers.Field(source='node.name')
     username =serializers.Field(source='user.username')
     
     class Meta:
         model = Comment
-        fields = ('username', 'text','added')
+        fields= ('node','username','text','added',)
+   
 
+class CommentSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Comment
 
 class NodeCommentSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(source='comment_set')
