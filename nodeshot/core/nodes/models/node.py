@@ -2,6 +2,8 @@ from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.contrib.gis.measure import D
 
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.managers import GeoAccessLevelPublishedManager
@@ -17,6 +19,7 @@ class Node(BaseAccessLevel):
     """
     name = models.CharField(_('name'), max_length=50, unique=True)
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
+    address = models.CharField(_('address'),max_length=150,blank=True, null=True)
     status = models.SmallIntegerField(_('status'), max_length=3, choices=choicify(NODE_STATUS), default=NODE_STATUS.get(settings.NODESHOT['DEFAULTS']['NODE_STATUS'], 'potential'))
     is_published = models.BooleanField(default=settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True))
     
@@ -69,8 +72,26 @@ class Node(BaseAccessLevel):
         if self.pk:
             self._current_status = self.status
     
+    def clean(self , *args, **kwargs):
+        #TODO: write test
+        """
+        Check  distance between nodes if feature is enabled.
+        Check node is contained, in layer's area if defined
+        """
+        distance=settings.NODESHOT['DEFAULTS']['ZONE_MINIMUM_DISTANCE']
+        coords=self.coords
+        layer_area=self.layer.area
+        near_nodes=Node.objects.filter(coords__distance_lte=(coords, D(m=distance)))
+        error_string_distance="Distance between nodes cannot be less than %s meters" % (distance)
+        error_string_not_contained_in_layer="Node must be inside layer area"
+        if len(near_nodes) > 0 :
+            raise ValidationError(error_string_distance)
+        if layer_area is not None and not layer_area.contains(coords):
+            raise ValidationError(error_string_not_contained_in_layer)
+        
+        
+    
     def save(self, *args, **kwargs):
-        """ detect status change """
         super(Node, self).save(*args, **kwargs)
         # if status of a node changes
         if self.status != self._current_status:

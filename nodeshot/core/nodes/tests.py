@@ -183,3 +183,22 @@ class APITest(TestCase):
         
         # POST
         # todo
+    
+    def test_node_coords_distance(self):
+        json_data={
+        "user": 1,
+        "access_level": 0, 
+        "name": "test_distance2", 
+        "slug": "test_distance2", 
+        "address": "via dei test", 
+        "status": 0, 
+        "is_published": True, 
+        "layer": 1, 
+        "coords": "POINT (12.4922005670872949 41.8904524119848318)", 
+        "description": "", 
+        "notes": ""
+        }
+        login=self.client.login(username='admin', password='tester')
+        url = reverse('api_node_list')
+        response = self.client.post(url,json_data)
+        self.assertEqual(400, response.status_code)
