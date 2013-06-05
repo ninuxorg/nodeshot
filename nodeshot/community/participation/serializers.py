@@ -34,10 +34,12 @@ class CommentListSerializer(serializers.ModelSerializer):
    
 
 class CommentSerializer(serializers.ModelSerializer):
-    
+    username =serializers.Field(source='user.username')
     class Meta:
         model = Comment
-
+        fields= ('username','text','added',)
+        
+        
 class NodeCommentSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(source='comment_set')
     

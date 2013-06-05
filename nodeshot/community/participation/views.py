@@ -5,6 +5,7 @@ from .models import NodeRatingCount, Rating, Vote, Comment
 from serializers import *
 from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.nodes.models import Node
+from nodeshot.core.layers.models import Layer
 
 
 class CommentCreate(generics.CreateAPIView):
@@ -55,6 +56,70 @@ class AllNodesCommentList(generics.ListAPIView):
     serializer_class= NodeCommentSerializer
     
 all_nodes_comments= AllNodesCommentList.as_view()
+    
+class LayerNodesCommentList(generics.ListAPIView):
+    """
+    ### GET
+    
+    Retrieve comments  for all nodes of a layer
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Node
+    serializer_class= NodeCommentSerializer
+    
+    def get_queryset(self):
+        """
+        Get comments of specified existing layer
+        or otherwise return 404
+        """
+        # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get layer
+            layer_id=Layer.objects.get(slug=slug_value)
+            node=Node.objects.published().all().filter(layer_id=layer_id)
+
+            #node = Node.objects.published().get(layer_id=1)
+        except Exception:
+            raise Http404(_('Node not found'))
+        
+        return node.all()
+    
+layer_nodes_comments= LayerNodesCommentList.as_view()
+
+class LayerNodesParticipationList(generics.ListAPIView):
+    """
+    ### GET
+    
+    Retrieve participation details for all nodes of a layer
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Node
+    serializer_class= NodeParticipationSerializer
+    
+    def get_queryset(self):
+        """
+        Get comments of specified existing layer
+        or otherwise return 404
+        """
+        # ensure exists
+        try:
+            # retrieve slug value from instance attribute kwargs, which is a dictionary
+            slug_value = self.kwargs.get('slug', None)
+            # get layer
+            layer_id=Layer.objects.get(slug=slug_value)
+            node=Node.objects.published().all().filter(layer_id=layer_id)
+
+            #node = Node.objects.published().get(layer_id=1)
+        except Exception:
+            raise Http404(_('Node not found'))
+        
+        return node.all()
+    
+layer_nodes_participation= LayerNodesParticipationList.as_view()
 
 class NodeCommentList(generics.ListCreateAPIView):
     """
