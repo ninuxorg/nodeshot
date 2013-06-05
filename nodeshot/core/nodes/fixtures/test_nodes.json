@@ -8,7 +8,7 @@
             "slug": "fusolab",
             "layer": 1,
             "user": 4,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "80",
             "description": "Fusolab",
             "notes": ""
@@ -23,7 +23,7 @@
             "slug": "eigenlab",
             "layer": 2,
             "user": 5,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "80",
             "description": "EigenLab",
             "notes": ""
@@ -38,7 +38,7 @@
             "slug": "tulug",
             "layer": 3,
             "user": 6,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "25.0",
             "description": "House",
             "notes": ""
@@ -53,7 +53,7 @@
             "slug": "potenziale-romano",
             "layer": 1,
             "user": 4,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "80",
             "description": "Test record Rome"
         }
@@ -67,7 +67,7 @@
             "slug": "potenziale-pisano",
             "layer": 2,
             "user": 5,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "80",
             "description": "Test record Pisa"
         }
@@ -81,7 +81,7 @@
             "slug": "potenziale-viterbo",
             "layer": 3,
             "user": 6,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "25.0",
             "description": "Test record Viterbo"
         }
@@ -95,7 +95,7 @@
             "slug": "pomezia",
             "layer": 1,
             "user": 4,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "160.0",
             "description": "Pomezia",
             "notes": ""
@@ -110,7 +110,7 @@
             "slug": "rdp",
             "layer": 1,
             "user": 4,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "650.0",
             "description": "Piazza dell'erba",
             "notes": ""
@@ -126,7 +126,7 @@
             "slug": "hidden-rome",
             "layer": 1,
             "user": 6,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "250.0",
             "description": "test"
         }
@@ -141,7 +141,7 @@
             "slug": "registered-rome",
             "layer": 1,
             "user": 6,
-            "coords": "POINT (41.8720419277 12.5822391919)",
+            "coords": "POINT (12.5822391919 41.8720419277 )",
             "elev": "150.0",
             "description": "test"
         }
