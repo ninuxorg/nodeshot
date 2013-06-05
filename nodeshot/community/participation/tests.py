@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 from nodeshot.core.nodes.models import Node
+from nodeshot.core.layers.models import Layer
 from .models import Comment, Rating, Vote
 
 
@@ -104,7 +105,7 @@ class ParticipationModelsTest(TestCase):
         self.assertEqual(0, node.rating_count.likes)
         self.assertEqual(0, node.rating_count.dislikes)
         
-    def test_comments_api(self,*args,**kwargs):
+    def test_node_comment_api(self,*args,**kwargs):
         """
         Comments endpoint should be reachable with GET and return 404 if object is not found.
         POST method allowed
@@ -153,7 +154,7 @@ class ParticipationModelsTest(TestCase):
         response = self.client.post('/api/v1/nodes/fusolab/comments/',good_post_data)
         self.assertEqual(response.status_code, 403)
         
-    def test_participation_api(self,*args,**kwargs):
+    def test_node_participation_api(self,*args,**kwargs):
         """
         Participation endpoint should be reachable only with GET and return 404 if object is not found.
         """
@@ -225,7 +226,7 @@ class ParticipationModelsTest(TestCase):
         
     def test_votes_api(self,*args,**kwargs):    
         """
-        Ratings endpoint should be reachable only with POST and return 404 if object is not found.
+        Vote endpoint should be reachable only with POST and return 404 if object is not found.
         """
         node = Node.objects.get(pk=1)
         node_slug=node.slug
@@ -267,3 +268,39 @@ class ParticipationModelsTest(TestCase):
         self.client.logout()
         response = self.client.post('/api/v1/nodes/fusolab/votes/',good_post_data)
         self.assertEqual(response.status_code, 403)
+        
+    def test_layer_comments_api(self, *args,**kwargs):
+        """
+        Layer comments endpoint should be reachable only with GET and return 404 if object is not found.
+        """
+        layer = Layer.objects.get(pk=1)
+        layer_slug=layer.slug
+        fake_layer_slug="nonesisto"
+        
+        # api_layer_nodes_comments
+        
+        # GET
+        
+        response = self.client.get(reverse('api_layer_nodes_comments',args=[layer_slug]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api_layer_nodes_comments',args=[fake_layer_slug]))
+        self.assertEqual(response.status_code, 404)
+        
+    def test_layer_participation_api(self, *args,**kwargs):
+        """
+        Layer participation endpoint should be reachable only with GET and return 404 if object is not found.
+        """
+        layer = Layer.objects.get(pk=1)
+        layer_slug=layer.slug
+        fake_layer_slug="nonesisto"
+        
+        # api_layer_nodes_participation
+        
+        # GET
+        
+        response = self.client.get(reverse('api_layer_nodes_participation',args=[layer_slug]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api_layer_nodes_participation',args=[fake_layer_slug]))
+        self.assertEqual(response.status_code, 404)
+            
+    
