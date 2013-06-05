@@ -23,7 +23,7 @@ __all__ = [
 class NodeListSerializer(serializers.ModelSerializer):
     
     user= serializers.Field(source='user.username')
-    layer = serializers.Field(source='layer.name')
+    #layer = serializers.Field(source='layer.name')
     
     details = serializers.HyperlinkedIdentityField(view_name='api_node_details', slug_field='slug')
     
@@ -36,7 +36,7 @@ class NodeListSerializer(serializers.ModelSerializer):
         #
         #fields += ['details']
         
-        fields = ('layer', 'name', 'slug', 'user', 'coords', 'elev', 'details')
+        #fields = ('layer', 'name', 'slug', 'user', 'coords', 'elev', 'details')
 
   
 class NodeDetailSerializer(serializers.ModelSerializer):

@@ -21,7 +21,7 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     Retrieve a list of nodes
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly,)
     model = Node
     serializer_class = NodeListSerializer
     def get_queryset(self):
