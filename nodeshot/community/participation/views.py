@@ -151,6 +151,12 @@ class NodeCommentList(generics.ListCreateAPIView):
             node = Node.objects.published().get(slug=slug_value)
         except Exception:
             raise Http404(_('Node not found'))
+        
+        #request.DATA['node'] = node.id
+        #data = request.DATA.copy()
+        #data['node'] = node.id
+        #request.DATA = data
+        
         return self.create(request, *args, **kwargs)
     
     def get_queryset(self):
