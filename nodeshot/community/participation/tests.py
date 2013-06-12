@@ -111,47 +111,38 @@ class ParticipationModelsTest(TestCase):
         POST method allowed
         """
         node = Node.objects.get(pk=1)
-        node_slug=node.slug
-        fake_node_slug="nonesisto"
+        node_slug = node.slug
+        fake_node_slug = "idontexist"
+        
+        url = reverse('api_node_comments', args=[node_slug])
+        wrong_url = reverse('api_node_comments', args=[fake_node_slug])
         
         # api_node_comments
         
         # GET
         
-        response = self.client.get(reverse('api_node_comments',args=[node_slug]))
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_node_comments',args=[fake_node_slug]))
+        response = self.client.get(wrong_url)
         self.assertEqual(response.status_code, 404)
         
         #POST
         
-        #FIXME: non riesco ad accedere alla URL se non esplicitamente-
-        #Tutti i seguenti metodi non funzionano:
-        #Metodo 1
-        #response = self.client.post(reverse('api_node_comments',kwargs={'slug':'fusolab','node': '1', 'text': 'test_comment', 'user': '2'}))
-        #Metodo 2
-        #url="/api/v1/nodes/%s/comments/ " % (node_slug)
-        #response = self.client.post(url,post_data)
-        
-        login=self.client.login(username='admin', password='tester')
-        good_post_data= {"node": 1, "text": "test_comment", "user": 2}
-        bad_post_data= {"node": 100, "text": "test_comment", "user": 2}
+        login = self.client.login(username='admin', password='tester')
+        good_post_data = {"text": "test_comment"}
+        bad_post_data = {"node": 100, "text": "test_comment", "user": 2}
         
         #wrong slug -- 404
-        response = self.client.post('/api/v1/nodes/notexists/comments/',good_post_data)
+        response = self.client.post(wrong_url,good_post_data)
         self.assertEqual(response.status_code, 404)
         
-        #wrong POST data -- 400
-        response = self.client.post('/api/v1/nodes/fusolab/comments/',bad_post_data)
-        self.assertEqual(response.status_code, 400)
-        
-        #Correct  POST data and correct slug-- 201
-        response = self.client.post('/api/v1/nodes/fusolab/comments/',good_post_data)
+        # correct POST data and correct slug -- 201
+        response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
-        #User not allowed -- 403
+        # User not allowed -- 403
         self.client.logout()
-        response = self.client.post('/api/v1/nodes/fusolab/comments/',good_post_data)
+        response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 403)
         
     def test_node_participation_api(self,*args,**kwargs):
