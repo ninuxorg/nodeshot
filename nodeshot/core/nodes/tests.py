@@ -10,6 +10,7 @@ from django.contrib.auth.models import User, AnonymousUser
 import simplejson as json
 
 from .models import Node, Image
+from nodeshot.core.layers.models import Layer
 
 
 class ModelsTest(TestCase):
@@ -185,20 +186,35 @@ class APITest(TestCase):
         # todo
     
     def test_node_coords_distance(self):
+        """ test minimum distance check between nodes """
         json_data={
         "user": 1,
         "access_level": 0, 
-        "name": "test_distance2", 
-        "slug": "test_distance2", 
+        "name": "test_distance", 
+        "slug": "test_distance", 
         "address": "via dei test", 
         "status": 0, 
         "is_published": True, 
         "layer": 1, 
-        "coords": "POINT (12.4922005670872949 41.8904524119848318)", 
+        "coords": "POINT (12.5822391919 41.8720419277)", 
         "description": "", 
         "notes": ""
         }
+        #Node coordinates don't respect minimum distance
         login=self.client.login(username='admin', password='tester')
         url = reverse('api_node_list')
         response = self.client.post(url,json_data)
         self.assertEqual(400, response.status_code)
+        #Node coordinates respect minimum distance
+        json_data['coords']="POINT (12.7822391919 41.8720419277)";
+        response = self.client.post(url,json_data)
+        self.assertEqual(201, response.status_code)
+        #Disable minimum distance control in layer and test again with coords too near
+        layer=Layer.objects.get(pk=1)
+        layer.minimum_distance=0
+        layer.save()
+        json_data['coords']="POINT (12.5822391919 41.8720419277)";
+        json_data['name']="test_distance2";
+        json_data['slug']="test_distance2";
+        response = self.client.post(url,json_data)
+        self.assertEqual(201, response.status_code)
