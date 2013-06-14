@@ -78,7 +78,7 @@ class LayerAllNodesGeojsonList(generics.RetrieveAPIView):
         except Exception:
             raise Http404(_('Layer not found'))
         node = layer.node_set.all()
-        dj = Django.Django(geodjango="coords", properties=['name', 'description'])
+        dj = Django.Django(geodjango="coords", properties=['slug','name', 'address','description'])
         geojson = GeoJSON.GeoJSON()
         string = geojson.encode(dj.decode(node))  
         

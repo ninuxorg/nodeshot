@@ -72,7 +72,7 @@ class NodeGeojsonList(generics.RetrieveAPIView):
         TODO: improve readability and cleanup
         """
         node = Node.objects.published().accessible_to(request.user)
-        dj = Django.Django(geodjango="coords", properties=['name', 'description'])
+        dj = Django.Django(geodjango="coords", properties=['slug','name', 'address','description'])
         geojson = GeoJSON.GeoJSON()
         string = geojson.encode(dj.decode(node))  
         
