@@ -1,6 +1,7 @@
 from rest_framework import permissions, authentication, generics
 from django.contrib.auth.models import User, Permission
 from django.http import Http404
+from django.shortcuts import render
 from .models import NodeRatingCount, Rating, Vote, Comment
 from serializers import *
 from django.utils.translation import ugettext_lazy as _
@@ -228,3 +229,6 @@ class NodeVotesList(generics.CreateAPIView):
         obj.node_id = node.id
 
 node_votes = NodeVotesList.as_view()
+
+def map_view(request):
+    return render(request,'participation/index.html')
