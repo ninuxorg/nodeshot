@@ -11,19 +11,29 @@ osm_layer.addTo(map);
 map.on('click', onMapClick);
 var popup = L.popup();
 //Layer insert
-var roma = new L.MarkerClusterGroup();
-var pisa = new L.MarkerClusterGroup();
-rome_nodes=   getData('http://localhost:8000/api/v1/layers/rome/geojson/');
-pisa_nodes=   getData('http://localhost:8000/api/v1/layers/pisa/geojson/');
-//console.log(hotspots)   ;
-rome_nodes_layer=load_nodes(rome_nodes)	;
-pisa_nodes_layer=load_nodes(pisa_nodes)	;
+var overlaymaps={};
+layers= getData('http://localhost:8000/api/v1/layers/');
+console.log(layers);
+for (i in layers)
+{
+//alert(layers[i].name );
+var newCluster = new L.MarkerClusterGroup();
+newCluster_nodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
+newCluster_layer=load_nodes(newCluster_nodes)	;
+newCluster.addLayer(newCluster_layer);
+map.addLayer(newCluster);
+newClusterKey=layers[i].name;
+overlaymaps[newClusterKey]=newCluster;
+//alert(overlaymaps[newClusterKey]);
+}
 
-roma.addLayer(rome_nodes_layer);
-pisa.addLayer(pisa_nodes_layer);
-//Layer control creation
-map.addLayer(roma);
-map.addLayer(pisa); 
+
+
+//var pisa = new L.MarkerClusterGroup();
+//pisa_nodes=   getData('http://localhost:8000/api/v1/layers/pisa/geojson/');
+//pisa_nodes_layer=load_nodes(pisa_nodes)	;
+//pisa.addLayer(pisa_nodes_layer);
+//map.addLayer(pisa); 
 		 
 var baseMaps = {
 		"OpenStreetMap": osm_layer,
@@ -33,12 +43,13 @@ var baseMaps = {
 		
 				};
 				
-var overlaymaps = {
-			
-			
-			"Roma": roma,
-			"Pisa" : pisa,
-		};
+//var overlaymaps = {
+//			
+//			
+//			"Roma": roma,
+//			"Pisa" : pisa,
+//		};
+
 L.control.layers(null,overlaymaps).addTo(map);
 
 

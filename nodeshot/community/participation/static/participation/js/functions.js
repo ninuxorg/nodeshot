@@ -9,14 +9,14 @@
 		//	 var address=   eval ("(" + getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1' + ")"));
 			var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
 		//	alert (address);
-			console.log(address);
+		//	console.log(address);
 			var address_display=address.display_name;
-	//		alert(address_display);
+		//	alert(address_display);
 			$("#lat").html(lat);
-      $("#lng").html(lng);
+			$("#lng").html(lng);
 			$("#address").html(address.display_name);
 		}
-     //Layer insert
+ //Layer insert
      
     	function onMapClick(e) {
 			//alert(e.latlng);
@@ -30,8 +30,9 @@
 				.openOn(map);
 			open_insert(e.latlng.toString());
 		}
-	//Load layer nodes
-		function load_nodes(geojson_layer_nodes)		
+//Load layer nodes
+	
+	function load_nodes(geojson_layer_nodes)		
 	L.geoJson(geojson_layer_nodes, {
 	onEachFeature: function (feature, layer) {
 	//layer.bindPopup("<br><button onclick=\"alert('"+feature.properties.name+"')\";>Apri box commenti</button>");
@@ -45,9 +46,14 @@
 	
 	var domelem = document.createElement('div');
 	domelem.href = "#";
-	domelem.innerHTML = node.name;
-	domelem.innerHTML += '<br> '+ feature.properties.address;
-	domelem.innerHTML += '<br> Commenti: '+ node.participation.comment_count;
+	domelem.innerHTML = node.name+'<br>';
+	domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
+	domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
+	domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
+	domelem.innerHTML += '<br> <b>Comments: </b>'+ node.participation.comment_count+'<br>';
+	domelem.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
+	domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
+
 	domelem.onclick = function() {
 	    alert(this.href); 
 	    // do whatever else you want to do 
@@ -78,8 +84,11 @@
         }
     });
 });
- //Get Data   
-    function getData(url) {
+  
+ //Get Data
+ 
+
+function getData(url) {
 var data;
     $.ajax({
         async: false, //thats the trick
@@ -96,7 +105,8 @@ var data;
 
 // Load #loading layers
 // Assuming that the div or any other HTML element has the ID = loading and it contains the necessary loading image.
-   $('#loading').hide(); //initially hide the loading icon
+
+$('#loading').hide(); //initially hide the loading icon
  
         $('#loading').ajaxStart(function(){
             $(this).show();
