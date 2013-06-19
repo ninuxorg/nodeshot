@@ -7,10 +7,10 @@ if 'nodeshot.core.nodes' not in settings.INSTALLED_APPS:
 
 from profile import Profile
 from social_link import SocialLink
-from stats import Stats
+#from stats import Stats
 from email_notification import EmailNotification
 
-__all__ = ['Profile', 'SocialLink', 'Stats', 'EmailNotification']
+__all__ = ['Profile', 'SocialLink', 'EmailNotification']
 
 # Signals
 # perform certain actions when some other parts of the application changes
@@ -33,7 +33,7 @@ def new_user(sender, **kwargs):
         # create profile
         Profile(user=user).save()
         # create statistics
-        Stats(user=user).save()
+        #Stats(user=user).save()
         # create notification settings
         EmailNotification(user=user).save()
         # add user to default group
@@ -45,32 +45,32 @@ def new_user(sender, **kwargs):
             pass
         user.save()
 
-@receiver(post_save, sender=Device)
-def new_device(sender, **kwargs):
-    """ update user device count when a new device is added """
-    created = kwargs['created']
-    device = kwargs['instance']
-    if created:
-        Stats.update_or_create(device.node.user, 'devices')
-
-@receiver(post_delete, sender=Device)
-def delete_device(sender, **kwargs):
-    """ update user device count when a device is deleted """
-    device = kwargs['instance']
-    Stats.update_or_create(device.node.user, 'devices')
-
-@receiver(post_save, sender=Node)
-def node_changed(sender, **kwargs):
-    """ update user node count when a node is saved """
-    created = kwargs['created']
-    node = kwargs['instance']
-    Stats.update_or_create(node.user, 'nodes')
-
-@receiver(post_delete, sender=Node)
-def delete_node(sender, **kwargs):
-    """ update user node count when a node is deleted """
-    node = kwargs['instance']
-    Stats.update_or_create(node.user, 'nodes')
+#@receiver(post_save, sender=Device)
+#def new_device(sender, **kwargs):
+#    """ update user device count when a new device is added """
+#    created = kwargs['created']
+#    device = kwargs['instance']
+#    if created:
+#        Stats.update_or_create(device.node.user, 'devices')
+#
+#@receiver(post_delete, sender=Device)
+#def delete_device(sender, **kwargs):
+#    """ update user device count when a device is deleted """
+#    device = kwargs['instance']
+#    Stats.update_or_create(device.node.user, 'devices')
+#
+#@receiver(post_save, sender=Node)
+#def node_changed(sender, **kwargs):
+#    """ update user node count when a node is saved """
+#    created = kwargs['created']
+#    node = kwargs['instance']
+#    Stats.update_or_create(node.user, 'nodes')
+#
+#@receiver(post_delete, sender=Node)
+#def delete_node(sender, **kwargs):
+#    """ update user node count when a node is deleted """
+#    node = kwargs['instance']
+#    Stats.update_or_create(node.user, 'nodes')
 
 # email notifications
 #@receiver(node_status_changed)

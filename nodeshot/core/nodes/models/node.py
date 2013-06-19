@@ -73,24 +73,23 @@ class Node(BaseAccessLevel):
             self._current_status = self.status
     
     def clean(self , *args, **kwargs):
-        #TODO: write test for not contained in layer
         """
-        Check  distance between nodes if feature is enabled.
+        Check distance between nodes if feature is enabled.
         Check node is contained, in layer's area if defined
         """
-        minimum_distance=self.layer.minimum_distance
-        coords=self.coords
-        layer_area=self.layer.area
-        error_string_minimum_distance=_('Distance between nodes cannot be less than %s meters') % (minimum_distance)
-        error_string_not_contained_in_layer=_('Node must be inside layer area')
-        if minimum_distance <> 0:
-            near_nodes=Node.objects.filter(coords__distance_lte=(coords, D(m=minimum_distance))).count()
-            if near_nodes > 0 :
-                raise ValidationError(error_string_minimum_distance)        
-        if layer_area is not None and not layer_area.contains(coords):
-            raise ValidationError(error_string_not_contained_in_layer)
-        
-        
+        if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+            minimum_distance = self.layer.minimum_distance
+            coords = self.coords
+            layer_area = self.layer.area
+            
+            if minimum_distance <> 0:
+                near_nodes = Node.objects.filter(coords__distance_lte=(coords, D(m=minimum_distance))).count()
+                if near_nodes > 0 :
+                    raise ValidationError(_('Distance between nodes cannot be less than %s meters') % minimum_distance)        
+            
+            # TODO: this needs to be tested
+            if layer_area is not None and not layer_area.contains(coords):
+                raise ValidationError(_('Node must be inside layer area'))
     
     def save(self, *args, **kwargs):
         super(Node, self).save(*args, **kwargs)
