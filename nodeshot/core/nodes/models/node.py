@@ -83,7 +83,7 @@ class Node(BaseAccessLevel):
             layer_area = self.layer.area
             
             if minimum_distance <> 0:
-                near_nodes = Node.objects.filter(coords__distance_lte=(coords, D(m=minimum_distance))).count()
+                near_nodes = Node.objects.exclude(pk=self.id).filter(coords__distance_lte=(coords, D(m=minimum_distance))).count()
                 if near_nodes > 0 :
                     raise ValidationError(_('Distance between nodes cannot be less than %s meters') % minimum_distance)        
             
