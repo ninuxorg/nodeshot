@@ -1,6 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
@@ -20,7 +22,7 @@ class Vote(UpdateCountsMixin, BaseDate):
     )
     
     node = models.ForeignKey(Node)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     # TODO: this should also be called "value" instead of "vote"
     vote = models.IntegerField(choices=VOTING_CHOICES)
     

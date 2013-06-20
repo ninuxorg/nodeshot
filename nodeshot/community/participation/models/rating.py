@@ -1,7 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.db.models import Avg
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
@@ -17,7 +19,7 @@ class Rating(UpdateCountsMixin, BaseDate):
     RATING_CHOICES = [(n, '%d' % n) for n in range(1, 11)]
     
     node = models.ForeignKey(Node)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     value = models.IntegerField(_('rating value'), choices=RATING_CHOICES)
     
     class Meta:

@@ -1,9 +1,12 @@
 from rest_framework import permissions, authentication, generics
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.http import Http404
+from django.utils.translation import ugettext_lazy as _
+
 from .models import NodeRatingCount, Rating, Vote, Comment
 from serializers import *
-from django.utils.translation import ugettext_lazy as _
+
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
 

@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.core.validators import MaxLengthValidator, MinLengthValidator
@@ -11,6 +10,7 @@ from nodeshot.core.base.models import BaseDate
 from choices import INWARD_STATUS_CHOICES
 
 
+# TODO: auth.User ?
 limit = models.Q(app_label = 'nodes', model = 'Node') | models.Q(app_label = 'auth', model = 'User') | models.Q(app_label = 'layers', model = 'Layer')
 
 
@@ -23,7 +23,7 @@ class Inward(BaseDate):
     content_type = models.ForeignKey(ContentType, limit_choices_to=limit)
     object_id = models.PositiveIntegerField()
     to = generic.GenericForeignKey('content_type', 'object_id')
-    user = models.ForeignKey(User, verbose_name=_('user'), blank=not settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH'], null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), blank=not settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH'], null=True)
     from_name = models.CharField(_('name'), max_length=50)
     from_email = models.EmailField(_('email'), max_length=50)
     message = models.TextField(_('message'), validators=[

@@ -6,7 +6,9 @@ from django.test import TestCase
 from django.test.client import Client
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 import simplejson as json
 
