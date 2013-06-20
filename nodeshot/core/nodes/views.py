@@ -21,18 +21,25 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     Retrieve a list of nodes
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly,)
-    model = Node
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    queryset = Node.objects.published()
     serializer_class = NodeListSerializer
+    
     def get_queryset(self):
         """
         Optionally restricts the returned nodes
         by filtering against a `search` query parameter in the URL.
         """
-        queryset = Node.objects.published().select_related('user', 'layer')
+        # retrieve all nodes which are published and accessible to current user
+        # and use joins to retrieve related fields
+        queryset = super(NodeList, self).get_queryset()
+        # retrieve value of querystring parameter "search"
         search = self.request.QUERY_PARAMS.get('search', None)
+        
         if search is not None:
+            # add instructions for search to queryset
             queryset = queryset.filter(name__icontains=search)
+        
         return queryset
     
 

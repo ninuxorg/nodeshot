@@ -13,13 +13,6 @@ __all__ = [
 ]
 
 
-#class UserSerializer(serializers.ModelSerializer):
-#
-#    class Meta:
-#        model = User
-#        fields = ('id', 'username')
-
-
 class NodeListSerializer(serializers.ModelSerializer):
     
     user= serializers.Field(source='user.username')
@@ -29,12 +22,12 @@ class NodeListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Node
-        #fields = ['layer', 'name', 'slug', 'user', 'coords', 'elev']
-        #
-        #if settings.NODESHOT['SETTINGS']['NODE_AREA']:
-        #    fields += ['area']
-        #
-        #fields += ['details']
+        fields = ['layer', 'name', 'slug', 'user', 'coords', 'elev', 'address']
+        
+        if settings.NODESHOT['SETTINGS']['NODE_AREA']:
+            fields += ['area']
+        
+        fields += ['details']
         
         #fields = ('layer', 'name', 'slug', 'user', 'coords', 'elev', 'details')
 
@@ -42,9 +35,10 @@ class NodeListSerializer(serializers.ModelSerializer):
 class NodeDetailSerializer(serializers.ModelSerializer):
     """ node detail """
     #Added user and layer so tht explicit names are displayed instead of ID
-    user= serializers.Field(source='user.username')
+    user = serializers.Field(source='user.username')
     layer = serializers.Field(source='layer.name')
     images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
+    
     if 'nodeshot.community.participation' in settings.NODESHOT['API']['APPS_ENABLED']:
         comments = serializers.HyperlinkedIdentityField(view_name='api_node_comments', slug_field='slug')
     
