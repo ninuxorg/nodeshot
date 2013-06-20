@@ -4,6 +4,7 @@ nodeshot.core.nodes unit tests
 
 from django.test import TestCase
 from django.test.client import Client
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 
@@ -116,7 +117,19 @@ class APITest(TestCase):
         public_node_count = Node.objects.published().access_level_up_to('public').count()
         self.assertEqual(public_node_count, len(nodes))
         
-        # POST
+        self.client.login(username='registered', password='tester')
+        
+        # POST: 201
+        json_data = {
+            "layer": 1,
+            "name": "test_distance", 
+            "slug": "test_distance", 
+            "address": "via dei test", 
+            "coords": "POINT (12.5822391919 41.8720419277)", 
+            "description": ""
+        }
+        response = self.client.post(url, json_data)
+        self.assertEqual(201, response.status_code)
     
     def test_node_geojson_list(self):
         """ test node geojson list """
@@ -187,34 +200,45 @@ class APITest(TestCase):
     
     def test_node_coords_distance(self):
         """ test minimum distance check between nodes """
-        json_data={
-        "user": 1,
-        "access_level": 0, 
-        "name": "test_distance", 
-        "slug": "test_distance", 
-        "address": "via dei test", 
-        "status": 0, 
-        "is_published": True, 
-        "layer": 1, 
-        "coords": "POINT (12.5822391919 41.8720419277)", 
-        "description": "", 
-        "notes": ""
-        }
-        #Node coordinates don't respect minimum distance
-        login=self.client.login(username='admin', password='tester')
+        self.client.login(username='admin', password='tester')
+        
         url = reverse('api_node_list')
-        response = self.client.post(url,json_data)
-        self.assertEqual(400, response.status_code)
-        #Node coordinates respect minimum distance
-        json_data['coords']="POINT (12.7822391919 41.8720419277)";
-        response = self.client.post(url,json_data)
-        self.assertEqual(201, response.status_code)
-        #Disable minimum distance control in layer and test again with coords too near
-        layer=Layer.objects.get(pk=1)
-        layer.minimum_distance=0
+        
+        json_data = {
+            "layer": 1,
+            "name": "test_distance", 
+            "slug": "test_distance", 
+            "address": "via dei test", 
+            "coords": "POINT (12.5822391919 41.8720419277)", 
+            "description": ""
+        }
+        layer = Layer.objects.get(pk=1)
+        layer.minimum_distance = 100
         layer.save()
-        json_data['coords']="POINT (12.5822391919 41.8720419277)";
-        json_data['name']="test_distance2";
-        json_data['slug']="test_distance2";
-        response = self.client.post(url,json_data)
+        
+        # Node coordinates don't respect minimum distance
+        response = self.client.post(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        
+        # Node coordinates respect minimum distance
+        json_data['coords'] = "POINT (12.7822391919 41.8720419277)";
+        response = self.client.post(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(201, response.status_code)
+        
+        # Disable minimum distance control in layer and test again with coords too near
+        layer.minimum_distance = 0
+        layer.save()
+        json_data['coords'] = "POINT (12.5822391917 41.872042278)";
+        json_data['name'] = "test_distance2";
+        json_data['slug'] = "test_distance2";
+        response = self.client.post(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(201, response.status_code)
+        
+        # re-enable minimum distance
+        layer.minimum_distance = 100
+        layer.save()
+        # delete new nodes just added before
+        n = Node.objects.get(slug='test_distance')
+        n.delete()
+        n2 = Node.objects.get(slug='test_distance2')
+        n2.delete()
