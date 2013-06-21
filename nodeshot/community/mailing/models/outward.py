@@ -15,6 +15,9 @@ from choices import *
 from datetime import datetime
 from django.utils.timezone import utc
 
+import socket, time
+from lxml import html
+
 
 class Outward(BaseDate):
     """
@@ -160,7 +163,6 @@ class Outward(BaseDate):
         # prepare text plain if necessary
         if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True:
             # store plain text in var
-            from lxml import html
             html_content = self.message
             message = html.fromstring(self.message).text_content()
             # set EmailClass to EmailMultiAlternatives
@@ -187,7 +189,7 @@ class Outward(BaseDate):
             emails.append(msg)
             
         
-        import socket, time
+        
         # try sending email
         try:
             # counter will count how many emails have been sent

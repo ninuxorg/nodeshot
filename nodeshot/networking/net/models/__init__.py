@@ -1,8 +1,10 @@
-# this app is dependant on "node"
-from django.conf import settings
-if 'nodeshot.core.nodes' not in settings.INSTALLED_APPS:
-    from nodeshot.core.base.exceptions import DependencyError
-    raise DependencyError('nodeshot.networking.net depends on nodeshot.core.nodes, which should be in settings.INSTALLED_APPS')
+from nodeshot.core.base.utils import check_dependencies
+
+check_dependencies(
+    dependencies='nodeshot.core.nodes',
+    module='nodeshot.networking.net'
+)
+
 
 from routing_protocol import RoutingProtocol
 from device import Device

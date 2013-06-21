@@ -7,10 +7,13 @@ from django.core.exceptions import ValidationError
 
 from django.db.models import Q
 from django.contrib.auth.models import Group
-from django.contrib.auth import get_user_model as User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
+from nodeshot.core.base.tests import user_fixtures
+
 from .models import Inward, Outward
 from .models.choices import GROUPS, FILTERS
 
@@ -22,7 +25,7 @@ class OutwardTest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_nodes.json'
     ]
@@ -42,15 +45,16 @@ class OutwardTest(TestCase):
             message = self.message.subject,
         )
     
-    def test_fixtures(self):
-        """ *** Tests fixtures have loaded properly *** """
-        layers = Layer.objects.all()
-        #nodes = Node.objects.all()
-        users = User.objects.filter(is_active=True)
-        
-        self.assertEqual(len(layers), 4, 'layers')
-        #self.assertEqual(len(nodes), 8, 'nodes') this is not really smart
-        self.assertEqual(len(users), 8, 'users')
+    # useless
+    #def test_fixtures(self):
+    #    """ *** Tests fixtures have loaded properly *** """
+    #    layers = Layer.objects.all()
+    #    #nodes = Node.objects.all()
+    #    users = User.objects.filter(is_active=True)
+    #    
+    #    self.assertEqual(len(layers), 4, 'layers')
+    #    #self.assertEqual(len(nodes), 8, 'nodes') this is not really smart
+    #    self.assertEqual(len(users), 8, 'users')
     
     def test_no_filter(self):
         """ *** Test no filtering, send to all *** """

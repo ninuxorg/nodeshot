@@ -1,8 +1,10 @@
-# this app is dependant on "net"
-from django.conf import settings
+from nodeshot.core.base.utils import check_dependencies
 
-if 'nodeshot.core.nodes' not in settings.INSTALLED_APPS:
-    raise DependencyError('nodeshot.community.mailing depends on nodeshot.core.nodes, which should be in settings.INSTALLED_APPS')
+check_dependencies(
+    dependencies='nodeshot.core.nodes',
+    module='nodeshot.community.mailing'
+)
+
 
 from inward import Inward
 from outward import Outward

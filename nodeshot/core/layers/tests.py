@@ -6,6 +6,8 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
+from nodeshot.core.base.tests import user_fixtures
+
 from .models import Layer
 
 
@@ -13,7 +15,7 @@ class LayerTest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_nodes.json'
     ]

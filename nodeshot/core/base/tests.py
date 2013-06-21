@@ -1,7 +1,18 @@
 from django.test.client import FakePayload, MULTIPART_CONTENT
 from django.test.client import Client as BaseClient
 from django.test import TestCase
+from django.conf import settings
+
 from urlparse import urlparse, urlsplit
+
+
+if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
+    user_fixtures = 'test_profiles.json'
+else:
+    user_fixtures = 'test_users.json'
+
+
+### --- Add patch method, for Django < 1.5 --- ###
 
 
 class Client(BaseClient):

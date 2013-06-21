@@ -141,8 +141,9 @@ INSTALLED_APPS = (
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
     'nodeshot.interoperability',
-    'nodeshot.community.mailing',
     'nodeshot.community.profiles',
+    'nodeshot.community.participation',
+    'nodeshot.community.mailing',
     'nodeshot.networking.net',
     'nodeshot.networking.links',
     'nodeshot.networking.services',
@@ -154,9 +155,16 @@ INSTALLED_APPS = (
     'rest_framework',
     'south',
     'debug_toolbar',
+    
+    # profiles and social networks
+    'emailconfirmation',
+    'social_auth',
+    
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+AUTH_USER_MODEL = 'profiles.Profile'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

@@ -1,20 +1,15 @@
-# this app is dependant on "net"
-from django.conf import settings
-if 'nodeshot.core.nodes' not in settings.INSTALLED_APPS:
-    from nodeshot.core.base.exceptions import DependencyError
-    raise DependencyError('nodeshot.community.profiles depends on nodeshot.core.nodes, which should be in settings.INSTALLED_APPS')
+from nodeshot.core.base.utils import check_dependencies
 
-if 'emailconfirmation' not in settings.INSTALLED_APPS:
-    from nodeshot.core.base.exceptions import DependencyError
-    raise DependencyError('nodeshot.community.profiles depends on emailconfirmation, which should be in settings.INSTALLED_APPS')
+check_dependencies(
+    dependencies='emailconfirmation',
+    module='nodeshot.community.profiles'
+)
+
 
 from profile import Profile
 from social_link import SocialLink
-#from stats import Stats
-#from email_notification import EmailNotification
 
 __all__ = ['Profile', 'SocialLink']
-#__all__ = ['Profile', 'SocialLink', 'EmailNotification']
 
 # Signals
 # perform certain actions when some other parts of the application changes

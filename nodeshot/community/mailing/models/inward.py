@@ -10,8 +10,9 @@ from nodeshot.core.base.models import BaseDate
 from choices import INWARD_STATUS_CHOICES
 
 
-# TODO: auth.User ?
-limit = models.Q(app_label = 'nodes', model = 'Node') | models.Q(app_label = 'auth', model = 'User') | models.Q(app_label = 'layers', model = 'Layer')
+user_app_label = settings.AUTH_USER_MODEL.split('.')[0]
+user_model_name = settings.AUTH_USER_MODEL.split('.')[1]
+limit = models.Q(app_label = 'nodes', model = 'Node') | models.Q(app_label = user_app_label, model = user_model_name) | models.Q(app_label = 'layers', model = 'Layer')
 
 
 class Inward(BaseDate):
@@ -33,8 +34,6 @@ class Inward(BaseDate):
     ip = models.GenericIPAddressField(verbose_name=_('ip address'), blank=True, null=True)
     user_agent = models.CharField(max_length=255, blank=True)
     accept_language = models.CharField(max_length=255, blank=True)
-    # who fucking cares
-    #http_referer = models.CharField(max_length=255, blank=True)
     
     class Meta:
         verbose_name = _('Inward message')
