@@ -15,61 +15,26 @@ __all__ = ['Profile', 'SocialLink']
 # perform certain actions when some other parts of the application changes
 # eg: update user statistics when a new device is added
 
-#from django.contrib.auth.models import Group
-#from nodeshot.networking.net.models import Device
-#from nodeshot.core.nodes.models import Node
-#
-#from django.dispatch import receiver
-#from django.db.models.signals import post_save, post_delete
+from django.contrib.auth.models import Group
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 #from nodeshot.core.nodes.signals import node_status_changed
 
-#@receiver(post_save, sender=User)
-#def new_user(sender, **kwargs):
-#    """ create profile, stat and email_notification objects every time a new user is created """
-#    created = kwargs['created']
-#    user = kwargs['instance']
-#    if created:
-#        # create profile
-#        #Profile(user=user).save()
-#        # create statistics
-#        #Stats(user=user).save()
-#        # create notification settings
-#        EmailNotification(user=user).save()
-#        # add user to default group
-#        # TODO: make this configurable in settings
-#        try:
-#            default_group = Group.objects.get(name='registered')
-#            user.groups.add(default_group)
-#        except Group.DoesNotExist:
-#            pass
-#        user.save()
+@receiver(post_save, sender=Profile)
+def new_user(sender, **kwargs):
+    """ operations to be performed each time a new user is created """
+    created = kwargs['created']
+    user = kwargs['instance']
+    if created:
+        # add user to default group
+        # TODO: make this configurable in settings
+        try:
+            default_group = Group.objects.get(name='registered')
+            user.groups.add(default_group)
+        except Group.DoesNotExist:
+            pass
+        user.save()
 
-#@receiver(post_save, sender=Device)
-#def new_device(sender, **kwargs):
-#    """ update user device count when a new device is added """
-#    created = kwargs['created']
-#    device = kwargs['instance']
-#    if created:
-#        Stats.update_or_create(device.node.user, 'devices')
-#
-#@receiver(post_delete, sender=Device)
-#def delete_device(sender, **kwargs):
-#    """ update user device count when a device is deleted """
-#    device = kwargs['instance']
-#    Stats.update_or_create(device.node.user, 'devices')
-#
-#@receiver(post_save, sender=Node)
-#def node_changed(sender, **kwargs):
-#    """ update user node count when a node is saved """
-#    created = kwargs['created']
-#    node = kwargs['instance']
-#    Stats.update_or_create(node.user, 'nodes')
-#
-#@receiver(post_delete, sender=Node)
-#def delete_node(sender, **kwargs):
-#    """ update user node count when a node is deleted """
-#    node = kwargs['instance']
-#    Stats.update_or_create(node.user, 'nodes')
 
 # email notifications
 #@receiver(node_status_changed)

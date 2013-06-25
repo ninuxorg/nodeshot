@@ -7,26 +7,10 @@ from nodeshot.core.base.admin import BaseStackedInline
 from .models import SocialLink, Profile#, EmailNotification
 from .forms import *
 
-#class ProfileInline(BaseStackedInline):
-#    model = Profile
-#    fk_name = 'user'
-#    extra = 0
-
 
 class ProfileSocialLinksInline(BaseStackedInline):
     model = SocialLink
     extra = 0
-
-
-#class EmailNotificationInline(BaseStackedInline):
-#    model = EmailNotification
-#    extra = 0
-
-
-#class UserStatsInline(BaseStackedInline):
-#    model = Stats
-#    extra = 0
-#    #readonly_fields = ['nodes', 'devices'] + BaseStackedInline.readonly_fields
 
 
 class UserAdmin(BaseUserAdmin):
