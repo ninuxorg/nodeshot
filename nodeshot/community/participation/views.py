@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from .models import NodeRatingCount, Rating, Vote, Comment
 from .serializers import *
@@ -137,6 +138,7 @@ class NodeCommentList(generics.ListCreateAPIView):
     
     def initial(self, request, *args, **kwargs):
         """ overwritten initial method to ensure node exists """
+        #TODO : it's not working. GET request returns comments for all nodes
         super(NodeCommentList, self).initial(request, *args, **kwargs)
         # ensure node exists
         self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
@@ -164,7 +166,6 @@ class NodeRatingList(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         # ensure node exists
         self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
-        
         return self.create(request, *args, **kwargs)
     
     def pre_save(self, obj):
