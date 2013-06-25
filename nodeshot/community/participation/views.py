@@ -1,10 +1,12 @@
 from rest_framework import permissions, authentication, generics
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.http import Http404
-from django.shortcuts import render
-from .models import NodeRatingCount, Rating, Vote, Comment
-from serializers import *
 from django.utils.translation import ugettext_lazy as _
+
+from .models import NodeRatingCount, Rating, Vote, Comment
+from .serializers import *
+
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
 
@@ -20,31 +22,7 @@ def get_queryset_or_404(queryset, kwargs):
         raise Http404(_('Not found'))
     
     return obj
-        
-        
-#def check_layer(slug_value):
-#    """
-#    Checks if a layer exists
-#    """
-#    # ensure exists
-#    try:
-#        # retrieve slug value from instance attribute kwargs, which is a dictionary
-#        #slug_value = self.kwargs.get('slug', None)
-#        # get node, ensure is published
-#        layer = Layer.objects.published().get(slug=slug_value)
-#    except Exception:
-#        raise Http404(_('Layer not found'))
-#    
-#    return layer
 
-#class CommentCreate(generics.CreateAPIView):
-#    """
-#    ### POST
-#    
-#    create comments 
-#    """
-#    model = Comment
-#    serializer_class = CommentAddSerializer
     
 class AllNodesParticipationList(generics.ListAPIView):
     """
@@ -197,6 +175,7 @@ class NodeRatingList(generics.CreateAPIView):
         obj.user_id = self.request.user.id
     
 node_ratings = NodeRatingList.as_view()
+
 
 class NodeVotesList(generics.CreateAPIView):
     """

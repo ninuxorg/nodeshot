@@ -4,21 +4,25 @@ nodeshot.core.nodes unit tests
 
 from django.test import TestCase
 from django.test.client import Client
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 import simplejson as json
 
-from .models import Node, Image
 from nodeshot.core.layers.models import Layer
+from nodeshot.core.base.tests import user_fixtures
+
+from .models import Node, Image
+
 
 
 class ModelsTest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_nodes.json',
         'test_images.json'
@@ -80,10 +84,10 @@ class ModelsTest(TestCase):
         self.assertEqual(count, Node.objects.published().accessible_to(user=1).count())
         self.assertEqual(count, Node.objects.accessible_to(user=1).published().count())
         # chain with geographic query
-        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 7000)).accessible_to(user=1).published().count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).filter(coords__distance_lte=(pnt, 7000)).published().count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).published().filter(coords__distance_lte=(pnt, 7000)).count())
-        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 7000)).accessible_to(user=1).published().count())
+        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
+        self.assertEqual(count, Node.objects.accessible_to(user=1).filter(coords__distance_lte=(pnt, 70000)).published().count())
+        self.assertEqual(count, Node.objects.accessible_to(user=1).published().filter(coords__distance_lte=(pnt, 70000)).count())
+        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
     
     def test_image_manager(self):
         """ test manager methods of Image model """
@@ -98,7 +102,7 @@ class APITest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_nodes.json',
         'test_images.json'

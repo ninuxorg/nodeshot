@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.core.base.models import BaseDate
@@ -13,7 +13,7 @@ class Comment(UpdateCountsMixin, BaseDate):
     Comment model
     """
     node = models.ForeignKey(Node)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     text = models.CharField(_('Comment text'), max_length=255)
     
     class Meta:

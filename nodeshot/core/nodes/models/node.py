@@ -1,5 +1,4 @@
 from django.contrib.gis.db import models
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -32,7 +31,7 @@ class Node(BaseAccessLevel):
         external_id = models.PositiveIntegerField(blank=True, null=True)
     
     # nodes might be assigned to a foreign layer, therefore user can be left blank, requires custom validation
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     
     # area if enabled
     if settings.NODESHOT['SETTINGS']['NODE_AREA']:

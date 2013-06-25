@@ -1,7 +1,37 @@
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.utils.timezone import utc
+from django.conf import settings
+
 from datetime import datetime, timedelta
+from .exceptions import DependencyError
+
+
+__all__ = [
+    'check_dependencies',
+    'choicify',
+    'get_key_by_value',
+    'now',
+    'now_after',
+    'after',
+]
+
+
+def check_dependencies(dependencies, module):
+    """
+    Ensure dependencies of a module are listed in settings.INSTALLED_APPS
+    
+    :dependencies string | list: list of dependencies to check
+    :module string: string representing the path to the current app
+    """
+    if type(dependencies) == str:
+        dependencies = [dependencies]
+    elif type(dependencies) != list:
+        raise TypeError('dependencies argument must be of type list or string')
+    
+    for dependency in dependencies:
+        if dependency not in settings.INSTALLED_APPS:
+            raise DependencyError('%s depends on %s, which should be in settings.INSTALLED_APPS' % (module, dependency))
 
 
 def choicify(dictionary):

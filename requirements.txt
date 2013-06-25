@@ -2,8 +2,8 @@
 # install python-virtualenv
 # create a virtual environment (be sure to include the system default psycpog2 db drivers)
 # run pip install -r requirements
-psycopg2 
 
+psycopg2
 Django==1.5.1
 
 # python libraries
@@ -16,17 +16,24 @@ python-dateutil
 six
 wsgiref
 vectorformats
+lxml
 
 # better admin
 django-grappelli==2.4.4
 
 # RESTful API and API documentation
-djangorestframework==2.3.3
+djangorestframework==2.3.5
 markdown
 
 # networking
 netaddr
 django-netfields==0.2.1
+
+# email confirmation with configurable user model
+-e git+https://github.com/mfogel/django-email-confirmation.git#egg=email_confirmation
+
+# authentication with social networks
+django-social-auth
 
 # asynchronous tasks
 kombu

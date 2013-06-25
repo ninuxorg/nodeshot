@@ -1,12 +1,15 @@
 """
 Unit tests for participation app
 """
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
+from nodeshot.core.base.tests import user_fixtures
+
 from .models import Comment, Rating, Vote
 
 
@@ -15,7 +18,7 @@ class ParticipationModelsTest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_nodes.json',
         'test_images.json'
