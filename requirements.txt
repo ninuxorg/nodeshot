@@ -30,7 +30,7 @@ netaddr
 django-netfields==0.2.1
 
 # email confirmation with configurable user model
--e git+https://github.com/mfogel/django-email-confirmation.git#egg=email_confirmation
+-e git+https://github.com/nemesisdesign/django-email-confirmation.git#egg=email_confirmation
 
 # authentication with social networks
 django-social-auth
