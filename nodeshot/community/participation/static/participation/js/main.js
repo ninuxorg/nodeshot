@@ -3,9 +3,11 @@
 //Map initialization
 var map = L.map('map').setView([41.87, 12.49], 9);
 var osm_layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+//Uncomment for Google maps. Works only in quirk mode.
 //var ggl_hybrid = new L.Google('HYBRID');
 //var ggl_map = new L.Google('ROADMAP');
 //var ggl_sat = new L.Google();
+
 //OSM layer added to map
 osm_layer.addTo(map);
 map.on('click', onMapClick);
@@ -37,6 +39,7 @@ overlaymaps[newClusterKey]=newCluster;
 		 
 var baseMaps = {
 		"OpenStreetMap": osm_layer,
+		//Uncomment for Google maps. Works only in quirk mode.
 		//"Google Sat": ggl_sat,
 		//"Google Map": ggl_map,
 		//"Google Hybrid": ggl_hybrid
@@ -50,6 +53,6 @@ var baseMaps = {
 //			"Pisa" : pisa,
 //		};
 
-L.control.layers(null,overlaymaps).addTo(map);
+L.control.layers(baseMaps,overlaymaps).addTo(map);
 
 
