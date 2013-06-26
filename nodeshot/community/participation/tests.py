@@ -6,6 +6,8 @@ User = get_user_model()
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
+import simplejson as json
+
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.base.tests import user_fixtures
@@ -115,9 +117,13 @@ class ParticipationModelsTest(TestCase):
         """
         node = Node.objects.get(pk=1)
         node_slug = node.slug
+        node2 = Node.objects.get(pk=2)
+        node2_slug = node2.slug
         fake_node_slug = "idontexist"
+        layer = Layer.objects.get(pk=node.layer_id)
         
         url = reverse('api_node_comments', args=[node_slug])
+        url2 = reverse('api_node_comments', args=[node2_slug])
         wrong_url = reverse('api_node_comments', args=[fake_node_slug])
         
         # api_node_comments
@@ -126,8 +132,11 @@ class ParticipationModelsTest(TestCase):
         
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        
         response = self.client.get(wrong_url)
         self.assertEqual(response.status_code, 404)
+        
+        
         
         #POST
         
@@ -143,10 +152,20 @@ class ParticipationModelsTest(TestCase):
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
+        # POSTing a comment for node2
+        response = self.client.post(url2, good_post_data)
+        self.assertEqual(response.status_code, 201)
+        
+        #GET should not return both the comments inserted above     
+        response = self.client.get(url)
+        comments = json.loads(response.content)
+        node_comments_count = Comment.objects.filter(node=1).count()
+        self.assertEqual(1, len(comments))
+        
         # User not allowed -- 403
         self.client.logout()
         response = self.client.post(url, good_post_data)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)      
         
     def test_node_participation_api(self,*args,**kwargs):
         """
@@ -154,7 +173,7 @@ class ParticipationModelsTest(TestCase):
         """
         node = Node.objects.get(pk=1)
         node_slug=node.slug
-        fake_node_slug="nonesisto"
+        fake_node_slug="idontexist"
         
         # api_node_participation
         
@@ -179,7 +198,7 @@ class ParticipationModelsTest(TestCase):
         """
         node = Node.objects.get(pk=1)
         node_slug=node.slug
-        fake_node_slug="nonesisto"
+        fake_node_slug="idontexist"
         
         # api_node_ratings
         
@@ -224,7 +243,7 @@ class ParticipationModelsTest(TestCase):
         """
         node = Node.objects.get(pk=1)
         node_slug=node.slug
-        fake_node_slug="nonesisto"
+        fake_node_slug="idontexist"
         
         # api_node_ratings
         
@@ -269,7 +288,7 @@ class ParticipationModelsTest(TestCase):
         """
         layer = Layer.objects.get(pk=1)
         layer_slug=layer.slug
-        fake_layer_slug="nonesisto"
+        fake_layer_slug="idontexist"
         
         # api_layer_nodes_comments
         
@@ -286,7 +305,7 @@ class ParticipationModelsTest(TestCase):
         """
         layer = Layer.objects.get(pk=1)
         layer_slug=layer.slug
-        fake_layer_slug="nonesisto"
+        fake_layer_slug="idontexist"
         
         # api_layer_nodes_participation
         
