@@ -24,6 +24,12 @@ if 'grappelli' in settings.INSTALLED_APPS:
     )
 
 
+if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+    urlpatterns = urlpatterns + patterns('',
+        url(r'^confirm_email/(\w+)/$', 'emailconfirmation.views.confirm_email', name='confirm_email'),
+    )
+
+
 # include 'nodeshot.core.api.urls'
 if 'nodeshot.core.api' in settings.INSTALLED_APPS:
     

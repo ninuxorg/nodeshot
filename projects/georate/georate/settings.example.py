@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    #'django.contrib.sites',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
@@ -149,9 +149,16 @@ INSTALLED_APPS = (
     'rest_framework',
     'south',
     'debug_toolbar',
+    
+    # profiles and social networks
+    'emailconfirmation',
+    'social_auth',
+    
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+AUTH_USER_MODEL = 'profiles.Profile'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -255,7 +262,9 @@ NODESHOT = {
         'CONTACT_OUTWARD_STEP': 20,
         'CONTACT_OUTWARD_DELAY': 10,
         'CONTACT_OUTWARD_HTML': True, # grappelli must be in INSTALLED_APPS, otherwise it won't work
-        'NODE_AREA': True
+        'NODE_AREA': True,
+        'PROFILE_EMAIL_CONFIRMATION': True,
+        'PROFILE_REQUIRED_FIELDS': ['email'],
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (

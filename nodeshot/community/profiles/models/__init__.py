@@ -1,9 +1,11 @@
+from django.conf import settings
 from nodeshot.core.base.utils import check_dependencies
 
-check_dependencies(
-    dependencies='emailconfirmation',
-    module='nodeshot.community.profiles'
-)
+if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+    check_dependencies(
+        dependencies='emailconfirmation',
+        module='nodeshot.community.profiles'
+    )
 
 
 from profile import Profile
@@ -35,6 +37,20 @@ def new_user(sender, **kwargs):
             pass
         user.save()
 
+
+if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+    from emailconfirmation.signals import email_confirmed
+    from emailconfirmation.models import EmailConfirmation
+    
+    @receiver(email_confirmed, sender=EmailConfirmation)
+    def activate_user(sender, email_address, **kwargs):
+        """
+        activate user when primary email is confirmed
+        """
+        user = email_address.user
+        if user.is_active is False:
+            user.is_active = True
+            user.save()
 
 # email notifications
 #@receiver(node_status_changed)
