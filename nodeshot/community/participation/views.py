@@ -225,5 +225,7 @@ class NodeVotesList(generics.CreateAPIView):
 
 node_votes = NodeVotesList.as_view()
 
+
+from django.shortcuts import render
 def map_view(request):
     return render(request,'participation/index.html')
