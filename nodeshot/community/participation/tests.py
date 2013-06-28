@@ -117,6 +117,7 @@ class ParticipationModelsTest(TestCase):
         """
         node = Node.objects.get(pk=1)
         node_slug = node.slug
+        node_id=node.id
         node2 = Node.objects.get(pk=2)
         node2_slug = node2.slug
         fake_node_slug = "idontexist"
@@ -134,9 +135,7 @@ class ParticipationModelsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         
         response = self.client.get(wrong_url)
-        self.assertEqual(response.status_code, 404)
-        
-        
+        self.assertEqual(response.status_code, 404)       
         
         #POST
         
@@ -159,14 +158,34 @@ class ParticipationModelsTest(TestCase):
         #GET should not return both the comments inserted above     
         response = self.client.get(url)
         comments = json.loads(response.content)
-        node_comments_count = Comment.objects.filter(node=1).count()
-        self.assertEqual(1, len(comments))
+        node_comments_count = Comment.objects.filter(node_id=node_id).count()
+        self.assertEqual(node_comments_count, len(comments))
+        
+        #Comments not allowed on layer
+        node.layer.participation_settings.comments_allowed = False
+        node.layer.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 400)
+        node.layer.participation_settings.comments_allowed = True
+        node.layer.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 201)
+        
+        #Comments not allowed on node
+        node.participation_settings.comments_allowed = False
+        node.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 400)
+        node.participation_settings.comments_allowed = True
+        node.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 201)
         
         # User not allowed -- 403
         self.client.logout()
         response = self.client.post(url, good_post_data)
-        self.assertEqual(response.status_code, 403)      
-        
+        self.assertEqual(response.status_code, 403)
+               
     def test_node_participation_api(self,*args,**kwargs):
         """
         Participation endpoint should be reachable only with GET and return 404 if object is not found.
