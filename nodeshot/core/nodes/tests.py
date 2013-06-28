@@ -4,21 +4,29 @@ nodeshot.core.nodes unit tests
 
 from django.test import TestCase
 from django.test.client import Client
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth import get_user_model
+from django.contrib.gis.geos import *
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
+
+User = get_user_model()
 
 import simplejson as json
 
-from .models import Node, Image
 from nodeshot.core.layers.models import Layer
+from nodeshot.core.base.tests import user_fixtures
+
+from .models import Node, Image
+
 
 
 class ModelsTest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_nodes.json',
         'test_images.json'
@@ -80,10 +88,11 @@ class ModelsTest(TestCase):
         self.assertEqual(count, Node.objects.published().accessible_to(user=1).count())
         self.assertEqual(count, Node.objects.accessible_to(user=1).published().count())
         # chain with geographic query
-        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 7000)).accessible_to(user=1).published().count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).filter(coords__distance_lte=(pnt, 7000)).published().count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).published().filter(coords__distance_lte=(pnt, 7000)).count())
-        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 7000)).accessible_to(user=1).published().count())
+        count = Node.objects.all().filter(is_published=True).filter(layer_id=1).count()
+        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
+        self.assertEqual(count, Node.objects.accessible_to(user=1).filter(coords__distance_lte=(pnt, 70000)).published().count())
+        self.assertEqual(count, Node.objects.accessible_to(user=1).published().filter(coords__distance_lte=(pnt, 70000)).count())
+        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
     
     def test_image_manager(self):
         """ test manager methods of Image model """
@@ -98,7 +107,7 @@ class APITest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_nodes.json',
         'test_images.json'
@@ -125,7 +134,7 @@ class APITest(TestCase):
             "name": "test_distance", 
             "slug": "test_distance", 
             "address": "via dei test", 
-            "coords": "POINT (12.5822391919 41.8720419277)", 
+            "coords": "POINT (12.99 41.8720419277)", 
             "description": ""
         }
         response = self.client.post(url, json_data)
@@ -209,36 +218,63 @@ class APITest(TestCase):
             "name": "test_distance", 
             "slug": "test_distance", 
             "address": "via dei test", 
-            "coords": "POINT (12.5822391919 41.8720419277)", 
+            "coords": "POINT (12.5822391919000012 41.8720419276999820)", 
             "description": ""
         }
         layer = Layer.objects.get(pk=1)
         layer.minimum_distance = 100
         layer.save()
         
-        # Node coordinates don't respect minimum distance
+        # Node coordinates don't respect minimum distance. Insert should fail because coords are near to already existing PoI ( fusolab )
         response = self.client.post(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
         
-        # Node coordinates respect minimum distance
+        # Node coordinates respect minimum distance. Insert should succed
         json_data['coords'] = "POINT (12.7822391919 41.8720419277)";
         response = self.client.post(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(201, response.status_code)
         
-        # Disable minimum distance control in layer and test again with coords too near
+        # Disable minimum distance control in layer and update node inserting coords too near. Insert should succed
         layer.minimum_distance = 0
         layer.save()
         json_data['coords'] = "POINT (12.5822391917 41.872042278)";
-        json_data['name'] = "test_distance2";
-        json_data['slug'] = "test_distance2";
-        response = self.client.post(url, json.dumps(json_data), content_type='application/json')
-        self.assertEqual(201, response.status_code)
+        n = Node.objects.get(slug='test_distance')
+        node_slug=n.slug
+        url = reverse('api_node_details',args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
         
-        # re-enable minimum distance
+        # re-enable minimum distance and update again with coords too near. Insert should fail
+        layer.minimum_distance = 100
+        layer.save()
+        url = reverse('api_node_details',args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+                
+        # Defining an area for the layer and testing if node is inside the area
+        layer.area= GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
+        layer.save()
+        #Node update should fail because coords are outside layer area
+        json_data['coords'] = "POINT (50 50)";
+        url = reverse('api_node_details',args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+        #Node update should succeed because coords are inside layer area and respect minimum distance
+        json_data['coords'] = "POINT (12.7822391919 41.8720419277)";
+        url = reverse('api_node_details',args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        #Node update should succeed because layer area is disabled
+        layer.area=None
+        layer.save()
+        json_data['coords'] = "POINT (50 50)";
+        url = reverse('api_node_details',args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        
+        # re-enable minimum distance 
         layer.minimum_distance = 100
         layer.save()
         # delete new nodes just added before
-        n = Node.objects.get(slug='test_distance')
         n.delete()
-        n2 = Node.objects.get(slug='test_distance2')
-        n2.delete()
+        

@@ -4,7 +4,9 @@ interactive shell shortcuts for nodeshot ninux project
 
 try:
     # django
-    from django.contrib.auth.models import User, AnonymousUser
+    from django.contrib.auth.models import AnonymousUser
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
     from django.contrib.gis.measure import D
     # nodeshot
     from nodeshot.core.nodes.models import Node, Image

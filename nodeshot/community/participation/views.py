@@ -1,10 +1,14 @@
-from rest_framework import permissions, authentication, generics
-from django.contrib.auth.models import User, Permission
+from rest_framework import permissions, authentication, generics,serializers,exceptions
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.http import Http404
-from django.shortcuts import render
-from .models import NodeRatingCount, Rating, Vote, Comment
-from serializers import *
+from django.http import QueryDict
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
+
+from .models import NodeRatingCount, Rating, Vote, Comment
+from .serializers import *
+
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
 
@@ -20,31 +24,7 @@ def get_queryset_or_404(queryset, kwargs):
         raise Http404(_('Not found'))
     
     return obj
-        
-        
-#def check_layer(slug_value):
-#    """
-#    Checks if a layer exists
-#    """
-#    # ensure exists
-#    try:
-#        # retrieve slug value from instance attribute kwargs, which is a dictionary
-#        #slug_value = self.kwargs.get('slug', None)
-#        # get node, ensure is published
-#        layer = Layer.objects.published().get(slug=slug_value)
-#    except Exception:
-#        raise Http404(_('Layer not found'))
-#    
-#    return layer
 
-#class CommentCreate(generics.CreateAPIView):
-#    """
-#    ### POST
-#    
-#    create comments 
-#    """
-#    model = Comment
-#    serializer_class = CommentAddSerializer
     
 class AllNodesParticipationList(generics.ListAPIView):
     """
@@ -157,16 +137,35 @@ class NodeCommentList(generics.ListCreateAPIView):
     model = Comment
     serializer_class = CommentListSerializer
     
-    def initial(self, request, *args, **kwargs):
-        """ overwritten initial method to ensure node exists """
-        super(NodeCommentList, self).initial(request, *args, **kwargs)
+    #def initial(self, request, *args, **kwargs):
+    #    """ overwritten initial method to ensure node exists """
+    #    TODO : it's not working. GET request returns comments for all nodes
+    #    WORKAROUND : Different methods for GET and POST
+    #    super(NodeCommentList, self).initial(request, *args, **kwargs)
+    #    # ensure node exists
+    #    self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+    
+    def post(self, request, *args, **kwargs):
         # ensure node exists
         self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        
+        return self.create(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        self.queryset = Comment.objects.all().filter(node=node.id)
+        
+        return self.list(request, *args, **kwargs)
         
     def pre_save(self, obj):
         """
         Set node and user id based on the incoming request.
         """
+        if self.node.layer.participation_settings.comments_allowed == False :
+            raise exceptions.ParseError  (_("Comments not allowed for this layer"))
+        if self.node.participation_settings.comments_allowed == False :
+            raise exceptions.ParseError  (_("Comments not allowed for this node"))
+    
         obj.node_id = self.node.id
         obj.user_id = self.request.user.id
     
@@ -197,6 +196,7 @@ class NodeRatingList(generics.CreateAPIView):
         obj.user_id = self.request.user.id
     
 node_ratings = NodeRatingList.as_view()
+
 
 class NodeVotesList(generics.CreateAPIView):
     """

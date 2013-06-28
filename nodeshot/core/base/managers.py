@@ -2,7 +2,8 @@ from django.db.models import Manager, Q
 from django.contrib.gis.db.models import GeoManager
 from django.db.models.query import QuerySet
 from django.contrib.gis.db.models.query import GeoQuerySet
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 from nodeshot.core.base.choices import ACCESS_LEVELS
 

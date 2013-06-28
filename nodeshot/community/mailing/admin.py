@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
@@ -34,6 +35,7 @@ def send_now(modeladmin, request, queryset):
     send_now.short_description = _('Send selected messages now')
     # show message in the admin
     messages.info(request, _('Message sent successfully'))
+
 
 class OutwardAdmin(BaseAdmin):
     list_display  = ('subject', 'status', 'is_scheduled', 'added', 'updated')

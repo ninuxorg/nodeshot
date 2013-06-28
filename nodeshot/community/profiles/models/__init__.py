@@ -1,49 +1,48 @@
-# this app is dependant on "net"
-from django.conf import settings
-if 'nodeshot.core.nodes' not in settings.INSTALLED_APPS:
-    from nodeshot.core.base.exceptions import DependencyError
-    raise DependencyError('nodeshot.community.profiles depends on nodeshot.core.nodes, which should be in settings.INSTALLED_APPS')
-    
+from nodeshot.core.base.utils import check_dependencies
+
+check_dependencies(
+    dependencies='emailconfirmation',
+    module='nodeshot.community.profiles'
+)
+
 
 from profile import Profile
 from social_link import SocialLink
-#from stats import Stats
-from email_notification import EmailNotification
 
-__all__ = ['Profile', 'SocialLink', 'EmailNotification']
+__all__ = ['Profile', 'SocialLink']
 
 # Signals
 # perform certain actions when some other parts of the application changes
 # eg: update user statistics when a new device is added
 
-from django.contrib.auth.models import User, Group
-from nodeshot.networking.net.models import Device
-from nodeshot.core.nodes.models import Node
+#from django.contrib.auth.models import Group
+#from nodeshot.networking.net.models import Device
+#from nodeshot.core.nodes.models import Node
+#
+#from django.dispatch import receiver
+#from django.db.models.signals import post_save, post_delete
+#from nodeshot.core.nodes.signals import node_status_changed
 
-from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
-from nodeshot.core.nodes.signals import node_status_changed
-
-@receiver(post_save, sender=User)
-def new_user(sender, **kwargs):
-    """ create profile, stat and email_notification objects every time a new user is created """
-    created = kwargs['created']
-    user = kwargs['instance']
-    if created:
-        # create profile
-        Profile(user=user).save()
-        # create statistics
-        #Stats(user=user).save()
-        # create notification settings
-        EmailNotification(user=user).save()
-        # add user to default group
-        # TODO: make this configurable in settings
-        try:
-            default_group = Group.objects.get(name='registered')
-            user.groups.add(default_group)
-        except Group.DoesNotExist:
-            pass
-        user.save()
+#@receiver(post_save, sender=User)
+#def new_user(sender, **kwargs):
+#    """ create profile, stat and email_notification objects every time a new user is created """
+#    created = kwargs['created']
+#    user = kwargs['instance']
+#    if created:
+#        # create profile
+#        #Profile(user=user).save()
+#        # create statistics
+#        #Stats(user=user).save()
+#        # create notification settings
+#        EmailNotification(user=user).save()
+#        # add user to default group
+#        # TODO: make this configurable in settings
+#        try:
+#            default_group = Group.objects.get(name='registered')
+#            user.groups.add(default_group)
+#        except Group.DoesNotExist:
+#            pass
+#        user.save()
 
 #@receiver(post_save, sender=Device)
 #def new_device(sender, **kwargs):

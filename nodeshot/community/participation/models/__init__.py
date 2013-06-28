@@ -1,8 +1,9 @@
-# this app is dependant on "nodes"
-from django.conf import settings
-if 'nodeshot.core.nodes' not in settings.INSTALLED_APPS:
-    from nodeshot.core.base.exceptions import DependencyError
-    raise DependencyError('nodeshot.community.participation depends on nodeshot.core.nodes, which should be in settings.INSTALLED_APPS')
+from nodeshot.core.base.utils import check_dependencies
+
+check_dependencies(
+    dependencies='nodeshot.core.nodes',
+    module='nodeshot.community.participation'
+)
 
 
 from comment import Comment
@@ -12,6 +13,8 @@ from rating import Rating
 from node_participation_settings import NodeParticipationSettings
 from node_rating_count import NodeRatingCount
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
+
 
 __all__ = [
     'NodeRatingCount',
@@ -111,4 +114,4 @@ def create_node_rating_counts(sender, **kwargs):
     if created:
         # create node_rating_count 
         node_rating_count = NodeRatingCount(node=node)
-        node_rating_count.save()
+        node_rating_count.save()    

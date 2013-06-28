@@ -3,7 +3,8 @@ from django.db.models import Q
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage, EmailMultiAlternatives
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.core.base.models import BaseDate
@@ -13,6 +14,9 @@ from choices import *
 
 from datetime import datetime
 from django.utils.timezone import utc
+
+import socket, time
+from lxml import html
 
 
 class Outward(BaseDate):
@@ -159,7 +163,6 @@ class Outward(BaseDate):
         # prepare text plain if necessary
         if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True:
             # store plain text in var
-            from lxml import html
             html_content = self.message
             message = html.fromstring(self.message).text_content()
             # set EmailClass to EmailMultiAlternatives
@@ -186,7 +189,7 @@ class Outward(BaseDate):
             emails.append(msg)
             
         
-        import socket, time
+        
         # try sending email
         try:
             # counter will count how many emails have been sent

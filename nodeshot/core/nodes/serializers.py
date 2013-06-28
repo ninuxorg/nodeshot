@@ -1,6 +1,4 @@
-from django.contrib.auth.models import User
 from django.conf import settings
-
 from rest_framework import serializers
 
 from nodeshot.core.layers.models import Layer

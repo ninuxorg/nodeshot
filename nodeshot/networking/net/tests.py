@@ -1,6 +1,8 @@
 from django.test import TestCase
 from .models import Ip
 
+from nodeshot.core.base.tests import user_fixtures
+
 
 class NetworkModelTest(TestCase):
     """
@@ -9,7 +11,7 @@ class NetworkModelTest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_nodes.json',
         'test_routing_protocols.json',
