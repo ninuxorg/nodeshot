@@ -1,8 +1,10 @@
-from rest_framework import permissions, authentication, generics
+from rest_framework import permissions, authentication, generics,serializers,exceptions
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.http import Http404
+from django.http import QueryDict
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from .models import NodeRatingCount, Rating, Vote, Comment
 from .serializers import *
@@ -135,17 +137,35 @@ class NodeCommentList(generics.ListCreateAPIView):
     model = Comment
     serializer_class = CommentListSerializer
     
-    def initial(self, request, *args, **kwargs):
-        """ overwritten initial method to ensure node exists """
-        #TODO : it's not working. GET request returns comments for all nodes
-        super(NodeCommentList, self).initial(request, *args, **kwargs)
+    #def initial(self, request, *args, **kwargs):
+    #    """ overwritten initial method to ensure node exists """
+    #    TODO : it's not working. GET request returns comments for all nodes
+    #    WORKAROUND : Different methods for GET and POST
+    #    super(NodeCommentList, self).initial(request, *args, **kwargs)
+    #    # ensure node exists
+    #    self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+    
+    def post(self, request, *args, **kwargs):
         # ensure node exists
         self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        
+        return self.create(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        self.queryset = Comment.objects.all().filter(node=node.id)
+        
+        return self.list(request, *args, **kwargs)
         
     def pre_save(self, obj):
         """
         Set node and user id based on the incoming request.
         """
+        if self.node.layer.participation_settings.comments_allowed == False :
+            raise exceptions.ParseError  (_("Comments not allowed for this layer"))
+        if self.node.participation_settings.comments_allowed == False :
+            raise exceptions.ParseError  (_("Comments not allowed for this node"))
+    
         obj.node_id = self.node.id
         obj.user_id = self.request.user.id
     
