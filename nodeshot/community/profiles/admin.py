@@ -8,9 +8,7 @@ from django.contrib.auth.forms import UserCreationForm as BaseCreationForm
 from django.contrib.auth.forms import AdminPasswordChangeForm as BasePasswordChangeForm
 
 from nodeshot.core.base.admin import BaseStackedInline
-from .models import SocialLink, Profile
-
-PROFILE_EMAIL_CONFIRMATION = settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True)
+from .models import SocialLink, Profile, PasswordReset
 
 
 # --- User management forms --- #
@@ -62,7 +60,7 @@ class UserAdmin(BaseUserAdmin):
     ]
 
 
-if PROFILE_EMAIL_CONFIRMATION:    
+if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
     from emailconfirmation.models import EmailAddress
     
     class EmailAddressInline(admin.StackedInline):
@@ -73,4 +71,10 @@ if PROFILE_EMAIL_CONFIRMATION:
     UserAdmin.fieldsets[1][1]['fields'].remove('email')
 
 
+class PasswordResetAdmin(admin.ModelAdmin):
+    pass
+    list_display = ('user', 'timestamp', 'reset', 'temp_key')
+
+
 admin.site.register(Profile, UserAdmin)
+admin.site.register(PasswordReset, PasswordResetAdmin)

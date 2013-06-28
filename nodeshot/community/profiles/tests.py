@@ -8,12 +8,15 @@ from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.utils.http import int_to_base36
+from django.core import mail
 from django.conf import settings
 
 from nodeshot.core.nodes.models import Node
 from emailconfirmation.models import EmailAddress, EmailConfirmation
 
 from .models import Profile as User
+from .models import PasswordReset
 
 
 class ProfilesTest(TestCase):
@@ -162,14 +165,14 @@ class ProfilesTest(TestCase):
         new_password = {}
         response = self.client.post(url, new_password)
         self.assertContains(response, 'current_password', status_code=400)
-        self.assertContains(response, 'password', status_code=400)
-        self.assertContains(response, 'password_confirmation', status_code=400)
+        self.assertContains(response, 'password1', status_code=400)
+        self.assertContains(response, 'password2', status_code=400)
         
         # POST 400: wrong current password
         new_password = {
             "current_password": "wrong",
-            "password": "new_password",
-            "password_confirmation": "new_password"
+            "password1": "new_password",
+            "password2": "new_password"
         }
         response = self.client.post(url, new_password)
         self.assertContains(response, 'Current password', status_code=400)
@@ -177,8 +180,8 @@ class ProfilesTest(TestCase):
         # POST 400: password mismatch
         new_password = {
             "current_password": "tester",
-            "password": "new_password",
-            "password_confirmation": "wrong"
+            "password1": "new_password",
+            "password2": "wrong"
         }
         response = self.client.post(url, new_password)
         self.assertContains(response, 'mismatch', status_code=400)
@@ -186,8 +189,8 @@ class ProfilesTest(TestCase):
         # POST 200: password changed
         new_password = {
             "current_password": "tester",
-            "password": "new_password",
-            "password_confirmation": "new_password"
+            "password1": "new_password",
+            "password2": "new_password"
         }
         response = self.client.post(url, new_password)
         self.assertContains(response, 'successfully')
@@ -202,3 +205,85 @@ class ProfilesTest(TestCase):
         # GET 405 again
         response = self.client.get(url)
         self.assertEqual(405, response.status_code)
+    
+    def test_account_password_reset_API(self):
+        url = reverse('api_account_password_reset')
+        
+        # GET 403 - user must not be authenticated
+        response = self.client.get(url)
+        self.assertEqual(403, response.status_code)
+        
+        self.client.logout()
+        
+        # GET 405
+        response = self.client.get(url)
+        self.assertEqual(405, response.status_code)
+        
+        # POST 400: missing required field
+        response = self.client.post(url)
+        self.assertContains(response, 'required', status_code=400)
+        
+        # POST 400: email not found in the DB
+        response = self.client.post(url, { 'email': 'imnotin@the.db' })
+        self.assertContains(response, 'address not verified for any', status_code=400)
+        
+        # POST 200
+        user = User.objects.get(username='registered')
+        
+        if self.PROFILE_EMAIL_CONFIRMATION:
+            email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
+            email_address.save()
+        
+        response = self.client.post(url, { 'email': user.email })
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(PasswordReset.objects.filter(user=user).count(), 1, 'dummy email outbox should contain 1 email message')
+        self.assertEqual(len(mail.outbox), 1, 'dummy email outbox should contain 1 email message')
+        
+        password_reset = PasswordReset.objects.get(user=user)
+        
+        uid_36 = int_to_base36(user.id)
+        url = reverse('api_account_password_reset_key',
+                      kwargs={ 'uidb36': uid_36, 'key': password_reset.temp_key })
+        
+        # POST 400: wrong password
+        params = { 'password1': 'new_password', 'password2': 'wrong' }
+        response = self.client.post(url, params)
+        self.assertContains(response, '"password2"', status_code=400)
+        
+        # correct
+        params['password2'] = 'new_password'
+        response = self.client.post(url, json.dumps(params), content_type='application/json')
+        self.assertContains(response, '"detail"')
+        
+        # ensure password has been changed
+        user = User.objects.get(username='registered')
+        self.assertTrue(user.check_password('new_password'))
+        
+        # ensure password reset object has been used
+        password_reset = PasswordReset.objects.get(user=user)
+        self.assertTrue(password_reset.reset)
+        
+        # request a new password reset key
+        response = self.client.post(reverse('api_account_password_reset'), { 'email': user.email })
+        self.assertEqual(200, response.status_code)
+        
+        # test HTML version of password reset from key
+        password_reset = PasswordReset.objects.get(user=user, reset=False)
+        uid = int_to_base36(password_reset.user_id)
+        key = password_reset.temp_key
+        url = reverse('account_password_reset_key', args=[uid, key])
+        
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        response = self.client.post(url, { 'password1': 'changed', 'password2': 'changed' } )
+        self.assertEqual(200, response.status_code)
+        
+        # ensure password has been changed
+        user = User.objects.get(username='registered')
+        self.assertTrue(user.check_password('changed'))
+        
+        # ensure password reset object has been used
+        password_reset = PasswordReset.objects.filter(user=user).order_by('-id')[0]
+        self.assertTrue(password_reset.reset)

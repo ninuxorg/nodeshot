@@ -30,7 +30,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         validators=[
             validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
         ])
-    email = models.EmailField(_('primary email address'), blank=True)
+    email = models.EmailField(_('primary email address'), blank=True, unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     

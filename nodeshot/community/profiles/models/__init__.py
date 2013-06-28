@@ -1,3 +1,5 @@
+# part of the code of this app is based on pinax.account
+
 from django.conf import settings
 from nodeshot.core.base.utils import check_dependencies
 
@@ -8,10 +10,11 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
     )
 
 
-from profile import Profile
-from social_link import SocialLink
+from .profile import Profile
+from .social_link import SocialLink
+from .password_reset import PasswordReset
 
-__all__ = ['Profile', 'SocialLink']
+__all__ = ['Profile', 'SocialLink', 'PasswordReset']
 
 # Signals
 # perform certain actions when some other parts of the application changes

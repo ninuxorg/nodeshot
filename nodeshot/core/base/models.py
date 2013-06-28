@@ -1,12 +1,12 @@
+from datetime import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import utc
 from django.conf import settings
-from datetime import datetime
-from choices import ACCESS_LEVELS
 
-from utils import choicify
-from utils import now
+from .choices import ACCESS_LEVELS
+from .utils import choicify, now
 
 
 class BaseDate(models.Model):
