@@ -2,9 +2,7 @@ from rest_framework import permissions, authentication, generics,serializers,exc
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.http import Http404
-from django.http import QueryDict
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
 
 from .models import NodeRatingCount, Rating, Vote, Comment
 from .serializers import *
