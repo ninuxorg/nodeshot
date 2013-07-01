@@ -287,3 +287,48 @@ class ProfilesTest(TestCase):
         # ensure password reset object has been used
         password_reset = PasswordReset.objects.filter(user=user).order_by('-id')[0]
         self.assertTrue(password_reset.reset)
+    
+    def test_account_login(self):
+        url = reverse('api_account_login')
+        
+        # GET 403: already loggedin
+        response = self.client.get(url)
+        self.assertEqual(403, response.status_code)
+        
+        self.client.logout()
+        
+        # POST 400 bad credentials
+        response = self.client.post(url, { "username": "wrong", "password": "wrong" })
+        self.assertContains(response, 'not correct', status_code=400)
+        
+        # POST 400 missing credentials
+        response = self.client.post(url)
+        self.assertContains(response, 'required', status_code=400)
+        
+        # POST 200 login successfull
+        response = self.client.post(url, { "username": "registered", "password": "tester" })
+        self.assertContains(response, 'successful')
+        
+        # GET 403: already loggedin
+        response = self.client.get(url)
+        self.assertEqual(403, response.status_code)
+    
+    def test_account_logout(self):
+        url = reverse('api_account_logout')
+        account_url = reverse('api_account_detail')
+        
+        # GET 405
+        response = self.client.get(url)
+        self.assertEqual(405, response.status_code)
+        
+        # Ensure is authenticated
+        response = self.client.get(account_url)
+        self.assertEqual(200, response.status_code)
+        
+        # POST 200
+        response = self.client.post(url)
+        self.assertEqual(200, response.status_code)
+        
+        # Ensure is NOT authenticated
+        response = self.client.get(account_url)
+        self.assertEqual(401, response.status_code)

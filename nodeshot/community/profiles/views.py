@@ -1,9 +1,11 @@
 from django.http import Http404
+from django.contrib.auth import login, logout
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import generics
 from rest_framework import exceptions
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -105,6 +107,58 @@ profile_detail = ProfileDetail.as_view()
 
 
 # ------ Account ------ #
+
+
+class AccountLogin(generics.GenericAPIView):
+    """
+    ### POST
+    
+    Login
+    
+    **Parameters**:
+    
+     * username
+     * password
+     * remember
+    """
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = (IsNotAuthenticated, )
+    serializer_class = LoginSerializer
+    
+    def post(self, request, format=None):
+        """ authenticate """
+        serializer = self.serializer_class(data=request.DATA)
+        
+        if serializer.is_valid():
+            login(request, serializer.instance)
+        
+            if request.DATA.get('remember'):
+                request.session.set_expiry(60 * 60 * 24 * 7 * 3)
+            else:
+                request.session.set_expiry(0)
+                
+            return Response({ 'detail': _(u'Logged in successfully') })
+        
+        return Response(serializer.errors, status=400)
+
+account_login = AccountLogin.as_view()
+
+
+class AccountLogout(APIView):
+    """
+    ### POST
+    
+    Logout
+    """
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = (IsAuthenticated, )
+    
+    def post(self, request, format=None):
+        """ clear session """
+        logout(request)
+        return Response({ 'detail': _(u'Logged out successfully') })
+
+account_logout = AccountLogout.as_view()
 
 
 class AccountDetail(generics.GenericAPIView):

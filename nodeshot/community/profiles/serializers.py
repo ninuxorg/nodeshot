@@ -2,6 +2,7 @@ import hashlib
 
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.contrib.auth import authenticate
 
 from rest_framework import serializers
 
@@ -11,12 +12,14 @@ from .models import PasswordReset
 
 PROFILE_EMAIL_CONFIRMATION = settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True)
 PASSWORD_MAX_LENGTH = User._meta.get_field('password').max_length
+EMAIL_AUTHENTICATION = False
 
 if PROFILE_EMAIL_CONFIRMATION:
     from emailconfirmation.models import EmailAddress
 
 
 __all__ = [
+    'LoginSerializer',
     'ProfileSerializer',
     'ProfileCreateSerializer',
     'AccountSerializer',
@@ -24,6 +27,45 @@ __all__ = [
     'ResetPasswordSerializer',
     'ResetPasswordKeySerializer',
 ]
+
+
+class LoginSerializer(serializers.Serializer):
+    
+    username = serializers.CharField(max_length=User._meta.get_field('username').max_length)
+    password = serializers.CharField(max_length=PASSWORD_MAX_LENGTH)
+    remember = serializers.BooleanField(default=True, help_text = _("If checked you will stay logged in for 3 weeks"))
+    
+    def user_credentials(self, attrs):
+        """
+        Provides the credentials required to authenticate the user for login.
+        """
+        credentials = {}
+        if EMAIL_AUTHENTICATION:
+            credentials["email"] = attrs["email"]
+        else:
+            credentials["username"] = attrs["username"]
+        credentials["password"] = attrs["password"]
+        return credentials
+    
+    def validate(self, attrs):
+        """ checks if login credentials are correct """
+        user = authenticate(**self.user_credentials(attrs))
+        if user:
+            if user.is_active:
+                self.instance = user
+            else:
+                raise forms.ValidationError(_("This account is currently inactive."))
+        else:
+            if EMAIL_AUTHENTICATION:
+                error = _("The email address and/or password you specified are not correct.")
+            else:
+                error = _("The username and/or password you specified are not correct.")
+            raise serializers.ValidationError(error)
+        return attrs
+    
+    def restore_object(self, attrs, instance=None):
+        """ do nothing """
+        return instance
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -79,10 +121,11 @@ class AccountSerializer(serializers.ModelSerializer):
     
     profile = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_profile_detail')
     change_password = HyperlinkedField(view_name='api_account_password_change')
+    logout = HyperlinkedField(view_name='api_account_logout')
     
     class Meta:
         model = User
-        fields = ['profile', 'change_password']
+        fields = ['profile', 'change_password', 'logout']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
