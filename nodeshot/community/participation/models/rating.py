@@ -4,9 +4,11 @@ User = get_user_model()
 from django.db.models import Avg
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
+from nodeshot.core.layers.models import Layer
 
 from .base import UpdateCountsMixin
 
@@ -37,3 +39,17 @@ class Rating(UpdateCountsMixin, BaseDate):
             node_rating_count.rating_avg = 0
 
         node_rating_count.save()
+    
+    #Works for admin but not for API, because pre_save in views.py is executed after this control
+    #If uncommented API throws an exception
+    
+    #def clean(self , *args, **kwargs):
+    #    """
+    #    Check if rating can be inserted for parent node or parent layer
+    #    """
+    #    node = Node.objects.get(pk=self.node_id)
+    #    layer= Layer.objects.get(pk=node.layer_id)
+    #    if  layer.participation_settings.rating_allowed != True:
+    #        raise ValidationError  ("Rating not allowed for this layer")
+    #    if  node.participation_settings.rating_allowed != True:
+    #        raise ValidationError  ("Rating not allowed for this node")

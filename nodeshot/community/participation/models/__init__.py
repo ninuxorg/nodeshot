@@ -114,4 +114,4 @@ def create_node_rating_counts(sender, **kwargs):
     if created:
         # create node_rating_count 
         node_rating_count = NodeRatingCount(node=node)
-        node_rating_count.save()
+        node_rating_count.save()    

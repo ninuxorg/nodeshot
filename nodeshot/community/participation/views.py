@@ -1,54 +1,28 @@
-from rest_framework import permissions, authentication, generics
+from rest_framework import permissions, authentication, generics,serializers,exceptions
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 
 from .models import NodeRatingCount, Rating, Vote, Comment
-from serializers import *
+from .serializers import *
 
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
 
 
-def check_node(slug_value):
+def get_queryset_or_404(queryset, kwargs):
     """
-    Checks if a node exists
-    """
-    # ensure exists
-    try:
-        # retrieve slug value from instance attribute kwargs, which is a dictionary
-        # get node, ensure is published
-        node = Node.objects.published().get(slug=slug_value)
-    except Exception:
-        raise Http404(_('Node not found'))
-    
-    return node
-        
-        
-def check_layer(slug_value):
-    """
-    Checks if a layer exists
+    Checks if object returned by queryset exists
     """
     # ensure exists
     try:
-        # retrieve slug value from instance attribute kwargs, which is a dictionary
-        #slug_value = self.kwargs.get('slug', None)
-        # get node, ensure is published
-        layer = Layer.objects.published().get(slug=slug_value)
+        obj = queryset.get(**kwargs)
     except Exception:
-        raise Http404(_('Layer not found'))
+        raise Http404(_('Not found'))
     
-    return layer
+    return obj
 
-#class CommentCreate(generics.CreateAPIView):
-#    """
-#    ### POST
-#    
-#    create comments 
-#    """
-#    model = Comment
-#    serializer_class = CommentAddSerializer
     
 class AllNodesParticipationList(generics.ListAPIView):
     """
@@ -89,17 +63,17 @@ class LayerNodesCommentList(generics.ListAPIView):
     model = Node
     serializer_class= NodeCommentSerializer
     
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
         """
         Get comments of specified existing layer
         or otherwise return 404
         """
         # ensure layer exists
-        slug_value = self.kwargs.get('slug', None)
-        layer = check_layer(slug_value)
+        layer = get_queryset_or_404(Layer.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        
         # Get queryset of nodes related to layer
-        node = Node.objects.published().all().filter(layer_id=layer.id)        
-        self.queryset = node.all()
+        self.queryset = Node.objects.published().filter(layer_id=layer.id)
+        
         return self.list(request, *args, **kwargs)
 
 layer_nodes_comments= LayerNodesCommentList.as_view()
@@ -122,11 +96,11 @@ class LayerNodesParticipationList(generics.ListAPIView):
         or otherwise return 404
         """
         # ensure layer exists
-        slug_value = self.kwargs.get('slug', None)
-        layer = check_layer(slug_value)
+        layer = get_queryset_or_404(Layer.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        
         # Get queryset of nodes related to layer
-        node = Node.objects.published().all().filter(layer_id=layer.id)        
-        self.queryset = node.all()
+        self.queryset = Node.objects.published().filter(layer_id=layer.id)
+        
         return self.list(request, *args, **kwargs)
     
 layer_nodes_participation= LayerNodesParticipationList.as_view()
@@ -161,16 +135,35 @@ class NodeCommentList(generics.ListCreateAPIView):
     model = Comment
     serializer_class = CommentListSerializer
     
-    def initial(self, request, *args, **kwargs):
-        """ overwritten initial method to ensure node exists """
-        super(NodeCommentList, self).initial(request, *args, **kwargs)
+    #def initial(self, request, *args, **kwargs):
+    #    """ overwritten initial method to ensure node exists """
+    #    TODO : it's not working. GET request returns comments for all nodes
+    #    WORKAROUND : Different methods for GET and POST
+    #    super(NodeCommentList, self).initial(request, *args, **kwargs)
+    #    # ensure node exists
+    #    self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+    
+    def post(self, request, *args, **kwargs):
         # ensure node exists
-        self.node = check_node(self.kwargs.get('slug', None))
+        self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        
+        return self.create(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        self.queryset = Comment.objects.all().filter(node=node.id)
+        
+        return self.list(request, *args, **kwargs)
         
     def pre_save(self, obj):
         """
-        Set node id based on the incoming request.
+        Set node and user id based on the incoming request.
         """
+        if self.node.layer.participation_settings.comments_allowed == False :
+            raise exceptions.ParseError  (_("Comments not allowed for this layer"))
+        if self.node.participation_settings.comments_allowed == False :
+            raise exceptions.ParseError  (_("Comments not allowed for this node"))
+    
         obj.node_id = self.node.id
         obj.user_id = self.request.user.id
     
@@ -188,21 +181,20 @@ class NodeRatingList(generics.CreateAPIView):
     model = Rating
     
     def post(self, request, *args, **kwargs):
-        # ensure exists
-        slug_value = self.kwargs.get('slug', None)
-        check_node(slug_value)
+        # ensure node exists
+        self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
         
         return self.create(request, *args, **kwargs)
     
     def pre_save(self, obj):
         """
-        Set node id based on the incoming request.
+        Set node and user id based on the incoming request.
         """
-        slug_value = self.kwargs.get('slug', None)
-        node=check_node (slug_value)
-        obj.node_id = node.id
+        obj.node_id = self.node.id
+        obj.user_id = self.request.user.id
     
 node_ratings = NodeRatingList.as_view()
+
 
 class NodeVotesList(generics.CreateAPIView):
     """
@@ -217,17 +209,16 @@ class NodeVotesList(generics.CreateAPIView):
     model = Vote
     
     def post(self, request, *args, **kwargs):
-    # ensure exists
-        slug_value = self.kwargs.get('slug', None)
-        check_node (slug_value)
+        # ensure node exists
+        self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        
         return self.create(request, *args, **kwargs)
     
     def pre_save(self, obj):
         """
-        Set node id based on the incoming request.
+        Set node and user id based on the incoming request.
         """
-        slug_value = self.kwargs.get('slug', None)
-        node = check_node (slug_value)
-        obj.node_id = node.id
+        obj.node_id = self.node.id
+        obj.user_id = self.request.user.id
 
 node_votes = NodeVotesList.as_view()

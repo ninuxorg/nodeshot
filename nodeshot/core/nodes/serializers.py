@@ -42,7 +42,7 @@ class NodeDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Node
-        fields = ['layer', 'name', 'slug', 'user', 'coords', 'elev']
+        fields = ['layer', 'name', 'slug', 'user', 'coords', 'elev','address']
         
         if settings.NODESHOT['SETTINGS']['NODE_AREA']:
             fields += ['area']
