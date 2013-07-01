@@ -6,8 +6,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from nodeshot.core.base.models import BaseDate
-from nodeshot.core.nodes.models import Node
-from nodeshot.core.layers.models import Layer
 
 from .base import UpdateCountsMixin
 
@@ -23,7 +21,7 @@ class Vote(UpdateCountsMixin, BaseDate):
         (-1, 'Dislike'),
     )
     
-    node = models.ForeignKey(Node)
+    node = models.ForeignKey('nodes.Node')
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     # TODO: this should also be called "value" instead of "vote"
     vote = models.IntegerField(choices=VOTING_CHOICES)
@@ -44,13 +42,19 @@ class Vote(UpdateCountsMixin, BaseDate):
     #Works for admin but not for API, because pre_save in views.py is executed after this control
     #If uncommented API throws an exception
     
-    #def clean(self , *args, **kwargs):
-    #    """
-    #    Check if votes can be inserted for parent node or parent layer
-    #    """
-    #    node = Node.objects.get(pk=self.node_id)
-    #    layer= Layer.objects.get(pk=node.layer_id)
-    #    if  layer.participation_settings.voting_allowed != True:
-    #        raise ValidationError  ("Voting not allowed for this layer")
-    #    if  node.participation_settings.voting_allowed != True:
-    #        raise ValidationError  ("Voting not allowed for this node")
+    def clean(self , *args, **kwargs):
+        """
+        Check if votes can be inserted for parent node or parent layer
+        """
+        node = self.node
+        
+        # ensure voting for this node is allowed
+        if node.participation_settings.voting_allowed is not True:
+            raise ValidationError("Voting not allowed for this node")
+        
+        if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+            layer = node.layer
+            
+            # ensure voting for this layer is allowed
+            if layer.participation_settings.voting_allowed is not True:
+                raise ValidationError("Voting not allowed for this layer")

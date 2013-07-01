@@ -1,12 +1,14 @@
-from rest_framework import permissions, authentication, generics,serializers,exceptions
-from django.contrib.auth import get_user_model
-User = get_user_model()
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+from rest_framework import permissions, authentication, generics#, exceptions
 
 from .models import NodeRatingCount, Rating, Vote, Comment
 from .serializers import *
 
+from nodeshot.core.base.mixins import CustomDataMixin
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
 
@@ -120,7 +122,7 @@ class NodeParticipationDetail(generics.RetrieveAPIView):
 node_participation = NodeParticipationDetail.as_view()  
 
 
-class NodeCommentList(generics.ListCreateAPIView):
+class NodeCommentList(CustomDataMixin, generics.ListCreateAPIView):
     """
     ### GET
     
@@ -132,40 +134,29 @@ class NodeCommentList(generics.ListCreateAPIView):
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    model = Comment
     serializer_class = CommentListSerializer
+    serializer_custom_class = CommentAddSerializer
     
-    #def initial(self, request, *args, **kwargs):
-    #    """ overwritten initial method to ensure node exists """
-    #    TODO : it's not working. GET request returns comments for all nodes
-    #    WORKAROUND : Different methods for GET and POST
-    #    super(NodeCommentList, self).initial(request, *args, **kwargs)
-    #    # ensure node exists
-    #    self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+    def get_custom_data(self):
+        """ additional request.DATA """
+        return {
+            'node': self.node.id,
+            'user': self.request.user.id
+        }
     
-    def post(self, request, *args, **kwargs):
+    def initial(self, request, *args, **kwargs):
+        """
+        Custom initial method:
+            * ensure node exists and store it in an instance attribute
+            * change queryset to return only comments of current node
+        """
+        super(NodeCommentList, self).initial(request, *args, **kwargs)
+        
         # ensure node exists
         self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
         
-        return self.create(request, *args, **kwargs)
-    
-    def get(self, request, *args, **kwargs):
-        node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
-        self.queryset = Comment.objects.all().filter(node=node.id)
-        
-        return self.list(request, *args, **kwargs)
-        
-    def pre_save(self, obj):
-        """
-        Set node and user id based on the incoming request.
-        """
-        if self.node.layer.participation_settings.comments_allowed == False :
-            raise exceptions.ParseError  (_("Comments not allowed for this layer"))
-        if self.node.participation_settings.comments_allowed == False :
-            raise exceptions.ParseError  (_("Comments not allowed for this node"))
-    
-        obj.node_id = self.node.id
-        obj.user_id = self.request.user.id
+        # return only comments of current node
+        self.queryset = Comment.objects.filter(node_id=self.node.id)
     
 node_comments = NodeCommentList.as_view()    
 
