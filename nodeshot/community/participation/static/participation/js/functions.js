@@ -16,20 +16,62 @@
 			$("#lng").html(lng);
 			$("#address").html(address.display_name);
 		}
- //Layer insert
-     
+//Layers load
+function load_layers(layers) {
+for (i in layers)
+	{
+	//alert(layers[i].name );
+	var newCluster = new L.MarkerClusterGroup();
+	newCluster_nodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
+	newCluster_layer=load_nodes(newCluster_nodes)	;
+	newCluster.addLayer(newCluster_layer);
+	map.addLayer(newCluster);
+	newClusterKey=layers[i].name;
+	overlaymaps[newClusterKey]=newCluster;
+	//alert(overlaymaps[newClusterKey]);
+	}		
+}
+
+ //Marker insert
+	var marker
+	var markerLocation
+	var marker_to_remove
     	function onMapClick(e) {
 			//alert(e.latlng);
-			var markerLocation = e.latlng
-			var marker = new L.Marker(markerLocation);
+			if (marker_to_remove) {
+				map.removeLayer(marker_to_remove);
+			}
+			
+			markerLocation = e.latlng
+			markerLocationtoString = e.latlng.toString();
+			var popupelem= document.createElement('div');
+			marker = new L.Marker(markerLocation);
+			marker_to_remove=marker
+			//popupelem.innerHTML=markerLocation;
+			popupelem.innerHTML+='Is position correct ?<br>';
+			popupelem.innerHTML+='<a class=\'confirm_marker\' onclick=marker_confirm(markerLocationtoString)>Confirm</a>&nbsp;';
+			popupelem.innerHTML+='<a class=\'remove_marker\' onclick=marker_delete(marker)>Delete</a>';
+			
 			map
+				
 				.addLayer(marker);
 			popup
 				.setLatLng(e.latlng)
-				.setContent("Inserisci un commento e invia il PoI")
+				.setContent(popupelem)
 				.openOn(map);
-			open_insert(e.latlng.toString());
+			
 		}
+		
+//Marker delete
+function marker_delete(marker) {
+map.removeLayer(marker);
+map.closePopup();
+}
+function marker_confirm(markerLocationtoString) {
+open_insert(markerLocationtoString);
+map.closePopup();
+}
+		
 //Load layer nodes
 	
 	function load_nodes(geojson_layer_nodes)		
