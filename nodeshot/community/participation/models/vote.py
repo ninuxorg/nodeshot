@@ -38,10 +38,7 @@ class Vote(UpdateCountsMixin, BaseDate):
         node_rating_count.likes = self.node.vote_set.filter(vote=1).count()
         node_rating_count.dislikes = self.node.vote_set.filter(vote=-1).count()
         node_rating_count.save()
-   
-    #Works for admin but not for API, because pre_save in views.py is executed after this control
-    #If uncommented API throws an exception
-    
+      
     def clean(self , *args, **kwargs):
         """
         Check if votes can be inserted for parent node or parent layer

@@ -40,9 +40,6 @@ class Rating(UpdateCountsMixin, BaseDate):
 
         node_rating_count.save()
     
-    #Works for admin but not for API, because pre_save in views.py is executed after this control
-    #If uncommented API throws an exception
-    
     def clean(self , *args, **kwargs):
         """
         Check if rating can be inserted for parent node or parent layer

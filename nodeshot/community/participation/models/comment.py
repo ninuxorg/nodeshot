@@ -29,9 +29,6 @@ class Comment(UpdateCountsMixin, BaseDate):
         node_rating_count.comment_count = self.node.comment_set.count()
         node_rating_count.save()
     
-    #Works for admin but not for API, because pre_save in views.py is executed after this control
-    #If uncommented API throws an exception
-    
     def clean(self , *args, **kwargs):
         """
         Check if comments can be inserted for parent node or parent layer
