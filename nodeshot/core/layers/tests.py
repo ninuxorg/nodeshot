@@ -43,7 +43,7 @@ class LayerTest(TestCase):
         count = Layer.objects.filter(is_external=True, is_published=True).count()
         self.assertEquals(Layer.objects.external().published().count(), count)
         self.assertEquals(Layer.objects.published().external().count(), count)
-               
+        
     def test_layers_api(self,*args,**kwargs):
         """
         Layers endpoint should be reachable and return 404 if layer is not found.
@@ -54,12 +54,12 @@ class LayerTest(TestCase):
         # api_layer list
         response = self.client.get(reverse('api_layer_list'))
         self.assertEqual(response.status_code, 200)
+        
         # api's expecting slug in request,test with existing and fake slug
-        #
-        # api_layer_details
-        response = self.client.get(reverse('api_layer_details',args=[layer_slug]))
+        # api_layer_detail
+        response = self.client.get(reverse('api_layer_detail',args=[layer_slug]))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_details',args=[fake_layer_slug]))
+        response = self.client.get(reverse('api_layer_detail',args=[fake_layer_slug]))
         self.assertEqual(response.status_code, 404)
         # api_layer_nodes
         response = self.client.get(reverse('api_layer_nodes_list',args=[layer_slug]))

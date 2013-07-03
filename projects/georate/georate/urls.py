@@ -15,6 +15,7 @@ urlpatterns = patterns('',
         
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r"^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$", "nodeshot.community.profiles.html_views.password_reset_from_key", name="account_password_reset_key"),
 )
 
 

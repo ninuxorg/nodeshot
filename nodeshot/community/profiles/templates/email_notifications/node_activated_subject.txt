@@ -1,1 +1,0 @@
-{% load i18n %}{% blocktrans %}Node "{{ node }}" activated on {{ site_name }}{% endblocktrans %}

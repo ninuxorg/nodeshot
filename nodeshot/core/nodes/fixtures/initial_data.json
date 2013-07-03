@@ -19,5 +19,13 @@
         "fields": {
             "name": "trusted"
         }
+    },
+    {
+        "model": "sites.site",
+        "pk": 1,
+        "fields": {
+            "domain": "ninux.testing.org",
+            "name": "ninux"
+        }
     }
 ]
