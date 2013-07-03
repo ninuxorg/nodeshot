@@ -43,13 +43,17 @@ class Rating(UpdateCountsMixin, BaseDate):
     #Works for admin but not for API, because pre_save in views.py is executed after this control
     #If uncommented API throws an exception
     
-    #def clean(self , *args, **kwargs):
-    #    """
-    #    Check if rating can be inserted for parent node or parent layer
-    #    """
-    #    node = Node.objects.get(pk=self.node_id)
-    #    layer= Layer.objects.get(pk=node.layer_id)
-    #    if  layer.participation_settings.rating_allowed != True:
-    #        raise ValidationError  ("Rating not allowed for this layer")
-    #    if  node.participation_settings.rating_allowed != True:
-    #        raise ValidationError  ("Rating not allowed for this node")
+    def clean(self , *args, **kwargs):
+        """
+        Check if rating can be inserted for parent node or parent layer
+        """
+        
+        if not self.pk:
+        
+            node = self.node
+            
+            layer= Layer.objects.get(pk=node.layer_id)
+            if  layer.participation_settings.rating_allowed != True:
+                raise ValidationError  ("Rating not allowed for this layer")
+            if  node.participation_settings.rating_allowed != True:
+                raise ValidationError  ("Rating not allowed for this node")

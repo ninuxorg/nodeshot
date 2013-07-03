@@ -46,15 +46,18 @@ class Vote(UpdateCountsMixin, BaseDate):
         """
         Check if votes can be inserted for parent node or parent layer
         """
-        node = self.node
         
-        # ensure voting for this node is allowed
-        if node.participation_settings.voting_allowed is not True:
-            raise ValidationError("Voting not allowed for this node")
+        if not self.pk:
         
-        if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-            layer = node.layer
+            node = self.node
             
-            # ensure voting for this layer is allowed
-            if layer.participation_settings.voting_allowed is not True:
-                raise ValidationError("Voting not allowed for this layer")
+            # ensure voting for this node is allowed
+            if node.participation_settings.voting_allowed is not True:
+                raise ValidationError("Voting not allowed for this node")
+            
+            if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+                layer = node.layer
+                
+                # ensure voting for this layer is allowed
+                if layer.participation_settings.voting_allowed is not True:
+                    raise ValidationError("Voting not allowed for this layer")

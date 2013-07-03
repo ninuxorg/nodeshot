@@ -14,9 +14,14 @@ __all__ = [
     'CommentSerializer',
     'NodeCommentSerializer',
     'ParticipationSerializer',
-    'NodeParticipationSerializer'
+    'NodeParticipationSerializer',
+    'RatingListSerializer',
+    'RatingAddSerializer' ,
+    'VoteListSerializer',
+    'VoteAddSerializer',
 ]
 
+#Comments serializers
 
 class CommentAddSerializer(serializers.ModelSerializer):
     
@@ -34,15 +39,15 @@ class CommentListSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('node', 'username', 'text',)
         readonly_fields = ('node', 'username', 'added')
-   
+
 
 class CommentSerializer(serializers.ModelSerializer):
     username = serializers.Field(source='user.username')
     class Meta:
         model = Comment
         fields = ('username', 'text', 'added',)
-        
-        
+      
+  
 class NodeCommentSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(source='comment_set')
     
@@ -50,7 +55,46 @@ class NodeCommentSerializer(serializers.ModelSerializer):
         model = Node
         fields = ('name', 'description', 'comments')
         
+#Rating serializers
         
+class RatingAddSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Rating       
+        fields= ('node', 'user', 'value', )
+    
+    
+class RatingListSerializer(serializers.ModelSerializer):
+    """ Rating serializer """
+    node = serializers.Field(source='node.name')
+    username = serializers.Field(source='user.username')
+    
+    class Meta:
+        model = Rating
+        fields = ('node', 'username', 'value',)
+        readonly_fields = ('node', 'username', 'added')
+
+#Vote serializers
+        
+class VoteAddSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Vote       
+        fields= ('node', 'user', 'vote', )
+    
+    
+class VoteListSerializer(serializers.ModelSerializer):
+    """ Votes serializer """
+    node = serializers.Field(source='node.name')
+    username = serializers.Field(source='user.username')
+    
+    class Meta:
+        model = Vote
+        fields = ('node', 'username', 'vote',)
+        readonly_fields = ('node', 'username', 'added')   
+
+#Participation serializers
+ 
 class ParticipationSerializer(serializers.ModelSerializer):
     
         
