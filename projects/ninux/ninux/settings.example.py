@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    #'django.contrib.sites',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
@@ -268,6 +268,8 @@ NODESHOT = {
         'CONTACT_OUTWARD_STEP': 20,
         'CONTACT_OUTWARD_DELAY': 10,
         'CONTACT_OUTWARD_HTML': True, # grappelli must be in INSTALLED_APPS, otherwise it won't work
+        'PROFILE_EMAIL_CONFIRMATION': True,
+        'PROFILE_REQUIRED_FIELDS': ['email'],
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (

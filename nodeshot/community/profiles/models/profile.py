@@ -3,8 +3,11 @@ from django.core import validators
 from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
+from emailconfirmation.models import EmailAddress
 from nodeshot.core.base.utils import now
+from ..signals import password_changed
 
 import re
 
@@ -27,7 +30,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         validators=[
             validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
         ])
-    email = models.EmailField(_('primary email address'), blank=True)
+    email = models.EmailField(_('primary email address'), blank=True, unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     
@@ -50,7 +53,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    REQUIRED_FIELDS = settings.NODESHOT['SETTINGS'].get('PROFILE_REQUIRED_FIELDS', ['email'])
 
     class Meta:
         verbose_name = _('user')
@@ -73,3 +76,24 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         """
         send_mail(subject, message, from_email, [self.email])
+    
+    def add_email(self):
+        """
+        Add email to DB and sends a confirmation mail if PROFILE_EMAL_CONFIRMATION is True
+        """
+        if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+            self.is_active = False
+            self.save()
+            EmailAddress.objects.add_email(self, self.email)
+            return True
+        else:
+            return False
+    
+    def change_password(self, new_password):
+        """
+        Changes password and sends a signal
+        """
+        self.set_password(new_password)
+        self.save()
+        password_changed.send(sender=self.__class__, user=self)
+    

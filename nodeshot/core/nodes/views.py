@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import permissions, authentication, generics
 from rest_framework.response import Response
 
-from nodeshot.core.base.views import ACLMixin
+from nodeshot.core.base.mixins import ACLMixin
 
 from .models import Node, Image
 from .serializers import *
@@ -41,7 +41,6 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
         
         return queryset
     
-
 node_list = NodeList.as_view()
     
     
