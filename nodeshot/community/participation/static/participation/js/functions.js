@@ -23,7 +23,7 @@ for (i in layers)
 	//alert(layers[i].name );
 	var newCluster = new L.MarkerClusterGroup();
 	newCluster_nodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
-	newCluster_layer=load_nodes(newCluster_nodes)	;
+	var newCluster_layer=load_nodes(newCluster_nodes)	;
 	newCluster.addLayer(newCluster_layer);
 	map.addLayer(newCluster);
 	newClusterKey=layers[i].name;
@@ -74,35 +74,36 @@ map.closePopup();
 		
 //Load layer nodes
 	
-	function load_nodes(geojson_layer_nodes)		
-	L.geoJson(geojson_layer_nodes, {
-	onEachFeature: function (feature, layer) {
-	//layer.bindPopup("<br><button onclick=\"alert('"+feature.properties.name+"')\";>Apri box commenti</button>");
-	//layer.bindPopup(feature.properties.popupContent+"<br><button onclick=\"alert('Il resto alla prossima puntata')\";>Apri box commenti</button>");
-	
-	slug=feature.properties.slug
-	//alert(slug);
-	node=   getData('http://localhost:8000/api/v1/nodes/'+slug+'/participation/');
-	console.log(node)
-	//node_obj=JSON.parse(node);
-	
-	var domelem = document.createElement('div');
-	domelem.href = "#";
-	domelem.innerHTML = node.name+'<br>';
-	domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
-	domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
-	domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
-	domelem.innerHTML += '<br> <b>Comments: </b>'+ node.participation.comment_count+'<br>';
-	domelem.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
-	domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
-
-	domelem.onclick = function() {
-	    alert(this.href); 
-	    // do whatever else you want to do 
-	};
-	layer.bindPopup(domelem);
+	function load_nodes(geojson_layer_nodes)
+	{
+	layer=
+		L.geoJson(geojson_layer_nodes, {
+		onEachFeature: function (feature, layer)
+			{
+			//console.log(layer);
+			slug=feature.properties.slug
+			//alert(slug);
+			node=   getData('http://localhost:8000/api/v1/nodes/'+slug+'/participation/');
+			//console.log(node)
+			//node_obj=JSON.parse(node);
+			
+			var domelem = document.createElement('div');
+			domelem.href = "#";
+			domelem.innerHTML = node.name+'<br>';
+			domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
+			domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
+			domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
+			domelem.innerHTML += '<br> <b>Comments: </b>'+ node.participation.comment_count+'<br>';
+			domelem.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
+			domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
+			//console.log(layer.options);
+			layer.bindPopup(domelem);
+			}
+			
+		});
+	return layer;	
 	}
-	});
+	
 //Ajax check
     
   $(function() {
