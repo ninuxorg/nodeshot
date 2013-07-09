@@ -93,9 +93,9 @@ map.closePopup();
 			domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
 			domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
 			domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
-			domelem.innerHTML += '<br> <b>Comments: </b>'+ node.participation.comment_count+'<br>';
 			domelem.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
 			domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
+			domelem.innerHTML += '<br> <b><a onclick=alert(node.slug);>Comments: </b>'+ node.participation.comment_count+'</a><br>';
 			//console.log(layer.options);
 			layer.bindPopup(domelem);
 			}
@@ -146,6 +146,10 @@ var data;
     return data;
 }
 
+//Show_comments
+function show_comments(node) {
+	$("#valori").html(node);
+}
 // Load #loading layers
 // Assuming that the div or any other HTML element has the ID = loading and it contains the necessary loading image.
 
