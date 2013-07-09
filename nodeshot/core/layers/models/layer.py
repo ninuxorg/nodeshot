@@ -1,12 +1,11 @@
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.base.choices import MAP_ZOOM, ACCESS_LEVELS
 from nodeshot.core.base.utils import choicify
-
 from ..managers import LayerManager
 
 
@@ -28,8 +27,14 @@ class Layer(BaseDate):
     # organizational
     organization = models.CharField(_('organization'), help_text=_('Organization which is responsible to manage this layer'), max_length=255)
     website = models.URLField(_('Website'), blank=True, null=True)
-    email = models.EmailField(_('email'), help_text=_('possibly an email address that delivers messages to all the active participants; if you don\'t have such an email you can add specific users in the "mantainers" field'), blank=True)
-    mantainers = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('mantainers'), help_text=_('you can specify the users who are mantaining this layer so they will receive emails from the system'), blank=True)
+    email = models.EmailField(_('email'),
+                              help_text=_("""possibly an email address that delivers messages to all the active participants;
+                                          if you don't have such an email you can add specific users in the "mantainers" field"""),
+                              blank=True)
+    mantainers = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                        verbose_name=_('mantainers'),
+                                        help_text=_('you can specify the users who are mantaining this layer so they will receive emails from the system'),
+                                        blank=True)
     
     # settings
     minimum_distance = models.IntegerField(default=settings.NODESHOT['DEFAULTS']['ZONE_MINIMUM_DISTANCE'],
