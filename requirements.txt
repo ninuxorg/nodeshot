@@ -16,6 +16,9 @@ python-dateutil
 six
 wsgiref
 vectorformats
+requests
+
+# this should be removed
 lxml
 
 # better admin

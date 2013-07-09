@@ -1,10 +1,11 @@
+import requests
+import simplejson
+from xml.dom import minidom
+
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-import urllib2
-from xml.dom import minidom
-import simplejson
 
 
 class BaseConverter(object):
@@ -32,15 +33,19 @@ class BaseConverter(object):
         return [message]
     
     def retrieve_content(self):
-        """ retrieve xml data """
-        self.content = urllib2.urlopen(self.config.get('url')).read()
+        """ retrieve data """
+        # shortcuts for readability
+        url = self.config.get('url')
+        verify_SSL = self.config.get('verify_SSL', True)
+        # do HTTP request and store content
+        self.content = requests.get(url, verify=verify_SSL).content
     
     def parse(self):
-        """ parse XML data """
+        """ parse data """
         self.parsed_content = minidom.parseString(self.content)
     
     def save_file(self, name, content, resource_name='nodes'):
-        """ save json file on server's hard drive """
+        """ save output file on server's hard drive """
         file_name = '%s.json' % name
         file_contents = ContentFile(content)
         path = '%sexternal/%s/%s' % (settings.MEDIA_ROOT, resource_name, file_name)

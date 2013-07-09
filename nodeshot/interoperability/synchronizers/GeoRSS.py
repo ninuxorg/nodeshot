@@ -1,7 +1,8 @@
-from nodeshot.core.nodes.models.choices import NODE_STATUS
-from BaseInterop import BaseConverter
-import simplejson
+import simplejson as json
 from dateutil import parser
+
+from nodeshot.core.nodes.models.choices import NODE_STATUS
+from .BaseInterop import BaseConverter
 
 
 class GeoRSS(BaseConverter):
@@ -13,6 +14,7 @@ class GeoRSS(BaseConverter):
         items = self.parsed_content.getElementsByTagName('item')
         # init empty list
         nodes = []
+        
         # loop over all of them
         for item in items:
             # retrieve info in auxiliary variables
@@ -32,11 +34,11 @@ class GeoRSS(BaseConverter):
                 'name': name,
                 'status': NODE_STATUS.get('active'),
                 'center': "POINT (%s %s)" % (lat, lng),
-                #'is_hotspot': True,
                 'description': description
             }
             # fill node list container
             nodes.append(node)
+        
         # dictionary that will be converted to json 
         json_dict = {
             'meta': {
@@ -45,5 +47,6 @@ class GeoRSS(BaseConverter):
             'status': NODE_STATUS,
             'objects': nodes
         }
+        
         # return json formatted string
-        return simplejson.dumps(json_dict)
+        return json.dumps(json_dict)
