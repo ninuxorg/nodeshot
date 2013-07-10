@@ -1,7 +1,9 @@
+import simplejson
+
 from nodeshot.core.nodes.models.choices import NODE_STATUS
 from nodeshot.core.links.choices import LINK_STATUS, LINK_TYPE
-from BaseInterop import BaseConverter
-import simplejson
+
+from .base import BaseConverter
 
 
 class NodeshotOld(BaseConverter):

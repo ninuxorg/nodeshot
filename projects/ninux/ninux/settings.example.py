@@ -314,7 +314,7 @@ NODESHOT = {
     },
     'INTEROPERABILITY': [
         ('nodeshot.interoperability.synchronizers.NodeshotOld', 'Nodeshot 0.9'),
-        ('nodeshot.interoperability.synchronizers.GeoRSS', 'GeoRSS'),
+        ('nodeshot.interoperability.synchronizers.OpenWISP', 'OpenWISP'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
     ]
 }

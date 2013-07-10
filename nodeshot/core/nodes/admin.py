@@ -20,9 +20,16 @@ class ImageInline(BaseStackedInline):
         classes = ('grp-collapse grp-open', )
 
 
+NODE_FILTERS = ['is_published', 'status', 'access_level', 'added']
+
+# include layer in filters if layers app installed
+if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+    NODE_FILTERS = ['layer'] + NODE_FILTERS
+
+
 class NodeAdmin(geoadmin.OSMGeoAdmin, BaseAdmin):
     list_display  = ('name', 'status', 'access_level', 'is_published', 'added', 'updated')
-    list_filter   = ('status', 'access_level', 'added')
+    list_filter   = NODE_FILTERS
     search_fields = ('name',)
     date_hierarchy = 'added'
     ordering = ('-id',)

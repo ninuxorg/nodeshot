@@ -1,21 +1,22 @@
+import simplejson as json
+from dateutil import parser
+
 from django.template.defaultfilters import slugify
 from django.contrib.gis.geos import Point
-from django.core.exceptions import ValidationError
-from django.conf import settings
 
-from nodeshot.core.nodes.models.choices import NODE_STATUS
 from nodeshot.core.nodes.models import Node
+from nodeshot.core.nodes.models.choices import NODE_STATUS
 
 from .base import XMLConverter
 
 
-class ProvinciaWIFI(XMLConverter):
-    """ ProvinciaWIFI interoperability class """
+class OpenWISP(XMLConverter):
+    """ OpenWISP GeoRSS interoperability class """
     
     def save(self):
         """ synchronize DB """
         # retrieve all items
-        items = self.parsed_data.getElementsByTagName('AccessPoint')
+        items = self.parsed_data.getElementsByTagName('item')
         
         # init empty lists
         added_nodes = []
@@ -32,38 +33,21 @@ class ProvinciaWIFI(XMLConverter):
         for item in items:
             # retrieve info in auxiliary variables
             # readability counts!
-            name = self.get_text(item, 'Denominazione')[0:70]
+            guid = self.get_text(item, 'guid')
+            name, created_at = guid.split('201', 1)
             slug = slugify(name)
-            
-            number = 1
-            original_name = name
-            needed_different_name = False
-            while True:
-                # items might have the same name... so we add a number..
-                if slug in external_nodes_slug:
-                    needed_different_name = True
-                    number = number + 1
-                    name = "%s - %d" % (original_name, number)
-                    slug = slug = slugify(name)                    
-                else:
-                    if needed_different_name:
-                        self.verbose('needed a different name for %s, trying "%s"' % (original_name, name))
-                    break
-            
-            lat = self.get_text(item, 'Latitudine')
-            lng = self.get_text(item, 'longitudine')
-            description = 'Indirizzo: %s, %s; Tipologia: %s' % (
-                self.get_text(item, 'Indirizzo'),
-                self.get_text(item, 'Comune'),
-                self.get_text(item, 'Tipologia')
-            )
-            address = '%s, %s' % (
-                self.get_text(item, 'Indirizzo'),
-                self.get_text(item, 'Comune')
-            )
+            created_at = "201%s" % created_at
+            updated_at = self.get_text(item, 'updated')            
+            lat, lng = self.get_text(item, 'georss:point').split(' ')
+            description = self.get_text(item, 'title')
+            address = self.get_text(item, 'description')
             
             # point object
             point = Point(float(lng), float(lat))
+            
+            # convert dates to python datetime
+            created_at = parser.parse(created_at)
+            updated_at = parser.parse(updated_at)
             
             # default values
             added = False
@@ -99,14 +83,17 @@ class ProvinciaWIFI(XMLConverter):
                 node.address = address
                 changed = True
             
-            # perform save or update only if necessary
+            if node.added != created_at:
+                node.added = created_at
+                changed = True
+            
+            if node.updated != updated_at:
+                node.updated = updated_at
+                changed = True
+            
             if added or changed:
-                try:
-                    node.full_clean()
-                    node.save()
-                except ValidationError as e:
-                    # TODO: are we sure we want to interrupt the execution?
-                    raise Exception("%s errors: %s" % (name, e.messages))
+                node.full_clean()
+                node.save(auto_update=False)
             
             if added:
                 added_nodes.append(node)
@@ -125,13 +112,11 @@ class ProvinciaWIFI(XMLConverter):
         for local_node in local_nodes_slug:
             # if local node not found in external nodes
             if not local_node in external_nodes_slug:
-                node_name = node.name
                 # retrieve from DB and delete
                 node = Node.objects.get(slug=local_node)
                 node.delete()
                 # then increment count that will be included in message
                 deleted_nodes_count = deleted_nodes_count + 1
-                self.verbose('node "%s" deleted' % node_name)
         
         # message that will be returned
         self.message = """
@@ -139,6 +124,7 @@ class ProvinciaWIFI(XMLConverter):
             %s nodes changed
             %s nodes deleted
             %s nodes unmodified
+            
             %s total external records processed
             %s total local nodes for this layer
         """ % (

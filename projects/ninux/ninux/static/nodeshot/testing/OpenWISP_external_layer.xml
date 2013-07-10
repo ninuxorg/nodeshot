@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:georss="http://www.georss.org/georss">
+  <channel>
+    <title>FreePublicWifi GeoRSS feed</title>
+    <link>http://openwisp.org/</link>
+    <author>
+      <name>OpenWISP.org</name>
+      <email></email>
+    </author>
+    <description>FreePublicWifi Access Points</description>
+    <language>en-us</language>
+        <item>
+          <guid>Podesta1_CED2011-08-24 12:24:35 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4185 8.96166</georss:point>
+          <updated>2013-07-10 06:36:23 +0200</updated>
+        </item>
+        <item>
+          <guid>Brocchi1_062011-08-25 11:04:04 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.3832 9.04392</georss:point>
+          <updated>2013-07-10 06:36:39 +0200</updated>
+        </item>
+        <item>
+          <guid>Informag1_RU272011-09-01 10:46:06 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4071 8.93399</georss:point>
+          <updated>2013-07-10 06:35:02 +0200</updated>
+        </item>
+        <item>
+          <guid>Informag2_CED2011-09-01 11:33:04 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4071 8.93399</georss:point>
+          <updated>2013-07-10 06:34:50 +0200</updated>
+        </item>
+        <item>
+          <guid>AereoIAT1_042011-09-01 17:27:22 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.412 8.84633</georss:point>
+          <updated>2013-07-10 06:36:01 +0200</updated>
+        </item>
+        <item>
+          <guid>AereoIAT2_052011-09-05 11:55:02 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.412 8.84633</georss:point>
+          <updated>2013-07-10 06:35:24 +0200</updated>
+        </item>
+        <item>
+          <guid>Campanella1_032011-09-05 15:06:54 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4493 9.01213</georss:point>
+          <updated>2013-07-10 06:35:28 +0200</updated>
+        </item>
+        <item>
+          <guid>Campanella2_022011-09-05 15:19:20 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4493 9.01213</georss:point>
+          <updated>2013-07-10 06:35:12 +0200</updated>
+        </item>
+        <item>
+          <guid>Deamicis2_182011-09-05 17:11:19 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4084 8.92757</georss:point>
+          <updated>2013-07-10 06:35:41 +0200</updated>
+        </item>
+        <item>
+          <guid>Deamicis1_352011-09-13 11:14:39 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4084 8.92757</georss:point>
+          <updated>2013-07-10 06:36:24 +0200</updated>
+        </item>
+        <item>
+          <guid>Guerra1_P1_342011-09-20 16:23:03 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4161 8.87222</georss:point>
+          <updated>2013-07-10 07:42:14 +0200</updated>
+        </item>
+        <item>
+          <guid>Guerra3_P2_222011-09-20 17:20:02 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4161 8.87222</georss:point>
+          <updated>2013-07-10 07:42:17 +0200</updated>
+        </item>
+        <item>
+          <guid>Guerra4_P2_72011-09-20 17:39:57 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4161 8.87222</georss:point>
+          <updated>2013-07-10 07:42:28 +0200</updated>
+        </item>
+        <item>
+          <guid>Guerra2_P1_422011-10-05 10:46:15 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4161 8.87222</georss:point>
+          <updated>2013-07-10 07:42:15 +0200</updated>
+        </item>
+        <item>
+          <guid>Buranello1_922011-10-04 17:02:04 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4107 8.89476</georss:point>
+          <updated>2013-07-10 06:34:57 +0200</updated>
+        </item>
+        <item>
+          <guid>Gallino1_662011-10-04 17:12:43 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4107 8.89476</georss:point>
+          <updated>2013-07-10 06:35:16 +0200</updated>
+        </item>
+        <item>
+          <guid>CastAlb1_CED2011-10-10 08:46:44 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4177 8.92668</georss:point>
+          <updated>2013-07-10 06:34:41 +0200</updated>
+        </item>
+        <item>
+          <guid>CastAlb2_XX2011-10-10 09:05:33 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4177 8.92668</georss:point>
+          <updated>2013-07-10 09:51:13 +0200</updated>
+        </item>
+        <item>
+          <guid>CastAlb3_XX2011-10-10 09:44:20 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4177 8.92668</georss:point>
+          <updated>2013-06-12 12:48:42 +0200</updated>
+        </item>
+        <item>
+          <guid>Bruschi_CED2011-10-26 18:19:17 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4247 8.84412</georss:point>
+          <updated>2013-07-09 08:42:00 +0200</updated>
+        </item>
+        <item>
+          <guid>VCroce1_A0402012-02-02 12:33:31 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.3982 8.9367</georss:point>
+          <updated>2013-07-10 06:34:41 +0200</updated>
+        </item>
+        <item>
+          <guid>Firpo1_CED2011-11-02 08:34:30 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4357 8.76677</georss:point>
+          <updated>2013-07-10 06:35:11 +0200</updated>
+        </item>
+        <item>
+          <guid>Tursi_M1102012-02-23 09:15:08 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4111 8.93296</georss:point>
+          <updated>2013-07-10 06:35:07 +0200</updated>
+        </item>
+        <item>
+          <guid>Wolfson1_CED2012-05-15 18:10:12 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.3817 9.04431</georss:point>
+          <updated>2013-06-12 12:48:59 +0200</updated>
+        </item>
+        <item>
+          <guid>Benzi2_XXX2012-05-29 20:10:26 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4279 8.7488</georss:point>
+          <updated>2013-06-12 12:49:02 +0200</updated>
+        </item>
+        <item>
+          <guid>Benzi3_Direz2012-05-29 20:11:40 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4279 8.7488</georss:point>
+          <updated>2013-07-10 06:34:45 +0200</updated>
+        </item>
+        <item>
+          <guid>MAL1_CED2012-11-21 16:14:36 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4258 8.81794</georss:point>
+          <updated>2013-07-10 06:35:49 +0200</updated>
+        </item>
+        <item>
+          <guid>MAL2_262012-11-21 16:15:13 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4258 8.81794</georss:point>
+          <updated>2013-06-12 12:49:10 +0200</updated>
+        </item>
+        <item>
+          <guid>MAL3_232012-11-21 16:16:14 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4258 8.81794</georss:point>
+          <updated>2013-07-10 06:35:56 +0200</updated>
+        </item>
+        <item>
+          <guid>MVIMP22012-11-23 13:52:38 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.424 8.8523</georss:point>
+          <updated>2013-06-12 12:49:13 +0200</updated>
+        </item>
+        <item>
+          <guid>MVIMP12012-06-29 10:00:39 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.424 8.85216</georss:point>
+          <updated>2013-07-10 06:35:50 +0200</updated>
+        </item>
+        <item>
+          <guid>VDP1_CED2012-12-07 11:06:23 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.41 8.93178</georss:point>
+          <updated>2013-07-10 06:35:24 +0200</updated>
+        </item>
+        <item>
+          <guid>MAZ1_362012-12-13 11:37:32 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4126 8.92935</georss:point>
+          <updated>2013-07-10 06:35:01 +0200</updated>
+        </item>
+        <item>
+          <guid>Mun_Med_Levante2013-03-14 11:55:11 +0100</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.3965 8.94449</georss:point>
+          <updated>2013-07-10 06:36:05 +0200</updated>
+        </item>
+        <item>
+          <guid>Lercari1_522013-06-14 11:15:48 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4076 8.96108</georss:point>
+          <updated>2013-07-10 06:35:01 +0200</updated>
+        </item>
+        <item>
+          <guid>Lercari3_942013-06-14 11:17:51 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4076 8.96147</georss:point>
+          <updated>2013-07-10 06:35:26 +0200</updated>
+        </item>
+        <item>
+          <guid>Lercari4_1082013-06-14 11:18:58 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4076 8.96147</georss:point>
+          <updated>2013-07-10 06:35:03 +0200</updated>
+        </item>
+        <item>
+          <guid>Lercari5_1142013-06-14 11:19:42 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4076 8.96147</georss:point>
+          <updated>2013-07-10 10:48:19 +0200</updated>
+        </item>
+        <item>
+          <guid>Lercari2_422013-06-14 11:56:19 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4076 8.96147</georss:point>
+          <updated>2013-07-10 06:35:39 +0200</updated>
+        </item>
+        <item>
+          <guid>Cervetto_12013-06-27 11:00:27 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4316 8.89204</georss:point>
+          <updated>2013-07-10 14:59:04 +0200</updated>
+        </item>
+        <item>
+          <guid>Cervetto_22013-06-27 10:56:19 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4316 8.89204</georss:point>
+          <updated>2013-07-10 15:01:11 +0200</updated>
+        </item>
+        <item>
+          <guid>SantaTecla2013-06-28 09:58:26 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4158 8.98035</georss:point>
+          <updated>2013-07-10 06:54:58 +0200</updated>
+        </item>
+  </channel>
+</rss>

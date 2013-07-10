@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:georss="http://www.georss.org/georss">
+  <channel>
+    <title>FreePublicWifi GeoRSS feed</title>
+    <link>http://openwisp.org/</link>
+    <author>
+      <name>OpenWISP.org</name>
+      <email></email>
+    </author>
+    <description>FreePublicWifi Access Points</description>
+    <language>en-us</language>
+        <item>
+          <guid>Lercari2_422013-06-14 11:56:19 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4076 8.96147</georss:point>
+          <updated>2013-07-10 06:35:39 +0200</updated>
+        </item>
+        <item>
+          <guid>Cervetto_12013-06-27 11:00:27 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4316 8.89204</georss:point>
+          <updated>2013-07-10 14:59:04 +0200</updated>
+        </item>
+        <item>
+          <guid>Cervetto_22013-06-27 10:56:19 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4316 8.89204</georss:point>
+          <updated>2013-07-10 15:01:11 +0200</updated>
+        </item>
+        <item>
+          <guid>SantaTecla2013-06-28 09:58:26 +0200</guid>
+          <title></title>
+              <description>Test WISP</description>
+              <georss:point>44.4158 8.98035</georss:point>
+          <updated>2013-07-10 06:54:58 +0200</updated>
+        </item>
+  </channel>
+</rss>
