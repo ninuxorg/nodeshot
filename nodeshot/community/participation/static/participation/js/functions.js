@@ -154,21 +154,24 @@ var data;
 
 //Show_comments
 function show_comments(node) {
-	var html_text
-	html_text=node;
+	var html_text=node+'<br>&nbsp;'
 	//$("#valori").html('');
 	url='http://localhost:8000/api/v1/nodes/'+node+'/comments/?format=json';
 	comments=   getData(url);
 	console.log(comments);
 	for (var i = 0; i < comments.length; i++) { 
 
-	html_text+='<ul>';	
-	html_text+='<li>Username:'+comments[i].username+'</li>';
-	html_text+='<li>Added:'+comments[i].added+'</li>';
-	html_text+='<li>Comment:'+comments[i].text+'</comments[i].addedli>';
-	html_text+='</ul>';
+	html_text+='<div class=\'comment_text\'>';	
+	//html_text+='<li>Added:'+comments[i].added+'</li>';
+	html_text+=comments[i].text;
+	html_text+='</div>';
+	html_text+='<div class=\'comment_user\'>';	
+	html_text+='Posted by: '+comments[i].username+' on ';
+	html_text+=comments[i].added+'<br>';
+	html_text+='</div>';
 	}
 	//alert(html_text);
+	html_text+='Add your:<br>';
 	$("#node_insert").hide();
 	$("#valori").html(html_text);
 
