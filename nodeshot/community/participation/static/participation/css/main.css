@@ -16,12 +16,41 @@
 
 #valori {
   background-color: #cccccc;
-  color: #000000
+  color: #000000;
+  font-size: 10px;
 }
 
+#node_insert {
+  background-color: #cccccc;
+  color: #000000;
+  font-size: 10px;
+  display:none;
+}  
 
+#box{
+     width:200px;
+     height:400px;
+     margin:-200px 0 0 -300px;
+     top:50%;
+     left:50%;
+     background-color:#CCCCCC;
+     display:none;
+     z-index:+300;
+     position:fixed;
+     -moz-border-radius:15px;
+     -webkit-border-radius:15px;
+     border-radius: 15px;
+}
 
-
+.chiudi{
+    font-size:18px;
+     color:#000;
+     font-weight:bold;
+     position:absolute;
+     right:2%;
+     top:0%;
+     cursor:pointer;
+}
 
 
 

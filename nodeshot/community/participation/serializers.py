@@ -37,7 +37,7 @@ class CommentListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Comment
-        fields = ('node', 'username', 'text',)
+        fields = ('node', 'username', 'text','added')
         readonly_fields = ('node', 'username', 'added')
 
 
@@ -111,6 +111,6 @@ class NodeParticipationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=Node
-        fields= ('name', 'participation')       
+        fields= ('name','slug', 'participation')       
 
 
