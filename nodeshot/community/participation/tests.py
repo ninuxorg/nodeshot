@@ -206,32 +206,7 @@ class ParticipationModelsTest(TestCase):
         self.client.logout()
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 403)
-               
-    def test_node_participation_api(self,*args,**kwargs):
-        """
-        Participation endpoint should be reachable only with GET and return 404 if object is not found.
-        """
-        node = Node.objects.get(pk=1)
-        node_slug = node.slug
-        fake_node_slug = "idontexist"
-        
-        # api_node_participation
-        
-        # GET
-        
-        response = self.client.get(reverse('api_node_participation', args=[node_slug]))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_node_participation', args=[fake_node_slug]))
-        self.assertEqual(response.status_code, 404)
-        
-        # POST not allowed -- 405
-        
-        # FIXME: non riesco ad accedere alla URL se non esplicitamente-
-        
-        login=self.client.login(username='admin', password='tester')
-        response = self.client.post('/api/v1/nodes/fusolab/participation/', args=[node_slug])
-        self.assertEqual(response.status_code, 405)
-    
+                  
     def test_ratings_api(self,*args,**kwargs):    
         """
         Ratings endpoint should be reachable only with POST and return 404 if object is not found.
@@ -239,87 +214,142 @@ class ParticipationModelsTest(TestCase):
         node = Node.objects.get(pk=1)
         node_slug = node.slug
         fake_node_slug = "idontexist"
+        node_id = node.id
+        layer = Layer.objects.get(pk=node.layer_id)
+        
+        url = reverse('api_node_ratings', args=[node_slug])
+        wrong_url = reverse('api_node_ratings', args=[fake_node_slug])
         
         # api_node_ratings
         
         # GET not allowed -- 405
         
-        response = self.client.get(reverse('api_node_ratings',args=[node_slug]))
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
         
         # POST
         
-        # FIXME: non riesco ad accedere alla URL se non esplicitamente-
-        
         login = self.client.login(username='admin', password='tester')
-        good_post_data = { "node": 1, "value": "5", "user": 2 }
-        
+        good_post_data = { "value": "5" }
+                
         #wrong slug -- 404
-        response = self.client.post('/api/v1/nodes/notexists/ratings/', good_post_data)
+        response = self.client.post(wrong_url, good_post_data)
         self.assertEqual(response.status_code, 404)
-        
-        #wrong POST data (node not exists ) -- 400
-        bad_post_data= {"node": 100, "value": "5", "user": 2}
-        response = self.client.post('/api/v1/nodes/fusolab/ratings/', bad_post_data)
-        self.assertEqual(response.status_code, 400)
         
         #wrong POST data (wrong rating) -- 400
         bad_post_data= {"node": 1, "value": "12", "user": 2}
-        response = self.client.post('/api/v1/nodes/fusolab/ratings/', bad_post_data)
+        response = self.client.post(url, bad_post_data)
         self.assertEqual(response.status_code, 400)
         
         #Correct  POST data and correct slug-- 201
-        response = self.client.post('/api/v1/nodes/fusolab/ratings/', good_post_data)
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 201)
+        
+        # POST 201 - ensure additional post data "user" and "node" are ignored
+        bad_post_data = { "node": 100, "value": "10", "user": 2 }
+        response = self.client.post(url, bad_post_data)
+        self.assertEqual(response.status_code, 201)
+        ratings_dict = json.loads(response.content)
+        self.assertEqual(ratings_dict['user'], 1)
+        self.assertEqual(ratings_dict['node'], 1)
+        self.assertEqual(ratings_dict['value'], 10)
+        
+        # Rating not allowed on layer
+        node.layer.participation_settings.rating_allowed = False
+        node.layer.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 400)
+        node.layer.participation_settings.rating_allowed = True
+        node.layer.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 201)
+        
+        # Rating not allowed on node
+        node.participation_settings.rating_allowed = False
+        node.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 400)
+        node.participation_settings.rating_allowed = True
+        node.participation_settings.save()
+        response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
         #User not allowed -- 403
         self.client.logout()
-        response = self.client.post('/api/v1/nodes/fusolab/ratings/', good_post_data)
+        response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 403)
         
     def test_votes_api(self,*args,**kwargs):    
         """
         Vote endpoint should be reachable only with POST and return 404 if object is not found.
         """
+      
         node = Node.objects.get(pk=1)
-        node_slug=node.slug
-        fake_node_slug="idontexist"
+        node_slug = node.slug
+        fake_node_slug = "idontexist"
+        node_id = node.id
+        layer = Layer.objects.get(pk=node.layer_id)
         
-        # api_node_ratings
+        url = reverse('api_node_votes', args=[node_slug])
+        wrong_url = reverse('api_node_votes', args=[fake_node_slug])
+        
+        # api_node_votes
         
         # GET not allowed -- 405
         
-        response = self.client.get(reverse('api_node_votes',args=[node_slug]))
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
         
         #POST
         
-        #FIXME: non riesco ad accedere alla URL se non esplicitamente-
-        
         login=self.client.login(username='admin', password='tester')
-        good_post_data= { "node": 1, "vote": "1", "user": 2 }
+        good_post_data= { "vote": "1" }
         
         #wrong slug -- 404
-        response = self.client.post('/api/v1/nodes/notexists/votes/', good_post_data)
+        response = self.client.post(wrong_url, good_post_data)
         self.assertEqual(response.status_code, 404)
         
-        #wrong POST data (node not exists ) -- 400
-        bad_post_data= { "node": 100, "vote": "1", "user": 2 }
-        response = self.client.post('/api/v1/nodes/fusolab/votes/', bad_post_data)
-        self.assertEqual(response.status_code, 400)
-        
         #wrong POST data (wrong vote) -- 400
-        bad_post_data= { "node": 1, "vote": "3", "user": 2 }
-        response = self.client.post('/api/v1/nodes/fusolab/votes/', bad_post_data)
+        bad_post_data= { "vote": "3" }
+        response = self.client.post(url, bad_post_data)
         self.assertEqual(response.status_code, 400)
         
         #Correct  POST data and correct slug-- 201
-        response = self.client.post('/api/v1/nodes/fusolab/votes/', good_post_data)
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 201)
+        
+        # POST 201 - ensure additional post data "user" and "node" are ignored
+        bad_post_data = { "node": 100, "vote": "1", "user": 2 }
+        response = self.client.post(url, bad_post_data)
+        self.assertEqual(response.status_code, 201)
+        votes_dict = json.loads(response.content)
+        self.assertEqual(votes_dict['user'], 1)
+        self.assertEqual(votes_dict['node'], 1)
+        self.assertEqual(votes_dict['vote'], 1)
+        
+        # Voting not allowed on layer
+        node.layer.participation_settings.voting_allowed = False
+        node.layer.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 400)
+        node.layer.participation_settings.voting_allowed = True
+        node.layer.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 201)
+        
+        # Voting not allowed on node
+        node.participation_settings.voting_allowed = False
+        node.participation_settings.save()
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 400)
+        node.participation_settings.voting_allowed = True
+        node.participation_settings.save()
+        response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
         #User not allowed -- 403
         self.client.logout()
-        response = self.client.post('/api/v1/nodes/fusolab/votes/', good_post_data)
+        response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 403)
         
     def test_layer_comments_api(self, *args,**kwargs):
@@ -329,15 +359,23 @@ class ParticipationModelsTest(TestCase):
         layer = Layer.objects.get(pk=1)
         layer_slug = layer.slug
         fake_layer_slug = "idontexist"
+        url = reverse('api_layer_nodes_comments', args=[layer_slug])
+        wrong_url = reverse('api_layer_nodes_comments', args=[fake_layer_slug])
         
         # api_layer_nodes_comments
         
         # GET
         
-        response = self.client.get(reverse('api_layer_nodes_comments', args=[layer_slug]))
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_nodes_comments', args=[fake_layer_slug]))
+        response = self.client.get(wrong_url)
         self.assertEqual(response.status_code, 404)
+        
+        # POST not allowed -- 405
+        
+        login=self.client.login(username='admin', password='tester')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405) 
         
     def test_layer_participation_api(self, *args,**kwargs):
         """
@@ -346,14 +384,58 @@ class ParticipationModelsTest(TestCase):
         layer = Layer.objects.get(pk=1)
         layer_slug = layer.slug
         fake_layer_slug = "idontexist"
+        url = reverse('api_layer_nodes_participation', args=[layer_slug])
+        wrong_url = reverse('api_layer_nodes_participation', args=[fake_layer_slug])
         
         # api_layer_nodes_participation
         
         # GET
         
-        response = self.client.get(reverse('api_layer_nodes_participation', args=[layer_slug]))
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_nodes_participation', args=[fake_layer_slug]))
+        response = self.client.get(wrong_url)
         self.assertEqual(response.status_code, 404)
+        
+        # POST not allowed -- 405
+        
+        login=self.client.login(username='admin', password='tester')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)   
+        
+    def test_node_participation_api(self,*args,**kwargs):
+        """
+        Participation endpoint should be reachable only with GET and return 404 if object is not found.
+        """
+        node = Node.objects.get(pk=1)
+        node_slug = node.slug
+        fake_node_slug = "idontexist"
+        url = reverse('api_node_participation', args=[node_slug])
+        wrong_url = reverse('api_node_participation', args=[fake_node_slug])
+        
+        # api_node_participation
+        
+        # GET
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        participation_dict = json.loads(response.content)
+        likes_count=node.noderatingcount.likes
+        dislikes_count=node.noderatingcount.dislikes
+        comment_count=node.noderatingcount.comment_count
+        rating_count=node.noderatingcount.rating_count
+        rating_avg=node.noderatingcount.rating_avg
+        self.assertEqual(participation_dict['participation']['likes'], likes_count)
+        self.assertEqual(participation_dict['participation']['dislikes'], dislikes_count)
+        self.assertEqual(participation_dict['participation']['comment_count'], comment_count)
+        self.assertEqual(participation_dict['participation']['rating_count'], rating_count)
+        self.assertEqual(participation_dict['participation']['rating_avg'], rating_avg)
+        response = self.client.get(wrong_url)
+        self.assertEqual(response.status_code, 404)
+        
+        # POST not allowed -- 405
+        
+        login=self.client.login(username='admin', password='tester')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
             
     

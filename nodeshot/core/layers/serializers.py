@@ -24,6 +24,7 @@ class LayerListSerializer(serializers.ModelSerializer):
         fields= ('name', 'center', 'area', 'details', 'nodes', 'geojson')
 
 
+
 class LayerDetailSerializer(LayerListSerializer):
     """
     Layer details

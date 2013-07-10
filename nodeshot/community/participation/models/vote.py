@@ -38,23 +38,23 @@ class Vote(UpdateCountsMixin, BaseDate):
         node_rating_count.likes = self.node.vote_set.filter(vote=1).count()
         node_rating_count.dislikes = self.node.vote_set.filter(vote=-1).count()
         node_rating_count.save()
-   
-    #Works for admin but not for API, because pre_save in views.py is executed after this control
-    #If uncommented API throws an exception
-    
+      
     def clean(self , *args, **kwargs):
         """
         Check if votes can be inserted for parent node or parent layer
         """
-        node = self.node
         
-        # ensure voting for this node is allowed
-        if node.participation_settings.voting_allowed is not True:
-            raise ValidationError("Voting not allowed for this node")
+        if not self.pk:
         
-        if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-            layer = node.layer
+            node = self.node
             
-            # ensure voting for this layer is allowed
-            if layer.participation_settings.voting_allowed is not True:
-                raise ValidationError("Voting not allowed for this layer")
+            # ensure voting for this node is allowed
+            if node.participation_settings.voting_allowed is not True:
+                raise ValidationError("Voting not allowed for this node")
+            
+            if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+                layer = node.layer
+                
+                # ensure voting for this layer is allowed
+                if layer.participation_settings.voting_allowed is not True:
+                    raise ValidationError("Voting not allowed for this layer")

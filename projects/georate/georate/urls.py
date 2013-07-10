@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-    
+        
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r"^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$", "nodeshot.community.profiles.html_views.password_reset_from_key", name="account_password_reset_key"),
@@ -22,6 +22,11 @@ urlpatterns = patterns('',
 if 'grappelli' in settings.INSTALLED_APPS:
     urlpatterns = urlpatterns + patterns('',
         url(r'^grappelli/', include('grappelli.urls')),
+    )
+
+if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+    urlpatterns = urlpatterns + patterns('',
+        url(r'^confirm_email/(\w+)/$', 'emailconfirmation.views.confirm_email', name='confirm_email'),
     )
 
 
@@ -37,3 +42,8 @@ if settings.DEBUG:
     urlpatterns += patterns('django.contrib.staticfiles.views',
         url(r'^static/(?P<path>.*)$', 'serve'),
     )
+
+urlpatterns += patterns('nodeshot.community.participation.views',
+        url(r'^map/', 'map_view'),
+    )
+    

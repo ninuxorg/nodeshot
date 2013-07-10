@@ -161,34 +161,63 @@ class NodeCommentList(CustomDataMixin, generics.ListCreateAPIView):
 node_comments = NodeCommentList.as_view()    
 
 
-class NodeRatingList(generics.CreateAPIView):
+class NodeRatingList(CustomDataMixin,generics.CreateAPIView):
     """
+    ### GET
+    
+    Not allowed
+    
     ### POST
     
     Add a rating for the specified node
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    model = Rating
+    serializer_class = RatingListSerializer
+    serializer_custom_class = RatingAddSerializer
     
-    def post(self, request, *args, **kwargs):
+    def get_custom_data(self):
+        """ additional request.DATA """
+        return {
+            'node': self.node.id,
+            'user': self.request.user.id
+        }
+    
+    def initial(self, request, *args, **kwargs):
+        """
+        Custom initial method:
+            * ensure node exists and store it in an instance attribute
+            * change queryset to return only comments of current node
+        """
+        super(NodeRatingList, self).initial(request, *args, **kwargs)
+        
         # ensure node exists
         self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
         
-        return self.create(request, *args, **kwargs)
+        # return only comments of current node
+        self.queryset = Rating.objects.filter(node_id=self.node.id)
     
-    def pre_save(self, obj):
-        """
-        Set node and user id based on the incoming request.
-        """
-        obj.node_id = self.node.id
-        obj.user_id = self.request.user.id
+node_ratings = NodeRatingList.as_view() 
     
-node_ratings = NodeRatingList.as_view()
+    #def post(self, request, *args, **kwargs):
+    #    # ensure node exists
+    #    self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+    #    
+    #    return self.create(request, *args, **kwargs)
+    #
+    #def pre_save(self, obj):
+    #    """
+    #    Set node and user id based on the incoming request.
+    #    """
+    #    obj.node_id = self.node.id
+    #    obj.user_id = self.request.user.id
 
 
-class NodeVotesList(generics.CreateAPIView):
+class NodeVotesList(CustomDataMixin,generics.CreateAPIView):
     """
+    ### GET
+    
+    Not allowed
     
     ### POST
     
@@ -197,19 +226,48 @@ class NodeVotesList(generics.CreateAPIView):
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    model = Vote
+    serializer_class = VoteListSerializer
+    serializer_custom_class = VoteAddSerializer
     
-    def post(self, request, *args, **kwargs):
+    def get_custom_data(self):
+        """ additional request.DATA """
+        return {
+            'node': self.node.id,
+            'user': self.request.user.id
+        }
+    
+    def initial(self, request, *args, **kwargs):
+        """
+        Custom initial method:
+            * ensure node exists and store it in an instance attribute
+            * change queryset to return only comments of current node
+        """
+        super(NodeVotesList, self).initial(request, *args, **kwargs)
+        
         # ensure node exists
         self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
         
-        return self.create(request, *args, **kwargs)
+        # return only comments of current node
+        self.queryset = Vote.objects.filter(node_id=self.node.id)
     
-    def pre_save(self, obj):
-        """
-        Set node and user id based on the incoming request.
-        """
-        obj.node_id = self.node.id
-        obj.user_id = self.request.user.id
+
+    
+    #def post(self, request, *args, **kwargs):
+    #    # ensure node exists
+    #    self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+    #    
+    #    return self.create(request, *args, **kwargs)
+    #
+    #def pre_save(self, obj):
+    #    """
+    #    Set node and user id based on the incoming request.
+    #    """
+    #    obj.node_id = self.node.id
+    #    obj.user_id = self.request.user.id
 
 node_votes = NodeVotesList.as_view()
+
+
+from django.shortcuts import render
+def map_view(request):
+    return render(request,'participation/index.html')
