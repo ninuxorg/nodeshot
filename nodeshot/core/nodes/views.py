@@ -56,7 +56,7 @@ class NodeDetail(ACLMixin, generics.RetrieveUpdateAPIView):
     """
     lookup_field = 'slug'
     model = Node
-    serializer_class= NodeDetailSerializer
+    serializer_class = NodeDetailSerializer
     authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     queryset = Node.objects.published().select_related('user', 'layer')

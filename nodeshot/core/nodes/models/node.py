@@ -16,8 +16,8 @@ class Node(BaseAccessLevel):
     """
     Nodes of a network, can be assigned to 'Layers' and should belong to 'Users'
     """
-    name = models.CharField(_('name'), max_length=50, unique=True)
-    slug = models.SlugField(max_length=50, db_index=True, unique=True)
+    name = models.CharField(_('name'), max_length=75, unique=True)
+    slug = models.SlugField(max_length=75, db_index=True, unique=True)
     address = models.CharField(_('address'),max_length=150,blank=True, null=True)
     status = models.SmallIntegerField(_('status'), max_length=3, choices=choicify(NODE_STATUS), default=NODE_STATUS.get(settings.NODESHOT['DEFAULTS']['NODE_STATUS'], 'potential'))
     is_published = models.BooleanField(default=settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True))

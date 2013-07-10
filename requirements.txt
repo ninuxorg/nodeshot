@@ -16,7 +16,7 @@ python-dateutil
 six
 wsgiref
 vectorformats
-lxml
+requests
 
 # better admin
 django-grappelli==2.4.4

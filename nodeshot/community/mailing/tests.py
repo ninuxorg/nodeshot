@@ -296,6 +296,9 @@ class OutwardTest(TestCase):
             for email in emails:
                 self.assertTrue(email in recipients)
     
+    # TODO:
+    # test html/plain-text format
+    
     def test_outward_validation_scheduled1(self):
         """ *** A scheduled message without any value for scheduled date and time should not pass validation *** """
         self.msg.is_scheduled = 1

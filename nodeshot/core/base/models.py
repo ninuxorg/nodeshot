@@ -26,7 +26,15 @@ class BaseDate(models.Model):
         """
         automatically update updated date field
         """
-        self.updated = now()
+        # auto fill updated field with current time unless explicitly disabled
+        auto_update = kwargs.get('auto_update', True)
+        if auto_update:
+            self.updated = now()
+        
+        # remove eventual auto_update
+        if kwargs.has_key('auto_update'):
+            kwargs.pop('auto_update')
+        
         super(BaseDate, self).save(*args, **kwargs)
 
 

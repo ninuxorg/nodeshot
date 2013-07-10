@@ -1,22 +1,22 @@
+import socket
+import time
+
 from django.db import models
 from django.db.models import Q
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.utils.translation import ugettext_lazy as _
+from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.core.base.models import BaseDate
-from nodeshot.core.nodes.models import Node
 from nodeshot.core.base.fields import MultiSelectField
-from choices import *
+from nodeshot.core.base.utils import now
+from nodeshot.core.nodes.models import Node
 
-from datetime import datetime
-from django.utils.timezone import utc
-
-import socket, time
-from lxml import html
+from .choices import *
 
 
 class Outward(BaseDate):
@@ -164,12 +164,13 @@ class Outward(BaseDate):
         if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True:
             # store plain text in var
             html_content = self.message
-            message = html.fromstring(self.message).text_content()
             # set EmailClass to EmailMultiAlternatives
             EmailClass = EmailMultiAlternatives
         else:
             EmailClass = EmailMessage
-            message = self.message
+        
+        # default message is plain text
+        message = strip_tags(self.message)
         
         # loop over recipients and fill "emails" list
         for recipient in recipients:
@@ -187,8 +188,6 @@ class Outward(BaseDate):
                 msg.attach_alternative(html_content, "text/html")
             # prepare email object
             emails.append(msg)
-            
-        
         
         # try sending email
         try:
@@ -235,7 +234,7 @@ class Outward(BaseDate):
         if self.is_scheduled is 1 and (self.scheduled_date == '' or self.scheduled_date is None or self.scheduled_time == '' or self.scheduled_time is None):
             raise ValidationError(_('If message is scheduled both fields "scheduled date" and "scheduled time" must be specified'))
         
-        if self.is_scheduled is 1 and self.scheduled_date < datetime.utcnow().replace(tzinfo=utc).date():
+        if self.is_scheduled is 1 and self.scheduled_date < now().date():
             raise ValidationError(_('The scheduled date is set to a past date'))
         
         if self.is_filtered is 1 and (len(self.filters) < 1 or self.filters == [''] or self.filters == [u''] or self.filters == '' or self.filters is None):
