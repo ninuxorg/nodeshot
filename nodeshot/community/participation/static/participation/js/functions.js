@@ -1,66 +1,4 @@
-var marker
-var markerLocation
-var marker_to_remove
-var newCluster
-
-
-//function to catch and display PoI coordinates
-function open_insert(latlng)
-{
-	$("#valori").html('');
-	//alert(latlng);
-	var arr_latlng=latlng.split(",");
-	var lat=arr_latlng[0].slice(7);
-	var lng=arr_latlng[1].slice(0,-1);
-	str_latlng="Latitudine:" + lat + "<br>Longitudine:" + lng
-//	 var address=   eval ("(" + getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1' + ")"));
-	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
-//	alert (address);
-//	console.log(address);
-	var address_display=address.display_name;
-//	alert(address_display);
-	$("#node_insert").show();
-	$("#lat").html(lat);
-	$("#lng").html(lng);
-	$("#address").html(address.display_name);
-}
-
-
-//Layers load
-function load_layers(layers) {
-
-for (i in layers)
-	{
-	var AllLayers= []
-	//alert(layers[i].name );
-	var newCluster = new L.MarkerClusterGroup();
-	newCluster_nodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
-	var newCluster_layer=load_nodes(newCluster_nodes)	;
-	newCluster.addLayer(newCluster_layer);
-	map.addLayer(newCluster);
-	newClusterKey=layers[i].name;
-	overlaymaps[newClusterKey]=newCluster;
-	AllLayers[i]=newCluster;
-	//newCluster.clearLayers();
-	}
-
-
-}
-
-
-//function clearLayers(mapIn) {
-//            var larrays = map.getLayers();
-//            for (var curs = 0; curs < larrays.length; curs++) {
-//                if (curs > 0) {
-//                    mapIn.removeLayer(larrays[curs]);
-//                }
-//            }
-//        }
-function clear_layers()  {
-            roma.clean_layers;
-        }
-
- //Marker manual insert on map
+//Marker manual insert on map
 
 function onMapClick(e) {
 	//alert(e.latlng);
@@ -87,48 +25,100 @@ function onMapClick(e) {
 		.openOn(map);
 	
 }
-		
+
 //Marker delete
 function marker_delete(marker) {
-map.removeLayer(marker);
-map.closePopup();
+	map.removeLayer(marker);
+	map.closePopup();	
 }
 
 //Marker confirm
-function marker_confirm(markerLocationtoString) {
-open_insert(markerLocationtoString);
-map.closePopup();
+function marker_confirm(marker) {
+	open_insert(marker);
+	map.closePopup();
 }
+
+//function to catch and display PoI coordinates
+function open_insert(latlng){
+	$("#valori").html('');
+	//alert(latlng);
+	var arr_latlng=latlng.split(",");
+	var lat=arr_latlng[0].slice(7);
+	var lng=arr_latlng[1].slice(0,-1);
+	var str_latlng="Latitudine:" + lat + "<br>Longitudine:" + lng
+	// var address=   eval ("(" + getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1' + ")"));
+	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
+	//console.log(address);
+	//alert(address_display);
+	$("#node_insert").show();
+	$("#lat").html(lat);
+	$("#lng").html(lng);
+	$("#address").html(address.display_name);
+}
+
+
+
+//Layers load
+function load_layers(layers) {
+	var AllLayers= []
+	for (i in layers)
+		{
+		
+		//alert(layers[i].name );
+		var newCluster = new L.MarkerClusterGroup();
+		var newCluster_nodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
+		var newCluster_layer=load_nodes(newCluster_nodes)	;
+		newCluster.addLayer(newCluster_layer);
+		map.addLayer(newCluster);
+		var newClusterKey=layers[i].name;
+		overlaymaps[newClusterKey]=newCluster;
+		AllLayers[i]=newCluster;
+		//console.log(AllLayers[i])
+		}
+	return AllLayers;
+
+}
+
+
+function clear_layers(a)  {
+            for (x in a) {
+		alert (x);
+		a[x].clearLayers();
+	    }
+        }
+
+
+		
+
 		
 //Load layer nodes
 
-function load_nodes(geojson_layer_nodes)
-{
-layer=
-L.geoJson(geojson_layer_nodes, {
-onEachFeature: function (feature, layer)
-	{
-	//console.log(layer);
-	slug=feature.properties.slug
-	//alert(slug);
-	node=   getData('http://localhost:8000/api/v1/nodes/'+slug+'/participation/');
-	//console.log(node)
-	//node_obj=JSON.parse(node);
-	
-	var domelem = document.createElement('div');
-	domelem.innerHTML ='<b>'+ node.name+'</b><br>';
-	domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
-	domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
-	domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
-	domelemhttps://mail.google.com/mail/u/0/?shva=1#inbox.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
-	domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
-	domelem.innerHTML += '<br> <b><a onclick=show_comments(\''+node.slug+'\');>Comments: </b>'+ node.participation.comment_count+'</a><br>';
-	//console.log(layer.options);
-	layer.bindPopup(domelem);
-	}
-	
-});
-return layer;	
+function load_nodes(geojson_layer_nodes){
+
+	layer=
+	L.geoJson(geojson_layer_nodes, {
+	onEachFeature: function (feature, layer)
+		{
+		//console.log(layer);
+		slug=feature.properties.slug
+		//alert(slug);
+		node=   getData('http://localhost:8000/api/v1/nodes/'+slug+'/participation/');
+		//console.log(node)
+		//node_obj=JSON.parse(node);
+		var domelem = document.createElement('div');
+		domelem.innerHTML ='<b>'+ node.name+'</b><br>';
+		domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
+		domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
+		domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
+		domelemhttps://mail.google.com/mail/u/0/?shva=1#inbox.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
+		domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
+		domelem.innerHTML += '<br> <b><a onclick=show_comments(\''+node.slug+'\');>Comments: </b>'+ node.participation.comment_count+'</a><br>';
+		//console.log(layer.options);
+		layer.bindPopup(domelem);
+		}
+		
+	});
+	return layer;	
 }
 	
 //Ajax check
