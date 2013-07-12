@@ -1,6 +1,7 @@
 var marker
 var markerLocation
 var marker_to_remove
+var newCluster
 
 
 //function to catch and display PoI coordinates
@@ -27,8 +28,10 @@ function open_insert(latlng)
 
 //Layers load
 function load_layers(layers) {
+
 for (i in layers)
 	{
+	var AllLayers= []
 	//alert(layers[i].name );
 	var newCluster = new L.MarkerClusterGroup();
 	newCluster_nodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
@@ -37,9 +40,25 @@ for (i in layers)
 	map.addLayer(newCluster);
 	newClusterKey=layers[i].name;
 	overlaymaps[newClusterKey]=newCluster;
-	//alert(overlaymaps[newClusterKey]);
-	}		
+	AllLayers[i]=newCluster;
+	//newCluster.clearLayers();
+	}
+
+
 }
+
+
+//function clearLayers(mapIn) {
+//            var larrays = map.getLayers();
+//            for (var curs = 0; curs < larrays.length; curs++) {
+//                if (curs > 0) {
+//                    mapIn.removeLayer(larrays[curs]);
+//                }
+//            }
+//        }
+function clear_layers()  {
+            roma.clean_layers;
+        }
 
  //Marker manual insert on map
 
@@ -101,7 +120,7 @@ onEachFeature: function (feature, layer)
 	domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
 	domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
 	domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
-	domelem.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
+	domelemhttps://mail.google.com/mail/u/0/?shva=1#inbox.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
 	domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
 	domelem.innerHTML += '<br> <b><a onclick=show_comments(\''+node.slug+'\');>Comments: </b>'+ node.participation.comment_count+'</a><br>';
 	//console.log(layer.options);
