@@ -14,7 +14,11 @@ var newCluster
 //Layer insert
 var overlaymaps={};
 layers= getData('http://localhost:8000/api/v1/layers/');
-map_layers=load_layers(layers)		 
+console.log(layers)
+map_layers=load_layers(layers);
+var layer_slug_list
+layer_slug_list=get_layer_slug(layers);
+console.log(layer_slug_list);
 var baseMaps = {
 		"OpenStreetMap": osm_layer,
 		//Uncomment for Google maps. Works only in quirk mode.

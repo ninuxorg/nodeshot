@@ -54,9 +54,35 @@ function open_insert(latlng){
 	$("#lat").html(lat);
 	$("#lng").html(lng);
 	$("#address").html(address.display_name);
+	var options = $("#Layer_select");	
+  }  
+//    //don't forget error handling!
+   $.each(layer_slug, function(item) {
+      options.append($("<option />").val(item.name).text(item.name));
+  });
+//
+//
+
+function get_layer_slug(layers) {
+	var layer_slug={};
+	for(var i=0;i<layers.length;i++){
+		var obj = layers[i];
+		for(var key in obj){
+		
+		 //var attrName = key;
+		 var attrValue = obj[key];
+		if (key=='slug' ) {
+			var attrValue = obj[key];
+			//alert (attrName);
+			//alert (attrValue);
+			test=key;
+			layer_slug[i]=obj[key];
+		}
+	    
+    }
 }
-
-
+return layer_slug;
+}
 
 //Layers load
 function load_layers(layers) {
@@ -80,17 +106,13 @@ function load_layers(layers) {
 }
 
 
-function clear_layers(a)  {
-            for (x in a) {
-		alert (x);
-		a[x].clearLayers();
+function clear_layers(layer_group)  {
+            for (x in layer_group) {
+		//alert (x);
+		layer_group[x].clearLayers();
 	    }
         }
-
-
-		
-
-		
+	
 //Load layer nodes
 
 function load_nodes(geojson_layer_nodes){
@@ -103,7 +125,7 @@ function load_nodes(geojson_layer_nodes){
 		slug=feature.properties.slug
 		//alert(slug);
 		node=   getData('http://localhost:8000/api/v1/nodes/'+slug+'/participation/');
-		//console.log(node)
+		console.log(node)
 		//node_obj=JSON.parse(node);
 		var domelem = document.createElement('div');
 		domelem.innerHTML ='<b>'+ node.name+'</b><br>';
@@ -170,15 +192,15 @@ function show_comments(node) {
 	console.log(comments);
 	for (var i = 0; i < comments.length; i++) { 
 
-	html_text+='<div class=\'comment_text\'>';	
-	//html_text+='<li>Added:'+comments[i].added+'</li>';
-	html_text+=comments[i].text;
-	html_text+='</div>';
-	html_text+='<div class=\'comment_user\'>';	
-	html_text+='Posted by: '+comments[i].username+' on ';
-	html_text+=comments[i].added+'<br>';
-	html_text+='</div>';
-	}
+		html_text+='<div class=\'comment_text\'>';	
+		//html_text+='<li>Added:'+comments[i].added+'</li>';
+		html_text+=comments[i].text;
+		html_text+='</div>';
+		html_text+='<div class=\'comment_user\'>';	
+		html_text+='Posted by: '+comments[i].username+' on ';
+		html_text+=comments[i].added+'<br>';
+		html_text+='</div>';
+		}
 	//alert(html_text);
 	html_text+='Add your:<br>';
 	$("#node_insert").hide();
