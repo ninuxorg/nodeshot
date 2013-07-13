@@ -1,20 +1,19 @@
 //Marker manual insert on map
-
+var markerToRemove
 function onMapClick(e) {
 	//alert(e.latlng);
-	if (marker_to_remove) {
-		map.removeLayer(marker_to_remove);
+	if (markerToRemove) {
+		map.removeLayer(markerToRemove);
 	}
 	
 	markerLocation = e.latlng
 	markerLocationtoString = e.latlng.toString();
-	var popupelem= document.createElement('div');
 	marker = new L.Marker(markerLocation);
-	marker_to_remove=marker
-	//popupelem.innerHTML=markerLocation;
+	markerToRemove=marker
+	var popupelem= document.createElement('div');
 	popupelem.innerHTML+='Is position correct ?<br>';
-	popupelem.innerHTML+='<a class=\'confirm_marker\' onclick=marker_confirm(markerLocationtoString)>Confirm</a>&nbsp;';
-	popupelem.innerHTML+='<a class=\'remove_marker\' onclick=marker_delete(marker)>Delete</a>';
+	popupelem.innerHTML+='<a class=\'confirm_marker\' onclick=markerConfirm(markerLocationtoString)>Confirm</a>&nbsp;';
+	popupelem.innerHTML+='<a class=\'remove_marker\' onclick=markerDelete(marker)>Delete</a>';
 	
 	map
 		
@@ -27,114 +26,103 @@ function onMapClick(e) {
 }
 
 //Marker delete
-function marker_delete(marker) {
+function markerDelete(marker) {
 	map.removeLayer(marker);
 	map.closePopup();	
 }
 
 //Marker confirm
-function marker_confirm(marker) {
-	open_insert(marker);
+function markerConfirm(marker) {
+	openInsertDiv(marker);
 	map.closePopup();
 }
 
 //function to catch and display PoI coordinates
-function open_insert(latlng){
+function openInsertDiv(latlng){
 	$("#valori").html('');
 	//alert(latlng);
-	var arr_latlng=latlng.split(",");
-	var lat=arr_latlng[0].slice(7);
-	var lng=arr_latlng[1].slice(0,-1);
-	var str_latlng="Latitudine:" + lat + "<br>Longitudine:" + lng
-	// var address=   eval ("(" + getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1' + ")"));
-	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
+	var arrayLatLng=latlng.split(",");
+	var lat=arrayLatLng[0].slice(7);
+	var lng=arrayLatLng[1].slice(0,-1);
+//	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
 	//console.log(address);
-	//alert(address_display);
 	$("#node_insert").show();
 	$("#lat").html(lat);
 	$("#lng").html(lng);
 	$("#address").html(address.display_name);
-	var options = $("#Layer_select");	
-  }  
-//    //don't forget error handling!
-   $.each(layer_slug, function(item) {
-      options.append($("<option />").val(item.name).text(item.name));
-  });
+	
+        }
 //
 //
 
-function get_layer_slug(layers) {
-	var layer_slug={};
+function getLayerList(layers) {
+	layerList=[];
 	for(var i=0;i<layers.length;i++){
+		layerList[i]={}
 		var obj = layers[i];
 		for(var key in obj){
-		
-		 //var attrName = key;
-		 var attrValue = obj[key];
-		if (key=='slug' ) {
+			var attrName = key;
 			var attrValue = obj[key];
-			//alert (attrName);
-			//alert (attrValue);
-			test=key;
-			layer_slug[i]=obj[key];
+			if (key=='slug' || key== 'name' ) {
+				layerList[i][key]=attrValue;
+			}	    
 		}
-	    
-    }
-}
-return layer_slug;
+	}
+	var options = $("#Layer_select");	
+	$.each(layerList, function(obj,city) {
+		options.append($("<option />").val(city.slug).text(city.name));
+		});
 }
 
 //Layers load
-function load_layers(layers) {
-	var AllLayers= []
+function loadLayers(layers) {
+	var allLayers= []
 	for (i in layers)
 		{
 		
 		//alert(layers[i].name );
 		var newCluster = new L.MarkerClusterGroup();
-		var newCluster_nodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
-		var newCluster_layer=load_nodes(newCluster_nodes)	;
-		newCluster.addLayer(newCluster_layer);
+		var newClusterNodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
+		var newClusterLayer=loadNodes(newClusterNodes)	;
+		newCluster.addLayer(newClusterLayer);
 		map.addLayer(newCluster);
 		var newClusterKey=layers[i].name;
 		overlaymaps[newClusterKey]=newCluster;
-		AllLayers[i]=newCluster;
-		//console.log(AllLayers[i])
+		allLayers[i]=newCluster;
 		}
-	return AllLayers;
+	return allLayers;
 
 }
 
 
-function clear_layers(layer_group)  {
-            for (x in layer_group) {
+function clearLayers()  {
+            for (x in mapLayers) {
 		//alert (x);
-		layer_group[x].clearLayers();
+		mapLayers[x].clearLayers();
 	    }
         }
 	
 //Load layer nodes
 
-function load_nodes(geojson_layer_nodes){
+function loadNodes(newClusterNodes){
 
-	layer=
-	L.geoJson(geojson_layer_nodes, {
+	var layer=
+	L.geoJson(newClusterNodes, {
 	onEachFeature: function (feature, layer)
 		{
 		//console.log(layer);
 		slug=feature.properties.slug
 		//alert(slug);
 		node=   getData('http://localhost:8000/api/v1/nodes/'+slug+'/participation/');
-		console.log(node)
-		//node_obj=JSON.parse(node);
+		//console.log(node)
 		var domelem = document.createElement('div');
 		domelem.innerHTML ='<b>'+ node.name+'</b><br>';
 		domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
 		domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
 		domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
-		domelemhttps://mail.google.com/mail/u/0/?shva=1#inbox.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
+		domelem.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
 		domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
-		domelem.innerHTML += '<br> <b><a onclick=show_comments(\''+node.slug+'\');>Comments: </b>'+ node.participation.comment_count+'</a><br>';
+		domelem.innerHTML += '<br> <b><a onclick=showComments(\''+node.slug+'\');>Comments: </b>'+ node.participation.comment_count+'</a><br>';
 		//console.log(layer.options);
 		layer.bindPopup(domelem);
 		}
@@ -184,7 +172,7 @@ var data;
 }
 
 //Show_comments
-function show_comments(node) {
+function showComments(node) {
 	var html_text=node+'<br>&nbsp;'
 	//$("#valori").html('');
 	url='http://localhost:8000/api/v1/nodes/'+node+'/comments/?format=json';

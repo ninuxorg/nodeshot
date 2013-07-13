@@ -1,30 +1,29 @@
 //Map initialization
 var map = L.map('map').setView([41.87, 12.49], 9);
-var osm_layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 //Uncomment for Google maps. Works only in quirk mode.
-var ggl_hybrid = new L.Google('HYBRID');
-var ggl_map = new L.Google('ROADMAP');
-var ggl_sat = new L.Google();
+var googleHybrid = new L.Google('HYBRID');
+var googleMap = new L.Google('ROADMAP');
+var googleSat = new L.Google();
+
 //OSM layer added to map
-osm_layer.addTo(map);
+osmLayer.addTo(map);
 map.on('click', onMapClick);
 var popup = L.popup();
-var marker_to_remove
-var newCluster
-//Layer insert
+
+//Layer insert on map
 var overlaymaps={};
-layers= getData('http://localhost:8000/api/v1/layers/');
-console.log(layers)
-map_layers=load_layers(layers);
-var layer_slug_list
-layer_slug_list=get_layer_slug(layers);
-console.log(layer_slug_list);
+var layers= getData('http://localhost:8000/api/v1/layers/');
+//console.log(layers)
+var mapLayers=loadLayers(layers);
+var layerList=getLayerList(layers);
+//console.log(layerList);
 var baseMaps = {
-		"OpenStreetMap": osm_layer,
+		"OpenStreetMap": osmLayer,
 		//Uncomment for Google maps. Works only in quirk mode.
-		"Google Sat": ggl_sat,
-		"Google Map": ggl_map,
-		"Google Hybrid": ggl_hybrid
+		"Google Sat": googleSat,
+		"Google Map": googleMap,
+		"Google Hybrid": googleHybrid
 		
 				};
 L.control.layers(baseMaps,overlaymaps).addTo(map);
