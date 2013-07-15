@@ -1,5 +1,16 @@
 //Marker manual insert on map
+//var nodeDiv = $("#nodeDiv");
 var markerToRemove
+var pageX
+var pageY
+
+$(document).ready(function(){
+    $('html').bind('click', function (event) {
+	//alert (event.pageX);
+
+    });
+});
+
 function onMapClick(e) {
 	//alert(e.latlng);
 	if (markerToRemove) {
@@ -54,7 +65,7 @@ function openInsertDiv(latlng){
         }
 //
 //
-
+//Create a list with layers' slug and name
 function getLayerList(layers) {
 	layerList=[];
 	for(var i=0;i<layers.length;i++){
@@ -94,7 +105,7 @@ function loadLayers(layers) {
 
 }
 
-
+//Delete all layers from map
 function clearLayers()  {
             for (x in mapLayers) {
 		//alert (x);
@@ -103,34 +114,107 @@ function clearLayers()  {
         }
 	
 //Load layer nodes
-
 function loadNodes(newClusterNodes){
 
 	var layer=
 	L.geoJson(newClusterNodes, {
-	onEachFeature: function (feature, layer)
-		{
-		//console.log(layer);
-		slug=feature.properties.slug
-		//alert(slug);
-		node=   getData('http://localhost:8000/api/v1/nodes/'+slug+'/participation/');
-		//console.log(node)
-		var domelem = document.createElement('div');
-		domelem.innerHTML ='<b>'+ node.name+'</b><br>';
-		domelem.innerHTML += '<br> '+ feature.properties.address+'<br>';
-		domelem.innerHTML += '<br> <b>Ratings average: </b>'+ node.participation.rating_count+'<br>';
-		domelem.innerHTML += '<br> <b>Ratings count: </b>'+ node.participation.rating_count+'<br>';
-		domelem.innerHTML += '<br> <b>Likes: </b>'+ node.participation.likes+'<br>';
-		domelem.innerHTML += '<br> <b>Dislikes: </b>'+ node.participation.dislikes+'<br>';
-		domelem.innerHTML += '<br> <b><a onclick=showComments(\''+node.slug+'\');>Comments: </b>'+ node.participation.comment_count+'</a><br>';
-		//console.log(layer.options);
-		layer.bindPopup(domelem);
+	onEachFeature: function (feature, layer) {
+		nodeSlug=feature.properties.slug;
+		nodeAddress=feature.properties.address;
+		layer.on('click', function (e) {
+			populateNodeDiv(feature.properties.slug);
+			this.bindPopup(nodeDiv)
+			
+				});
+		//console.log(nodeSlug);
 		}
 		
 	});
 	return layer;	
 }
+
+////Create div that will display nodes'info
+function createNodeDiv(nodeSlug) {
+		nodeDiv = document.createElement('div');
+		nodeDiv.id=nodeSlug;
+		populateNodeDiv (nodeSlug);
+//
+}
+
+function populateNodeDiv(nodeSlug) {
+	nodeDiv = document.createElement('div');
+	//nodeDiv.id=nodeSlug;
+	node=   getData('http://localhost:8000/api/v1/nodes/'+nodeSlug+'/participation/');
+	nodeName=node.name;
+	nodeRatingCount=node.participation.rating_count;
+	nodeRatingAVG=node.participation.rating_avg;
+	nodeLikes=node.participation.likes;
+	nodeDislikes=node.participation.dislikes;
+	nodeVoteCount=nodeLikes+nodeDislikes;
+	nodeComments=node.participation.comment_count;
+	//alert(node.name)
+	$(nodeDiv).append(nodeName+'<br>');
+	if (nodeRatingCount==0) {
+		$(nodeDiv).append('Not rated yet<br>');
+	}
+	else {
+	$(nodeDiv).append('Rated:'+node.participation.rating_avg+'<br> by '+node.participation.rating_count+' people<br>');
+	}
 	
+	if (nodeVoteCount==0) {
+		$(nodeDiv).append('Not voted yet</br>');
+	}
+	else {
+	$(nodeDiv).append('Likes to:'+nodeLikes+' people.<br>');
+	$(nodeDiv).append('Don\'t likes to:'+nodeDislikes+' people.<br>');
+	}
+	
+	if (nodeComments==0) {
+		$(nodeDiv).append('Not commented yet<br>');
+	}
+	else {
+		$(nodeDiv).append('test');
+		//$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'"+','+nodeName+'");>Comments: '+ node.participation.comment_count+'</a><br>');
+		//$(nodeDiv).append('<a id="nodeComments">Comments: '+ nodeComments+'</a><br>');
+	//	$("#nodeComments").bind('click', function() {
+	//				alert(nodeSlug);
+	//				});
+	}
+//	    $('#nodeDiv').css('left',pageX);      // <<< use pageX and pageY
+//    $('#nodeDiv').css('top',pageY);
+//    $('#nodeDiv').css('display','inline');     
+//    $("#nodeDiv").css("position", "absolute");  // <<< also make it absolute!
+//	$(nodeDiv).show();
+	return(nodeDiv)
+
+}
+
+//Show_comments
+function showComments(nodeSlug) {
+	alert(JSON.stringify(nodeSlug))
+	html_text='<b>'+nodeSlug+'</b><br>';
+	//$("#valori").html('');
+	url='http://localhost:8000/api/v1/nodes/'+nodeSlug+'/comments/?format=json';
+	comments=   getData(url);
+	//console.log(comments);
+	for (var i = 0; i < comments.length; i++) { 
+
+		html_text+='<div class=\'comment_text\'>';	
+		//html_text+='<li>Added:'+comments[i].added+'</li>';
+		html_text+=comments[i].text;
+		html_text+='</div>';
+		html_text+='<div class=\'comment_user\'>';	
+		html_text+='Posted by: '+comments[i].username+' on ';
+		html_text+=comments[i].added+'<br>';
+		html_text+='</div>';
+		}
+	//alert(html_text);
+	html_text+='Add your:<br>';
+	html_text+='<textarea>'
+	$("#node_insert").hide();
+	$("#valori").html(html_text);
+
+}
 //Ajax check
     
   $(function() {
@@ -171,30 +255,7 @@ var data;
     return data;
 }
 
-//Show_comments
-function showComments(node) {
-	var html_text=node+'<br>&nbsp;'
-	//$("#valori").html('');
-	url='http://localhost:8000/api/v1/nodes/'+node+'/comments/?format=json';
-	comments=   getData(url);
-	console.log(comments);
-	for (var i = 0; i < comments.length; i++) { 
 
-		html_text+='<div class=\'comment_text\'>';	
-		//html_text+='<li>Added:'+comments[i].added+'</li>';
-		html_text+=comments[i].text;
-		html_text+='</div>';
-		html_text+='<div class=\'comment_user\'>';	
-		html_text+='Posted by: '+comments[i].username+' on ';
-		html_text+=comments[i].added+'<br>';
-		html_text+='</div>';
-		}
-	//alert(html_text);
-	html_text+='Add your:<br>';
-	$("#node_insert").hide();
-	$("#valori").html(html_text);
-
-}
 // Load #loading layers
 // Assuming that the div or any other HTML element has the ID = loading and it contains the necessary loading image.
 
