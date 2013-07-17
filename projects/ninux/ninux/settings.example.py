@@ -255,10 +255,12 @@ _ = lambda s: s
 
 NODESHOT = {
     'SETTINGS': {
-        'API_PREFIX': 'api/v1', # it must not begin nor end with a slash
+        'API_PREFIX': 'api/v1',  # it must not begin nor end with a slash
         'ACL_GLOBAL_EDITABLE': True,
-        # the following is an example of possible granular ACL setting that is available
+        
+        # the following is an example of possible granular ACL setting that can be specified
         #'ACL_NODES_NODE_EDITABLE': False,
+        
         'CONTACT_INWARD_LOG': True,
         'CONTACT_INWARD_MAXLENGTH': 2000,
         'CONTACT_INWARD_MINLENGTH': 15,
@@ -267,9 +269,11 @@ NODESHOT = {
         'CONTACT_OUTWARD_MINLENGTH': 50,
         'CONTACT_OUTWARD_STEP': 20,
         'CONTACT_OUTWARD_DELAY': 10,
-        'CONTACT_OUTWARD_HTML': True, # grappelli must be in INSTALLED_APPS, otherwise it won't work
+        'CONTACT_OUTWARD_HTML': True,  # grappelli must be in INSTALLED_APPS, otherwise it won't work
         'PROFILE_EMAIL_CONFIRMATION': True,
         'PROFILE_REQUIRED_FIELDS': ['email'],
+        'ADMIN_MAP_COORDS': [41.8934, 12.4960],  # lat, lng
+        'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (
