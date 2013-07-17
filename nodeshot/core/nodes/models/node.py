@@ -2,7 +2,6 @@ from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.contrib.gis.measure import D
 
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.managers import GeoAccessLevelPublishedManager
@@ -52,11 +51,15 @@ class Node(BaseAccessLevel):
     # http://stackoverflow.com/questions/1355150/django-when-saving-how-can-you-check-if-a-field-has-changed
     _current_status = None
     
+    # needed for extensible validation
+    _additional_validation = []
+    
     class Meta:
         db_table = 'nodes_node'
         app_label= 'nodes'
         permissions = (('can_view_nodes', 'Can view nodes'),)
         
+        # TODO: does this really have sense?
         if 'nodeshot.interoperability' in settings.INSTALLED_APPS:
             # the combinations of layer_id and external_id must be unique
             unique_together = ('layer', 'external_id')
@@ -72,23 +75,8 @@ class Node(BaseAccessLevel):
             self._current_status = self.status
     
     def clean(self , *args, **kwargs):
-        """
-        Check distance between nodes if feature is enabled.
-        Check node is contained, in layer's area if defined
-        """
-        if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-            minimum_distance = self.layer.minimum_distance
-            coords = self.coords
-            layer_area = self.layer.area
-            
-            if minimum_distance <> 0:
-                near_nodes = Node.objects.exclude(pk=self.id).filter(coords__distance_lte=(coords, D(m=minimum_distance))).count()
-                if near_nodes > 0 :
-                    raise ValidationError(_('Distance between nodes cannot be less than %s meters') % minimum_distance)        
-            
-            # TODO: this needs to be tested
-            if layer_area is not None and not layer_area.contains(coords):
-                raise ValidationError(_('Node must be inside layer area'))
+        """ call extensible validation """
+        self.extensible_validation()
     
     def save(self, *args, **kwargs):
         super(Node, self).save(*args, **kwargs)
@@ -98,6 +86,32 @@ class Node(BaseAccessLevel):
             node_status_changed.send(sender=self, old_status=self._current_status, new_status=self.status)
         # update __current_status
         self._current_status = self.status
+    
+    def extensible_validation(self):
+        """
+        Execute additional validation that might be defined elsewhere in the code.
+        Additional validation is introduced through the class method Node.add_validation_method()
+        """
+        # loop over additional validation method list
+        for validation_method in self._additional_validation:
+            # call each additional validation method
+            getattr(self, validation_method)()
+    
+    @classmethod
+    def add_validation_method(class_, method):
+        """
+        Extend validation of Node by adding a function to the _additional_validation list.
+        The additional validation function will be called by the clean method
+        
+        :method function: function to be added to _additional_validation
+        """
+        method_name = method.func_name
+        
+        # add method name to additional validation method list
+        class_._additional_validation.append(method_name)
+        
+        # add method to this class
+        setattr(class_, method_name, method)
     
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod

@@ -7,6 +7,8 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
+from nodeshot.core.nodes.models import Node
+
 
 __all__ = [
     # classes
@@ -51,7 +53,15 @@ class BaseConverter(object):
         """
         self.retrieve_data()
         self.parse()
+        
+        # TRICK: disable new_nodes_allowed_for_layer validation
+        Node._additional_validation.remove('new_nodes_allowed_for_layer')
+        
         self.save()
+        
+        # Re-enable new_nodes_allowed_for_layer validation
+        Node._additional_validation.insert(0, 'new_nodes_allowed_for_layer')
+        
         # return message as a list because more than one messages might be returned
         return [self.message]
     

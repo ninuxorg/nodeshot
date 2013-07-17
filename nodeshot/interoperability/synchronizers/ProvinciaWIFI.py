@@ -38,6 +38,7 @@ class ProvinciaWIFI(XMLConverter):
             number = 1
             original_name = name
             needed_different_name = False
+            
             while True:
                 # items might have the same name... so we add a number..
                 if slug in external_nodes_slug:

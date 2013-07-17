@@ -207,7 +207,7 @@ class APITest(TestCase):
         # POST
         # todo
     
-    def test_node_coords_distance(self):
+    def test_node_coords_distance_and_area(self):
         """ test minimum distance check between nodes """
         self.client.login(username='admin', password='tester')
         
@@ -239,7 +239,7 @@ class APITest(TestCase):
         layer.save()
         json_data['coords'] = "POINT (12.5822391917 41.872042278)";
         n = Node.objects.get(slug='test_distance')
-        node_slug=n.slug
+        node_slug = n.slug
         url = reverse('api_node_details',args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)
@@ -250,21 +250,24 @@ class APITest(TestCase):
         url = reverse('api_node_details',args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
-                
+        
         # Defining an area for the layer and testing if node is inside the area
-        layer.area= GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
+        layer.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
         layer.save()
-        #Node update should fail because coords are outside layer area
+        
+        # Node update should fail because coords are outside layer area
         json_data['coords'] = "POINT (50 50)";
         url = reverse('api_node_details',args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
-        #Node update should succeed because coords are inside layer area and respect minimum distance
+        
+        # Node update should succeed because coords are inside layer area and respect minimum distance
         json_data['coords'] = "POINT (12.7822391919 41.8720419277)";
         url = reverse('api_node_details',args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)
-        #Node update should succeed because layer area is disabled
+        
+        # Node update should succeed because layer area is disabled
         layer.area=None
         layer.save()
         json_data['coords'] = "POINT (50 50)";
@@ -275,6 +278,6 @@ class APITest(TestCase):
         # re-enable minimum distance 
         layer.minimum_distance = 100
         layer.save()
+        
         # delete new nodes just added before
         n.delete()
-        

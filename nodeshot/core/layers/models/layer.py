@@ -1,11 +1,14 @@
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.contrib.gis.measure import D
 from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.base.choices import MAP_ZOOM, ACCESS_LEVELS
 from nodeshot.core.base.utils import choicify
+from nodeshot.core.nodes.models import Node
+
 from ..managers import LayerManager
 
 
@@ -38,11 +41,9 @@ class Layer(BaseDate):
     
     # settings
     minimum_distance = models.IntegerField(default=settings.NODESHOT['DEFAULTS']['ZONE_MINIMUM_DISTANCE'],
-                                           help_text=_('minimum distance between nodes, 0 means feature disabled'))
-    write_access_level = models.SmallIntegerField(_('write access level'),
-                                                  choices=choicify(ACCESS_LEVELS),
-                                                  default=ACCESS_LEVELS.get('public'),
-                                                  help_text=_('minimum access level to insert new nodes in this layer'))
+                                           help_text=_('minimum distance between nodes in meters, 0 means feature disabled'))
+    new_nodes_allowed = models.BooleanField(_('new nodes allowed'), default=True, help_text=_('indicates whether users can add new nodes to this layer'))
+    
     # default manager
     objects = LayerManager()
     
@@ -63,3 +64,36 @@ class Layer(BaseDate):
         Custom validation
         """
         pass
+
+
+# ------ Additional validation for Node model ------ #
+
+
+def new_nodes_allowed_for_layer(self):
+    """
+    ensure new nodes are allowed for this layer
+    """
+    if not self.pk and not self.layer.new_nodes_allowed:
+        raise ValidationError(_('New nodes are not allowed for this layer'))
+
+# TODO: thes features must be tested inside the layer's app code (nodeshot.core.layers.tests)
+def node_layer_validation(self):
+    """
+    1. if minimum distance is specified, ensure node is not too close to other nodes;
+    2. if layer defines an area, ensure node coordinates are contained in the area
+    """
+    minimum_distance = self.layer.minimum_distance
+    coords = self.coords
+    layer_area = self.layer.area
+    
+    # TODO - lower priority: do this check only when coordinates are changing
+    if minimum_distance > 0:
+        near_nodes = Node.objects.exclude(pk=self.id).filter(coords__distance_lte=(coords, D(m=minimum_distance))).count()
+        if near_nodes > 0 :
+            raise ValidationError(_('Distance between nodes cannot be less than %s meters') % minimum_distance)        
+    
+    if layer_area is not None and not layer_area.contains(coords):
+        raise ValidationError(_('Node must be inside layer area'))
+
+Node.add_validation_method(new_nodes_allowed_for_layer)
+Node.add_validation_method(node_layer_validation)
