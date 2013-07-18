@@ -206,6 +206,26 @@ class APITest(TestCase):
         
         # POST
         # todo
+        login = self.client.login(username='admin', password='tester')
+        good_post_data = { "file": "testjpg" ,"description" : "new image"}
+        bad_post_data = { "node": 100, "image": "jpeg99" ,"description" : "new image"}
+        url = reverse('api_node_images', args=['fusolab'])
+        wrong_url = reverse('api_node_images', args=['idontexist'])
+        
+        # wrong slug -- 404
+        response = self.client.post(wrong_url, good_post_data)
+        self.assertEqual(response.status_code, 404)
+        
+        # correct POST data and correct slug -- 201
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 201)
+        #
+        # POST 201 - ensure additional post data "user" and "node" are ignored
+        response = self.client.post(url, bad_post_data)
+        self.assertEqual(response.status_code, 201)
+        image_dict = json.loads(response.content)
+        self.assertEqual(image_dict['node'], 1)
+        self.assertEqual(image_dict['description'], "new image")
     
     def test_node_coords_distance(self):
         """ test minimum distance check between nodes """

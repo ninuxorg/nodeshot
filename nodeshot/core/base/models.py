@@ -114,7 +114,7 @@ class BaseOrdered(BaseAccessLevel):
         ordering = ["order"]
         abstract = True
         
-    def save(self):
+    def save(self, *args, **kwargs):
         if not self.id:
             try:
                 self.order = self.__class__.objects.all().order_by("-order")[0].order + 1
