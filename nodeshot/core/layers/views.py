@@ -22,7 +22,7 @@ class LayerList(generics.ListCreateAPIView):
     queryset = Layer.objects.published()
     pagination_serializer_class = PaginationSerializer
     paginate_by_param = 'limit'
-    paginate_by = 10
+    paginate_by = None
 
 layer_list = LayerList.as_view()
 

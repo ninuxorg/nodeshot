@@ -29,6 +29,10 @@
   display:none;
 }
 
+/*#logoutButton {
+  display:none;
+}*/
+
 .comment_text{
     font-size:11px;
     color:#000000;
@@ -37,7 +41,7 @@
     border-style:solid;
     border-width:1px;
     padding: 1px;
-      margin: 1px;
+    margin: 1px;
 
      
 }
@@ -51,6 +55,14 @@
 */     
 }
 
+.user{
+    font-size:10px;
+    color:#FFFFFF;
+    background-color: #CCCCCC;
+    word-wrap: break-word;
+/*    padding: 1px;
+*/     
+}
 
 
 

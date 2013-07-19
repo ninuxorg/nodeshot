@@ -3,6 +3,9 @@
 var markerToRemove
 var pageX
 var pageY
+var csrftoken = $.cookie('csrftoken');
+console.log(csrftoken)
+
 
 $(document).ready(function(){
     $('html').bind('click', function (event) {
@@ -173,8 +176,7 @@ function populateNodeDiv(nodeSlug) {
 		$(nodeDiv).append('Not commented yet<br>');
 	}
 	else {
-		$(nodeDiv).append('test');
-		//$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'"+','+nodeName+'");>Comments: '+ node.participation.comment_count+'</a><br>');
+		$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>Comments: '+ node.participation.comment_count+'</a><br>');
 		//$(nodeDiv).append('<a id="nodeComments">Comments: '+ nodeComments+'</a><br>');
 	//	$("#nodeComments").bind('click', function() {
 	//				alert(nodeSlug);
@@ -191,12 +193,13 @@ function populateNodeDiv(nodeSlug) {
 
 //Show_comments
 function showComments(nodeSlug) {
-	alert(JSON.stringify(nodeSlug))
-	html_text='<b>'+nodeSlug+'</b><br>';
+	//alert(JSON.stringify(nodeSlug))
+	
 	//$("#valori").html('');
 	url='http://localhost:8000/api/v1/nodes/'+nodeSlug+'/comments/?format=json';
 	comments=   getData(url);
 	//console.log(comments);
+	html_text='<b>'+nodeSlug+'</b><br>';
 	for (var i = 0; i < comments.length; i++) { 
 
 		html_text+='<div class=\'comment_text\'>';	
@@ -215,10 +218,49 @@ function showComments(nodeSlug) {
 	$("#valori").html(html_text);
 
 }
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
 //Ajax check
     
-  $(function() {
+ $(function() {
+	
     $.ajaxSetup({
+	beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    },
         error: function(jqXHR, exception) {
             if (jqXHR.status === 0) {
                 alert('Not connect.\n Verify Network.');
@@ -239,7 +281,7 @@ function showComments(nodeSlug) {
     });
 });
   
- //Get Data
+ //Get Data in async way, so that it can return an object to a variable
 function getData(url) {
 var data;
     $.ajax({
@@ -255,6 +297,66 @@ var data;
     return data;
 }
 
+
+//post data to API
+function postData(url) {
+var data;
+    $.ajax({
+        type: "POST",
+        url: url,
+	data: { "username": "registered", "password": "tester" },
+        dataType: 'json',
+        success: function(response){
+        data = response;
+        }
+        
+    });
+    //alert(data);
+    return data;
+}
+
+//post data to API
+function login() {
+var user=$("#user").val();
+var password=$("#password").val();
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8000/api/v1/account/login/",
+	data: { "username": user, "password": password },
+        dataType: 'json',
+        success: function(response){
+        showLogout(user);
+        }
+    });
+}
+
+function logout() {
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8000/api/v1/account/logout/",
+        dataType: 'json',
+        success: function(response){
+	showLogin();
+        }
+        
+    });
+}
+
+function showLogin() {
+	$('#userForm').html('');
+	var login_html='<input id="user" class="span2" type="text" placeholder="Email">'
+	login_html+='<input id="password" class="span2" type="password"placeholder="Password">'
+        login_html+=' <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>'
+	$('#userForm').append(login_html)
+}
+
+function showLogout(user) {
+	$('#userForm').html('');
+	var logout_html='<font color="#FFFFFF">Hi ' + user + ' </font>'
+	logout_html+='<button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>'
+	$('#userForm').append(logout_html)
+	
+}
 
 // Load #loading layers
 // Assuming that the div or any other HTML element has the ID = loading and it contains the necessary loading image.

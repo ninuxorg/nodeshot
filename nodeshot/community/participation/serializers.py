@@ -54,7 +54,7 @@ class CommentListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Comment
-        fields = ('username', 'text','added')
+        fields = ('node','username', 'text','added')
         readonly_fields = ('node', 'username', 'added')
 
 
