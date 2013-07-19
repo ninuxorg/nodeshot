@@ -14,7 +14,7 @@ var popup = L.popup();
 //Layer insert on map
 var overlaymaps={};
 var layers= getData('http://localhost:8000/api/v1/layers/');
-//console.log(layers)
+console.log(layers)
 var mapLayers=loadLayers(layers);
 var layerList=getLayerList(layers);
 //console.log(layerList);

@@ -12,6 +12,7 @@ from .serializers import *
 from vectorformats.Formats import Django, GeoJSON
 import simplejson as json
 
+
 def get_queryset_or_404(queryset, kwargs):
     """
     Checks if object returned by queryset exists
@@ -34,8 +35,9 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     
     Parameters:
     
-     * results (e.g: results=10 returns 10 results per page)
-     * Default : all nodes are returned in a single page
+     * limit (e.g: limit=10 returns 10 results per page)
+     * Default : 10
+     * limit=0 turns off pagination
     
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -43,8 +45,8 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     queryset = Node.objects.published()
     serializer_class = NodeListSerializer
     pagination_serializer_class = NodePaginationSerializer
-    paginate_by_param = 'results'
-    #paginate_by = 10
+    paginate_by_param = 'limit'
+    paginate_by = 10
     
     def get_queryset(self):
         """
