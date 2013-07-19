@@ -60,11 +60,42 @@
     color:#FFFFFF;
     background-color: #CCCCCC;
     word-wrap: break-word;
-/*    padding: 1px;
-*/     
+  
 }
 
+.rome {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    background-color: green;
+    text-align: center;
+    font-size: 16px;
+    border-radius: 15px;
+}
 
+.provinciawifi {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    background-color: blue;
+    text-align: center;
+    font-size: 16px;
+    border-radius: 15px;
+}
+
+/*.mycluster {
+	width: 30px;
+	height: 30px;
+	margin-left: 5px;
+	margin-top: 5px;
+        background-color: #CCCCCC;
+	text-align: center;
+	border-radius: 15px;
+	font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	}
+*/
 
 
 

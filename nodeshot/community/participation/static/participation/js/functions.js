@@ -1,10 +1,10 @@
 //Marker manual insert on map
 //var nodeDiv = $("#nodeDiv");
 var markerToRemove
-var pageX
-var pageY
 var csrftoken = $.cookie('csrftoken');
-console.log(csrftoken)
+//console.log(csrftoken)
+var nodeSlug
+var comment
 
 
 $(document).ready(function(){
@@ -95,7 +95,17 @@ function loadLayers(layers) {
 		{
 		
 		//alert(layers[i].name );
-		var newCluster = new L.MarkerClusterGroup();
+		var newCluster = new L.MarkerClusterGroup(
+		//					  {
+		//iconCreateFunction: function (cluster) {
+		//		return L.divIcon({
+		//			html: cluster.getChildCount(),
+		//			className: layers[i].slug,
+		//			iconSize: L.point(40, 40) });
+		//			},
+		//zoomToBoundsOnClick: false
+		//	}
+			);
 		var newClusterNodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
 		var newClusterLayer=loadNodes(newClusterNodes)	;
 		newCluster.addLayer(newClusterLayer);
@@ -122,7 +132,7 @@ function loadNodes(newClusterNodes){
 	var layer=
 	L.geoJson(newClusterNodes, {
 	onEachFeature: function (feature, layer) {
-		nodeSlug=feature.properties.slug;
+		//nodeSlug=feature.properties.slug;
 		nodeAddress=feature.properties.address;
 		layer.on('click', function (e) {
 			populateNodeDiv(feature.properties.slug);
@@ -145,8 +155,9 @@ function createNodeDiv(nodeSlug) {
 }
 
 function populateNodeDiv(nodeSlug) {
+	
 	nodeDiv = document.createElement('div');
-	//nodeDiv.id=nodeSlug;
+	nodeDiv.id=nodeSlug;
 	node=   getData('http://localhost:8000/api/v1/nodes/'+nodeSlug+'/participation/');
 	nodeName=node.name;
 	nodeRatingCount=node.participation.rating_count;
@@ -156,7 +167,7 @@ function populateNodeDiv(nodeSlug) {
 	nodeVoteCount=nodeLikes+nodeDislikes;
 	nodeComments=node.participation.comment_count;
 	//alert(node.name)
-	$(nodeDiv).append(nodeName+'<br>');
+	$(nodeDiv).append('<b>'+nodeName+'</b><br>');
 	if (nodeRatingCount==0) {
 		$(nodeDiv).append('Not rated yet<br>');
 	}
@@ -177,16 +188,48 @@ function populateNodeDiv(nodeSlug) {
 	}
 	else {
 		$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>Comments: '+ node.participation.comment_count+'</a><br>');
-		//$(nodeDiv).append('<a id="nodeComments">Comments: '+ nodeComments+'</a><br>');
-	//	$("#nodeComments").bind('click', function() {
-	//				alert(nodeSlug);
-	//				});
+
 	}
-//	    $('#nodeDiv').css('left',pageX);      // <<< use pageX and pageY
-//    $('#nodeDiv').css('top',pageY);
-//    $('#nodeDiv').css('display','inline');     
-//    $("#nodeDiv").css("position", "absolute");  // <<< also make it absolute!
-//	$(nodeDiv).show();
+
+	return(nodeDiv)
+
+}
+
+function updateNodeDiv(nodeSlug) {
+	
+	node=   getData('http://localhost:8000/api/v1/nodes/'+nodeSlug+'/participation/');
+	nodeName=node.name;
+	nodeRatingCount=node.participation.rating_count;
+	nodeRatingAVG=node.participation.rating_avg;
+	nodeLikes=node.participation.likes;
+	nodeDislikes=node.participation.dislikes;
+	nodeVoteCount=nodeLikes+nodeDislikes;
+	nodeComments=node.participation.comment_count;
+	//alert(node.name)
+	$(nodeDiv).append('<b>'+nodeName+'</b><br>');
+	if (nodeRatingCount==0) {
+		$(nodeDiv).append('Not rated yet<br>');
+	}
+	else {
+	$(nodeDiv).append('Rated:'+node.participation.rating_avg+'<br> by '+node.participation.rating_count+' people<br>');
+	}
+	
+	if (nodeVoteCount==0) {
+		$(nodeDiv).append('Not voted yet</br>');
+	}
+	else {
+	$(nodeDiv).append('Likes to:'+nodeLikes+' people.<br>');
+	$(nodeDiv).append('Don\'t likes to:'+nodeDislikes+' people.<br>');
+	}
+	
+	if (nodeComments==0) {
+		$(nodeDiv).append('Not commented yet<br>');
+	}
+	else {
+		$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>Comments: '+ node.participation.comment_count+'</a><br>');
+
+	}
+
 	return(nodeDiv)
 
 }
@@ -194,35 +237,42 @@ function populateNodeDiv(nodeSlug) {
 //Show_comments
 function showComments(nodeSlug) {
 	//alert(JSON.stringify(nodeSlug))
-	
 	//$("#valori").html('');
-	url='http://localhost:8000/api/v1/nodes/'+nodeSlug+'/comments/?format=json';
+	var node=nodeSlug
+	url='http://localhost:8000/api/v1/nodes/'+node+'/comments/?format=json';
 	comments=   getData(url);
 	//console.log(comments);
-	html_text='<b>'+nodeSlug+'</b><br>';
+	htmlText='<b>'+node+'</b><br>';
 	for (var i = 0; i < comments.length; i++) { 
 
-		html_text+='<div class=\'comment_text\'>';	
-		//html_text+='<li>Added:'+comments[i].added+'</li>';
-		html_text+=comments[i].text;
-		html_text+='</div>';
-		html_text+='<div class=\'comment_user\'>';	
-		html_text+='Posted by: '+comments[i].username+' on ';
-		html_text+=comments[i].added+'<br>';
-		html_text+='</div>';
+		htmlText+='<div class=\'comment_text\'>';	
+		//htmlText+='<li>Added:'+comments[i].added+'</li>';
+		htmlText+=comments[i].text;
+		htmlText+='</div>';
+		htmlText+='<div class=\'comment_user\'>';	
+		htmlText+='Posted by: '+comments[i].username+' on ';
+		htmlText+=comments[i].added+'<br>';
+		htmlText+='</div>';
 		}
-	//alert(html_text);
-	html_text+='Add your:<br>';
-	html_text+='<textarea>'
+	//alert(htmlText);
+	htmlText+='Add your:<br>';
+	htmlText+='<textarea id="commentText"></textarea><br>';
+	//htmlText+='<button onclick=alert(\'commento\')>Add</button>'
+	var comment="Altro ciao"
+	htmlText+='<button onclick=postComment("'+node+'");>Add</button>'
 	$("#node_insert").hide();
-	$("#valori").html(html_text);
+	$("#valori").html(htmlText);
 
 }
+
+
 
 function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
+
+
 function sameOrigin(url) {
     // test that a given url is a same-origin URL
     // url could be relative or scheme relative or absolute
@@ -236,16 +286,6 @@ function sameOrigin(url) {
         // or any other URL that isn't scheme relative or absolute i.e relative.
         !(/^(\/\/|http:|https:).*/.test(url));
 }
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-            // Send the token to same-origin, relative URLs only.
-            // Send the token only if the method warrants CSRF protection
-            // Using the CSRFToken value acquired earlier
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
 
 
 //Ajax check
@@ -298,26 +338,28 @@ var data;
 }
 
 
-//post data to API
-function postData(url) {
-var data;
+//post a comment
+function postComment(nodeSlug) {
+//nodeSlug='fusolab';
+//alert (nodeSlug);
+comment=$("#commentText").val();
     $.ajax({
         type: "POST",
-        url: url,
-	data: { "username": "registered", "password": "tester" },
+        url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/comments/',
+	data: { "text": comment},
         dataType: 'json',
-        success: function(response){
-        data = response;
+        success: function(response){	
+	var nodeDiv=  $("#" + nodeSlug);
+	$(nodeDiv).html('')
+        updateNodeDiv (nodeSlug);
         }
         
     });
-    //alert(data);
-    return data;
 }
 
 //post data to API
 function login() {
-var user=$("#user").val();
+user=$("#user").val();
 var password=$("#password").val();
     $.ajax({
         type: "POST",
