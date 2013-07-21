@@ -5,14 +5,8 @@ var csrftoken = $.cookie('csrftoken');
 //console.log(csrftoken)
 var nodeSlug
 var comment
+var colors={"provinciawifi":"blue","rome":"green","pisa":"red","viterbo":"yellow"}
 
-
-$(document).ready(function(){
-    $('html').bind('click', function (event) {
-	//alert (event.pageX);
-
-    });
-});
 
 function onMapClick(e) {
 	//alert(e.latlng);
@@ -93,21 +87,12 @@ function loadLayers(layers) {
 	var allLayers= []
 	for (i in layers)
 		{
-		
+		var color=colors[layers[i].slug];
+		clusterClass=layers[i].slug;
 		//alert(layers[i].name );
-		var newCluster = new L.MarkerClusterGroup(
-		//					  {
-		//iconCreateFunction: function (cluster) {
-		//		return L.divIcon({
-		//			html: cluster.getChildCount(),
-		//			className: layers[i].slug,
-		//			iconSize: L.point(40, 40) });
-		//			},
-		//zoomToBoundsOnClick: false
-		//	}
-			);
+		var newCluster = createCluster(clusterClass)
 		var newClusterNodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
-		var newClusterLayer=loadNodes(newClusterNodes)	;
+		var newClusterLayer=loadNodes(newClusterNodes,color)	;
 		newCluster.addLayer(newClusterLayer);
 		map.addLayer(newCluster);
 		var newClusterKey=layers[i].name;
@@ -118,6 +103,25 @@ function loadLayers(layers) {
 
 }
 
+//create cluster group
+function  createCluster(clusterClass) {
+var newCluster=
+new L.MarkerClusterGroup(
+		{
+		iconCreateFunction: function (cluster) {
+				return L.divIcon({
+					html: cluster.getChildCount(),
+					className: clusterClass,
+					iconSize: L.point(30, 30) });
+					},
+		spiderfyOnMaxZoom: true, showCoverageOnHover: true, zoomToBoundsOnClick: true
+			}
+			);
+return newCluster;	
+}
+
+
+
 //Delete all layers from map
 function clearLayers()  {
             for (x in mapLayers) {
@@ -126,11 +130,24 @@ function clearLayers()  {
 	    }
         }
 	
+function showLayerProperties()  {
+            for (x in mapLayers) {
+		var obj=mapLayers[x]
+		for (var key in obj) {
+		if (obj.hasOwnProperty(key)) {
+        console.log(key+obj[key])
+    }
+}
+	    }
+        }
+	
+	
 //Load layer nodes
-function loadNodes(newClusterNodes){
+function loadNodes(newClusterNodes,color){
 
 	var layer=
 	L.geoJson(newClusterNodes, {
+		
 	onEachFeature: function (feature, layer) {
 		//nodeSlug=feature.properties.slug;
 		nodeAddress=feature.properties.address;
@@ -140,19 +157,29 @@ function loadNodes(newClusterNodes){
 			
 				});
 		//console.log(nodeSlug);
-		}
+		},
+	pointToLayer: function (feature, latlng) {
+				return L.circleMarker(latlng, {
+					radius: 8,
+					fillColor: color,
+					color: color,
+					weight: 1,
+					opacity: 1,
+					fillOpacity: 0.8
+				});
+			}
 		
 	});
 	return layer;	
 }
 
 ////Create div that will display nodes'info
-function createNodeDiv(nodeSlug) {
-		nodeDiv = document.createElement('div');
-		nodeDiv.id=nodeSlug;
-		populateNodeDiv (nodeSlug);
-//
-}
+//function createNodeDiv(nodeSlug) {
+//		nodeDiv = document.createElement('div');
+//		nodeDiv.id=nodeSlug;
+//		populateNodeDiv (nodeSlug);
+////
+//}
 
 function populateNodeDiv(nodeSlug) {
 	
@@ -352,6 +379,7 @@ comment=$("#commentText").val();
 	var nodeDiv=  $("#" + nodeSlug);
 	$(nodeDiv).html('')
         updateNodeDiv (nodeSlug);
+	showComments(nodeSlug)
         }
         
     });

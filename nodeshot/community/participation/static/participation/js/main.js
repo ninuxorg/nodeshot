@@ -27,7 +27,7 @@ var baseMaps = {
 		
 				};
 L.control.layers(baseMaps,overlaymaps).addTo(map);
-
+//showLayerProperties()
 
 //var pisa = new L.MarkerClusterGroup();
 //pisa_nodes=   getData('http://localhost:8000/api/v1/layers/pisa/geojson/');

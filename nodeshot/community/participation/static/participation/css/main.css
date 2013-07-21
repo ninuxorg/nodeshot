@@ -70,7 +70,7 @@
     margin-top: 5px;
     background-color: green;
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
     border-radius: 15px;
 }
 
@@ -81,7 +81,29 @@
     margin-top: 5px;
     background-color: blue;
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
+    border-radius: 15px;
+}
+
+.viterbo {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    background-color: yellow;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 15px;
+}
+
+.pisa {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    background-color: red;
+    text-align: center;
+    font-size: 14px;
     border-radius: 15px;
 }
 
