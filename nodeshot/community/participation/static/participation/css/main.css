@@ -52,6 +52,15 @@
     background-color: #CCCCCC;
     word-wrap: break-word;
 /*    padding: 1px;
+*/
+}
+
+.comment_date{
+    font-size:10px;
+    color:#000000;
+    background-color: #CCCCCC;
+    word-wrap: break-word;
+/*    padding: 1px;
 */     
 }
 
@@ -107,17 +116,9 @@
     border-radius: 15px;
 }
 
-/*.mycluster {
-	width: 30px;
-	height: 30px;
-	margin-left: 5px;
-	margin-top: 5px;
-        background-color: #CCCCCC;
-	text-align: center;
-	border-radius: 15px;
-	font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
-	}
-*/
+
+#pagingControls ul{display:inline;padding-left:0.5em}
+#pagingControls li{display:inline;padding:0 0.5em}
 
 
 

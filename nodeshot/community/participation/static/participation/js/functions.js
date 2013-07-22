@@ -1,13 +1,10 @@
-//Marker manual insert on map
-//var nodeDiv = $("#nodeDiv");
 var markerToRemove
 var csrftoken = $.cookie('csrftoken');
 //console.log(csrftoken)
 var nodeSlug
-var comment
 var colors={"provinciawifi":"blue","rome":"green","pisa":"red","viterbo":"yellow"}
 
-
+//Marker manual insert on map
 function onMapClick(e) {
 	//alert(e.latlng);
 	if (markerToRemove) {
@@ -60,8 +57,8 @@ function openInsertDiv(latlng){
 	$("#address").html(address.display_name);
 	
         }
-//
-//
+
+
 //Create a list with layers' slug and name
 function getLayerList(layers) {
 	layerList=[];
@@ -129,7 +126,7 @@ function clearLayers()  {
 		mapLayers[x].clearLayers();
 	    }
         }
-	
+//show layer properties	
 function showLayerProperties()  {
             for (x in mapLayers) {
 		var obj=mapLayers[x]
@@ -209,14 +206,8 @@ function populateNodeDiv(nodeSlug) {
 	$(nodeDiv).append('Likes to:'+nodeLikes+' people.<br>');
 	$(nodeDiv).append('Don\'t likes to:'+nodeDislikes+' people.<br>');
 	}
-	
-	if (nodeComments==0) {
-		$(nodeDiv).append('Not commented yet<br>');
-	}
-	else {
-		$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>Comments: '+ node.participation.comment_count+'</a><br>');
 
-	}
+	$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>Comments: '+ node.participation.comment_count+'</a><br>');
 
 	return(nodeDiv)
 
@@ -265,31 +256,40 @@ function updateNodeDiv(nodeSlug) {
 function showComments(nodeSlug) {
 	//alert(JSON.stringify(nodeSlug))
 	//$("#valori").html('');
+	$("#node_insert").hide();
 	var node=nodeSlug
 	url='http://localhost:8000/api/v1/nodes/'+node+'/comments/?format=json';
 	comments=   getData(url);
 	//console.log(comments);
-	htmlText='<b>'+node+'</b><br>';
+	htmlText='Comments on <b>'+node+'</b><br>';
+	htmlText+='<div id="comment" >';
 	for (var i = 0; i < comments.length; i++) { 
 
-		htmlText+='<div class=\'comment_text\'>';	
-		//htmlText+='<li>Added:'+comments[i].added+'</li>';
+		htmlText+='<div  class="comment_div">';
+		htmlText+='<span class="comment_user">'+comments[i].username+'</span>';	
+		htmlText+='<div class="comment_text">';
 		htmlText+=comments[i].text;
 		htmlText+='</div>';
-		htmlText+='<div class=\'comment_user\'>';	
-		htmlText+='Posted by: '+comments[i].username+' on ';
-		htmlText+=comments[i].added+'<br>';
+		htmlText+='<span class="comment_date">'+comments[i].added+'</span>';	
 		htmlText+='</div>';
 		}
 	//alert(htmlText);
-	htmlText+='Add your:<br>';
-	htmlText+='<textarea id="commentText"></textarea><br>';
-	//htmlText+='<button onclick=alert(\'commento\')>Add</button>'
-	var comment="Altro ciao"
-	htmlText+='<button onclick=postComment("'+node+'");>Add</button>'
-	$("#node_insert").hide();
+	
+	htmlText+='</div><div id="pagingControls"></div>'
+	
 	$("#valori").html(htmlText);
-
+	pager = new Imtech.Pager();
+	$(document).ready(function() {
+	pager.paragraphsPerPage = 5; // set amount elements per page
+	pager.pagingContainer = $('#comment'); // set of main container
+	pager.paragraphs = $('div.comment_div', pager.pagingContainer); // set of required containers
+	pager.showPage(1);
+	});
+	htmlText='<hr>Add your:<br>';
+	htmlText+='<textarea id="commentText"></textarea><br>';
+	htmlText+='<button onclick=postComment("'+node+'");>Add</button>'
+	$("#valori").append(htmlText);
+	
 }
 
 
@@ -385,7 +385,7 @@ comment=$("#commentText").val();
     });
 }
 
-//post data to API
+//login
 function login() {
 user=$("#user").val();
 var password=$("#password").val();
@@ -400,6 +400,7 @@ var password=$("#password").val();
     });
 }
 
+//logout
 function logout() {
     $.ajax({
         type: "POST",

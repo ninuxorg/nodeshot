@@ -101,8 +101,10 @@ class ImageListSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Image
-        fields = ('file', 'description','added')
-        
+        fields = ('file', 'description', 'added', 'order')
+        read_only_fields = ('added',)
+
+
 class ImageAddSerializer(serializers.ModelSerializer):
     
     user= serializers.Field(source='user.username')
@@ -110,4 +112,4 @@ class ImageAddSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Image
-        fields = ('node','file', 'description')
+        fields = ('node', 'file', 'description', 'order')
