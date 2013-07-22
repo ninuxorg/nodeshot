@@ -128,6 +128,6 @@ class NodeParticipationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=Node
-        fields= ('name','slug', 'participation')       
+        fields= ('name','slug','address', 'participation')       
 
 

@@ -49,6 +49,8 @@ function openInsertDiv(latlng){
 	var arrayLatLng=latlng.split(",");
 	var lat=arrayLatLng[0].slice(7);
 	var lng=arrayLatLng[1].slice(0,-1);
+	var lngLatInsert='POINT('+lng+' '+lat+')'
+	//alert (lngLatInsert)
 //	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
 	//console.log(address);
 	$("#node_insert").show();
@@ -147,9 +149,9 @@ function loadNodes(newClusterNodes,color){
 		
 	onEachFeature: function (feature, layer) {
 		//nodeSlug=feature.properties.slug;
-		nodeAddress=feature.properties.address;
+		//nodeAddress=feature.properties.address;
 		layer.on('click', function (e) {
-			populateNodeDiv(feature.properties.slug);
+			populateNodeDiv(feature.properties.slug,1);
 			this.bindPopup(nodeDiv)
 			
 				});
@@ -170,20 +172,17 @@ function loadNodes(newClusterNodes,color){
 	return layer;	
 }
 
-////Create div that will display nodes'info
-//function createNodeDiv(nodeSlug) {
-//		nodeDiv = document.createElement('div');
-//		nodeDiv.id=nodeSlug;
-//		populateNodeDiv (nodeSlug);
-////
-//}
-
-function populateNodeDiv(nodeSlug) {
+//Info on node to be displayed on popup
+function populateNodeDiv(nodeSlug,create) {
+	var create_me=create
+	if (create_me ==1) {
+		nodeDiv = document.createElement('div');
+		nodeDiv.id=nodeSlug;	
+	}
 	
-	nodeDiv = document.createElement('div');
-	nodeDiv.id=nodeSlug;
 	node=   getData('http://localhost:8000/api/v1/nodes/'+nodeSlug+'/participation/');
 	nodeName=node.name;
+	nodeAddress=node.address;
 	nodeRatingCount=node.participation.rating_count;
 	nodeRatingAVG=node.participation.rating_avg;
 	nodeLikes=node.participation.likes;
@@ -191,7 +190,10 @@ function populateNodeDiv(nodeSlug) {
 	nodeVoteCount=nodeLikes+nodeDislikes;
 	nodeComments=node.participation.comment_count;
 	//alert(node.name)
-	$(nodeDiv).append('<b>'+nodeName+'</b><br>');
+	$(nodeDiv).append('<strong>'+nodeName+'</strong><br>');
+	$(nodeDiv).append(nodeAddress+'<br>');
+	$(nodeDiv).append('<strong>Rating:</strong><br>');
+	
 	if (nodeRatingCount==0) {
 		$(nodeDiv).append('Not rated yet<br>');
 	}
@@ -199,54 +201,18 @@ function populateNodeDiv(nodeSlug) {
 	$(nodeDiv).append('Rated:'+node.participation.rating_avg+'<br> by '+node.participation.rating_count+' people<br>');
 	}
 	
-	if (nodeVoteCount==0) {
-		$(nodeDiv).append('Not voted yet</br>');
-	}
-	else {
-	$(nodeDiv).append('Likes to:'+nodeLikes+' people.<br>');
-	$(nodeDiv).append('Don\'t likes to:'+nodeDislikes+' people.<br>');
-	}
+	$(nodeDiv).append('<strong>Votes:</strong><br>');
+	$(nodeDiv).append('In favour: <strong>'+nodeLikes+'</strong><br>');
+	$(nodeDiv).append('Against: <strong>'+nodeDislikes+'</strong><br>');
 
-	$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>Comments: '+ node.participation.comment_count+'</a><br>');
-
-	return(nodeDiv)
-
-}
-
-function updateNodeDiv(nodeSlug) {
 	
-	node=   getData('http://localhost:8000/api/v1/nodes/'+nodeSlug+'/participation/');
-	nodeName=node.name;
-	nodeRatingCount=node.participation.rating_count;
-	nodeRatingAVG=node.participation.rating_avg;
-	nodeLikes=node.participation.likes;
-	nodeDislikes=node.participation.dislikes;
-	nodeVoteCount=nodeLikes+nodeDislikes;
-	nodeComments=node.participation.comment_count;
-	//alert(node.name)
-	$(nodeDiv).append('<b>'+nodeName+'</b><br>');
-	if (nodeRatingCount==0) {
-		$(nodeDiv).append('Not rated yet<br>');
-	}
-	else {
-	$(nodeDiv).append('Rated:'+node.participation.rating_avg+'<br> by '+node.participation.rating_count+' people<br>');
-	}
+	var like=1
+	var dislike=-1
+	$(nodeDiv).append('<button onclick=postVote(\''+nodeSlug+'\',\''+like+'\')>I am in favor of it!</button>');
+	$(nodeDiv).append('<button onclick=postVote(\''+nodeSlug+'\',\''+dislike+'\')>I am against it!</button><br>');
 	
-	if (nodeVoteCount==0) {
-		$(nodeDiv).append('Not voted yet</br>');
-	}
-	else {
-	$(nodeDiv).append('Likes to:'+nodeLikes+' people.<br>');
-	$(nodeDiv).append('Don\'t likes to:'+nodeDislikes+' people.<br>');
-	}
-	
-	if (nodeComments==0) {
-		$(nodeDiv).append('Not commented yet<br>');
-	}
-	else {
-		$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>Comments: '+ node.participation.comment_count+'</a><br>');
-
-	}
+	$(nodeDiv).append('<strong>Comments:</strong><br>');
+	$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>comments: '+ node.participation.comment_count+'</a><br>');
 
 	return(nodeDiv)
 
@@ -261,7 +227,7 @@ function showComments(nodeSlug) {
 	url='http://localhost:8000/api/v1/nodes/'+node+'/comments/?format=json';
 	comments=   getData(url);
 	//console.log(comments);
-	htmlText='Comments on <b>'+node+'</b><br>';
+	htmlText='Comments on <strong>'+node+'</strong><br>';
 	htmlText+='<div id="comment" >';
 	for (var i = 0; i < comments.length; i++) { 
 
@@ -378,8 +344,28 @@ comment=$("#commentText").val();
         success: function(response){	
 	var nodeDiv=  $("#" + nodeSlug);
 	$(nodeDiv).html('')
-        updateNodeDiv (nodeSlug);
+        populateNodeDiv (nodeSlug,0);
 	showComments(nodeSlug)
+        }
+        
+    });
+}
+
+//post a vote
+function postVote(nodeSlug,vote) {
+//nodeSlug='fusolab';
+//alert (nodeSlug);
+comment=$("#commentText").val();
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/votes/',
+	data: { "vote": vote},
+        dataType: 'json',
+        success: function(response){	
+	var nodeDiv=  $("#" + nodeSlug);
+	$(nodeDiv).html('')
+        populateNodeDiv (nodeSlug,0);
+	//showComments(nodeSlug)
         }
         
     });
