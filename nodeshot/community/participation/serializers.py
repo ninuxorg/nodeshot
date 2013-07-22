@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers,pagination
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -19,7 +19,24 @@ __all__ = [
     'RatingAddSerializer' ,
     'VoteListSerializer',
     'VoteAddSerializer',
+    'PaginationSerializer',
+    'LinksSerializer',
 ]
+
+
+#Pagination serializers
+
+class LinksSerializer(serializers.Serializer):
+    
+    next = pagination.NextPageField(source='*')
+    prev = pagination.PreviousPageField(source='*')
+
+
+class PaginationSerializer(pagination.BasePaginationSerializer):
+
+    links = LinksSerializer(source='*')  # Takes the page object as the source
+    total_results = serializers.Field(source='paginator.count')
+    results_field = 'nodes'
 
 #Comments serializers
 
@@ -37,7 +54,7 @@ class CommentListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Comment
-        fields = ('node', 'username', 'text',)
+        fields = ('node','username', 'text','added')
         readonly_fields = ('node', 'username', 'added')
 
 
@@ -111,6 +128,6 @@ class NodeParticipationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=Node
-        fields= ('name', 'participation')       
+        fields= ('name','slug', 'participation')       
 
 

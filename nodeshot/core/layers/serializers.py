@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers,pagination
 
 from .models import Layer
 from nodeshot.core.nodes.serializers import NodeListSerializer
@@ -7,9 +7,23 @@ from nodeshot.core.nodes.serializers import NodeListSerializer
 __all__ = [
     'LayerDetailSerializer',
     'LayerListSerializer',
-    'LayerNodeListSerializer'
+    'LayerNodeListSerializer',
+    'PaginationSerializer',
+    'LinksSerializer',
 ]
 
+
+class LinksSerializer(serializers.Serializer):
+    
+    next = pagination.NextPageField(source='*')
+    prev = pagination.PreviousPageField(source='*')
+
+
+class PaginationSerializer(pagination.BasePaginationSerializer):
+
+    links = LinksSerializer(source='*')  # Takes the page object as the source
+    total_results = serializers.Field(source='paginator.count')
+    results_field = 'layers'
 
 class LayerListSerializer(serializers.ModelSerializer):
     """
@@ -21,7 +35,7 @@ class LayerListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Layer
-        fields= ('name', 'center', 'area', 'details', 'nodes', 'geojson')
+        fields= ('slug','name', 'center', 'area', 'details', 'nodes', 'geojson')
 
 
 

@@ -36,6 +36,9 @@ class AllNodesParticipationList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Node
     serializer_class= NodeParticipationSerializer
+    pagination_serializer_class = PaginationSerializer
+    paginate_by_param = 'limit'
+    paginate_by = 10
 
 all_nodes_participation= AllNodesParticipationList.as_view()
 
@@ -50,6 +53,9 @@ class AllNodesCommentList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Node
     serializer_class= NodeCommentSerializer
+    pagination_serializer_class = PaginationSerializer
+    paginate_by_param = 'limit'
+    paginate_by = 10
     
 all_nodes_comments= AllNodesCommentList.as_view()
 

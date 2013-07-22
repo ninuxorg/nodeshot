@@ -23,10 +23,7 @@
 	<link rel="stylesheet" href="{% static 'participation/css/main.css' %}" />
         <!--<link rel="stylesheet" href="css/main.css">-->
         <link rel="stylesheet" href="{% static 'participation/css/leaflet.css' %}" />
-        <link rel="stylesheet" href="{% static 'participation/css/MarkerCluster.css' %}" />
-        <link rel="stylesheet" href="{% static 'participation/css/MarkerCluster.Default.css' %}" />
-<!--[if lte IE 8]><link rel="stylesheet" href="{% static 'participation/css/leaflet.ie.css' %}" /><![endif]-->
-<!--[if lte IE 8]><link rel="stylesheet" href="{% static 'participation/css/MarkerCluster.Default.ie.css' %}" /><![endif]-->
+
 
         <script src="{% static 'participation/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js' %}"></script>
     </head>
@@ -47,27 +44,17 @@
                     </a>
                     <a class="brand" href="#">Nodeshot</a>
                     <div class="nav-collapse collapse">
-                        <ul class="nav">
-                            <li class="active"><a href="#">Home</a></li>
-                            <li><a href="#about">About</a></li>
-                            <li><a href="#contact">Contact</a></li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">Action</a></li>
-                                    <li><a href="#">Another action</a></li>
-                                    <li><a href="#">Something else here</a></li>
-                                    <li class="divider"></li>
-                                    <li class="nav-header">Nav header</li>
-                                    <li><a href="#">Separated link</a></li>
-                                    <li><a href="#">One more separated link</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                        <form class="navbar-form pull-right">
-                            <input class="span2" type="text" placeholder="Email">
-                            <input class="span2" type="password" placeholder="Password">
-                            <button type="submit" class="btn">Sign in</button>
+                        
+                        <form id="userForm" class="navbar-form pull-right">
+			 {% if not user.is_authenticated %}
+                            <input id="user" class="span2" type="text" placeholder="Email">
+                            <input id="password" class="span2" type="password" placeholder="Password">
+                            <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
+			  {% else %}
+			  <font color="#FFFFFF">Hi {{ user }} </font>
+			   
+			    <button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>
+			 {% endif %}  
                         </form>
                     </div><!--/.nav-collapse -->
                 </div>
@@ -87,22 +74,40 @@
             <div class="row">
 
                 <div class="span9">
-                <div id="map" style="width: 600px; height: 450px"></div>
-               <div id='loading'>Loading...</div>
+
                 <!--<p><a class="btn" href="#">View details &raquo;</a></p>-->
+              
+                <div id="map" style="width: 600px; height: 450px">
+		    <div id='loading'>Loading...</div>
+		    
+		</div>
                </div>
                 <div class="span3">
                     <div id='valori' >
-
-<div class="intestazione">
-<p style='font-family: arial ; font-size: 10pt; font-weight:bold;'>
-Clicca sulla mappa per aggiungere un Punto di Interesse o clicca su un PoI esistente.</div>
-<div class="label" id="user">
+		    </div>
+<!--<div class="intestazione">
+<p style='font-family: arial ; font-size: 8pt; font-weight:bold;'>
+Clicca sulla mappa per aggiungere un Punto di Interesse o clicca su un PoI esistente.</div>-->
+<!--<div class="label" id="user">
 	User
 </div>
 <div class="valore" id="user">
 	Test
+</div>-->
+<div id="nodeDiv"></div>
+<div id="node_insert">
+    <div class="label" >
+	Layer
+    </div>
+    
+	<select id="Layer_select" class="select">
+	  
+	</select>
+    
+     <div class="label" >
+	Nome
 </div>
+<input class="input" id="nome">
 <div class="label" >
 	Indirizzo
 </div>
@@ -127,7 +132,7 @@ Clicca sulla mappa per aggiungere un Punto di Interesse o clicca su un PoI esist
 <div class="valore" id="comment">
 <textarea>Comment here</textarea>	
 </div>
-<button onclick="load_layers(layers);">Invia</button>
+<button onclick="clearLayers();">Invia</button>
 </p>
 </div>	</div>
                     <!--<p><a class="btn" href="#">View details &raquo;</a></p>-->
@@ -137,7 +142,7 @@ Clicca sulla mappa per aggiungere un Punto di Interesse o clicca su un PoI esist
             <hr>
 
             <footer>
-                <p>Cineca 2013</p>
+               
             </footer>
 
         </div> <!-- /container -->
@@ -146,11 +151,13 @@ Clicca sulla mappa per aggiungere un Punto di Interesse o clicca su un PoI esist
 <!--        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
 -->
         <script src="{% static 'participation/js/vendor/jquery-1.8.3.min.js' %}"></script>
+	<script src="{% static 'participation/js/vendor/jquery.cookie.js' %}"></script>
         <script src="{% static 'participation/js/vendor/bootstrap.min.js' %}"></script>
         <script src="{% static 'participation/js/vendor/leaflet.js' %}"></script>
         <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
         <script src="{% static 'participation/js/vendor/Google.js' %}"></script>
         <script src="{% static 'participation/js/vendor/leaflet.markercluster-src.js' %}"></script>
+	<script src="{% static 'participation/js/vendor/imtech_pager.js' %}"></script>
         <!--<script type="text/javascript" src="leaflet/leaflet.ajax.js"></script>-->
         <script src="{% static 'participation/js/functions.js' %}"></script>
         <script src="{% static 'participation/js/main.js' %}"></script>
