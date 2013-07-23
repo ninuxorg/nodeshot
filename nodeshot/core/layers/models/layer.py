@@ -16,7 +16,10 @@ class Layer(BaseDate):
     """ Layer Model """
     name = models.CharField(_('name'), max_length=50, unique=True)
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
-    description = models.CharField(_('description'), max_length=250, blank=True, null=True)
+    description = models.CharField(_('description'), max_length=250, blank=True, null=True,
+                                   help_text=_('short description of this layer'))
+    text = models.TextField(_('extended text'), blank=True, null=True,
+                            help_text=_('extended description, specific instructions, links, ecc.'))
     
     # record management
     is_published = models.BooleanField(_('published'), default=True)

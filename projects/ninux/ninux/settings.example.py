@@ -261,7 +261,9 @@ NODESHOT = {
         # the following is an example of possible granular ACL setting that can be specified
         #'ACL_NODES_NODE_EDITABLE': False,
         
+        'LAYER_TEXT_HTML': True,
         'NODE_DESCRIPTION_HTML': True,
+        'NODE_AREA': False,
         
         'CONTACT_INWARD_LOG': True,
         'CONTACT_INWARD_MAXLENGTH': 2000,
@@ -304,7 +306,6 @@ NODESHOT = {
         'MAP_ZOOM': 12,
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
         'NODE_STATUS': 'potential',
-        'NODE_AREA': True,
         'NODE_PUBLISHED': True,
         'ZONE_ZOOM': 12,
         'ZONE_MINIMUM_DISTANCE': 0,

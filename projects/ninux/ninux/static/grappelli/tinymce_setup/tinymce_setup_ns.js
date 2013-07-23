@@ -25,7 +25,7 @@ tinyMCE.init({
     // see http://www.tinymce.com/wiki.php/Configuration
     
     // Init
-    mode: 'textareas',
+    selector: 'textarea.vLargeTextField',
     theme: 'advanced',
     skin: 'grappelli',
     
