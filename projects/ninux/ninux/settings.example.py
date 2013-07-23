@@ -261,6 +261,8 @@ NODESHOT = {
         # the following is an example of possible granular ACL setting that can be specified
         #'ACL_NODES_NODE_EDITABLE': False,
         
+        'NODE_DESCRIPTION_HTML': True,
+        
         'CONTACT_INWARD_LOG': True,
         'CONTACT_INWARD_MAXLENGTH': 2000,
         'CONTACT_INWARD_MINLENGTH': 15,
@@ -270,8 +272,10 @@ NODESHOT = {
         'CONTACT_OUTWARD_STEP': 20,
         'CONTACT_OUTWARD_DELAY': 10,
         'CONTACT_OUTWARD_HTML': True,  # grappelli must be in INSTALLED_APPS, otherwise it won't work
+        
         'PROFILE_EMAIL_CONFIRMATION': True,
         'PROFILE_REQUIRED_FIELDS': ['email'],
+        
         'ADMIN_MAP_COORDS': [41.8934, 12.4960],  # lat, lng
         'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin
     },
