@@ -119,8 +119,6 @@ new L.MarkerClusterGroup(
 return newCluster;	
 }
 
-
-
 //Delete all layers from map
 function clearLayers()  {
             for (x in mapLayers) {
@@ -152,7 +150,23 @@ function loadNodes(newClusterNodes,color){
 		//nodeAddress=feature.properties.address;
 		layer.on('click', function (e) {
 			populateNodeDiv(feature.properties.slug,1);
-			this.bindPopup(nodeDiv)
+			this.bindPopup(nodeDiv);
+			alert(nodeRatingAVG);
+			$(function() {
+			alert(feature.properties.slug);
+			x=$(nodeDiv).find('#star');
+			$(x).raty(
+				  {
+					score: nodeRatingAVG,
+					number:10,
+					path: $.myproject.STATIC_URL+'participation/js/vendor/images',
+					 click: function(score, evt) {
+				postRating(feature.properties.slug,score );
+				}
+					
+					}
+				  );
+			 });
 			
 				});
 		//console.log(nodeSlug);
@@ -193,13 +207,15 @@ function populateNodeDiv(nodeSlug,create) {
 	$(nodeDiv).append('<strong>'+nodeName+'</strong><br>');
 	$(nodeDiv).append(nodeAddress+'<br>');
 	$(nodeDiv).append('<strong>Rating:</strong><br>');
+	$(nodeDiv).append('<div id="star"></div>');
 	
-	if (nodeRatingCount==0) {
-		$(nodeDiv).append('Not rated yet<br>');
-	}
-	else {
-	$(nodeDiv).append('Rated:'+node.participation.rating_avg+'<br> by '+node.participation.rating_count+' people<br>');
-	}
+	
+	//if (nodeRatingCount==0) {
+	//	$(nodeDiv).append('Not rated yet<br>');
+	//}
+	//else {
+	//$(nodeDiv).append('Rated:'+node.participation.rating_avg+'<br> by '+node.participation.rating_count+' people<br>');
+	//}
 	
 	$(nodeDiv).append('<strong>Votes:</strong><br>');
 	$(nodeDiv).append('In favour: <strong>'+nodeLikes+'</strong><br>');
@@ -208,13 +224,14 @@ function populateNodeDiv(nodeSlug,create) {
 	
 	var like=1
 	var dislike=-1
-	$(nodeDiv).append('<button onclick=postVote(\''+nodeSlug+'\',\''+like+'\')>I am in favor of it!</button>');
-	$(nodeDiv).append('<button onclick=postVote(\''+nodeSlug+'\',\''+dislike+'\')>I am against it!</button><br>');
+	$(nodeDiv).append('<button class="vote" onclick=postVote(\''+nodeSlug+'\',\''+like+'\')>In favour</button>');
+	$(nodeDiv).append('<button class="vote" onclick=postVote(\''+nodeSlug+'\',\''+dislike+'\')>Against</button><br>');
 	
 	$(nodeDiv).append('<strong>Comments:</strong><br>');
 	$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>comments: '+ node.participation.comment_count+'</a><br>');
 
-	return(nodeDiv)
+	populateRating(nodeSlug,nodeRatingAVG)
+	return(nodeDiv,nodeRatingAVG)
 
 }
 
@@ -355,7 +372,6 @@ comment=$("#commentText").val();
 function postVote(nodeSlug,vote) {
 //nodeSlug='fusolab';
 //alert (nodeSlug);
-comment=$("#commentText").val();
     $.ajax({
         type: "POST",
         url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/votes/',
@@ -370,6 +386,42 @@ comment=$("#commentText").val();
         
     });
 }
+
+//post a rating
+function postRating(nodeSlug,rating) {
+//nodeSlug='fusolab';
+//alert (nodeSlug);
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/ratings/',
+	data: { "value": rating},
+        dataType: 'json',
+        success: function(response){	
+	var nodeDiv=  $("#" + nodeSlug);
+	$(nodeDiv).html('')
+        populateNodeDiv (nodeSlug,0);
+	//populateRating(nodeSlug,nodeRatingAVG)
+	//showComments(nodeSlug)
+        }
+        
+    });
+}
+
+function populateRating(nodeSlug,nodeRatingAVG) {
+		alert(nodeSlug);
+			x=$(nodeSlug).find('#star');
+			$(x).raty(
+				  {
+					score: nodeRatingAVG,
+					number:10,
+					path: $.myproject.STATIC_URL+'participation/js/vendor/images',
+					 click: function(score, evt) {
+				postRating(feature.properties.slug,score );
+				}
+					
+					}
+				  );
+			 };
 
 //login
 function login() {

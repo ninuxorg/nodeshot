@@ -158,6 +158,11 @@ Clicca sulla mappa per aggiungere un Punto di Interesse o clicca su un PoI esist
         <script src="{% static 'participation/js/vendor/Google.js' %}"></script>
         <script src="{% static 'participation/js/vendor/leaflet.markercluster-src.js' %}"></script>
 	<script src="{% static 'participation/js/vendor/imtech_pager.js' %}"></script>
+	<script type="text/javascript">  
+    $.myproject = {} // namespace
+    $.myproject.STATIC_URL = '{{ STATIC_URL }}';
+</script>
+	<script src="{% static 'participation/js/vendor/jquery.raty.js' %}"></script>
         <!--<script type="text/javascript" src="leaflet/leaflet.ajax.js"></script>-->
         <script src="{% static 'participation/js/functions.js' %}"></script>
         <script src="{% static 'participation/js/main.js' %}"></script>
