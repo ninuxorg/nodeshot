@@ -25,6 +25,7 @@ def get_queryset_or_404(queryset, kwargs):
     
     return obj
 
+
 class NodeList(ACLMixin, generics.ListCreateAPIView):
     """
     ### GET
@@ -44,9 +45,10 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Node.objects.published()
     serializer_class = NodeListSerializer
-    pagination_serializer_class = NodePaginationSerializer
+    serializer_custom_class = NodeCreatorSerializer
+    pagination_serializer_class = PaginatedNodeListSerializer
     paginate_by_param = 'limit'
-    paginate_by = 10
+    paginate_by = 40
     
     def get_queryset(self):
         """
@@ -97,7 +99,7 @@ class NodeGeojsonList(generics.ListAPIView):
     #model = Node
     #paginate_by = 10
     paginate_by_param = 'results'
-    serializer_class=GeojsonNodeListSerializer
+    serializer_class = GeojsonNodeListSerializer
     #pagination_serializer_class = NodePaginationSerializer
     
     #def get_queryset(self):

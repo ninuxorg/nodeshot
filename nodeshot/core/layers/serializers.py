@@ -1,6 +1,9 @@
+from django.conf import settings
 from rest_framework import serializers,pagination
 
 from .models import Layer
+
+from nodeshot.core.nodes.models import Node
 from nodeshot.core.nodes.serializers import NodeListSerializer
 
 
@@ -25,6 +28,7 @@ class PaginationSerializer(pagination.BasePaginationSerializer):
     total_results = serializers.Field(source='paginator.count')
     results_field = 'layers'
 
+
 class LayerListSerializer(serializers.ModelSerializer):
     """
     Layer list
@@ -35,8 +39,7 @@ class LayerListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Layer
-        fields= ('slug','name', 'center', 'area', 'details', 'nodes', 'geojson')
-
+        fields= ('slug', 'name', 'center', 'area', 'details', 'nodes', 'geojson')
 
 
 class LayerDetailSerializer(LayerListSerializer):
@@ -49,12 +52,29 @@ class LayerDetailSerializer(LayerListSerializer):
                   'description', 'organization', 'website', 'nodes', 'geojson')
 
 
+class CustomNodeListSerializer(NodeListSerializer):
+    
+    class Meta:
+        model = Node
+        fields = [
+            'name', 'slug', 'user',
+            'coords', 'elev', 'address', 'description'
+        ]
+        
+        if settings.NODESHOT['SETTINGS']['NODE_AREA']:
+            fields += ['area']
+        
+        fields += ['updated', 'added', 'details']
+        read_only_fields = ['added', 'updated']
+    
+
+
 class LayerNodeListSerializer(LayerDetailSerializer):
     """
     Nodes of a Layer
     """
-    nodes = NodeListSerializer(source='node_set')
+    nodes = CustomNodeListSerializer(source='node_set')
     
     class Meta:
         model = Layer
-        fields = ('name', 'nodes')    
+        fields = ('name', 'description', 'organization', 'website', 'nodes')    

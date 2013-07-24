@@ -2,6 +2,9 @@
 nodeshot.core.nodes unit tests
 """
 
+import os
+import simplejson as json
+
 from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
@@ -10,10 +13,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import *
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
-
 User = get_user_model()
-
-import simplejson as json
 
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.base.tests import user_fixtures
@@ -121,7 +121,7 @@ class APITest(TestCase):
         url = reverse('api_node_list')
         
         # GET: 200
-        response = self.client.get(url)
+        response = self.client.get(url, { "limit": 0 })
         nodes = json.loads(response.content)
         public_node_count = Node.objects.published().access_level_up_to('public').count()
         self.assertEqual(public_node_count, len(nodes))
@@ -134,7 +134,7 @@ class APITest(TestCase):
             "name": "test_distance", 
             "slug": "test_distance", 
             "address": "via dei test", 
-            "coords": "POINT (12.99 41.8720419277)", 
+            "coords": "41.8720419277,12.99", 
             "description": ""
         }
         response = self.client.post(url, json_data)
@@ -207,8 +207,8 @@ class APITest(TestCase):
         # POST
         # todo
         login = self.client.login(username='admin', password='tester')
-        good_post_data = { "file": "testjpg" ,"description" : "new image"}
-        bad_post_data = { "node": 100, "image": "jpeg99" ,"description" : "new image"}
+        good_post_data = { "description": "new image", "order": "" }
+        bad_post_data = { "node": 100, "image": "jpeg99" ,"description" : "new image", "order": "" }
         url = reverse('api_node_images', args=['fusolab'])
         wrong_url = reverse('api_node_images', args=['idontexist'])
         
@@ -217,15 +217,29 @@ class APITest(TestCase):
         self.assertEqual(response.status_code, 404)
         
         # correct POST data and correct slug -- 201
-        response = self.client.post(url, good_post_data)
-        self.assertEqual(response.status_code, 201)
-        #
+        with open("%s/templates/image_unit_test.gif" % os.path.dirname(os.path.realpath(__file__)), 'rb') as image_file:
+            good_post_data['file'] = image_file
+            response = self.client.post(url, good_post_data)
+            self.assertEqual(response.status_code, 201)
+            # ensure image name is in DB
+            image = Image.objects.all().order_by('-id')[0]
+            self.assertIn('image_unit_test.gif', image.file.name)
+            # remove file
+            os.remove(image.file.file.name)
+        
         # POST 201 - ensure additional post data "user" and "node" are ignored
-        response = self.client.post(url, bad_post_data)
-        self.assertEqual(response.status_code, 201)
-        image_dict = json.loads(response.content)
-        self.assertEqual(image_dict['node'], 1)
-        self.assertEqual(image_dict['description'], "new image")
+        with open("%s/templates/image_unit_test.gif" % os.path.dirname(os.path.realpath(__file__)), 'rb') as image_file:
+            bad_post_data['file'] = image_file
+            response = self.client.post(url, bad_post_data)
+            self.assertEqual(response.status_code, 201)
+            image_dict = json.loads(response.content)
+            self.assertEqual(image_dict['node'], 1)
+            self.assertEqual(image_dict['description'], "new image")
+            # ensure image name is in DB
+            image = Image.objects.all().order_by('-id')[0]
+            self.assertIn('image_unit_test', image.file.name)
+            # remove file
+            os.remove(image.file.file.name)
     
     def test_node_coords_distance_and_area(self):
         """ test minimum distance check between nodes """
@@ -238,7 +252,7 @@ class APITest(TestCase):
             "name": "test_distance", 
             "slug": "test_distance", 
             "address": "via dei test", 
-            "coords": "POINT (12.5822391919000012 41.8720419276999820)", 
+            "coords": "41.8720419276999820, 12.5822391919000012", 
             "description": ""
         }
         layer = Layer.objects.get(pk=1)
@@ -250,24 +264,24 @@ class APITest(TestCase):
         self.assertEqual(400, response.status_code)
         
         # Node coordinates respect minimum distance. Insert should succed
-        json_data['coords'] = "POINT (12.7822391919 41.8720419277)";
+        json_data['coords'] = "41.8720419277,12.7822391919";
         response = self.client.post(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(201, response.status_code)
         
         # Disable minimum distance control in layer and update node inserting coords too near. Insert should succed
         layer.minimum_distance = 0
         layer.save()
-        json_data['coords'] = "POINT (12.5822391917 41.872042278)";
+        json_data['coords'] = "41.872042278,12.5822391917";
         n = Node.objects.get(slug='test_distance')
         node_slug = n.slug
-        url = reverse('api_node_details',args=[node_slug])
+        url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)
         
         # re-enable minimum distance and update again with coords too near. Insert should fail
         layer.minimum_distance = 100
         layer.save()
-        url = reverse('api_node_details',args=[node_slug])
+        url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
         
@@ -276,22 +290,22 @@ class APITest(TestCase):
         layer.save()
         
         # Node update should fail because coords are outside layer area
-        json_data['coords'] = "POINT (50 50)";
-        url = reverse('api_node_details',args=[node_slug])
+        json_data['coords'] = "50,50";
+        url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
         
         # Node update should succeed because coords are inside layer area and respect minimum distance
-        json_data['coords'] = "POINT (12.7822391919 41.8720419277)";
-        url = reverse('api_node_details',args=[node_slug])
+        json_data['coords'] = "41.8720419277,12.7822391919";
+        url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)
         
         # Node update should succeed because layer area is disabled
         layer.area=None
         layer.save()
-        json_data['coords'] = "POINT (50 50)";
-        url = reverse('api_node_details',args=[node_slug])
+        json_data['coords'] = "50,50";
+        url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)
         

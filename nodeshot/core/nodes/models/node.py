@@ -37,7 +37,7 @@ class Node(BaseAccessLevel):
         area = models.PolygonField(blank=True, null=True)
     
     # positioning
-    coords = models.PointField(_('coordinates'))
+    coords = models.PointField(_('coordinates'), help_text=_('geographic coordinates (latitude and longitude)'))
     elev = models.FloatField(_('elevation'), blank=True, null=True)
     
     description = models.TextField(_('description'), max_length=255, blank=True, null=True)

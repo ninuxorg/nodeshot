@@ -39,3 +39,13 @@ if 'nodeshot.core.api' in settings.INSTALLED_APPS:
     from nodeshot.core.api.urls import urlpatterns as api_urlpatterns
     
     urlpatterns += api_urlpatterns
+
+
+#if settings.DEBUG:
+#    urlpatterns += patterns('django.contrib.staticfiles.views',
+#        url(r'^static/(?P<path>.*)$', 'serve'),
+#    )
+
+urlpatterns += patterns('nodeshot.community.participation.views',
+        url(r'^map/', 'map_view'),
+    )
