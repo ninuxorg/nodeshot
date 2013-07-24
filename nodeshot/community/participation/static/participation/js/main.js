@@ -16,7 +16,7 @@ var overlaymaps={};
 var layers= getData('http://localhost:8000/api/v1/layers/');
 //console.log(layers)
 var mapLayers=loadLayers(layers);
-var layerList=getLayerList(layers);
+//var layerList=getLayerList(layers);
 //console.log(layerList);
 var baseMaps = {
 		"OpenStreetMap": osmLayer,
@@ -28,19 +28,6 @@ var baseMaps = {
 				};
 L.control.layers(baseMaps,overlaymaps).addTo(map);
 //showLayerProperties()
-
-//var pisa = new L.MarkerClusterGroup();
-//pisa_nodes=   getData('http://localhost:8000/api/v1/layers/pisa/geojson/');
-//pisa_nodes_layer=load_nodes(pisa_nodes)	;
-//pisa.addLayer(pisa_nodes_layer);
-//map.addLayer(pisa); 
-				
-//var overlaymaps = {
-//			
-//			
-//			"Roma": roma,
-//			"Pisa" : pisa,
-//		};
 
 
 

@@ -42,45 +42,6 @@ function markerConfirm(marker) {
 	map.closePopup();
 }
 
-//function to catch and display PoI coordinates
-function openInsertDiv(latlng){
-	$("#valori").html('');
-	//alert(latlng);
-	var arrayLatLng=latlng.split(",");
-	var lat=arrayLatLng[0].slice(7);
-	var lng=arrayLatLng[1].slice(0,-1);
-	var lngLatInsert='POINT('+lng+' '+lat+')'
-	//alert (lngLatInsert)
-//	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
-	//console.log(address);
-	$("#node_insert").show();
-	$("#lat").html(lat);
-	$("#lng").html(lng);
-	$("#address").html(address.display_name);
-	
-        }
-
-
-//Create a list with layers' slug and name
-function getLayerList(layers) {
-	layerList=[];
-	for(var i=0;i<layers.length;i++){
-		layerList[i]={}
-		var obj = layers[i];
-		for(var key in obj){
-			var attrName = key;
-			var attrValue = obj[key];
-			if (key=='slug' || key== 'name' ) {
-				layerList[i][key]=attrValue;
-			}	    
-		}
-	}
-	var options = $("#Layer_select");	
-	$.each(layerList, function(obj,city) {
-		options.append($("<option />").val(city.slug).text(city.name));
-		});
-}
-
 //Layers load
 function loadLayers(layers) {
 	var allLayers= []
@@ -119,26 +80,6 @@ new L.MarkerClusterGroup(
 return newCluster;	
 }
 
-//Delete all layers from map
-function clearLayers()  {
-            for (x in mapLayers) {
-		//alert (x);
-		mapLayers[x].clearLayers();
-	    }
-        }
-//show layer properties	
-function showLayerProperties()  {
-            for (x in mapLayers) {
-		var obj=mapLayers[x]
-		for (var key in obj) {
-		if (obj.hasOwnProperty(key)) {
-        console.log(key+obj[key])
-    }
-}
-	    }
-        }
-	
-	
 //Load layer nodes
 function loadNodes(newClusterNodes,color){
 
@@ -146,28 +87,13 @@ function loadNodes(newClusterNodes,color){
 	L.geoJson(newClusterNodes, {
 		
 	onEachFeature: function (feature, layer) {
-		//nodeSlug=feature.properties.slug;
+		var nodeSlug=feature.properties.slug;
 		//nodeAddress=feature.properties.address;
 		layer.on('click', function (e) {
+			$("#valori").html('test');
 			populateNodeDiv(feature.properties.slug,1);
 			this.bindPopup(nodeDiv);
-			alert(nodeRatingAVG);
-			$(function() {
-			alert(feature.properties.slug);
-			x=$(nodeDiv).find('#star');
-			$(x).raty(
-				  {
-					score: nodeRatingAVG,
-					number:10,
-					path: $.myproject.STATIC_URL+'participation/js/vendor/images',
-					 click: function(score, evt) {
-				postRating(feature.properties.slug,score );
-				}
-					
-					}
-				  );
-			 });
-			
+			populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
 				});
 		//console.log(nodeSlug);
 		},
@@ -186,6 +112,26 @@ function loadNodes(newClusterNodes,color){
 	return layer;	
 }
 
+//Delete all layers from map
+function clearLayers()  {
+            for (x in mapLayers) {
+		//alert (x);
+		mapLayers[x].clearLayers();
+	    }
+        }
+	
+//show layer properties	
+function showLayerProperties()  {
+            for (x in mapLayers) {
+		var obj=mapLayers[x]
+		for (var key in obj) {
+		if (obj.hasOwnProperty(key)) {
+        console.log(key+obj[key])
+    }
+}
+	    }
+        }
+
 //Info on node to be displayed on popup
 function populateNodeDiv(nodeSlug,create) {
 	var create_me=create
@@ -203,24 +149,15 @@ function populateNodeDiv(nodeSlug,create) {
 	nodeDislikes=node.participation.dislikes;
 	nodeVoteCount=nodeLikes+nodeDislikes;
 	nodeComments=node.participation.comment_count;
-	//alert(node.name)
+	
 	$(nodeDiv).append('<strong>'+nodeName+'</strong><br>');
 	$(nodeDiv).append(nodeAddress+'<br>');
 	$(nodeDiv).append('<strong>Rating:</strong><br>');
 	$(nodeDiv).append('<div id="star"></div>');
 	
-	
-	//if (nodeRatingCount==0) {
-	//	$(nodeDiv).append('Not rated yet<br>');
-	//}
-	//else {
-	//$(nodeDiv).append('Rated:'+node.participation.rating_avg+'<br> by '+node.participation.rating_count+' people<br>');
-	//}
-	
 	$(nodeDiv).append('<strong>Votes:</strong><br>');
 	$(nodeDiv).append('In favour: <strong>'+nodeLikes+'</strong><br>');
 	$(nodeDiv).append('Against: <strong>'+nodeDislikes+'</strong><br>');
-
 	
 	var like=1
 	var dislike=-1
@@ -235,32 +172,79 @@ function populateNodeDiv(nodeSlug,create) {
 
 }
 
+//Create a list with layers' slug and name
+function getLayerList(layers) {
+	layerList=[];
+	for(var i=0;i<layers.length;i++){
+		layerList[i]={}
+		var obj = layers[i];
+		for(var key in obj){
+			var attrName = key;
+			var attrValue = obj[key];
+			if (key=='slug' || key== 'name' ) {
+				layerList[i][key]=attrValue;
+			}	    
+		}
+	}
+	var options = $("#layerSelect");	
+	$.each(layerList, function(obj,city) {
+		options.append($("<option />").val(city.slug).text(city.name));
+		});
+}
+
+//function to catch and display PoI coordinates
+function openInsertDiv(latlng){
+	$("#valori").html('');
+	var nodeInsertDiv = $("<div>", {id: "nodeInsertDiv"});
+	var arrayLatLng=latlng.split(",");
+	var lat=arrayLatLng[0].slice(7);
+	var lng=arrayLatLng[1].slice(0,-1);
+	var lngLatInsert='POINT('+lng+' '+lat+')'
+	//alert (lngLatInsert)
+	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
+	//console.log(address);
+	htmlText='<strong>Insert node details</strong><br>';
+	htmlText+='<select id="layerSelect" class="select">';
+	htmlText+='</select>';
+	htmlText+='<div class="valore" id="lat"></div>'
+	$(nodeInsertDiv).append(htmlText);
+	$("#valori").append(nodeInsertDiv);
+	$("#lat").html(lat);
+	$("#lng").html(lng);
+	$("#address").html(address.display_name);
+	getLayerList(layers);
+	
+        }
+
 //Show_comments
 function showComments(nodeSlug) {
 	//alert(JSON.stringify(nodeSlug))
-	//$("#valori").html('');
-	$("#node_insert").hide();
+	//$("#valori").html('Comments');
+	$("#valori").html('');
+	var commentsDiv = $("<div>", {id: "comments"});
 	var node=nodeSlug
 	url='http://localhost:8000/api/v1/nodes/'+node+'/comments/?format=json';
 	comments=   getData(url);
 	//console.log(comments);
-	htmlText='Comments on <strong>'+node+'</strong><br>';
+	htmlText='<strong>'+node+'</strong><br>';
 	htmlText+='<div id="comment" >';
 	for (var i = 0; i < comments.length; i++) { 
-
+		var comment=comments[i].text;
+		var username=comments[i].username;
+		var added=comments[i].added;
 		htmlText+='<div  class="comment_div">';
-		htmlText+='<span class="comment_user">'+comments[i].username+'</span>';	
+		htmlText+='<span class="comment_user">'+username+'</span>';	
 		htmlText+='<div class="comment_text">';
-		htmlText+=comments[i].text;
+		htmlText+=escapeHtml(comment);
 		htmlText+='</div>';
-		htmlText+='<span class="comment_date">'+comments[i].added+'</span>';	
+		htmlText+='<span class="comment_date">'+added+'</span>';	
 		htmlText+='</div>';
 		}
 	//alert(htmlText);
 	
 	htmlText+='</div><div id="pagingControls"></div>'
 	
-	$("#valori").html(htmlText);
+	$(commentsDiv).html(htmlText);
 	pager = new Imtech.Pager();
 	$(document).ready(function() {
 	pager.paragraphsPerPage = 5; // set amount elements per page
@@ -270,10 +254,23 @@ function showComments(nodeSlug) {
 	});
 	htmlText='<hr>Add your:<br>';
 	htmlText+='<textarea id="commentText"></textarea><br>';
-	htmlText+='<button onclick=postComment("'+node+'");>Add</button>'
-	$("#valori").append(htmlText);
+	htmlText+='<button onclick=postComment("'+node+'");>Add</button>';
+	$(commentsDiv).append(htmlText);
+	$("#valori").append(commentsDiv);
 	
 }
+
+
+	
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
 
 
 
@@ -350,8 +347,6 @@ var data;
 
 //post a comment
 function postComment(nodeSlug) {
-//nodeSlug='fusolab';
-//alert (nodeSlug);
 comment=$("#commentText").val();
     $.ajax({
         type: "POST",
@@ -362,6 +357,7 @@ comment=$("#commentText").val();
 	var nodeDiv=  $("#" + nodeSlug);
 	$(nodeDiv).html('')
         populateNodeDiv (nodeSlug,0);
+	populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
 	showComments(nodeSlug)
         }
         
@@ -370,8 +366,6 @@ comment=$("#commentText").val();
 
 //post a vote
 function postVote(nodeSlug,vote) {
-//nodeSlug='fusolab';
-//alert (nodeSlug);
     $.ajax({
         type: "POST",
         url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/votes/',
@@ -381,7 +375,7 @@ function postVote(nodeSlug,vote) {
 	var nodeDiv=  $("#" + nodeSlug);
 	$(nodeDiv).html('')
         populateNodeDiv (nodeSlug,0);
-	//showComments(nodeSlug)
+	populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
         }
         
     });
@@ -389,8 +383,6 @@ function postVote(nodeSlug,vote) {
 
 //post a rating
 function postRating(nodeSlug,rating) {
-//nodeSlug='fusolab';
-//alert (nodeSlug);
     $.ajax({
         type: "POST",
         url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/ratings/',
@@ -400,28 +392,27 @@ function postRating(nodeSlug,rating) {
 	var nodeDiv=  $("#" + nodeSlug);
 	$(nodeDiv).html('')
         populateNodeDiv (nodeSlug,0);
-	//populateRating(nodeSlug,nodeRatingAVG)
-	//showComments(nodeSlug)
+	populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
         }
         
     });
 }
 
-function populateRating(nodeSlug,nodeRatingAVG) {
-		alert(nodeSlug);
-			x=$(nodeSlug).find('#star');
-			$(x).raty(
-				  {
-					score: nodeRatingAVG,
-					number:10,
-					path: $.myproject.STATIC_URL+'participation/js/vendor/images',
-					 click: function(score, evt) {
-				postRating(feature.properties.slug,score );
-				}
-					
-					}
-				  );
-			 };
+function populateRating(nodeSlug,nodeDiv,nodeRatingAVG) {
+	
+	x=$(nodeDiv).find('#star');
+	$(x).raty(
+		  {
+			score: nodeRatingAVG,
+			number:10,
+			path: $.myproject.STATIC_URL+'participation/js/vendor/images',
+			 click: function(score, evt) {
+		postRating(nodeSlug,score );
+		}
+			
+			}
+		  );
+	 };
 
 //login
 function login() {
