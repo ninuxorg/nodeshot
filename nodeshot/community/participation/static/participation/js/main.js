@@ -26,7 +26,7 @@ var baseMaps = {
 		"Google Hybrid": googleHybrid
 		
 				};
-L.control.layers(baseMaps,overlaymaps).addTo(map);
+var mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
 //showLayerProperties()
 
 

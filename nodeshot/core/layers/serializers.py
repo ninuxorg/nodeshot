@@ -35,7 +35,7 @@ class LayerListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Layer
-        fields= ('slug','name', 'center', 'area', 'details', 'nodes', 'geojson')
+        fields= ('id','slug','name', 'center', 'area', 'details', 'nodes', 'geojson')
 
 
 

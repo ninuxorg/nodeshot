@@ -123,15 +123,17 @@ function clearLayers()  {
 	
 //show layer properties	
 function showLayerProperties()  {
-            for (x in mapLayers) {
-		var obj=mapLayers[x]
-		for (var key in obj) {
-		if (obj.hasOwnProperty(key)) {
-        console.log(key+obj[key])
-    }
+for (var x in mapLayers) {
+		//alert (x);
+		var layergroups=[]
+	//layergroups=	mapLayers[x].getLayers();
+	//console.log(layergroups)
+	mapLayers[x].eachLayer(function (layer) {
+    alert(layer.id)
+});
+	}
 }
-	    }
-        }
+
 
 //Info on node to be displayed on popup
 function populateNodeDiv(nodeSlug,create) {
@@ -182,14 +184,14 @@ function getLayerList(layers) {
 		for(var key in obj){
 			var attrName = key;
 			var attrValue = obj[key];
-			if (key=='slug' || key== 'name' ) {
+			if (key=='id' || key== 'name' ) {
 				layerList[i][key]=attrValue;
 			}	    
 		}
 	}
 	var options = $("#layerSelect");	
 	$.each(layerList, function(obj,city) {
-		options.append($("<option />").val(city.slug).text(city.name));
+		options.append($("<option />").val(city.id).text(city.name));
 		});
 }
 
@@ -229,8 +231,9 @@ function openInsertDiv(latlng){
 	getLayerList(layers);
 	
         }
+	
 function insertNode(nodeSlug,lngLatInsert){
-	alert('latlng: '+ lngLatInsert )
+	//alert('latlng: '+ lngLatInsert )
 	var nodeToInsert={}
 	nodeToInsert["layer"]="1";
 	nodeToInsert["name"]=$("#nodeToInsertName").val();
@@ -406,54 +409,62 @@ function postVote(nodeSlug,vote) {
 
 //post a rating
 function postRating(nodeSlug,rating) {
-    $.ajax({
-        type: "POST",
-        url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/ratings/',
-	data: { "value": rating},
-        dataType: 'json',
-        success: function(response){	
-	var nodeDiv=  $("#" + nodeSlug);
-	$(nodeDiv).html('')
-        populateNodeDiv (nodeSlug,0);
-	populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
-        }
-        
-    });
+	var ok=confirm("Add rating" + rating + " for this node?");
+	if (ok==true)
+	{
+		$.ajax({
+	    type: "POST",
+	    url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/ratings/',
+	    data: { "value": rating},
+	    dataType: 'json',
+	    success: function(response){	
+			var nodeDiv=  $("#" + nodeSlug);
+			$(nodeDiv).html('')
+			populateNodeDiv (nodeSlug,0);
+			populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
+			alert("Your rating has been added!");
+			}
+	    
+	});
+	}
+
 }
 
+
+
+function populateRating(nodeSlug,nodeDiv,nodeRatingAVG) {
+	
+	x=$(nodeDiv).find('#star');
+	$(x).raty(  {
+			score: nodeRatingAVG,
+			number:10,
+			path: $.myproject.STATIC_URL+'participation/js/vendor/images',
+			 click: function(score) {
+				postRating(nodeSlug,score );
+			}
+			
+		}
+		  );
+	 };
+	 
 //post a node
 function postNode(nodeSlug,node_json) {
-	alert(nodeSlug)
+	console.log (node_json)
     $.ajax({
         type: "POST",
         url: 'http://localhost:8000/api/v1/nodes/',
 	data: node_json,
         dataType: 'json',
-//        success: function(response){	
-//	var nodeDiv=  $("#" + nodeSlug);
-//	$(nodeDiv).html('')
-//        populateNodeDiv (nodeSlug,0);
-//	populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
-//        }
+        success: function(response){
+	clearLayers();
+	map.removeControl(mapControl)
+	mapLayers=loadLayers(layers);
+	mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
+	//L.control.layers(baseMaps,overlaymaps).addTo(map);
+        }
         
     });
 }
-
-function populateRating(nodeSlug,nodeDiv,nodeRatingAVG) {
-	
-	x=$(nodeDiv).find('#star');
-	$(x).raty(
-		  {
-			score: nodeRatingAVG,
-			number:10,
-			path: $.myproject.STATIC_URL+'participation/js/vendor/images',
-			 click: function(score, evt) {
-		postRating(nodeSlug,score );
-		}
-			
-			}
-		  );
-	 };
 
 //login
 function login() {
