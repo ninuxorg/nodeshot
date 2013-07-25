@@ -36,6 +36,7 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     
     Parameters:
     
+     * `search=<word>`: search <word> in name of nodes
      * `limit=<n>`: specify number of items per page (defaults to 40)
      * `limit=0`: turns off pagination
     

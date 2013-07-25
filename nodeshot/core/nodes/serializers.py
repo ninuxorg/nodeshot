@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers,pagination
+from rest_framework import serializers, pagination
 
 from nodeshot.core.base.fields import PointField
 from nodeshot.core.layers.models import Layer
