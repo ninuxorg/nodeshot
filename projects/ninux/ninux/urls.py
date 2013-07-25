@@ -15,10 +15,14 @@ urlpatterns = patterns('',
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     
-    #url(r"^password_reset/$", "nodeshot.community.profile.views.password_reset", name="acct_passwd_reset"),
-    #url(r"^password_reset/done/$", "account.views.password_reset_done", name="acct_passwd_reset_done"),
     url(r"^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$", "nodeshot.community.profiles.html_views.password_reset_from_key", name="account_password_reset_key"),
 )
+
+
+if 'social_auth' in settings.INSTALLED_APPS:
+    urlpatterns = urlpatterns + patterns('',
+        url(r'', include('social_auth.urls')),
+    )
 
 
 if 'grappelli' in settings.INSTALLED_APPS:
@@ -39,3 +43,14 @@ if 'nodeshot.core.api' in settings.INSTALLED_APPS:
     from nodeshot.core.api.urls import urlpatterns as api_urlpatterns
     
     urlpatterns += api_urlpatterns
+
+
+if settings.DEBUG and settings.SERVE_STATIC:
+    urlpatterns += patterns('django.contrib.staticfiles.views',
+        url(r'^static/(?P<path>.*)$', 'serve'),
+    )
+
+
+urlpatterns += patterns('nodeshot.community.participation.views',
+    url(r'^$', 'map_view', name='home'),
+)

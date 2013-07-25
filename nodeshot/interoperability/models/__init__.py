@@ -9,6 +9,7 @@ check_dependencies(
 )
 
 
-from layer_external import LayerExternal
+from .layer_external import LayerExternal
+
 
 __all__ = ['LayerExternal']

@@ -19,10 +19,13 @@ vectorformats
 requests
 
 # better admin
-django-grappelli==2.4.4
+django-grappelli==2.4.5
+
+# utils
+django-extensions
 
 # RESTful API and API documentation
-djangorestframework==2.3.5
+djangorestframework==2.3.6
 markdown
 
 # networking

@@ -36,10 +36,22 @@ class ProfileSocialLinksInline(BaseStackedInline):
     model = SocialLink
     extra = 0
 
+USER_ADMIN_INLINES = [ProfileSocialLinksInline]
+
+
+if 'social_auth' in settings.INSTALLED_APPS:
+    from social_auth.models import UserSocialAuth
+    
+    class SocialAuthInline(admin.StackedInline):
+        model = UserSocialAuth
+        extra = 0
+    
+    USER_ADMIN_INLINES.append(SocialAuthInline)
+
 
 class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'date_joined', 'last_login', 'is_staff', 'is_superuser')
-    inlines = [ProfileSocialLinksInline]#,  EmailNotificationInline]
+    inlines = USER_ADMIN_INLINES
     ordering = ['-is_staff', '-date_joined']
     search_fields = ('email', 'username', 'first_name', 'last_name')
     list_filter = ('is_active', 'is_staff', 'is_superuser')

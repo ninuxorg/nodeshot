@@ -48,6 +48,11 @@ class InteroperabilityTest(TestCase):
         """ test OpenWISP converter """
         
         layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
         
         xml_url = '%snodeshot/testing/OpenWISP_external_layer.xml' % settings.STATIC_URL
         
@@ -126,6 +131,11 @@ class InteroperabilityTest(TestCase):
         """ test ProvinciaWIFI converter """
         
         layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
         
         xml_url = '%snodeshot/testing/ProvinciaWIFI_external_layer.xml' % settings.STATIC_URL
         

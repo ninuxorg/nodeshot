@@ -3,6 +3,7 @@
 import os
 
 DEBUG = True
+SERVE_STATIC = DEBUG
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -154,6 +155,9 @@ INSTALLED_APPS = (
     'emailconfirmation',
     'social_auth',
     
+    # other utilities
+    'django-extensions',
+    
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -249,10 +253,16 @@ _ = lambda s: s
 
 NODESHOT = {
     'SETTINGS': {
-        'API_PREFIX': 'api/v1', # it must not begin nor end with a slash
+        'API_PREFIX': 'api/v1',  # it must not begin nor end with a slash
         'ACL_GLOBAL_EDITABLE': True,
-        # the following is an example of possible granular ACL setting that is available
+        
+        # the following is an example of possible granular ACL setting that can be specified
         #'ACL_NODES_NODE_EDITABLE': False,
+        
+        'LAYER_TEXT_HTML': True,
+        'NODE_DESCRIPTION_HTML': True,
+        'NODE_AREA': False,
+        
         'CONTACT_INWARD_LOG': True,
         'CONTACT_INWARD_MAXLENGTH': 2000,
         'CONTACT_INWARD_MINLENGTH': 15,
@@ -261,10 +271,13 @@ NODESHOT = {
         'CONTACT_OUTWARD_MINLENGTH': 50,
         'CONTACT_OUTWARD_STEP': 20,
         'CONTACT_OUTWARD_DELAY': 10,
-        'CONTACT_OUTWARD_HTML': True, # grappelli must be in INSTALLED_APPS, otherwise it won't work
-        'NODE_AREA': True,
+        'CONTACT_OUTWARD_HTML': True,  # grappelli must be in INSTALLED_APPS, otherwise it won't work
+        
         'PROFILE_EMAIL_CONFIRMATION': True,
         'PROFILE_REQUIRED_FIELDS': ['email'],
+        
+        'ADMIN_MAP_COORDS': [41.8934, 12.4960],  # lat, lng
+        'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (
@@ -291,7 +304,6 @@ NODESHOT = {
         'MAP_ZOOM': 12,
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
         'NODE_STATUS': 'potential',
-        'NODE_AREA': True,
         'NODE_PUBLISHED': True,
         'ZONE_ZOOM': 12,
         'ZONE_MINIMUM_DISTANCE': 0,
@@ -324,5 +336,62 @@ EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025 # 1025 if you are debugging
 DEFAULT_FROM_EMAIL = 'your@email.org'
 
+# ------ GRAPPELLI ------ #
+
 if 'grappelli' in INSTALLED_APPS:
     GRAPPELLI_ADMIN_TITLE = 'Nodeshot Admin'
+
+# ------ DEBUG TOOLBAR ------ #
+
+INTERNAL_IPS = ('127.0.0.1', '::1',)  # ip addresses where you want to show the debug toolbar here 
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False,
+    'HIDE_DJANGO_SQL': False
+}
+
+# ------ UNIT TESTING SPEED UP ------ #
+
+SOUTH_TESTS_MIGRATE = False
+
+if 'test' in sys.argv:
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+    )
+
+
+# ------ SOCIAL AUTH SETTINGS ------ #
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'social_auth.backends.facebook.FacebookBackend',
+    'social_auth.backends.google.GoogleBackend',
+)
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_auth.backends.pipeline.social.social_auth_user',
+    #'social_auth.backends.pipeline.associate.associate_by_email',
+    'social_auth.backends.pipeline.user.get_username',
+    'social_auth.backends.pipeline.user.create_user',
+    'social_auth.backends.pipeline.social.associate_user',
+    'nodeshot.community.profiles.pipeline.load_extra_data',
+    'social_auth.backends.pipeline.user.update_user_details'
+)
+
+SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google')
+FACEBOOK_APP_ID              = ''
+FACEBOOK_API_SECRET          = ''
+
+SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
+SOCIAL_AUTH_UUID_LENGTH = 3
+SOCIAL_AUTH_SESSION_EXPIRATION = False
+SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
+
+FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_ERROR_URL    = '/'

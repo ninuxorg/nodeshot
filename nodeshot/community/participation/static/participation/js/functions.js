@@ -52,7 +52,7 @@ function loadLayers(layers) {
 		clusterClass=layers[i].slug;
 		//alert(layers[i].name );
 		var newCluster = createCluster(clusterClass)
-		var newClusterNodes=   getData('http://localhost:8000/api/v1/layers/'+layers[i].slug+'/geojson/');
+		var newClusterNodes=   getData(window.__BASEURL__+'api/v1/layers/'+layers[i].slug+'/geojson/');
 		var newClusterLayer=loadNodes(newClusterNodes,color)	;
 		newCluster.addLayer(newClusterLayer);
 		map.addLayer(newCluster);
@@ -113,6 +113,7 @@ function loadNodes(newClusterNodes,color){
 	return layer;	
 }
 
+
 //Delete all layers from map
 function clearLayers()  {
             for (x in mapLayers) {
@@ -120,6 +121,7 @@ function clearLayers()  {
 		mapLayers[x].clearLayers();
 	    }
         }
+
 	
 //show layer properties	
 function showLayerProperties()  {
@@ -143,7 +145,7 @@ function populateNodeDiv(nodeSlug,create) {
 		nodeDiv.id=nodeSlug;	
 	}
 	
-	node=   getData('http://localhost:8000/api/v1/nodes/'+nodeSlug+'/participation/');
+	node=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/participation/');
 	nodeName=node.name;
 	nodeAddress=node.address;
 	nodeRatingCount=node.participation.rating_count;
@@ -249,7 +251,7 @@ function showComments(nodeSlug) {
 	$("#valori").html('');
 	var commentsDiv = $("<div>", {id: "comments"});
 	var node=nodeSlug
-	url='http://localhost:8000/api/v1/nodes/'+node+'/comments/?format=json';
+	url=window.__BASEURL__+'api/v1/nodes/'+node+'/comments/?format=json';
 	comments=   getData(url);
 	//console.log(comments);
 	htmlText='<strong>'+node+'</strong><br>';
@@ -376,7 +378,7 @@ function postComment(nodeSlug) {
 comment=$("#commentText").val();
     $.ajax({
         type: "POST",
-        url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/comments/',
+        url: window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/comments/',
 	data: { "text": comment},
         dataType: 'json',
         success: function(response){	
@@ -472,7 +474,7 @@ user=$("#user").val();
 var password=$("#password").val();
     $.ajax({
         type: "POST",
-        url: "http://localhost:8000/api/v1/account/login/",
+        url: window.__BASEURL__+"api/v1/account/login/",
 	data: { "username": user, "password": password },
         dataType: 'json',
         success: function(response){
@@ -485,7 +487,7 @@ var password=$("#password").val();
 function logout() {
     $.ajax({
         type: "POST",
-        url: "http://localhost:8000/api/v1/account/logout/",
+        url: window.__BASEURL__+"api/v1/account/logout/",
         dataType: 'json',
         success: function(response){
 	showLogin();
