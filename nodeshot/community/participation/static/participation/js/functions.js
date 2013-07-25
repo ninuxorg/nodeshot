@@ -1,7 +1,8 @@
 var markerToRemove
 var csrftoken = $.cookie('csrftoken');
 //console.log(csrftoken)
-var nodeSlug
+var nodeSlug;
+var latlngToInsert
 var colors={"provinciawifi":"blue","rome":"green","pisa":"red","viterbo":"yellow"}
 
 //Marker manual insert on map
@@ -17,7 +18,7 @@ function onMapClick(e) {
 	markerToRemove=marker
 	var popupelem= document.createElement('div');
 	popupelem.innerHTML+='Is position correct ?<br>';
-	popupelem.innerHTML+='<a class=\'confirm_marker\' onclick=markerConfirm(markerLocationtoString)>Confirm</a>&nbsp;';
+	popupelem.innerHTML+='<a class=\'confirm_marker\' onclick=markerConfirm(markerLocation)>Confirm</a>&nbsp;';
 	popupelem.innerHTML+='<a class=\'remove_marker\' onclick=markerDelete(marker)>Delete</a>';
 	
 	map
@@ -194,32 +195,54 @@ function getLayerList(layers) {
 
 //function to catch and display PoI coordinates
 function openInsertDiv(latlng){
-	$("#valori").html('');
-	var nodeInsertDiv = $("<div>", {id: "nodeInsertDiv"});
-	var arrayLatLng=latlng.split(",");
+
+	latlngToString = latlng.toString();
+	var arrayLatLng=latlngToString.split(",");
 	var lat=arrayLatLng[0].slice(7);
 	var lng=arrayLatLng[1].slice(0,-1);
-	var lngLatInsert='POINT('+lng+' '+lat+')'
-	//alert (lngLatInsert)
+	latlngToInsert='POINT('+lng+' '+lat+')';
+	//alert (latlng)
 	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
 	//console.log(address);
+	
+	$("#valori").html('');
 	htmlText='<strong>Insert node details</strong><br>';
+	htmlText+='<div class="label" >Layer</div>';
 	htmlText+='<select id="layerSelect" class="select">';
 	htmlText+='</select>';
-	htmlText+='<div class="valore" id="lat"></div>'
+	htmlText+='<div class="label" >Name</div>';
+	htmlText+='<input class="input" id="nodeToInsertName">';
+	htmlText+='<div class="label" >Address</div>';
+	htmlText+='<textarea class="valore" id="nodeToInsertAddress"></textarea>';
+    	htmlText+='<div class="label" >Lat</div>';    
+	htmlText+='<div class="valore" id="nodeToInsertLat"></div>';
+	htmlText+='<div class="label" >Lng</div>';
+	htmlText+='<div class="valore" id="nodeToInsertLng"></div>';
+	htmlText+='<button onclick=insertNode(nodeSlug,latlngToInsert);>Insert node</button>';
+	var nodeInsertDiv = $("<div>", {id: "nodeInsertDiv"});
+	
 	$(nodeInsertDiv).append(htmlText);
 	$("#valori").append(nodeInsertDiv);
-	$("#lat").html(lat);
-	$("#lng").html(lng);
-	$("#address").html(address.display_name);
+	$("#nodeToInsertLng").html(lng);
+	$("#nodeToInsertLat").html(lat);
+	$("#nodeToInsertAddress").val(address.display_name);
 	getLayerList(layers);
 	
         }
-
+function insertNode(nodeSlug,lngLatInsert){
+	alert('latlng: '+ lngLatInsert )
+	var nodeToInsert={}
+	nodeToInsert["layer"]="1";
+	nodeToInsert["name"]=$("#nodeToInsertName").val();
+	nodeToInsert["slug"]=convertToSlug($("#nodeToInsertName").val())
+	nodeToInsert["address"]=$("#nodeToInsertAddress").val();
+	nodeToInsert["coords"]=lngLatInsert;
+	console.log (nodeToInsert);
+	postNode(nodeSlug,nodeToInsert);
+}
 //Show_comments
 function showComments(nodeSlug) {
-	//alert(JSON.stringify(nodeSlug))
-	//$("#valori").html('Comments');
+
 	$("#valori").html('');
 	var commentsDiv = $("<div>", {id: "comments"});
 	var node=nodeSlug
@@ -240,23 +263,23 @@ function showComments(nodeSlug) {
 		htmlText+='<span class="comment_date">'+added+'</span>';	
 		htmlText+='</div>';
 		}
-	//alert(htmlText);
 	
 	htmlText+='</div><div id="pagingControls"></div>'
 	
 	$(commentsDiv).html(htmlText);
 	pager = new Imtech.Pager();
+	
+	htmlText='<hr>Add your:<br>';
+	htmlText+='<textarea id="commentText"></textarea><br>';
+	htmlText+='<button onclick=postComment("'+node+'");>Add comment</button>';
+	$(commentsDiv).append(htmlText);
+	$("#valori").append(commentsDiv);
 	$(document).ready(function() {
 	pager.paragraphsPerPage = 5; // set amount elements per page
 	pager.pagingContainer = $('#comment'); // set of main container
 	pager.paragraphs = $('div.comment_div', pager.pagingContainer); // set of required containers
 	pager.showPage(1);
 	});
-	htmlText='<hr>Add your:<br>';
-	htmlText+='<textarea id="commentText"></textarea><br>';
-	htmlText+='<button onclick=postComment("'+node+'");>Add</button>';
-	$(commentsDiv).append(htmlText);
-	$("#valori").append(commentsDiv);
 	
 }
 
@@ -398,6 +421,24 @@ function postRating(nodeSlug,rating) {
     });
 }
 
+//post a node
+function postNode(nodeSlug,node_json) {
+	alert(nodeSlug)
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:8000/api/v1/nodes/',
+	data: node_json,
+        dataType: 'json',
+//        success: function(response){	
+//	var nodeDiv=  $("#" + nodeSlug);
+//	$(nodeDiv).html('')
+//        populateNodeDiv (nodeSlug,0);
+//	populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
+//        }
+        
+    });
+}
+
 function populateRating(nodeSlug,nodeDiv,nodeRatingAVG) {
 	
 	x=$(nodeDiv).find('#star');
@@ -470,4 +511,13 @@ $('#loading').hide(); //initially hide the loading icon
         $("#loading").ajaxStop(function(){
             $(this).hide();
             //  console.log('hidden');
-        }); 
+        });
+	
+function convertToSlug(Text)
+{
+    return Text
+        .toLowerCase()
+        .replace(/[^\w ]+/g,'')
+        .replace(/ +/g,'-')
+        ;
+}
