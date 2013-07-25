@@ -13,7 +13,7 @@ var popup = L.popup();
 
 //Layer insert on map
 var overlaymaps={};
-var layers= getData('http://localhost:8000/api/v1/layers/');
+var layers= getData(window.__BASEURL__+'api/v1/layers/');
 //console.log(layers)
 var mapLayers=loadLayers(layers);
 var layerList=getLayerList(layers);
@@ -30,7 +30,7 @@ L.control.layers(baseMaps,overlaymaps).addTo(map);
 //showLayerProperties()
 
 //var pisa = new L.MarkerClusterGroup();
-//pisa_nodes=   getData('http://localhost:8000/api/v1/layers/pisa/geojson/');
+//pisa_nodes=   getData(window.__BASEURL__+'api/v1/layers/pisa/geojson/');
 //pisa_nodes_layer=load_nodes(pisa_nodes)	;
 //pisa.addLayer(pisa_nodes_layer);
 //map.addLayer(pisa); 
