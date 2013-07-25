@@ -170,7 +170,7 @@ function populateNodeDiv(nodeSlug,create) {
 	$(nodeDiv).append('<button class="vote" onclick=postVote(\''+nodeSlug+'\',\''+dislike+'\')>Against</button><br>');
 	
 	$(nodeDiv).append('<strong>Comments:</strong><br>');
-	$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>comments: '+ node.participation.comment_count+'</a><br>');
+	$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>comments: '+ nodeComments +'</a><br>');
 
 	populateRating(nodeSlug,nodeRatingAVG)
 	return(nodeDiv,nodeRatingAVG)
@@ -202,9 +202,9 @@ function openInsertDiv(latlng){
 
 	latlngToString = latlng.toString();
 	var arrayLatLng=latlngToString.split(",");
-	var lat=arrayLatLng[0].slice(7);
-	var lng=arrayLatLng[1].slice(0,-1);
-	latlngToInsert='POINT('+lng+' '+lat+')';
+	lat=arrayLatLng[0].slice(7);
+	lng=arrayLatLng[1].slice(0,-1);
+	latlngToInsert=lat+','+lng;
 	//alert (latlng)
 	var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
 	//console.log(address);
@@ -222,7 +222,7 @@ function openInsertDiv(latlng){
 	htmlText+='<div class="valore" id="nodeToInsertLat"></div>';
 	htmlText+='<div class="label" >Lng</div>';
 	htmlText+='<div class="valore" id="nodeToInsertLng"></div>';
-	htmlText+='<button onclick=insertNode(nodeSlug,latlngToInsert);>Insert node</button>';
+	htmlText+='<button onclick=insertNode(nodeSlug,lat,lng);>Insert node</button>';
 	var nodeInsertDiv = $("<div>", {id: "nodeInsertDiv"});
 	
 	$(nodeInsertDiv).append(htmlText);
@@ -234,16 +234,16 @@ function openInsertDiv(latlng){
 	
         }
 	
-function insertNode(nodeSlug,lngLatInsert){
+function insertNode(nodeSlug,lat,lng){
 	//alert('latlng: '+ lngLatInsert )
 	var nodeToInsert={}
-	nodeToInsert["layer"]="1";
+	nodeToInsert["layer"]=$("#layerSelect").val();
 	nodeToInsert["name"]=$("#nodeToInsertName").val();
 	nodeToInsert["slug"]=convertToSlug($("#nodeToInsertName").val())
 	nodeToInsert["address"]=$("#nodeToInsertAddress").val();
-	nodeToInsert["coords"]=lngLatInsert;
+	nodeToInsert["coords"]=lat+','+lng;
 	console.log (nodeToInsert);
-	postNode(nodeSlug,nodeToInsert);
+	postNode(nodeSlug,nodeToInsert,lat,lng);
 }
 //Show_comments
 function showComments(nodeSlug) {
@@ -375,43 +375,53 @@ var data;
 
 //post a comment
 function postComment(nodeSlug) {
-comment=$("#commentText").val();
-    $.ajax({
-        type: "POST",
-        url: window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/comments/',
-	data: { "text": comment},
-        dataType: 'json',
-        success: function(response){	
-	var nodeDiv=  $("#" + nodeSlug);
-	$(nodeDiv).html('')
-        populateNodeDiv (nodeSlug,0);
-	populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
-	showComments(nodeSlug)
-        }
+	comment=$("#commentText").val();
+	var ok=confirm("Add comment for this node?");
+	if (ok==true)
+	{
+	$.ajax({
+		type: "POST",
+		url: window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/comments/',
+		data: { "text": comment},
+		dataType: 'json',
+		success: function(response){	
+			var nodeDiv=  $("#" + nodeSlug);
+			$(nodeDiv).html('');
+			populateNodeDiv (nodeSlug,0);
+			populateRating(nodeSlug,nodeDiv,nodeRatingAVG);
+			showComments(nodeSlug);
+			alert("Your comment has been added!");
+			 }
         
-    });
+		 });
+	}
 }
 
 //post a vote
 function postVote(nodeSlug,vote) {
-    $.ajax({
-        type: "POST",
-        url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/votes/',
-	data: { "vote": vote},
-        dataType: 'json',
-        success: function(response){	
-	var nodeDiv=  $("#" + nodeSlug);
-	$(nodeDiv).html('')
-        populateNodeDiv (nodeSlug,0);
-	populateRating(nodeSlug,nodeDiv,nodeRatingAVG)
-        }
+	var ok=confirm("Add vote " + vote + " for this node?");
+	if (ok==true)
+	{
+	$.ajax({
+		type: "POST",
+		url: 'http://localhost:8000/api/v1/nodes/'+nodeSlug+'/votes/',
+		data: { "vote": vote},
+		dataType: 'json',
+		success: function(response){	
+			var nodeDiv=  $("#" + nodeSlug);
+			$(nodeDiv).html('')
+			populateNodeDiv (nodeSlug,0);
+			populateRating(nodeSlug,nodeDiv,nodeRatingAVG);
+			alert("Your vote has been added!");
+			}
         
-    });
+		});
+	  }
 }
 
 //post a rating
 function postRating(nodeSlug,rating) {
-	var ok=confirm("Add rating" + rating + " for this node?");
+	var ok=confirm("Add rating " + rating + " for this node?");
 	if (ok==true)
 	{
 		$.ajax({
@@ -432,8 +442,6 @@ function postRating(nodeSlug,rating) {
 
 }
 
-
-
 function populateRating(nodeSlug,nodeDiv,nodeRatingAVG) {
 	
 	x=$(nodeDiv).find('#star');
@@ -443,15 +451,16 @@ function populateRating(nodeSlug,nodeDiv,nodeRatingAVG) {
 			path: $.myproject.STATIC_URL+'participation/js/vendor/images',
 			 click: function(score) {
 				postRating(nodeSlug,score );
-			}
+				}
 			
 		}
 		  );
 	 };
 	 
 //post a node
-function postNode(nodeSlug,node_json) {
-	console.log (node_json)
+function postNode(nodeSlug,node_json,lat,lng) {
+	console.log (node_json);
+	var latlng=new L.LatLng(lat, lng);
     $.ajax({
         type: "POST",
         url: 'http://localhost:8000/api/v1/nodes/',
@@ -462,7 +471,9 @@ function postNode(nodeSlug,node_json) {
 	map.removeControl(mapControl)
 	mapLayers=loadLayers(layers);
 	mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
-	//L.control.layers(baseMaps,overlaymaps).addTo(map);
+	var newMarker=L.marker(latlng).addTo(map);
+	newMarker.bindPopup("Node added");
+	newMarker.openPopup()
         }
         
     });
