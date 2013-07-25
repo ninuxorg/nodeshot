@@ -36,9 +36,8 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     
     Parameters:
     
-     * limit (e.g: limit=10 returns 10 results per page)
-     * Default : 10
-     * limit=0 turns off pagination
+     * `limit=<n>`: specify number of items per page (defaults to 40)
+     * `limit=0`: turns off pagination
     
     """
     authentication_classes = (authentication.SessionAuthentication,)
