@@ -18,13 +18,14 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
     social_user = social_user or \
                   UserSocialAuth.get_social_auth(backend.name, uid)
     
-    emailaddress = EmailAddress(**{
-        'user': user,
-        'email': user.email,
-        'verified': True,
-        'primary': True
-    })
-    emailaddress.save()
+    if kwargs['is_new']:
+        emailaddress = EmailAddress(**{
+            'user': user,
+            'email': user.email,
+            'verified': True,
+            'primary': True
+        })
+        emailaddress.save()
     
     if social_user:
         extra_data = backend.extra_data(user, uid, response, details)
@@ -37,7 +38,7 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
                 social_user.extra_data = extra_data
             social_user.save()
         
-        if backend.name == 'facebook':
+        if backend.name == 'facebook' and kwargs['is_new']:
             response = json.loads(requests.get('https://graph.facebook.com/%s?access_token=%s' % (extra_data['id'], extra_data['access_token'])).content)
             
             try:
