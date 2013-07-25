@@ -19,6 +19,12 @@ urlpatterns = patterns('',
 )
 
 
+if 'social_auth' in settings.INSTALLED_APPS:
+    urlpatterns = urlpatterns + patterns('',
+        url(r'', include('social_auth.urls')),
+    )
+
+
 if 'grappelli' in settings.INSTALLED_APPS:
     urlpatterns = urlpatterns + patterns('',
         url(r'^grappelli/', include('grappelli.urls')),
@@ -38,12 +44,12 @@ if 'nodeshot.core.api' in settings.INSTALLED_APPS:
     urlpatterns += api_urlpatterns
 
 
-if settings.DEBUG:
+if settings.DEBUG and settings.SERVE_STATIC:
     urlpatterns += patterns('django.contrib.staticfiles.views',
         url(r'^static/(?P<path>.*)$', 'serve'),
     )
 
+
 urlpatterns += patterns('nodeshot.community.participation.views',
-        url(r'^map/', 'map_view'),
-    )
-    
+    url(r'^$', 'map_view', name='home'),
+)

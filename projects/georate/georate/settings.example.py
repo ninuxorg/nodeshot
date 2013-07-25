@@ -3,6 +3,7 @@
 import os
 
 DEBUG = True
+SERVE_STATIC = DEBUG
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -153,6 +154,9 @@ INSTALLED_APPS = (
     # profiles and social networks
     'emailconfirmation',
     'social_auth',
+    
+    # other utilities
+    'django-extensions',
     
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
@@ -332,5 +336,62 @@ EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025 # 1025 if you are debugging
 DEFAULT_FROM_EMAIL = 'your@email.org'
 
+# ------ GRAPPELLI ------ #
+
 if 'grappelli' in INSTALLED_APPS:
     GRAPPELLI_ADMIN_TITLE = 'Nodeshot Admin'
+
+# ------ DEBUG TOOLBAR ------ #
+
+INTERNAL_IPS = ('127.0.0.1', '::1',)  # ip addresses where you want to show the debug toolbar here 
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False,
+    'HIDE_DJANGO_SQL': False
+}
+
+# ------ UNIT TESTING SPEED UP ------ #
+
+SOUTH_TESTS_MIGRATE = False
+
+if 'test' in sys.argv:
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+    )
+
+
+# ------ SOCIAL AUTH SETTINGS ------ #
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'social_auth.backends.facebook.FacebookBackend',
+    'social_auth.backends.google.GoogleBackend',
+)
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_auth.backends.pipeline.social.social_auth_user',
+    #'social_auth.backends.pipeline.associate.associate_by_email',
+    'social_auth.backends.pipeline.user.get_username',
+    'social_auth.backends.pipeline.user.create_user',
+    'social_auth.backends.pipeline.social.associate_user',
+    'nodeshot.community.profiles.pipeline.load_extra_data',
+    'social_auth.backends.pipeline.user.update_user_details'
+)
+
+SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google')
+FACEBOOK_APP_ID              = ''
+FACEBOOK_API_SECRET          = ''
+
+SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
+SOCIAL_AUTH_UUID_LENGTH = 3
+SOCIAL_AUTH_SESSION_EXPIRATION = False
+SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
+
+FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_ERROR_URL    = '/'
