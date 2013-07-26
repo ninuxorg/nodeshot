@@ -123,7 +123,7 @@ class ImageListSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Image
-        fields = ('file', 'description', 'added', 'order')
+        fields = ('file', 'description', 'added', 'order', 'access_level')
         read_only_fields = ('added',)
 
 
