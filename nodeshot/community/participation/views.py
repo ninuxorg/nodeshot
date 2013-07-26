@@ -204,19 +204,6 @@ class NodeRatingList(CustomDataMixin,generics.CreateAPIView):
         self.queryset = Rating.objects.filter(node_id=self.node.id)
     
 node_ratings = NodeRatingList.as_view() 
-    
-    #def post(self, request, *args, **kwargs):
-    #    # ensure node exists
-    #    self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
-    #    
-    #    return self.create(request, *args, **kwargs)
-    #
-    #def pre_save(self, obj):
-    #    """
-    #    Set node and user id based on the incoming request.
-    #    """
-    #    obj.node_id = self.node.id
-    #    obj.user_id = self.request.user.id
 
 
 class NodeVotesList(CustomDataMixin,generics.CreateAPIView):
@@ -255,25 +242,11 @@ class NodeVotesList(CustomDataMixin,generics.CreateAPIView):
         
         # return only comments of current node
         self.queryset = Vote.objects.filter(node_id=self.node.id)
-    
-
-    
-    #def post(self, request, *args, **kwargs):
-    #    # ensure node exists
-    #    self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
-    #    
-    #    return self.create(request, *args, **kwargs)
-    #
-    #def pre_save(self, obj):
-    #    """
-    #    Set node and user id based on the incoming request.
-    #    """
-    #    obj.node_id = self.node.id
-    #    obj.user_id = self.request.user.id
 
 node_votes = NodeVotesList.as_view()
 
 
 from django.shortcuts import render
+
 def map_view(request):
-    return render(request,'participation/index.html')
+    return render(request, 'participation/index.html')

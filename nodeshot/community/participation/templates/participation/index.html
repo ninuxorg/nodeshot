@@ -87,8 +87,10 @@
                </div>
                 <div class="span3">
 		    <div id="controls">
-			 <button onclick=createNodelist()>Node list</button>
-			 Choose layer:<select id="selectLayerNodeList" class="layerList"></select>
+			 Choose layer to get its node list:<br>
+			 <select id="selectLayerNodeList" onchange=createNodelist() class="layerList">
+			      <option value=" "> </option>
+			 </select>
 	  	    </div>
                     <div id='valori' >
 			 

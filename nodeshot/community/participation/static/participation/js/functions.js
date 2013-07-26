@@ -428,6 +428,8 @@ var data;
 
 function createNodelist() {
     layer=$("#selectLayerNodeList").val();
+    if (layer != " ") {
+	
     $.ajax({
         type: 'GET',
         url: window.__BASEURL__+'api/v1/layers/'+layer+'/nodes',
@@ -435,24 +437,24 @@ function createNodelist() {
         //data: JSON.stringify(bounds),
         contentType: 'application/json; charset=utf-8',
         success: function (result) {
-		//alert(result)
             addToList(result)
         },
     })
+    }
 }
 
 function addToList(data) {
+	//console.log(JSON.stringify(data))
 	$("#valori").html('');
 	$("#nodelist").html('');
-    for (var i = 0; i < data.nodes.length; i++) {
-	console.log(data.nodes[i])
-        var nodes = data.nodes[i];
+    for (var i = 0; i < data.nodes["results"].length; i++) {
+	//console.log(data.nodes["results"][i])
+        var nodes = data.nodes["results"][i];
         $("#nodelist").append('<a href="#" class="list-link" data-slug='+nodes["slug"]+' >' + nodes.name + '</a><br>')
     }
     $('a.list-link').click(function (e) {
         //Get the id of the element clicked
-      var slug = $(this).data( 'slug' );
-	//alert(slug);
+        var slug = $(this).data( 'slug' );
         var marker = markerMap[slug];
 	//console.log(marker.toGeoJSON());
         //marker.openPopup(marker.getLatLng());

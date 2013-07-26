@@ -1,5 +1,5 @@
 from django.conf import settings
-from rest_framework import serializers,pagination
+from rest_framework import serializers, pagination
 
 from .models import Layer
 
@@ -11,6 +11,7 @@ __all__ = [
     'LayerDetailSerializer',
     'LayerListSerializer',
     'LayerNodeListSerializer',
+    'CustomNodeListSerializer',
     'PaginationSerializer',
     'LinksSerializer',
 ]
@@ -51,7 +52,7 @@ class LayerDetailSerializer(LayerListSerializer):
     class Meta:
         model = Layer
         fields = ('name', 'center', 'area', 'zoom', 'is_external',
-                  'description', 'organization', 'website', 'nodes', 'geojson')
+                  'description', 'text', 'organization', 'website', 'nodes', 'geojson')
 
 
 class CustomNodeListSerializer(NodeListSerializer):
@@ -68,15 +69,15 @@ class CustomNodeListSerializer(NodeListSerializer):
         
         fields += ['updated', 'added', 'details']
         read_only_fields = ['added', 'updated']
-    
 
 
 class LayerNodeListSerializer(LayerDetailSerializer):
     """
     Nodes of a Layer
     """
-    nodes = CustomNodeListSerializer(source='node_set')
     
     class Meta:
         model = Layer
-        fields = ('name', 'description', 'organization', 'website', 'nodes')    
+
+        fields = ('name', 'description', 'text', 'organization', 'website')    
+

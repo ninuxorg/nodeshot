@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib.gis.measure import D
 from django.conf import settings
 
@@ -76,8 +76,12 @@ def new_nodes_allowed_for_layer(self):
     """
     ensure new nodes are allowed for this layer
     """
-    if not self.pk and not self.layer.new_nodes_allowed:
-        raise ValidationError(_('New nodes are not allowed for this layer'))
+    try:
+        if not self.pk and not self.layer.new_nodes_allowed:
+            raise ValidationError(_('New nodes are not allowed for this layer'))
+    except ObjectDoesNotExist:
+        # this happens if node.layer is None
+        return
 
 # TODO: thes features must be tested inside the layer's app code (nodeshot.core.layers.tests)
 def node_layer_validation(self):
@@ -85,9 +89,13 @@ def node_layer_validation(self):
     1. if minimum distance is specified, ensure node is not too close to other nodes;
     2. if layer defines an area, ensure node coordinates are contained in the area
     """
-    minimum_distance = self.layer.minimum_distance
-    coords = self.coords
-    layer_area = self.layer.area
+    try:
+        minimum_distance = self.layer.minimum_distance
+        coords = self.coords
+        layer_area = self.layer.area
+    except ObjectDoesNotExist:
+        # this happens if node.layer is None 
+        return
     
     # TODO - lower priority: do this check only when coordinates are changing
     if minimum_distance > 0:

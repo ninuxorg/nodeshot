@@ -2,10 +2,13 @@
 nodeshot.core.layers unit tests
 """
 
+import simplejson as json
+
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
+from django.contrib.gis.geos import GEOSGeometry
 
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.core.nodes.models import Node  # test additional validation added by layer model
@@ -79,6 +82,54 @@ class LayerTest(TestCase):
         except ValidationError as e:
             self.assertIn(_('New nodes are not allowed for this layer'), e.messages)
     
+    def test_layer_minimum_distance(self):
+        """ ensure minimum distance settings works as expected """
+        layer = Layer.objects.get(slug='rome')
+        node = layer.node_set.all()[0]
+        
+        # creating node with same coordinates should not be an issue
+        new_node = Node(**{
+            'name': 'new_node',
+            'slug': 'new_node',
+            'layer': layer,
+            'coords': node.coords
+        })
+        new_node.full_clean()
+        new_node.save()
+        
+        layer.minimum_distance = 100
+        layer.save()
+        
+        try:
+            new_node.full_clean()
+        except ValidationError as e:
+            self.assertIn(_('Distance between nodes cannot be less than %s meters') % layer.minimum_distance, e.messages)
+            return
+        
+        self.assertTrue(False, 'validation not working as expected')
+    
+    def test_layer_area_validation(self):
+        """ ensure area validation works as expected """
+        layer = Layer.objects.get(slug='rome')
+        layer.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
+        layer.save()
+        
+        # creating node with same coordinates should not be an issue
+        new_node = Node(**{
+            'name': 'new_node',
+            'slug': 'new_node',
+            'layer': layer,
+            'coords': 'POINT (50.0 50.0)'
+        })
+        
+        try:
+            new_node.full_clean()
+        except ValidationError as e:
+            self.assertIn(_('Node must be inside layer area'), e.messages)
+            return
+        
+        self.assertTrue(False, 'validation not working as expected')
+    
     def test_layers_api(self,*args,**kwargs):
         """
         Layers endpoint should be reachable and return 404 if layer is not found.
@@ -93,21 +144,21 @@ class LayerTest(TestCase):
         
         # api's expecting slug in request,test with existing and fake slug
         # api_layer_detail
-        response = self.client.get(reverse('api_layer_detail',args=[layer_slug]))
+        response = self.client.get(reverse('api_layer_detail', args=[layer_slug]))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_detail',args=[fake_layer_slug]))
+        response = self.client.get(reverse('api_layer_detail', args=[fake_layer_slug]))
         self.assertEqual(response.status_code, 404)
         
         # api_layer_nodes
-        response = self.client.get(reverse('api_layer_nodes_list',args=[layer_slug]))
+        response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_nodes_list',args=[fake_layer_slug]))
+        response = self.client.get(reverse('api_layer_nodes_list', args=[fake_layer_slug]))
         self.assertEqual(response.status_code, 404)
         
         # api_layer_nodes_geojson
-        response = self.client.get(reverse('api_layer_nodes_geojson',args=[layer_slug]))
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_nodes_geojson',args=[fake_layer_slug]))
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[fake_layer_slug]))
         self.assertEqual(response.status_code, 404)
         
     def test_layers_api_results(self,*args,**kwargs):
@@ -125,15 +176,35 @@ class LayerTest(TestCase):
         self.assertEqual(api_layer_count, layer_count)
         
         # api_layer_nodes_list 
-        response = self.client.get(reverse('api_layer_nodes_list',args=[layer_slug]))
-        
-        # each of 'node' values is a node
-        api_layer_nodes = len(response.data['nodes'])
-        self.assertEqual(api_layer_nodes, layer_nodes)
+        response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]))
+        layer_public_nodes_count = Node.objects.filter(layer=layer).published().access_level_up_to('public').count()
+        self.assertEqual(len(response.data['nodes']['results']), layer_public_nodes_count)
         
         # api_layer_nodes_geojson
-        response = self.client.get(reverse('api_layer_nodes_geojson',args=[layer_slug]))
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]))
         
         # each of 'features' values in geojson is a node
         api_layer_nodes = len(response.data['features'])
-        self.assertEqual(api_layer_nodes, layer_nodes)
+        self.assertEqual(len(response.data['features']), layer_public_nodes_count)
+        
+    def test_layers_api_post(self):
+        layer_count = Layer.objects.all().count()
+        
+        # POST to create, 400
+        self.client.login(username='registered', password='tester')
+        data = {
+            "name": "test",
+            "slug": "test", 
+            "center": "POINT (38.1154075128999921 12.5107643007999929)", 
+            "area": None
+        }
+        response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(layer_count, Layer.objects.all().count())
+        
+        # POST to create 200
+        self.client.logout()
+        self.client.login(username='admin', password='tester')
+        response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(layer_count + 1, Layer.objects.all().count())
