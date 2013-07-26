@@ -186,3 +186,25 @@ class LayerTest(TestCase):
         # each of 'features' values in geojson is a node
         api_layer_nodes = len(response.data['features'])
         self.assertEqual(len(response.data['features']), layer_public_nodes_count)
+        
+    def test_layers_api_post(self):
+        layer_count = Layer.objects.all().count()
+        
+        # POST to create, 400
+        self.client.login(username='registered', password='tester')
+        data = {
+            "name": "test",
+            "slug": "test", 
+            "center": "POINT (38.1154075128999921 12.5107643007999929)", 
+            "area": None
+        }
+        response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(layer_count, Layer.objects.all().count())
+        
+        # POST to create 200
+        self.client.logout()
+        self.client.login(username='admin', password='tester')
+        response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(layer_count + 1, Layer.objects.all().count())

@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 
 from nodeshot.core.nodes.views import NodeList
 
@@ -18,6 +19,10 @@ class LayerList(generics.ListCreateAPIView):
     ### GET
     
     Retrieve list of layers.
+    
+    ### POST
+    
+    Create new layer if authorized (admins and allowed users only).
     """
     model= Layer
     serializer_class= LayerListSerializer
@@ -25,6 +30,7 @@ class LayerList(generics.ListCreateAPIView):
     pagination_serializer_class = PaginationSerializer
     paginate_by_param = 'limit'
     paginate_by = None
+    permission_classes = (DjangoModelPermissionsOrAnonReadOnly, )
 
 layer_list = LayerList.as_view()
 
