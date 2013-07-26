@@ -27,7 +27,10 @@ var baseMaps = {
 		
 				};
 var mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
-//showLayerProperties()
+getLayerListSlug(layers,"selectLayerNodeList");
 
+//for (var key in markerMap) {
+//  console.log(markerMap[key].toGeoJSON());
+//}
 
 

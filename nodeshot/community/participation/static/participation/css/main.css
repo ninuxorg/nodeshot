@@ -19,6 +19,27 @@
   background-color: #cccccc;
   color: #000000;
   font-size: 12px;
+/*  margin: 1px;
+  border-style:solid;
+  border-width:1px;
+  border-color: #0000ff*/
+}
+
+#nodelist {
+  background-color: #cccccc;
+  color: #000000;
+  font-size: 12px;
+   max-height: 300px;
+  overflow:auto;
+/*  margin: 1px;
+  border-style:solid;
+  border-width:1px;
+  border-color: #0000ff*/
+}
+#controls {
+  background-color: #cccccc;
+  color: #000000;
+  font-size: 12px;
   margin: 1px;
   border-style:solid;
   border-width:1px;
@@ -30,8 +51,22 @@
   color: #000000;
   font-size: 12px;
   margin: 1px;
+  border-style:solid;
+  border-width:1px;
+  border-color: #0000ff
 /*  max-height: 300px;
   overflow:auto;*/
+}
+
+
+#nodeInsertDiv {
+  background-color: #cccccc;
+  color: #000000;
+  font-size: 12px;
+  margin: 1px;
+  border-style:solid;
+  border-width:1px;
+  border-color: #0000ff
 }
 
 #nodeInsert {
