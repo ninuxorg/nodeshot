@@ -55,7 +55,7 @@ class CommentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('node','username', 'text','added')
-        readonly_fields = ('node', 'username', 'added')
+        read_only_fields = ('added',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -89,7 +89,7 @@ class RatingListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ('node', 'username', 'value',)
-        readonly_fields = ('node', 'username', 'added')
+        read_only_fields = ('node', 'username', 'added')
 
 #Vote serializers
         
@@ -108,7 +108,7 @@ class VoteListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
         fields = ('node', 'username', 'vote',)
-        readonly_fields = ('node', 'username', 'added')   
+        read_only_fields = ('node', 'username', 'added')   
 
 #Participation serializers
  
@@ -128,6 +128,6 @@ class NodeParticipationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=Node
-        fields= ('name','slug', 'participation')       
+        fields= ('name','slug','address', 'participation')       
 
 

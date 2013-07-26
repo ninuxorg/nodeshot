@@ -28,6 +28,7 @@ class Vote(UpdateCountsMixin, BaseDate):
     
     class Meta:
         app_label = 'participation'
+        unique_together = (("node", "user"),)
     
     def __unicode__(self):
         return self.node.name

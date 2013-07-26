@@ -86,58 +86,19 @@
 		</div>
                </div>
                 <div class="span3">
+		    <div id="controls">
+			 <button onclick=createNodelist()>Node list</button>
+			 Choose layer:<select id="selectLayerNodeList" class="layerList"></select>
+	  	    </div>
                     <div id='valori' >
+			 
 		    </div>
-<!--<div class="intestazione">
-<p style='font-family: arial ; font-size: 8pt; font-weight:bold;'>
-Clicca sulla mappa per aggiungere un Punto di Interesse o clicca su un PoI esistente.</div>-->
-<!--<div class="label" id="user">
-	User
-</div>
-<div class="valore" id="user">
-	Test
-</div>-->
-<div id="nodeDiv"></div>
-<div id="node_insert">
-    <div class="label" >
-	Layer
-    </div>
-    
-	<select id="Layer_select" class="select">
-	  
-	</select>
-    
-     <div class="label" >
-	Nome
-</div>
-<input class="input" id="nome">
-<div class="label" >
-	Indirizzo
-</div>
-<div class="valore" id="address">
-	
-</div>
-<div class="label" >
-	Latitudine
-</div>
-<div class="valore" id="lat">
-	
-</div>
-<div class="label" >
-	Longitudine
-</div>
-<div class="valore" id="lng">
-	
-</div>
-<div class="label" >
-	Commento
-</div>
-<div class="valore" id="comment">
-<textarea>Comment here</textarea>	
-</div>
-<button onclick="clearLayers();">Invia</button>
-</p>
-</div>	</div>
+		    <div id="nodelist">
+		    
+		</div>
+
+
+		</div>
                     <!--<p><a class="btn" href="#">View details &raquo;</a></p>-->
                 </div>
             </div>
@@ -162,6 +123,11 @@ Clicca sulla mappa per aggiungere un Punto di Interesse o clicca su un PoI esist
         <script src="{% static 'participation/js/vendor/Google.js' %}"></script>
         <script src="{% static 'participation/js/vendor/leaflet.markercluster-src.js' %}"></script>
 	<script src="{% static 'participation/js/vendor/imtech_pager.js' %}"></script>
+	<script type="text/javascript">  
+    $.myproject = {} // namespace
+    $.myproject.STATIC_URL = '{{ STATIC_URL }}';
+</script>
+	<script src="{% static 'participation/js/vendor/jquery.raty.js' %}"></script>
         <!--<script type="text/javascript" src="leaflet/leaflet.ajax.js"></script>-->
         <script src="{% static 'participation/js/functions.js' %}"></script>
         <script src="{% static 'participation/js/main.js' %}"></script>

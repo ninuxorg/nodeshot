@@ -16,7 +16,7 @@ var overlaymaps={};
 var layers= getData(window.__BASEURL__+'api/v1/layers/');
 //console.log(layers)
 var mapLayers=loadLayers(layers);
-var layerList=getLayerList(layers);
+//var layerList=getLayerList(layers);
 //console.log(layerList);
 var baseMaps = {
 		"OpenStreetMap": osmLayer,
@@ -26,22 +26,11 @@ var baseMaps = {
 		"Google Hybrid": googleHybrid
 		
 				};
-L.control.layers(baseMaps,overlaymaps).addTo(map);
-//showLayerProperties()
+var mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
+getLayerListSlug(layers,"selectLayerNodeList");
 
-//var pisa = new L.MarkerClusterGroup();
-//pisa_nodes=   getData(window.__BASEURL__+'api/v1/layers/pisa/geojson/');
-//pisa_nodes_layer=load_nodes(pisa_nodes)	;
-//pisa.addLayer(pisa_nodes_layer);
-//map.addLayer(pisa); 
-				
-//var overlaymaps = {
-//			
-//			
-//			"Roma": roma,
-//			"Pisa" : pisa,
-//		};
-
-
+//for (var key in markerMap) {
+//  console.log(markerMap[key].toGeoJSON());
+//}
 
 
