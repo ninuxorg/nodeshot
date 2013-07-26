@@ -40,6 +40,33 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
      * `search=<word>`: search <word> in name of nodes
      * `limit=<n>`: specify number of items per page (defaults to 40)
      * `limit=0`: turns off pagination
+    
+    ### POST
+    
+    Create a new node.
+    
+    **Permissions:** restricted to authenticated users only.
+    
+    Example of **JSON** representation that should be sent:
+    
+    <pre>{
+        "name": "Fusolab Rome", 
+        "slug": "fusolab", 
+        "user": "romano", 
+        "coords": [41.872041927700003, 12.582239191899999], 
+        "elev": 80.0, 
+        "address": "", 
+        "description": "Fusolab test", 
+        "access_level": "public",
+        "layer": 1
+    }</pre>
+    
+    **Required Fields**:
+    
+     * name
+     * slug
+     * coords
+     * layer (if layer app installed)
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -154,7 +181,18 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
     
     Upload a new image.
     
+    **Permissions:** only owner of a node can upload images.
     
+    **Fields**:
+    
+     * `file`: binary file of the image, accepted file types are JPEG, PNG and GIF - **required**
+     * `description`: description / caption of the image
+     * `order`: order of the image, leave blank to set as last
+     * `access_level`: determines who can see the image, defaults to public
+    
+    ### How do I upload an image?
+    
+    Set the content-type as **"multipart-formdata"** and send the file param as a binary stream.
     """
     authentication_classes = (authentication.SessionAuthentication,)
     model = Image
