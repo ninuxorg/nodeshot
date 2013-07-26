@@ -63,6 +63,8 @@ class HyperlinkedField(Field):
         self.view_name = kwargs.pop('view_name', None)
         # Optionally the format of the target hyperlink may be specified
         self.format = kwargs.pop('format', None)
+        # Optionally specify arguments
+        self.view_args = kwargs.pop('view_args', None)
 
         super(HyperlinkedField, self).__init__(*args, **kwargs)
 
@@ -77,7 +79,7 @@ class HyperlinkedField(Field):
             format = self.format
 
         try:
-            return reverse(view_name, request=request, format=format)
+            return reverse(view_name, args=self.view_args, request=request, format=format)
         except NoReverseMatch:
             pass
 

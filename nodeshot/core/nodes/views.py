@@ -123,26 +123,8 @@ class NodeGeojsonList(generics.ListAPIView):
     
     Retrieve nodes in GeoJSON format.
     """
-    #model = Node
-    #paginate_by = 10
     paginate_by_param = 'results'
     serializer_class = GeojsonNodeListSerializer
-    #pagination_serializer_class = NodePaginationSerializer
-    
-    #def get_queryset(self):
-        #"""
-        #TODO: improve readability and cleanup and make it work !!
-        #"""
-        ##node = Node.objects.published().accessible_to(request.user)
-        ##super(NodeGeojsonList, self).initial(request, *args, **kwargs)
-        #node = Node.objects.published()
-        #dj = Django.Django(geodjango="coords", properties=['slug','name', 'address','description'])
-        #geojson = GeoJSON.GeoJSON()
-        #string = geojson.encode(dj.decode(node))
-        #geojson_queryset=json.loads(string)
-        #self.queryset=(geojson_queryset)
-        #return self.queryset
-        ##return Response(geojson_queryset)
     
     def get(self, request, *args, **kwargs):
         """
@@ -170,13 +152,15 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
     
     ### POST
     
-    Upload a new image, TODO!
+    Upload a new image.
+    
+    
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Image
     serializer_class = ImageListSerializer
     serializer_custom_class = ImageAddSerializer
+    permission_classes = (IsOwnerOrReadOnly, )
     
     def get_custom_data(self):
         """ additional request.DATA """
@@ -193,25 +177,55 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
         super(NodeImageList, self).initial(request, *args, **kwargs)
         
         # ensure node exists
-        self.node = get_queryset_or_404(Node.objects.published(), { 'slug': self.kwargs.get('slug', None) })
+        self.node = get_queryset_or_404(Node.objects.published().accessible_to(request.user), { 'slug': self.kwargs.get('slug', None) })
+        
+        # check permissions on node (for image creation)
+        self.check_object_permissions(request, self.node)
         
         # return only comments of current node
-        self.queryset = Image.objects.filter(node_id=self.node.id).accessible_to(self.request.user)
-    
-    #def get_queryset(self):
-    #    """
-    #    Get images of specified existing and published node
-    #    or otherwise return 404
-    #    """
-    #    ## ensure exists
-    #    #try:
-    #    #    # retrieve slug value from instance attribute kwargs, which is a dictionary
-    #    #    slug_value = self.kwargs.get('slug', None)
-    #    #    # get node, ensure is published
-    #    #    node = Node.objects.published().get(slug=slug_value)
-    #    #except Exception:
-    #    #    raise Http404(_('Node not found'))
-    #    #
-    #    #return node.image_set.accessible_to(self.request.user)
+        self.queryset = Image.objects.filter(node_id=self.node.id).accessible_to(self.request.user).select_related('node')
 
 node_images = NodeImageList.as_view()
+
+
+class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    ### GET
+    
+    Retrieve details of specified image
+    
+    ### DELETE
+    
+    Delete specified nodes. Must be authenticated as owner or admin.
+    
+    ### PUT & PATCH
+    
+    Edit image.
+    
+    **Permissions:** only owner of a node can edit.
+    
+    Example of **JSON** representation that should be sent:
+    
+    <pre>{
+        "description": "image caption", 
+        "order": 3,
+        "access_level": "public"
+    }</pre>
+    """
+    model = Image
+    queryset = Image.objects.all()
+    serializer_class = ImageEditSerializer
+    authentication_classes = (authentication.SessionAuthentication, )
+    permission_classes = (IsOwnerOrReadOnly, )
+    lookup_field = 'pk'
+    
+    def get_queryset(self):
+        
+        self.node = get_queryset_or_404(Node.objects.published().accessible_to(self.request.user), {
+            'slug': self.kwargs.get('slug', None)
+        })
+        
+        return super(ImageDetail, self).get_queryset().filter(node=self.node)
+    
+
+node_image_detail = ImageDetail.as_view()

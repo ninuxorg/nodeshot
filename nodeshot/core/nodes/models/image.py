@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -26,3 +28,14 @@ class Image(BaseOrdered):
     
     def __unicode__(self):
         return self.file.name
+    
+    def delete(self, *args, **kwargs):
+        """ delete image when an image record is deleted """
+        try:
+            os.remove(self.file.file.name)
+        # image does not exist
+        except (OSError, IOError):
+            pass
+        
+        super(Image, self).delete(*args, **kwargs)
+    

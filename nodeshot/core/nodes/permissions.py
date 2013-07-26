@@ -10,16 +10,26 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS:            
+        if request.method in permissions.SAFE_METHODS:
             return True
         
         action = ''
         
         if request.method in ['PUT', 'PATCH']:
             action = 'change'
-        
-        if request.method in ['DELETE']:
+        elif request.method in ['DELETE']:
             action = 'delete'
-
+        elif request.method == 'POST':
+            action = 'add'
+        
+        class_name = obj.__class__.__name__
+        
+        # if node
+        if class_name == 'Node':
+            owner = obj.user
+        # if image
+        elif class_name == 'Image':
+            owner = obj.node.user
+        
         # Instance must have an attribute named `owner`.
-        return obj.user == request.user or request.user.has_perm('nodes.%s_node')
+        return owner == request.user or request.user.has_perm('nodes.%s_%s' % (action, class_name.lower()))

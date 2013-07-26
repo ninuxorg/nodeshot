@@ -282,6 +282,24 @@ class APITest(BaseTestCase):
             self.assertIn('image_unit_test', image.file.name)
             # remove file
             os.remove(image.file.file.name)
+        
+        self.client.logout()
+        self.client.login(username='pisano', password='tester')
+        
+        with open("%s/templates/image_unit_test.gif" % os.path.dirname(os.path.realpath(__file__)), 'rb') as image_file:
+            good_post_data['file'] = image_file
+            response = self.client.post(url, good_post_data)
+            self.assertEqual(response.status_code, 403)
+        
+    def test_node_image_list_permissions(self):
+        # GET protected image should return 404
+        url = reverse('api_node_images', args=['hidden-rome'])
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+        
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
     
     def test_node_coords_distance_and_area(self):
         """ test minimum distance check between nodes """

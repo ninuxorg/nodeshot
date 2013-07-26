@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, pagination
 
 from nodeshot.core.base.fields import PointField
+from rest_framework.reverse import reverse
 from nodeshot.core.layers.models import Layer
 from .models import Node,Image
 
@@ -15,7 +16,8 @@ __all__ = [
     #'LinksSerializer',
     'GeojsonNodeListSerializer',
     'ImageListSerializer',
-    'ImageAddSerializer'
+    'ImageAddSerializer',
+    'ImageEditSerializer'
     
 ]
   
@@ -88,7 +90,7 @@ class NodeDetailSerializer(serializers.ModelSerializer):
     user = serializers.Field(source='user.username')
     coords = PointField()
     layer_name = serializers.Field(source='layer.name')
-    layer_details = serializers.HyperlinkedIdentityField(view_name='api_layer_detail', slug_field='slug')
+    layer_details = serializers.HyperlinkedRelatedField(view_name='api_layer_detail', source='layer', read_only=True)
     images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
     access_level = serializers.Field(source='get_access_level_display')
     
@@ -100,8 +102,8 @@ class NodeDetailSerializer(serializers.ModelSerializer):
         fields = [
             'name', 'slug', 'user',
             'coords', 'elev', 'address', 'description',
-            'access_level', 'layer', 'layer_name', 'layer_details',
-            'images', 
+            'access_level', 'layer', 'layer_name', 'added', 'updated',
+            'layer_details', 'images', 
         ]
         
         if settings.NODESHOT['SETTINGS']['NODE_AREA']:
@@ -111,6 +113,8 @@ class NodeDetailSerializer(serializers.ModelSerializer):
         
         if 'nodeshot.community.participation' in settings.NODESHOT['API']['APPS_ENABLED']:
             fields += ['comments']
+        
+        read_only_fields = ('added', 'updated')
 
 
 class NodeCreatorSerializer(NodeDetailSerializer):
@@ -118,19 +122,53 @@ class NodeCreatorSerializer(NodeDetailSerializer):
 
 
 class ImageListSerializer(serializers.ModelSerializer):
+    """ Serializer used to show list """
     
-    user = serializers.Field(source='user.username')
+    file_url = serializers.SerializerMethodField('get_image_file')
+    uri = serializers.SerializerMethodField('get_uri')
+    
+    def get_image_file(self, obj):
+        """ returns url to image file or empty string otherwise """
+        url = ''
         
+        if obj.file != '':
+            url = '%s%s' % (settings.MEDIA_URL, obj.file)
+        
+        return url
+    
+    def get_uri(self, obj):
+        """ returns uri of API image resource """
+        args = {
+            'slug': obj.node.slug,
+            'pk': obj.pk
+        }
+        
+        return reverse('api_node_image_detail', kwargs=args, request=self.context.get('request', None))
+    
     class Meta:
         model = Image
-        fields = ('file', 'description', 'added', 'order', 'access_level')
-        read_only_fields = ('added',)
+        fields = (
+            'id', 'file', 'file_url', 'description', 'order',
+            'access_level', 'added', 'updated', 'uri'
+        )
+        read_only_fields = ('added', 'updated')
 
 
-class ImageAddSerializer(serializers.ModelSerializer):
+class ImageAddSerializer(ImageListSerializer):
+    """ Serializer for image creation """
     
-    user = serializers.Field(source='user.username')
-        
     class Meta:
         model = Image
-        fields = ('node', 'file', 'description', 'order')
+        fields = (
+            'node', 'id', 'file', 'file_url', 'description', 'order',
+            'access_level', 'added', 'updated', 'uri'
+        )
+
+
+class ImageEditSerializer(ImageListSerializer):
+    """ Serializer for image edit """
+    
+    class Meta:
+        model = Image
+        fields = ('id', 'file_url', 'description', 'order', 'access_level', 'added', 'updated', 'uri')
+        read_only_fields = ('file', 'added', 'updated')
