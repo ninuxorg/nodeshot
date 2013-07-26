@@ -124,7 +124,10 @@ class PointField(WritableField):
 
     def from_native(self, value):
         try:
-            lat, lng = value.replace(' ', '').replace('[', '').replace(']', '').split(',')
+            if type(value) == str or type(value) == unicode:
+                lat, lng = value.replace(' ', '').replace('[', '').replace(']', '').split(',')
+            elif type(value) == list:
+                lat, lng = value
             value = GEOSGeometry(json.dumps({
                 "type": "Point",
                 "coordinates": [float(lng), float(lat)]
