@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from nodeshot.core.base.mixins import ACLMixin,CustomDataMixin
 
 from .models import Node, Image
+from .permissions import IsOwnerOrReadOnly
 from .serializers import *
 
 from vectorformats.Formats import Django, GeoJSON
@@ -39,7 +40,6 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
      * `search=<word>`: search <word> in name of nodes
      * `limit=<n>`: specify number of items per page (defaults to 40)
      * `limit=0`: turns off pagination
-    
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -70,21 +70,48 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
 node_list = NodeList.as_view()
     
     
-class NodeDetail(ACLMixin, generics.RetrieveUpdateAPIView):
+class NodeDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     """
     ### GET
     
     Retrieve details of specified node
     
+    ### DELETE
+    
+    Delete specified nodes. Must be authenticated as owner or admin.
+    
     ### PUT & PATCH
     
-    Edit node
+    Edit node.
+    
+    **Permissions:** only owner of a node can edit.
+    
+    Example of **JSON** representation that should be sent:
+    
+    <pre>{
+        "name": "Fusolab Rome", 
+        "slug": "fusolab", 
+        "user": "romano", 
+        "coords": [41.872041927700003, 12.582239191899999], 
+        "elev": 80.0, 
+        "address": "", 
+        "description": "Fusolab test", 
+        "access_level": "public",
+        "layer": 1
+    }</pre>
+    
+    **Required Fields**:
+    
+     * name
+     * slug
+     * coords
+     * layer (if layer app installed)
     """
     lookup_field = 'slug'
     model = Node
     serializer_class = NodeDetailSerializer
     authentication_classes = (authentication.SessionAuthentication, )
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsOwnerOrReadOnly, )
     queryset = Node.objects.published().select_related('user', 'layer')
 
 node_details = NodeDetail.as_view()
@@ -134,7 +161,7 @@ geojson_list = NodeGeojsonList.as_view()
 ### ------ Images ------ ###
 
 
-class NodeImageList(CustomDataMixin,generics.ListCreateAPIView):
+class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
     """
     ### GET
     
@@ -148,14 +175,8 @@ class NodeImageList(CustomDataMixin,generics.ListCreateAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Image
-    serializer_class=ImageListSerializer
-    serializer_custom_class=ImageAddSerializer
-    
-    # TODO:
-    # create a dedicated serializer
-    # which puts added and updated as last attributes
-    # removes node_id
-    # inserts full url path to where image is located
+    serializer_class = ImageListSerializer
+    serializer_custom_class = ImageAddSerializer
     
     def get_custom_data(self):
         """ additional request.DATA """
@@ -192,6 +213,5 @@ class NodeImageList(CustomDataMixin,generics.ListCreateAPIView):
     #    #    raise Http404(_('Node not found'))
     #    #
     #    #return node.image_set.accessible_to(self.request.user)
-    
 
 node_images = NodeImageList.as_view()

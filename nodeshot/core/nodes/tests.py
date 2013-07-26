@@ -16,7 +16,7 @@ from django.contrib.gis.measure import D
 User = get_user_model()
 
 from nodeshot.core.layers.models import Layer
-from nodeshot.core.base.tests import user_fixtures
+from nodeshot.core.base.tests import user_fixtures, BaseTestCase
 
 from .models import Node, Image
 
@@ -103,7 +103,7 @@ class ModelsTest(TestCase):
 ### ------ API tests ------ ###
 
 
-class APITest(TestCase):
+class APITest(BaseTestCase):
     
     fixtures = [
         'initial_data.json',
@@ -126,8 +126,6 @@ class APITest(TestCase):
         public_node_count = Node.objects.published().access_level_up_to('public').count()
         self.assertEqual(public_node_count, len(nodes))
         
-        self.client.login(username='registered', password='tester')
-        
         # POST: 201
         json_data = {
             "layer": 1,
@@ -137,6 +135,10 @@ class APITest(TestCase):
             "coords": "41.8720419277,12.99", 
             "description": ""
         }
+        response = self.client.post(url, json_data)
+        self.assertEqual(403, response.status_code)
+        
+        self.client.login(username='registered', password='tester')
         response = self.client.post(url, json_data)
         self.assertEqual(201, response.status_code)
     
@@ -160,9 +162,40 @@ class APITest(TestCase):
         # images_url in node['images']
         self.assertIn(images_url, node['images'])
         
-        # PUT
+        # PUT: 403 - must be logged in
+        response = self.client.put(url)
+        self.assertEqual(403, response.status_code)
+        
+        self.client.login(username='pisano', password='tester')
+        # PUT: 403 - only owner can edit
+        data = {
+            "name": "Fusolab Rome test", 
+            "slug": "fusolab", 
+            "user": "romano", 
+            "coords": [41.872041927700003, 12.582239191899999], 
+            "elev": 80.0, 
+            "address": "", 
+            "description": "Fusolab test 2", 
+            "access_level": "public",
+            "layer": 1
+        }
+        response = self.client.put(url, json.dumps(data), content_type='application/json')
+        self.assertEqual(403, response.status_code)
+        
+        self.client.logout()
+        self.client.login(username='romano', password='tester')
+        response = self.client.put(url, json.dumps(data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        node = Node.objects.get(slug='fusolab')
+        self.assertEqual(node.name, 'Fusolab Rome test')
+        self.assertEqual(node.description, 'Fusolab test 2')
         
         # PATCH
+        response = self.client.patch(url, { 'name': 'Patched Fusolab Name' })
+        self.assertEqual(200, response.status_code)
+        node = Node.objects.get(slug='fusolab')
+        self.assertEqual(node.name, 'Patched Fusolab Name')
+        self.client.logout()
         
         # CAN'T GET restricted if not authenticated
         fusolab = Node.objects.get(slug='fusolab')
@@ -181,6 +214,15 @@ class APITest(TestCase):
         fusolab.save()
         response = self.client.get(url)
         self.assertEqual(404, response.status_code)
+        
+        fusolab.is_published = True
+        fusolab.save()
+        
+        # DELETE 204
+        response = self.client.delete(url)
+        self.assertEqual(204, response.status_code)
+        with self.assertRaises(Node.DoesNotExist):
+            Node.objects.get(slug='fusolab')
     
     def test_node_images(self):
         """ test node images """
