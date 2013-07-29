@@ -322,7 +322,9 @@ NODESHOT = {
     'INTEROPERABILITY': [
         ('nodeshot.interoperability.synchronizers.NodeshotOld', 'Nodeshot 0.9'),
         ('nodeshot.interoperability.synchronizers.OpenWISP', 'OpenWISP'),
+        ('nodeshot.interoperability.synchronizers.OpenWISPCitySDK', 'OpenWISPCitySDK'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
+        ('nodeshot.interoperability.synchronizers.ProvinciaWIFICitySDK', 'ProvinciaWIFICitySDK'),
     ]
 }
 

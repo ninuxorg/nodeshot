@@ -91,7 +91,7 @@ class CitySDKMixin(object):
                 self.verbose('Creating new category in CitySDK DB')
                 
                 # put to create
-                response = requests.put(citysdk_categories_url, data=json.dumps(category),
+                response = requests.put(self.citysdk_categories_url, data=json.dumps(category),
                                         headers={'content-type': 'application/json'},
                                         cookies=self.cookies)
                 
