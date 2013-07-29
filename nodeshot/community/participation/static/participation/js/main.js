@@ -16,8 +16,6 @@ var overlaymaps={};
 var layers= getData(window.__BASEURL__+'api/v1/layers/');
 //console.log(layers)
 var mapLayers=loadLayers(layers);
-//var layerList=getLayerList(layers);
-//console.log(layerList);
 var baseMaps = {
 		"OpenStreetMap": osmLayer,
 		//Uncomment for Google maps. Works only in quirk mode.
