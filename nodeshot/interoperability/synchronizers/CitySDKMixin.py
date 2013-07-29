@@ -188,8 +188,9 @@ class CitySDKMixin(object):
         response = requests.put(self.citysdk_resource_url, data=json.dumps(citysdk_record),
                      headers={ 'content-type': 'application/json' }, cookies=self.cookies)
         
+        data = json.loads(response.content)
+        
         if response.status_code == 200:
-            data = json.loads(response.content)
             external = NodeExternal.objects.create(node=node, external_id=data['id'])
             self.verbose('new %s saved in CitySDK db with id "%s"' % (self.config['citysdk_type'], data['id']))
         else:
