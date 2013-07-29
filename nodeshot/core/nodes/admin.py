@@ -48,15 +48,12 @@ class NodeAdmin(BaseGeoAdmin):
                 '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
             ]
         
-        # since django-grappelli enables the HTML editor for each text field
-        # and since notes is a text field but we do not want it to be a rich
-        # html field we will disable it this way so we don't have to create
-        # a custom template for this Admin class
+        # enable editor for "node description" only
         def formfield_for_dbfield(self, db_field, **kwargs):
             field = super(NodeAdmin, self).formfield_for_dbfield(db_field, **kwargs)
             
-            if db_field.name == 'notes':
-                field.widget.attrs['class'] = 'mceNoEditor %s' % field.widget.attrs.get('class', '')
+            if db_field.name == 'description':
+                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
             
             return field
 

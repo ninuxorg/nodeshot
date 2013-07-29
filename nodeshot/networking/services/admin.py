@@ -41,7 +41,15 @@ class ServiceAdmin(BaseAdmin):
                 '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
                 '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
             ]
-
+        
+        # enable editor for "node description" only
+        def formfield_for_dbfield(self, db_field, **kwargs):
+            field = super(ServiceAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+            
+            if db_field.name == 'description':
+                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
+            
+            return field
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Service, ServiceAdmin)
