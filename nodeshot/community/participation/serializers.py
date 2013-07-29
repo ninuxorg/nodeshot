@@ -5,7 +5,7 @@ User = get_user_model()
 
 from nodeshot.core.nodes.models import Node
 
-from .models import NodeRatingCount, Comment, Vote, Rating
+from .models import NodeRatingCount, NodeParticipationSettings,LayerParticipationSettings,Comment, Vote, Rating
 
 
 __all__ = [
@@ -21,6 +21,10 @@ __all__ = [
     'VoteAddSerializer',
     'PaginationSerializer',
     'LinksSerializer',
+    'NodeParticipationSettingsSerializer',
+    'NodeSettingsSerializer',
+    'LayerParticipationSettingsSerializer',
+    'LayerSettingsSerializer'
 ]
 
 
@@ -128,6 +132,43 @@ class NodeParticipationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=Node
-        fields= ('name','slug','address', 'participation')       
+        fields= ('name','slug','address', 'participation')
+        
+#Participation settings
+ 
+class NodeSettingsSerializer(serializers.ModelSerializer):
+    
+        
+    class Meta:
+        model = NodeParticipationSettings
+        fields = ('voting_allowed', 'rating_allowed', 'comments_allowed',)
+
+    
+class NodeParticipationSettingsSerializer(serializers.ModelSerializer):
+    """ Node participation settings"""
+
+    participation_settings = NodeSettingsSerializer(source='node_participation_settings')
+    
+    class Meta:
+        model=Node
+        fields= ('name','slug','address', 'participation_settings')
+
+
+class LayerSettingsSerializer(serializers.ModelSerializer):
+    
+        
+    class Meta:
+        model = LayerParticipationSettings
+        fields = ('voting_allowed', 'rating_allowed', 'comments_allowed',)
+
+    
+class LayerParticipationSettingsSerializer(serializers.ModelSerializer):
+    """ Layer participation settings"""
+
+    participation_settings = LayerSettingsSerializer(source='layer_participation_settings')
+    
+    class Meta:
+        model=Node
+        fields= ('name','slug', 'participation_settings')  
 
 

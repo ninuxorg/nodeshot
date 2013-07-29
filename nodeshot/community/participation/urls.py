@@ -15,6 +15,8 @@ urlpatterns = patterns('nodeshot.community.participation.views',
     url(r'^/nodes/(?P<slug>[-\w]+)/ratings/$', 'node_ratings',name='api_node_ratings'),
     url(r'^/nodes/(?P<slug>[-\w]+)/votes/$', 'node_votes',name='api_node_votes'),
     url(r'^/nodes/(?P<slug>[-\w]+)/participation/$', 'node_participation', name= 'api_node_participation'),
+    url(r'^/nodes/(?P<slug>[-\w]+)/participation_settings/$', 'node_participation_settings', name= 'api_node_participation_settings'),
+    url(r'^/layers/(?P<slug>[-\w]+)/participation_settings/$', 'layer_participation_settings', name= 'api_layer_participation_settings'),
 )
 
 #urlpatterns = format_suffix_patterns(urlpatterns)

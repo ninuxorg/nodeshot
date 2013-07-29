@@ -125,8 +125,35 @@ class NodeParticipationDetail(generics.RetrieveAPIView):
     model = Node
     serializer_class = NodeParticipationSerializer
     
-node_participation = NodeParticipationDetail.as_view()  
+node_participation = NodeParticipationDetail.as_view()
 
+
+class NodeParticipationSettingsDetail(generics.RetrieveAPIView):
+    """
+    ### GET
+    
+    Retrieve participation settings for a node
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Node
+    serializer_class = NodeParticipationSettingsSerializer
+    
+node_participation_settings = NodeParticipationSettingsDetail.as_view()
+
+
+class LayerParticipationSettingsDetail(generics.RetrieveAPIView):
+    """
+    ### GET
+    
+    Retrieve participation settings for a layer
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Layer
+    serializer_class = LayerParticipationSettingsSerializer
+    
+layer_participation_settings = LayerParticipationSettingsDetail.as_view() 
 
 class NodeCommentList(CustomDataMixin, generics.ListCreateAPIView):
     """
