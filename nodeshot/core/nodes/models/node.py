@@ -25,10 +25,6 @@ class Node(BaseAccessLevel):
         # layer might need to be able to be blank, would require custom validation
         layer = models.ForeignKey('layers.Layer')
     
-    if 'nodeshot.interoperability' in settings.INSTALLED_APPS:
-        # add reference to the external layer's ID
-        external_id = models.PositiveIntegerField(blank=True, null=True)
-    
     # nodes might be assigned to a foreign layer, therefore user can be left blank, requires custom validation
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     
@@ -58,11 +54,6 @@ class Node(BaseAccessLevel):
         db_table = 'nodes_node'
         app_label= 'nodes'
         permissions = (('can_view_nodes', 'Can view nodes'),)
-        
-        # TODO: does this really have sense?
-        if 'nodeshot.interoperability' in settings.INSTALLED_APPS:
-            # the combinations of layer_id and external_id must be unique
-            unique_together = ('layer', 'external_id')
     
     def __unicode__(self):
         return '%s' % self.name
