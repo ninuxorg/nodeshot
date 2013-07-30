@@ -7,6 +7,9 @@ var markerMap={} //Object holding all nodes'slug and a reference to their marker
 
 var colors={"provinciawifi":"blue","rome":"green","pisa":"red","viterbo":"yellow"}
 
+ /* LAYERS LIST CREATION
+  * ====================*/
+
 //Create a list with layers' slug and name
 function getLayerListSlug(layers,cssLayer) {
 	layerList=[];
@@ -49,13 +52,46 @@ function getLayerListId(layers,cssLayer) {
 
  /* INSERTION OF NODES ON MAP ON PAGE LOAD
   * ====================================== */
+ 
+function loadLayersArea(layers) {
+/*
+ * Puts layer areas on map
+ */
+
+var allLayersArea= []
+	for (var i in layers)
+		{
+		
+		var color=colors[layers[i].slug];
+		if ( layers[i].area !== null)  {
+
+			var polygon=[]
+			var area=layers[i].area.slice(10,(layers[i].area.length-2));
+			var areaArray=area.split(",");
+			for (var x = 0; x < areaArray.length; x++) {
+
+				var replaced = areaArray[x].trim().split(' ');
+				polygon[x]=new L.LatLng(replaced[1],replaced[0])
+				
+				}
+			console.log(polygon[3])
+			var newArea=new L.Polygon( polygon,{color: color} ).addTo(map);
+			var newAreaKey=layers[i].name+' Area';
+			overlaymaps[newAreaKey]=newArea;
+			allLayersArea[i]=newArea;
+		
+			}
+		}
+	return allLayersArea;
+
+}
 
 function loadLayers(layers) {
 /*
  * Takes all node of a layer and puts them on map in a Leaflet Clustered group
  */
 var allLayers= []
-	for (i in layers)
+	for (var i in layers)
 		{
 		
 		var color=colors[layers[i].slug];
@@ -116,7 +152,7 @@ function loadNodes(newClusterNodes,color){
 	pointToLayer: function (feature, latlng) {
 				var marker= new
 					L.circleMarker(latlng, {
-					radius: 8,
+					radius: 6,
 					fillColor: color,
 					color: color,
 					weight: 1,
@@ -200,13 +236,13 @@ function openInsertDiv(latlng){
 	htmlText+='<div class="label" >Name</div>';
 	htmlText+='<input class="input" id="nodeToInsertName">';
 	htmlText+='<div class="label" >Address ';
-	htmlText+='<button onclick=getAddress();>Get it from OpenStreetMap</button></div>';
-	htmlText+='<textarea class="valore" id="nodeToInsertAddress"></textarea>';
+	htmlText+='<button class="vote" onclick=getAddress();>Get it from OpenStreetMap</button></div>';
+	htmlText+='<textarea class="valore" id="nodeToInsertAddress"></textarea><br>';
     	htmlText+='<div class="label" >Lat</div>';    
 	htmlText+='<div class="valore" id="nodeToInsertLat"></div>';
 	htmlText+='<div class="label" >Lng</div>';
 	htmlText+='<div class="valore" id="nodeToInsertLng"></div>';
-	htmlText+='<button onclick=postNode();>Insert node</button>';
+	htmlText+='<button class="vote" onclick=postNode();>Insert node</button>';
 	var nodeInsertDiv = $("<div>", {id: "nodeInsertDiv"});
 	
 	$(nodeInsertDiv).append(htmlText);
@@ -245,6 +281,7 @@ function postNode() {
 		success: function(response){
 		clearLayers();
 		map.removeControl(mapControl)
+		mapLayersArea=loadLayersArea(layers);
 		mapLayers=loadLayers(layers);
 		mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
 		var newMarker=L.marker(latlng).addTo(map);
@@ -266,6 +303,10 @@ function clearLayers()  {
 for ( var x in mapLayers) {
 		mapLayers[x].clearLayers();
 	    }
+        
+//for ( var y in mapLayersArea) {
+//		mapLayersArea[y].clearLayers();
+//	    }
         }
 
  /* DISPLAYING OF NODES' PROPERTIES 

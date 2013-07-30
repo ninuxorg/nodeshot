@@ -14,7 +14,8 @@ var popup = L.popup();
 //Layer insert on map
 var overlaymaps={};
 var layers= getData(window.__BASEURL__+'api/v1/layers/');
-//console.log(layers)
+console.log(layers)
+var mapLayersArea=loadLayersArea(layers);
 var mapLayers=loadLayers(layers);
 var baseMaps = {
 		"OpenStreetMap": osmLayer,
