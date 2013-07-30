@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 from nodeshot.core.nodes.models import Node, Image
 from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline
@@ -59,3 +60,19 @@ class NodeAdmin(BaseGeoAdmin):
 
 
 admin.site.register(Node, NodeAdmin)
+
+
+# disable celery admin if not needed
+if getattr(settings, 'CELERYBEAT_SCHEDULER', None) != 'djcelery.schedulers.DatabaseScheduler':
+    from djcelery.models import (
+        TaskState, WorkerState, PeriodicTask, IntervalSchedule, CrontabSchedule
+    )
+
+    try:
+        admin.site.unregister(TaskState)
+        admin.site.unregister(WorkerState)
+        admin.site.unregister(IntervalSchedule)
+        admin.site.unregister(CrontabSchedule)
+        admin.site.unregister(PeriodicTask) 
+    except admin.sites.NotRegistered:
+        raise ImproperlyConfigured('django-celery (djcelery) is either not installed or does not come before nodeshot in settings.INSTALLED_APPS')

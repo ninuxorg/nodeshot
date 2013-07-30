@@ -137,6 +137,15 @@ INSTALLED_APPS = (
     'grappelli',
     'django.contrib.admin',
     
+    # --- background jobs --- #
+    'djcelery_email',  # Celery Django Email Backend
+    'djcelery',  # Celery database scheduling for Django
+    # this app makes it possible to use django as a queue system for celery
+    # so you don't need to install RabbitQM or Redis
+    # pretty cool for development, but might not suffice for production if your system is heavily used
+    # our suggestion is to switch only if you start experiencing issues
+    'kombu.transport.django',
+    
     # nodeshot
     'nodeshot.core.api',
     'nodeshot.core.layers',
@@ -163,6 +172,8 @@ INSTALLED_APPS = (
 )
 
 AUTH_USER_MODEL = 'profiles.Profile'
+
+# ------ DJANGO LOGGING ------ #
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -235,6 +246,8 @@ LOGGING = {
     },
 }
 
+# ------ DJANGO CACHE ------ #
+
 CACHES = {
     'default': {
         #'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
@@ -246,6 +259,31 @@ CACHES = {
         }
     }
 }
+
+# ------ EMAIL SETTINGS ------ #
+
+# if you want a dummy SMTP server that logs outgoing emails but doesn't actually send them
+# you have 2 options:
+#     * python -m -smtpd -n -c DebuggingServer localhost:1025
+#     * python manage.py mail_debug  (django-extensions must be installed)
+
+#EMAIL_USE_TLS = True
+EMAIL_HOST = 'localhost'
+#EMAIL_HOST_USER = 'your@email.org'
+#EMAIL_HOST_PASSWORD = '***********'
+EMAIL_PORT = 1025  # 1025 if you are in development mode, while 25 is usually the production port
+DEFAULT_FROM_EMAIL = 'your@email.org'
+
+# ------ CELERY SCHEDULED JOBS ------ #
+
+#from datetime import timedelta
+#
+#CELERYBEAT_SCHEDULE = {
+#    'synchronize': {
+#        'task': 'interoperability.tasks.synchronize_external_layers',
+#        'schedule': timedelta(hours=12),
+#    }
+#}
 
 # https://docs.djangoproject.com/en/dev/topics/i18n/translation/
 # look for (ctrl + f) 'lambda' and you'll find why the following is needed
@@ -329,14 +367,6 @@ NODESHOT = {
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
-
-# use the command 'python -m -smtpd -n -c DebuggingServer localhost:1025' if you want a dummy SMTP server that logs outgoing emails but doesn't actually send them
-#EMAIL_USE_TLS = True
-EMAIL_HOST = 'localhost'
-#EMAIL_HOST_USER = 'your@email.org'
-#EMAIL_HOST_PASSWORD = '***********'
-EMAIL_PORT = 1025 # 1025 if you are debugging
-DEFAULT_FROM_EMAIL = 'your@email.org'
 
 # ------ GRAPPELLI ------ #
 

@@ -1,5 +1,7 @@
 import requests
 import simplejson as json
+from time import sleep
+from random import randint
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 
@@ -59,19 +61,30 @@ class CitySDKMixin(object):
     def find_citysdk_category(self):
         # category check
         
-        citysdk_category_id = None
+        citysdk_category_id = self.config.get('citysdk_category_id', False)
         response = requests.get(self.citysdk_categories_url, cookies=self.cookies)
         
         # do we already have the category id in the db config?
-        if self.config.get('citysdk_category_id', False) is not False:
+        # And is the category present in the API response?
+        if citysdk_category_id is not False and citysdk_category_id in response.content :
             citysdk_category_id = self.config['citysdk_category_id']
             
             self.verbose('category with ID "%s" already present in config' % citysdk_category_id)
         
         # if not go and find it!
         else:
+            # if category does not exist
+            if self.config['citysdk_category'] not in response.content:
+                
+                # trick needed to avoid to create more than 1 category
+                random_secs = randint(1, 5)
+                random_secs = 0 if random_secs == 1 else random_secs
+                sleep(random_secs)
+                response = requests.get(self.citysdk_categories_url, cookies=self.cookies)
+                
             # category does not exist, create it
             if self.config['citysdk_category'] not in response.content:
+                
                 category = {
                     "list": self.config['citysdk_type'],  # poi, event, route
                     "category": {
@@ -224,12 +237,7 @@ class CitySDKMixin(object):
         except ObjectDoesNotExist:
             return self.add(node, authenticate=False)
     
-    def delete(self, node, authenticate=True):
-        try:
-            external_id = node.external.external_id
-        except ObjectDoesNotExist:
-            return False
-        
+    def delete(self, external_id, authenticate=True):
         if authenticate:
             self.authenticate()
         
