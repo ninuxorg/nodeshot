@@ -144,3 +144,26 @@ class LayerAllNodesGeojsonList(generics.RetrieveAPIView):
         return Response(json.loads(string))
 
 nodes_geojson_list = LayerAllNodesGeojsonList.as_view()
+
+
+class LayerGeojsonList(generics.ListAPIView):
+    """
+    ### GET
+    
+    Retrieve layers in GeoJSON format.
+    """
+    paginate_by_param = 'results'
+    
+    def get(self, request, *args, **kwargs):
+        """
+        TODO: improve readability and cleanup
+        """
+        #select only layers with field 'area' populated. Otherwise VectorFormats throws an exception
+        layer = Layer.objects.published().exclude(area__isnull=True)
+        dj = Django.Django(geodjango="area", properties=['slug','name', 'id'])
+        geojson = GeoJSON.GeoJSON()
+        string = geojson.encode(dj.decode(layer))  
+        
+        return Response(json.loads(string))
+
+layers_geojson_list = LayerGeojsonList.as_view()
