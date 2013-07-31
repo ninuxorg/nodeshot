@@ -15,9 +15,8 @@
             "user": [
                 "romano"
             ], 
-            "elev": 80.0, 
-            "address": "Viale della Bella Villa, 94", 
-            "external_id": null, 
+            "elev": 80.0,
+            "address": "Viale della Bella Villa",
             "slug": "fusolab", 
             "is_published": true
         }
@@ -39,8 +38,8 @@
                     "pisano"
                 ], 
                 "elev": 80.0, 
-                "address": "", 
-                "external_id": null, 
+                "address": "",
+              
                 "slug": "eigenlab", 
                 "is_published": true
             }
@@ -63,7 +62,7 @@
                 ], 
                 "elev": 25.0, 
                 "address": "", 
-                "external_id": null, 
+                 
                 "slug": "tulug", 
             "is_published": true
         }
@@ -86,7 +85,7 @@
           ], 
           "elev": 80.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "potenziale-romano", 
           "is_published": true
         }
@@ -109,7 +108,7 @@
           ], 
           "elev": 80.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "potenziale-pisano", 
           "is_published": true
         }
@@ -132,7 +131,7 @@
           ], 
           "elev": 25.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "potenziale-viterbo", 
           "is_published": true
         }
@@ -155,7 +154,7 @@
           ], 
           "elev": 160.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "pomezia", 
           "is_published": true
         }
@@ -178,7 +177,7 @@
           ], 
           "elev": 650.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "rdp", 
           "is_published": true
         }
@@ -201,7 +200,7 @@
           ], 
           "elev": 250.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "hidden-rome", 
           "is_published": true
         }
@@ -224,7 +223,7 @@
           ], 
           "elev": 150.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "registered-rome", 
           "is_published": true
         }

@@ -1,0 +1,53 @@
+{% extends "admin/change_form.html" %}
+
+<!-- LOADING -->
+{% load url from future %}
+{% load admin_static i18n admin_modify grp_tags %}
+
+<!-- JAVASCRIPTS -->
+{% block javascripts %}
+    {{ block.super }}
+    <script type="text/javascript" charset="utf-8">
+        (function($) {
+            $(document).ready(function() {
+                var show_options = function(el){
+                    var fieldset = el.parents('fieldset'),
+                        icon_fields = fieldset.find('.icon'),
+                        circle_fields = fieldset.find('.background_color, .foreground_color');
+                    
+                    if(el.val() == 'icon'){
+                        if(!icon_fields.is(':visible')){
+                            icon_fields.fadeIn(250);
+                        }
+                        if(circle_fields.is(':visible')){
+                            circle_fields.fadeOut(250);
+                        }
+                    }
+                    else{
+                        if(!circle_fields.is(':visible')){
+                            circle_fields.fadeIn(250);
+                        }
+                        if(icon_fields.is(':visible')){
+                            icon_fields.fadeOut(250);
+                        }
+                        
+                    }
+                };
+                
+                var selects = $('#statusicon_set-group .marker select'),
+                    selects_length = selects.length - 1;
+                
+                selects.live('change', function(e){
+                    show_options($(this));
+                }).each(function(i, el){
+                    // apply to existing objects except last one which is a template
+                    if(i < selects_length){
+                        show_options($(el));
+                    }
+                });
+                
+                window.show_options = show_options;
+            });
+        })(grp.jQuery);
+    </script>
+{% endblock %}

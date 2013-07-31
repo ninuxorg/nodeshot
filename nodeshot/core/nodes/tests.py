@@ -8,6 +8,8 @@ import simplejson as json
 from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import *
@@ -18,7 +20,7 @@ User = get_user_model()
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.base.tests import user_fixtures, BaseTestCase
 
-from .models import Node, Image
+from .models import *
 
 
 
@@ -98,6 +100,58 @@ class ModelsTest(TestCase):
         """ test manager methods of Image model """
         # admin can see all the images
         self.assertEqual(Image.objects.all().count(), Image.objects.accessible_to(user=1).count())
+    
+    def test_status_icon_validation(self):
+        """ test StatusIcon custom validation """
+        status = Status(name='test', slug='test', description='test')
+        status.save()
+        
+        icon = StatusIcon(status=status, marker='circle')
+        
+        try:
+            icon.full_clean()
+            self.fail('ValidationError not raised')
+        except ValidationError as e:
+            self.assertIn(_('circle colour info is missing'), e.messages)
+        
+        icon.background_color = '#000'
+        icon.foreground_color = '#FFF'
+        icon.full_clean()
+        icon.save()
+        
+        icon.marker = 'icon'
+        #icon.icon = 'file.jpg'
+        
+        try:
+            icon.full_clean()
+            self.fail('ValidationError not raised')
+        except ValidationError as e:
+            self.assertIn(_('icon image is missing'), e.messages)
+        
+        icon.save()
+        # get again from DB
+        icon = StatusIcon.objects.get(pk=icon.pk)
+        
+        # ensure colour info is reset after marker has switched to icon
+        self.assertEqual(icon.background_color, '')
+        self.assertEqual(icon.foreground_color, '')
+        
+        icon.marker = 'circle'
+        icon.save()
+        
+        self.assertEqual(icon.icon, None)
+        
+        icon2 = StatusIcon(
+            status=status, marker='circle',
+            background_color='#000',
+            foreground_color='#FFF'
+        )
+        
+        try:
+            icon2.full_clean()
+            self.fail('ValidationError not raised')
+        except ValidationError as e:
+            self.assertIn(_('Status "%s" already has a default icon' % status.name), e.messages)
 
 
 ### ------ API tests ------ ###
@@ -362,7 +416,7 @@ class APITest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         
         # Node update should succeed because layer area is disabled
-        layer.area=None
+        layer.area = None
         layer.save()
         json_data['coords'] = "50,50";
         url = reverse('api_node_details', args=[node_slug])

@@ -3,7 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from nodeshot.core.nodes.models import Node, Image
+from nodeshot.core.nodes.models import *
 from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline
 from nodeshot.core.base.widgets import AdvancedFileInput
 
@@ -59,7 +59,29 @@ class NodeAdmin(BaseGeoAdmin):
             return field
 
 
+class StatusIconInline(admin.StackedInline):
+    model = StatusIcon
+    extra = 0
+    
+    formfield_overrides = {
+        models.ImageField: {'widget': AdvancedFileInput(image_width='auto')},
+    }
+    
+    if 'grappelli' in settings.INSTALLED_APPS:
+        classes = ('grp-collapse grp-open', )
+        inline_classes = ('grp-collapse grp-open',) 
+
+
+class StatusAdmin(admin.ModelAdmin):
+    list_display  = ('name', 'slug', 'description')
+    prepopulated_fields = {'slug': ('name',)}
+    inlines = [StatusIconInline]
+    
+    change_form_template = 'admin/status_change_form.html'
+
+
 admin.site.register(Node, NodeAdmin)
+admin.site.register(Status, StatusAdmin)
 
 
 # disable celery admin if not needed

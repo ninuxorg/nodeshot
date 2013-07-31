@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from django.utils.safestring import mark_safe
 from django.utils.html import escape, conditional_escape
 from django.utils.encoding import force_unicode
 from django.forms.widgets import ClearableFileInput, CheckboxInput
+from django.utils.translation import ugettext as _
 
 
 class AdvancedFileInput(ClearableFileInput):
@@ -48,3 +50,53 @@ class AdvancedFileInput(ClearableFileInput):
                 substitutions['clear_template'] = self.template_with_clear % substitutions
 
         return mark_safe(template % substitutions)
+
+
+# originally taken from django-colorful but adapted
+
+from django.conf import settings
+from django.forms.widgets import TextInput
+from django.utils.safestring import SafeUnicode
+
+try:
+    url = settings.STATIC_URL
+except AttributeError:
+    try:
+        url = settings.MEDIA_URL
+    except AttributeError:
+        url = ''
+
+class ColorFieldWidget(TextInput):
+    class Media:
+        css = {
+            'all': ("%scolorful/spectrum.css" % url,)
+        }
+        js  = ("%scolorful/spectrum.js" % url,)
+
+    input_type = 'color'
+
+    def render_script(self, id):
+        return u'''<script type="text/javascript">
+                    (function($){
+                        $(document).ready(function(){
+                            $('#%s').each(function(i, elm){
+                                // Make sure html5 color element is not replaced
+                                if(elm.type != 'color'){
+                                    $(elm).spectrum({
+                                        showInput: true,
+                                        showInitial: true,
+                                        cancelText: '%s',
+                                        chooseText: '%s'
+                                    });
+                                }
+                            });
+                        });
+                    })('django' in window ? django.jQuery : jQuery);
+                </script>
+                ''' % (id, _('cancel'), _('ok'))
+
+    def render(self, name, value, attrs={}):
+        if not 'id' in attrs:
+            attrs['id'] = "#id_%s" % name
+        render = super(ColorFieldWidget, self).render(name, value, attrs)
+        return SafeUnicode(u"%s%s" % (render, self.render_script(attrs['id'])))
