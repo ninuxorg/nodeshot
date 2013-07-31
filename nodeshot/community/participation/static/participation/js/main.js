@@ -13,9 +13,13 @@ var popup = L.popup();
 
 //Layer insert on map
 var overlaymaps={};
-var layers= getData(window.__BASEURL__+'api/v1/layers/');
-console.log(layers)
-var mapLayersArea=loadLayersArea(layers);
+var layers= getData(window.__BASEURL__+'api/v1/layers/'); //nodes
+var geojsonlayers=getData(window.__BASEURL__+'api/v1/layers-geojson/'); //layers' area
+//console.log(layers)
+var mapLayersArea=loadLayersArea(geojsonlayers);
+
+//console.log(geojsonlayers)
+
 var mapLayers=loadLayers(layers);
 var baseMaps = {
 		"OpenStreetMap": osmLayer,
@@ -28,8 +32,5 @@ var baseMaps = {
 var mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
 getLayerListSlug(layers,"selectLayerNodeList");
 
-//for (var key in markerMap) {
-//  console.log(markerMap[key].toGeoJSON());
-//}
 
 

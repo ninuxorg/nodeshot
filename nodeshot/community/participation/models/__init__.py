@@ -107,11 +107,25 @@ from django.db.models.signals import post_save
 from nodeshot.core.nodes.models import Node
 
 @receiver(post_save, sender=Node)
-def create_node_rating_counts(sender, **kwargs):
-    """ create node rating count """
+def create_node_rating_counts_settings(sender, **kwargs):
+    """ create node rating count and settings"""
     created = kwargs['created']
     node = kwargs['instance']
     if created:
-        # create node_rating_count 
+        # create node_rating_count and settings
         node_rating_count = NodeRatingCount(node=node)
-        node_rating_count.save()    
+        node_rating_count.save()
+        node_participation_settings = NodeParticipationSettings(node=node)
+        node_participation_settings.save()
+        
+@receiver(post_save, sender=Layer)
+def create_layer_rating_settings(sender, **kwargs):
+    """ create layer rating settings """
+    created = kwargs['created']
+    layer = kwargs['instance']
+    if created:
+        # create layer participation settings
+        layer_rating_count = LayerParticipationSettings(layer=layer)
+        layer_rating_count.save()
+
+

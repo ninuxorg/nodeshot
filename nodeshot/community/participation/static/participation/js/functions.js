@@ -5,7 +5,7 @@ var nodeRatingAVG // Rating data has to be globally available for rating plugin 
 
 var markerMap={} //Object holding all nodes'slug and a reference to their marker
 
-var colors={"provinciawifi":"blue","rome":"green","pisa":"red","viterbo":"yellow"}
+
 
  /* LAYERS LIST CREATION
   * ====================*/
@@ -53,34 +53,47 @@ function getLayerListId(layers,cssLayer) {
  /* INSERTION OF NODES ON MAP ON PAGE LOAD
   * ====================================== */
  
+var colors={"provinciawifi":"blue","rome":"green","pisa":"red","viterbo":"yellow"}
+
+// get color depending on node's slug
+function getColor(d) {
+	//alert (d)
+	return d == "rome" ? 'green' :
+	       d == "pisa" ? 'red'   :
+	       d == "viterbo" ? 'yellow'   :
+	       d == "test" ? 'grey'   :
+			  '#FFEDA0';
+}
+
+function style(feature) {
+	
+		return {
+			weight: 1,
+			opacity: 1,
+			color: 'black',
+			clickable: false,
+			dashArray: '3',
+			fillOpacity: 0.2,
+			fillColor: getColor(feature.properties.slug)
+		};
+	}
+
 function loadLayersArea(layers) {
 /*
  * Puts layer areas on map
  */
 
 var allLayersArea= []
-	for (var i in layers)
+
+	for (var i in layers.features)
 		{
 		
-		var color=colors[layers[i].slug];
-		if ( layers[i].area !== null)  {
-
-			var polygon=[]
-			var area=layers[i].area.slice(10,(layers[i].area.length-2));
-			var areaArray=area.split(",");
-			for (var x = 0; x < areaArray.length; x++) {
-
-				var replaced = areaArray[x].trim().split(' ');
-				polygon[x]=new L.LatLng(replaced[1],replaced[0])
-				
-				}
-			console.log(polygon[3])
-			var newArea=new L.Polygon( polygon,{color: color} ).addTo(map);
-			var newAreaKey=layers[i].name+' Area';
-			overlaymaps[newAreaKey]=newArea;
-			allLayersArea[i]=newArea;
-		
-			}
+		var color=colors[layers.features[i]["properties"].slug];
+		layers.features[i]["properties"].color=color
+		var newArea= L.geoJson(layers.features[i],{style: style}).addTo(map);
+		var newAreaKey=[layers.features[i]["properties"].name]+' Area';
+		overlaymaps[newAreaKey]=newArea;
+		allLayersArea[i]=newArea;
 		}
 	return allLayersArea;
 
@@ -181,13 +194,22 @@ function onMapClick(e) {
 	}
 	
 	markerLocation = e.latlng
-	markerLocationtoString = e.latlng.toString();
+	//markerLocationtoString = e.latlng.toString();
+	areaLayer=L.geoJson(geojsonlayers)
+	var results = leafletPip.pointInLayer(markerLocation, areaLayer);
+	if (results.length == 0) {
+		alert('Nodes must be inserted inside existing layers\' area');
+		return (false);
+	}
+	layerName=results[0].feature.properties.name
+	layerID=results[0].feature.properties.id
+	console.log(layerName)
 	marker = new L.Marker(markerLocation);
 	markerToRemove=marker
 	var popupelem= document.createElement('div');
 	popupelem.innerHTML+='Is position correct ?<br>';
-	popupelem.innerHTML+='<a class=\'confirm_marker\' onclick=markerConfirm(markerLocation)>Confirm</a>&nbsp;';
-	popupelem.innerHTML+='<a class=\'remove_marker\' onclick=markerDelete(marker)>Delete</a>';
+	popupelem.innerHTML+='<button class=\'confirm_marker\' onclick=markerConfirm(markerLocation,layerID,layerName)>Confirm</button>&nbsp;';
+	popupelem.innerHTML+='<button class=\'remove_marker\' onclick=markerDelete(marker)>Delete</b>';
 	
 	map
 		
@@ -209,15 +231,15 @@ function markerDelete(marker) {
 }
 
 
-function markerConfirm(marker) {
+function markerConfirm(marker,layerID,layerName) {
 /*
  * Opens node's insertion form
  */
-	openInsertDiv(marker);
+	openInsertDiv(marker,layerID,layerName);
 	map.closePopup();
 }
 
-function openInsertDiv(latlng){
+function openInsertDiv(latlng,layerID,layerName){
 /*
  *Creates node's insertion form
  */
@@ -225,32 +247,35 @@ function openInsertDiv(latlng){
 	var arrayLatLng=latlngToString.split(",");
 	var lat=arrayLatLng[0].slice(7);
 	var lng=arrayLatLng[1].slice(0,-1);
-	//var address=   getData('http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
-	//console.log(address);
-	
+
 	$("#valori").html('');
 	htmlText='<strong>Insert node details</strong><br>';
 	htmlText+='<div class="label" >Layer</div>';
-	htmlText+='<select id= "selectLayerNodeInsert"class="layerSelect" >';
-	htmlText+='</select>';
+	htmlText+='<input class="input" id="layerToInsert" >';
+	htmlText+='<input type="hidden" id="layerIdToInsert" >';
 	htmlText+='<div class="label" >Name</div>';
 	htmlText+='<input class="input" id="nodeToInsertName">';
-	htmlText+='<div class="label" >Address ';
-	htmlText+='<button class="vote" onclick=getAddress();>Get it from OpenStreetMap</button></div>';
-	htmlText+='<textarea class="valore" id="nodeToInsertAddress"></textarea><br>';
+	htmlText+='<div class="label" >Address </div>';
+	htmlText+='<div id="loadingAddress" >Loading...</div>';
+	htmlText+='<textarea class="input" id="nodeToInsertAddress"></textarea>';
     	htmlText+='<div class="label" >Lat</div>';    
-	htmlText+='<div class="valore" id="nodeToInsertLat"></div>';
+	htmlText+='<input class="input" id="nodeToInsertLat"><br>';
 	htmlText+='<div class="label" >Lng</div>';
-	htmlText+='<div class="valore" id="nodeToInsertLng"></div>';
+	htmlText+='<input class="input" id="nodeToInsertLng">';
 	htmlText+='<button class="vote" onclick=postNode();>Insert node</button>';
 	var nodeInsertDiv = $("<div>", {id: "nodeInsertDiv"});
 	
 	$(nodeInsertDiv).append(htmlText);
 	$("#valori").append(nodeInsertDiv);
-	$("#nodeToInsertLng").html(lng);
-	$("#nodeToInsertLat").html(lat);
-	//$("#nodeToInsertAddress").val(address.display_name);
-	getLayerListId(layers,"selectLayerNodeInsert");
+	$("#nodeToInsertLng").val(lng);
+	$("#nodeToInsertLat").val(lat);
+	$("#layerToInsert").val(layerName);
+	$("#layerIdToInsert").val(layerID);
+	$('#layerToInsert').attr('readonly', true);
+	$('#nodeToInsertLng').attr('readonly', true);
+	$('#nodeToInsertLat').attr('readonly', true);
+
+	getAddress();
 	
         }
 	
@@ -260,10 +285,10 @@ function postNode() {
  * Inserts node in DB and displays it on map
  */
 	var nodeToInsert={}
-	var lng=$("#nodeToInsertLng").text();
-	var lat=$("#nodeToInsertLat").text();
+	var lng=$("#nodeToInsertLng").val();
+	var lat=$("#nodeToInsertLat").val();
 	var latlngToInsert=lat+'\,'+lng;
-	nodeToInsert["layer"]=$("#selectLayerNodeInsert").val();
+	nodeToInsert["layer"]=$("#layerIdToInsert").val();
 	nodeToInsert["name"]=$("#nodeToInsertName").val();
 	nodeToInsert["slug"]=convertToSlug($("#nodeToInsertName").val())
 	nodeToInsert["address"]=$("#nodeToInsertAddress").val();
@@ -325,11 +350,16 @@ function populateNodeDiv(nodeSlug,create) {
 	}
 	
 	var node=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/participation/');
-	var nodeSettings=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/participation_settings/');
+	nodeSettings=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/participation_settings/');
 	
-	var voting_allowed=nodeSettings.voting_allowed
-	var rating_allowed=nodeSettings.rating_allowed
-	var comments_allowed=nodeSettings.comments_allowed
+/* TODO: find a solution for nodes that don't implement participation settings */
+	
+	//
+	//var voting_allowed=nodeSettings.participation_settings["voting_allowed"]
+	//var rating_allowed=nodeSettings.participation_settings["rating_allowed"]
+	//var comments_allowed=nodeSettings.participation_settings["comments_allowed"]
+	//
+	//console.log(comments_allowed,rating_allowed,voting_allowed)
 
 	var nodeName=node.name;
 	var nodeAddress=node.address;
@@ -680,8 +710,8 @@ function getAddress() {
 /*
  * Get Address using OSM Nominatim service
  */
-var lng=$("#nodeToInsertLng").text();
-var lat=$("#nodeToInsertLat").text();
+var lng=$("#nodeToInsertLng").val();
+var lat=$("#nodeToInsertLat").val();
 var url='http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1';
     $.ajax({
         async: true, //thats the trick
@@ -693,7 +723,8 @@ var url='http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon=
      //  console.log(data.display_name)
        
        address=data.display_name
-	$("#nodeToInsertAddress").html(address);
+	$("#nodeToInsertAddress").val(address);
+	$("#loadingAddress").hide();
         }
         
     });
