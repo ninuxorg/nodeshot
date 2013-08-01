@@ -30,8 +30,8 @@ def send_now(modeladmin, request, queryset):
     Send now action available in change outward list
     """
     objects = queryset
-    for object in objects:
-        object.send()
+    for obj in objects:
+        obj.send()
     send_now.short_description = _('Send selected messages now')
     # show message in the admin
     messages.info(request, _('Message sent successfully'))
@@ -55,11 +55,21 @@ class OutwardAdmin(BaseAdmin):
     if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True: 
         if 'grappelli' not in settings.INSTALLED_APPS:
             raise ImproperlyConfigured(_("settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is set to True but grappelli is not in settings.INSTALLED_APPS"))
+        
         class Media:
             js = [
                 '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
                 '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
             ]
+        
+        # enable editor for "message" field only
+        def formfield_for_dbfield(self, db_field, **kwargs):
+            field = super(OutwardAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+            
+            if db_field.name == 'message':
+                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
+            
+            return field
 
 
 admin.site.register(Inward, InwardAdmin)
