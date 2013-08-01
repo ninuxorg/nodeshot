@@ -4,8 +4,7 @@ from dateutil import parser
 from django.template.defaultfilters import slugify
 from django.contrib.gis.geos import Point
 
-from nodeshot.core.nodes.models import Node
-from nodeshot.core.nodes.models.choices import NODE_STATUS
+from nodeshot.core.nodes.models import Node, Status
 
 from .base import XMLConverter
 
@@ -28,6 +27,11 @@ class OpenWISP(XMLConverter):
         # init empty list of slug of external nodes that will be needed to perform delete operations
         external_nodes_slug = []
         deleted_nodes_count = 0
+        
+        try:
+            self.status = Status.objects.get(slug=self.config.get('status', None))
+        except Status.DoesNotExist:
+            self.status = None
         
         # loop over every parsed item
         for item in items:
@@ -60,7 +64,7 @@ class OpenWISP(XMLConverter):
                 # add a new node
                 node = Node()
                 node.layer = self.layer
-                node.status = NODE_STATUS.get('active')  # TODO: solve status debate...
+                node.status = self.status
                 added = True
             
             if node.name != name:

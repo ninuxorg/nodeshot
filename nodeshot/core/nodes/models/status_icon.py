@@ -22,12 +22,15 @@ class StatusIcon(models.Model):
     """
     # if layer app is not installed, a status can have only 1 icon
     status = models.ForeignKey('nodes.Status', verbose_name=_('status'), unique=UNIQUE_STATUS_FOREIGN_KEY)
-    
-    # layers may have custom status
-    if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-        layer = models.ForeignKey('layers.Layer', help_text=_('leave blank to make default icon for this status'), blank=True, null=True)
-    
     marker = models.CharField(_('type of marker'), max_length=20, choices=MARKER_CHOICES, help_text=_('icon or simple color?'))
+    
+    # each layer may have a custom icon for each status
+    if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+        layer = models.ForeignKey('layers.Layer', blank=True, null=True,
+                help_text=_("""each layer might have its own custom icon,
+                            otherwise leave blank to set as default icon for
+                            all layers which do not have a custom icon.<br>
+                            PS: always be sure there is a default icon."""))
     
     # icon settings
     icon = models.ImageField(upload_to='status-icons/', verbose_name=_('icon of this status'), blank=True, null=True)
@@ -81,7 +84,7 @@ class StatusIcon(models.Model):
         super(StatusIcon, self).delete(*args, **kwargs)
     
     def save(self, *args, **kwargs):
-        """ cleanup """
+        """ cleanup unnecessary information """
         if self.marker == 'icon':
             self.background_color = ''
             self.foreground_color = ''

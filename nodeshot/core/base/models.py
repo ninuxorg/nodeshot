@@ -104,7 +104,7 @@ class BaseAccessLevel(BaseDate):
         super(BaseAccessLevel, self).__init__(*args, **kwargs)
 
 
-class BaseOrdered(BaseAccessLevel):
+class BaseOrdered(models.Model):
     """
     Ordered Model provides functions for ordering objects in the Django Admin
     """
@@ -113,61 +113,22 @@ class BaseOrdered(BaseAccessLevel):
     class Meta:
         ordering = ["order"]
         abstract = True
-        
+    
+    def get_auto_order_queryset(self):
+        return self.__class__.objects.all()
+    
     def save(self, *args, **kwargs):
-        if not self.id:
+        """ if order left blank """
+        if self.order == '' or self.order == None:
             try:
-                self.order = self.__class__.objects.all().order_by("-order")[0].order + 1
+                self.order = self.get_auto_order_queryset().order_by("-order")[0].order + 1
             except IndexError:
-                self.order = 1
+                self.order = 0
         super(BaseOrdered, self).save()
 
-    def order_link(self):
-        """
-        Shows move-up and move-down links in the django admin
-        """
-        model_type_id = ContentType.objects.get_for_model(self.__class__).id
-        model_id = self.id
-        kwargs = {"direction": "up", "model_type_id": model_type_id, "model_id": model_id}
-        from django.core.urlresolvers import reverse
-        url_up = reverse("admin-move", kwargs=kwargs)
-        kwargs["direction"] = "down"
-        url_down = reverse("admin-move", kwargs=kwargs)
-        return '<a href="%s" class="up"><b>up</b><span>&nbsp;</span></a> <a href="%s" class="down"><b>down</b><span>&nbsp;</span></a>' % (url_up, url_down)
-    order_link.allow_tags = True
-    order_link.short_description = 'Move'
-    order_link.admin_order_field = 'order'
 
-    @staticmethod
-    def move_up(model_type_id, model_id):
-        """
-        Changes the order of two items so that the one with the lower order goes up
-        """
-        try:
-            ModelClass = ContentType.objects.get(id=model_type_id).model_class()
-            lower_model = ModelClass.objects.get(id=model_id)
-            higher_model = ModelClass.objects.filter(order__gt=lower_model.order).order_by('order')[0]
-            lower_model.order, higher_model.order = higher_model.order, lower_model.order
-            higher_model.save()
-            lower_model.save()
-        except IndexError:
-            pass
-        except ModelClass.DoesNotExist:
-            pass
-
-    @staticmethod
-    def move_down(model_type_id, model_id):
-        """
-        Changes the order of two items so that the one with the higher order goes down
-        """
-        try:
-            ModelClass = ContentType.objects.get(id=model_type_id).model_class()
-            higher_model = ModelClass.objects.get(id=model_id)
-            lower_model = ModelClass.objects.filter(order__lt=higher_model.order)[0]
-            lower_model.order, higher_model.order = higher_model.order, lower_model.order
-            higher_model.save()
-            lower_model.save()
-        except IndexError:
-            pass
-        except ModelClass.DoesNotExist:
-            pass
+class BaseOrderedACL(BaseOrdered, BaseAccessLevel):
+    
+    class Meta:
+        ordering = ["order"]
+        abstract = True

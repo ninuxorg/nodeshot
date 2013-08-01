@@ -25,6 +25,7 @@ class ProfilesTest(TestCase):
         'initial_data.json',
         'test_profiles.json',
         'test_layers.json',
+        'test_status.json',
         'test_nodes.json',
     ]
     

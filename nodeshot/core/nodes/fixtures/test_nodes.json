@@ -71,7 +71,7 @@
         "pk": 4, 
         "model": "nodes.node", 
         "fields": {
-          "status": 0, 
+          "status": 1, 
           "updated": "2013-06-20T11:37:11.841Z", 
           "added": "2013-06-14T13:30:29.323Z", 
           "name": "Potenziale Romano", 
@@ -94,7 +94,7 @@
         "pk": 5, 
         "model": "nodes.node", 
         "fields": {
-          "status": 0, 
+          "status": 1, 
           "updated": "2013-06-20T13:21:36.284Z", 
           "added": "2013-06-14T13:30:29.323Z", 
           "name": "Potenziale Pisano", 
@@ -117,7 +117,7 @@
         "pk": 6, 
         "model": "nodes.node", 
         "fields": {
-          "status": 0, 
+          "status": 1, 
           "updated": "2013-06-20T11:42:43.583Z", 
           "added": "2013-06-14T13:30:29.323Z", 
           "name": "Potenziale Viterbo", 

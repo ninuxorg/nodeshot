@@ -27,6 +27,7 @@ class OutwardTest(TestCase):
         'initial_data.json',
         user_fixtures,
         'test_layers.json',
+        'test_status.json',
         'test_nodes.json'
     ]
     

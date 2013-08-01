@@ -19,7 +19,7 @@ class LayerExternalInline(admin.StackedInline):
 
 
 class LayerAdmin(BaseLayerAdmin):
-    inlines = [LayerExternalInline]
+    inlines = BaseLayerAdmin.inlines + [LayerExternalInline]
     # custom admin template
     change_form_template = '%s/templates/admin/layer_change_form.html' % os.path.dirname(os.path.realpath(__file__))
 
@@ -31,5 +31,6 @@ admin.site.register(Layer, LayerAdmin)
 class NodeExternalInline(admin.StackedInline):
     model = NodeExternal
     fk_name = 'node'
+    extra = 0
 
 NodeAdmin.inlines.append(NodeExternalInline)

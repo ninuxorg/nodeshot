@@ -31,6 +31,7 @@ class NodeAdmin(BaseGeoAdmin):
     list_display  = ('name', 'status', 'access_level', 'is_published', 'added', 'updated')
     list_filter   = NODE_FILTERS
     search_fields = ('name',)
+    actions_on_bottom = True
     date_hierarchy = 'added'
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
@@ -73,11 +74,12 @@ class StatusIconInline(admin.StackedInline):
 
 
 class StatusAdmin(admin.ModelAdmin):
-    list_display  = ('name', 'slug', 'description')
+    list_display  = ('name', 'slug', 'description', 'order', 'is_default')
     prepopulated_fields = {'slug': ('name',)}
+    list_editable = ('order', )
     inlines = [StatusIconInline]
     
-    change_form_template = 'admin/status_change_form.html'
+    change_list_template = 'smuggler/change_list.html'
 
 
 admin.site.register(Node, NodeAdmin)

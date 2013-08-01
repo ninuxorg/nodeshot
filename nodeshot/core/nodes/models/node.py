@@ -6,9 +6,11 @@ from django.core.exceptions import ValidationError
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.managers import GeoAccessLevelPublishedManager
 from nodeshot.core.base.utils import choicify
-from ..signals import node_status_changed
 
-from choices import NODE_STATUS
+from ..signals import node_status_changed
+from .status import Status
+
+#from choices import NODE_STATUS
 
 
 class Node(BaseAccessLevel):
@@ -18,7 +20,7 @@ class Node(BaseAccessLevel):
     name = models.CharField(_('name'), max_length=75, unique=True)
     slug = models.SlugField(max_length=75, db_index=True, unique=True)
     address = models.CharField(_('address'),max_length=150,blank=True, null=True)
-    status = models.SmallIntegerField(_('status'), max_length=3, choices=choicify(NODE_STATUS), default=NODE_STATUS.get(settings.NODESHOT['DEFAULTS']['NODE_STATUS'], 'potential'))
+    status = models.ForeignKey(Status, blank=True, null=True)
     is_published = models.BooleanField(default=settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True))
     
     if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
@@ -63,20 +65,28 @@ class Node(BaseAccessLevel):
         super(Node, self).__init__(*args, **kwargs)
         # set current status, but only if it is an existing node
         if self.pk:
-            self._current_status = self.status
+            self._current_status = self.status_id
     
     def clean(self , *args, **kwargs):
         """ call extensible validation """
         self.extensible_validation()
     
     def save(self, *args, **kwargs):
+        # if no status specified
+        if not self.status and not self.status_id:
+            try:
+                self.status = Status.objects.filter(is_default=True)[0]
+            except IndexError:
+                pass
+        
         super(Node, self).save(*args, **kwargs)
+        
         # if status of a node changes
-        if self.status != self._current_status:
+        if self.status and self._current_status and self.status.id != self._current_status:
             # send django signal
-            node_status_changed.send(sender=self, old_status=self._current_status, new_status=self.status)
+            node_status_changed.send(sender=self, old_status=Status.objects.get(pk=self._current_status), new_status=self.status)
         # update __current_status
-        self._current_status = self.status
+        self._current_status = self.status_id
     
     def extensible_validation(self):
         """
