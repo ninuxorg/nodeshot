@@ -72,7 +72,6 @@ class ModelsTest(TestCase):
         self.assertEqual(default_statuses.count(), 1)
         self.assertEqual(default_statuses[0].pk, unconfirmed.pk)
     
-    
     def test_current_status(self):
         """ test that node._current_status is none for new nodes """
         n = Node()

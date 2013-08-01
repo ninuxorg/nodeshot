@@ -5,8 +5,6 @@ from random import randint
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 
-from nodeshot.core.nodes.models.choices import NODE_STATUS
-
 from ..models import NodeExternal
 from .base import XMLConverter
 
