@@ -24,8 +24,8 @@
         "model": "sites.site",
         "pk": 1,
         "fields": {
-            "domain": "ninux.testing.org",
-            "name": "ninux"
+            "domain": "yourdomain.com",
+            "name": "your site name"
         }
     }
 ]

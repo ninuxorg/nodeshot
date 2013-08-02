@@ -3,10 +3,13 @@ nodeshot.community.mailing unit tests
 """
 
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
+from django.core import mail
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
-
 from django.db.models import Q
 from django.contrib.auth.models import Group
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -21,7 +24,7 @@ import datetime
 from django.utils.timezone import utc
 
 
-class OutwardTest(TestCase):
+class MailingTest(TestCase):
     
     fixtures = [
         'initial_data.json',
@@ -46,16 +49,48 @@ class OutwardTest(TestCase):
             message = self.message.subject,
         )
     
-    # useless
-    #def test_fixtures(self):
-    #    """ *** Tests fixtures have loaded properly *** """
-    #    layers = Layer.objects.all()
-    #    #nodes = Node.objects.all()
-    #    users = User.objects.filter(is_active=True)
-    #    
-    #    self.assertEqual(len(layers), 4, 'layers')
-    #    #self.assertEqual(len(nodes), 8, 'nodes') this is not really smart
-    #    self.assertEqual(len(users), 8, 'users')
+    def test_inward_model(self):
+        """ ensure inward model validation works as expected """
+        message = Inward(message='this is a test to ensure inward model validation works as expected')
+        
+        content_type = ContentType.objects.only('id', 'model').get(model='node')
+        message.content_type = content_type
+        message.object_id = 1
+        
+        try:
+            message.full_clean()
+            self.fail('ValidationError not raised')
+        except ValidationError as e:
+            self.assertIn(_('If sender is not specified from_name and from_email must be filled in'), e.messages)
+        
+        user = User.objects.get(pk=1)
+        
+        message.user = user
+        message.full_clean()
+        
+        self.assertEqual(message.from_name, user.get_full_name())
+        self.assertEqual(message.from_email, user.email)
+        
+        message.user = None
+        message.full_clean()
+        
+        message.user = user
+        message.save()
+        
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(message.status, 1)
+    
+    def test_contact_node_api(self):
+        """ ensure contact node api works as expected """
+        url = reverse('api_node_contact', args=['fusolab'])
+        self.client.login(username='admin', password='tester')
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405)
+        
+        response = self.client.post(url, { 'message': 'ensure contact node api works as expected' })
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(Inward.objects.count(), 1)
     
     def test_no_filter(self):
         """ *** Test no filtering, send to all *** """
@@ -213,7 +248,7 @@ class OutwardTest(TestCase):
             # and is_active = True
             q1 = q1 & Q(user__is_active=True)
             
-            # ZONES
+            # LAYERS
             q2 = Q()
             for layer in layers:
                 q2 = q2 | Q(layer=layer)

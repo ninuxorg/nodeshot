@@ -2,17 +2,21 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.contrib.sites.models import Site
 from django.core.validators import MaxLengthValidator, MinLengthValidator
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate
-from choices import INWARD_STATUS_CHOICES
+
+from .choices import INWARD_STATUS_CHOICES
 
 
 user_app_label = settings.AUTH_USER_MODEL.split('.')[0]
 user_model_name = settings.AUTH_USER_MODEL.split('.')[1]
-limit = models.Q(app_label = 'nodes', model = 'Node') | models.Q(app_label = user_app_label, model = user_model_name) | models.Q(app_label = 'layers', model = 'Layer')
+limit = models.Q(app_label='nodes', model='node') | models.Q(app_label=user_app_label, model=user_model_name.lower()) | models.Q(app_label='layers', model='layer')
+USER_CAN_BE_BLANK = not settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH']
 
 
 class Inward(BaseDate):
@@ -24,9 +28,9 @@ class Inward(BaseDate):
     content_type = models.ForeignKey(ContentType, limit_choices_to=limit)
     object_id = models.PositiveIntegerField()
     to = generic.GenericForeignKey('content_type', 'object_id')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), blank=not settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH'], null=True)
-    from_name = models.CharField(_('name'), max_length=50)
-    from_email = models.EmailField(_('email'), max_length=50)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), blank=USER_CAN_BE_BLANK, null=True)
+    from_name = models.CharField(_('name'), max_length=50, blank=True)
+    from_email = models.EmailField(_('email'), max_length=50, blank=True)
     message = models.TextField(_('message'), validators=[
         MaxLengthValidator(settings.NODESHOT['SETTINGS']['CONTACT_INWARD_MAXLENGTH']),
         MinLengthValidator(settings.NODESHOT['SETTINGS']['CONTACT_INWARD_MINLENGTH'])
@@ -42,7 +46,17 @@ class Inward(BaseDate):
         ordering = ['-status']
     
     def __unicode__(self):
-        return _(u'Message from %(from)s to %(to)s') % ({'from':self.from_name, 'to':self.content_type})
+        return _(u'Message from %(from)s to %(to)s') % ({'from': self.from_name, 'to': self.content_type})
+    
+    def clean(self, *args, **kwargs):
+        """ custom validation """
+        if not self.user and (not self.from_name or not self.from_email):
+            raise ValidationError(_('If sender is not specified from_name and from_email must be filled in'))
+        
+        # fill name and email
+        if self.user:
+            self.from_name = self.user.get_full_name()
+            self.from_email = self.user.email
     
     def send(self):
         """
@@ -62,7 +76,7 @@ class Inward(BaseDate):
 
         email = EmailMessage(
             # subject
-            _('Contact request from %(sender)s - %(site)s') % {'sender': self.from_name, 'site': settings.SITE_NAME},
+            _('Contact request from %(sender)s - %(site)s') % {'sender': self.from_name, 'site': Site.objects.get(pk=settings.SITE_ID)},
             # message
             self.message,
             # from
@@ -91,6 +105,11 @@ class Inward(BaseDate):
         """
         Custom save method
         """
+        # fill name and email
+        if self.user:
+            self.from_name = self.user.get_full_name()
+            self.from_email = self.user.email
+        
         # if not sent yet
         if int(self.status) < 1:
             # tries sending email (will modify self.status!)

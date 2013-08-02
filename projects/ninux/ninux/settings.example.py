@@ -366,6 +366,7 @@ NODESHOT = {
             'nodeshot.core.layers',
             'nodeshot.core.cms',
             'nodeshot.community.participation',
+            'nodeshot.community.mailing',
         ]
     },
     'INTEROPERABILITY': [
