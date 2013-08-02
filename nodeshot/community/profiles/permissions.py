@@ -16,6 +16,8 @@ class IsProfileOwner(permissions.IsAuthenticated):
             return request.user.id == obj.id
         else:
             return True
+    
+    has_permission = has_object_permission
 
 
 class IsNotAuthenticated(permissions.IsAuthenticated):

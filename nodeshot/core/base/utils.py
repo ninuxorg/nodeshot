@@ -8,6 +8,7 @@ from .exceptions import DependencyError
 
 
 __all__ = [
+    'Hider',
     'check_dependencies',
     'choicify',
     'get_key_by_value',
@@ -15,6 +16,14 @@ __all__ = [
     'now_after',
     'after',
 ]
+
+
+class Hider(object):
+    def __get__(self,instance,owner):
+        raise AttributeError, "Hidden attrbute"
+
+    def __set__(self, obj, val):
+        raise AttributeError, "Hidden attribute"
 
 
 def check_dependencies(dependencies, module):

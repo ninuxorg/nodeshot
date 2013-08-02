@@ -2,6 +2,7 @@ from django.http import Http404
 from django.contrib.auth import login, logout
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from rest_framework import generics
 from rest_framework import exceptions
@@ -9,6 +10,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+
+from nodeshot.core.base.mixins import ListSerializerMixin
+from nodeshot.core.base.utils import Hider
+from nodeshot.core.nodes.views import NodeList
 
 from .models import Profile, PasswordReset
 from .serializers import *
@@ -288,3 +293,43 @@ class PasswordResetFromKey(generics.GenericAPIView):
         raise exceptions.PermissionDenied(_("You can't reset your password if you are already authenticated"))
 
 account_password_reset_key = PasswordResetFromKey.as_view()
+
+
+# ------ User Nodes ------ #
+
+if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
+
+    class UserNodes(ListSerializerMixin, NodeList):
+        """
+        ### GET
+        
+        Retrieve list of nodes of the specified layer
+        
+        Parameters:
+        
+         * `search=<word>`: search <word> in name of nodes of specified layer
+         * `limit=<n>`: specify number of items per page (defaults to 40)
+         * `limit=0`: turns off pagination
+        """
+        
+        def get_queryset(self):
+            try:
+                self.user = Profile.objects.get(username=self.kwargs['username'])
+            except Profile.DoesNotExist:
+                raise Http404(_('User not found'))
+            
+            return super(UserNodes, self).get_queryset().filter(user_id=self.user.id)
+        
+        def get(self, request, *args, **kwargs):
+            """ custom structure """
+            # ListSerializerMixin.list returns a serializer object
+            nodes = self.list(request, *args, **kwargs)
+            
+            content = ProfileSerializer(self.user, context=self.get_serializer_context()).data
+            content['nodes'] = nodes.data
+            
+            return Response(content)
+        
+        post = Hider()
+    
+    user_nodes = UserNodes.as_view()

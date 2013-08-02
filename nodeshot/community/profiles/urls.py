@@ -3,7 +3,8 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('nodeshot.community.profiles.views',
     url(r'^/profiles/$', 'profile_list', name='api_profile_list'),
-    url(r'^/profiles/(?P<username>.+)/$', 'profile_detail', name='api_profile_detail'),
+    url(r'^/profiles/(?P<username>[-.\w]+)/$', 'profile_detail', name='api_profile_detail'),
+    url(r'^/profiles/(?P<username>[-.\w]+)/nodes/$', 'user_nodes', name='api_user_nodes'),
     
     url(r'^/account/$', 'account_detail', name='api_account_detail'),
     url(r'^/account/login/$', 'account_login', name='api_account_login'),

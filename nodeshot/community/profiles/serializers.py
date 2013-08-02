@@ -1,8 +1,8 @@
 import hashlib
 
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from django.contrib.auth import authenticate
+from django.conf import settings
 
 from rest_framework import serializers
 
@@ -73,17 +73,30 @@ class ProfileSerializer(serializers.ModelSerializer):
     
     uri = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_profile_detail')
     avatar = serializers.SerializerMethodField('get_avatar')
+    full_name = serializers.SerializerMethodField('get_full_name')
+    
+    if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
+        nodes = serializers.HyperlinkedIdentityField(view_name='api_user_nodes', slug_field='username')
     
     def get_avatar(self, obj):
         """ avatar from gravatar.com """
         return 'http://www.gravatar.com/avatar/%s' % hashlib.md5(obj.email).hexdigest()
     
+    def get_full_name(self, obj):
+        """ user's full name """
+        return obj.get_full_name()
+    
     class Meta:
         model = User
-        exclude = [
-            'password', 'last_login', 'is_superuser', 'email',
-            'is_staff', 'is_active', 'last_login', 'groups', 'user_permissions'
+        fields = [
+            'username', 'full_name', 'first_name', 'last_name',
+            'about', 'gender', 'birth_date', 'address', 'city', 'country',
+            'date_joined', 'avatar',# 'uri' 
         ]
+        
+        #if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
+        #    fields.append('nodes')
+            
         read_only_fields = ('username', 'date_joined',)
 
 

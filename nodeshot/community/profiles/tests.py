@@ -134,6 +134,10 @@ class ProfilesTest(TestCase):
         url = reverse('api_profile_detail', args=['romano'])
         response = self.client.put(url, json.dumps(profile), content_type='application/json')
         self.assertEqual(response.status_code, 403)
+        
+        self.client.logout()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
     
     def test_account_detail_API(self):
         url = reverse('api_account_detail')
@@ -333,3 +337,14 @@ class ProfilesTest(TestCase):
         # Ensure is NOT authenticated
         response = self.client.get(account_url)
         self.assertEqual(401, response.status_code)
+    
+    if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
+        def test_user_nodes(self):
+            url = reverse('api_user_nodes', args=['romano'])
+            
+            response = self.client.get(url)
+            self.assertEqual(200, response.status_code)
+            
+            response = self.client.post(url)
+            self.assertEqual(405, response.status_code)
+        
