@@ -1,5 +1,5 @@
-from django.conf.urls import patterns, include, url
-from rest_framework.urlpatterns import format_suffix_patterns
+from django.conf.urls import patterns, url
+#from rest_framework.urlpatterns import format_suffix_patterns
 
 
 urlpatterns = patterns('nodeshot.core.layers.views',

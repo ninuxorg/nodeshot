@@ -90,9 +90,9 @@ class AccessLevelQuerySet(QuerySet, ACLMixin):
     pass
 
 
-#class GeoAccessLevelQuerySet(GeoQuerySet, ACLMixin):
-#    """ AccessLevelQuerySet with GeoDjango queryset """
-#    pass
+class AccessLevelPublishedQuerySet(QuerySet, ACLMixin, PublishedMixin):
+    """ AccessLevelQuerySet and PublishedQuerySet """
+    pass
 
 
 class GeoAccessLevelPublishedQuerySet(GeoQuerySet, ACLMixin, PublishedMixin):
@@ -123,11 +123,21 @@ class GeoPublishedManager(GeoManager, ExtendedManagerMixin, PublishedMixin):
 #    pass
 
 
+
 class AccessLevelManager(Manager, ExtendedManagerMixin, ACLMixin):
     """ Manager to filter depending on access level """
 
     def get_query_set(self): 
         return AccessLevelQuerySet(self.model, using=self._db)
+
+
+class AccessLevelPublishedManager(Manager, ExtendedManagerMixin, ACLMixin, PublishedMixin):
+    """
+    AccessLeveManager and Publishedmanager in one
+    """
+    
+    def get_query_set(self): 
+        return AccessLevelPublishedQuerySet(self.model, using=self._db)
 
 
 class GeoAccessLevelPublishedManager(GeoManager, ExtendedManagerMixin, ACLMixin, PublishedMixin):

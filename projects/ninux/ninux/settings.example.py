@@ -150,6 +150,7 @@ INSTALLED_APPS = (
     'nodeshot.core.api',
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
+    'nodeshot.core.cms',
     'nodeshot.interoperability',
     'nodeshot.community.profiles',
     'nodeshot.community.participation',
@@ -161,10 +162,12 @@ INSTALLED_APPS = (
     'nodeshot.networking.planning',
     'nodeshot.networking.monitor',
     
-    # dependencies
+    # 3d parthy django apps
     'rest_framework',
     'south',
     'debug_toolbar',
+    'smuggler',
+    'reversion',
     
     # profiles and social networks
     'emailconfirmation',
@@ -361,6 +364,7 @@ NODESHOT = {
         'APPS_ENABLED': [
             'nodeshot.core.nodes',
             'nodeshot.core.layers',
+            'nodeshot.core.cms',
             'nodeshot.community.participation',
         ]
     },

@@ -10,8 +10,6 @@ from nodeshot.core.base.utils import choicify
 from ..signals import node_status_changed
 from .status import Status
 
-#from choices import NODE_STATUS
-
 
 class Node(BaseAccessLevel):
     """
