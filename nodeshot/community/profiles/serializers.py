@@ -91,11 +91,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = [
             'username', 'full_name', 'first_name', 'last_name',
             'about', 'gender', 'birth_date', 'address', 'city', 'country',
-            'date_joined', 'avatar',# 'uri' 
+            'date_joined', 'avatar', 'uri' 
         ]
         
-        #if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
-        #    fields.append('nodes')
+        if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
+            fields.append('nodes')
             
         read_only_fields = ('username', 'date_joined',)
 
@@ -147,7 +147,8 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     current_password = serializers.CharField(
         help_text=_('Current Password'),
-        max_length=PASSWORD_MAX_LENGTH
+        max_length=PASSWORD_MAX_LENGTH,
+        required=False  # optional because users subscribed from social network won't have a password set
     )
     password1 = serializers.CharField(
         help_text = _('New Password'),
@@ -162,7 +163,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         """
         current password check
         """
-        if not self.object.check_password(attrs.get("current_password")):
+        if self.object.has_usable_password() and not self.object.check_password(attrs.get("current_password")):
             raise serializers.ValidationError(_('Current password is not correct'))
         
         return attrs
