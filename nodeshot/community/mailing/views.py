@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 from rest_framework import generics, authentication, permissions
 from rest_framework.response import Response
@@ -10,7 +12,7 @@ from rest_framework.response import Response
 from nodeshot.core.nodes.models import Node
 
 from .serializers import *
-from .models import *
+from .models import Inward, Outward
 
 
 CONTACT_PERMISSIONS = (permissions.IsAuthenticated,) if settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH'] else []
@@ -29,10 +31,16 @@ class ContactNode(generics.CreateAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = CONTACT_PERMISSIONS
     serializer_class = InwardMessageSerializer
+    content_type = 'node'
+    model = Node
+    slug_field = 'slug'
+    
+    def is_contactable(self):
+        return True
     
     def get_object(self, *args, **kwargs):
         try:
-            self.recipient = Node.objects.get(slug=kwargs.get('slug', False))
+            self.recipient = self.model.objects.get(**{ self.slug_field: kwargs.get(self.slug_field, False) })
         except Node.DoesNotExist:
             raise Http404('Not Found')
         
@@ -43,6 +51,9 @@ class ContactNode(generics.CreateAPIView):
             self.get_object(**kwargs)
         except Http404:
             return Response({ 'detail': _('Not Found') }, status=404)
+        
+        if not self.is_contactable():
+            return Response({ 'detail': _('This resource cannot be contacted') }, status=400)
         
         return Response({ 'detail': _('Method Not Allowed') }, status=405)
     
@@ -56,7 +67,10 @@ class ContactNode(generics.CreateAPIView):
         except Http404:
             return Response({ 'detail': _('Not Found') }, status=404)
         
-        content_type = ContentType.objects.only('id', 'model').get(model='node')
+        if not self.is_contactable():
+            return Response({ 'detail': _('This resource cannot be contacted') }, status=400)
+        
+        content_type = ContentType.objects.only('id', 'model').get(model=self.content_type)
         
         # shortcut
         data = request.DATA
@@ -88,8 +102,49 @@ class ContactNode(generics.CreateAPIView):
         message.save()
         
         if message.status >= 1:
-            return Response({ 'details': _('Message sent successfully') })
+            return Response({ 'details': _('Message sent successfully') }, status=201)
         else:
             return Response({ 'details': _('Something went wrong. The email was not sent.') }, status=500)
 
 contact_node = ContactNode.as_view()
+
+
+class ContactUser(ContactNode):
+    """
+    ### POST
+    
+    Contact user.
+    
+    Might require authentication depending on configuration.
+    
+    Name and email fields will be determined automatically if the user is authenticated.
+    """
+    content_type = User.__name__.lower()
+    model = User
+    slug_field = 'username'
+
+contact_user = ContactUser.as_view()
+
+
+if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+    
+    from nodeshot.core.layers.models import Layer
+    
+    class ContactLayer(ContactNode):
+        """
+        ### POST
+        
+        Contact mantainers of a Layer.
+        
+        Might require authentication depending on configuration.
+        
+        Name and email fields will be determined automatically if the user is authenticated.
+        """
+        content_type = 'layer'
+        model = Layer
+        slug_field = 'slug'
+    
+        def is_contactable(self):
+            return bool(self.recipient.email or self.recipient.mantainers.count() > 1)
+    
+    contact_layer = ContactLayer.as_view()

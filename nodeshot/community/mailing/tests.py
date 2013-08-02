@@ -89,8 +89,47 @@ class MailingTest(TestCase):
         self.assertEqual(response.status_code, 405)
         
         response = self.client.post(url, { 'message': 'ensure contact node api works as expected' })
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(Inward.objects.count(), 1)
+    
+    def test_contact_user_api(self):
+        """ ensure contact user api works as expected """
+        url = reverse('api_user_contact', args=['romano'])
+        self.client.login(username='admin', password='tester')
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405)
+        
+        response = self.client.post(url, { 'message': 'ensure contact user api works as expected' })
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(Inward.objects.count(), 1)
+    
+    def test_contact_layer_api(self):
+        """ ensure contact layer api works as expected """
+        url = reverse('api_layer_contact', args=['rome'])
+        self.client.login(username='admin', password='tester')
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405)
+        
+        response = self.client.post(url, { 'message': 'ensure contact user api works as expected' })
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(Inward.objects.count(), 1)
+        
+        vienna = Layer.objects.get(slug='vienna')
+        vienna.email = None
+        vienna.save()
+        
+        # cannot be contacted because no email nor mantainers specified
+        url = reverse('api_layer_contact', args=['vienna'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+        
+        response = self.client.post(url, { 'message': 'ensure contact user api works as expected' })
+        self.assertEqual(response.status_code, 400)
     
     def test_no_filter(self):
         """ *** Test no filtering, send to all *** """
