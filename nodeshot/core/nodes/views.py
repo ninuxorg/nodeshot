@@ -86,7 +86,8 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
         """
         # retrieve all nodes which are published and accessible to current user
         # and use joins to retrieve related fields
-        queryset = super(NodeList, self).get_queryset()
+        queryset = super(NodeList, self).get_queryset().select_related('layer', 'status', 'user')
+        
         # retrieve value of querystring parameter "search"
         search = self.request.QUERY_PARAMS.get('search', None)
         

@@ -61,10 +61,6 @@ class LayerNodesList(NodeList):
      * `limit=<n>`: specify number of items per page (defaults to 40)
      * `limit=0`: turns off pagination
     """
-    #model = Layer
-    #serializer_class = CustomNodeListSerializer
-    #queryset = Layer.objects.published()
-    #lookup_field = 'slug'
     
     def get_queryset(self):
         try:
