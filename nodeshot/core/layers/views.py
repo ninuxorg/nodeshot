@@ -3,6 +3,7 @@ from vectorformats.Formats import Django, GeoJSON
 
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from rest_framework import generics
 from rest_framework.response import Response
@@ -64,21 +65,35 @@ class LayerNodesList(ListSerializerMixin, NodeList):
      * `limit=0`: turns off pagination
     """
     
-    def get_queryset(self):
+    layer = None
+    
+    def get_layer(self):
+        """ retrieve layer from DB """
+        if self.layer:
+            return
         try:
             self.layer = Layer.objects.get(slug=self.kwargs['slug'])
         except Layer.DoesNotExist:
             raise Http404(_('Layer not found'))
-        
+    
+    def get_queryset(self):
+        self.get_layer()
         return super(LayerNodesList, self).get_queryset().filter(layer_id=self.layer.id)
     
     def get(self, request, *args, **kwargs):
         """ custom structure """
-        # ListSerializerMixin.list returns a serializer object
-        nodes = self.list(request, *args, **kwargs)
+        self.get_layer()
+        
+        # here I had to mix the code of the interoperability module
+        # not 100% satisfied but I couldn't find a better way
+        if 'nodeshot.interoperability' in settings.INSTALLED_APPS and self.layer.is_external and hasattr(self.layer.external, 'get_nodes'):
+            nodes = self.layer.external.get_nodes()
+        else:
+            # ListSerializerMixin.list returns a serializer object
+            nodes = (self.list(request, *args, **kwargs)).data
         
         content = LayerNodeListSerializer(self.layer, context=self.get_serializer_context()).data
-        content['nodes'] = nodes.data
+        content['nodes'] = nodes
         
         return Response(content)
     

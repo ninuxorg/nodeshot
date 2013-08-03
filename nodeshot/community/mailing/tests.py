@@ -120,7 +120,7 @@ class MailingTest(TestCase):
         self.assertEqual(Inward.objects.count(), 1)
         
         vienna = Layer.objects.get(slug='vienna')
-        vienna.email = None
+        vienna.email = ''
         vienna.save()
         
         # cannot be contacted because no email nor mantainers specified
