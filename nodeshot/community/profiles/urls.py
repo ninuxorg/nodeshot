@@ -5,6 +5,8 @@ urlpatterns = patterns('nodeshot.community.profiles.views',
     url(r'^/profiles/$', 'profile_list', name='api_profile_list'),
     url(r'^/profiles/(?P<username>[-.\w]+)/$', 'profile_detail', name='api_profile_detail'),
     url(r'^/profiles/(?P<username>[-.\w]+)/nodes/$', 'user_nodes', name='api_user_nodes'),
+    url(r'^/profiles/(?P<username>[-.\w]+)/social-links/$', 'user_social_links_list', name='api_user_social_links_list'),
+    url(r'^/profiles/(?P<username>[-.\w]+)/social-links/(?P<pk>[0-9]+)/$', 'user_social_links_detail', name='api_user_social_links_detail'),
     
     url(r'^/account/$', 'account_detail', name='api_account_detail'),
     url(r'^/account/login/$', 'account_login', name='api_account_login'),

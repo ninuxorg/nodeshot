@@ -11,11 +11,11 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
-from nodeshot.core.base.mixins import ListSerializerMixin
+from nodeshot.core.base.mixins import ListSerializerMixin, CustomDataMixin
 from nodeshot.core.base.utils import Hider
 from nodeshot.core.nodes.views import NodeList
 
-from .models import Profile, PasswordReset
+from .models import Profile, PasswordReset, SocialLink
 from .serializers import *
 from .permissions import *
 
@@ -333,3 +333,68 @@ if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
         post = Hider()
     
     user_nodes = UserNodes.as_view()
+
+
+# ------ Social Links ------ #
+
+
+class SocialLinkMixin(object):
+    """
+    Current user queryset
+    """
+    
+    queryset = SocialLink.objects.select_related('user').only(
+        'id', 'user', 'user__username', 'url', 'description', 'added', 'updated'
+    )
+    
+    def get_queryset(self):
+        try:
+            self.user = Profile.objects.only('id', 'username').get(username=self.kwargs['username'])
+        except Profile.DoesNotExist:
+            raise Http404(_('User not found'))
+        
+        return super(SocialLinkMixin, self).get_queryset().filter(user_id=self.user.id)
+
+
+class UserSocialLinksList(CustomDataMixin, SocialLinkMixin, generics.ListCreateAPIView):
+    """
+    ### GET
+    
+    Get social links of a user
+    
+    ### POST
+    
+    Insert new social link. Profile owner only.
+    """
+    
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsProfileOwner)
+    serializer_class = SocialLinkSerializer
+    serializer_custom_class = SocialLinkAddSerializer
+    
+    def get_custom_data(self):
+        """ additional request.DATA """
+        return {
+            'user': self.request.user.id
+        }
+
+user_social_links_list = UserSocialLinksList.as_view()
+
+
+class UserSocialLinksDetail(SocialLinkMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    ### GET
+    
+    Get specified social link
+    
+    ### PUT & PATCH
+    
+    Edit existing social link. Profile owner only.
+    """
+    
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsProfileOwner)
+    serializer_class = SocialLinkSerializer
+    model = SocialLink
+
+user_social_links_detail = UserSocialLinksDetail.as_view()

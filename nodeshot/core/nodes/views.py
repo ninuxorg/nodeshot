@@ -54,12 +54,10 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     <pre>{
         "name": "Fusolab Rome", 
         "slug": "fusolab", 
-        "user": "romano", 
         "coords": [41.872041927700003, 12.582239191899999], 
         "elev": 80.0, 
         "address": "", 
         "description": "Fusolab test", 
-        "access_level": "public",
         "layer": 1
     }</pre>
     

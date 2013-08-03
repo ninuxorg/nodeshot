@@ -16,7 +16,7 @@ from nodeshot.core.nodes.models import Node
 from emailconfirmation.models import EmailAddress, EmailConfirmation
 
 from .models import Profile as User
-from .models import PasswordReset
+from .models import PasswordReset, SocialLink
 
 
 class ProfilesTest(TestCase):
@@ -347,4 +347,40 @@ class ProfilesTest(TestCase):
             
             response = self.client.post(url)
             self.assertEqual(405, response.status_code)
+    
+    def test_social_links_api(self):
+        url = reverse('api_user_social_links_list', args=['romano'])
         
+        # GET 200
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        # POST 403 - only profile owner can submit new links to his profile
+        response = self.client.post(url, { 'url': 'http://mywebsite.com', 'description': 'mywebsite' })
+        self.assertEqual(response.status_code, 403)
+        
+        # POST 201
+        self.client.login(username='romano', password='tester')
+        response = self.client.post(url, { 'url': 'http://mywebsite.com', 'description': 'mywebsite' })
+        self.assertEqual(response.status_code, 201)
+        
+        self.assertEqual(SocialLink.objects.count(), 1)
+        
+        url = reverse('api_user_social_links_detail', args=['romano', 1])
+        
+        # GET 200
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        data = json.dumps({ 'url': 'http://changed.com', 'description': 'changed' })
+        
+        # PUT 200
+        response = self.client.put(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        
+        self.client.logout()
+        self.client.login(username='registered', password='tester')
+        
+        # POST 403 - only profile owner can edit
+        response = self.client.put(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)

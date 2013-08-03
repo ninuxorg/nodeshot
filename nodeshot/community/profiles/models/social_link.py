@@ -15,6 +15,7 @@ class SocialLink(BaseDate):
     
     class Meta:
         db_table = 'profiles_social_links'
+        unique_together = ('user', 'url')
     
     def __unicode__(self):
         return self.url

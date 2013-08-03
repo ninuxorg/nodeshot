@@ -5,10 +5,11 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from nodeshot.core.base.serializers import ExtensibleModelSerializer, HyperlinkedField
 from .models import Profile as User
-from .models import PasswordReset
+from .models import PasswordReset, SocialLink
 
 PROFILE_EMAIL_CONFIRMATION = settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True)
 PASSWORD_MAX_LENGTH = User._meta.get_field('password').max_length
@@ -26,6 +27,8 @@ __all__ = [
     'ChangePasswordSerializer',
     'ResetPasswordSerializer',
     'ResetPasswordKeySerializer',
+    'SocialLinkSerializer',
+    'SocialLinkAddSerializer'
 ]
 
 
@@ -68,12 +71,39 @@ class LoginSerializer(serializers.Serializer):
         return instance
 
 
+class SocialLinkSerializer(serializers.ModelSerializer):
+    
+    user = serializers.Field(source='user.username')
+    details = serializers.SerializerMethodField('get_detail_url')
+    
+    def get_detail_url(self, obj):
+        """ return detail url """
+        request = self.context.get('request', None)
+        format = self.context.get('format', None)
+        args = [obj.user.username, obj.pk]
+        return reverse('api_user_social_links_detail', args=args, request=request, format=format)
+    
+    class Meta:
+        model = SocialLink
+        fields = ('id', 'user', 'url', 'description', 'added', 'updated', 'details')
+        read_only_fields = ('added', 'updated',)
+
+
+class SocialLinkAddSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = SocialLink
+        read_only_fields = ('added', 'updated', )
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     """ Profile Serializer for visualization """
     
-    uri = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_profile_detail')
+    details = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_profile_detail')
     avatar = serializers.SerializerMethodField('get_avatar')
     full_name = serializers.SerializerMethodField('get_full_name')
+    social_links_url = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_user_social_links_list')
+    social_links = SocialLinkSerializer(source='sociallink_set', many=True, read_only=True)
     
     if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
         nodes = serializers.HyperlinkedIdentityField(view_name='api_user_nodes', slug_field='username')
@@ -89,13 +119,16 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            'details',
             'username', 'full_name', 'first_name', 'last_name',
             'about', 'gender', 'birth_date', 'address', 'city', 'country',
-            'date_joined', 'avatar', 'uri' 
+            'date_joined', 'avatar',
         ]
         
         if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
             fields.append('nodes')
+            
+        fields += ['social_links_url', 'social_links']
             
         read_only_fields = ('username', 'date_joined',)
 

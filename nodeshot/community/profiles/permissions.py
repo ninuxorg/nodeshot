@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from .models import Profile
 
 
 __all__ = [
@@ -12,12 +13,27 @@ class IsProfileOwner(permissions.IsAuthenticated):
     Restrict edit to owners only
     """
     def has_object_permission(self, request, view, obj=None):
-        if (request.method == 'PUT' or request.method == 'PATCH') and obj is not None:
-            return request.user.id == obj.id
+        # in edit request restrict permission to profile owner only
+        if (request.method in ['PUT', 'PATCH']) and obj is not None:
+            model = obj.__class__.__name__
+            
+            user_id = obj.id
+            
+            # in case of social link view
+            if model == 'SocialLink':
+                user_id = obj.user.id
+            
+            return request.user.id == user_id
         else:
             return True
     
-    has_permission = has_object_permission
+    def has_permission(self, request, view):
+        """ applies to social-link-list """
+        if request.method == 'POST':
+            user = Profile.objects.only('id', 'username').get(username=view.kwargs['username'])
+            return request.user.id == user.id
+        
+        return True
 
 
 class IsNotAuthenticated(permissions.IsAuthenticated):
