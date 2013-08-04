@@ -28,7 +28,10 @@ __all__ = [
     'ResetPasswordSerializer',
     'ResetPasswordKeySerializer',
     'SocialLinkSerializer',
-    'SocialLinkAddSerializer'
+    'SocialLinkAddSerializer',
+    'EmailSerializer',
+    'EmailAddSerializer',
+    'EmailEditSerializer'
 ]
 
 
@@ -169,9 +172,15 @@ class AccountSerializer(serializers.ModelSerializer):
     change_password = HyperlinkedField(view_name='api_account_password_change')
     logout = HyperlinkedField(view_name='api_account_logout')
     
+    if PROFILE_EMAIL_CONFIRMATION:
+        email_addresses = HyperlinkedField(view_name='api_account_email_list')
+    
     class Meta:
         model = User
         fields = ['profile', 'change_password', 'logout']
+        
+        if PROFILE_EMAIL_CONFIRMATION:
+            fields += ['email_addresses']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -278,3 +287,57 @@ class ResetPasswordKeySerializer(serializers.Serializer):
         instance.save()
         
         return instance
+
+
+# email addresses
+if PROFILE_EMAIL_CONFIRMATION:
+    
+    class EmailSerializer(serializers.ModelSerializer):
+        details = serializers.HyperlinkedIdentityField(lookup_field='pk', view_name='api_account_email_detail')
+        resend_confirmation = serializers.SerializerMethodField('get_resend_confirmation')
+    
+        def get_resend_confirmation(self, obj):
+            """ return resend_confirmation url """
+            if obj.verified:
+                return False
+            request = self.context.get('request', None)
+            format = self.context.get('format', None)
+            return reverse('api_account_email_resend_confirmation',
+                           args=[obj.pk], request=request, format=format)
+        
+        class Meta:
+            model = EmailAddress
+            fields = ('id', 'email', 'verified', 'primary', 'details', 'resend_confirmation')
+            read_only_fields = ('verified', 'primary')
+    
+    
+    class EmailAddSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = EmailAddress
+            read_only_fields = ('verified', 'primary')
+    
+    
+    class EmailEditSerializer(EmailSerializer):
+        
+        def validate_primary(self, attrs, source):
+            """
+            primary field validation
+            """
+            primary = attrs[source]
+            verified = self.object.verified
+            
+            if primary is True and verified is False:
+                raise serializers.ValidationError(_('Email address cannot be made primary if it is not verified first'))
+            
+            if primary is False and verified is True:
+                primary_addresses = EmailAddress.objects.filter(user=self.object.user, primary=True)
+                
+                if primary_addresses.count() == 1 and primary_addresses[0].pk == self.object.pk:
+                    raise serializers.ValidationError(_('You must have at least one primary address.'))
+            
+            return attrs
+        
+        class Meta:
+            model = EmailAddress
+            fields = ('id', 'email', 'verified', 'primary', 'resend_confirmation')
+            read_only_fields = ('verified', 'email')

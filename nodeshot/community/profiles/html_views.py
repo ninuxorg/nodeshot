@@ -7,7 +7,6 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext
-
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
@@ -79,3 +78,25 @@ def password_reset_from_key(request, uidb36, key, **kwargs):
         })
     
     return render_to_response(template_name, RequestContext(request, ctx))
+
+
+if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+
+    from emailconfirmation.models import EmailConfirmation, EmailAddress
+    
+    def confirm_email(request, confirmation_key):
+        """ confirm email view """
+        confirmation_key = confirmation_key.lower()
+        
+        # get email confirmation or 404
+        email_confirmation = get_object_or_404(EmailConfirmation, key=confirmation_key)
+        
+        # make primary if no other primary addresses for this user
+        make_primary = EmailAddress.objects.filter(user_id=email_confirmation.email_address.user_id, primary=True).count() <= 0
+        
+        # confirm email
+        email_address = EmailConfirmation.objects.confirm_email(confirmation_key, make_primary=make_primary)
+        
+        return render_to_response("emailconfirmation/confirm_email.html", {
+            "email_address": email_address,
+        }, context_instance=RequestContext(request))
