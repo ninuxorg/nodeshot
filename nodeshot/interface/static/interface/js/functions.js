@@ -156,7 +156,7 @@ function loadNodes(newClusterNodes,color){
 		
 	onEachFeature: function (feature, layer) {
 		layer.on('click', function (e) {
-			populateNodeDiv(feature.properties.slug,1);
+			populateNodeDiv(feature.properties.slug,"true");
 			this.bindPopup(nodeDiv);
 			populateRating(feature.properties.slug,nodeDiv,nodeRatingAVG)
 				});
@@ -204,7 +204,6 @@ function onMapClick(e) {
 	popupelem.innerHTML+='<button id="confirm" class=\'confirm_marker\' onclick=markerConfirm(markerLocation)>Confirm</button>&nbsp;';
 	popupelem.innerHTML+='<button class=\'remove_marker\' onclick=markerDelete(marker)>Delete</b>';
 	
-    // $('div#movemenexttolink').css({left: offsetsForLink.left + 60, top: offsetsForLink.top + 10});
 	
 	map
 		
@@ -252,8 +251,7 @@ case 0:
 		
 	}
 	htmlRadio+='<button id="sendLayer">Go</button>';
-	
-	//alert(htmlRadio)
+
 	var htmlText='You clicked outside layer\' area.<br>Choose a no-area layer:<br>'
 	$("#insertMarker").append(htmlText);
 	$("#insertMarker").append(htmlRadio);
@@ -362,7 +360,7 @@ function postNode() {
 		mapLayers=loadLayers(layers);
 		mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
 		var newMarker=L.marker(latlng).addTo(map);
-		populateNodeDiv(nodeToInsert["slug"],1);
+		populateNodeDiv(nodeToInsert["slug"],"true");
 		//newMarker.bindPopup("Node added");
 		newMarker.bindPopup(nodeDiv).openPopup();
 		populateRating(nodeToInsert["slug"],nodeDiv,nodeRatingAVG);
@@ -396,7 +394,7 @@ function populateNodeDiv(nodeSlug,create) {
  * 
  */
  
-	if (create ==1) {
+	if (create === "true") {
 		nodeDiv = document.createElement('div');
 		nodeDiv.id=nodeSlug;	
 	}
@@ -430,7 +428,7 @@ function populateNodeDiv(nodeSlug,create) {
 		var nodeComments=node.participation.comment_count;
 		
 		nodeRatingAVG=node.participation.rating_avg;
-		alert(rating_allowed)
+		
 		if (rating_allowed == true) {
 			
 			$(nodeDiv).append('<strong>Rating:</strong><br>');
@@ -623,7 +621,6 @@ function createNodeList() {
         type: 'GET',
         url: window.__BASEURL__+'api/v1/layers/'+layer+'/nodes',
         dataType: 'json',
-        //data: JSON.stringify(bounds),
         contentType: 'application/json; charset=utf-8',
         success: function (result) {
             addToList(result)
