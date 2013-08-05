@@ -12,10 +12,7 @@ class ParticipationModelsTest(TestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
-        #'test_layers.json',
-        #'test_nodes.json',
-        #'test_images.json'
+        #'test_users.json'
     ]
     
     def setUp(self):
@@ -41,4 +38,5 @@ class ParticipationModelsTest(TestCase):
         self.assertNotContains(response, 'comments')
         # ensure other URLs are still there
         self.assertContains(response, 'nodes')
-    
+        
+        settings.INSTALLED_APPS = self.installed_apps

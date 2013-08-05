@@ -1,6 +1,6 @@
 import sys
 
-if not 'synchronize' in sys.argv:
+if not 'synchronize' in sys.argv and not 'celery' in sys.argv:
     from django.contrib.auth import get_user_model
     User = get_user_model()
 
@@ -137,5 +137,3 @@ class GeoAccessLevelPublishedManager(GeoManager, ExtendedManagerMixin, ACLMixin,
     
     def get_query_set(self): 
         return GeoAccessLevelPublishedQuerySet(self.model, using=self._db)
-
-    

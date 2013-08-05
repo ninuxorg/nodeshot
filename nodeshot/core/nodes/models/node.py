@@ -6,9 +6,11 @@ from django.core.exceptions import ValidationError
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.managers import GeoAccessLevelPublishedManager
 from nodeshot.core.base.utils import choicify
-from ..signals import node_status_changed
 
-from choices import NODE_STATUS
+from ..signals import node_status_changed
+from .status import Status
+
+#from choices import NODE_STATUS
 
 
 class Node(BaseAccessLevel):
@@ -18,16 +20,12 @@ class Node(BaseAccessLevel):
     name = models.CharField(_('name'), max_length=75, unique=True)
     slug = models.SlugField(max_length=75, db_index=True, unique=True)
     address = models.CharField(_('address'),max_length=150,blank=True, null=True)
-    status = models.SmallIntegerField(_('status'), max_length=3, choices=choicify(NODE_STATUS), default=NODE_STATUS.get(settings.NODESHOT['DEFAULTS']['NODE_STATUS'], 'potential'))
+    status = models.ForeignKey(Status, blank=True, null=True)
     is_published = models.BooleanField(default=settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True))
     
     if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
         # layer might need to be able to be blank, would require custom validation
         layer = models.ForeignKey('layers.Layer')
-    
-    if 'nodeshot.interoperability' in settings.INSTALLED_APPS:
-        # add reference to the external layer's ID
-        external_id = models.PositiveIntegerField(blank=True, null=True)
     
     # nodes might be assigned to a foreign layer, therefore user can be left blank, requires custom validation
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
@@ -58,11 +56,6 @@ class Node(BaseAccessLevel):
         db_table = 'nodes_node'
         app_label= 'nodes'
         permissions = (('can_view_nodes', 'Can view nodes'),)
-        
-        # TODO: does this really have sense?
-        if 'nodeshot.interoperability' in settings.INSTALLED_APPS:
-            # the combinations of layer_id and external_id must be unique
-            unique_together = ('layer', 'external_id')
     
     def __unicode__(self):
         return '%s' % self.name
@@ -72,20 +65,28 @@ class Node(BaseAccessLevel):
         super(Node, self).__init__(*args, **kwargs)
         # set current status, but only if it is an existing node
         if self.pk:
-            self._current_status = self.status
+            self._current_status = self.status_id
     
     def clean(self , *args, **kwargs):
         """ call extensible validation """
         self.extensible_validation()
     
     def save(self, *args, **kwargs):
+        # if no status specified
+        if not self.status and not self.status_id:
+            try:
+                self.status = Status.objects.filter(is_default=True)[0]
+            except IndexError:
+                pass
+        
         super(Node, self).save(*args, **kwargs)
+        
         # if status of a node changes
-        if self.status != self._current_status:
+        if self.status and self._current_status and self.status.id != self._current_status:
             # send django signal
-            node_status_changed.send(sender=self, old_status=self._current_status, new_status=self.status)
+            node_status_changed.send(sender=self, old_status=Status.objects.get(pk=self._current_status), new_status=self.status)
         # update __current_status
-        self._current_status = self.status
+        self._current_status = self.status_id
     
     def extensible_validation(self):
         """

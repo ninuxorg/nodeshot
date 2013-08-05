@@ -50,6 +50,6 @@ if settings.DEBUG and settings.SERVE_STATIC:
     )
 
 
-urlpatterns += patterns('nodeshot.community.participation.views',
+urlpatterns += patterns('nodeshot.interface.views',
     url(r'^$', 'map_view', name='home'),
 )

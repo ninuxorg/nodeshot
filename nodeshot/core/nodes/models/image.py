@@ -3,13 +3,13 @@ import os
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from nodeshot.core.base.models import BaseOrdered
+from nodeshot.core.base.models import BaseOrderedACL
 from nodeshot.core.base.managers import AccessLevelManager
 
 from . import Node
 
 
-class Image(BaseOrdered):
+class Image(BaseOrderedACL):
     """
     Images of a 'Node'
     """
@@ -28,6 +28,10 @@ class Image(BaseOrdered):
     
     def __unicode__(self):
         return self.file.name
+    
+    def get_auto_order_queryset(self):
+        """ overriding a BaseOrdered Abstract Model method """
+        return self.__class__.objects.filter(node=self.node)
     
     def delete(self, *args, **kwargs):
         """ delete image when an image record is deleted """

@@ -8,6 +8,8 @@ import simplejson as json
 from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import *
@@ -18,7 +20,7 @@ User = get_user_model()
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.base.tests import user_fixtures, BaseTestCase
 
-from .models import Node, Image
+from .models import *
 
 
 
@@ -28,9 +30,47 @@ class ModelsTest(TestCase):
         'initial_data.json',
         user_fixtures,
         'test_layers.json',
+        'test_status.json',
         'test_nodes.json',
         'test_images.json'
     ]
+    
+    def test_status_model(self):
+        """ test status model internal mechanism works correctly """
+        for status in Status.objects.all():
+            status.delete()
+        
+        testing = Status(name='testing', slug='testing', description='slug')
+        testing.save()
+        
+        self.assertEqual(testing.order, 0)
+        self.assertEqual(testing.is_default, True)
+        
+        active = Status(name='active', slug='active', description='active')
+        active.save()
+        
+        self.assertEqual(active.order, 1)
+        self.assertEqual(active.is_default, False)
+        
+        pending = Status(name='pending', slug='pending', description='pending')
+        pending.save()
+        
+        self.assertEqual(pending.order, 2)
+        self.assertEqual(pending.is_default, False)
+        
+        pending.is_default = True
+        pending.save()
+        
+        default_statuses = Status.objects.filter(is_default=True)
+        self.assertEqual(default_statuses.count(), 1)
+        self.assertEqual(default_statuses[0].pk, pending.pk)
+        
+        unconfirmed = Status(name='unconfirmed', slug='unconfirmed', description='unconfirmed', is_default=True)
+        unconfirmed.save()
+        
+        default_statuses = Status.objects.filter(is_default=True)
+        self.assertEqual(default_statuses.count(), 1)
+        self.assertEqual(default_statuses[0].pk, unconfirmed.pk)
     
     def test_current_status(self):
         """ test that node._current_status is none for new nodes """
@@ -38,12 +78,12 @@ class ModelsTest(TestCase):
         self.failUnlessEqual(n._current_status, None, 'new node _current_status private attribute is different than None')
         #self.failUnlessEqual(n._current_hotspot, None, 'new node _current_status private attribute is different than None')
         n = Node.objects.all()[0]
-        self.failUnlessEqual(n._current_status, n.status, 'new node _current_status private attribute is different than status')
-        n.status = 2
-        self.failIfEqual(n._current_status, n.status, 'new node _current_status private attribute is still equal to status')
+        self.failUnlessEqual(n._current_status, n.status.id, 'new node _current_status private attribute is different than status')
+        n.status = Status.objects.get(pk=2)
+        self.failIfEqual(n._current_status, n.status.id, 'new node _current_status private attribute is still equal to status')
         n.save()
-        self.failUnlessEqual(n._current_status, n.status, 'new node _current_status private attribute is different than status')
-        n.status = 3
+        self.failUnlessEqual(n._current_status, n.status.id, 'new node _current_status private attribute is different than status')
+        n.status = Status.objects.get(pk=3)
         n.save()
     
     def test_node_manager(self):
@@ -98,6 +138,72 @@ class ModelsTest(TestCase):
         """ test manager methods of Image model """
         # admin can see all the images
         self.assertEqual(Image.objects.all().count(), Image.objects.accessible_to(user=1).count())
+    
+    def test_image_auto_order(self):
+        """ test image automatic ordering works correctly """
+        # node #3 has already 2 images, therefore the new image auto order should be set to 2
+        image = Image(node_id=3, file='test3.jpg')
+        image.full_clean()
+        image.save()
+        self.assertEqual(image.order, 2)
+        
+        # node #2 does not have any image, therefore the new image auto order should be set to 0
+        image = Image(node_id=2, file='test2.jpg')
+        image.full_clean()
+        image.save()
+        self.assertEqual(image.order, 0)
+    
+    def test_status_icon_validation(self):
+        """ test StatusIcon custom validation """
+        status = Status(name='test', slug='test', description='test')
+        status.save()
+        
+        icon = StatusIcon(status=status, marker='circle')
+        
+        try:
+            icon.full_clean()
+            self.fail('ValidationError not raised')
+        except ValidationError as e:
+            self.assertIn(_('circle colour info is missing'), e.messages)
+        
+        icon.background_color = '#000'
+        icon.foreground_color = '#FFF'
+        icon.full_clean()
+        icon.save()
+        
+        icon.marker = 'icon'
+        #icon.icon = 'file.jpg'
+        
+        try:
+            icon.full_clean()
+            self.fail('ValidationError not raised')
+        except ValidationError as e:
+            self.assertIn(_('icon image is missing'), e.messages)
+        
+        icon.save()
+        # get again from DB
+        icon = StatusIcon.objects.get(pk=icon.pk)
+        
+        # ensure colour info is reset after marker has switched to icon
+        self.assertEqual(icon.background_color, '')
+        self.assertEqual(icon.foreground_color, '')
+        
+        icon.marker = 'circle'
+        icon.save()
+        
+        self.assertEqual(icon.icon, None)
+        
+        icon2 = StatusIcon(
+            status=status, marker='circle',
+            background_color='#000',
+            foreground_color='#FFF'
+        )
+        
+        try:
+            icon2.full_clean()
+            self.fail('ValidationError not raised')
+        except ValidationError as e:
+            self.assertIn(_('Status "%s" already has a default icon' % status.name), e.messages)
 
 
 ### ------ API tests ------ ###
@@ -109,6 +215,7 @@ class APITest(BaseTestCase):
         'initial_data.json',
         user_fixtures,
         'test_layers.json',
+        'test_status.json',
         'test_nodes.json',
         'test_images.json'
     ]
@@ -362,7 +469,7 @@ class APITest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         
         # Node update should succeed because layer area is disabled
-        layer.area=None
+        layer.area = None
         layer.save()
         json_data['coords'] = "50,50";
         url = reverse('api_node_details', args=[node_slug])

@@ -22,6 +22,7 @@ class ParticipationModelsTest(TestCase):
         'initial_data.json',
         user_fixtures,
         'test_layers.json',
+        'test_status.json',
         'test_nodes.json',
         'test_images.json'
     ]
@@ -300,7 +301,7 @@ class ParticipationModelsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
         
-        #POST
+        # POST
         
         login=self.client.login(username='admin', password='tester')
         good_post_data= { "vote": "1" }
@@ -309,23 +310,36 @@ class ParticipationModelsTest(TestCase):
         response = self.client.post(wrong_url, good_post_data)
         self.assertEqual(response.status_code, 404)
         
-        #wrong POST data (wrong vote) -- 400
+        # wrong POST data (wrong vote) -- 400
         bad_post_data= { "vote": "3" }
         response = self.client.post(url, bad_post_data)
         self.assertEqual(response.status_code, 400)
         
-        #Correct  POST data and correct slug-- 201
+        # Correct  POST data and correct slug -- 201
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
-        # POST 201 - ensure additional post data "user" and "node" are ignored
-        bad_post_data = { "node": 100, "vote": "1", "user": 2 }
+        # POST 400 - repeating the same vote fails because unique_together
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 400)
+        
+        # POST 400 - repeating the same vote trying to change user and node fails
+        # cos node and user params are ignored, so the system returns 400 because
+        # this user has already voted that node
+        bad_post_data = { "node": 100, "vote": "1", "user": 3 }
         response = self.client.post(url, bad_post_data)
+        self.assertEqual(response.status_code, 400)
+        
+        # POST 201 - ensure additional post data "user" and "node" are ignored
+        response = self.client.post(reverse('api_node_votes', args=['eigenlab']), bad_post_data)
         self.assertEqual(response.status_code, 201)
         votes_dict = json.loads(response.content)
         self.assertEqual(votes_dict['user'], 1)
-        self.assertEqual(votes_dict['node'], 1)
+        self.assertEqual(votes_dict['node'], 2)
         self.assertEqual(votes_dict['vote'], 1)
+        
+        url = reverse('api_node_votes', args=['tulug'])
+        node = Node.objects.get(slug='tulug')
         
         # Voting not allowed on layer
         node.layer.participation_settings.voting_allowed = False
@@ -337,6 +351,10 @@ class ParticipationModelsTest(TestCase):
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
+        # delete last vote
+        vote = Vote.objects.all().order_by('-id')[0]
+        vote.delete()
+        
         # Voting not allowed on node
         node.participation_settings.voting_allowed = False
         node.participation_settings.save()
@@ -347,7 +365,7 @@ class ParticipationModelsTest(TestCase):
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
-        #User not allowed -- 403
+        # User not allowed -- 403
         self.client.logout()
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 403)
@@ -437,5 +455,3 @@ class ParticipationModelsTest(TestCase):
         login=self.client.login(username='admin', password='tester')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
-            
-    

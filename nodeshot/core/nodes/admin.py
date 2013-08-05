@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
-from nodeshot.core.nodes.models import Node, Image
+from nodeshot.core.nodes.models import *
 from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline
 from nodeshot.core.base.widgets import AdvancedFileInput
 
@@ -30,6 +31,7 @@ class NodeAdmin(BaseGeoAdmin):
     list_display  = ('name', 'status', 'access_level', 'is_published', 'added', 'updated')
     list_filter   = NODE_FILTERS
     search_fields = ('name',)
+    actions_on_bottom = True
     date_hierarchy = 'added'
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
@@ -48,17 +50,53 @@ class NodeAdmin(BaseGeoAdmin):
                 '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
             ]
         
-        # since django-grappelli enables the HTML editor for each text field
-        # and since notes is a text field but we do not want it to be a rich
-        # html field we will disable it this way so we don't have to create
-        # a custom template for this Admin class
+        # enable editor for "node description" only
         def formfield_for_dbfield(self, db_field, **kwargs):
             field = super(NodeAdmin, self).formfield_for_dbfield(db_field, **kwargs)
             
-            if db_field.name == 'notes':
-                field.widget.attrs['class'] = 'mceNoEditor %s' % field.widget.attrs.get('class', '')
+            if db_field.name == 'description':
+                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
             
             return field
 
 
+class StatusIconInline(admin.StackedInline):
+    model = StatusIcon
+    extra = 0
+    
+    formfield_overrides = {
+        models.ImageField: {'widget': AdvancedFileInput(image_width='auto')},
+    }
+    
+    if 'grappelli' in settings.INSTALLED_APPS:
+        classes = ('grp-collapse grp-open', )
+        inline_classes = ('grp-collapse grp-open',) 
+
+
+class StatusAdmin(admin.ModelAdmin):
+    list_display  = ('name', 'slug', 'description', 'order', 'is_default')
+    prepopulated_fields = {'slug': ('name',)}
+    list_editable = ('order', )
+    inlines = [StatusIconInline]
+    
+    change_list_template = 'smuggler/change_list.html'
+
+
 admin.site.register(Node, NodeAdmin)
+admin.site.register(Status, StatusAdmin)
+
+
+# disable celery admin if not needed
+if getattr(settings, 'CELERYBEAT_SCHEDULER', None) != 'djcelery.schedulers.DatabaseScheduler':
+    from djcelery.models import (
+        TaskState, WorkerState, PeriodicTask, IntervalSchedule, CrontabSchedule
+    )
+
+    try:
+        admin.site.unregister(TaskState)
+        admin.site.unregister(WorkerState)
+        admin.site.unregister(IntervalSchedule)
+        admin.site.unregister(CrontabSchedule)
+        admin.site.unregister(PeriodicTask) 
+    except admin.sites.NotRegistered:
+        raise ImproperlyConfigured('django-celery (djcelery) is either not installed or does not come before nodeshot in settings.INSTALLED_APPS')

@@ -5,7 +5,7 @@
         "fields": {
             "access_level": 0,
             "node": 1,
-            "order": 1,
+            "order": 0,
             "file": "test1.jpeg"
         }
     },
@@ -15,7 +15,7 @@
         "fields": {
             "access_level": 0,
             "node": 1,
-            "order": 2,
+            "order": 1,
             "file": "test2.jpeg"
         }
     },
@@ -25,7 +25,7 @@
         "fields": {
             "access_level": 1,
             "node": 3,
-            "order": 3,
+            "order": 0,
             "file": "test3.jpeg"
         }
     },
@@ -35,7 +35,7 @@
         "fields": {
             "access_level": 0,
             "node": 3,
-            "order": 4,
+            "order": 1,
             "file": "test4.jpeg"
         }
     },
@@ -45,7 +45,7 @@
         "fields": {
             "access_level": 2,
             "node": 1,
-            "order": 5,
+            "order": 2,
             "file": "test5.jpeg"
         }
     }

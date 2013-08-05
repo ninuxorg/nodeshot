@@ -10,6 +10,9 @@ urlpatterns = patterns('nodeshot.core.nodes.views',
     # images
     url(r'^/nodes/(?P<slug>[-\w]+)/images/$', 'node_images', name='api_node_images'),
     url(r'^/nodes/(?P<slug>[-\w]+)/images/(?P<pk>[0-9]+)/$', 'node_image_detail', name='api_node_image_detail'),
+    
+    # status
+    url(r'^/status/$', 'status_list', name='api_status_list'),
 )
 
 #urlpatterns = format_suffix_patterns(urlpatterns)

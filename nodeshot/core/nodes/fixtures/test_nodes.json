@@ -15,9 +15,8 @@
             "user": [
                 "romano"
             ], 
-            "elev": 80.0, 
-            "address": "Viale della Bella Villa, 94", 
-            "external_id": null, 
+            "elev": 80.0,
+            "address": "Viale della Bella Villa",
             "slug": "fusolab", 
             "is_published": true
         }
@@ -39,8 +38,8 @@
                     "pisano"
                 ], 
                 "elev": 80.0, 
-                "address": "", 
-                "external_id": null, 
+                "address": "",
+              
                 "slug": "eigenlab", 
                 "is_published": true
             }
@@ -63,7 +62,7 @@
                 ], 
                 "elev": 25.0, 
                 "address": "", 
-                "external_id": null, 
+                 
                 "slug": "tulug", 
             "is_published": true
         }
@@ -72,7 +71,7 @@
         "pk": 4, 
         "model": "nodes.node", 
         "fields": {
-          "status": 0, 
+          "status": 1, 
           "updated": "2013-06-20T11:37:11.841Z", 
           "added": "2013-06-14T13:30:29.323Z", 
           "name": "Potenziale Romano", 
@@ -86,7 +85,7 @@
           ], 
           "elev": 80.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "potenziale-romano", 
           "is_published": true
         }
@@ -95,7 +94,7 @@
         "pk": 5, 
         "model": "nodes.node", 
         "fields": {
-          "status": 0, 
+          "status": 1, 
           "updated": "2013-06-20T13:21:36.284Z", 
           "added": "2013-06-14T13:30:29.323Z", 
           "name": "Potenziale Pisano", 
@@ -109,7 +108,7 @@
           ], 
           "elev": 80.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "potenziale-pisano", 
           "is_published": true
         }
@@ -118,7 +117,7 @@
         "pk": 6, 
         "model": "nodes.node", 
         "fields": {
-          "status": 0, 
+          "status": 1, 
           "updated": "2013-06-20T11:42:43.583Z", 
           "added": "2013-06-14T13:30:29.323Z", 
           "name": "Potenziale Viterbo", 
@@ -132,7 +131,7 @@
           ], 
           "elev": 25.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "potenziale-viterbo", 
           "is_published": true
         }
@@ -155,7 +154,7 @@
           ], 
           "elev": 160.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "pomezia", 
           "is_published": true
         }
@@ -178,7 +177,7 @@
           ], 
           "elev": 650.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "rdp", 
           "is_published": true
         }
@@ -201,7 +200,7 @@
           ], 
           "elev": 250.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "hidden-rome", 
           "is_published": true
         }
@@ -224,7 +223,7 @@
           ], 
           "elev": 150.0, 
           "address": "", 
-          "external_id": null, 
+           
           "slug": "registered-rome", 
           "is_published": true
         }

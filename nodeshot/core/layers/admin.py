@@ -2,6 +2,7 @@ from django.contrib.gis import admin
 from django.conf import settings
 
 from nodeshot.core.base.admin import BaseGeoAdmin
+from nodeshot.core.nodes.admin import StatusIconInline
 from models import Layer
 
 
@@ -11,6 +12,9 @@ class LayerAdmin(BaseGeoAdmin):
     search_fields = ('name', 'description', 'organization', 'email')
     filter_horizontal = ('mantainers',)
     prepopulated_fields = {'slug': ('name',)}
+    inlines = [StatusIconInline]
+    
+    change_list_template = 'smuggler/change_list.html'
     
     # Enable TinyMCE HTML Editor according to settings, defaults to True
     if settings.NODESHOT['SETTINGS'].get('LAYER_TEXT_HTML', True) is True: 
@@ -23,17 +27,14 @@ class LayerAdmin(BaseGeoAdmin):
                 '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
             ]
         
-        # since django-grappelli enables the HTML editor for each text field
-        # and since notes is a text field but we do not want it to be a rich
-        # html field we will disable it this way so we don't have to create
-        # a custom template for this Admin class
-        #def formfield_for_dbfield(self, db_field, **kwargs):
-        #    field = super(LayerAdmin, self).formfield_for_dbfield(db_field, **kwargs)
-        #    
-        #    if db_field.name in ['center', 'area']:
-        #        field.widget.attrs['class'] = 'mceNoEditor %s' % field.widget.attrs.get('class', '')
-        #    
-        #    return field
+        # enable editor for "extended text description" only
+        def formfield_for_dbfield(self, db_field, **kwargs):
+            field = super(LayerAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+            
+            if db_field.name == 'text':
+                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
+            
+            return field
 
 
 admin.site.register(Layer, LayerAdmin)

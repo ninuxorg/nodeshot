@@ -274,6 +274,8 @@ node_votes = NodeVotesList.as_view()
 
 
 from django.shortcuts import render
+from django.conf import settings
 
 def map_view(request):
+    
     return render(request, 'participation/index.html')

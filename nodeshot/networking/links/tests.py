@@ -17,6 +17,7 @@ class LinkTest(TestCase):
         'initial_data.json',
         'test_users.json',
         'test_layers.json',
+        'test_status.json',
         'test_nodes.json',
         'test_routing_protocols.json',
         'test_devices.json',

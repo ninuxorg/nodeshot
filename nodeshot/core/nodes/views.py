@@ -1,14 +1,16 @@
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 from rest_framework import permissions, authentication, generics
 from rest_framework.response import Response
 
-from nodeshot.core.base.mixins import ACLMixin,CustomDataMixin
+from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
 
-from .models import Node, Image
 from .permissions import IsOwnerOrReadOnly
 from .serializers import *
+from .models import *
 
 from vectorformats.Formats import Django, GeoJSON
 import simplejson as json
@@ -150,15 +152,13 @@ class NodeGeojsonList(generics.ListAPIView):
     
     Retrieve nodes in GeoJSON format.
     """
-    paginate_by_param = 'results'
-    serializer_class = GeojsonNodeListSerializer
     
     def get(self, request, *args, **kwargs):
         """
         TODO: improve readability and cleanup
         """
         node = Node.objects.published().accessible_to(request.user)
-        dj = Django.Django(geodjango="coords", properties=['slug','name', 'address','description'])
+        dj = Django.Django(geodjango="coords", properties=['slug', 'name', 'address', 'description'])
         geojson = GeoJSON.GeoJSON()
         string = geojson.encode(dj.decode(node))  
         
@@ -267,3 +267,22 @@ class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     
 
 node_image_detail = ImageDetail.as_view()
+
+
+### ------ Status ------ ###
+
+
+class StatusList(generics.ListAPIView):
+    """
+    ### GET
+    
+    Retrieve all the status and their relative icons.
+    """
+    model = Status
+    serializer_class = StatusListSerializer
+    
+    @method_decorator(cache_page(86400))  # cache for 1 day
+    def dispatch(self, *args, **kwargs):
+        return super(StatusList, self).dispatch(*args, **kwargs)
+    
+status_list = StatusList.as_view()

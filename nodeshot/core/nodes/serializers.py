@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+
 from rest_framework import serializers, pagination
+from rest_framework.reverse import reverse
 
 from nodeshot.core.base.fields import PointField
-from rest_framework.reverse import reverse
 from nodeshot.core.layers.models import Layer
-from .models import Node,Image
+
+from .models import *
 
 
 __all__ = [
@@ -13,53 +15,18 @@ __all__ = [
     'NodeCreatorSerializer',
     'NodeDetailSerializer',
     'PaginatedNodeListSerializer',
-    #'LinksSerializer',
-    'GeojsonNodeListSerializer',
     'ImageListSerializer',
     'ImageAddSerializer',
-    'ImageEditSerializer'
-    
+    'ImageEditSerializer',
+    'StatusListSerializer'
 ]
-  
-  
-#class LinksSerializer(serializers.Serializer):
-#    
-#    next = pagination.NextPageField(source='*')
-#    prev = pagination.PreviousPageField(source='*')
-#
-#
-#class NodePaginationSerializer(pagination.BasePaginationSerializer):
-#
-#    links = LinksSerializer(source='*')  # Takes the page object as the source
-#    total_results = serializers.Field(source='paginator.count')
-#    results_field = 'nodes'   
-
-
-class GeojsonNodeListSerializer(serializers.Serializer):
-    
-    #user= serializers.Field(source='user.username')
-    #layer = serializers.Field(source='layer.name')
-    
-    #details = serializers.HyperlinkedIdentityField(view_name='api_node_details', slug_field='slug')
-    
-    class Meta:
-        model = Node
-        #crs=serializers.Field()
-        #type=serializers.Field()
-        #features=serializers.Field()
-
-    #    
-    #    if settings.NODESHOT['SETTINGS']['NODE_AREA']:
-    #        fields += ['area']
-    #    
-    #    fields += ['details']
-        
-        #fields = ('layer', 'name', 'slug', 'user', 'coords', 'elev', 'details')
 
 
 class NodeListSerializer(serializers.ModelSerializer):
     
     user = serializers.Field(source='user.username')
+    status = serializers.Field(source='status.slug')
+    layer_name = serializers.Field(source='layer.name')
     layer_details = serializers.HyperlinkedRelatedField(source='layer.slug',
                                         many=False, read_only=True, view_name='api_layer_detail')
     coords = PointField(label=_('coordinates'))
@@ -69,7 +36,7 @@ class NodeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = [
-            'layer', 'name', 'slug', 'user',
+            'name', 'slug', 'layer', 'layer_name', 'user', 'status',
             'coords', 'elev', 'address', 'description'
         ]
         
@@ -88,6 +55,7 @@ class PaginatedNodeListSerializer(pagination.PaginationSerializer):
 class NodeDetailSerializer(serializers.ModelSerializer):
     """ node detail """
     user = serializers.Field(source='user.username')
+    status = serializers.Field(source='status.slug')
     coords = PointField()
     layer_name = serializers.Field(source='layer.name')
     layer_details = serializers.HyperlinkedRelatedField(view_name='api_layer_detail', source='layer', read_only=True)
@@ -100,7 +68,7 @@ class NodeDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = [
-            'name', 'slug', 'user',
+            'name', 'slug', 'status', 'user',
             'coords', 'elev', 'address', 'description',
             'access_level', 'layer', 'layer_name', 'added', 'updated',
             'layer_details', 'images', 
@@ -172,3 +140,23 @@ class ImageEditSerializer(ImageListSerializer):
         model = Image
         fields = ('id', 'file_url', 'description', 'order', 'access_level', 'added', 'updated', 'uri')
         read_only_fields = ('file', 'added', 'updated')
+
+
+# --------- Status --------- #
+
+
+class StatusIconSerializer(serializers.ModelSerializer):
+    """ status icons """
+    
+    class Meta:
+        model = StatusIcon
+
+
+class StatusListSerializer(serializers.ModelSerializer):
+    """ status list """
+    
+    icons = StatusIconSerializer(source='statusicon_set', many=True, read_only=True)
+    
+    class Meta:
+        model = Status
+        fields = ['id', 'name', 'slug', 'description', 'icons']

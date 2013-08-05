@@ -137,6 +137,15 @@ INSTALLED_APPS = (
     'grappelli',
     'django.contrib.admin',
     
+    # --- background jobs --- #
+    'djcelery_email',  # Celery Django Email Backend
+    'djcelery',  # Celery database scheduling for Django
+    # this app makes it possible to use django as a queue system for celery
+    # so you don't need to install RabbitQM or Redis
+    # pretty cool for development, but might not suffice for production if your system is heavily used
+    # our suggestion is to switch only if you start experiencing issues
+    'kombu.transport.django',
+    
     # nodeshot
     'nodeshot.core.api',
     'nodeshot.core.layers',
@@ -271,6 +280,17 @@ EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025  # 1025 if you are in development mode, while 25 is usually the production port
 DEFAULT_FROM_EMAIL = 'your@email.org'
 
+# ------ CELERY SCHEDULED JOBS ------ #
+
+#from datetime import timedelta
+#
+#CELERYBEAT_SCHEDULE = {
+#    'synchronize': {
+#        'task': 'interoperability.tasks.synchronize_external_layers',
+#        'schedule': timedelta(hours=12),
+#    }
+#}
+
 # ------ NODESHOT ------ #
 
 # https://docs.djangoproject.com/en/dev/topics/i18n/translation/
@@ -329,7 +349,6 @@ NODESHOT = {
         # default map zoom level when creating new zones
         'MAP_ZOOM': 12,
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
-        'NODE_STATUS': 'potential',
         'NODE_PUBLISHED': True,
         'ZONE_ZOOM': 12,
         'ZONE_MINIMUM_DISTANCE': 0,
@@ -348,7 +367,9 @@ NODESHOT = {
     'INTEROPERABILITY': [
         ('nodeshot.interoperability.synchronizers.NodeshotOld', 'Nodeshot 0.9'),
         ('nodeshot.interoperability.synchronizers.OpenWISP', 'OpenWISP'),
+        ('nodeshot.interoperability.synchronizers.OpenWISPCitySDK', 'OpenWISPCitySDK'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
+        ('nodeshot.interoperability.synchronizers.ProvinciaWIFICitySDK', 'ProvinciaWIFICitySDK'),
     ]
 }
 

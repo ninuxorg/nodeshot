@@ -8,6 +8,7 @@ from django import forms
 from django.db import models
 from django.utils.text import capfirst
 from django.core import exceptions
+from django.conf import settings
 
 
 class MultiSelectFormField(forms.MultipleChoiceField):
@@ -92,11 +93,36 @@ class MultiSelectField(models.Field):
         return self.get_db_prep_value(value)
 
 
+# taken from django-colorful
+# https://github.com/charettes/django-colorful
+import re
+from django.forms.fields import RegexField
+from .widgets import ColorFieldWidget
+
+RGB_REGEX = re.compile('^#?((?:[0-F]{3}){1,2})$', re.IGNORECASE)
+
+class RGBColorField(models.CharField):
+
+    widget = ColorFieldWidget
+
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 7
+        super(RGBColorField, self).__init__(*args, **kwargs)
+
+    def formfield(self, **kwargs):
+        kwargs.update({
+                       'form_class': RegexField,
+                       'widget': self.widget,
+                       'regex': RGB_REGEX
+                       })
+        return super(RGBColorField, self).formfield(**kwargs)
+
+
 # needed for South compatibility
-from django.conf import settings
 if 'south' in settings.INSTALLED_APPS:
-    from south.modelsinspector import add_introspection_rules  
+    from south.modelsinspector import add_introspection_rules
     add_introspection_rules([], ["^coop\.utils\.fields\.MultiSelectField"])
+    add_introspection_rules([], ["^nodeshot\.core\.base\.fields\.RGBColorField"])
 
 
 # rest_framework point field

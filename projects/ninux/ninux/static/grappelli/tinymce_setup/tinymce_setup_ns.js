@@ -25,7 +25,7 @@ tinyMCE.init({
     // see http://www.tinymce.com/wiki.php/Configuration
     
     // Init
-    selector: 'textarea.vLargeTextField :not(#id_external-0-config)',
+    selector: 'textarea.html-editor',
     theme: 'advanced',
     skin: 'grappelli',
     
@@ -44,7 +44,7 @@ tinyMCE.init({
     file_browser_callback: 'CustomFileBrowser',
     
     // Cleanup/Output
-    element_format: 'xhtml',
+    element_format: 'html',
     fix_list_elements: true,
     forced_root_block: 'p',
     // style formsts overrides theme_advanced_styles
