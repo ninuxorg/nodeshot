@@ -228,11 +228,12 @@ function markerConfirm(marker) {
 /*
  * Opens node's insertion form
  */
-	var areaLayer=L.geoJson(geojsonlayers);
-	results = leafletPip.pointInLayer(markerLocation, areaLayer,false);
+	
 	
 	$("#insertMarker").html('');
 	
+	var areaLayer=L.geoJson(geojsonlayers);
+	var results = leafletPip.pointInLayer(markerLocation, areaLayer,false);
 	switch(results.length)
 {
 case 0:
@@ -398,28 +399,38 @@ function populateNodeDiv(nodeSlug,create) {
 		nodeDiv = document.createElement('div');
 		nodeDiv.id=nodeSlug;	
 	}
+
+	var node=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug);
+	var nodeName=node.name;
+	var nodeAddress=node.address;
+	var nodeLayer=node.layer;
+	//alert (nodeLayer)
+	for (var i in layers) {
+		if (layers[i].id==nodeLayer) {
+			var layerSlug= (layers[i].slug)
+		}
+	}
 	
+	$(nodeDiv).append('<strong>'+nodeName+'</strong><br>');
+	$(nodeDiv).append(nodeAddress+'<br>');
+
 	
 	
 	if (participation === "True") {
 		
 	
 		var nodeSettings=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/participation_settings/');
+		var layerSettings=   getData(window.__BASEURL__+'api/v1/layers/'+layerSlug+'/participation_settings/');
 		
+		var layerVotingAllowed=layerSettings.participation_settings["voting_allowed"]
+		var layerRatingAllowed=layerSettings.participation_settings["rating_allowed"]
+		var layerCommentsAllowed=layerSettings.participation_settings["comments_allowed"]
 		
+		var nodeVotingAllowed=nodeSettings.participation_settings["voting_allowed"]
+		var nodeRatingAllowed=nodeSettings.participation_settings["rating_allowed"]
+		var nodeCommentsAllowed=nodeSettings.participation_settings["comments_allowed"]
 		
-		var voting_allowed=nodeSettings.participation_settings["voting_allowed"]
-		var rating_allowed=nodeSettings.participation_settings["rating_allowed"]
-		var comments_allowed=nodeSettings.participation_settings["comments_allowed"]
-		console.log(comments_allowed,rating_allowed,voting_allowed)
-		var node=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/participation/');
-		var nodeName=node.name;
-		var nodeAddress=node.address;
-	
-		$(nodeDiv).append('<strong>'+nodeName+'</strong><br>');
-		$(nodeDiv).append(nodeAddress+'<br>');
-		
-	
+		node=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/participation/');
 		
 		var nodeRatingCount=node.participation.rating_count;
 		var nodeLikes=node.participation.likes;
@@ -429,13 +440,13 @@ function populateNodeDiv(nodeSlug,create) {
 		
 		nodeRatingAVG=node.participation.rating_avg;
 		
-		if (rating_allowed == true) {
+		if (layerRatingAllowed && nodeRatingAllowed == true) {
 			
 			$(nodeDiv).append('<strong>Rating:</strong><br>');
 			$(nodeDiv).append('<div id="star"></div>');
 		}
 		
-		if (voting_allowed == true) {
+		if (layerVotingAllowed && nodeVotingAllowed == true) {
 				
 			$(nodeDiv).append('<strong>Votes:</strong><br>');
 			$(nodeDiv).append('In favour: <strong>'+nodeLikes+'</strong><br>');
@@ -447,7 +458,7 @@ function populateNodeDiv(nodeSlug,create) {
 			$(nodeDiv).append('<button class="vote" onclick=postVote(\''+nodeSlug+'\',\''+dislike+'\')>Against</button><br>');
 		}
 		
-		if (comments_allowed == true) {
+		if (layerCommentsAllowed && nodeCommentsAllowed == true) {
 			
 			$(nodeDiv).append('<strong>Comments:</strong><br>');
 			$(nodeDiv).append('<a onclick=showComments("'+nodeSlug+'");>comments: '+ nodeComments +'</a><br>');
@@ -459,15 +470,7 @@ function populateNodeDiv(nodeSlug,create) {
 				
 	
 	}
-	else
-	{
-		var node=   getData(window.__BASEURL__+'api/v1/nodes/'+nodeSlug);
-		var nodeName=node.name;
-		var nodeAddress=node.address;
 	
-		$(nodeDiv).append('<strong>'+nodeName+'</strong><br>');
-		$(nodeDiv).append(nodeAddress+'<br>');
-	}
 	return(nodeDiv,nodeRatingAVG)
 
 }
@@ -641,7 +644,7 @@ function addToList(data) {
         var marker = markerMap[slug];
 	//console.log(marker.toGeoJSON());
         //marker.openPopup(marker.getLatLng());
-	populateNodeDiv(slug,1);
+	populateNodeDiv(slug,"true");
         marker.addTo(map)
 	marker.bindPopup(nodeDiv)
 	populateRating(slug,nodeDiv,nodeRatingAVG)
