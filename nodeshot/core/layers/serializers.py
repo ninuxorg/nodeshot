@@ -77,4 +77,5 @@ class LayerNodeListSerializer(LayerDetailSerializer):
     
     class Meta:
         model = Layer
+
         fields = ('name', 'description', 'text', 'organization', 'website')

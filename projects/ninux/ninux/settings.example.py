@@ -161,6 +161,7 @@ INSTALLED_APPS = (
     'nodeshot.networking.hardware',
     'nodeshot.networking.planning',
     'nodeshot.networking.monitor',
+    'nodeshot.interface',
     
     # 3d parthy django apps
     'rest_framework',
@@ -420,7 +421,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.user.get_username',
     'social_auth.backends.pipeline.user.create_user',
     'social_auth.backends.pipeline.social.associate_user',
-    'nodeshot.community.profiles.pipeline.load_extra_data',
+    'nodeshot.community.profiles.social_auth_extra.pipeline.load_extra_data',
     'social_auth.backends.pipeline.user.update_user_details'
 )
 

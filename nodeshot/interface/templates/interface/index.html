@@ -1,0 +1,144 @@
+{% load staticfiles %}
+
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="{% static 'interface/css/bootstrap.css' %}" />
+
+       <style>
+            body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
+        </style>
+
+	<link rel="stylesheet" href="{% static 'interface/css/bootstrap-responsive.css' %}" />
+	<link rel="stylesheet" href="{% static 'interface/css/main.css' %}" />
+        <!--<link rel="stylesheet" href="css/main.css">-->
+        <link rel="stylesheet" href="{% static 'interface/css/leaflet.css' %}" />
+
+
+        <script src="{% static 'interface/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js' %}"></script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
+
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="#">Nodeshot</a>
+                    <div class="nav-collapse collapse">
+                        
+                        <form id="userForm" class="navbar-form pull-right">
+			 {% if not user.is_authenticated %}
+                            <input id="user" class="span2" type="text" placeholder="Email">
+                            <input id="password" class="span2" type="password" placeholder="Password">
+                            <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
+							
+							<a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-info">Facebook Sign in</a>
+							<a href="{% url "socialauth_begin" "google" %}" class="btn btn-inverse">Google</a>
+			  {% else %}
+			  <font color="#FFFFFF">Hi {{ user }} </font>
+			   
+			    <button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>
+			 {% endif %}  
+                        </form>
+                    </div><!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+
+            <!-- Main hero unit for a primary marketing message or call to action -->
+<!--            <div class="hero-unit">
+                <h1>Hello, world!</h1>
+                <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+                <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+            </div>-->
+
+            <!-- Example row of columns -->
+            <div class="row">
+	       
+                <div class="span9">
+
+                <!--<p><a class="btn" href="#">View details &raquo;</a></p>-->
+              
+                <div id="map" style="width: 600px; height: 450px">
+		    <div id='loading'>Loading...</div>
+		   
+		</div>
+		 
+               </div>
+                <div class="span3">
+		    <div id="controls">
+			 Choose layer to get its node list:<br>
+			 <select id="selectLayerNodeList" onchange=createNodeList() class="layerList">
+			      <option value=" "> </option>
+			 </select>
+	  	    </div>
+		    <div id="nodelist">
+		    
+		</div>
+                    <div id='valori' >
+			 <div id="chooseLayer"></div>
+		    </div>
+		    
+
+
+		</div>
+                    <!--<p><a class="btn" href="#">View details &raquo;</a></p>-->
+                </div>
+            </div>
+
+            <hr>
+
+            <footer>
+               
+            </footer>
+
+        </div> <!-- /container -->
+
+        <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+<!--        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+-->
+	 <script>window.__BASEURL__ = '{% url "home" %}'</script>
+	<script>window.participation = '{{ participation }}'</script>
+        <script src="{% static 'interface/js/vendor/jquery-1.8.3.min.js' %}"></script>
+	<script src="{% static 'interface/js/vendor/jquery.tools.min.js' %}"></script>
+	<script src="{% static 'interface/js/vendor/jquery.cookie.js' %}"></script>
+        <script src="{% static 'interface/js/vendor/bootstrap.min.js' %}"></script>
+        <script src="{% static 'interface/js/vendor/leaflet.js' %}"></script>
+        <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
+        <script src="{% static 'interface/js/vendor/Google.js' %}"></script>
+        <script src="{% static 'interface/js/vendor/leaflet.markercluster-src.js' %}"></script>
+	 <script src="{% static 'interface/js/vendor/leaflet-pip.min.js' %}"></script>
+	<script src="{% static 'interface/js/vendor/imtech_pager.js' %}"></script>
+	<script type="text/javascript">  
+    $.myproject = {} // namespace
+    $.myproject.STATIC_URL = '{{ STATIC_URL }}';
+</script>
+	<script src="{% static 'interface/js/vendor/jquery.raty.js' %}"></script>
+        <!--<script type="text/javascript" src="leaflet/leaflet.ajax.js"></script>-->
+        <script src="{% static 'interface/js/functions.js' %}"></script>
+        <script src="{% static 'interface/js/main.js' %}"></script>
+ 
+
+    </body>
+</html>
