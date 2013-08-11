@@ -51,15 +51,15 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     
     Example of **JSON** representation that should be sent:
     
-    <pre>{
-        "name": "Fusolab Rome", 
-        "slug": "fusolab", 
-        "coords": [41.872041927700003, 12.582239191899999], 
-        "elev": 80.0, 
-        "address": "", 
-        "description": "Fusolab test", 
-        "layer": 1
-    }</pre>
+        {
+            "name": "Fusolab Rome", 
+            "slug": "fusolab", 
+            "coords": [41.872041927700003, 12.582239191899999], 
+            "elev": 80.0, 
+            "address": "", 
+            "description": "Fusolab test", 
+            "layer": 1
+        }
     
     **Required Fields**:
     
@@ -116,17 +116,17 @@ class NodeDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     
     Example of **JSON** representation that should be sent:
     
-    <pre>{
-        "name": "Fusolab Rome", 
-        "slug": "fusolab", 
-        "user": "romano", 
-        "coords": [41.872041927700003, 12.582239191899999], 
-        "elev": 80.0, 
-        "address": "", 
-        "description": "Fusolab test", 
-        "access_level": "public",
-        "layer": 1
-    }</pre>
+        {
+            "name": "Fusolab Rome", 
+            "slug": "fusolab", 
+            "user": "romano", 
+            "coords": [41.872041927700003, 12.582239191899999], 
+            "elev": 80.0, 
+            "address": "", 
+            "description": "Fusolab test", 
+            "access_level": "public",
+            "layer": 1
+        }
     
     **Required Fields**:
     
@@ -243,11 +243,11 @@ class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     
     Example of **JSON** representation that should be sent:
     
-    <pre>{
-        "description": "image caption", 
-        "order": 3,
-        "access_level": "public"
-    }</pre>
+        {
+            "description": "image caption", 
+            "order": 3,
+            "access_level": "public"
+        }
     """
     model = Image
     queryset = Image.objects.all()
