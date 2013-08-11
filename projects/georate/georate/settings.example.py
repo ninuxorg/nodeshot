@@ -160,6 +160,7 @@ INSTALLED_APPS = (
     
     # 3d parthy django apps
     'rest_framework',
+    'olwidget',  # geometry widgets
     'south',
     'debug_toolbar',
     'smuggler',
@@ -359,6 +360,7 @@ NODESHOT = {
             'nodeshot.core.nodes',
             'nodeshot.core.layers',
             'nodeshot.core.cms',
+            'nodeshot.community.profiles',
             'nodeshot.community.participation',
             'nodeshot.community.mailing',
         ]
@@ -407,6 +409,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.google.GoogleBackend',
+    'nodeshot.community.profiles.social_auth_extra.openwisp.OpenWISPBackend',
 )
 
 SOCIAL_AUTH_PIPELINE = (
@@ -419,16 +422,22 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.user.update_user_details'
 )
 
-SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google')
-FACEBOOK_APP_ID              = ''
-FACEBOOK_API_SECRET          = ''
+SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google', 'openwisp')
 
 SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
 SOCIAL_AUTH_UUID_LENGTH = 3
 SOCIAL_AUTH_SESSION_EXPIRATION = False
 SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
 
+# FACEBOOK APP SETTINGS
+#FACEBOOK_APP_ID              = 'c650e4985e8b3c9c18e68425149361d6'
+#FACEBOOK_API_SECRET          = 'c650e4985e8b3c9c18e68425149361d6'
 FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+
+# OpenWISP Oauth2 settings
+#OPENWISP_BASE_URL = 'http://youropenwisp.baseurl.com/'
+#OPENWISP_APP_ID = 'c650e4985e8b3c9c18e68425149361d6'
+#OPENWISP_API_SECRET = '6c95bffed32507ac41ebca73c5192da9'
 
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'

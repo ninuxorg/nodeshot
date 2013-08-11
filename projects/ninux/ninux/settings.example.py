@@ -165,6 +165,7 @@ INSTALLED_APPS = (
     
     # 3d parthy django apps
     'rest_framework',
+    'olwidget',  # geodjango better widgets
     'south',
     'debug_toolbar',
     'smuggler',
@@ -366,6 +367,7 @@ NODESHOT = {
             'nodeshot.core.nodes',
             'nodeshot.core.layers',
             'nodeshot.core.cms',
+            'nodeshot.community.profiles',
             'nodeshot.community.participation',
             'nodeshot.community.mailing',
         ]
