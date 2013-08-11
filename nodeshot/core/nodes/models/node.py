@@ -4,11 +4,18 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
-from nodeshot.core.base.managers import GeoAccessLevelPublishedManager
 from nodeshot.core.base.utils import choicify
 
 from ..signals import node_status_changed
 from .status import Status
+
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
+
+if HSTORE_ENABLED:
+    from django_hstore.fields import DictionaryField
+    from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as NodeManager
+else:
+    from nodeshot.core.base.managers import GeoAccessLevelPublishedManager as NodeManager
 
 
 class Node(BaseAccessLevel):
@@ -37,10 +44,13 @@ class Node(BaseAccessLevel):
     elev = models.FloatField(_('elevation'), blank=True, null=True)
     
     description = models.TextField(_('description'), max_length=255, blank=True, null=True)
-    notes = models.TextField(_('notes'), blank=True, null=True)
+    notes = models.TextField(_('notes'), blank=True, null=True, help_text=_('for internal use only'))
+    
+    if HSTORE_ENABLED:
+        data = DictionaryField(_('extra data'), null=True, blank=True, help_text=('store extra attributes'))
     
     # manager
-    objects = GeoAccessLevelPublishedManager()
+    objects = NodeManager()
     
     # this is needed to check if the status is changing
     # explained here:

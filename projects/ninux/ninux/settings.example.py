@@ -329,6 +329,8 @@ NODESHOT = {
         
         'ADMIN_MAP_COORDS': [41.8934, 12.4960],  # lat, lng
         'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin
+        
+        'HSTORE': True,  #  postgresql hstore types for extra data fields
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (
@@ -398,6 +400,7 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # ------ UNIT TESTING SPEED UP ------ #
 
+SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
 SOUTH_TESTS_MIGRATE = False
 
 if 'test' in sys.argv:

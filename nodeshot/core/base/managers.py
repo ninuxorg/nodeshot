@@ -8,8 +8,11 @@ from django.db.models import Manager, Q
 from django.contrib.gis.db.models import GeoManager
 from django.db.models.query import QuerySet
 from django.contrib.gis.db.models.query import GeoQuerySet
+from django.conf import settings
 
 from nodeshot.core.base.choices import ACCESS_LEVELS
+
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 
 ### ------ MIXINS ------ ###
@@ -100,6 +103,14 @@ class GeoAccessLevelPublishedQuerySet(GeoQuerySet, ACLMixin, PublishedMixin):
     pass
 
 
+if HSTORE_ENABLED:
+    from django_hstore.query import HStoreGeoQuerySet
+    
+    class HStoreGeoAccessLevelPublishedQuerySet(HStoreGeoQuerySet, ACLMixin, PublishedMixin):
+        """ AccessLevelQuerySet, PublishedQuerySet with GeoDjango queryset """
+        pass
+
+
 
 ### ------ MANAGERS ------ ###
 
@@ -147,3 +158,15 @@ class GeoAccessLevelPublishedManager(GeoManager, ExtendedManagerMixin, ACLMixin,
     
     def get_query_set(self): 
         return GeoAccessLevelPublishedQuerySet(self.model, using=self._db)
+
+
+if HSTORE_ENABLED:
+    from django_hstore.managers import HStoreGeoManager
+    
+    class HStoreGeoAccessLevelPublishedManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin, PublishedMixin):
+        """
+        HStoreManager, GeoManager, AccessLeveManager and Publishedmanager in one
+        """
+        
+        def get_query_set(self): 
+            return HStoreGeoAccessLevelPublishedQuerySet(self.model, using=self._db)
