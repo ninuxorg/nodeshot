@@ -4,6 +4,7 @@ nodeshot.core.api unit tests
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 
 
@@ -17,6 +18,7 @@ class ParticipationModelsTest(TestCase):
     
     def setUp(self):
        self.installed_apps = settings.INSTALLED_APPS
+       self.api_apps_enabled = settings.NODESHOT['API']['APPS_ENABLED']
     
     def test_root_endpoint(self):
         """
@@ -32,6 +34,12 @@ class ParticipationModelsTest(TestCase):
         # remove participation from INSTALLED_APPS
         settings.INSTALLED_APPS = [app for app in settings.INSTALLED_APPS if app != 'nodeshot.community.participation']
         
+        # ensure improperly configured because participation is enabled but is not in installed apps
+        with self.assertRaises(ImproperlyConfigured):
+            response = self.client.get(reverse('api_root_endpoint'))
+        
+        settings.NODESHOT['API']['APPS_ENABLED'] = [app for app in settings.NODESHOT['API']['APPS_ENABLED'] if app != 'nodeshot.community.participation']
+        
         # ensure participation URLs is not there
         response = self.client.get(reverse('api_root_endpoint'))
         self.assertNotContains(response, 'participation')
@@ -40,3 +48,4 @@ class ParticipationModelsTest(TestCase):
         self.assertContains(response, 'nodes')
         
         settings.INSTALLED_APPS = self.installed_apps
+        settings.NODESHOT['API']['APPS_ENABLED'] = self.api_apps_enabled
