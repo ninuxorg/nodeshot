@@ -19,7 +19,7 @@ class NodeExternal(models.Model):
     
     class Meta:
         db_table = 'nodes_external'
-        app_label= 'nodes'
+        app_label= 'interoperability'
         verbose_name = _('external node')
         verbose_name_plural = _('external node info')
 

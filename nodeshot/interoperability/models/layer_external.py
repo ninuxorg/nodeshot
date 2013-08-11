@@ -31,7 +31,7 @@ class LayerExternal(models.Model):
     
     class Meta:
         db_table = 'layers_external'
-        app_label= 'layers'
+        app_label= 'interoperability'
         verbose_name = _('external layer')
         verbose_name_plural = _('external layer info')
 
