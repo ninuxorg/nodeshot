@@ -20,7 +20,9 @@ else:
 
 class Node(BaseAccessLevel):
     """
-    Nodes of a network, can be assigned to 'Layers' and should belong to 'Users'
+    Nodes are generic geo-referenced records
+    Can be assigned to 'Layers' if nodeshot.core.layers is installed
+    Can belong to 'Users'
     """
     name = models.CharField(_('name'), max_length=75, unique=True)
     slug = models.SlugField(max_length=75, db_index=True, unique=True)
@@ -47,7 +49,8 @@ class Node(BaseAccessLevel):
     notes = models.TextField(_('notes'), blank=True, null=True, help_text=_('for internal use only'))
     
     if HSTORE_ENABLED:
-        data = DictionaryField(_('extra data'), null=True, blank=True, help_text=('store extra attributes'))
+        data = DictionaryField(_('extra data'), null=True, blank=True,
+                            help_text=('store extra attributes in JSON string'))
     
     # manager
     objects = NodeManager()

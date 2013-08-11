@@ -167,3 +167,35 @@ class PointField(WritableField):
         super(PointField, self).validate(value)
         if value is False:
             raise ValidationError(_('Bad format for coordinates, please send a string with latitude and longitude separated by comma and space, eg: "41.8264921129, 12.4943909063"'))
+
+
+# rest_framework HStoreDictionaryField
+
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
+
+if HSTORE_ENABLED:
+    
+    from django_hstore.fields import HStoreDictionary
+    from django_hstore.exceptions import HStoreDictionaryException
+
+    class HStoreDictionaryField(WritableField):
+        """
+        A field to handle HStore Dictionary field as a string
+        """
+        
+        def from_native(self, value):
+            if value:
+                try:
+                    return HStoreDictionary(value)
+                except HStoreDictionaryException as e:
+                    raise ValidationError(_('Invalid JSON: %s' % e.json_error_message))
+            else:
+                return None
+    
+        def to_native(self, value):
+            if isinstance(value, dict) or value is None:
+                return value
+            
+            value = HStoreDictionary(value)
+    
+            return value

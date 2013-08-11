@@ -9,6 +9,12 @@ from nodeshot.core.layers.models import Layer
 
 from .models import *
 
+PARTICIPATION_INSTALLED = 'nodeshot.community.participation' in settings.NODESHOT['API']['APPS_ENABLED']
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
+
+if HSTORE_ENABLED:
+    from nodeshot.core.base.fields import HStoreDictionaryField
+
 
 __all__ = [
     'NodeListSerializer',
@@ -21,15 +27,51 @@ __all__ = [
     'StatusListSerializer'
 ]
 
-
-class NodeListSerializer(serializers.ModelSerializer):
-    
+  
+class NodeDetailSerializer(serializers.ModelSerializer):
+    """ node detail """
     user = serializers.Field(source='user.username')
     status = serializers.Field(source='status.slug')
-    layer_name = serializers.Field(source='layer.name')
-    layer_details = serializers.HyperlinkedRelatedField(source='layer.slug',
-                                        many=False, read_only=True, view_name='api_layer_detail')
     coords = PointField(label=_('coordinates'))
+    layer_name = serializers.Field(source='layer.name')
+    layer_details = serializers.HyperlinkedRelatedField(view_name='api_layer_detail', source='layer', read_only=True)
+    images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
+    access_level = serializers.Field(source='get_access_level_display')
+    
+    if HSTORE_ENABLED:
+        data = HStoreDictionaryField(required=False, label=_('extra data'), help_text=_('stoca!'))
+    
+    if PARTICIPATION_INSTALLED:
+        comments = serializers.HyperlinkedIdentityField(view_name='api_node_comments', slug_field='slug')
+    
+    class Meta:
+        model = Node
+        primary_fields = [
+            'name', 'slug', 'status', 'user',
+            'coords', 'elev', 'address', 'description',
+        ]
+        
+        if HSTORE_ENABLED:
+            primary_fields += ['data']
+        
+        if settings.NODESHOT['SETTINGS']['NODE_AREA']:
+            primary_fields += ['area']
+            
+        secondary_fields = [
+            'access_level', 'layer', 'layer_name', 'added', 'updated',
+            'layer_details', 'images'
+        ]
+        
+        if PARTICIPATION_INSTALLED:
+            secondary_fields += ['comments']
+        
+        fields = primary_fields + secondary_fields
+        
+        read_only_fields = ('added', 'updated')
+
+
+class NodeListSerializer(NodeDetailSerializer):
+    """ node list """
     
     details = serializers.HyperlinkedIdentityField(view_name='api_node_details', slug_field='slug')
     
@@ -37,7 +79,7 @@ class NodeListSerializer(serializers.ModelSerializer):
         model = Node
         fields = [
             'name', 'slug', 'layer', 'layer_name', 'user', 'status',
-            'coords', 'elev', 'address', 'description'
+            'coords', 'elev', 'address', 'description', 'data'
         ]
         
         if settings.NODESHOT['SETTINGS']['NODE_AREA']:
@@ -50,39 +92,6 @@ class NodeListSerializer(serializers.ModelSerializer):
 class PaginatedNodeListSerializer(pagination.PaginationSerializer):
     class Meta:
         object_serializer_class = NodeListSerializer
-
-  
-class NodeDetailSerializer(serializers.ModelSerializer):
-    """ node detail """
-    user = serializers.Field(source='user.username')
-    status = serializers.Field(source='status.slug')
-    coords = PointField()
-    layer_name = serializers.Field(source='layer.name')
-    layer_details = serializers.HyperlinkedRelatedField(view_name='api_layer_detail', source='layer', read_only=True)
-    images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
-    access_level = serializers.Field(source='get_access_level_display')
-    
-    if 'nodeshot.community.participation' in settings.NODESHOT['API']['APPS_ENABLED']:
-        comments = serializers.HyperlinkedIdentityField(view_name='api_node_comments', slug_field='slug')
-    
-    class Meta:
-        model = Node
-        fields = [
-            'name', 'slug', 'status', 'user',
-            'coords', 'elev', 'address', 'description',
-            'access_level', 'layer', 'layer_name', 'added', 'updated',
-            'layer_details', 'images', 
-        ]
-        
-        if settings.NODESHOT['SETTINGS']['NODE_AREA']:
-            fields += ['area']
-            
-        fields += ['images']
-        
-        if 'nodeshot.community.participation' in settings.NODESHOT['API']['APPS_ENABLED']:
-            fields += ['comments']
-        
-        read_only_fields = ('added', 'updated')
 
 
 class NodeCreatorSerializer(NodeDetailSerializer):

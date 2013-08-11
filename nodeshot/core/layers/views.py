@@ -16,6 +16,8 @@ from nodeshot.core.nodes.views import NodeList
 from .models import Layer
 from .serializers import *
 
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
+
 
 class LayerList(generics.ListCreateAPIView):
     """
@@ -128,7 +130,13 @@ class LayerAllNodesGeojsonList(generics.RetrieveAPIView):
             raise Http404(_('Layer not found'))
         
         nodes = layer.node_set.published().accessible_to(request.user)
-        dj = Django.Django(geodjango="coords", properties=['slug', 'name', 'address', 'description'])
+        properties = ['slug', 'name', 'address', 'description']
+        
+        # if HStore is enabled add the "data" field
+        if HSTORE_ENABLED:
+            properties.append('data')
+            
+        dj = Django.Django(geodjango="coords", properties=properties)
         geojson = GeoJSON.GeoJSON()
         string = geojson.encode(dj.decode(nodes))  
         

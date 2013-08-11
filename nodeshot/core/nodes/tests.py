@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import *
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
+from django.conf import settings
 User = get_user_model()
 
 from nodeshot.core.layers.models import Layer
@@ -22,6 +23,7 @@ from nodeshot.core.base.tests import user_fixtures, BaseTestCase
 
 from .models import *
 
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 
 class ModelsTest(TestCase):
@@ -233,8 +235,7 @@ class APITest(BaseTestCase):
         public_node_count = Node.objects.published().access_level_up_to('public').count()
         self.assertEqual(public_node_count, len(nodes))
         
-        # POST: 201
-        json_data = {
+        node = {
             "layer": 1,
             "name": "test_distance", 
             "slug": "test_distance", 
@@ -242,12 +243,23 @@ class APITest(BaseTestCase):
             "coords": "41.8720419277,12.99", 
             "description": ""
         }
-        response = self.client.post(url, json_data)
+        
+        if HSTORE_ENABLED:
+            node['data'] = { "is_test": True }
+        
+        # POST: 403 - unauthenticated
+        response = self.client.post(url, json.dumps(node), content_type='application/json')
         self.assertEqual(403, response.status_code)
         
+        # POST: 201
         self.client.login(username='registered', password='tester')
-        response = self.client.post(url, json_data)
+        response = self.client.post(url, json.dumps(node), content_type='application/json')
         self.assertEqual(201, response.status_code)
+        
+        if HSTORE_ENABLED:
+            node = Node.objects.get(slug='test_distance')
+            self.assertEqual(node.data, { 'is_test': 'true' })
+            self.assertEqual(Node.objects.filter(data__contains={ "is_test": "true" }).count(), 1)
     
     def test_node_geojson_list(self):
         """ test node geojson list """

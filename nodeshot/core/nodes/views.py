@@ -2,6 +2,7 @@ from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.conf import settings
 
 from rest_framework import permissions, authentication, generics
 from rest_framework.response import Response
@@ -14,6 +15,8 @@ from .models import *
 
 from vectorformats.Formats import Django, GeoJSON
 import simplejson as json
+
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 
 def get_queryset_or_404(queryset, kwargs):
@@ -157,7 +160,13 @@ class NodeGeojsonList(generics.ListAPIView):
         TODO: improve readability and cleanup
         """
         node = Node.objects.published().accessible_to(request.user)
-        dj = Django.Django(geodjango="coords", properties=['slug', 'name', 'address', 'description'])
+        properties = ['slug', 'name', 'address', 'description']
+        
+        # if HStore is enabled add the "data" field
+        if HSTORE_ENABLED:
+            properties.append('data')
+            
+        dj = Django.Django(geodjango="coords", properties=properties)
         geojson = GeoJSON.GeoJSON()
         string = geojson.encode(dj.decode(node))  
         
