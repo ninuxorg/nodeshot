@@ -30,6 +30,7 @@ if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
 class NodeAdmin(BaseGeoAdmin):
     list_display  = ('name', 'status', 'access_level', 'is_published', 'added', 'updated')
     list_filter   = NODE_FILTERS
+    list_select_related = True
     search_fields = ('name',)
     actions_on_bottom = True
     date_hierarchy = 'added'

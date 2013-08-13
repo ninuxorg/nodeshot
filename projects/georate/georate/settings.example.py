@@ -372,7 +372,21 @@ NODESHOT = {
         ('nodeshot.interoperability.synchronizers.OpenWISPCitySDK', 'OpenWISPCitySDK'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFICitySDK', 'ProvinciaWIFICitySDK'),
-    ]
+    ],
+    'NOTIFICATIONS': {
+        'TEXTS': {
+            'custom': None,
+            'node_created': _('A new node with name "%(name)s" has been created'),
+            'node_status_changed': _('Node "%s" changed its status from %s to %s'),
+            'node_deleted': _('Node "%s" deleted'),
+        },
+        'ACTIONS': {
+            'new_node_created': "reverse('api_node_detail', args=[node.slug])",
+        },
+        'REGISTRARS': (
+            'nodeshot.community.notifications.registrars.nodes',
+        )
+    }
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
