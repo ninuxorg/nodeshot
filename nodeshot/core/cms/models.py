@@ -49,3 +49,19 @@ class MenuItem(BaseOrderedACL):
     
     def __unicode__(self):
         return self.url
+
+
+# ------ Signals ------ #
+
+
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete, post_save
+from django.core.cache import cache
+
+
+@receiver(post_save, sender=Page)
+@receiver(post_save, sender=MenuItem)
+@receiver(pre_delete, sender=Page)
+@receiver(pre_delete, sender=MenuItem)
+def clear_cache(sender, **kwargs):
+    cache.clear()

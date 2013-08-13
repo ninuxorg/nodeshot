@@ -1,6 +1,5 @@
 import simplejson as json
 
-#from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -24,6 +23,10 @@ class PageList(ACLMixin, generics.ListAPIView):
     queryset = Page.objects.published()
     serializer_class = PageListSerializer
     
+    @method_decorator(cache_page(86400))  # cache for 1 day
+    def dispatch(self, *args, **kwargs):
+        return super(self.__class__, self).dispatch(*args, **kwargs)
+    
 page_list = PageList.as_view()
 
 
@@ -36,6 +39,10 @@ class PageDetail(ACLMixin, generics.RetrieveAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     queryset = Page.objects.published()
     serializer_class = PageDetailSerializer
+    
+    @method_decorator(cache_page(86400))  # cache for 1 day
+    def dispatch(self, *args, **kwargs):
+        return super(self.__class__, self).dispatch(*args, **kwargs)
     
 page_detail = PageDetail.as_view()
 
@@ -52,5 +59,9 @@ class MenuList(ACLMixin, generics.ListAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     queryset = MenuItem.objects.published()
     serializer_class = MenuSerializer
+    
+    @method_decorator(cache_page(86400))  # cache for 1 day
+    def dispatch(self, *args, **kwargs):
+        return super(self.__class__, self).dispatch(*args, **kwargs)
     
 menu_list = MenuList.as_view()
