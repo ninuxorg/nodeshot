@@ -125,58 +125,17 @@ if 'south' in settings.INSTALLED_APPS:
     add_introspection_rules([], ["^nodeshot\.core\.base\.fields\.RGBColorField"])
 
 
-# rest_framework point field
-
-from django.contrib.gis.geos import GEOSGeometry
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
-
-from rest_framework.fields import WritableField
-import simplejson as json
-
-
-class PointField(WritableField):
-    """
-    A field to handle GeoDjango Point field as a string
-    """
-
-    def to_native(self, value):
-        if isinstance(value, dict) or value is None:
-            return value
-
-        # Get GeoDjango geojson serialization and then convert it _back_ to
-        # a Python object
-        return [value.coords[1], value.coords[0]]
-
-    def from_native(self, value):
-        try:
-            if type(value) == str or type(value) == unicode:
-                lat, lng = value.replace(' ', '').replace('[', '').replace(']', '').split(',')
-            elif type(value) == list:
-                lat, lng = value
-            value = GEOSGeometry(json.dumps({
-                "type": "Point",
-                "coordinates": [float(lng), float(lat)]
-            }))
-        except (ValueError, AttributeError):
-            return False
-        
-        return value
-    
-    def validate(self, value):
-        super(PointField, self).validate(value)
-        if value is False:
-            raise ValidationError(_('Bad format for coordinates, please send a string with latitude and longitude separated by comma and space, eg: "41.8264921129, 12.4943909063"'))
-
-
 # rest_framework HStoreDictionaryField
 
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 if HSTORE_ENABLED:
     
+    from django.core.exceptions import ValidationError
+    from django.utils.translation import ugettext_lazy as _
     from django_hstore.fields import HStoreDictionary
     from django_hstore.exceptions import HStoreDictionaryException
+    from rest_framework.fields import WritableField
 
     class HStoreDictionaryField(WritableField):
         """

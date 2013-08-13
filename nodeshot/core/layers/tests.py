@@ -182,11 +182,11 @@ class LayerTest(TestCase):
         self.assertEqual(len(response.data['nodes']['results']), layer_public_nodes_count)
         
         # api_layer_nodes_geojson
-        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]))
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]), { 'limit': 0 })
         
         # each of 'features' values in geojson is a node
-        api_layer_nodes = len(response.data['features'])
-        self.assertEqual(len(response.data['features']), layer_public_nodes_count)
+        api_layer_nodes = len(response.data['nodes']['features'])
+        self.assertEqual(len(response.data['nodes']['features']), layer_public_nodes_count)
         
     def test_layers_api_post(self):
         layer_count = Layer.objects.all().count()

@@ -7,6 +7,7 @@ from cStringIO import StringIO
 
 from django.test import TestCase
 from django.core import management
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.gis.geos import Point
 
@@ -44,6 +45,29 @@ class InteroperabilityTest(TestCase):
         
         # ensure following text is in output
         self.assertIn('does not have an interoperability class specified', output.getvalue())
+    
+    def test_layer_admin(self):
+        """ ensure layer admin does not return any error """
+        layer = Layer.objects.external()[0]
+        url = reverse('admin:layers_layer_change', args=[layer.id])
+        
+        self.client.login(username='admin', password='tester')
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.Nodeshot'
+        external.config = '{ "layer_url": "http://test.com/" }'
+        external.save()
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        layer = Layer.objects.filter(is_external=False)[0]
+        url = reverse('admin:layers_layer_change', args=[layer.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
     
     def test_openwisp(self):
         """ test OpenWISP converter """

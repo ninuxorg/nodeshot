@@ -57,7 +57,7 @@ class LayerExternal(models.Model):
     @property
     def synchronizer(self):
         """ access synchronizer """
-        if not self.interoperability or not self.layer:
+        if not self.interoperability or self.interoperability == 'None' or not self.layer:
             return False
         
         # init synchronizer if not already done

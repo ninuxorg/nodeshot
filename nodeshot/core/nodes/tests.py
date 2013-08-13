@@ -12,7 +12,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
-from django.contrib.gis.geos import *
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.conf import settings
@@ -239,9 +238,9 @@ class APITest(BaseTestCase):
             "layer": 1,
             "name": "test_distance", 
             "slug": "test_distance", 
-            "address": "via dei test", 
-            "geometry": "41.8720419277,12.99", 
-            "description": ""
+            "address": "via dei test",
+            "description": "",
+            "geometry": json.loads(GEOSGeometry("POINT (12.99 41.8720419277)").json),
         }
         
         if HSTORE_ENABLED:
@@ -276,7 +275,7 @@ class APITest(BaseTestCase):
         # GET: 200
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        node = json.loads(response.content)
+        node = response.data
         images_url = reverse('api_node_images', args=['fusolab'])
         # images_url in node['images']
         self.assertIn(images_url, node['images'])
@@ -290,13 +289,13 @@ class APITest(BaseTestCase):
         data = {
             "name": "Fusolab Rome test", 
             "slug": "fusolab", 
-            "user": "romano", 
-            "geometry": [41.872041927700003, 12.582239191899999], 
+            "user": "romano",
             "elev": 80.0, 
             "address": "", 
             "description": "Fusolab test 2", 
             "access_level": "public",
-            "layer": 1
+            "layer": 1,
+            "geometry": json.loads(GEOSGeometry("POINT (12.582239191899999 41.872041927700003)").json)
         }
         response = self.client.put(url, json.dumps(data), content_type='application/json')
         self.assertEqual(403, response.status_code)
@@ -431,8 +430,8 @@ class APITest(BaseTestCase):
             "name": "test_distance", 
             "slug": "test_distance", 
             "address": "via dei test", 
-            "geometry": "41.8720419276999820, 12.5822391919000012", 
-            "description": ""
+            "description": "",
+            "geometry": json.loads(GEOSGeometry("POINT (12.5822391919000012 41.8720419276999820)").json), 
         }
         layer = Layer.objects.get(pk=1)
         layer.minimum_distance = 100
@@ -443,14 +442,14 @@ class APITest(BaseTestCase):
         self.assertEqual(400, response.status_code)
         
         # Node coordinates respect minimum distance. Insert should succed
-        json_data['geometry'] = "41.8720419277,12.7822391919";
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (12.7822391919 41.8720419277)").json);
         response = self.client.post(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(201, response.status_code)
         
         # Disable minimum distance control in layer and update node inserting coords too near. Insert should succed
         layer.minimum_distance = 0
         layer.save()
-        json_data['geometry'] = "41.872042278,12.5822391917";
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (12.5822391917 41.872042278)").json)
         n = Node.objects.get(slug='test_distance')
         node_slug = n.slug
         url = reverse('api_node_details', args=[node_slug])
@@ -469,13 +468,13 @@ class APITest(BaseTestCase):
         layer.save()
         
         # Node update should fail because coords are outside layer area
-        json_data['geometry'] = "50,50";
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (50 50)").json)
         url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
         
         # Node update should succeed because coords are inside layer area and respect minimum distance
-        json_data['geometry'] = "41.8720419277,12.7822391919";
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (12.7822391919 41.8720419277)").json)
         url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)
@@ -483,7 +482,7 @@ class APITest(BaseTestCase):
         # Node update should succeed because layer area is disabled
         layer.area = None
         layer.save()
-        json_data['geometry'] = "50,50";
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (50 50)").json)
         url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)

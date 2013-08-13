@@ -9,13 +9,11 @@ from rest_framework import permissions, authentication, generics
 from rest_framework.response import Response
 
 from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
+from nodeshot.core.base.utils import Hider
 
 from .permissions import IsOwnerOrReadOnly
 from .serializers import *
 from .models import *
-
-from vectorformats.Formats import Django, GeoJSON
-import simplejson as json
 
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
@@ -155,31 +153,23 @@ class NodeDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
 node_details = NodeDetail.as_view()
 
 
-class NodeGeojsonList(generics.ListAPIView):
+class NodeGeoJSONList(NodeList):
     """
     ### GET
     
     Retrieve nodes in GeoJSON format.
+    
+    Parameters:
+    
+     * `search=<word>`: search <word> in name, slug, description and address of nodes
+     * `limit=<n>`: specify number of items per page (defaults to 40)
+     * `limit=0`: turns off pagination
     """
     
-    def get(self, request, *args, **kwargs):
-        """
-        TODO: improve readability and cleanup
-        """
-        node = Node.objects.published().accessible_to(request.user)
-        properties = ['slug', 'name', 'address', 'description']
-        
-        # if HStore is enabled add the "data" field
-        if HSTORE_ENABLED:
-            properties.append('data')
-            
-        dj = Django.Django(geodjango="geometry", properties=properties)
-        geojson = GeoJSON.GeoJSON()
-        string = geojson.encode(dj.decode(node))  
-        
-        return Response(json.loads(string))
+    serializer_class = NodeGeoSerializer
+    post = Hider()
 
-geojson_list = NodeGeojsonList.as_view()
+geojson_list = NodeGeoJSONList.as_view()
 
 
 ### ------ Images ------ ###

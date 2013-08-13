@@ -46,7 +46,7 @@ class Node(BaseAccessLevel):
     
     if HSTORE_ENABLED:
         data = DictionaryField(_('extra data'), null=True, blank=True,
-                            help_text=('store extra attributes in JSON string'))
+                            help_text=_('store extra attributes in JSON string'))
     
     # manager
     objects = NodeManager()

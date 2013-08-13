@@ -1,5 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers, pagination
+from rest_framework_gis import serializers as geoserializers
 
 from .models import Layer
 
@@ -11,26 +12,13 @@ __all__ = [
     'LayerDetailSerializer',
     'LayerListSerializer',
     'LayerNodeListSerializer',
+    'GeoLayerListSerializer',
     'CustomNodeListSerializer',
-    'PaginationSerializer',
-    'LinksSerializer',
+    'PaginatedLayerListSerializer',
 ]
 
 
-class LinksSerializer(serializers.Serializer):
-    
-    next = pagination.NextPageField(source='*')
-    prev = pagination.PreviousPageField(source='*')
-
-
-class PaginationSerializer(pagination.BasePaginationSerializer):
-
-    links = LinksSerializer(source='*')  # Takes the page object as the source
-    total_results = serializers.Field(source='paginator.count')
-    results_field = 'layers'
-
-
-class LayerListSerializer(serializers.ModelSerializer):
+class LayerListSerializer(geoserializers.GeoModelSerializer):
     """
     Layer list
     """
@@ -41,7 +29,23 @@ class LayerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Layer
 
-        fields= ('id','slug','name', 'center', 'area', 'details', 'nodes', 'geojson')
+        fields= (
+            'id', 'slug', 'name', 'center', 'area',
+            'details', 'nodes', 'geojson'
+        )
+
+
+class PaginatedLayerListSerializer(pagination.PaginationSerializer):
+    class Meta:
+        object_serializer_class = LayerListSerializer
+
+
+class GeoLayerListSerializer(geoserializers.GeoFeatureModelSerializer, LayerListSerializer):
+    class Meta:
+        model = Layer
+        geo_field = 'area'
+
+        fields= ('id', 'name', 'slug')
 
 
 class LayerDetailSerializer(LayerListSerializer):
@@ -64,6 +68,7 @@ class CustomNodeListSerializer(NodeListSerializer):
             'updated', 'added', 'details'
         ]
         read_only_fields = ['added', 'updated']
+        geo_field = 'geometry'
 
 
 class LayerNodeListSerializer(LayerDetailSerializer):

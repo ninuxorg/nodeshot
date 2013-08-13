@@ -3,8 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers, pagination
 from rest_framework.reverse import reverse
+from rest_framework_gis import serializers as geoserializers
 
-from nodeshot.core.base.fields import PointField
 from nodeshot.core.layers.models import Layer
 
 from .models import *
@@ -20,6 +20,7 @@ __all__ = [
     'NodeListSerializer',
     'NodeCreatorSerializer',
     'NodeDetailSerializer',
+    'NodeGeoSerializer',
     'PaginatedNodeListSerializer',
     'ImageListSerializer',
     'ImageAddSerializer',
@@ -28,21 +29,24 @@ __all__ = [
 ]
 
   
-class NodeDetailSerializer(serializers.ModelSerializer):
+class NodeDetailSerializer(geoserializers.GeoModelSerializer):
     """ node detail """
     user = serializers.Field(source='user.username')
     status = serializers.Field(source='status.slug')
-    geometry = PointField(label=_('coordinates'))
+    geometry = geoserializers.GeometryField(label=_('coordinates'))
     layer_name = serializers.Field(source='layer.name')
     layer_details = serializers.HyperlinkedRelatedField(view_name='api_layer_detail', source='layer', read_only=True)
     images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
     access_level = serializers.Field(source='get_access_level_display')
     
     if HSTORE_ENABLED:
-        data = HStoreDictionaryField(required=False, label=_('extra data'), help_text=_('stoca!'))
+        data = HStoreDictionaryField(required=False,
+                                     label=_('extra data'),
+                                     help_text=_('store extra attributes in JSON string'))
     
     if PARTICIPATION_INSTALLED:
-        comments = serializers.HyperlinkedIdentityField(view_name='api_node_comments', slug_field='slug')
+        comments = serializers.HyperlinkedIdentityField(view_name='api_node_comments',
+                                                        slug_field='slug')
     
     class Meta:
         model = Node
@@ -65,6 +69,7 @@ class NodeDetailSerializer(serializers.ModelSerializer):
         fields = primary_fields + secondary_fields
         
         read_only_fields = ('added', 'updated')
+        geo_field = 'geometry'
 
 
 class NodeListSerializer(NodeDetailSerializer):
@@ -81,6 +86,7 @@ class NodeListSerializer(NodeDetailSerializer):
         ]
         
         read_only_fields = ['added', 'updated']
+        geo_field = 'geometry'
 
 
 class PaginatedNodeListSerializer(pagination.PaginationSerializer):
@@ -88,8 +94,12 @@ class PaginatedNodeListSerializer(pagination.PaginationSerializer):
         object_serializer_class = NodeListSerializer
 
 
-class NodeCreatorSerializer(NodeDetailSerializer):
+class NodeCreatorSerializer(NodeListSerializer):
     layer = serializers.WritableField(source='layer')
+
+
+class NodeGeoSerializer(geoserializers.GeoFeatureModelSerializer, NodeListSerializer):
+    pass
 
 
 class ImageListSerializer(serializers.ModelSerializer):

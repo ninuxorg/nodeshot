@@ -15,7 +15,6 @@ mimeparse
 python-dateutil
 six
 wsgiref
-vectorformats
 requests
 
 # better admin
@@ -30,6 +29,7 @@ olwidget
 # RESTful API and API documentation
 djangorestframework==2.3.6
 markdown
+-e git+https://github.com/nemesisdesign/django-rest-framework-gis.git#egg=django_restframework_gis
 
 # networking
 netaddr
