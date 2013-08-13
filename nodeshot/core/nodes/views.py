@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.conf import settings
+from django.db.models import Q
 
 from rest_framework import permissions, authentication, generics
 from rest_framework.response import Response
@@ -42,7 +43,7 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     
     Parameters:
     
-     * `search=<word>`: search <word> in name of nodes
+     * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (defaults to 40)
      * `limit=0`: turns off pagination
     
@@ -93,8 +94,14 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
         search = self.request.QUERY_PARAMS.get('search', None)
         
         if search is not None:
+            search_query = (
+                Q(name__icontains=search) |
+                Q(slug__icontains=search) |
+                Q(description__icontains=search) |
+                Q(address__icontains=search)
+            )
             # add instructions for search to queryset
-            queryset = queryset.filter(name__icontains=search)
+            queryset = queryset.filter(search_query)
         
         return queryset
     
