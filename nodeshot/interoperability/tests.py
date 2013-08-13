@@ -89,7 +89,7 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(node.name, 'Podesta1_CED')
         self.assertEqual(node.address, 'Test WISP')
         point = Point(8.96166, 44.4185)
-        self.assertTrue(node.coords.equals(point))
+        self.assertTrue(node.geometry.equals(point))
         self.assertEqual(node.updated.strftime('%Y-%m-%d'), '2013-07-10')
         self.assertEqual(node.added.strftime('%Y-%m-%d'), '2011-08-24')
         
@@ -124,7 +124,7 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(node.name, 'Lercari2_42')
         self.assertEqual(node.address, 'Test WISP')
         point = Point(8.96147, 44.4076)
-        self.assertTrue(node.coords.equals(point))
+        self.assertTrue(node.geometry.equals(point))
         self.assertEqual(node.updated.strftime('%Y-%m-%d'), '2013-07-10')
         self.assertEqual(node.added.strftime('%Y-%m-%d'), '2013-06-14')
     
@@ -172,7 +172,7 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(node.name, 'viale di valle aurelia, 73')
         self.assertEqual(node.address, 'viale di valle aurelia, 73, Roma')
         point = Point(12.4373, 41.9025)
-        self.assertTrue(node.coords.equals(point))
+        self.assertTrue(node.geometry.equals(point))
         
         # ensure itmes with the same name on the XML get a different name in the DB
         node = Node.objects.get(slug='largo-agostino-gemelli-8')
@@ -213,4 +213,4 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(node.address, 'Via G. Pullino 97, Roma')
         self.assertEqual(node.description, 'Indirizzo: Via G. Pullino 97, Roma; Tipologia: Privati federati')
         point = Point(12.484, 41.8641)
-        self.assertTrue(node.coords.equals(point))
+        self.assertTrue(node.geometry.equals(point))

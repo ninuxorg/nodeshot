@@ -72,7 +72,7 @@ class LayerTest(TestCase):
             'name': 'test new node',
             'slug': 'test-new-node',
             'layer': layer,
-            'coords': 'POINT (10.4389188797003565 43.7200020000987328)'
+            'geometry': 'POINT (10.4389188797003565 43.7200020000987328)'
         })
         with self.assertRaises(ValidationError):
             node.full_clean()
@@ -93,7 +93,7 @@ class LayerTest(TestCase):
             'name': 'new_node',
             'slug': 'new_node',
             'layer': layer,
-            'coords': node.coords
+            'geometry': node.geometry
         })
         new_node.full_clean()
         new_node.save()
@@ -120,7 +120,7 @@ class LayerTest(TestCase):
             'name': 'new_node',
             'slug': 'new_node',
             'layer': layer,
-            'coords': 'POINT (50.0 50.0)'
+            'geometry': 'POINT (50.0 50.0)'
         })
         
         try:

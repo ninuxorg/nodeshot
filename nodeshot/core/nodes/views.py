@@ -57,7 +57,7 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
         {
             "name": "Fusolab Rome", 
             "slug": "fusolab", 
-            "coords": [41.872041927700003, 12.582239191899999], 
+            "geometry": [41.872041927700003, 12.582239191899999], 
             "elev": 80.0, 
             "address": "", 
             "description": "Fusolab test", 
@@ -68,7 +68,7 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
     
      * name
      * slug
-     * coords
+     * geometry
      * layer (if layer app installed)
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -123,7 +123,7 @@ class NodeDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
             "name": "Fusolab Rome", 
             "slug": "fusolab", 
             "user": "romano", 
-            "coords": [41.872041927700003, 12.582239191899999], 
+            "geometry": [41.872041927700003, 12.582239191899999], 
             "elev": 80.0, 
             "address": "", 
             "description": "Fusolab test", 
@@ -166,7 +166,7 @@ class NodeGeojsonList(generics.ListAPIView):
         if HSTORE_ENABLED:
             properties.append('data')
             
-        dj = Django.Django(geodjango="coords", properties=properties)
+        dj = Django.Django(geodjango="geometry", properties=properties)
         geojson = GeoJSON.GeoJSON()
         string = geojson.encode(dj.decode(node))  
         

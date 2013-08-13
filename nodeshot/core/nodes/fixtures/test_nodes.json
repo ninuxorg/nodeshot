@@ -11,7 +11,7 @@
             "description": "Fusolab", 
             "layer": 1, 
             "access_level": 0, 
-            "coords": "POINT (12.5822391919000012 41.8720419276999820)", 
+            "geometry": "POINT (12.5822391919000012 41.8720419276999820)", 
             "user": [
                 "romano"
             ], 
@@ -33,7 +33,7 @@
                 "description": "EigenLab", 
                 "layer": 2, 
                 "access_level": 0, 
-                "coords": "POINT (10.4289188797003565 43.7100020000987328)", 
+                "geometry": "POINT (10.4289188797003565 43.7100020000987328)", 
                 "user": [
                     "pisano"
                 ], 
@@ -56,7 +56,7 @@
                 "description": "House", 
                 "layer": 3, 
                 "access_level": 0, 
-                "coords": "POINT (12.1073379926315674 42.4160316978522047)", 
+                "geometry": "POINT (12.1073379926315674 42.4160316978522047)", 
                 "user": [
                   "viterbese"
                 ], 
@@ -79,7 +79,7 @@
           "description": "Test record Rome", 
           "layer": 1, 
           "access_level": 0, 
-          "coords": "POINT (12.5255051068249479 41.9143381543942581)", 
+          "geometry": "POINT (12.5255051068249479 41.9143381543942581)", 
           "user": [
             "romano"
           ], 
@@ -102,7 +102,7 @@
           "description": "Test record Pisa", 
           "layer": 2, 
           "access_level": 0, 
-          "coords": "POINT (10.5168095046877568 43.6464368965596421)", 
+          "geometry": "POINT (10.5168095046877568 43.6464368965596421)", 
           "user": [
             "pisano"
           ], 
@@ -125,7 +125,7 @@
           "description": "Test record Viterbo", 
           "layer": 3, 
           "access_level": 0, 
-          "coords": "POINT (12.1132603101296237 42.4212908498151577)", 
+          "geometry": "POINT (12.1132603101296237 42.4212908498151577)", 
           "user": [
             "viterbese"
           ], 
@@ -148,7 +148,7 @@
           "description": "Pomezia", 
           "layer": 1, 
           "access_level": 0, 
-          "coords": "POINT (12.5012150219913654 41.6677070012515074)", 
+          "geometry": "POINT (12.5012150219913654 41.6677070012515074)", 
           "user": [
             "romano"
           ], 
@@ -171,7 +171,7 @@
           "description": "Piazza dell'erba", 
           "layer": 1, 
           "access_level": 0, 
-          "coords": "POINT (12.4902286938660296 41.8972185849048984)", 
+          "geometry": "POINT (12.4902286938660296 41.8972185849048984)", 
           "user": [
             "romano"
           ], 
@@ -194,7 +194,7 @@
           "description": "test", 
           "layer": 1, 
           "access_level": 2, 
-          "coords": "POINT (12.5310841015748746 41.9405835009790309)", 
+          "geometry": "POINT (12.5310841015748746 41.9405835009790309)", 
           "user": [
             "viterbese"
           ], 
@@ -217,7 +217,7 @@
           "description": "test", 
           "layer": 1, 
           "access_level": 1, 
-          "coords": "POINT (12.5253334454477372 41.8890404543067518)", 
+          "geometry": "POINT (12.5253334454477372 41.8890404543067518)", 
           "user": [
             "viterbese"
           ], 

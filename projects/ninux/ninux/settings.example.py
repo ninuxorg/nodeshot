@@ -312,7 +312,6 @@ NODESHOT = {
         
         'LAYER_TEXT_HTML': True,
         'NODE_DESCRIPTION_HTML': True,
-        'NODE_AREA': False,
         
         'CONTACT_INWARD_LOG': True,
         'CONTACT_INWARD_MAXLENGTH': 2000,

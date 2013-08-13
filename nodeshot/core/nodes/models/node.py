@@ -37,12 +37,8 @@ class Node(BaseAccessLevel):
     # nodes might be assigned to a foreign layer, therefore user can be left blank, requires custom validation
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     
-    # area if enabled
-    if settings.NODESHOT['SETTINGS']['NODE_AREA']:
-        area = models.PolygonField(blank=True, null=True)
-    
     # positioning
-    coords = models.PointField(_('coordinates'), help_text=_('geographic coordinates (latitude and longitude)'))
+    geometry = models.GeometryField(_('geometry'), help_text=_('geometry of the node (point, polygon, line)'))
     elev = models.FloatField(_('elevation'), blank=True, null=True)
     
     description = models.TextField(_('description'), max_length=255, blank=True, null=True)

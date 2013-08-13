@@ -60,13 +60,9 @@ class CustomNodeListSerializer(NodeListSerializer):
         model = Node
         fields = [
             'name', 'slug', 'user',
-            'coords', 'elev', 'address', 'description'
+            'geometry', 'elev', 'address', 'description',
+            'updated', 'added', 'details'
         ]
-        
-        if settings.NODESHOT['SETTINGS']['NODE_AREA']:
-            fields += ['area']
-        
-        fields += ['updated', 'added', 'details']
         read_only_fields = ['added', 'updated']
 
 

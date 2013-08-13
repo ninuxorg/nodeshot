@@ -143,7 +143,7 @@ class CitySDKMixin(object):
                    "point":[
                         {
                             "Point":{
-                                "posList":"%s %s" % (float(node.coords.coords[1]), float(node.coords.coords[0])),
+                                "posList":"%s %s" % (float(node.geometry.coords[1]), float(node.geometry.coords[0])),
                                 "srsName":"http://www.opengis.net/def/crs/EPSG/0/4326"
                             },
                             "term": self.config['citysdk_term']

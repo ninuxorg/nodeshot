@@ -32,7 +32,7 @@ class NodeDetailSerializer(serializers.ModelSerializer):
     """ node detail """
     user = serializers.Field(source='user.username')
     status = serializers.Field(source='status.slug')
-    coords = PointField(label=_('coordinates'))
+    geometry = PointField(label=_('coordinates'))
     layer_name = serializers.Field(source='layer.name')
     layer_details = serializers.HyperlinkedRelatedField(view_name='api_layer_detail', source='layer', read_only=True)
     images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
@@ -48,14 +48,11 @@ class NodeDetailSerializer(serializers.ModelSerializer):
         model = Node
         primary_fields = [
             'name', 'slug', 'status', 'user',
-            'coords', 'elev', 'address', 'description',
+            'geometry', 'elev', 'address', 'description',
         ]
         
         if HSTORE_ENABLED:
             primary_fields += ['data']
-        
-        if settings.NODESHOT['SETTINGS']['NODE_AREA']:
-            primary_fields += ['area']
             
         secondary_fields = [
             'access_level', 'layer', 'layer_name', 'added', 'updated',
@@ -79,13 +76,10 @@ class NodeListSerializer(NodeDetailSerializer):
         model = Node
         fields = [
             'name', 'slug', 'layer', 'layer_name', 'user', 'status',
-            'coords', 'elev', 'address', 'description', 'data'
+            'geometry', 'elev', 'address', 'description', 'data',
+            'updated', 'added', 'details'
         ]
         
-        if settings.NODESHOT['SETTINGS']['NODE_AREA']:
-            fields += ['area']
-        
-        fields += ['updated', 'added', 'details']
         read_only_fields = ['added', 'updated']
 
 

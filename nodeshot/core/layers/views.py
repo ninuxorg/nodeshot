@@ -136,7 +136,7 @@ class LayerAllNodesGeojsonList(generics.RetrieveAPIView):
         if HSTORE_ENABLED:
             properties.append('data')
             
-        dj = Django.Django(geodjango="coords", properties=properties)
+        dj = Django.Django(geodjango="geometry", properties=properties)
         geojson = GeoJSON.GeoJSON()
         string = geojson.encode(dj.decode(nodes))  
         

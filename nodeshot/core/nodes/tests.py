@@ -103,8 +103,8 @@ class ModelsTest(TestCase):
         self.assertEqual(count-1, Node.objects.published().filter(layer=1).count())
         
         # Ensure GeoManager distance is available
-        pnt = Node.objects.get(slug='pomezia').coords
-        Node.objects.filter(coords__distance_lte=(pnt, 7000))
+        pnt = Node.objects.get(slug='pomezia').geometry
+        Node.objects.filter(geometry__distance_lte=(pnt, 7000))
         
         # access level manager
         user = User.objects.get(pk=1, is_superuser=True)
@@ -131,10 +131,10 @@ class ModelsTest(TestCase):
         self.assertEqual(count, Node.objects.accessible_to(user=1).published().count())
         # chain with geographic query
         count = Node.objects.all().filter(is_published=True).filter(layer_id=1).count()
-        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).filter(coords__distance_lte=(pnt, 70000)).published().count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).published().filter(coords__distance_lte=(pnt, 70000)).count())
-        self.assertEqual(count, Node.objects.filter(coords__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
+        self.assertEqual(count, Node.objects.filter(geometry__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
+        self.assertEqual(count, Node.objects.accessible_to(user=1).filter(geometry__distance_lte=(pnt, 70000)).published().count())
+        self.assertEqual(count, Node.objects.accessible_to(user=1).published().filter(geometry__distance_lte=(pnt, 70000)).count())
+        self.assertEqual(count, Node.objects.filter(geometry__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
     
     def test_image_manager(self):
         """ test manager methods of Image model """
@@ -240,7 +240,7 @@ class APITest(BaseTestCase):
             "name": "test_distance", 
             "slug": "test_distance", 
             "address": "via dei test", 
-            "coords": "41.8720419277,12.99", 
+            "geometry": "41.8720419277,12.99", 
             "description": ""
         }
         
@@ -291,7 +291,7 @@ class APITest(BaseTestCase):
             "name": "Fusolab Rome test", 
             "slug": "fusolab", 
             "user": "romano", 
-            "coords": [41.872041927700003, 12.582239191899999], 
+            "geometry": [41.872041927700003, 12.582239191899999], 
             "elev": 80.0, 
             "address": "", 
             "description": "Fusolab test 2", 
@@ -420,7 +420,7 @@ class APITest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
     
-    def test_node_coords_distance_and_area(self):
+    def test_node_geometry_distance_and_area(self):
         """ test minimum distance check between nodes """
         self.client.login(username='admin', password='tester')
         
@@ -431,7 +431,7 @@ class APITest(BaseTestCase):
             "name": "test_distance", 
             "slug": "test_distance", 
             "address": "via dei test", 
-            "coords": "41.8720419276999820, 12.5822391919000012", 
+            "geometry": "41.8720419276999820, 12.5822391919000012", 
             "description": ""
         }
         layer = Layer.objects.get(pk=1)
@@ -443,14 +443,14 @@ class APITest(BaseTestCase):
         self.assertEqual(400, response.status_code)
         
         # Node coordinates respect minimum distance. Insert should succed
-        json_data['coords'] = "41.8720419277,12.7822391919";
+        json_data['geometry'] = "41.8720419277,12.7822391919";
         response = self.client.post(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(201, response.status_code)
         
         # Disable minimum distance control in layer and update node inserting coords too near. Insert should succed
         layer.minimum_distance = 0
         layer.save()
-        json_data['coords'] = "41.872042278,12.5822391917";
+        json_data['geometry'] = "41.872042278,12.5822391917";
         n = Node.objects.get(slug='test_distance')
         node_slug = n.slug
         url = reverse('api_node_details', args=[node_slug])
@@ -469,13 +469,13 @@ class APITest(BaseTestCase):
         layer.save()
         
         # Node update should fail because coords are outside layer area
-        json_data['coords'] = "50,50";
+        json_data['geometry'] = "50,50";
         url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(400, response.status_code)
         
         # Node update should succeed because coords are inside layer area and respect minimum distance
-        json_data['coords'] = "41.8720419277,12.7822391919";
+        json_data['geometry'] = "41.8720419277,12.7822391919";
         url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)
@@ -483,7 +483,7 @@ class APITest(BaseTestCase):
         # Node update should succeed because layer area is disabled
         layer.area = None
         layer.save()
-        json_data['coords'] = "50,50";
+        json_data['geometry'] = "50,50";
         url = reverse('api_node_details', args=[node_slug])
         response = self.client.put(url, json.dumps(json_data), content_type='application/json')
         self.assertEqual(200, response.status_code)

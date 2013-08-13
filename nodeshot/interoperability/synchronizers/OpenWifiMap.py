@@ -25,8 +25,8 @@ class OpenWifiMapMixin(object):
         return {
             "type": "node",
             "hostname": node.slug,
-            "latitude": node.coords.coords[1],
-            "longitude": node.coords.coords[0],
+            "latitude": node.geometry.coords[1],
+            "longitude": node.geometry.coords[0],
             "updateInterval": 6000
         }
     

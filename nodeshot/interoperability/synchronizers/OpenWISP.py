@@ -75,8 +75,8 @@ class OpenWISP(XMLConverter):
                 node.slug = slug
                 changed = True
             
-            if added is True or node.coords.equals(point) is False:
-                node.coords = point
+            if added is True or node.geometry.equals(point) is False:
+                node.geometry = point
                 changed = True
             
             if node.description != description:
