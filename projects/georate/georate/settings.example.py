@@ -53,6 +53,7 @@ USE_TZ = True
 SITE_ID = 1
 SITE_NAME = 'Ninux.org'
 SITE_DOMAIN = 'localhost'
+PROTOCOL = 'http'
 BASE_URL = 'http://%s/' % SITE_DOMAIN
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
