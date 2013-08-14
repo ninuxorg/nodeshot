@@ -1,10 +1,11 @@
 from django.conf import settings
 from .notification import Notification
-from .user_settings import UserEmailNotificationSettings
+from .user_settings import UserEmailNotificationSettings, UserWebNotificationSettings
 
 
 __all__ = [
     'Notification',
+    'UserWebNotificationSettings',
     'UserEmailNotificationSettings'
 ]
 
@@ -20,6 +21,7 @@ def create_settings(sender, **kwargs):
     created = kwargs['created']
     user = kwargs['instance']
     if created:
+        user_web_settings = UserWebNotificationSettings.objects.create(user=user)
         user_email_settings = UserEmailNotificationSettings.objects.create(user=user)
 
 

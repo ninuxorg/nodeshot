@@ -292,8 +292,12 @@ DEFAULT_FROM_EMAIL = 'your@email.org'
 #
 #CELERYBEAT_SCHEDULE = {
 #    'synchronize': {
-#        'task': 'interoperability.tasks.synchronize_external_layers',
+#        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
 #        'schedule': timedelta(hours=12),
+#    },
+#    'purge_notifications': {
+#        'task': 'nodeshot.community.notifications.tasks.purge_notifications',
+#        'schedule': timedelta(days=1),
 #    }
 #}
 
@@ -331,6 +335,7 @@ NODESHOT = {
         'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin
         
         'HSTORE': True,  #  postgresql hstore types for extra data fields
+        'NOTIFICATIONS_DELETE_OLD': 40,  # delete notifications older than specified days
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (
@@ -360,6 +365,8 @@ NODESHOT = {
         'ACL_GLOBAL': 'public',
         # default access_level value for app: services, model: Login
         'ACL_SERVICES_LOGIN': 'community',
+        'NOTIFICATION_BOOLEAN_FIELDS': True,
+        'NOTIFICATION_DISTANCE_FIELDS': 30
     },
     'API': {
         'APPS_ENABLED': [
@@ -381,12 +388,23 @@ NODESHOT = {
     'NOTIFICATIONS': {
         'TEXTS': {
             'custom': None,
-            'node_created': _('A new node with name "%(name)s" has been created'),
-            'node_status_changed': _('Node "%s" changed its status from %s to %s'),
-            'node_deleted': _('Node "%s" deleted'),
+            'node_created': _('A new node with name "%(name)s" has been created.'),
+            'node_status_changed': _('Status of node "%(name)s" has changed from "%(old_status)s" to "%(new_status)s".'),
+            'your_node_status_changed': _('Status of your node "%(name)s" changed from "%(old_status)s" to "%(new_status)s".'),
+            'node_deleted': _('Node "%(name)s" with ID #%(id)s was deleted.'),
+        },
+        # boolean: users can only turn on or off
+        # distance: users can turn off (-1), turn on for all (0) or set a range of km (n)
+        'USER_SETTING': {
+            'node_created':             { 'type': 'distance', 'geo_field': 'geometry' },
+            'node_status_changed':      { 'type': 'distance', 'geo_field': 'geometry' },
+            'node_deleted':             { 'type': 'distance', 'geo_field': 'geometry' },
+            'your_node_status_changed': { 'type': 'boolean' },
         },
         'ACTIONS': {
-            'new_node_created': "reverse('api_node_detail', args=[node.slug])",
+            'node_created': "reverse('api_node_details', args=[self.related_object.slug])",
+            'node_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
+            'your_node_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
         },
         'REGISTRARS': (
             'nodeshot.community.notifications.registrars.nodes',
@@ -415,6 +433,8 @@ SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
 SOUTH_TESTS_MIGRATE = False
 
 if 'test' in sys.argv:
+    CELERY_ALWAYS_EAGER = True
+    
     PASSWORD_HASHERS = (
         'django.contrib.auth.hashers.MD5PasswordHasher',
         'django.contrib.auth.hashers.SHA1PasswordHasher',

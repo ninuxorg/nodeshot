@@ -46,7 +46,7 @@ def node_status_changed_handler(**kwargs):
     obj.new_status = kwargs['new_status'].name
     queryset = exclude_owner_of_node(obj)
     create_notifications.delay(**{
-        "queryset": queryset,
+        "users": queryset,
         "notification_model": Notification,
         "notification_type": "node_status_changed",
         "related_object": obj
