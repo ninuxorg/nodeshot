@@ -1,15 +1,15 @@
 from celery import task
-#from importlib import import_module
+
 from django.core import management
 from django.conf import settings
 
 
 @task()
-def delete_old_notifications():
+def purge_notifications():
     """
     deletes old notifications
     """
-    management.call_command('delete_old_notifications')
+    management.call_command('purge_notifications')
 
 
 # ------ Asynchronous tasks ------ #

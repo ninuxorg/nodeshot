@@ -84,6 +84,10 @@ def now_after(**kwargs):
     """ returns the current date and time plus the time (seconds, minutes, hours, days, years) specified """
     return now() + timedelta(**kwargs)
 
+def ago(**kwargs):
+    """ returns the current date and time minus the time (seconds, minutes, hours, days, years) specified """
+    return now() - timedelta(**kwargs)
+
 def after(date, **kwargs):
     """
     returns the result of the calculation of the date param plus the time (seconds, minutes, hours, days, years) specified
