@@ -77,15 +77,16 @@ class ModelsTest(TestCase):
         """ test that node._current_status is none for new nodes """
         n = Node()
         self.failUnlessEqual(n._current_status, None, 'new node _current_status private attribute is different than None')
-        #self.failUnlessEqual(n._current_hotspot, None, 'new node _current_status private attribute is different than None')
-        n = Node.objects.all()[0]
+        n = Node.objects.all().order_by('-id')[0]
         self.failUnlessEqual(n._current_status, n.status.id, 'new node _current_status private attribute is different than status')
         n.status = Status.objects.get(pk=2)
         self.failIfEqual(n._current_status, n.status.id, 'new node _current_status private attribute is still equal to status')
         n.save()
         self.failUnlessEqual(n._current_status, n.status.id, 'new node _current_status private attribute is different than status')
-        n.status = Status.objects.get(pk=3)
+        n.status_id = 3
         n.save()
+        n = Node.objects.all().order_by('-id')[0]
+        self.failUnlessEqual(n._current_status, n.status.id, 'new node _current_status private attribute is different than status')
     
     def test_node_manager(self):
         """ test manager methods of Node model """

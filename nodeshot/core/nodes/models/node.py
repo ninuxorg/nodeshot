@@ -89,10 +89,12 @@ class Node(BaseAccessLevel):
         super(Node, self).save(*args, **kwargs)
         
         # if status of a node changes
-        if self.status and self._current_status and self.status.id != self._current_status:
+        if (self.status and self._current_status and self.status.id != self._current_status) or (
+            self.status_id and self._current_status and self.status_id != self._current_status
+        ):
             # send django signal
             node_status_changed.send(sender=self.__class__, instance=self, old_status=Status.objects.get(pk=self._current_status), new_status=self.status)
-        # update __current_status
+        # update _current_status
         self._current_status = self.status_id
     
     def extensible_validation(self):
