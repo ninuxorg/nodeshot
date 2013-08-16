@@ -371,6 +371,7 @@ NODESHOT = {
             'nodeshot.core.cms',
             'nodeshot.community.profiles',
             'nodeshot.community.participation',
+            'nodeshot.community.notifications',
             'nodeshot.community.mailing',
         ]
     },

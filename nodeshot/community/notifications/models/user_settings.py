@@ -3,8 +3,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 
-# profile stuff
 def add_notifications(myclass):
+    """
+    Decorator which adds fields dynamically to User Notification Settings models.
+    
+    Each of the keys in the settings.NODESHOT['NOTIFICATIONS']['TEXTS'] dictionary
+    are added as a field and DB column.
+    """
     for key, value in settings.NODESHOT['NOTIFICATIONS']['TEXTS'].items():
         # custom notifications cannot be disabled
         if key == 'custom':

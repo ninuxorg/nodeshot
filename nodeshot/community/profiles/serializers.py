@@ -14,6 +14,7 @@ from .models import PasswordReset, SocialLink
 PROFILE_EMAIL_CONFIRMATION = settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True)
 PASSWORD_MAX_LENGTH = User._meta.get_field('password').max_length
 EMAIL_AUTHENTICATION = False
+NOTIFICATIONS_INSTALLED = 'nodeshot.community.notifications' in settings.INSTALLED_APPS
 
 if PROFILE_EMAIL_CONFIRMATION:
     from emailconfirmation.models import EmailAddress
@@ -168,19 +169,29 @@ class ProfileCreateSerializer(ExtensibleModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     """ Account serializer """
     
-    profile = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_profile_detail')
+    profile = serializers.HyperlinkedIdentityField(lookup_field='username',
+                                                view_name='api_profile_detail')
+    social_links = serializers.HyperlinkedIdentityField(lookup_field='username',
+                                                view_name='api_user_social_links_list')
     change_password = HyperlinkedField(view_name='api_account_password_change')
     logout = HyperlinkedField(view_name='api_account_logout')
     
     if PROFILE_EMAIL_CONFIRMATION:
         email_addresses = HyperlinkedField(view_name='api_account_email_list')
     
+    if NOTIFICATIONS_INSTALLED:
+        web_notification_settings = HyperlinkedField(view_name='api_notification_web_settings')
+        email_notification_settings = HyperlinkedField(view_name='api_notification_email_settings')
+    
     class Meta:
         model = User
-        fields = ['profile', 'change_password', 'logout']
+        fields = ['profile', 'social_links', 'change_password', 'logout']
         
         if PROFILE_EMAIL_CONFIRMATION:
             fields += ['email_addresses']
+        
+        if NOTIFICATIONS_INSTALLED:
+            fields += ['web_notification_settings', 'email_notification_settings']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
