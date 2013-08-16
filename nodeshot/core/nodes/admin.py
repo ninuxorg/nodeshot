@@ -21,15 +21,23 @@ class ImageInline(BaseStackedInline):
 
 
 NODE_FILTERS = ['is_published', 'status', 'access_level', 'added']
+NODE_LIST_DISPLAY = ['name', 'user', 'status', 'access_level', 'is_published', 'added', 'updated']
+NODE_FIELDS_LOOKEDUP = [
+    'user__id', 'user__username',
+    'status__id', 'status__name', 'status__is_default',
+    'name', 'access_level', 'is_published', 'added', 'updated'
+]
 
 # include layer in filters if layers app installed
 if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-    NODE_FILTERS = ['layer'] + NODE_FILTERS
+    NODE_FILTERS.insert(0, 'layer')
+    NODE_LIST_DISPLAY.insert(2, 'layer')
+    NODE_FIELDS_LOOKEDUP += ['layer__id', 'layer__name']
 
 
 class NodeAdmin(BaseGeoAdmin):
-    list_display  = ('name', 'status', 'access_level', 'is_published', 'added', 'updated')
-    list_filter   = NODE_FILTERS
+    list_display = NODE_LIST_DISPLAY
+    list_filter = NODE_FILTERS
     list_select_related = True
     search_fields = ('name',)
     actions_on_bottom = True
@@ -39,6 +47,11 @@ class NodeAdmin(BaseGeoAdmin):
     inlines = [ImageInline]
     
     change_list_template = 'smuggler/change_list.html'
+    
+    def queryset(self, request):
+        return super(NodeAdmin, self).queryset(request).select_related('user', 'layer', 'status').only(
+            
+        )
     
     # Enable TinyMCE HTML Editor according to settings, defaults to True
     if settings.NODESHOT['SETTINGS'].get('NODE_DESCRIPTION_HTML', True) is True: 
