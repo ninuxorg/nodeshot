@@ -50,7 +50,7 @@ class NotificationList(generics.ListAPIView):
     def get_unread(self, request, notifications, mark_as_read):
         """ return unread notifications and mark as read (unless read=false param is passed)"""
         notifications = notifications.filter(is_read=False)
-        data = UnreadNotificationSerializer(notifications).data
+        data = UnreadNotificationSerializer(notifications, many=True).data
         # if True mark retrieve unread notifications as read (default behaviour)
         if mark_as_read:
             notifications.update(is_read=True)
@@ -67,6 +67,24 @@ class NotificationList(generics.ListAPIView):
         return self.list(request, notifications)
 
 notification_list = NotificationList.as_view()
+
+
+class NotificationDetail(generics.RetrieveAPIView):
+    """
+    ### GET
+    
+    Retrieve specific notification of current user.
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = NotificationSerializer
+    queryset = Notification.objects.select_related('from_user')
+    
+    def get_queryset(self):
+        """ filter only notifications of current user """
+        return self.queryset.filter(to_user=self.request.user)
+
+notification_detail = NotificationDetail.as_view()
 
 
 # ------ User Notification Settings ------ #

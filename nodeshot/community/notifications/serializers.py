@@ -33,7 +33,8 @@ class UnreadNotificationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Notification
-        fields = ('type', 'from_user_id', 'from_user_detail', 'text', 'action', 'added')
+        fields = ('id', 'type', 'from_user_id',
+                  'from_user_detail', 'text', 'action', 'added')
 
 
 class NotificationSerializer(UnreadNotificationSerializer):
@@ -43,7 +44,8 @@ class NotificationSerializer(UnreadNotificationSerializer):
     
     class Meta:
         model = Notification
-        fields = ('type', 'from_user_id', 'from_user_detail', 'text', 'action', 'is_read', 'added', 'updated')
+        fields = ('id', 'type', 'from_user_id', 'from_user_detail',
+                  'text', 'action', 'is_read', 'added', 'updated')
 
 
 class PaginatedNotificationSerializer(PaginationSerializer):

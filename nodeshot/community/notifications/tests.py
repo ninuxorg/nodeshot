@@ -10,7 +10,7 @@ User = get_user_model()
 
 from nodeshot.core.base.tests import user_fixtures, BaseTestCase
 from nodeshot.core.base.utils import ago
-from nodeshot.core.nodes.models import Node#, Status
+from nodeshot.core.nodes.models import Node
 
 from .models import *
 from .tasks import purge_notifications
@@ -670,7 +670,7 @@ class TestNotification(BaseTestCase):
             """ test read notification API operation """
             url = reverse('api_notification_list')
             
-            # GET 401 unauthorized
+            # GET 403 unauthorized
             response = self.client.get(url)
             self.assertEqual(response.status_code, 403)
             
@@ -738,6 +738,44 @@ class TestNotification(BaseTestCase):
             # test non expected action should default to unread
             response = self.client.get(url, { 'action': 'doesntexist' })
             self.assertEquals(30, len(response.data))
+        
+        def test_notification_detail_API(self):
+            # set user #4 to receive notifications
+            user = User.objects.get(pk=4)
+            user.web_notification_settings.node_created = 0
+            user.web_notification_settings.save()
+            
+            # generate a notification
+            fusolab = Node.objects.create(**{
+                'name': 'a node in rome',
+                'slug': 'a-node-in-rome',
+                'layer_id': 1,
+                'geometry': 'POINT (12.5822391919000012 41.8720419276999820)',
+                'user_id': 1  # admin
+            })
+            
+            notification_id = Notification.objects.order_by('-id').all()[0].id
+            
+            # test notification detail
+            url = reverse('api_notification_detail', args=[notification_id])
+            
+            # GET 403 unauthorized
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 403)
+            
+            # GET 404
+            # login as wrong user
+            self.client.login(username='registered', password='tester')
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 404)
+            self.client.logout()
+            
+            # GET 200
+            # login as right user
+            self.client.login(username='romano', password='tester')
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['id'], notification_id)
         
         def test_email_notification_settings(self):
             """ ensure email notification settings endpoint works correctly """

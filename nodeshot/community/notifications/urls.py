@@ -4,6 +4,7 @@ from django.conf import settings
 
 urlpatterns = patterns('nodeshot.community.notifications.views',
     url(r'^/account/notifications/$', 'notification_list', name='api_notification_list'),
+    url(r'^/account/notifications/(?P<pk>[0-9]+)/$', 'notification_detail', name='api_notification_detail'),
     
     # email settings
     url(r'^/account/notifications/email-settings/$',
