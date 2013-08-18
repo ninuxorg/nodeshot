@@ -77,8 +77,8 @@ class TestNotification(BaseTestCase):
         self.assertEqual(n.get_action(), '')
     
     def test_purge_notifications(self):
-        default_setting = settings.NODESHOT['SETTINGS']['NOTIFICATIONS_DELETE_OLD']
-        settings.NODESHOT['SETTINGS']['NOTIFICATIONS_DELETE_OLD'] = 7
+        default_setting = settings.NODESHOT['NOTIFICATIONS']['DELETE_OLD']
+        settings.NODESHOT['NOTIFICATIONS']['DELETE_OLD'] = 7
         
         n = Notification.objects.create(**{
             "to_user_id": 1,

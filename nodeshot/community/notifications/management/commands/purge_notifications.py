@@ -6,14 +6,14 @@ from nodeshot.core.base.utils import ago
 
 
 class Command(BaseCommand):
-    help = "Delete notifications older than settings.NODESHOT['SETTINGS']['NOTIFICATIONS_DELETE_OLD']"
+    help = "Delete notifications older than settings.NODESHOT['NOTIFICATIONS']['DELETE_OLD']"
 
     def retrieve_old_notifications(self):
         """
         Retrieve notifications older than X days, where X is specified in settings
         """
         
-        date = ago(days=settings.NODESHOT['SETTINGS'].get('NOTIFICATIONS_DELETE_OLD', 40))
+        date = ago(days=settings.NODESHOT['NOTIFICATIONS'].get('DELETE_OLD', 40))
         
         return Notification.objects.filter(added__lte=date)
     

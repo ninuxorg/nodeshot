@@ -337,7 +337,6 @@ NODESHOT = {
         'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin
         
         'HSTORE': True,  #  postgresql hstore types for extra data fields
-        'NOTIFICATIONS_DELETE_OLD': 40,  # delete notifications older than specified days
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (
@@ -409,6 +408,7 @@ NODESHOT = {
             'node_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
             'your_node_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
         },
+        'DELETE_OLD': 40,  # delete notifications older than specified days
         'REGISTRARS': (
             'nodeshot.community.notifications.registrars.nodes',
         )
