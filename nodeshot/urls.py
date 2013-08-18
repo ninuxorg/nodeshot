@@ -20,6 +20,12 @@ if 'grappelli' in settings.INSTALLED_APPS:
     )
 
 
+if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
+    urlpatterns = urlpatterns + patterns('',
+        url(r'^websockets/', include('nodeshot.core.websockets.urls')),
+    )
+
+
 if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
     urlpatterns = urlpatterns + patterns('',
         url(r"^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",

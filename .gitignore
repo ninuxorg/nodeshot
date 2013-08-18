@@ -7,8 +7,10 @@ settings.py
 python/
 projects/ninux/ninux/media/nodes/
 projects/ninux/ninux/media/external/
+projects/ninux/ninux/media/status-icons/
 projects/georate/georate/media/nodes/
 projects/georate/georate/media/external/
+projects/georate/georate/media/status-icons/
 debug.log
 *~
 ._*
@@ -16,3 +18,10 @@ startshell
 activate
 runserver
 TODO.txt
+nodeshot.websockets.private
+nodeshot.websockets.public
+celerybeat.pid
+celerybeat-schedule
+runtests
+coverage
+load_fixtures.sh

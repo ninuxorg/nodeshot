@@ -50,6 +50,9 @@ Celery
 django-celery
 django-celery-email
 
+# websockets
+tornado==3.1
+
 # Postgres HSTORE support
 -e git+https://github.com/nemesisdesign/django-hstore.git#egg=django_hstore
 

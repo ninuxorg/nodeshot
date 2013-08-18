@@ -1,5 +1,4 @@
-from django.conf.urls import patterns, include, url
-from rest_framework.urlpatterns import format_suffix_patterns
+from django.conf.urls import patterns, url
 
 
 urlpatterns = patterns('nodeshot.core.nodes.views',
@@ -14,5 +13,3 @@ urlpatterns = patterns('nodeshot.core.nodes.views',
     # status
     url(r'^/status/$', 'status_list', name='api_status_list'),
 )
-
-#urlpatterns = format_suffix_patterns(urlpatterns)

@@ -152,9 +152,11 @@ INSTALLED_APPS = (
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
     'nodeshot.core.cms',
+    'nodeshot.core.websockets',
     'nodeshot.interoperability',
     'nodeshot.community.profiles',
     'nodeshot.community.participation',
+    'nodeshot.community.notifications',
     'nodeshot.community.mailing',
     'nodeshot.networking.net',
     'nodeshot.networking.links',
@@ -409,6 +411,16 @@ NODESHOT = {
         },
         'REGISTRARS': (
             'nodeshot.community.notifications.registrars.nodes',
+        )
+    },
+    'WEBSOCKETS': {
+        'PUBLIC_PIPE': '%s/nodeshot.websockets.public' % os.path.dirname(SITE_ROOT),
+        'PRIVATE_PIPE': '%s/nodeshot.websockets.private' % os.path.dirname(SITE_ROOT),
+        'DOMAIN': SITE_DOMAIN,
+        'LISTENING_ADDRESS': '0.0.0.0',  # set to 127.0.0.1 to accept only local calls (used for proxying to port 80 with nginx or apache mod_proxy)
+        'LISTENING_PORT': 9090,
+        'REGISTRARS': (
+            'nodeshot.core.websockets.registrars.nodes',   
         )
     }
 }
