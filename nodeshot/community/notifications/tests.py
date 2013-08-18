@@ -15,6 +15,19 @@ from nodeshot.core.nodes.models import Node
 from .models import *
 from .tasks import purge_notifications
 
+# remove websockets from installed apps and disconnect signals
+if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
+    
+    from importlib import import_module
+    
+    for registrar in settings.NODESHOT['WEBSOCKETS']['REGISTRARS']:
+        module = import_module(registrar)
+        module.disconnect()
+    
+    settings.NODESHOT['WEBSOCKETS']['REGISTRARS'] = []
+    
+    settings.INSTALLED_APPS = [app for app in settings.INSTALLED_APPS if app != 'nodeshot.core.websockets']
+
 
 class TestNotification(BaseTestCase):
     """
@@ -27,6 +40,10 @@ class TestNotification(BaseTestCase):
         'test_layers.json',
         'test_status.json',
     ]
+    
+    #def setUp(self):
+    #    # disable web sockets registrars
+    #    settings.NODESHOT['WEBSOCKETS']['REGISTRARS'] = []
     
     def test_notification_to_herself(self):
         """ An user cannot send a notification to herself/himself """

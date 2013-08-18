@@ -76,3 +76,11 @@ def node_deleted_handler(sender, **kwargs):
         "related_object": obj
     })
 
+
+# ------ DISCONNECT UTILITY ------ #
+
+def disconnect():
+    """ disconnect signals """
+    post_save.disconnect(node_created_handler, sender=Node)
+    node_status_changed.disconnect(node_status_changed_handler)
+    pre_delete.disconnect(node_deleted_handler, sender=Node)
