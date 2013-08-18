@@ -7,6 +7,18 @@ from nodeshot.core.nodes.models import *
 from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline
 from nodeshot.core.base.widgets import AdvancedFileInput
 
+REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_NODES', True)
+
+# enable django-reversion according to settings
+if REVERSION_ENABLED:
+    import reversion
+    
+    class GeoAdmin(BaseGeoAdmin, reversion.VersionAdmin):
+        change_list_template = 'reversion_and_smuggler/change_list.html'
+else:
+    class GeoAdmin(BaseGeoAdmin):
+        change_list_template = 'smuggler/change_list.html'
+
 
 class ImageInline(BaseStackedInline):
     model = Image
@@ -35,7 +47,7 @@ if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
     NODE_FIELDS_LOOKEDUP += ['layer__id', 'layer__name']
 
 
-class NodeAdmin(BaseGeoAdmin):
+class NodeAdmin(GeoAdmin):
     list_display = NODE_LIST_DISPLAY
     list_filter = NODE_FILTERS
     list_select_related = True
@@ -46,12 +58,8 @@ class NodeAdmin(BaseGeoAdmin):
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ImageInline]
     
-    change_list_template = 'smuggler/change_list.html'
-    
     def queryset(self, request):
-        return super(NodeAdmin, self).queryset(request).select_related('user', 'layer', 'status').only(
-            
-        )
+        return super(NodeAdmin, self).queryset(request).select_related('user', 'layer', 'status')
     
     # Enable TinyMCE HTML Editor according to settings, defaults to True
     if settings.NODESHOT['SETTINGS'].get('NODE_DESCRIPTION_HTML', True) is True: 

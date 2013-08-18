@@ -16,6 +16,22 @@ from .serializers import *
 from .models import *
 
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
+REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_NODES', True)
+
+if REVERSION_ENABLED:
+    from nodeshot.core.base.mixins import RevisionCreate, RevisionUpdate
+    
+    class NodeListBase(ACLMixin, RevisionCreate, generics.ListCreateAPIView):
+        pass
+    
+    class NodeDetailBase(ACLMixin, RevisionUpdate, generics.RetrieveUpdateDestroyAPIView):
+        pass
+else:
+    class NodeListBase(ACLMixin, generics.ListCreateAPIView):
+        pass
+    
+    class NodeDetailBase(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
+        pass
 
 
 def get_queryset_or_404(queryset, kwargs):
@@ -31,7 +47,7 @@ def get_queryset_or_404(queryset, kwargs):
     return obj
 
 
-class NodeList(ACLMixin, generics.ListCreateAPIView):
+class NodeList(NodeListBase):
     """
     ### GET
     
@@ -106,7 +122,7 @@ class NodeList(ACLMixin, generics.ListCreateAPIView):
 node_list = NodeList.as_view()
     
     
-class NodeDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
+class NodeDetail(NodeDetailBase):
     """
     ### GET
     

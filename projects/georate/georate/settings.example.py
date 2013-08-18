@@ -330,6 +330,8 @@ NODESHOT = {
         'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin,
         
         'HSTORE': True,  #  postgresql hstore types for extra data fields
+        
+        'REVERSION_NODES': True,  # activate django reversion for nodes app
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (
