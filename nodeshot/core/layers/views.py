@@ -13,10 +13,25 @@ from nodeshot.core.nodes.serializers import NodeGeoSerializer
 from .models import Layer
 from .serializers import *
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
+REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_NODES', True)
+
+if REVERSION_ENABLED:
+    from nodeshot.core.base.mixins import RevisionCreate, RevisionUpdate
+    
+    class LayerListBase(RevisionCreate, generics.ListCreateAPIView):
+        pass
+    
+    class LayerDetailBase(RevisionUpdate, generics.RetrieveUpdateAPIView):
+        pass
+else:
+    class LayerListBase(generics.ListCreateAPIView):
+        pass
+    
+    class LayerDetailBase(generics.RetrieveUpdateAPIView):
+        pass
 
 
-class LayerList(generics.ListCreateAPIView):
+class LayerList(LayerListBase):
     """
     ### GET
     
@@ -38,11 +53,15 @@ class LayerList(generics.ListCreateAPIView):
 layer_list = LayerList.as_view()
 
 
-class LayerDetail(generics.RetrieveUpdateAPIView):
+class LayerDetail(LayerDetailBase):
     """
     ### GET
     
     Retrieve details of specified layer.
+    
+    ### PUT & PATCH
+    
+    Edit specified layer
     """
     permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
     authentication_classes = (authentication.SessionAuthentication,)

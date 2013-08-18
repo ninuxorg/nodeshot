@@ -331,6 +331,7 @@ NODESHOT = {
         
         'HSTORE': True,  #  postgresql hstore types for extra data fields
         
+        'REVERSION_LAYERS': True,  # activate django reversion for layers app
         'REVERSION_NODES': True,  # activate django reversion for nodes app
     },
     'CHOICES': {
