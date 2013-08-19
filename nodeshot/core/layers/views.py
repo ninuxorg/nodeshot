@@ -101,21 +101,16 @@ class LayerNodesList(ListSerializerMixin, NodeList):
         self.get_layer()
         return super(LayerNodesList, self).get_queryset().filter(layer_id=self.layer.id)
     
+    def get_nodes(self, request, *args, **kwargs):
+        """ this method might be overridden by other modules (eg: interoperability) """
+        # ListSerializerMixin.list returns a serializer object
+        return (self.list(request, *args, **kwargs)).data
+    
     def get(self, request, *args, **kwargs):
-        """ custom structure """
+        """ custom data structure """
         self.get_layer()
-        
-        # here I had to mix the code of the interoperability module
-        # not 100% satisfied but I couldn't find a better way
-        if 'nodeshot.interoperability' in settings.INSTALLED_APPS and self.layer.is_external and hasattr(self.layer.external, 'get_nodes'):
-            nodes = self.layer.external.get_nodes()
-        else:
-            # ListSerializerMixin.list returns a serializer object
-            nodes = (self.list(request, *args, **kwargs)).data
-        
         content = LayerNodeListSerializer(self.layer, context=self.get_serializer_context()).data
-        content['nodes'] = nodes
-        
+        content['nodes'] = self.get_nodes(request, *args, **kwargs)
         return Response(content)
     
     post = Hider()

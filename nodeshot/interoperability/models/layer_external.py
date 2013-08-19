@@ -78,7 +78,7 @@ class LayerExternal(models.Model):
         # if synchronizer has get_nodes method
         # add get_nodes method to current LayerExternal instance
         if self.synchronizer is not False and hasattr(self.synchronizer, 'get_nodes'):
-            def get_nodes():
-                return self.synchronizer.get_nodes()
+            def get_nodes(class_name, params):
+                return self.synchronizer.get_nodes(class_name, params)
             
             self.get_nodes = get_nodes
