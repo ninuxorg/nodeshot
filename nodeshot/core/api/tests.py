@@ -17,8 +17,8 @@ class ParticipationModelsTest(TestCase):
     ]
     
     def setUp(self):
-       self.installed_apps = settings.INSTALLED_APPS
-       self.api_apps_enabled = settings.NODESHOT['API']['APPS_ENABLED']
+       self.installed_apps = settings.INSTALLED_APPS[:]
+       self.api_apps_enabled = settings.NODESHOT['API']['APPS_ENABLED'][:]
     
     def test_root_endpoint(self):
         """
@@ -47,5 +47,5 @@ class ParticipationModelsTest(TestCase):
         # ensure other URLs are still there
         self.assertContains(response, 'nodes')
         
-        settings.INSTALLED_APPS = self.installed_apps
-        settings.NODESHOT['API']['APPS_ENABLED'] = self.api_apps_enabled
+        settings.INSTALLED_APPS = self.installed_apps[:]
+        settings.NODESHOT['API']['APPS_ENABLED'] = self.api_apps_enabled[:]

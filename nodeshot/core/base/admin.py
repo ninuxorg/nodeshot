@@ -9,7 +9,7 @@ GEODJANGO_IMPROVED_WIDGETS = 'olwidget' in settings.INSTALLED_APPS
 if GEODJANGO_IMPROVED_WIDGETS:
     from olwidget.admin import GeoModelAdmin
 else:
-    from django.contrib.gis import admin as GeoModelAdmin
+    from django.contrib.gis.admin import ModelAdmin as GeoModelAdmin
 
 
 def _get_geodjango_map_coords():

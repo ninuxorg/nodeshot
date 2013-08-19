@@ -81,9 +81,13 @@ class NodeListSerializer(NodeDetailSerializer):
         model = Node
         fields = [
             'name', 'slug', 'layer', 'layer_name', 'user', 'status',
-            'geometry', 'elev', 'address', 'description', 'data',
-            'updated', 'added', 'details'
+            'geometry', 'elev', 'address', 'description'
         ]
+        
+        if HSTORE_ENABLED:
+            fields += ['data']
+        
+        fields += ['updated', 'added', 'details']
         
         read_only_fields = ['added', 'updated']
         geo_field = 'geometry'

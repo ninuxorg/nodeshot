@@ -15,7 +15,6 @@ from .permissions import IsOwnerOrReadOnly
 from .serializers import *
 from .models import *
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_NODES', True)
 
 if REVERSION_ENABLED:

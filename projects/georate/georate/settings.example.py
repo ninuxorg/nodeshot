@@ -359,8 +359,8 @@ NODESHOT = {
         'MAP_ZOOM': 12,
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
         'NODE_PUBLISHED': True,
-        'ZONE_ZOOM': 12,
-        'ZONE_MINIMUM_DISTANCE': 0,
+        'LAYER_ZOOM': 12,
+        'LAYER_MINIMUM_DISTANCE': 0,
         'MAILING_SCHEDULE_OUTWARD': False,
         'ACL_GLOBAL': 'public',
         'NOTIFICATION_BOOLEAN_FIELDS': True,
