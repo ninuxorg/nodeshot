@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.conf import settings
 
-from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
+from nodeshot.core.base.admin import BaseAdmin, BaseGeoAdmin, BaseStackedInline
 from nodeshot.core.nodes.models import Node
 
 from .models import Device, Interface, Ethernet, Wireless, Bridge, Tunnel, Vap, Vlan, RoutingProtocol, Ip
@@ -56,6 +56,13 @@ class DeviceAdmin(BaseAdmin):
     list_display  = ('name', 'node', 'type', 'access_level', 'added', 'updated')
     search_fields = ('name', 'type')
     inlines = [EthernetInline, WirelessInline, BridgeInline, TunnelInline, VlanInline]
+    
+    raw_id_fields = ('node',)
+    autocomplete_lookup_fields = {
+        'fk': ['node'],
+    }
+    
+    exclude = ('shortcuts',)
     
     if not settings.DEBUG:
         readonly_fields = BaseAdmin.readonly_fields + ['status']

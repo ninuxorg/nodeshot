@@ -16,6 +16,8 @@ DEVICE_TYPES = {
     'server': 'server',
     'router': 'router',
     'switch managed': 'switch',
+    'sensor': 'sensor',
+    'other': 'other',
 }
 DEVICE_TYPES_CHOICES = choicify(DEVICE_TYPES)
 
