@@ -27,7 +27,7 @@ django-extensions
 olwidget
 
 # RESTful API and API documentation
-djangorestframework==2.3.6
+djangorestframework==2.3.7
 markdown
 -e git+https://github.com/nemesisdesign/django-rest-framework-gis.git#egg=django_restframework_gis
 
