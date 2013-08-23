@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.contrib.gis.geos.collections import GeometryCollection
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -79,6 +80,16 @@ class Node(BaseAccessLevel):
         self.extensible_validation()
     
     def save(self, *args, **kwargs):
+        """
+        Custom save method does the following things:
+            * converts geometry collections of just 1 item to that item (eg: a collection of 1 Point becomes a Point)
+            * intercepts changes to status and fires node_status_changed signal
+            * set default status
+        """
+        # geometry collection check
+        if isinstance(self.geometry, GeometryCollection) and 0 < len(self.geometry) < 2:
+            self.geometry = self.geometry[0]
+        
         # if no status specified
         if not self.status and not self.status_id:
             try:
@@ -126,4 +137,4 @@ class Node(BaseAccessLevel):
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod
         def autocomplete_search_fields():
-            return ('name__icontains',)
+            return ('name__icontains', 'slug__icontains', 'address__icontains')

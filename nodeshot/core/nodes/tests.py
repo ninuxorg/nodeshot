@@ -206,6 +206,16 @@ class ModelsTest(TestCase):
             self.fail('ValidationError not raised')
         except ValidationError as e:
             self.assertIn(_('Status "%s" already has a default icon' % status.name), e.messages)
+    
+    def test_geometry_collection_with_single_item(self):
+        node = Node.objects.get(pk=1)
+        node.geometry = GEOSGeometry("GEOMETRYCOLLECTION(POINT(12.509303756712 41.881163629853))")
+        node.save()
+        # fetch again cos geometry value is modified while saving
+        node = Node.objects.get(pk=1)
+        
+        point = GEOSGeometry("POINT(12.509303756712 41.881163629853)")
+        self.assertEqual(node.geometry, point)
 
 
 ### ------ API tests ------ ###
