@@ -90,8 +90,9 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+# CHANGE THIS KEY AND UNCOMMENT
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
+#SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -115,11 +116,11 @@ ROOT_URLCONF = 'ninux.urls' # replace myproject with the name of your project. D
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'ninux.wsgi.application'
 
-import nodeshot
+#import nodeshot
 
 TEMPLATE_DIRS = (
-    '%s/core/mailing/templates' % os.path.dirname(os.path.realpath(nodeshot.__file__)),
-    '%s/core/zones/templates' % os.path.dirname(os.path.realpath(nodeshot.__file__))
+    #'%s/core/mailing/templates' % os.path.dirname(os.path.realpath(nodeshot.__file__)),
+    #'%s/core/layers/templates' % os.path.dirname(os.path.realpath(nodeshot.__file__))
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
