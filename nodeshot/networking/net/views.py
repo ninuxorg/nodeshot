@@ -66,7 +66,7 @@ class DeviceList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Device
     #queryset = Device.objects.published()
-    serializer_class = DeviceSerializer
+    serializer_class = DeviceListSerializer
     pagination_serializer_class = PaginatedDeviceSerializer
     paginate_by_param = 'limit'
     paginate_by = 40
@@ -96,3 +96,10 @@ class DeviceList(generics.ListCreateAPIView):
     #    return queryset
     
 device_list = DeviceList.as_view()
+
+
+class DeviceDetails(generics.RetrieveUpdateDestroyAPIView):
+    model = Device
+    serializer_class = DeviceDetailSerializer
+
+device_details = DeviceDetails.as_view()
