@@ -339,8 +339,9 @@ NODESHOT = {
         
         'HSTORE': True,  #  postgresql hstore types for extra data fields
         
-        'REVERSION_LAYERS': True,  # activate django reversion for layers app
-        'REVERSION_NODES': True,  # activate django reversion for nodes app
+        'REVERSION_LAYERS': True,  # activate django reversion for layers.Layer model
+        'REVERSION_NODES': True,  # activate django reversion for nodes.Node model
+        'REVERSION_DEVICES': True,  # activate django reversion for net.Devices model
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (

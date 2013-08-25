@@ -51,7 +51,7 @@ class VapInline(BaseStackedInline):
     model = Vap
 
 
-class DeviceAdmin(BaseAdmin):
+class DeviceAdmin(BaseGeoAdmin):
     list_filter   = ('added', 'updated', 'node')
     list_display  = ('name', 'node', 'type', 'access_level', 'added', 'updated')
     search_fields = ('name', 'type')

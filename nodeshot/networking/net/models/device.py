@@ -99,6 +99,8 @@ class Device(BaseAccessLevel):
     @property
     def owner(self):
         if HSTORE_ENABLED:
+            if not self.shortcuts.has_key('user'):
+                self.store_shortcuts()
             return self.shortcuts['user']
         else:
             return self.node.user
@@ -108,7 +110,8 @@ class Device(BaseAccessLevel):
         if 'nodeshot.core.layers' not in settings.INSTALLED_APPS:
             return False
         if HSTORE_ENABLED:
+            if not self.shortcuts.has_key('layer'):
+                self.store_shortcuts()
             return self.shortcuts['layer']
         else:
             return self.node.layer
-    

@@ -1,13 +1,14 @@
-from django.test import TestCase
 from django.contrib.gis.geos import GEOSGeometry
+from django.core.urlresolvers import reverse
 
+from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.core.nodes.models import Node
 
 from .models import *
 
 
-class NetworkModelTest(TestCase):
+class NetTest(BaseTestCase):
     """
     Network Model Tests
     """
@@ -59,3 +60,66 @@ class NetworkModelTest(TestCase):
         self.assertEqual(d.owner, d.node.user)
         self.assertEqual(d.shortcuts['layer'], d.node.layer)
         self.assertEqual(d.layer, d.node.layer)
+    
+    def test_device_list_api(self):
+        """ API device list """
+        url = reverse('api_device_list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), Device.objects.access_level_up_to('public').count())
+    
+    def test_device_list_search_api(self):
+        """ API device list search """
+        url = reverse('api_device_list')
+        response = self.client.get(url, { 'search': 'RDP' })
+        self.assertEqual(len(response.data['results']), 1)
+    
+    def test_device_list_api_ACL(self):
+        """ API device list ACL """
+        device = Device.objects.get(pk=1)
+        device.access_level = 2
+        device.save()
+        
+        url = reverse('api_device_list')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data['results']), Device.objects.access_level_up_to('public').count())
+        
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data['results']), Device.objects.accessible_to(1).count())
+    
+    def test_device_details_api(self):
+        url = reverse('api_device_details', args=[1])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_device_details_api_permissions(self):
+        """ device detail permissions: only owner or admins can alter data """
+        # non owner can only read
+        url = reverse('api_device_details', args=[1])
+        response = self.client.patch(url, { 'description': 'permission test' })
+        self.assertEqual(response.status_code, 403)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+        
+        # login as owner
+        device = Device.objects.get(pk=1)
+        self.client.login(username=device.owner.username, password='tester')
+        
+        # owner can edit
+        response = self.client.patch(url, { 'description': 'permission test' })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['description'], 'permission test')
+        # check DB
+        device = Device.objects.get(pk=1)
+        self.assertEqual(device.description, 'permission test')
+        
+        # admin can edit too
+        self.client.logout()
+        self.client.login(username='admin', password='tester')
+        response = self.client.patch(url, { 'description': 'i am the admin' })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['description'], 'i am the admin')
+        # check DB
+        device = Device.objects.get(pk=1)
+        self.assertEqual(device.description, 'i am the admin')
