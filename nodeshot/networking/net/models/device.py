@@ -59,18 +59,19 @@ class Device(BaseAccessLevel):
     
     def save(self, *args, **kwargs):
         """
-        automatically inherit node coordinates and elevation
+        Custom save method does the following:
+            * automatically inherit node coordinates and elevation
+            * save shortcuts if HSTORE is enabled
         """
+        custom_checks = kwargs.pop('custom_checks', True)
+        
         super(Device, self).save(*args, **kwargs)
-        self.inherit_geo_data()
-        self.store_shortcuts()
-    
-    def inherit_geo_data(self):
-        """
-        inherith location and elevation from parent node
-        unless location or elevation are specified
-        """
+        
+        if custom_checks is False:
+            return
+        
         changed = False
+        
         if not self.location:
             if self.node.geometry.geom_type == 'Point':
                 self.location = self.node.geometry
@@ -82,36 +83,32 @@ class Device(BaseAccessLevel):
             self.elev = self.node.elev
             changed = True
         
-        if changed:
-            self.save()
-    
-    def store_shortcuts(self):
-        if HSTORE_ENABLED is False:
-            return False
-        
-        changed = False
-        original_user = self.shortcuts.get('user')
-        
-        self.shortcuts['user'] = self.node.user
-        
-        if original_user != self.shortcuts.get('user'):
-            changed = True
-        
-        if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-            original_layer = self.shortcuts.get('layer')
-            self.shortcuts['layer'] = self.node.layer
+        if HSTORE_ENABLED:
+            original_user = self.shortcuts.get('user')
             
-            if original_layer != self.shortcuts.get('layer'):
+            self.shortcuts['user'] = self.node.user
+            
+            if original_user != self.shortcuts.get('user'):
                 changed = True
+            
+            if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+                original_layer = self.shortcuts.get('layer')
+                self.shortcuts['layer'] = self.node.layer
+                
+                if original_layer != self.shortcuts.get('layer'):
+                    changed = True
         
         if changed:
-            self.save()
+            self.save(custom_checks=False)
     
     @property
     def owner(self):
         if HSTORE_ENABLED:
             if not self.shortcuts.has_key('user'):
-                self.store_shortcuts()
+                if self.node or self.node_id:
+                    self.save()
+                else:
+                    raise Exception('Instance does not have a node set yet')
             return self.shortcuts['user']
         else:
             return self.node.user
@@ -122,7 +119,10 @@ class Device(BaseAccessLevel):
             return False
         if HSTORE_ENABLED:
             if not self.shortcuts.has_key('layer'):
-                self.store_shortcuts()
+                if self.node or self.node_id:
+                    self.save()
+                else:
+                    raise Exception('Instance does not have a node set yet')
             return self.shortcuts['layer']
         else:
             return self.node.layer

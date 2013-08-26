@@ -19,7 +19,6 @@ class Interface(BaseAccessLevel):
     
     class Meta:
         app_label= 'net'
-        permissions = (('can_view_interfaces', 'Can view interfaces'),)
     
     def __unicode__(self):
         return '%s %s' % (self.get_type_display(), self.mac)

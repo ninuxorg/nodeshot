@@ -32,7 +32,7 @@ class DeviceList(ACLMixin, generics.ListAPIView):
      * `limit=0`: turns off pagination
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    queryset = Device.objects.all()
+    queryset = Device.objects.all().select_related('node')
     serializer_class = DeviceListSerializer
     pagination_serializer_class = PaginatedDeviceSerializer
     paginate_by_param = 'limit'
@@ -79,7 +79,7 @@ class DeviceDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (IsOwnerOrReadOnly,)
-    queryset = Device.objects.all()
+    queryset = Device.objects.all().select_related('node')
     serializer_class = DeviceDetailSerializer
 
 device_details = DeviceDetails.as_view()
