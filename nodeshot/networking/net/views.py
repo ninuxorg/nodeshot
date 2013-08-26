@@ -1,4 +1,4 @@
-#from django.http import Http404
+from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 #from django.utils.decorators import method_decorator
 #from django.views.decorators.cache import cache_page
@@ -6,24 +6,17 @@ from django.conf import settings
 from django.db.models import Q
 
 from rest_framework import permissions, authentication, generics
-from rest_framework.response import Response
+#from rest_framework.response import Response
 
-from nodeshot.core.base.mixins import ACLMixin
+from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
+from nodeshot.core.nodes.models import Node
 
 from .permissions import IsOwnerOrReadOnly
 from .serializers import *
 from .models import *
 
-#REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_DEVICES', True)
-#
-#if REVERSION_ENABLED:
-#    from nodeshot.core.base.mixins import RevisionCreate, RevisionUpdate
-#    
-#    class DeviceDetailBase(ACLMixin, RevisionUpdate, generics.RetrieveUpdateDestroyAPIView):
-#        pass
-#else:
-#    class DeviceDetailBase(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
-#        pass
+
+# ------ DEVICES ------ #
 
 
 class DeviceList(ACLMixin, generics.ListAPIView):
@@ -82,7 +75,7 @@ class DeviceDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     
     ### PUT & PATCH
     
-    Edit device.
+    Edit device. Must be authenticated as owner or admin.
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (IsOwnerOrReadOnly,)
@@ -90,3 +83,62 @@ class DeviceDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DeviceDetailSerializer
 
 device_details = DeviceDetails.as_view()
+
+
+class NodeDeviceList(CustomDataMixin, generics.ListCreateAPIView):
+    """
+    ### GET
+    
+    Retrieve devices of specified node according to user access level.
+    
+    Parameters:
+    
+     * `limit=<n>`: specify number of items per page (defaults to 40)
+     * `limit=0`: turns off pagination
+    
+    ### POST
+    
+    Create a new device for this node. Must be authenticated as node owner or admin.
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (IsOwnerOrReadOnly,)
+    serializer_class = NodeDeviceListSerializer
+    serializer_custom_class = DeviceAddSerializer
+    pagination_serializer_class = PaginatedNodeDeviceSerializer
+    paginate_by_param = 'limit'
+    paginate_by = 40
+    
+    def get_custom_data(self):
+        """ additional request.DATA """
+        return {
+            'node': self.node.id
+        }
+    
+    def initial(self, request, *args, **kwargs):
+        """
+        Custom initial method:
+            * ensure node exists and store it in an instance attribute
+            * change queryset to return only devices of current node
+        """
+        super(NodeDeviceList, self).initial(request, *args, **kwargs)
+        
+        # ensure node exists
+        try:
+            self.node = Node.objects.published()\
+                        .accessible_to(request.user)\
+                        .get(slug=self.kwargs.get('slug', None))
+        except Node.DoesNotExist:
+            raise Http404(_('Node not found.'))
+        
+        # check permissions on node (for device creation)
+        self.check_object_permissions(request, self.node)
+        
+        # return only devices of current node
+        self.queryset = Device.objects.filter(node_id=self.node.id)\
+                        .accessible_to(self.request.user)\
+                        .select_related('node')
+    
+node_device_list = NodeDeviceList.as_view()
+
+
+# ------ INTERFACES ------ #

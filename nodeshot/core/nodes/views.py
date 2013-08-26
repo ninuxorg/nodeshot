@@ -240,7 +240,7 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
         # check permissions on node (for image creation)
         self.check_object_permissions(request, self.node)
         
-        # return only comments of current node
+        # return only images of current node
         self.queryset = Image.objects.filter(node_id=self.node.id).accessible_to(self.request.user).select_related('node')
 
 node_images = NodeImageList.as_view()

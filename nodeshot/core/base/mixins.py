@@ -49,7 +49,9 @@ class CustomDataMixin(object):
         custom_data = dict(data.items() + additional_data.items())
         
         # pass custom data to serializer_custom_class
-        serializer = self.get_custom_serializer(data=custom_data, files=request.FILES)
+        serializer = self.get_custom_serializer(data=custom_data,
+                                                files=request.FILES,
+                                                context=self.get_serializer_context())
 
         if serializer.is_valid():
             self.pre_save(serializer.object)

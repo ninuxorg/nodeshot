@@ -134,6 +134,10 @@ class Node(BaseAccessLevel):
         # add method to this class
         setattr(class_, method_name, method)
     
+    @property
+    def owner(self):
+        return self.user
+    
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod
         def autocomplete_search_fields():

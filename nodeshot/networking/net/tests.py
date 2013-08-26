@@ -1,11 +1,16 @@
+import simplejson as json
+
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.core.nodes.models import Node
 
 from .models import *
+
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 
 class NetTest(BaseTestCase):
@@ -123,3 +128,79 @@ class NetTest(BaseTestCase):
         # check DB
         device = Device.objects.get(pk=1)
         self.assertEqual(device.description, 'i am the admin')
+    
+    def test_node_device_list_api(self):
+        """ API node device list """
+        
+        url = reverse('api_node_devices', args=[Node.objects.get(pk=7).slug])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        
+        url = reverse('api_node_devices', args=['idontexist'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+    
+    def test_node_device_list_api_ACL(self):
+        """ API device list ACL """
+        device = Device.objects.get(pk=1)
+        device.access_level = 2
+        device.save()
+        
+        node = Node.objects.get(pk=7)
+        url = reverse('api_node_devices', args=[node.slug])
+        response = self.client.get(url)
+        self.assertEqual(len(response.data['results']), Device.objects.filter(node_id=node.id).access_level_up_to('public').count())
+        
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data['results']), Device.objects.filter(node_id=node.id).accessible_to(1).count())
+    
+    def test_device_creation_api_permissions(self):
+        """ create device permissions: only node owner or admins can add devices """
+        # non owner can only read
+        node = Node.objects.get(pk=7)
+        url = reverse('api_node_devices', args=[node.slug])
+        
+        device_data = {
+            "name": "device creation test",
+            "type": "radio",
+            "description": "device creation test",
+        }
+        
+        if HSTORE_ENABLED:
+            device_data["data"] = { "is_unittest": "true" }
+        
+        response = self.client.post(url, device_data)
+        self.assertEqual(response.status_code, 403)
+        
+        # login as node owner
+        self.client.login(username=node.owner.username, password='tester')
+        
+        # node owner can create device
+        response = self.client.post(url, json.dumps(device_data), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['description'], 'device creation test')
+        if HSTORE_ENABLED:
+            self.assertEqual(response.data['data']['is_unittest'], 'true')
+        # check DB
+        device = Device.objects.order_by('-id').all()[0]
+        self.assertEqual(device.description, 'device creation test')
+        if HSTORE_ENABLED:
+            self.assertEqual(device.data['is_unittest'], 'true')
+        device.delete()
+        
+        # admin can create device too
+        self.client.logout()
+        self.client.login(username='admin', password='tester')
+        device_data["data"] = json.dumps(device_data["data"])
+        response = self.client.post(url, device_data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['description'], 'device creation test')
+        if HSTORE_ENABLED:
+            self.assertEqual(response.data['data']['is_unittest'], 'true')
+        # check DB
+        device = Device.objects.order_by('-id').all()[0]
+        self.assertEqual(device.description, 'device creation test')
+        if HSTORE_ENABLED:
+            self.assertEqual(device.data['is_unittest'], 'true')

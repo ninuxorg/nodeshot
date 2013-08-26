@@ -61,18 +61,29 @@ class Device(BaseAccessLevel):
         """
         automatically inherit node coordinates and elevation
         """
+        super(Device, self).save(*args, **kwargs)
+        self.inherit_geo_data()
+        self.store_shortcuts()
+    
+    def inherit_geo_data(self):
+        """
+        inherith location and elevation from parent node
+        unless location or elevation are specified
+        """
+        changed = False
         if not self.location:
             if self.node.geometry.geom_type == 'Point':
                 self.location = self.node.geometry
             else:
                 self.location = self.node.geometry.centroid
+            changed = True
         
         if not self.elev and self.node.elev:
             self.elev = self.node.elev
+            changed = True
         
-        super(Device, self).save(*args, **kwargs)
-        
-        self.store_shortcuts()
+        if changed:
+            self.save()
     
     def store_shortcuts(self):
         if HSTORE_ENABLED is False:
