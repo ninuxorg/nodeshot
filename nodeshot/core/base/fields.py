@@ -125,17 +125,43 @@ if 'south' in settings.INSTALLED_APPS:
     add_introspection_rules([], ["^nodeshot\.core\.base\.fields\.RGBColorField"])
 
 
+# rest_framework MacAddressField
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
+from rest_framework.fields import WritableField
+from netaddr import eui
+
+
+class MacAddressField(WritableField):
+        """
+        A field to handle mac address and avoid 500 internal server errors
+        """
+        
+        def validate(self, value):
+            """ ensure valid mac """
+            super(MacAddressField, self).validate(value)
+            
+            try:
+                eui.EUI(value)
+            except eui.AddrFormatError:
+                raise ValidationError(_('Invalid mac address'))
+        
+        def from_native(self, value):
+            return value
+    
+        def to_native(self, value):
+            return unicode(value)
+
+
 # rest_framework HStoreDictionaryField
 
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 if HSTORE_ENABLED:
     
-    from django.core.exceptions import ValidationError
-    from django.utils.translation import ugettext_lazy as _
     from django_hstore.fields import HStoreDictionary
     from django_hstore.exceptions import HStoreDictionaryException
-    from rest_framework.fields import WritableField
+    
 
     class HStoreDictionaryField(WritableField):
         """

@@ -104,10 +104,14 @@ class GeoAccessLevelPublishedQuerySet(GeoQuerySet, ACLMixin, PublishedMixin):
 
 
 if HSTORE_ENABLED:
-    from django_hstore.query import HStoreGeoQuerySet
+    from django_hstore.query import HStoreQuerySet, HStoreGeoQuerySet
+    
+    class HStoreAccessLevelQuerySet(HStoreQuerySet, ACLMixin):
+        """ HStoreQuerySet, PublishedQuerySet with GeoDjango queryset """
+        pass
     
     class HStoreGeoAccessLevelPublishedQuerySet(HStoreGeoQuerySet, ACLMixin, PublishedMixin):
-        """ AccessLevelQuerySet, PublishedQuerySet with GeoDjango queryset """
+        """ HStoreGeoQuerySet, AccessLevelQuerySet, PublishedQuerySet with GeoDjango queryset """
         pass
 
 
@@ -161,7 +165,15 @@ class GeoAccessLevelPublishedManager(GeoManager, ExtendedManagerMixin, ACLMixin,
 
 
 if HSTORE_ENABLED:
-    from django_hstore.managers import HStoreGeoManager
+    from django_hstore.managers import HStoreManager, HStoreGeoManager
+    
+    class HStoreAccessLevelManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin):
+        """
+        HStoreManager and AccessLeveManager in one
+        """
+        
+        def get_query_set(self): 
+            return HStoreAccessLevelQuerySet(self.model, using=self._db)
     
     class HStoreGeoAccessLevelPublishedManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin, PublishedMixin):
         """

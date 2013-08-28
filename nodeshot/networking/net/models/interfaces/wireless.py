@@ -7,13 +7,15 @@ from nodeshot.networking.net.models.choices import WIRELESS_MODE, WIRELESS_STAND
 
 class Wireless(Interface):
     """ Wireless Interface """
-    wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True)
-    wireless_standard = models.CharField(max_length=7, choices=WIRELESS_STANDARDS, blank=True)
-    wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
-    channel_width = models.CharField(max_length=6, blank=True, null=True)
-    transmitpower = models.IntegerField(null=True, blank=True)
+    mode = models.CharField(_('wireless mode'), max_length=5, choices=WIRELESS_MODE, blank=True)
+    standard = models.CharField(_('wireless standard'), max_length=7, choices=WIRELESS_STANDARDS, blank=True)
+    channel = models.CharField(_('channel'), max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
+    channel_width = models.CharField(_('channel width'), max_length=6, blank=True, null=True)
+    output_power = models.IntegerField(_('output power'), null=True, blank=True)
     dbm = models.IntegerField(_('dBm'), null=True, default=None, blank=True)
     noise = models.IntegerField(_('noise'), null=True, default=None, blank=True)
+    
+    objects = Interface.objects.__class__()
     
     class Meta:
         db_table = 'net_interface_wireless'

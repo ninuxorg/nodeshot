@@ -5,20 +5,37 @@
         "fields": {
             "device": 1,
             "type": 2,
-            "name": "ath0",
+            "name": "eth0",
             "mac": "00:27:22:38:13:E4",
             "mtu": 1500
+        }
+    },
+    {
+        "model": "net.Ethernet",
+        "pk": 1,
+        "fields": {
+            "interface_ptr": 1,
+            "standard": "fast",
+            "duplex": "full"
         }
     },
     {
         "model": "net.Interface",
         "pk": 2,
         "fields": {
-            "device": 2,
+            "device": 1,
             "type": 2,
             "name": "ath0",
             "mac": "00:27:22:00:50:71",
             "mtu": 1500
+        }
+    },
+    {
+        "model": "net.Wireless",
+        "pk": 1,
+        "fields": {
+            "interface_ptr": 1,
+            "standard": "802.11n"
         }
     }
 ]

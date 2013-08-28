@@ -101,7 +101,8 @@ INTERFACE_TYPES = {
     'ethernet': 1,
     'wireless': 2,
     'bridge': 3,
-    'virtual': 4
+    'virtual': 4,
+    'vlan': 5,
 }
 INTERFACE_TYPE_CHOICES = choicify(INTERFACE_TYPES)
 
@@ -116,9 +117,9 @@ WIRELESS_STANDARDS = (
 )
 
 ETHERNET_STANDARDS = (
-    ('10', 'Legacy Ethernet'),
-    ('10/100', '10/100 Fast Ethernet'),
-    ('10/100/1000', '10/100/1000 Gigabit Ethernet'),
+    ('legacy', 'Legacy Ethernet'),
+    ('fast', '10/100 Fast Ethernet'),
+    ('gigabit', '10/100/1000 Gigabit Ethernet'),
 )
 
 DUPLEX_CHOICES = (

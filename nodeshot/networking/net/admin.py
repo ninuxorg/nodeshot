@@ -71,6 +71,7 @@ class DeviceAdmin(BaseGeoAdmin):
 class InterfaceAdmin(BaseAdmin):
     list_display  = ('mac', 'name', 'type', 'device', 'added', 'updated')
     search_fields = ('mac',)
+    exclude = ('shortcuts',)
     inlines = (IpInline,)    
 
 

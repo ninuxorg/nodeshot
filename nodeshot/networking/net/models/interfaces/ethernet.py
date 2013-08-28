@@ -10,6 +10,8 @@ class Ethernet(Interface):
     standard = models.CharField(_('standard'), max_length=15, choices=ETHERNET_STANDARDS)
     duplex = models.CharField(_('duplex?'), max_length=15, choices=DUPLEX_CHOICES)
     
+    objects = Interface.objects.__class__()
+    
     class Meta:
         db_table = 'net_interface_ethernet'
         app_label= 'net'

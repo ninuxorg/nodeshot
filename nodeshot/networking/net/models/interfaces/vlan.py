@@ -17,5 +17,5 @@ class Vlan(Interface):
     
     def save(self, *args, **kwargs):
         """ automatically set Interface.type to virtual """
-        self.type = INTERFACE_TYPES.get('virtual')
+        self.type = INTERFACE_TYPES.get('vlan')
         super(Vlan, self).save(*args, **kwargs)

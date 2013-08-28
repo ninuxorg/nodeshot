@@ -8,7 +8,7 @@ from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 class Tunnel(Interface):
     """ Tunnel Interface """
     sap = models.CharField(max_length=10, null=True, blank=True)
-    protocol = models.CharField(max_length=10) # GRE, ... ecc
+    protocol = models.CharField(max_length=10)  # GRE, ... ecc
     endpoint = models.ForeignKey('net.Ip', verbose_name=_('ip address'))
     
     class Meta:
