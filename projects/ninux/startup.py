@@ -14,3 +14,9 @@ try:
     from nodeshot.community.mailing.models import Outward, Inward
 except ImportError as e:
     raise Exception('wrong imports!\n\n%s' % e.message)
+
+# print SQL queries
+import logging
+l = logging.getLogger('django.db.backends')
+l.setLevel(logging.DEBUG)
+l.addHandler(logging.StreamHandler())

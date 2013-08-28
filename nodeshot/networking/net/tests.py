@@ -107,6 +107,13 @@ class NetTest(BaseTestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
         
+        # login as non-owner
+        self.client.login(username='pisano', password='tester')
+        response = self.client.patch(url, { 'description': 'permission test' })
+        self.assertEqual(response.status_code, 403)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+        
         # login as owner
         device = Device.objects.get(pk=1)
         self.client.login(username=device.owner.username, password='tester')
@@ -171,8 +178,15 @@ class NetTest(BaseTestCase):
         if HSTORE_ENABLED:
             device_data["data"] = { "is_unittest": "true" }
         
+        # unregistered can't create
         response = self.client.post(url, device_data)
         self.assertEqual(response.status_code, 403)
+        
+        # login as non-owner
+        self.client.login(username='pisano', password='tester')
+        response = self.client.post(url, json.dumps(device_data), content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
         
         # login as node owner
         self.client.login(username=node.owner.username, password='tester')
@@ -204,3 +218,349 @@ class NetTest(BaseTestCase):
         self.assertEqual(device.description, 'device creation test')
         if HSTORE_ENABLED:
             self.assertEqual(device.data['is_unittest'], 'true')
+    
+    def test_interface_shortcuts(self):
+        ethernet = Ethernet.objects.create(
+            device_id=1,
+            name='eth0',
+            mac='00:27:22:38:13:f4',
+            standard='fast',
+            duplex='full'
+        )
+        self.assertEqual(ethernet.shortcuts['user'], ethernet.device.node.user)
+        self.assertEqual(ethernet.owner, ethernet.device.node.user)
+        self.assertEqual(ethernet.shortcuts['layer'], ethernet.device.node.layer)
+        self.assertEqual(ethernet.layer, ethernet.device.node.layer)
+        self.assertEqual(ethernet.shortcuts['node'], ethernet.device.node)
+        self.assertEqual(ethernet.node, ethernet.device.node)
+    
+    def test_device_ethernet_api(self):
+        """ API device ethernet interfaces """
+        
+        url = reverse('api_device_ethernet', args=[1])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        
+        url = reverse('api_device_ethernet', args=[99])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+    
+    def test_mac_address_rest_field(self):
+        data = {
+            "name": "eth0",
+            "mac": "IAM WRONG",
+            "tx_rate": 10000, 
+            "rx_rate": 10000, 
+            "data": {
+                "status": "active"
+            },
+            "standard": "fast", 
+            "duplex": "full"
+        }
+        self.client.login(username='romano', password='tester')
+        url = reverse('api_device_ethernet', args=[2])
+        
+        response = self.client.post(url, json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['mac'][0], 'Invalid mac address')
+        
+        data['mac'] = '00:27:22:38:13:f4'
+        response = self.client.post(url, json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+    
+    def test_device_ethernet_api_permissions(self):
+        """ API device ethernet interfaces permissions to create """
+        data = {
+            "name": "eth0",
+            "mac": "00:27:22:38:13:f4",
+            "tx_rate": 10000, 
+            "rx_rate": 10000, 
+            "standard": "fast", 
+            "duplex": "full"
+        }
+        if HSTORE_ENABLED:
+            data['data'] = { "status": "active" }
+        json_data = json.dumps(data)
+        eth_count = Ethernet.objects.filter(device_id=2).count()
+        url = reverse('api_device_ethernet', args=[2])
+        
+        # unlogged can't create
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Ethernet.objects.filter(device_id=2).count(), eth_count)
+        
+        # non-owner can't create
+        self.client.login(username='registered', password='tester')
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Ethernet.objects.filter(device_id=2).count(), eth_count)
+        self.client.logout()
+        
+        # owner can create
+        self.client.login(username='romano', password='tester')
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Ethernet.objects.filter(device_id=2).count(), eth_count+1)
+        self.client.logout()
+        Ethernet.objects.get(mac='00:27:22:38:13:f4').delete()
+        
+        # admin can create too
+        self.client.login(username='admin', password='tester')
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Ethernet.objects.filter(device_id=2).count(), eth_count+1)
+    
+    def test_device_ethernet_api_ACL(self):
+        """ API device ethernet ACL """
+        ethernet = Ethernet.objects.create(
+            device_id=1,
+            access_level=1,
+            name='private',
+            mac='00:27:22:38:13:a4',
+            standard='fast',
+            duplex='full'
+        )
+        
+        url = reverse('api_device_ethernet', args=[1])
+        device_url = reverse('api_device_details', args=[1])
+        
+        # unregistered can see only 1 record
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 1)
+        # check device detail url too
+        response = self.client.get(device_url)
+        self.assertEqual(len(response.data['ethernet']), 1)
+        
+        # registered can see two
+        self.client.login(username='registered', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 2)
+        # check device detail url too
+        response = self.client.get(device_url)
+        self.assertEqual(len(response.data['ethernet']), 2)
+        
+        # set to higher access level
+        ethernet.access_level = 2
+        ethernet.save()
+        
+        # now registed can see only 1
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 1)
+        # check device detail url too
+        response = self.client.get(device_url)
+        self.assertEqual(len(response.data['ethernet']), 1)
+        
+        # community can see two
+        self.client.logout()
+        self.client.login(username='community', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 2)
+        # check device detail url too
+        response = self.client.get(device_url)
+        self.assertEqual(len(response.data['ethernet']), 2)
+    
+    def test_ethernet_details_api_permissions(self):
+        """ ethernet details permissions: only owner or admins can alter data """
+        # non owner can only read
+        url = reverse('api_ethernet_details', args=[1])
+        response = self.client.patch(url, { 'name': 'eth2' })
+        self.assertEqual(response.status_code, 403)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+        
+        # login as non-owner
+        self.client.login(username='pisano', password='tester')
+        response = self.client.patch(url, { 'name': 'eth2' })
+        self.assertEqual(response.status_code, 403)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+        
+        # login as owner
+        ethernet = Ethernet.objects.get(pk=1)
+        self.client.login(username=ethernet.owner.username, password='tester')
+        
+        # owner can edit
+        response = self.client.patch(url, { 'name': 'eth2' })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], 'eth2')
+        # check DB
+        ethernet = Ethernet.objects.get(pk=1)
+        self.assertEqual(ethernet.name, 'eth2')
+        
+        # admin can edit too
+        self.client.logout()
+        self.client.login(username='admin', password='tester')
+        response = self.client.patch(url, { 'name': 'admineth2' })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], 'admineth2')
+        # check DB
+        ethernet = Ethernet.objects.get(pk=1)
+        self.assertEqual(ethernet.name, 'admineth2')
+    
+    def test_ethernet_details_api_ACL(self):
+        """ ethernet details ACL """
+        # non owner can only read
+        ethernet = Ethernet.objects.get(pk=1)
+        ethernet.access_level = 1
+        ethernet.save()
+        url = reverse('api_ethernet_details', args=[1])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        
+        self.client.login(username='registered', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_device_wireless_api(self):
+        """ API device wireless interfaces """
+        
+        url = reverse('api_device_wireless', args=[1])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        
+        url = reverse('api_device_wireless', args=[99])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+    
+    def test_device_wireless_api_ACL(self):
+        """ API device wireless ACL """
+        wireless = Wireless.objects.create(
+            device_id=1,
+            access_level=1,
+            name='private',
+            mac='00:27:22:38:13:a5',
+            standard='802.11n'
+        )
+        
+        url = reverse('api_device_wireless', args=[1])
+        device_url = reverse('api_device_details', args=[1])
+        
+        # unregistered can see 1
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 1)
+        # check device detail url too
+        response = self.client.get(device_url)
+        self.assertEqual(len(response.data['wireless']), 1)
+        
+        # registered can see 2
+        self.client.login(username='registered', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 2)
+        # check device detail url too
+        response = self.client.get(device_url)
+        self.assertEqual(len(response.data['wireless']), 2)
+        
+        # set to higher access level
+        wireless.access_level = 2
+        wireless.save()
+        
+        # now registed can see only 1
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 1)
+        # check device detail url too
+        response = self.client.get(device_url)
+        self.assertEqual(len(response.data['wireless']), 1)
+        
+        # community can see two
+        self.client.logout()
+        self.client.login(username='community', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 2)
+        # check device detail url too
+        response = self.client.get(device_url)
+        self.assertEqual(len(response.data['wireless']), 2)
+    
+    def test_device_wireless_api_permissions(self):
+        """ API device wireless interfaces permissions to create """
+        data = {
+            "name": "ath0",
+            "mac": "00:27:22:38:13:c4",
+            "tx_rate": 10000, 
+            "rx_rate": 10000, 
+            "standard": "802.11n"
+        }
+        if HSTORE_ENABLED:
+            data['data'] = { "status": "active" }
+        json_data = json.dumps(data)
+        eth_count = Wireless.objects.filter(device_id=2).count()
+        url = reverse('api_device_wireless', args=[2])
+        
+        # unlogged can't create
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Wireless.objects.filter(device_id=2).count(), eth_count)
+        
+        # non-owner can't create
+        self.client.login(username='registered', password='tester')
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Wireless.objects.filter(device_id=2).count(), eth_count)
+        self.client.logout()
+        
+        # owner can create
+        self.client.login(username='romano', password='tester')
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Wireless.objects.filter(device_id=2).count(), eth_count+1)
+        self.client.logout()
+        Wireless.objects.get(mac='00:27:22:38:13:c4').delete()
+        
+        # admin can create too
+        self.client.login(username='admin', password='tester')
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Wireless.objects.filter(device_id=2).count(), eth_count+1)
+    
+    def test_wireless_details_api_permissions(self):
+        """ wireless details permissions: only owner or admins can alter data """
+        # non owner can only read
+        url = reverse('api_wireless_details', args=[1])
+        response = self.client.patch(url, { 'name': 'eth2' })
+        self.assertEqual(response.status_code, 403)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+        
+        # login as non-owner
+        self.client.login(username='pisano', password='tester')
+        response = self.client.patch(url, { 'name': 'eth2' })
+        self.assertEqual(response.status_code, 403)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+        
+        # login as owner
+        wireless = Wireless.objects.get(pk=1)
+        self.client.login(username=wireless.owner.username, password='tester')
+        
+        # owner can edit
+        response = self.client.patch(url, { 'name': 'eth2' })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], 'eth2')
+        # check DB
+        wireless = Wireless.objects.get(pk=1)
+        self.assertEqual(wireless.name, 'eth2')
+        
+        # admin can edit too
+        self.client.logout()
+        self.client.login(username='admin', password='tester')
+        response = self.client.patch(url, { 'name': 'admineth2' })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], 'admineth2')
+        # check DB
+        wireless = Wireless.objects.get(pk=1)
+        self.assertEqual(wireless.name, 'admineth2')
+    
+    def test_wireless_details_api_ACL(self):
+        """ wireless details ACL """
+        # non owner can only read
+        wireless = Wireless.objects.get(pk=1)
+        wireless.access_level = 1
+        wireless.save()
+        url = reverse('api_wireless_details', args=[1])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        
+        self.client.login(username='registered', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

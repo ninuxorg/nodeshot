@@ -43,7 +43,7 @@ class DeviceList(ACLMixin, generics.ListAPIView):
         Optionally restricts the returned devices
         by filtering against a `search` query parameter in the URL.
         """
-        # retrieve all nodes which are published and accessible to current user
+        # retrieve all devices which are published and accessible to current user
         # and use joins to retrieve related fields
         queryset = super(DeviceList, self).get_queryset()#.select_related('layer', 'status', 'user')
         
@@ -142,3 +142,93 @@ node_device_list = NodeDeviceList.as_view()
 
 
 # ------ INTERFACES ------ #
+
+
+class BaseInterfaceList(CustomDataMixin, generics.ListCreateAPIView):
+    """
+    ### GET
+    
+    Retrieve interface list for specified device.
+    
+    ### POST
+    
+    Create new interface for specified device.
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (IsOwnerOrReadOnly,)
+    
+    def get_custom_data(self):
+        """ additional request.DATA """
+        return {
+            'device': self.device.id
+        }
+    
+    def initial(self, request, *args, **kwargs):
+        """
+        Custom initial method:
+            * ensure device exists and store it in an instance attribute
+            * change queryset to return only devices of current node
+        """
+        super(BaseInterfaceList, self).initial(request, *args, **kwargs)
+        
+        # ensure device exists
+        try:
+            self.device = Device.objects.accessible_to(request.user)\
+                        .get(pk=self.kwargs.get('pk', None))
+        except Device.DoesNotExist:
+            raise Http404(_('Device not found.'))
+        
+        # check permissions on device (for interface creation)
+        self.check_object_permissions(request, self.device)
+        
+        # return only interfaces of current device
+        self.queryset = self.model.objects.filter(device_id=self.device.id)\
+                        .accessible_to(self.request.user)
+
+
+class BaseInterfaceDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    ### GET
+    
+    Retrieve details of specified interface.
+    
+    ### DELETE
+    
+    Delete specified interface. Must be authenticated as owner or admin.
+    
+    ### PUT & PATCH
+    
+    Edit interface. Must be authenticated as owner or admin.
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (IsOwnerOrReadOnly,)
+
+
+class DeviceEthernetList(BaseInterfaceList):
+    model = Ethernet
+    serializer_class = EthernetSerializer
+    serializer_custom_class = EthernetAddSerializer
+    
+device_ethernet_list = DeviceEthernetList.as_view()
+
+
+class EthernetDetails(BaseInterfaceDetails):
+    queryset = Ethernet.objects.all()
+    serializer_class = EthernetSerializer
+
+ethernet_details = EthernetDetails.as_view()
+
+
+class DeviceWirelessList(BaseInterfaceList):
+    model = Wireless
+    serializer_class = WirelessSerializer
+    serializer_custom_class = WirelessAddSerializer
+    
+device_wireless_list = DeviceWirelessList.as_view()
+
+
+class WirelessDetails(BaseInterfaceDetails):
+    queryset = Wireless.objects.all()
+    serializer_class = WirelessSerializer
+
+wireless_details = WirelessDetails.as_view()
