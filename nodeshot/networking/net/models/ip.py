@@ -1,12 +1,13 @@
+from netfields import InetAddressField, CidrAddressField
+
 from django.db import models, DatabaseError, IntegrityError
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from nodeshot.core.base.models import BaseAccessLevel
+from nodeshot.core.base.managers import AccessLevelManager, NetAccessLevelManager
 from choices import IP_PROTOCOLS
-
-from netfields import InetAddressField, CidrAddressField, NetManager
 
 
 class Ip(BaseAccessLevel):
@@ -16,7 +17,8 @@ class Ip(BaseAccessLevel):
     protocol = models.CharField(_('IP Protocol Version'), max_length=4, choices=IP_PROTOCOLS, default=IP_PROTOCOLS[0][0], blank=True)
     netmask = CidrAddressField(_('netmask (CIDR, eg: 10.40.0.0/24)'))
     
-    objects = NetManager()
+    #objects = NetAccessLevelManager()  #TODO FIXME: this doesn't work, fix!
+    objects = AccessLevelManager()
     
     class Meta:
         app_label= 'net'

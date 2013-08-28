@@ -1,5 +1,7 @@
 import sys
 
+from netfields.managers import NetQuery, NetManager
+
 if not 'synchronize' in sys.argv and not 'celery' in sys.argv:
     from django.contrib.auth import get_user_model
     User = get_user_model()
@@ -98,6 +100,11 @@ class AccessLevelPublishedQuerySet(QuerySet, ACLMixin, PublishedMixin):
     pass
 
 
+class NetAccessLevelQuerySet(NetQuery, ACLMixin):
+    """ Custom queryset to filter depending on access levels + NetQuery """
+    pass
+
+
 class GeoAccessLevelPublishedQuerySet(GeoQuerySet, ACLMixin, PublishedMixin):
     """ AccessLevelQuerySet, PublishedQuerySet with GeoDjango queryset """
     pass
@@ -141,6 +148,13 @@ class GeoPublishedManager(GeoManager, ExtendedManagerMixin, PublishedMixin):
 
 class AccessLevelManager(Manager, ExtendedManagerMixin, ACLMixin):
     """ Manager to filter depending on access level """
+
+    def get_query_set(self): 
+        return AccessLevelQuerySet(self.model, using=self._db)
+
+
+class NetAccessLevelManager(NetManager, ExtendedManagerMixin, ACLMixin):
+    """ NetManager + AccessLevelManager """
 
     def get_query_set(self): 
         return AccessLevelQuerySet(self.model, using=self._db)

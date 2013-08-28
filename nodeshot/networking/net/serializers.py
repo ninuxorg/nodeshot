@@ -21,10 +21,13 @@ __all__ = [
     'NodeDeviceListSerializer',
     'PaginatedDeviceSerializer',
     'PaginatedNodeDeviceSerializer',
+    
     'EthernetSerializer',
     'EthernetAddSerializer',
     'WirelessSerializer',
-    'WirelessAddSerializer'
+    'WirelessAddSerializer',
+    
+    'IpSerializer',
 ]
 
 
@@ -44,8 +47,10 @@ class DeviceListSerializer(gis_serializers.GeoModelSerializer):
         fields = [
             'id', 'node', 'name', 'type', 'status',
             'location', 'elev',
-            'firmware', 'os', 'description', 'details'
+            'firmware', 'os', 'description',
+            'added', 'updated', 'details'
         ]
+        read_only_fields = ['added', 'updated']
 
 
 class DeviceDetailSerializer(DeviceListSerializer):
@@ -68,22 +73,24 @@ class DeviceDetailSerializer(DeviceListSerializer):
     def get_ethernet_interfaces(self, obj):
         user = self.context['request'].user
         interfaces = Ethernet.objects.filter(device=obj.id).accessible_to(user)
-        return EthernetSerializer(interfaces, many=True).data
+        return EthernetSerializer(interfaces, many=True, context=self.context).data
     
     def get_wireless_interfaces(self, obj):
         user = self.context['request'].user
         interfaces = Wireless.objects.filter(device=obj.id).accessible_to(user)
-        return WirelessSerializer(interfaces, many=True).data
+        return WirelessSerializer(interfaces, many=True, context=self.context).data
     
     class Meta:
         model = Device
         primary_fields = [
             'id', 'access_level', 'node', 'name', 'type', 'status',
             'location', 'elev',
-            'firmware', 'os', 'description', 'routing_protocols']
+            'firmware', 'os', 'description', 'routing_protocols',
+            'added', 'updated'
+        ]
         
         if HSTORE_ENABLED:
-            primary_fields += ['data']
+            primary_fields.insert(primary_fields.index('added'), 'data')
         
         secondary_fields = [
             'ethernet', 'ethernet_url',
@@ -126,6 +133,9 @@ class InterfaceSerializer(serializers.ModelSerializer):
     mac = MacAddressField(label=_('mac address'))
     type = serializers.Field(source='get_type_display', label=_('type'))
     
+    ip = serializers.SerializerMethodField('get_ip_addresses')
+    #ip_url = serializers.HyperlinkedIdentityField(view_name='api_device_ethernet')
+    
     if HSTORE_ENABLED:
         data = HStoreDictionaryField(
             required=False,
@@ -133,15 +143,22 @@ class InterfaceSerializer(serializers.ModelSerializer):
             help_text=_('store extra attributes in JSON string')
         )
     
+    def get_ip_addresses(self, obj):
+        user = self.context['request'].user
+        interfaces = Ip.objects.filter(interface=obj.id).accessible_to(user)
+        return IpSerializer(interfaces, many=True, context=self.context).data
+    
     class Meta:
         model = Interface
         fields = [
             'id', 'access_level', 'type', 'name',
-            'mac', 'mtu', 'tx_rate', 'rx_rate'
+            'mac', 'mtu', 'tx_rate', 'rx_rate',
+            'added', 'updated', 'ip',
         ]
+        read_only_fields = ['added', 'updated']
         
         if HSTORE_ENABLED:
-            fields += ['data']
+            fields.insert(fields.index('added'), 'data')
 
 
 class EthernetSerializer(InterfaceSerializer):
@@ -171,3 +188,12 @@ class WirelessAddSerializer(WirelessSerializer):
     class Meta:
         model = Wireless
         fields = WirelessSerializer.Meta.fields[:] + ['device']
+
+
+# ------ IP ADDRESS ------ #
+
+
+class IpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ip
+        fields = ['address', 'protocol', 'netmask', 'added', 'updated']
