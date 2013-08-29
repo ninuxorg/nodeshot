@@ -23,8 +23,10 @@ __all__ = [
     'PaginatedNodeDeviceSerializer',
     
     'EthernetSerializer',
+    'EthernetDetailSerializer',
     'EthernetAddSerializer',
     'WirelessSerializer',
+    'WirelessDetailSerializer',
     'WirelessAddSerializer',
     
     'IpSerializer',
@@ -169,6 +171,14 @@ class EthernetSerializer(InterfaceSerializer):
         ]
 
 
+class EthernetDetailSerializer(EthernetSerializer):
+    details = serializers.HyperlinkedIdentityField(view_name='api_ethernet_details')
+    
+    class Meta:
+        model = Ethernet
+        fields = EthernetSerializer.Meta.fields[:] + ['details']
+
+
 class EthernetAddSerializer(EthernetSerializer):
     class Meta:
         model = Ethernet
@@ -184,6 +194,14 @@ class WirelessSerializer(InterfaceSerializer):
         ]
 
 
+class WirelessDetailSerializer(EthernetSerializer):
+    details = serializers.HyperlinkedIdentityField(view_name='api_wireless_details')
+    
+    class Meta:
+        model = Wireless
+        fields = WirelessSerializer.Meta.fields[:] + ['details']
+
+
 class WirelessAddSerializer(WirelessSerializer):
     class Meta:
         model = Wireless
@@ -197,3 +215,4 @@ class IpSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ip
         fields = ['address', 'protocol', 'netmask', 'added', 'updated']
+        read_only_fields = ['added', 'updated']

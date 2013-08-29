@@ -206,7 +206,7 @@ class BaseInterfaceDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
 
 class DeviceEthernetList(BaseInterfaceList):
     model = Ethernet
-    serializer_class = EthernetSerializer
+    serializer_class = EthernetDetailSerializer
     serializer_custom_class = EthernetAddSerializer
     
 device_ethernet_list = DeviceEthernetList.as_view()
@@ -221,7 +221,7 @@ ethernet_details = EthernetDetails.as_view()
 
 class DeviceWirelessList(BaseInterfaceList):
     model = Wireless
-    serializer_class = WirelessSerializer
+    serializer_class = WirelessDetailSerializer
     serializer_custom_class = WirelessAddSerializer
     
 device_wireless_list = DeviceWirelessList.as_view()
@@ -232,3 +232,53 @@ class WirelessDetails(BaseInterfaceDetails):
     serializer_class = WirelessSerializer
 
 wireless_details = WirelessDetails.as_view()
+
+
+# ------ IP ADDRESS ------ #
+
+
+class InterfaceIpList(CustomDataMixin, generics.ListCreateAPIView):
+    """
+    ### GET
+    
+    Retrieve interface list for specified device.
+    
+    ### POST
+    
+    Create new interface for specified device.
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (IsOwnerOrReadOnly,)
+    model = Ip
+    serializer_class = IpSerializer
+    serializer_custom_class = IpSerializer
+    
+    def get_custom_data(self):
+        """ additional request.DATA """
+        return {
+            'interface': self.interface.id
+        }
+    
+    def initial(self, request, *args, **kwargs):
+        """
+        Custom initial method:
+            * ensure interface exists and store it in an instance attribute
+            * change queryset to return only devices of current node
+        """
+        super(InterfaceIpList, self).initial(request, *args, **kwargs)
+        
+        # ensure interface exists
+        try:
+            self.interface = Interface.objects.accessible_to(request.user)\
+                        .get(pk=self.kwargs.get('pk', None))
+        except Interface.DoesNotExist:
+            raise Http404(_('Interface not found.'))
+        
+        # check permissions on interface (for interface creation)
+        self.check_object_permissions(request, self.interface)
+        
+        # return only interfaces of current interface
+        self.queryset = self.model.objects.filter(interface_id=self.interface.id)\
+                        .accessible_to(self.request.user)
+
+interface_ip_list = InterfaceIpList.as_view()

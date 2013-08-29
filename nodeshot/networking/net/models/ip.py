@@ -28,8 +28,9 @@ class Ip(BaseAccessLevel):
     def __unicode__(self):
         return '%s: %s' % (self.protocol, self.address)
     
-    def full_clean(self, *args, **kwargs):
+    def clean(self, *args, **kwargs):
         """ TODO """
+        # netaddr.IPAddress('10.40.2.1') in netaddr.IPNetwork('10.40.0.0/24')
         pass
     
     def save(self, *args, **kwargs):
