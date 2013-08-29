@@ -11,9 +11,9 @@ HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 if HSTORE_ENABLED:
     from django_hstore.fields import DictionaryField, ReferencesField
-    from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as DeviceManager
+    from nodeshot.core.base.managers import HStoreGeoAccessLevelManager as DeviceManager
 else:
-    from nodeshot.core.base.managers import GeoAccessLevelPublishedManager as DeviceManager
+    from nodeshot.core.base.managers import GeoAccessLevelManager as DeviceManager
 
 
 class Device(BaseAccessLevel):

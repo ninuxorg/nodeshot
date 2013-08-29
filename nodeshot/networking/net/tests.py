@@ -1,6 +1,6 @@
 import simplejson as json
 
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -39,6 +39,18 @@ class NetTest(BaseTestCase):
         ip = Ip.objects.get(pk=2)
         ip.save()
         self.assertEquals('ipv6', ip.protocol)
+    
+    def test_device_manager(self):
+        self.assertEqual(
+            list(Device.objects.access_level_up_to('public').filter(location__distance_gte=(Point(41, 12), 8000))),
+            list(Device.objects.filter(access_level__lte=0, location__distance_gte=(Point(41, 12), 8000)))
+        )
+    
+    def test_netacl_manager(self):
+        self.assertEqual(
+            list(Ip.objects.access_level_up_to('public').filter(address__net_contained='172.16.40.0/24')),
+            list(Ip.objects.filter(access_level__lte=0, address__net_contained='172.16.40.0/24'))
+        )
     
     def test_device_inherits_node_location(self):
         """ ensure device location defaults to node location if empty """
