@@ -135,6 +135,37 @@ class ModelsTest(TestCase):
         self.assertEqual(count, Node.objects.accessible_to(user=1).filter(geometry__distance_lte=(pnt, 70000)).published().count())
         self.assertEqual(count, Node.objects.accessible_to(user=1).published().filter(geometry__distance_lte=(pnt, 70000)).count())
         self.assertEqual(count, Node.objects.filter(geometry__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
+        
+        # slice, first, last, find
+        self.assertEqual(Node.objects.last().__class__.__name__, 'Node')
+        self.assertEqual(Node.objects.last(), Node.objects.order_by('-id')[0])
+        
+        self.assertEqual(Node.objects.first().__class__.__name__, 'Node')
+        self.assertEqual(Node.objects.first(), Node.objects.order_by('id')[0])
+        
+        self.assertEqual(Node.objects.find(1), Node.objects.get(pk=1))
+        
+        with self.assertRaises(ValueError):
+            Node.objects.last(-1)
+        
+        with self.assertRaises(ValueError):
+            Node.objects.first(-3)
+        
+        self.assertEqual(list(Node.objects.slice('name', 5)), list(Node.objects.order_by('name')[0:5]))
+        self.assertEqual(list(Node.objects.slice('-name', 5)), list(Node.objects.order_by('-name')[0:5]))
+        
+        # chained
+        self.assertEqual(Node.objects.published().first(), Node.objects.filter(is_published=True).order_by('id')[0])
+        self.assertEqual(Node.objects.published().last(), Node.objects.filter(is_published=True).order_by('-id')[0])
+        
+        self.assertEqual(
+            Node.objects.published().access_level_up_to('public').first(),
+            Node.objects.filter(is_published=True, access_level__lte=0).order_by('id')[0]
+        )
+        self.assertEqual(
+            Node.objects.published().access_level_up_to('public').last(),
+            Node.objects.filter(is_published=True, access_level__lte=0).order_by('-id')[0]
+        )
     
     def test_image_manager(self):
         """ test manager methods of Image model """

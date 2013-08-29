@@ -1,6 +1,6 @@
 import sys
 
-from netfields.managers import NetQuery, NetManager
+from netfields.managers import NetQuery, NetWhere, NetManager
 
 if not 'synchronize' in sys.argv and not 'celery' in sys.argv:
     from django.contrib.auth import get_user_model
@@ -20,7 +20,33 @@ HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 ### ------ MIXINS ------ ###
 
 
-class PublishedMixin(object):
+class BaseUtilityMixin(object):
+    """ add some goodies for development """
+    
+    def slice(self, order_by='pk', n=None):
+        """ return n objects according to specified ordering """
+        if n is not None and n < 0:
+            raise ValueError('slice parameter cannot be negative')
+        
+        queryset = self.order_by(order_by)
+        
+        if n is None:
+            return queryset[0]
+        else:
+            return queryset[0:n]
+    
+    def last(self, n=None):
+        return self.slice('-id', n)
+    
+    def first(self, n=None):
+        """ return first object of a collection or first n specified objects """
+        return self.slice('id', n)
+    
+    def find(self, pk):
+        return self.get(pk=pk)
+
+
+class PublishedMixin(BaseUtilityMixin):
     """ adds published filter to queryset """
     
     def published(self):
@@ -28,7 +54,7 @@ class PublishedMixin(object):
         return self.filter(is_published=True)
 
 
-class ACLMixin(object):
+class ACLMixin(BaseUtilityMixin):
     """ adds acl filters to queryset """
     
     def access_level_up_to(self, access_level):
@@ -67,7 +93,7 @@ class ACLMixin(object):
         return queryset
 
 
-class ExtendedManagerMixin(object):
+class ExtendedManagerMixin(BaseUtilityMixin):
     """ add this mixin to chainable custom methods support to your manager """
     
     def __getattr__(self, attr, *args):
@@ -97,11 +123,6 @@ class AccessLevelQuerySet(QuerySet, ACLMixin):
 
 class AccessLevelPublishedQuerySet(QuerySet, ACLMixin, PublishedMixin):
     """ AccessLevelQuerySet and PublishedQuerySet """
-    pass
-
-
-class NetAccessLevelQuerySet(NetQuery, ACLMixin):
-    """ Custom queryset to filter depending on access levels + NetQuery """
     pass
 
 
@@ -156,8 +177,9 @@ class AccessLevelManager(Manager, ExtendedManagerMixin, ACLMixin):
 class NetAccessLevelManager(NetManager, ExtendedManagerMixin, ACLMixin):
     """ NetManager + AccessLevelManager """
 
-    def get_query_set(self): 
-        return AccessLevelQuerySet(self.model, using=self._db)
+    def get_query_set(self):
+        q = NetQuery(self.model, NetWhere)
+        return AccessLevelQuerySet(self.model, using=self._db, query=q)
 
 
 class AccessLevelPublishedManager(Manager, ExtendedManagerMixin, ACLMixin, PublishedMixin):
