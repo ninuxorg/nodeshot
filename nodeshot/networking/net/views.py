@@ -250,8 +250,8 @@ class InterfaceIpList(CustomDataMixin, generics.ListCreateAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (IsOwnerOrReadOnly,)
     model = Ip
-    serializer_class = IpSerializer
-    serializer_custom_class = IpSerializer
+    serializer_class = IpDetailSerializer
+    serializer_custom_class = IpAddSerializer
     
     def get_custom_data(self):
         """ additional request.DATA """
@@ -282,3 +282,25 @@ class InterfaceIpList(CustomDataMixin, generics.ListCreateAPIView):
                         .accessible_to(self.request.user)
 
 interface_ip_list = InterfaceIpList.as_view()
+
+
+class IpDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    ### GET
+    
+    Retrieve details of specified ip address.
+    
+    ### DELETE
+    
+    Delete specified ip address. Must be authenticated as owner or admin.
+    
+    ### PUT & PATCH
+    
+    Edit ip address. Must be authenticated as owner or admin.
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (IsOwnerOrReadOnly,)
+    queryset = Ip.objects.all()
+    serializer_class = IpDetailSerializer
+
+ip_details = IpDetails.as_view()

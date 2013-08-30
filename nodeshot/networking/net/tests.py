@@ -576,3 +576,143 @@ class NetTest(BaseTestCase):
         self.client.login(username='registered', password='tester')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+    
+    def test_interface_ip_address_get(self):
+        # GET 404
+        response = self.client.get(reverse('api_interface_ip', args=[99]))
+        self.assertEqual(response.status_code, 404)
+        
+        # GET 200
+        response = self.client.get(reverse('api_interface_ip', args=[1]))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_interface_ip_address_post_and_permissions(self):
+        url = reverse('api_interface_ip', args=[1])
+        data = {
+            "address": "10.40.0.35",
+            "netmask": "10.40.0.0/24"
+        }
+        
+        # POST 403 unauthenticated
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 403)
+        
+        # POST 403 non owner can't add ip
+        self.client.login(username='pisano', password='tester')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
+        
+        # POST 200 owner can add ip
+        self.client.login(username=Interface.objects.find(1).owner.username, password='tester')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 201)
+        # ensure address
+        ip = Ip.objects.last()
+        self.assertEqual(ip.address.__str__(), '10.40.0.35')
+        ip.delete()
+        self.client.logout()
+        
+        # POST 200 also admin can add ip
+        self.client.login(username='admin', password='tester')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 201)
+        # ensure address
+        ip = Ip.objects.last()
+        self.assertEqual(ip.address.__str__(), '10.40.0.35')
+    
+    def test_interface_ip_address_fields_validation(self):
+        url = reverse('api_interface_ip', args=[1])
+        data = {
+            "address": "WRONG",
+            "netmask": "VERY WRONG"
+        }
+        
+        self.client.login(username=Interface.objects.find(1).owner.username, password='tester')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['address'][0], 'Invalid ip address')
+        self.assertEqual(response.data['netmask'][0], 'Invalid ip network')
+        
+        data = {
+            "address": "10.40.0.1",
+            "netmask": "10.40."
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 400)
+        
+        data = {
+            "address": "10.40.0.",
+            "netmask": "10.40.0.0/24"
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 400)
+    
+    def test_interface_ip_api_ACL(self):
+        url = reverse('api_interface_ip', args=[1])
+        
+        # non owner can only read
+        interface = Interface.objects.get(pk=1)
+        ip_count = interface.ip_set.count()
+        ip = interface.ip_set.first()
+        ip.access_level = 1
+        ip.save()
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), interface.ip_set.access_level_up_to('public').count())
+        self.assertEqual(len(response.data), ip_count-1)
+        
+        self.client.login(username='registered', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), interface.ip_set.access_level_up_to('registered').count())
+        self.assertEqual(len(response.data), ip_count)
+    
+    def test_ip_address_details_permissions(self):
+        url = reverse('api_ip_details', args=[1])
+        data = json.dumps({
+            "address": "10.40.0.35",
+            "netmask": "10.40.0.0/24"
+        })
+        
+        # PUT 403 unauthenticated
+        response = self.client.put(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        
+        # PUT 403 non owner can't edit ip
+        self.client.login(username='pisano', password='tester')
+        response = self.client.put(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
+        
+        # PUT 200 owner can edit ip
+        self.client.login(username=Ip.objects.find(1).owner.username, password='tester')
+        response = self.client.put(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        # ensure address
+        ip = Ip.objects.find(1)
+        self.assertEqual(ip.address.__str__(), '10.40.0.35')
+        self.client.logout()
+        
+        # PUT 200 also admin can edit ip
+        self.client.login(username='admin', password='tester')
+        data = json.dumps({
+            "address": "10.40.0.36",
+            "netmask": "10.40.0.0/24"
+        })
+        response = self.client.put(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        # ensure address
+        ip = Ip.objects.find(1)
+        self.assertEqual(ip.address.__str__(), '10.40.0.36')
+    
+    def test_ip_details_api_ACL(self):
+        # non owner can only read
+        ip = Ip.objects.get(pk=1)
+        ip.access_level = 1
+        ip.save()
+        url = reverse('api_ip_details', args=[1])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        
+        self.client.login(username='registered', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

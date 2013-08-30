@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import pagination, serializers
 from rest_framework_gis import serializers as gis_serializers
 
-from nodeshot.core.base.fields import MacAddressField
+from nodeshot.core.base.fields import MacAddressField, IPAddressField, IPNetworkField
 
 from .models import *
 
@@ -30,6 +30,8 @@ __all__ = [
     'WirelessAddSerializer',
     
     'IpSerializer',
+    'IpDetailSerializer',
+    'IpAddSerializer'
 ]
 
 
@@ -59,6 +61,8 @@ class DeviceDetailSerializer(DeviceListSerializer):
     
     access_level = serializers.Field(source='get_access_level_display')
     
+    routing_protocols_named = serializers.RelatedField(source='routing_protocols', many=True)
+    
     ethernet = serializers.SerializerMethodField('get_ethernet_interfaces')
     ethernet_url = serializers.HyperlinkedIdentityField(view_name='api_device_ethernet')
     
@@ -87,7 +91,8 @@ class DeviceDetailSerializer(DeviceListSerializer):
         primary_fields = [
             'id', 'access_level', 'node', 'name', 'type', 'status',
             'location', 'elev',
-            'firmware', 'os', 'description', 'routing_protocols',
+            'firmware', 'os', 'description',
+            'routing_protocols', 'routing_protocols_named',
             'added', 'updated'
         ]
         
@@ -136,7 +141,7 @@ class InterfaceSerializer(serializers.ModelSerializer):
     type = serializers.Field(source='get_type_display', label=_('type'))
     
     ip = serializers.SerializerMethodField('get_ip_addresses')
-    #ip_url = serializers.HyperlinkedIdentityField(view_name='api_device_ethernet')
+    ip_url = serializers.HyperlinkedIdentityField(view_name='api_interface_ip')
     
     if HSTORE_ENABLED:
         data = HStoreDictionaryField(
@@ -155,7 +160,7 @@ class InterfaceSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'access_level', 'type', 'name',
             'mac', 'mtu', 'tx_rate', 'rx_rate',
-            'added', 'updated', 'ip',
+            'added', 'updated', 'ip_url', 'ip',
         ]
         read_only_fields = ['added', 'updated']
         
@@ -212,7 +217,24 @@ class WirelessAddSerializer(WirelessSerializer):
 
 
 class IpSerializer(serializers.ModelSerializer):
+    address = IPAddressField()
+    netmask = IPNetworkField()
+    
     class Meta:
         model = Ip
-        fields = ['address', 'protocol', 'netmask', 'added', 'updated']
-        read_only_fields = ['added', 'updated']
+        fields = ['address', 'protocol', 'netmask']
+
+
+class IpAddSerializer(IpSerializer):
+    class Meta:
+        model = Ip
+        fields = IpSerializer.Meta.fields[:] + ['interface']
+
+
+class IpDetailSerializer(IpSerializer):
+    details = serializers.HyperlinkedIdentityField(view_name='api_ip_details')
+    
+    class Meta:
+        model = Ip
+        fields = ['id'] + IpSerializer.Meta.fields[:] + ['added', 'updated', 'details']
+        read_only_fields = ('added', 'updated')

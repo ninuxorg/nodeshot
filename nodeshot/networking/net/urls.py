@@ -14,4 +14,5 @@ urlpatterns = patterns('nodeshot.networking.net.views',
     
     # ip
     url(r'^interfaces/(?P<pk>[0-9]+)/ip/$', 'interface_ip_list', name='api_interface_ip'),
+    url(r'^ip/(?P<pk>[0-9]+)/$', 'ip_details', name='api_ip_details'),
 )

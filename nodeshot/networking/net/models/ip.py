@@ -39,6 +39,10 @@ class Ip(BaseAccessLevel):
         # save
         super(Ip, self).save(*args, **kwargs)
     
+    @property
+    def owner(self):
+        return self.interface.owner
+    
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod
         def autocomplete_search_fields():
