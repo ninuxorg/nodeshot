@@ -169,6 +169,7 @@ INSTALLED_APPS = (
     
     # 3d parthy django apps
     'rest_framework',
+    'rest_framework_swagger',
     'olwidget',  # geodjango better widgets
     'south',
     'debug_toolbar',

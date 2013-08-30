@@ -93,7 +93,7 @@ class RatingListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ('node', 'username', 'value',)
-        read_only_fields = ('node', 'username', 'added')
+        read_only_fields = ('added',)
 
 #Vote serializers
         
@@ -112,7 +112,7 @@ class VoteListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
         fields = ('node', 'username', 'vote',)
-        read_only_fields = ('node', 'username', 'added')   
+        read_only_fields = ('added',)   
 
 #Participation serializers
  
@@ -132,7 +132,7 @@ class NodeParticipationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=Node
-        fields= ('name','slug','address', 'participation')
+        fields= ('name', 'slug', 'address', 'participation')
         
 #Participation settings
  
@@ -150,8 +150,8 @@ class NodeParticipationSettingsSerializer(serializers.ModelSerializer):
     participation_settings = NodeSettingsSerializer(source='node_participation_settings')
     
     class Meta:
-        model=Node
-        fields= ('name','slug','address', 'participation_settings')
+        model = Node
+        fields = ('name', 'slug', 'address', 'participation_settings')
 
 
 class LayerSettingsSerializer(serializers.ModelSerializer):

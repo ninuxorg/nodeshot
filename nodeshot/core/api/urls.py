@@ -8,6 +8,11 @@ urlpatterns = patterns('nodeshot.core.api.views',
     url(r'^%s$' % settings.NODESHOT['SETTINGS']['API_PREFIX'], 'root_endpoint', name='api_root_endpoint'),
 )
 
+if 'rest_framework_swagger' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        url(r'^%sdocs/' % settings.NODESHOT['SETTINGS']['API_PREFIX'], include('rest_framework_swagger.urls'))
+    )
+
 # loop over all the strings listed in settings.NODESHOT['API']['APPS_ENABLED]
 for app_path in settings.NODESHOT['API']['APPS_ENABLED']:
     

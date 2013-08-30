@@ -287,10 +287,11 @@ class AccountDetail(generics.GenericAPIView):
     """
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticated, )
+    serializer_class = AccountSerializer
     
     def get(self, request, format=None):
         """ Return current account """
-        serializer = AccountSerializer(request.user, context=self.get_serializer_context())
+        serializer = self.serializer_class(request.user, context=self.get_serializer_context())
         return Response(serializer.data)
 
 account_detail = AccountDetail.as_view()
