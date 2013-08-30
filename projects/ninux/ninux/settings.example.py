@@ -312,7 +312,11 @@ _ = lambda s: s
 
 NODESHOT = {
     'SETTINGS': {
-        'API_PREFIX': 'api/v1',  # it must not begin nor end with a slash
+        # api prefix examples:
+        #   * api/
+        #   * api/v1/
+        # leave blank to include api urls at root level, such as /nodes/, /layers/ and so on
+        'API_PREFIX': 'api/v1',
         'ACL_GLOBAL_EDITABLE': True,
         
         # the following is an example of possible granular ACL setting that can be specified
@@ -341,7 +345,6 @@ NODESHOT = {
         
         'REVERSION_LAYERS': True,  # activate django reversion for layers.Layer model
         'REVERSION_NODES': True,  # activate django reversion for nodes.Node model
-        'REVERSION_DEVICES': True,  # activate django reversion for net.Devices model
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (

@@ -5,7 +5,7 @@ from nodeshot.community.participation import urls
 
 
 urlpatterns = patterns('nodeshot.core.api.views',
-    url(r'^%s/$' % settings.NODESHOT['SETTINGS']['API_PREFIX'], 'root_endpoint', name='api_root_endpoint'),
+    url(r'^%s$' % settings.NODESHOT['SETTINGS']['API_PREFIX'], 'root_endpoint', name='api_root_endpoint'),
 )
 
 # loop over all the strings listed in settings.NODESHOT['API']['APPS_ENABLED]

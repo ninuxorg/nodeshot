@@ -43,9 +43,9 @@ if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and settings.NODESHO
 # include 'nodeshot.core.api.urls'
 if 'nodeshot.core.api' in settings.INSTALLED_APPS:
     
-    from nodeshot.core.api.urls import urlpatterns as api_urlpatterns
-    
-    urlpatterns += api_urlpatterns
+    urlpatterns = urlpatterns + patterns('',
+        url(r'', include('nodeshot.core.api.urls')),
+    )
 
 
 if 'nodeshot.interface' in settings.INSTALLED_APPS:
