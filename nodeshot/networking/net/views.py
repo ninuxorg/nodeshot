@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from rest_framework import permissions, authentication, generics
-#from rest_framework.response import Response
+from rest_framework.response import Response
 
 from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
 from nodeshot.core.nodes.models import Node
@@ -232,6 +232,51 @@ class WirelessDetails(BaseInterfaceDetails):
     serializer_class = WirelessSerializer
 
 wireless_details = WirelessDetails.as_view()
+
+
+class DeviceBridgeList(BaseInterfaceList):
+    model = Bridge
+    serializer_class = BridgeDetailSerializer
+    serializer_custom_class = BridgeAddSerializer
+    
+device_bridge_list = DeviceBridgeList.as_view()
+
+
+class BridgeDetails(BaseInterfaceDetails):
+    queryset = Bridge.objects.all()
+    serializer_class = BridgeSerializer
+
+bridge_details = BridgeDetails.as_view()
+
+
+class DeviceTunnelList(BaseInterfaceList):
+    model = Tunnel
+    serializer_class = TunnelDetailSerializer
+    serializer_custom_class = TunnelAddSerializer
+    
+device_tunnel_list = DeviceTunnelList.as_view()
+
+
+class TunnelDetails(BaseInterfaceDetails):
+    queryset = Tunnel.objects.all()
+    serializer_class = TunnelSerializer
+
+tunnel_details = TunnelDetails.as_view()
+
+
+class DeviceVlanList(BaseInterfaceList):
+    model = Vlan
+    serializer_class = VlanDetailSerializer
+    serializer_custom_class = VlanAddSerializer
+    
+device_vlan_list = DeviceVlanList.as_view()
+
+
+class VlanDetails(BaseInterfaceDetails):
+    queryset = Vlan.objects.all()
+    serializer_class = VlanSerializer
+
+vlan_details = VlanDetails.as_view()
 
 
 # ------ IP ADDRESS ------ #

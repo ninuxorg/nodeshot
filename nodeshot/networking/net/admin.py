@@ -91,6 +91,31 @@ class IpAdmin(BaseAdmin):
     readonly_fields = ['protocol'] + BaseAdmin.readonly_fields
 
 
+from django import forms
+from .models.interfaces.bridge import validate_bridged_interfaces
+
+class BridgeForm(forms.ModelForm):
+    class Meta:
+        model = Bridge
+      
+    def clean_interfaces(self):
+        interfaces = self.cleaned_data.get('interfaces', [])
+        if interfaces:
+            validate_bridged_interfaces(
+                sender=self.instance.interfaces,
+                instance=self.instance,
+                action="pre_add",
+                reverse=False,
+                model=self.instance.interfaces.model,
+                pk_set=interfaces
+            )
+        return self.cleaned_data['interfaces']
+
+
+class BridgeAdmin(InterfaceAdmin):
+    form = BridgeForm 
+
+
 admin.site.unregister(Node)
 admin.site.register(Node, NodeAdmin)
 
@@ -99,7 +124,7 @@ admin.site.register(Device, DeviceAdmin)
 
 admin.site.register(Ethernet, InterfaceAdmin)
 admin.site.register(Wireless, WirelessAdmin)
-admin.site.register(Bridge, InterfaceAdmin)
+admin.site.register(Bridge, BridgeAdmin)
 admin.site.register(Tunnel, InterfaceAdmin)
 admin.site.register(Vlan, InterfaceAdmin)
 

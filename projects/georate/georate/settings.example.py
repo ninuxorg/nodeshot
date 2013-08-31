@@ -309,7 +309,7 @@ NODESHOT = {
         #   * api/
         #   * api/v1/
         # leave blank to include api urls at root level, such as /nodes/, /layers/ and so on
-        'API_PREFIX': 'api/v1',
+        'API_PREFIX': 'api/v1/',
         'ACL_GLOBAL_EDITABLE': True,
         
         # the following is an example of possible granular ACL setting that can be specified

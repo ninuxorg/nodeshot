@@ -20,6 +20,9 @@ class Vap(BaseDate):
     accounting_server = models.CharField(max_length=50, null=True, blank=True)
     accounting_port = models.IntegerField(null=True, blank=True)
     
+    def __unicode__(self):
+        return self.essid
+    
     class Meta:
         db_table = 'net_interface_vap'
         app_label= 'net'

@@ -9,6 +9,8 @@ class Vlan(Interface):
     """ VLAN """
     tag = models.CharField(max_length=10)
     
+    objects = Interface.objects.__class__()
+    
     class Meta:
         db_table = 'net_interface_vlan'
         app_label= 'net'
