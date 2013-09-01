@@ -30,9 +30,9 @@ class LinkTest(BaseTestCase):
     
     def setUp(self):
         l = Link()
-        l.interface_a = Interface.objects.find(1)
-        l.interface_b = Interface.objects.find(2)
-        l.type = LINK_TYPE.get('fiber')
+        l.interface_a = Interface.objects.find(2)
+        l.interface_b = Interface.objects.find(3)
+        l.type = LINK_TYPE.get('radio')
         l.status = LINK_STATUS.get('active')
         self.link = l
     
@@ -76,6 +76,7 @@ class LinkTest(BaseTestCase):
     
     def test_same_to_and_from_interface(self):
         link = self.link
+        link.interface_a = Interface.objects.find(1)
         link.interface_b = Interface.objects.find(1)
         with self.assertRaises(ValidationError):
             link.full_clean()
@@ -101,3 +102,17 @@ class LinkTest(BaseTestCase):
         link = Link.objects.find(link.id)
         self.assertEqual(link.node_a_name, link.node_a.name)
         self.assertEqual(link.node_b_name, link.node_b.name)
+    
+    def test_link_interface_type(self):
+        link = self.link
+        link.interface_a = Interface.objects.find(1)  # ethernet, while interface_b is wireless
+        
+        with self.assertRaises(ValidationError):
+            link.full_clean()
+    
+    def test_auto_link_type(self):
+        link = self.link
+        link.type = None
+        link.save()
+        link = Link.objects.find(link.id)
+        self.assertEqual(link.type, LINK_TYPE.get('radio'))

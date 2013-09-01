@@ -539,7 +539,7 @@ class NetTest(BaseTestCase):
     def test_wireless_details_api_permissions(self):
         """ wireless details permissions: only owner or admins can alter data """
         # non owner can only read
-        url = reverse('api_wireless_details', args=[1])
+        url = reverse('api_wireless_details', args=[2])
         response = self.client.patch(url, { 'name': 'eth2' })
         self.assertEqual(response.status_code, 403)
         response = self.client.delete(url)
@@ -553,7 +553,7 @@ class NetTest(BaseTestCase):
         self.assertEqual(response.status_code, 403)
         
         # login as owner
-        wireless = Wireless.objects.get(pk=1)
+        wireless = Wireless.objects.get(pk=2)
         self.client.login(username=wireless.owner.username, password='tester')
         
         # owner can edit
@@ -561,7 +561,7 @@ class NetTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'eth2')
         # check DB
-        wireless = Wireless.objects.get(pk=1)
+        wireless = Wireless.objects.get(pk=2)
         self.assertEqual(wireless.name, 'eth2')
         
         # admin can edit too
@@ -571,16 +571,16 @@ class NetTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'admineth2')
         # check DB
-        wireless = Wireless.objects.get(pk=1)
+        wireless = Wireless.objects.get(pk=2)
         self.assertEqual(wireless.name, 'admineth2')
     
     def test_wireless_details_api_ACL(self):
         """ wireless details ACL """
         # non owner can only read
-        wireless = Wireless.objects.get(pk=1)
+        wireless = Wireless.objects.get(pk=2)
         wireless.access_level = 1
         wireless.save()
-        url = reverse('api_wireless_details', args=[1])
+        url = reverse('api_wireless_details', args=[2])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
         

@@ -387,6 +387,8 @@ NODESHOT = {
             'nodeshot.community.participation',
             'nodeshot.community.notifications',
             'nodeshot.community.mailing',
+            'nodeshot.networking.net',
+            'nodeshot.networking.links',
         ]
     },
     'INTEROPERABILITY': [
