@@ -76,7 +76,7 @@ class InterfaceAdmin(BaseAdmin):
 
 
 class WirelessAdmin(InterfaceAdmin):
-    inlines = (IpInline,VapInline)   
+    inlines = (IpInline, VapInline)   
 
 
 class RoutingProtocolAdmin(BaseAdmin):
@@ -120,7 +120,7 @@ admin.site.unregister(Node)
 admin.site.register(Node, NodeAdmin)
 
 admin.site.register(Device, DeviceAdmin)
-#admin.site.register(Interface, InterfaceAdmin)
+admin.site.register(Interface, InterfaceAdmin)
 
 admin.site.register(Ethernet, InterfaceAdmin)
 admin.site.register(Wireless, WirelessAdmin)

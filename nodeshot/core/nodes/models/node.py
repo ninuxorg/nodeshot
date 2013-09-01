@@ -138,6 +138,15 @@ class Node(BaseAccessLevel):
     def owner(self):
         return self.user
     
+    @property
+    def point(self):
+        """ returns location of node. If node geometry is not a point a centroid point will be returned """
+        if self.geometry.geom_type == 'Point':
+            return self.geometry
+        else:
+            # centroid is the aproximative center of a geometry
+            return self.geometry.centroid
+    
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod
         def autocomplete_search_fields():

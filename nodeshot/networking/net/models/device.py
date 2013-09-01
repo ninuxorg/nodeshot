@@ -73,10 +73,7 @@ class Device(BaseAccessLevel):
         changed = False
         
         if not self.location:
-            if self.node.geometry.geom_type == 'Point':
-                self.location = self.node.geometry
-            else:
-                self.location = self.node.geometry.centroid
+            self.location = self.node.point
             changed = True
         
         if not self.elev and self.node.elev:

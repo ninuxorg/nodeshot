@@ -2,20 +2,23 @@
 nodeshot.core.links unit tests
 """
 
-from django.test import TestCase
+import simplejson as json
+
 from django.core.exceptions import ValidationError
 
+from nodeshot.core.base.tests import BaseTestCase
+from nodeshot.core.base.tests import user_fixtures
 from nodeshot.networking.net.models import Interface
 
 from .models import Link
 from .choices import LINK_STATUS, LINK_TYPE
 
 
-class LinkTest(TestCase):
+class LinkTest(BaseTestCase):
     
     fixtures = [
         'initial_data.json',
-        'test_users.json',
+        user_fixtures,
         'test_layers.json',
         'test_status.json',
         'test_nodes.json',
@@ -27,22 +30,25 @@ class LinkTest(TestCase):
     
     def setUp(self):
         l = Link()
-        l.interface_a = Interface.objects.get(pk=1)
-        l.interface_b = Interface.objects.get(pk=2)
+        l.interface_a = Interface.objects.find(1)
+        l.interface_b = Interface.objects.find(2)
         l.type = LINK_TYPE.get('fiber')
         l.status = LINK_STATUS.get('active')
-        l.dbm = -70
-        l.noise = -90
         self.link = l
     
     def test_non_radio_shouldnt_have_radio_info(self):
         """ *** A link of any type which is not "radio" should not have dBm or noise data *** """
-        self.assertRaises(ValidationError, self.link.full_clean)
+        link = self.link
+        link.dbm = -70
+        link.noise = -90
+        self.assertRaises(ValidationError, link.full_clean)
     
     def test_save_radio_link(self):
         """ *** It should be possible to save a new link *** """
         l = self.link
         l.type = LINK_TYPE.get('radio')
+        l.dbm = -70
+        l.noise = -90
         l.save()
         # delete variable l
         del l
@@ -68,11 +74,30 @@ class LinkTest(TestCase):
         link = Link(type=LINK_TYPE.get('radio'), status=LINK_STATUS.get('planned'))
         self.assertRaises(ValidationError, link.full_clean)
     
-    def test_link_manager(self):
-        """ test link manager """
-        self.link.save()
-        self.assertEqual(Link.objects.layer('rome').count(), 1, "LinkManager layer slug lookup failed for layer 'rome'")
-        self.assertEqual(Link.objects.layer(1).count(), 1, "LinkManager layer id lookup failed for layer 'rome'")
-        self.assertEqual(Link.objects.layer('rome')[0].dbm, -70, "LinkManager dbm assert equal failed")
-        self.assertEqual(Link.objects.layer('pisa').count(), 0, "LinkManager layer slug lookup failed for layer 'pisa'")
-        self.assertEqual(Link.objects.layer(2).count(), 0, "LinkManager layer id lookup failed for layer 'pisa'")
+    def test_same_to_and_from_interface(self):
+        link = self.link
+        link.interface_b = Interface.objects.find(1)
+        with self.assertRaises(ValidationError):
+            link.full_clean()
+        
+        link2 = self.link
+        link2.interface_b_id = 1
+        link2.interface_a_id = 1
+        with self.assertRaises(ValidationError):
+            link.full_clean()
+    
+    def test_auto_linestring(self):
+        link = self.link
+        self.assertIsNone(link.line)
+        link.save()
+        self.assertIsNotNone(link.line)
+    
+    def test_node_name_properties(self):
+        link = self.link
+        link.interface_b = Interface.objects.find(3)  # different node
+        self.assertIsNone(link.node_a_name)
+        self.assertIsNone(link.node_b_name)
+        link.save()
+        link = Link.objects.find(link.id)
+        self.assertEqual(link.node_a_name, link.node_a.name)
+        self.assertEqual(link.node_b_name, link.node_b.name)

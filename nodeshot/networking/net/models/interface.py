@@ -32,7 +32,6 @@ class Interface(BaseAccessLevel):
         data = DictionaryField(_('extra data'), null=True, blank=True,
                             help_text=_('store extra attributes in JSON string'))
         shortcuts = ReferencesField(null=True, blank=True)
-        
     
     objects = InterfaceManager()
     
@@ -101,3 +100,28 @@ class Interface(BaseAccessLevel):
             return self.shortcuts['layer']
         else:
             return self.device.node.layer
+    
+    @property
+    def ip_addresses(self):
+        try:
+            addresses = self.data.get('ip_addresses', False)
+        # self.data might be none, hence self.data['ip_addresses'] will raise an exception
+        except AttributeError:
+            addresses = []
+        return addresses.replace(' ', '').split(',') if addresses else []
+    
+    @ip_addresses.setter
+    def ip_addresses(self, value):
+        """ :param value: a list of ip addresses """
+        if not isinstance(value, list):
+            raise ValueError('ip_addresses value must be a list')
+        # in soem cases self.data might be none, so let's instantiate an empty dict
+        if self.data is None:
+            self.data = {}
+        # update field
+        self.data['ip_addresses'] = ', '.join(value)
+    
+    if 'grappelli' in settings.INSTALLED_APPS:
+        @staticmethod
+        def autocomplete_search_fields():
+            return ('mac__icontains', 'data__icontains')

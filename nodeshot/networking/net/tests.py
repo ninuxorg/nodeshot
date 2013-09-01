@@ -41,6 +41,16 @@ class NetTest(BaseTestCase):
         ip.save()
         self.assertEquals('ipv6', ip.protocol)
     
+    def test_interface_data_ip_addresses(self):
+        ip = Ip.objects.get(pk=1)
+        ip.save()
+        
+        ip_addresses = ip.interface.data['ip_addresses'].replace(' ', '').split(',')
+        self.assertEqual(len(ip_addresses), ip.interface.ip_set.count())
+        
+        for ip in ip.interface.ip_set.all():
+            self.assertIn(str(ip.address), ip_addresses)
+    
     def test_device_manager(self):
         self.assertEqual(
             list(Device.objects.access_level_up_to('public').filter(location__distance_gte=(Point(41, 12), 8000))),
@@ -825,3 +835,5 @@ class NetTest(BaseTestCase):
         response = self.client.patch(url, { 'name': 'admin' })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'admin')
+    
+    # TODO: write tests for vlan, tunnel, vap
