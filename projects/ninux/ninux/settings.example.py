@@ -14,18 +14,29 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django_hstore.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'nodeshot',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-        # if you use mysql we suggest to use INNODB as a storage engine
-        #'OPTIONS': {
-        #    'init_command': 'SET storage_engine=INNODB',
-        #}
-    }
+    },
+    # uncomment if you need to use nodeshot.extra.oldimporter
+    #'old_nodeshot': {
+    #   'ENGINE': 'django.db.backends.mysql',
+    #   'NAME': 'nodeshot',
+    #   'USER': 'nodeshot-readonly',
+    #   'PASSWORD': '*********',
+    #   'HOST': 'remote-ip',
+    #   'PORT': 'remote-port',
+    #}
 }
+
+# uncomment if you need to use nodeshot.extra.oldimporter
+#DATABASE_ROUTERS = [
+#    'nodeshot.extra.oldimporter.db.DefaultRouter',
+#    'nodeshot.extra.oldimporter.db.OldNodeshotRouter'
+#]
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -166,6 +177,13 @@ INSTALLED_APPS = (
     'nodeshot.networking.planning',
     'nodeshot.networking.monitor',
     'nodeshot.interface',
+    
+    # import data from old nodeshot version 0.9
+    # needs python MySQL database driver
+    # run "pip install MySQL-python"
+    # you might need to run also a similar command according to your own OS distribution:
+    # sudo apt-get install libmysqlclient-dev
+    #'nodeshot.extra.oldimporter',  
     
     # 3d parthy django apps
     'rest_framework',
