@@ -4,7 +4,8 @@ from django.conf import settings
 from nodeshot.core.base.admin import BaseAdmin, BaseGeoAdmin, BaseStackedInline
 from nodeshot.core.nodes.models import Node
 
-from .models import Device, Interface, Ethernet, Wireless, Bridge, Tunnel, Vap, Vlan, RoutingProtocol, Ip
+from .models import *
+from .models.choices import INTERFACE_TYPES
 
 if 'nodeshot.community.participation' in settings.INSTALLED_APPS:
     from nodeshot.community.participation.admin import NodeAdmin as BaseNodeAdmin
@@ -72,7 +73,12 @@ class InterfaceAdmin(BaseAdmin):
     list_display  = ('mac', 'name', 'type', 'device', 'added', 'updated')
     search_fields = ('mac',)
     exclude = ('shortcuts',)
-    inlines = (IpInline,)    
+    inlines = (IpInline,)
+    
+    raw_id_fields = ('device',)
+    autocomplete_lookup_fields = {
+        'fk': ['device'],
+    }
 
 
 class WirelessAdmin(InterfaceAdmin):
@@ -88,6 +94,11 @@ class IpAdmin(BaseAdmin):
     list_filter = ('protocol', 'added', 'updated')
     search_fields = ('address',)
     
+    raw_id_fields = ('interface',)
+    autocomplete_lookup_fields = {
+        'fk': ['interface'],
+    }
+    
     readonly_fields = ['protocol'] + BaseAdmin.readonly_fields
 
 
@@ -97,7 +108,12 @@ from .models.interfaces.bridge import validate_bridged_interfaces
 class BridgeForm(forms.ModelForm):
     class Meta:
         model = Bridge
-      
+    
+    def __init__(self, *args, **kwargs):
+        super(BridgeForm, self).__init__(*args, **kwargs)
+        self.fields['interfaces'].queryset = Interface.objects.filter(device_id=self.instance.device_id) \
+                                             .exclude(type=INTERFACE_TYPES.get('bridge'))
+    
     def clean_interfaces(self):
         interfaces = self.cleaned_data.get('interfaces', [])
         if interfaces:
