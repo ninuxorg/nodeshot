@@ -5,6 +5,8 @@ check_dependencies(
     module='nodeshot.community.participation'
 )
 
+from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 from comment import Comment
 from vote import Vote
@@ -12,8 +14,7 @@ from rating import Rating
 
 from node_participation_settings import NodeParticipationSettings
 from node_rating_count import NodeRatingCount
-from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
+
 
 
 __all__ = [
@@ -99,12 +100,15 @@ def _node_participation_settings(self):
 Node.participation_settings = _node_participation_settings
 
 
-### SIGNALS ###
+# ------ SIGNALS ------ #
 
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from nodeshot.core.nodes.models import Node
+
+from ..tasks import create_related_object
+
 
 @receiver(post_save, sender=Node)
 def create_node_rating_counts_settings(sender, **kwargs):
@@ -113,11 +117,12 @@ def create_node_rating_counts_settings(sender, **kwargs):
     node = kwargs['instance']
     if created:
         # create node_rating_count and settings
-        node_rating_count = NodeRatingCount(node=node)
-        node_rating_count.save()
-        node_participation_settings = NodeParticipationSettings(node=node)
-        node_participation_settings.save()
-        
+        # task will be executed in background unless settings.CELERY_ALWAYS_EAGER is True
+        # if CELERY_ALWAYS_EAGER is False celery worker must be running otherwise task won't be executed
+        create_related_object.delay(NodeRatingCount, { 'node': node })
+        create_related_object.delay(NodeParticipationSettings, { 'node': node })
+
+
 @receiver(post_save, sender=Layer)
 def create_layer_rating_settings(sender, **kwargs):
     """ create layer rating settings """
@@ -125,7 +130,8 @@ def create_layer_rating_settings(sender, **kwargs):
     layer = kwargs['instance']
     if created:
         # create layer participation settings
-        layer_rating_count = LayerParticipationSettings(layer=layer)
-        layer_rating_count.save()
+        # task will be executed in background unless settings.CELERY_ALWAYS_EAGER is True
+        # if CELERY_ALWAYS_EAGER is False celery worker must be running otherwise task won't be executed
+        create_related_object.delay(LayerParticipationSettings, { 'layer': layer })
 
 

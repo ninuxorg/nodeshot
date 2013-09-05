@@ -150,6 +150,7 @@ INSTALLED_APPS = (
     
     # nodeshot
     'nodeshot.core.api',
+    'nodeshot.community.participation',  # must go before layers
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
     'nodeshot.core.cms',
@@ -157,7 +158,6 @@ INSTALLED_APPS = (
     'nodeshot.interoperability',
     'nodeshot.community.mailing',
     'nodeshot.community.profiles',
-    'nodeshot.community.participation',
     'nodeshot.community.notifications',
     'nodeshot.interface',
     
