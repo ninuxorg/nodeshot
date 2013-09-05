@@ -10,7 +10,8 @@ class Vap(BaseDate):
     VAP interface
     represents a virtual wireless interface
     """
-    interface = models.ForeignKey('net.Wireless', verbose_name='wireless interface')
+    interface = models.ForeignKey('net.Wireless',
+                                  verbose_name='wireless interface')
     essid = models.CharField(max_length=50)
     bssid = models.CharField(max_length=50, null=True, blank=True)
     encryption = models.CharField(max_length=50, null=True, blank=True)
@@ -24,7 +25,7 @@ class Vap(BaseDate):
         return self.essid
     
     class Meta:
+        app_label = 'net'
         db_table = 'net_interface_vap'
-        app_label= 'net'
         verbose_name = _('vap interface')
         verbose_name_plural = _('vap interfaces')

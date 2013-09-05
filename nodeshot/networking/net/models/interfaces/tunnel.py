@@ -14,8 +14,8 @@ class Tunnel(Interface):
     objects = Interface.objects.__class__()
     
     class Meta:
+        app_label = 'net'
         db_table = 'net_interface_tunnel'
-        app_label= 'net'
         verbose_name = _('tunnel interface')
         verbose_name_plural = _('tunnel interfaces')
     

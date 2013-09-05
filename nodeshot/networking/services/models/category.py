@@ -12,8 +12,8 @@ class Category(BaseDate):
     description = models.TextField(_('description'), blank=True, null=True)
     
     class Meta:
-        db_table = 'service_category'
         app_label = 'services'
+        db_table = 'service_category'
         verbose_name = _('category')
         verbose_name_plural = _('categories')
     

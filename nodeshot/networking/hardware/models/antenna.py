@@ -24,7 +24,7 @@ class Antenna(BaseDate):
     #lng = models.FloatField(_('longitude'), blank=True, null=True, help_text=_('automatically inherits the value of the node, specify a different value if needed'))
     
     class Meta:
-        app_label= 'hardware'
+        app_label = 'hardware'
     
     def __unicode__(self):
         return self.model.__unicode__()

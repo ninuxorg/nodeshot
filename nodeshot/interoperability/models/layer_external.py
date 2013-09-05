@@ -23,15 +23,16 @@ class LayerExternal(models.Model):
     """
     layer = models.OneToOneField(Layer, verbose_name=_('layer'), parent_link=True, related_name='external')
     interoperability = models.CharField(_('interoperability'), max_length=128, choices=INTEROPERABILITY, default=False)
-    config = models.TextField(_('configuration'), blank=True, help_text=_('JSON format, will be parsed by the interoperability class to retrieve config keys'))
+    config = models.TextField(_('configuration'), blank=True,
+                              help_text=_('JSON format, will be parsed by the interoperability class to retrieve config keys'))
     map = models.URLField(_('map URL'), blank=True)
     
     # will hold an instance of the synchronizer class
     _synchronizer = None
     
     class Meta:
+        app_label = 'interoperability'
         db_table = 'layers_external'
-        app_label= 'interoperability'
         verbose_name = _('external layer')
         verbose_name_plural = _('external layer info')
 

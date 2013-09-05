@@ -13,8 +13,8 @@ class Ethernet(Interface):
     objects = Interface.objects.__class__()
     
     class Meta:
+        app_label = 'net'
         db_table = 'net_interface_ethernet'
-        app_label= 'net'
         verbose_name = _('ethernet interface')
         verbose_name_plural = _('ethernet interfaces')
     

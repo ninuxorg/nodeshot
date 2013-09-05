@@ -4,13 +4,8 @@ from django.conf import settings
 from nodeshot.core.base.admin import BaseAdmin, BaseGeoAdmin, BaseStackedInline
 from nodeshot.core.nodes.models import Node
 
-from .models import *
 from .models.choices import INTERFACE_TYPES
-
-if 'nodeshot.community.participation' in settings.INSTALLED_APPS:
-    from nodeshot.community.participation.admin import NodeAdmin as BaseNodeAdmin
-else:
-    from nodeshot.core.nodes.admin import NodeAdmin as BaseNodeAdmin
+from .models import *
 
 
 class DeviceInline(BaseStackedInline):
@@ -18,10 +13,6 @@ class DeviceInline(BaseStackedInline):
     
     if 'grappelli' in settings.INSTALLED_APPS:
         classes = ('grp-collapse grp-open', )
-
-
-class NodeAdmin(BaseNodeAdmin):
-    inlines = [DeviceInline] + BaseNodeAdmin.inlines
 
 
 class EthernetInline(BaseStackedInline):
@@ -110,13 +101,16 @@ class BridgeForm(forms.ModelForm):
         model = Bridge
     
     def __init__(self, *args, **kwargs):
+        """ only interfaces of the same device can be bridged """
         super(BridgeForm, self).__init__(*args, **kwargs)
         self.fields['interfaces'].queryset = Interface.objects.filter(device_id=self.instance.device_id) \
                                              .exclude(type=INTERFACE_TYPES.get('bridge'))
     
     def clean_interfaces(self):
+        """ interface many2many validation """
         interfaces = self.cleaned_data.get('interfaces', [])
         if interfaces:
+            # custom signal
             validate_bridged_interfaces(
                 sender=self.instance.interfaces,
                 instance=self.instance,
@@ -132,9 +126,6 @@ class BridgeAdmin(InterfaceAdmin):
     form = BridgeForm 
 
 
-admin.site.unregister(Node)
-admin.site.register(Node, NodeAdmin)
-
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Interface, InterfaceAdmin)
 
@@ -147,3 +138,9 @@ admin.site.register(Vlan, InterfaceAdmin)
 admin.site.register(RoutingProtocol, RoutingProtocolAdmin)
 admin.site.register(Ip, IpAdmin)
 
+
+# ------ Add Device Inlines to NodeAdmin ------ #
+
+from nodeshot.core.nodes.admin import NodeAdmin
+
+NodeAdmin.inlines = [DeviceInline] + NodeAdmin.inlines

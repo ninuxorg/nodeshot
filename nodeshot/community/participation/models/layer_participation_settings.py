@@ -15,6 +15,6 @@ class LayerParticipationSettings(models.Model):
     comments_allowed = models.BooleanField(_('comments allowed?'), default=True)
 
     class Meta:
-        db_table='participation_layer_settings'
-        app_label='layers'
+        app_label = 'participation'
+        db_table = 'participation_layer_settings'
     

@@ -36,7 +36,7 @@ class Interface(BaseAccessLevel):
     objects = InterfaceManager()
     
     class Meta:
-        app_label= 'net'
+        app_label = 'net'
     
     def __unicode__(self):
         return '%s %s' % (self.get_type_display(), self.mac)

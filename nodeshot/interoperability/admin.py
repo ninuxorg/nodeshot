@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.conf import settings
 
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
-from nodeshot.core.layers.admin import Layer, LayerAdmin as BaseLayerAdmin
+from nodeshot.core.layers.admin import Layer, LayerAdmin
 from nodeshot.core.nodes.admin import Node, NodeAdmin
 
 from models import LayerExternal, NodeExternal
@@ -18,14 +18,10 @@ class LayerExternalInline(admin.StackedInline):
         inline_classes = ('grp-collapse grp-open',) 
 
 
-class LayerAdmin(BaseLayerAdmin):
-    inlines = BaseLayerAdmin.inlines + [LayerExternalInline]
-    # custom admin template
-    change_form_template = '%s/templates/admin/layer_change_form.html' % os.path.dirname(os.path.realpath(__file__))
-
-
-admin.site.unregister(Layer)
-admin.site.register(Layer, LayerAdmin)
+# add inline to LayerAdmin
+LayerAdmin.inlines.append(LayerExternalInline)
+# custom admin template
+LayerAdmin.change_form_template = '%s/templates/admin/layer_change_form.html' % os.path.dirname(os.path.realpath(__file__))
 
 
 class NodeExternalInline(admin.StackedInline):

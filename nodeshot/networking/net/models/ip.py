@@ -21,7 +21,7 @@ class Ip(BaseAccessLevel):
     objects = NetAccessLevelManager()
     
     class Meta:
-        app_label= 'net'
+        app_label = 'net'
         permissions = (('can_view_ip', 'Can view ip'),)
         verbose_name = _('ip address')
         verbose_name_plural = _('ip addresses')

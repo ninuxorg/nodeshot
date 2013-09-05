@@ -16,7 +16,8 @@ class Comment(UpdateCountsMixin, BaseDate):
     text = models.CharField(_('Comment text'), max_length=255)
     
     class Meta:
-        app_label='participation'
+        app_label = 'participation'
+        db_table = 'participation_comment'
         #permissions = (('can_view_comment', 'Can view comments'),)
         #ordering = ['order']
     

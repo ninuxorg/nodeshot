@@ -201,7 +201,7 @@ class NetTest(BaseTestCase):
         if HSTORE_ENABLED:
             device_data["data"] = { "is_unittest": "true" }
         
-        # unregistered can't create
+        # unauthenticated can't create
         response = self.client.post(url, device_data)
         self.assertEqual(response.status_code, 403)
         
@@ -348,7 +348,7 @@ class NetTest(BaseTestCase):
         url = reverse('api_device_ethernet', args=[1])
         device_url = reverse('api_device_details', args=[1])
         
-        # unregistered can see only 1 record
+        # unauthenticated can see only 1 record
         response = self.client.get(url)
         self.assertEqual(len(response.data), 1)
         # check device detail url too
@@ -460,7 +460,7 @@ class NetTest(BaseTestCase):
         url = reverse('api_device_wireless', args=[1])
         device_url = reverse('api_device_details', args=[1])
         
-        # unregistered can see 1
+        # unauthenticated can see 1
         response = self.client.get(url)
         self.assertEqual(len(response.data), 1)
         # check device detail url too

@@ -61,12 +61,6 @@ class Layer(BaseDate):
         @staticmethod
         def autocomplete_search_fields():
             return ('name__icontains', 'slug__icontains')
-    
-    def clean(self, *args, **kwargs):
-        """
-        Custom validation
-        """
-        pass
 
 
 # ------ Additional validation for Node model ------ #

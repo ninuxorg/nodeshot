@@ -21,10 +21,10 @@ class Service(BaseAccessLevel):
     is_published = models.BooleanField(_('published'), default=True)
     
     class Meta:
+        app_label = 'services'
         permissions = (('can_view_services', 'Can view services'),)
         verbose_name = _('service')
         verbose_name_plural = _('services')
-        app_label = 'services'
     
     def __unicode__(self):
         return '%s' % self.name

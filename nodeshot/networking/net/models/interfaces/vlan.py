@@ -12,8 +12,8 @@ class Vlan(Interface):
     objects = Interface.objects.__class__()
     
     class Meta:
+        app_label = 'net'
         db_table = 'net_interface_vlan'
-        app_label= 'net'
         verbose_name = _('vlan interface')
         verbose_name_plural = _('vlan interfaces')
     

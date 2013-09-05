@@ -25,7 +25,7 @@ class Status(BaseOrdered):
         db_table = 'nodes_status'
         app_label= 'nodes'
         verbose_name = _('status')
-        verbose_name_plural = _('statuses')
+        verbose_name_plural = _('status')
         ordering = ['order']
     
     def __unicode__(self):

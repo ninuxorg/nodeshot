@@ -19,5 +19,5 @@ class NodeRatingCount(models.Model):
         return self.node.name
     
     class Meta:
-        db_table='participation_node_counts'
-        app_label='participation'
+        app_label = 'participation'
+        db_table = 'participation_node_counts'

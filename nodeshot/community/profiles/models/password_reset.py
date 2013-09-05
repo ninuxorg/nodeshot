@@ -59,7 +59,7 @@ class PasswordReset(models.Model):
     class Meta:
         verbose_name = _('password reset')
         verbose_name_plural = _('password resets')
-        app_label= 'profiles'
+        app_label = 'profiles'
     
     def __unicode__(self):
         return "%s (key=%s, reset=%r)" % (

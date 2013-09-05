@@ -5,7 +5,7 @@ from django.db import models
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
 from nodeshot.core.base.widgets import AdvancedFileInput
 
-from models import Manufacturer, MacPrefix, DeviceModel, DeviceToModelRel, AntennaModel, Antenna, RadiationPattern
+from models import *
 
 
 class MacPrefixInline(admin.StackedInline):
@@ -73,10 +73,5 @@ class AntennaInline(BaseStackedInline):
     inline_classes = ('grp-collapse grp-open',)
 
 
-class ExtendedDeviceAdmin(DeviceAdmin):
-    DeviceAdmin.inlines.insert(0, DeviceToModelRelInline)
-    DeviceAdmin.inlines.insert(1, AntennaInline)
-
-
-admin.site.unregister(Device)
-admin.site.register(Device, DeviceAdmin)
+DeviceAdmin.inlines.insert(0, DeviceToModelRelInline)
+DeviceAdmin.inlines.insert(1, AntennaInline)

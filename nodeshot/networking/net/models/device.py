@@ -52,7 +52,7 @@ class Device(BaseAccessLevel):
     objects = DeviceManager()
     
     class Meta:
-        app_label= 'net'
+        app_label = 'net'
         
     def __unicode__(self):
         return '%s' % self.name

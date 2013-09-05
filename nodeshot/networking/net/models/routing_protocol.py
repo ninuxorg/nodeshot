@@ -11,8 +11,8 @@ class RoutingProtocol(BaseDate):
     url = models.URLField(_('url'), blank=True)
     
     class Meta:
+        app_label = 'net'
         db_table = 'net_routing_protocol'
-        app_label= 'net'
     
     def __unicode__(self):
         return '%s %s' % (self.name, self.version)

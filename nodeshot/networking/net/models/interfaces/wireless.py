@@ -18,8 +18,8 @@ class Wireless(Interface):
     objects = Interface.objects.__class__()
     
     class Meta:
+        app_label = 'net'
         db_table = 'net_interface_wireless'
-        app_label= 'net'
         verbose_name = _('wireless interface')
         verbose_name_plural = _('wireless interfaces')
     

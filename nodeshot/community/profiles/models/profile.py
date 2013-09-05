@@ -58,7 +58,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        app_label= 'profiles'
+        app_label = 'profiles'
 
     def get_full_name(self):
         """

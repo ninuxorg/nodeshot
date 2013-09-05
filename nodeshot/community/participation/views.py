@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from rest_framework import permissions, authentication, generics#, exceptions
+from rest_framework import permissions, authentication, generics
 
 from .models import NodeRatingCount, Rating, Vote, Comment
 from .serializers import *

@@ -15,6 +15,6 @@ class NodeParticipationSettings(models.Model):
     comments_allowed = models.BooleanField(_('comments allowed?'), default=True)
 
     class Meta:
-        app_label='participation'
-        db_table='participation_node_settings'
+        app_label = 'participation'
+        db_table = 'participation_node_settings'
     

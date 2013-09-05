@@ -23,7 +23,6 @@ __all__ = ['Profile', 'SocialLink', 'PasswordReset']
 from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-#from nodeshot.core.nodes.signals import node_status_changed
 
 @receiver(post_save, sender=Profile)
 def new_user(sender, **kwargs):
@@ -54,14 +53,3 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
         if user.is_active is False:
             user.is_active = True
             user.save()
-
-# email notifications
-#@receiver(node_status_changed)
-#def notify_status_changed(sender, **kwargs):
-#    """ TODO: write desc """
-#    node = sender
-#    old_status = kwargs['old_status']
-#    new_status = kwargs['new_status']
-#    notification_type = EmailNotification.determine_notification_type(old_status, new_status, 'Node')
-#    EmailNotification.notify_users(notification_type, node)
-#node_status_changed.connect(notify_status_changed)

@@ -18,8 +18,8 @@ class NodeExternal(models.Model):
     extra_data = models.TextField(_('configuration'), blank=True, help_text=_('JSON format, might contain extra data regarding the external record'))
     
     class Meta:
+        app_label = 'interoperability'
         db_table = 'nodes_external'
-        app_label= 'interoperability'
         verbose_name = _('external node')
         verbose_name_plural = _('external node info')
 
