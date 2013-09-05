@@ -1,11 +1,16 @@
 from django.template.defaultfilters import slugify
 from django.contrib.gis.geos import Point
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.conf import settings
 
+from nodeshot.core.base.utils import pause_disconnectable_signals, resume_disconnectable_signals
 from nodeshot.core.nodes.models import Node, Status
 
 from .base import XMLConverter
+
+if settings.NODESHOT['SETTINGS'].get('HSTORE', False) is False:
+    raise ImproperlyConfigured('HSTORE needs to be enabled for ProvinciaWIFI Converter to work properly')
+
 
 
 class ProvinciaWIFI(XMLConverter):
@@ -31,6 +36,9 @@ class ProvinciaWIFI(XMLConverter):
             self.status = Status.objects.get(slug=self.config.get('status', None))
         except Status.DoesNotExist:
             self.status = None
+        
+        # avoid sending zillions of notifications
+        pause_disconnectable_signals()
         
         # loop over every parsed item
         for item in items:
@@ -101,7 +109,13 @@ class ProvinciaWIFI(XMLConverter):
                 changed = True
             
             if node.address != address:
-                node.address = address
+                node.address = address  # complete address
+                node.data = {
+                    'address': self.get_text(item, 'Indirizzo'),
+                    'city': self.get_text(item, 'Comune'),
+                    'province': 'Roma',
+                    'country': 'Italia'
+                }
                 changed = True
             
             # perform save or update only if necessary
@@ -137,6 +151,9 @@ class ProvinciaWIFI(XMLConverter):
                 # then increment count that will be included in message
                 deleted_nodes_count = deleted_nodes_count + 1
                 self.verbose('node "%s" deleted' % node_name)
+        
+        # reconnect signals
+        resume_disconnectable_signals()
         
         # message that will be returned
         self.message = """

@@ -143,22 +143,31 @@ class CitySDKMixin(object):
                    "point":[
                         {
                             "Point":{
-                                "posList":"%s %s" % (float(node.geometry.coords[1]), float(node.geometry.coords[0])),
+                                "posList":"%s %s" % (float(node.point.coords[1]), float(node.point.coords[0])),
                                 "srsName":"http://www.opengis.net/def/crs/EPSG/0/4326"
                             },
                             "term": self.config['citysdk_term']
                         }
-                   ]
+                    ],
+                    "address": {
+                        "value":"""BEGIN:VCARD
+N:;%s;;;;
+ADR;INTL;PARCEL;WORK:;;%s;%s;%s;;%s
+END:VCARD""" % (
+                            node.name,
+                            node.data['address'],
+                            node.data['city'],
+                            node.data['province'],
+                            node.data['country'],
+                        ),
+                        "type": "text/vcard"
+                    },
                 },
                 "label":[
                     {
                         "term": "primary",
                         "value": node.name
                     },
-                    {
-                        "term": "address",
-                        "value": node.address
-                    }
                 ],
                 "description":[
                     {
@@ -171,8 +180,6 @@ class CitySDKMixin(object):
                         "id": self.citysdk_category_id
                     }
                 ],
-                "time": [],
-                "link": [],
                 "base": self.citysdk_resource_url,
                 "lang": self.config['citysdk_lang'],
                 "created": unicode(node.added),
