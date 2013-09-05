@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
+from django.conf import settings
 
 from nodeshot.core.nodes.signals import node_status_changed
 from nodeshot.core.nodes.models import Node
@@ -43,3 +44,18 @@ def disconnect():
     post_save.disconnect(node_created_handler, sender=Node)
     node_status_changed.disconnect(node_status_changed_handler)
     pre_delete.disconnect(node_deleted_handler, sender=Node)
+
+
+def reconnect():
+    """ reconnect signals """
+    post_save.connect(node_created_handler, sender=Node)
+    node_status_changed.connect(node_status_changed_handler)
+    pre_delete.connect(node_deleted_handler, sender=Node)
+
+
+settings.NODESHOT['DISCONNECTABLE_SIGNALS'].append(
+    {
+        'disconnect': disconnect,
+        'reconnect': reconnect
+    }
+)

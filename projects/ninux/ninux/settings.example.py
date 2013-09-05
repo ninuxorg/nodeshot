@@ -451,7 +451,11 @@ NODESHOT = {
         'REGISTRARS': (
             'nodeshot.core.websockets.registrars.nodes',   
         )
-    }
+    },
+    # list that will contain functions to disable and re-enable some signals
+    # for large import of data notifications, websockets, participation counts and similar operations
+    # might be temporarily disabled to avoid unnecessary database load
+    'DISCONNECTABLE_SIGNALS': []
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]

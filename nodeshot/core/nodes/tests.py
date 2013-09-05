@@ -302,18 +302,9 @@ class APITest(BaseTestCase):
             self.assertEqual(node.data, { 'is_test': 'true' })
             self.assertEqual(Node.objects.filter(data__contains={ "is_test": "true" }).count(), 1)
     
-    def test_node_list_without_hstore(self):
-        """ test node list """
-        
-        MODIFIED_NODESHOT_SETTINGS = settings.NODESHOT.copy()
-        MODIFIED_NODESHOT_SETTINGS['SETTINGS']['HSTORE'] = False
-        
-        with self.settings(NODESHOT=MODIFIED_NODESHOT_SETTINGS):
-            url = reverse('api_node_list')
-            
-            # GET: 200
-            response = self.client.get(url)
-            self.assertEqual(200, response.status_code)
+    def test_delete_node(self):
+        node = Node.objects.first()
+        node.delete()
     
     def test_node_geojson_list(self):
         """ test node geojson list """

@@ -74,6 +74,25 @@ def get_key_by_value(dictionary, search_value):
         if value == search_value:
             return ugettext(key)
 
+
+def pause_disconnectable_signals():
+    """
+    Disconnects non critical signals like notifications, websockets and stuff like that.
+    Use when managing large chunks of nodes
+    """
+    for signal in settings.NODESHOT['DISCONNECTABLE_SIGNALS']:
+        signal['disconnect']()
+
+
+def resume_disconnectable_signals():
+    """
+    Reconnects non critical signals like notifications, websockets and stuff like that.
+    Use when managing large chunks of nodes
+    """
+    for signal in settings.NODESHOT['DISCONNECTABLE_SIGNALS']:
+        signal['reconnect']()
+
+
 # time shortcuts
 
 def now():

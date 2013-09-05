@@ -3,6 +3,7 @@ import simplejson as json
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from nodeshot.community.notifications.models import Notification
 from ..tasks import send_message
@@ -28,3 +29,16 @@ def new_notification_handler(sender, **kwargs):
 def disconnect():
     """ disconnect signals """
     post_save.disconnect(new_notification_handler, sender=Notification)
+
+
+def reconnect():
+    """ reconnect signals """
+    post_save.connect(new_notification_handler, sender=Notification)
+
+
+settings.NODESHOT['DISCONNECTABLE_SIGNALS'].append(
+    {
+        'disconnect': disconnect,
+        'reconnect': reconnect
+    }
+)
