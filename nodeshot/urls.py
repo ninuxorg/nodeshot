@@ -2,10 +2,14 @@ from django.conf.urls import patterns, include, url
 from django.conf import settings
 from django.contrib import admin
 
+from filebrowser.sites import site
+
 admin.autodiscover()
 
 
-urlpatterns = patterns('',)
+urlpatterns = patterns('',
+   url(r'^admin/filebrowser/', include(site.urls)),
+)
 
 
 if 'social_auth' in settings.INSTALLED_APPS:

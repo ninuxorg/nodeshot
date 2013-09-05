@@ -116,14 +116,22 @@ ROOT_URLCONF = 'georate.urls' # replace myproject with the name of your project.
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'georate.wsgi.application'
 
-import nodeshot
 
 TEMPLATE_DIRS = (
-    '%s/core/mailing/templates' % os.path.dirname(os.path.realpath(nodeshot.__file__)),
-    '%s/core/zones/templates' % os.path.dirname(os.path.realpath(nodeshot.__file__))
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.request",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages"
 )
 
 INSTALLED_APPS = (
@@ -136,7 +144,9 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     
     # adming
+    'grappelli.dashboard',
     'grappelli',
+    'filebrowser',
     'django.contrib.admin',
     
     # --- background jobs --- #
@@ -230,15 +240,15 @@ LOGGING = {
         #    'level': 'DEBUG',
         #    'propagate': True,
         #},
-        'nodeshot.core.mailing': {
+        'nodeshot.community.mailing': {
             'handlers': ['logfile'],
             'level': 'DEBUG',
         },
-        'nodeshot.core.zones': {
+        'nodeshot.core.layers': {
             'handlers': ['logfile'],
             'level': 'DEBUG',
         },
-        'nodeshot.contrib.profiles': {
+        'nodeshot.community.profiles': {
             'handlers': ['logfile'],
             'level': 'DEBUG',
         },
@@ -360,8 +370,7 @@ NODESHOT = {
     },
     # default values for the application or new database objects
     'DEFAULTS': {
-        # default map zoom level when creating new zones
-        'MAP_ZOOM': 12,
+        'MAP_ZOOM': 12,  # default map zoom level when creating new layers
         'TIME_ZONE': 'GMT+1', # TODO: check if it can be determined by django
         'NODE_PUBLISHED': True,
         'LAYER_ZOOM': 12,
@@ -437,6 +446,7 @@ NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0
 
 if 'grappelli' in INSTALLED_APPS:
     GRAPPELLI_ADMIN_TITLE = 'Nodeshot Admin'
+    GRAPPELLI_INDEX_DASHBOARD = 'nodeshot.dashboard.NodeshotDashboard'
 
 # ------ DEBUG TOOLBAR ------ #
 

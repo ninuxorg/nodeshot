@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.5.1
+Django==1.5.2
 
 # python libraries
 PIL
@@ -18,7 +18,8 @@ wsgiref
 requests
 
 # better admin
-django-grappelli==2.4.5
+django-grappelli==2.4.6
+django-filebrowser==3.5.2
 
 # utils
 django-extensions
