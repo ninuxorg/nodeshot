@@ -7,8 +7,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from nodeshot.core.base.models import BaseAccessLevel
-from nodeshot.core.base.managers import NetAccessLevelManager
+from ..managers import NetAccessLevelManager
 from choices import IP_PROTOCOLS
+
 
 
 class Ip(BaseAccessLevel):

@@ -1,7 +1,5 @@
 import sys
 
-from netfields.managers import NetQuery, NetWhere, NetManager
-
 if not 'synchronize' in sys.argv and not 'celery' in sys.argv:
     from django.contrib.auth import get_user_model
     User = get_user_model()
@@ -185,14 +183,6 @@ class AccessLevelManager(Manager, ExtendedManagerMixin, ACLMixin):
 
     def get_query_set(self): 
         return AccessLevelQuerySet(self.model, using=self._db)
-
-
-class NetAccessLevelManager(NetManager, ExtendedManagerMixin, ACLMixin):
-    """ NetManager + AccessLevelManager """
-
-    def get_query_set(self):
-        q = NetQuery(self.model, NetWhere)
-        return AccessLevelQuerySet(self.model, using=self._db, query=q)
 
 
 class AccessLevelPublishedManager(Manager, ExtendedManagerMixin, ACLMixin, PublishedMixin):

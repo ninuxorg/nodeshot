@@ -61,7 +61,6 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-SITE_NAME = 'Ninux.org'
 SITE_DOMAIN = 'localhost'
 PROTOCOL = 'http'
 BASE_URL = 'http://%s/' % SITE_DOMAIN
@@ -209,7 +208,7 @@ INSTALLED_APPS = (
     'social_auth',
     
     # other utilities
-    'django-extensions',
+    'django_extensions',
     
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',

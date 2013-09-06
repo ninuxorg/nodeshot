@@ -25,7 +25,7 @@ django-filebrowser==3.5.2
 django-extensions
 
 # geodjango improved widgets
-olwidget
+django-olwidget
 
 # RESTful API and API documentation
 djangorestframework==2.3.7
