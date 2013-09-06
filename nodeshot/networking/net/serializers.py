@@ -6,10 +6,9 @@ from rest_framework import pagination, serializers
 from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as gis_serializers
 
-from nodeshot.core.base.fields import MacAddressField, IPAddressField, IPNetworkField
-
 from .models import *
 from .models.choices import INTERFACE_TYPES
+from .fields import MacAddressField, IPAddressField, IPNetworkField
 
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
