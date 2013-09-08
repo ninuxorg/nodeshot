@@ -18,6 +18,7 @@ from interfaces.tunnel import Tunnel
 from interfaces.vlan import Vlan
 from interfaces.vap import Vap
 
+
 __all__ = [
     'RoutingProtocol',
     'Device',
@@ -30,3 +31,14 @@ __all__ = [
     'Vlan',
     'Vap'
 ]
+
+
+# ------ Add relationship to NodeDetailSerializer ------ #
+
+from nodeshot.core.nodes.serializers import NodeDetailSerializer
+
+NodeDetailSerializer.add_relationship(**{
+    'name': 'devices',
+    'view_name': 'api_node_devices',
+    'lookup_field': 'slug'
+})

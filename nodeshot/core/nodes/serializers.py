@@ -5,11 +5,11 @@ from rest_framework import serializers, pagination
 from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers
 
+from nodeshot.core.base.serializers import DynamicRelationshipsMixin
 from nodeshot.core.layers.models import Layer
 
 from .models import *
 
-PARTICIPATION_INSTALLED = 'nodeshot.community.participation' in settings.NODESHOT['API']['APPS_ENABLED']
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 if HSTORE_ENABLED:
@@ -29,24 +29,28 @@ __all__ = [
 ]
 
   
-class NodeDetailSerializer(geoserializers.GeoModelSerializer):
+class NodeDetailSerializer(DynamicRelationshipsMixin, geoserializers.GeoModelSerializer):
     """ node detail """
     user = serializers.Field(source='user.username')
     status = serializers.Field(source='status.slug')
     geometry = geoserializers.GeometryField(label=_('coordinates'))
     layer_name = serializers.Field(source='layer.name')
-    layer_details = serializers.HyperlinkedRelatedField(view_name='api_layer_detail', source='layer', read_only=True)
-    images = serializers.HyperlinkedIdentityField(view_name='api_node_images', slug_field='slug')
     access_level = serializers.Field(source='get_access_level_display')
+    relationships = serializers.SerializerMethodField('get_relationships')
     
     if HSTORE_ENABLED:
         data = HStoreDictionaryField(required=False,
                                      label=_('extra data'),
                                      help_text=_('store extra attributes in JSON string'))
-    
-    if PARTICIPATION_INSTALLED:
-        comments = serializers.HyperlinkedIdentityField(view_name='api_node_comments',
-                                                        slug_field='slug')
+        
+    # relationships work this way:
+    # to add a new relationship, add a new key
+    # the value must be a tuple in which the first element is the view name (as specified in urls.py)
+    # and the second must be the lookup field, usually slug or id/pk
+    _relationships = {
+        'layer': ('api_layer_detail', 'layer.slug'),
+        'images': ('api_node_images', 'slug'),
+    }
     
     class Meta:
         model = Node
@@ -59,12 +63,9 @@ class NodeDetailSerializer(geoserializers.GeoModelSerializer):
             primary_fields += ['data']
             
         secondary_fields = [
-            'access_level', 'layer', 'layer_name', 'added', 'updated',
-            'layer_details', 'images'
+            'access_level', 'layer', 'layer_name',
+            'added', 'updated', 'relationships'
         ]
-        
-        if PARTICIPATION_INSTALLED:
-            secondary_fields += ['comments']
         
         fields = primary_fields + secondary_fields
         

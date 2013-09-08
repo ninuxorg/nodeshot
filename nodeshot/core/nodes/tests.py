@@ -332,7 +332,7 @@ class APITest(BaseTestCase):
         node = response.data
         images_url = reverse('api_node_images', args=['fusolab'])
         # images_url in node['images']
-        self.assertIn(images_url, node['images'])
+        self.assertIn(images_url, node['relationships']['images'])
         
         # PUT: 403 - must be logged in
         response = self.client.put(url)

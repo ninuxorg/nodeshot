@@ -41,10 +41,6 @@ class TestNotification(BaseTestCase):
         'test_status.json',
     ]
     
-    #def setUp(self):
-    #    # disable web sockets registrars
-    #    settings.NODESHOT['WEBSOCKETS']['REGISTRARS'] = []
-    
     def test_notification_to_herself(self):
         """ An user cannot send a notification to herself/himself """
         n = Notification(
@@ -113,8 +109,8 @@ class TestNotification(BaseTestCase):
                 "to_user_id": 4,
                 "type": "your_node_status_changed",
             })
-            self.assertTrue(n.check_user_settings(medium='web'))
-            self.assertTrue(n.check_user_settings(medium='email'))
+            self.assertEqual(n.check_user_settings(medium='web'), settings.NODESHOT['DEFAULTS']['NOTIFICATION_BOOLEAN_FIELDS'])
+            self.assertTrue(n.check_user_settings(medium='email'), settings.NODESHOT['DEFAULTS']['NOTIFICATION_BOOLEAN_FIELDS'])
         
         def test_node_created_to_all(self):
             # set every user to receive notifications about any node created

@@ -53,6 +53,69 @@ class ExtensibleModelSerializer(serializers.ModelSerializer):
         return ret
 
 
+class DynamicRelationshipsMixin(object):
+    """
+    Django Rest Framework Serializer Mixin
+    which adds the possibility to dynamically add relationships to a serializer.
+    
+    To add a relationship, use the class method "add_relationship", this way:
+    
+    >>> SerializerName.add_relationship('relationship_name', 'view_name', 'lookup_field')
+    
+    for example:    
+    
+    >>> from nodeshot.core.nodes.serializers import NodeDetailSerializer
+    >>> NodeDetailSerializer.add_relationship(**{
+        'name': 'comments',
+        'view_name': 'api_node_comments',
+        'lookup_field': 'slug'
+    })
+    """
+    _relationships = {}
+    
+    @classmethod
+    def add_relationship(_class, name, view_name, lookup_field):
+        """ adds a relationship to serializer
+        :param name: relationship name (dictionary key)
+        :type name: str
+        :param view_name: view name as specified in urls.py
+        :type view_name: str
+        :param lookup_field: lookup field, usually slug or id/pk
+        :type lookup_field: str
+        :returns: None
+        """
+        _class._relationships[name] = (view_name, lookup_field)
+    
+    def get_lookup_value(self, obj, string):
+        if '.' in string:
+            levels = string.split('.')
+            value = getattr(obj, levels.pop(0))
+            for level in levels:
+                value = getattr(value, level)
+            return value
+        else:
+            return getattr(obj, string)
+    
+    def get_relationships(self, obj):
+        request = self.context['request']
+        format = self.context['format']
+        relationships = {}
+        
+        # loop over private _relationship attribute
+        for key, value in self._relationships.iteritems():
+            # retrieve view_name and name of lookup field by splitting tuple
+            view_name, lookup_field = value
+            # retrieve value with getattr()
+            #string = 'obj.%s' % lookup_field
+            lookup_value = self.get_lookup_value(obj, lookup_field)
+            # populate new dictionary with links
+            relationships[key] = reverse(view_name,
+                                         args=[lookup_value],
+                                         request=request,
+                                         format=format)
+        return relationships
+
+
 class HyperlinkedField(Field):
     """
     Represents the instance, or a property on the instance, using hyperlinking.
