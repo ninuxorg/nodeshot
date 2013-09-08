@@ -24,18 +24,31 @@ class Outward(BaseDate):
     This is a tool that can be used to send out newsletters or important communications to your community.
     It's aimed to be useful and flexible.
     """
-    status = models.IntegerField(_('status'), choices=OUTWARD_STATUS_CHOICES, default=OUTWARD_STATUS.get('draft'))
+    status = models.IntegerField(_('status'), choices=OUTWARD_STATUS_CHOICES,
+                                 default=OUTWARD_STATUS.get('draft'))
     subject = models.CharField(_('subject'), max_length=50)
     message = models.TextField(_('message'), validators=[
         MinLengthValidator(settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_MINLENGTH']),
         MaxLengthValidator(settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_MAXLENGTH'])        
     ])
-    is_scheduled = models.SmallIntegerField(_('schedule sending'), choices=SCHEDULE_CHOICES, default=1 if settings.NODESHOT['DEFAULTS']['MAILING_SCHEDULE_OUTWARD'] is True else 0)
+    is_scheduled = models.SmallIntegerField(_('schedule sending'),
+                                            choices=SCHEDULE_CHOICES,
+                                            default=1 if settings.NODESHOT['DEFAULTS']['MAILING_SCHEDULE_OUTWARD'] is True else 0)
     scheduled_date = models.DateField(_('scheduled date'), blank=True, null=True)
-    scheduled_time = models.CharField(_('scheduled time'), max_length=20, choices=AVAILABLE_CRONJOBS, default=settings.NODESHOT['DEFAULTS']['CRONJOB'], blank=True)
-    is_filtered = models.SmallIntegerField(_('recipient filtering'), choices=FILTERING_CHOICES, default=0)
-    filters = MultiSelectField(max_length=255, choices=FILTER_CHOICES, blank=True, help_text=_('specify recipient filters'))
-    groups = MultiSelectField(max_length=255, choices=GROUPS, default=DEFAULT_GROUPS, blank=True, help_text=_('filter specific groups of users'))
+    scheduled_time = models.CharField(_('scheduled time'), max_length=20,
+                                      choices=AVAILABLE_CRONJOBS,
+                                      default=settings.NODESHOT['DEFAULTS']['CRONJOB'],
+                                      blank=True)
+    is_filtered = models.SmallIntegerField(_('recipient filtering'),
+                                           choices=FILTERING_CHOICES,
+                                           default=0)
+    filters = MultiSelectField(max_length=255, choices=FILTER_CHOICES,
+                               blank=True,
+                               help_text=_('specify recipient filters'))
+    groups = MultiSelectField(max_length=255, choices=GROUPS,
+                              default=DEFAULT_GROUPS,
+                              blank=True,
+                              help_text=_('filter specific groups of users'))
     
     if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
         layers = models.ManyToManyField('layers.Layer', verbose_name=_('layers'), blank=True)

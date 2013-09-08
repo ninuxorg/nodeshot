@@ -16,13 +16,27 @@ from .password_reset import PasswordReset
 
 __all__ = ['Profile', 'SocialLink', 'PasswordReset']
 
-# Signals
+
+# ------ Add relationship to ExtensibleNodeSerializer ------ #
+
+from nodeshot.core.nodes.base import ExtensibleNodeSerializer
+
+ExtensibleNodeSerializer.add_relationship(**{
+    'name': 'user',
+    'view_name': 'api_profile_detail',
+    'lookup_field': 'user.username'
+})
+
+
+# ------ SIGNALS ------ #
+
 # perform certain actions when some other parts of the application changes
 # eg: update user statistics when a new device is added
 
 from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+
 
 @receiver(post_save, sender=Profile)
 def new_user(sender, **kwargs):

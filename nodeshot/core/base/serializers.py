@@ -90,9 +90,12 @@ class DynamicRelationshipsMixin(object):
         if '.' in string:
             levels = string.split('.')
             value = getattr(obj, levels.pop(0))
-            for level in levels:
-                value = getattr(value, level)
-            return value
+            if value is not None:
+                for level in levels:
+                    value = getattr(value, level)
+                return value
+            else:
+                return None
         else:
             return getattr(obj, string)
     
@@ -105,8 +108,6 @@ class DynamicRelationshipsMixin(object):
         for key, value in self._relationships.iteritems():
             # retrieve view_name and name of lookup field by splitting tuple
             view_name, lookup_field = value
-            # retrieve value with getattr()
-            #string = 'obj.%s' % lookup_field
             lookup_value = self.get_lookup_value(obj, lookup_field)
             # populate new dictionary with links
             relationships[key] = reverse(view_name,

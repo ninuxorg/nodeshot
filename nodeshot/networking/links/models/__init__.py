@@ -20,9 +20,9 @@ __all__ = ['Link']
 
 # ------ Add relationship to NodeDetailSerializer ------ #
 
-from nodeshot.core.nodes.serializers import NodeDetailSerializer
+from nodeshot.core.nodes.serializers import ExtensibleNodeSerializer
 
-NodeDetailSerializer.add_relationship(**{
+ExtensibleNodeSerializer.add_relationship(**{
     'name': 'links',
     'view_name': 'api_node_links',
     'lookup_field': 'slug'

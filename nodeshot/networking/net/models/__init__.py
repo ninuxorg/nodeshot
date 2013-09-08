@@ -33,11 +33,11 @@ __all__ = [
 ]
 
 
-# ------ Add relationship to NodeDetailSerializer ------ #
+# ------ Add relationship to ExtensibleNodeSerializer ------ #
 
-from nodeshot.core.nodes.serializers import NodeDetailSerializer
+from nodeshot.core.nodes.base import ExtensibleNodeSerializer
 
-NodeDetailSerializer.add_relationship(**{
+ExtensibleNodeSerializer.add_relationship(**{
     'name': 'devices',
     'view_name': 'api_node_devices',
     'lookup_field': 'slug'

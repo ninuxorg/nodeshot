@@ -100,11 +100,11 @@ def _node_participation_settings(self):
 Node.participation_settings = _node_participation_settings
 
 
-# ------ Add relationship to NodeDetailSerializer ------ #
+# ------ Add relationship to ExtensibleNodeSerializer ------ #
 
-from nodeshot.core.nodes.serializers import NodeDetailSerializer
+from nodeshot.core.nodes.serializers import ExtensibleNodeSerializer
 
-NodeDetailSerializer.add_relationship(**{
+ExtensibleNodeSerializer.add_relationship(**{
     'name': 'comments',
     'view_name': 'api_node_comments',
     'lookup_field': 'slug'

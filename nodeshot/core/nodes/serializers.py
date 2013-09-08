@@ -5,10 +5,9 @@ from rest_framework import serializers, pagination
 from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers
 
-from nodeshot.core.base.serializers import DynamicRelationshipsMixin
-from nodeshot.core.layers.models import Layer
-
+from .base import ExtensibleNodeSerializer
 from .models import *
+
 
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
@@ -29,28 +28,13 @@ __all__ = [
 ]
 
   
-class NodeDetailSerializer(DynamicRelationshipsMixin, geoserializers.GeoModelSerializer):
+class NodeDetailSerializer(ExtensibleNodeSerializer):
     """ node detail """
-    user = serializers.Field(source='user.username')
-    status = serializers.Field(source='status.slug')
-    geometry = geoserializers.GeometryField(label=_('coordinates'))
-    layer_name = serializers.Field(source='layer.name')
-    access_level = serializers.Field(source='get_access_level_display')
-    relationships = serializers.SerializerMethodField('get_relationships')
     
     if HSTORE_ENABLED:
         data = HStoreDictionaryField(required=False,
                                      label=_('extra data'),
                                      help_text=_('store extra attributes in JSON string'))
-        
-    # relationships work this way:
-    # to add a new relationship, add a new key
-    # the value must be a tuple in which the first element is the view name (as specified in urls.py)
-    # and the second must be the lookup field, usually slug or id/pk
-    _relationships = {
-        'layer': ('api_layer_detail', 'layer.slug'),
-        'images': ('api_node_images', 'slug'),
-    }
     
     class Meta:
         model = Node
