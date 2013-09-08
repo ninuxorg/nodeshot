@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 from django.conf import settings
 
 from rest_framework import permissions, authentication, generics
@@ -7,7 +8,6 @@ from rest_framework import permissions, authentication, generics
 from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
 from nodeshot.core.nodes.models import Node
 
-#from .permissions import IsOwnerOrReadOnly
 from .serializers import *
 from .models import *
 
@@ -64,59 +64,35 @@ class LinkGeoJSONDetails(LinkDetails):
 link_geojson_details = LinkDetails.as_view()
 
 
-
-#
-#class NodeLinkList(CustomDataMixin, generics.ListCreateAPIView):
-#    """
-#    ### GET
-#    
-#    Retrieve links of specified node according to user access level.
-#    
-#    Parameters:
-#    
-#     * `limit=<n>`: specify number of items per page (defaults to 40)
-#     * `limit=0`: turns off pagination
-#    
-#    ### POST
-#    
-#    Create a new link for this node. Must be authenticated as node owner or admin.
-#    """
-#    authentication_classes = (authentication.SessionAuthentication,)
-#    permission_classes = (IsOwnerOrReadOnly,)
-#    serializer_class = NodeLinkListSerializer
-#    serializer_custom_class = LinkAddSerializer
-#    pagination_serializer_class = PaginatedNodeLinkSerializer
-#    paginate_by_param = 'limit'
-#    paginate_by = 40
-#    
-#    def get_custom_data(self):
-#        """ additional request.DATA """
-#        return {
-#            'node': self.node.id
-#        }
-#    
-#    def initial(self, request, *args, **kwargs):
-#        """
-#        Custom initial method:
-#            * ensure node exists and store it in an instance attribute
-#            * change queryset to return only links of current node
-#        """
-#        super(NodeLinkList, self).initial(request, *args, **kwargs)
-#        
-#        # ensure node exists
-#        try:
-#            self.node = Node.objects.published()\
-#                        .accessible_to(request.user)\
-#                        .get(slug=self.kwargs.get('slug', None))
-#        except Node.DoesNotExist:
-#            raise Http404(_('Node not found.'))
-#        
-#        # check permissions on node (for link creation)
-#        self.check_object_permissions(request, self.node)
-#        
-#        # return only links of current node
-#        self.queryset = Link.objects.filter(node_id=self.node.id)\
-#                        .accessible_to(self.request.user)\
-#                        .select_related('node')
-#    
-#node_link_list = NodeLinkList.as_view()
+class NodeLinkList(generics.ListAPIView):
+    """
+    Retrieve links of specified node according to user access level.
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    serializer_class = LinkDetailSerializer
+    
+    def initial(self, request, *args, **kwargs):
+        """
+        Custom initial method:
+            * ensure node exists and store it in an instance attribute
+            * change queryset to return only links of current node
+        """
+        super(NodeLinkList, self).initial(request, *args, **kwargs)
+        
+        # ensure node exists
+        try:
+            self.node = Node.objects.published()\
+                        .accessible_to(request.user)\
+                        .get(slug=self.kwargs.get('slug', None))
+        except Node.DoesNotExist:
+            raise Http404(_('Node not found.'))
+        
+        # check permissions on node (for link creation)
+        self.check_object_permissions(request, self.node)
+        
+        # return only links of current node
+        self.queryset = Link.objects.select_related('node')\
+                        .accessible_to(self.request.user)\
+                        .filter(Q(node_a_id=self.node.id) | Q(node_b_id=self.node.id))
+    
+node_link_list = NodeLinkList.as_view()

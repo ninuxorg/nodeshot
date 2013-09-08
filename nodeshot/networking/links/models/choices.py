@@ -1,5 +1,3 @@
-from django.utils.translation import ugettext_lazy as _
-
 
 LINK_STATUS = {
     'archived': -3,

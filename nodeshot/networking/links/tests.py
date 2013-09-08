@@ -95,15 +95,23 @@ class LinkTest(BaseTestCase):
         link.save()
         self.assertIsNotNone(link.line)
     
-    def test_node_name_properties(self):
+    def test_additional_properties(self):
         link = self.link
         link.interface_b = Interface.objects.find(3)  # different node
         self.assertIsNone(link.node_a_name)
         self.assertIsNone(link.node_b_name)
+        self.assertIsNone(link.node_a_slug)
+        self.assertIsNone(link.node_b_slug)
+        self.assertIsNone(link.interface_a_mac)
+        self.assertIsNone(link.interface_b_mac)
         link.save()
         link = Link.objects.find(link.id)
         self.assertEqual(link.node_a_name, link.node_a.name)
         self.assertEqual(link.node_b_name, link.node_b.name)
+        self.assertEqual(link.node_a_slug, link.node_a.slug)
+        self.assertEqual(link.node_b_slug, link.node_b.slug)
+        self.assertEqual(link.interface_a_mac, link.interface_a.mac)
+        self.assertEqual(link.interface_b_mac, link.interface_b.mac)
     
     def test_link_interface_type(self):
         link = self.link
@@ -124,18 +132,44 @@ class LinkTest(BaseTestCase):
         link.save()
         link = Link.objects.find(link.id)
         
+        # GET: 200 - link list
         url = reverse('api_link_list')
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         
+        # GET: 200 - link list geojson
         url = reverse('api_links_geojson_list')
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         
+        # GET: 200 - link details
         url = reverse('api_link_details', args=[link.id])
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         
+        # GET: 200 - link details geojson
         url = reverse('api_links_geojson_details', args=[link.id])
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
+    
+    def test_node_links_api(self):
+        link = self.link
+        link.save()
+        link = Link.objects.find(link.id)
+        
+        # GET: 200 - node A
+        url = reverse('api_node_links', args=[link.node_a.slug])
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(len(response.data), 1)
+        
+        # GET: 200 - node B
+        url = reverse('api_node_links', args=[link.node_b.slug])
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(len(response.data), 1)
+        
+        # GET: 404
+        url = reverse('api_node_links', args=['idontexist'])
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 404)

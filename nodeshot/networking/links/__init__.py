@@ -1,12 +1,4 @@
 """
-Dependencies:
-    * nodeshot.core.nodes
-    * nodeshot.networking.net
+nodeshot.networking.links v1.0 alpha
+management of links between devices in a network.
 """
-
-from nodeshot.core.base.utils import check_dependencies
-
-check_dependencies(
-    dependencies=['nodeshot.core.nodes', 'nodeshot.networking.net'],
-    module='nodeshot.networking.links'
-)

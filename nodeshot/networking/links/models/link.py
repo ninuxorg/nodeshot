@@ -13,7 +13,7 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.networking.net.models import Interface
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
-from choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
+from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
 
 
 class Link(BaseAccessLevel):
@@ -58,6 +58,9 @@ class Link(BaseAccessLevel):
     
     # manager
     objects = LinkManager()
+    
+    class Meta:
+        app_label = 'links'
     
     def __unicode__(self):
         return _(u'Link between %s and %s') % (self.node_a_name, self.node_b_name)
@@ -107,11 +110,10 @@ class Link(BaseAccessLevel):
             else:
                 self.type = LINK_TYPES.get('virtual')
         
-        #if self.interface_a_id:
-        #    self.interface_a = Interface.objects.get(pk=self.interface_a_id)
-        #
-        #if self.interface_b_id:
-        #    self.interface_b = Interface.objects.get(pk=self.interface_b_id)
+        if self.interface_a_id:
+            self.interface_a = Interface.objects.get(pk=self.interface_a_id)
+        if self.interface_b_id:
+            self.interface_b = Interface.objects.get(pk=self.interface_b_id)
         
         # fill in node_a and node_b
         if self.node_a is None and self.interface_a != None:
@@ -129,6 +131,14 @@ class Link(BaseAccessLevel):
             self.data['node_a_name'] = self.node_a.name
             self.data['node_b_name'] = self.node_b.name
         
+        if self.data.get('node_a_slug', None) is None or self.data.get('node_b_slug', None) is None:
+            self.data['node_a_slug'] = self.node_a.slug
+            self.data['node_b_slug'] = self.node_b.slug
+        
+        if self.data.get('interface_a_mac', None) is None or self.data.get('interface_b_mac', None) is None:
+            self.data['interface_a_mac'] = self.interface_a.mac
+            self.data['interface_b_mac'] = self.interface_b.mac
+        
         super(Link, self).save(*args, **kwargs)
     
     @property
@@ -140,6 +150,26 @@ class Link(BaseAccessLevel):
     def node_b_name(self):
         self.data = self.data or {}
         return self.data.get('node_b_name', None)
+    
+    @property
+    def node_a_slug(self):
+        self.data = self.data or {}
+        return self.data.get('node_a_slug', None)
+    
+    @property
+    def node_b_slug(self):
+        self.data = self.data or {}
+        return self.data.get('node_b_slug', None)
+    
+    @property
+    def interface_a_mac(self):
+        self.data = self.data or {}
+        return self.data.get('interface_a_mac', None)
+    
+    @property
+    def interface_b_mac(self):
+        self.data = self.data or {}
+        return self.data.get('interface_b_mac', None)
     
     @property
     def quality(self):

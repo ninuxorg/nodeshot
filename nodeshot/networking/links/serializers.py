@@ -1,20 +1,18 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-#from django.core.exceptions import ValidationError
 
 from rest_framework import pagination, serializers
-#from rest_framework.reverse import reverse
+from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as gis_serializers
 
-from .models import *
+from nodeshot.core.base.serializers import DynamicRelationshipsMixin
 
-from nodeshot.core.base.fields import HStoreDictionaryField
+from .models import *
 
 
 __all__ = [
     'LinkListSerializer',
     'LinkDetailSerializer',
-    #'LinkAddSerializer',
     'LinkListGeoJSONSerializer',
     'LinkDetailGeoJSONSerializer',
     'PaginatedLinkSerializer',
@@ -39,25 +37,32 @@ class LinkListGeoJSONSerializer(LinkListSerializer, gis_serializers.GeoFeatureMo
         fields = LinkListSerializer.Meta.fields[:]
 
 
-class LinkDetailSerializer(LinkListSerializer):
+class LinkDetailSerializer(DynamicRelationshipsMixin, LinkListSerializer):
     
     access_level = serializers.Field(source='get_access_level_display')
     status = serializers.Field(source='get_status_display')
     type = serializers.Field(source='get_type_display')
+    node_a_name = serializers.Field(source='node_a_name')
+    node_b_name = serializers.Field(source='node_b_name')
+    interface_a_mac = serializers.Field(source='interface_a_mac')
+    interface_b_mac = serializers.Field(source='interface_b_mac')
+    relationships = serializers.SerializerMethodField('get_relationships')
     
-    data = HStoreDictionaryField(
-        required=False,
-        label=_('extra data'),
-        help_text=_('store extra attributes in JSON string')
-    )
+    _relationships = {
+        'node_a': ('api_node_details', 'node_a_slug'),
+        'node_b': ('api_node_details', 'node_b_slug'),
+    }
 
     class Meta:
         model = Link
         fields = [
-            'id', 'access_level', 'status', 'type', 'line', 
+            'id', 
+            'node_a_name', 'node_b_name',
+            'interface_a_mac', 'interface_b_mac',
+            'access_level', 'status', 'type', 'line', 
             'quality', 'metric_type', 'metric_value',
             'tx_rate', 'rx_rate', 'dbm', 'noise',
-            'added', 'updated'
+            'added', 'updated', 'relationships'
         ]
 
 
@@ -66,13 +71,6 @@ class LinkDetailGeoJSONSerializer(LinkDetailSerializer, gis_serializers.GeoFeatu
         model = Link
         geo_field = 'line'
         fields = LinkDetailSerializer.Meta.fields[:]
-
-
-#class NodeLinkListSerializer(LinkDetailSerializer):
-#    """ serializer to list links of a node """
-#    class Meta:
-#        model = Link
-#        fields = LinkDetailSerializer.Meta.primary_fields[:] + ['details']
 
 
 #class LinkAddSerializer(NodeLinkListSerializer):
