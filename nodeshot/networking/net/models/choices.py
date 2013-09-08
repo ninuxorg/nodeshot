@@ -3,12 +3,15 @@ from nodeshot.core.base.utils import choicify
 
 
 ROUTING_PROTOCOLS = (
-    ('batman', 'Batman-adv'),
-    ('babel', 'Babel'),
     ('olsr', 'OLSR'),
+    ('batman', 'B.A.T.M.A.N.'),
+    ('batman-adv', 'B.A.T.M.A.N. advanced'),
+    ('bmx', 'BMX (Batman Experimental)'),
+    ('babel', 'Babel'),
+    ('802.11s', 'Open 802.11s'),
     ('bgp', 'BGP'),
+    ('ospf', 'OSPF'),
     ('static', _('Static Routing')),
-    ('none', _('None')),
 )
 
 DEVICE_TYPES = {
@@ -102,7 +105,8 @@ INTERFACE_TYPES = {
     'wireless': 2,
     'bridge': 3,
     'virtual': 4,
-    'vlan': 5,
+    'tunnel': 5,
+    'vlan': 6,
 }
 INTERFACE_TYPE_CHOICES = choicify(INTERFACE_TYPES)
 

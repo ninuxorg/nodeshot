@@ -1,7 +1,7 @@
 #import simplejson
 #
 #from nodeshot.core.nodes.models.choices import NODE_STATUS
-#from nodeshot.core.links.choices import LINK_STATUS, LINK_TYPE
+#from nodeshot.core.links.choices import LINK_STATUS, LINK_TYPES
 #
 #from .base import BaseConverter
 #
@@ -76,7 +76,7 @@
 #        for item in items:
 #            link = {
 #                'status': LINK_STATUS.get('active'),
-#                'type': LINK_TYPE.get('radio'),
+#                'type': LINK_TYPES.get('radio'),
 #                'from': [item.get('from_lat'), item.get('from_lng')],
 #                'to': [item.get('to_lat'), item.get('to_lng')]
 #            }
@@ -88,7 +88,7 @@
 #                'total_count': len(items)
 #            },
 #            'status': LINK_STATUS,
-#            'types': LINK_TYPE,
+#            'types': LINK_TYPES,
 #            'links': links
 #        }
 #        # return json formatted string

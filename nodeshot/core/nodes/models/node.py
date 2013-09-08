@@ -141,6 +141,8 @@ class Node(BaseAccessLevel):
     @property
     def point(self):
         """ returns location of node. If node geometry is not a point a centroid point will be returned """
+        if not self.geometry:
+            raise ValueError('geometry attribute must be set before trying to get point property')
         if self.geometry.geom_type == 'Point':
             return self.geometry
         else:
@@ -151,3 +153,6 @@ class Node(BaseAccessLevel):
         @staticmethod
         def autocomplete_search_fields():
             return ('name__icontains', 'slug__icontains', 'address__icontains')
+    
+    # some more properties are added by the layer app
+    #  * intersecting_layers

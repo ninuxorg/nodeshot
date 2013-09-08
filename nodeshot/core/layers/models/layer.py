@@ -63,8 +63,16 @@ class Layer(BaseDate):
             return ('name__icontains', 'slug__icontains')
 
 
-# ------ Additional validation for Node model ------ #
+# ------ Add Layer related methods to Node class ------ #
 
+@property
+def intersecting_layers(self):
+    return Layer.objects.filter(area__contains=self.point)
+
+Node.intersecting_layers = intersecting_layers
+
+
+# ------ Additional validation for Node model ------ #
 
 def new_nodes_allowed_for_layer(self):
     """

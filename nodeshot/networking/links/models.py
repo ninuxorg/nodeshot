@@ -13,7 +13,7 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.networking.net.models import Interface
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
-from choices import METRIC_TYPES, LINK_STATUS, LINK_TYPE
+from choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
 
 
 class Link(BaseAccessLevel):
@@ -23,7 +23,7 @@ class Link(BaseAccessLevel):
     """
     status = models.SmallIntegerField(_('status'), choices=choicify(LINK_STATUS), default=LINK_STATUS.get('planned'))
     type = models.SmallIntegerField(_('type'), max_length=10, null=True, blank=True,
-                                    choices=choicify(LINK_TYPE), default=LINK_TYPE.get('radio'))
+                                    choices=choicify(LINK_TYPES), default=LINK_TYPES.get('radio'))
     
     # in most cases these two fields are mandatory, except for "planned" links
     interface_a = models.ForeignKey(Interface, verbose_name=_('from interface'),
@@ -44,7 +44,8 @@ class Link(BaseAccessLevel):
     line = models.LineStringField(blank=True, null=True,
                            help_text=_('leave blank and the line will be drawn automatically'))
     
-    metric_type = models.CharField(_('metric type'), max_length=6, choices=choicify(METRIC_TYPES), blank=True)
+    metric_type = models.CharField(_('metric type'), max_length=6,
+                                   choices=choicify(METRIC_TYPES), blank=True, null=True)
     metric_value = models.FloatField(_('metric value'), blank=True, null=True)
     tx_rate = models.IntegerField(_('TX rate average'), null=True, default=None, blank=True)
     rx_rate = models.IntegerField(_('RX rate average'), null=True, default=None, blank=True)
@@ -77,7 +78,7 @@ class Link(BaseAccessLevel):
         if self.status == LINK_STATUS.get('planned') and (self.node_a == None or self.node_b == None):
             raise ValidationError(_('fields "from node" and "to node" are mandatory for planned links'))
         
-        if self.dbm != None or self.noise != None:
+        if self.type != LINK_TYPES.get('radio') and (self.dbm != None or self.noise != None):
             raise ValidationError(_('Only links of type "radio" can contain "dbm" and "noise" information'))
         
         if (self.interface_a_id == self.interface_b_id) or (self.interface_a == self.interface_b):
@@ -100,11 +101,17 @@ class Link(BaseAccessLevel):
         
         if not self.type:
             if self.interface_a.type == INTERFACE_TYPES.get('wireless'):
-                self.type = LINK_TYPE.get('radio')
+                self.type = LINK_TYPES.get('radio')
             elif self.interface_a.type == INTERFACE_TYPES.get('ethernet'):
-                self.type = LINK_TYPE.get('ethernet')
+                self.type = LINK_TYPES.get('ethernet')
             else:
-                self.type = LINK_TYPE.get('virtual')
+                self.type = LINK_TYPES.get('virtual')
+        
+        #if self.interface_a_id:
+        #    self.interface_a = Interface.objects.get(pk=self.interface_a_id)
+        #
+        #if self.interface_b_id:
+        #    self.interface_b = Interface.objects.get(pk=self.interface_b_id)
         
         # fill in node_a and node_b
         if self.node_a is None and self.interface_a != None:

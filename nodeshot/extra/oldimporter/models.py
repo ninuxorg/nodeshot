@@ -4,10 +4,35 @@ this app can import data from older nodeshot versions (0.9)
 developed to import data from map.ninux.org into the new version of nodeshot
 """
 
+from nodeshot.core.base.utils import check_dependencies
+
+check_dependencies(
+    dependencies=[
+        'nodeshot.core.nodes',
+        'nodeshot.core.layers',
+        'nodeshot.networking.net',
+        'nodeshot.networking.links',
+        'nodeshot.community.mailing',
+        'nodeshot.community.profiles',
+    ],
+    module='nodeshot.community.participation'
+)
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from .choices import *
+
+
+__all__ = [
+    'OldNode',
+    'OldDevice',
+    'OldHna',
+    'OldInterface',
+    'OldLink',
+    'OldStatistic',
+    'OldContact',
+]
 
 
 class OldNode(models.Model):

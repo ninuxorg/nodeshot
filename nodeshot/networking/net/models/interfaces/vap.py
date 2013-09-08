@@ -12,7 +12,7 @@ class Vap(BaseDate):
     """
     interface = models.ForeignKey('net.Wireless',
                                   verbose_name='wireless interface')
-    essid = models.CharField(max_length=50)
+    essid = models.CharField(max_length=50, null=True, blank=True)
     bssid = models.CharField(max_length=50, null=True, blank=True)
     encryption = models.CharField(max_length=50, null=True, blank=True)
     key = models.CharField(max_length=100, null=True, blank=True)

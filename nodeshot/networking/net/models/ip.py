@@ -17,7 +17,7 @@ class Ip(BaseAccessLevel):
     interface = models.ForeignKey('net.Interface', verbose_name=_('interface'))
     address = InetAddressField(verbose_name=_('ip address'), unique=True, db_index=True)
     protocol = models.CharField(_('IP Protocol Version'), max_length=4, choices=IP_PROTOCOLS, default=IP_PROTOCOLS[0][0], blank=True)
-    netmask = CidrAddressField(_('netmask (CIDR, eg: 10.40.0.0/24)'))
+    netmask = CidrAddressField(_('netmask (CIDR, eg: 10.40.0.0/24)'), blank=True, null=True)
     
     objects = NetAccessLevelManager()
     

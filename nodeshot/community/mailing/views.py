@@ -56,7 +56,6 @@ class ContactNode(generics.CreateAPIView):
             return Response({ 'detail': _('This resource cannot be contacted') }, status=400)
         
         return Response({ 'detail': _('Method Not Allowed') }, status=405)
-    
 
     def post(self, request, *args, **kwargs):
         """

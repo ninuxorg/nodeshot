@@ -97,7 +97,7 @@ class Inward(BaseDate):
             # log the error
             import logging
             log = logging.getLogger(__name__)
-            log.error('nodeshot.core.mailing.models.inward.send(): %s' % e)
+            log.error('nodeshot.community.mailing.models.inward.send(): %s' % e)
             # set status of the instance as "error"
             self.status = -1
     

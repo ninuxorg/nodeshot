@@ -5,13 +5,14 @@ nodeshot.core.links unit tests
 import simplejson as json
 
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 
 from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.networking.net.models import Interface
 
 from .models import Link
-from .choices import LINK_STATUS, LINK_TYPE
+from .choices import LINK_STATUS, LINK_TYPES
 
 
 class LinkTest(BaseTestCase):
@@ -32,13 +33,14 @@ class LinkTest(BaseTestCase):
         l = Link()
         l.interface_a = Interface.objects.find(2)
         l.interface_b = Interface.objects.find(3)
-        l.type = LINK_TYPE.get('radio')
+        l.type = LINK_TYPES.get('radio')
         l.status = LINK_STATUS.get('active')
         self.link = l
     
     def test_non_radio_shouldnt_have_radio_info(self):
         """ *** A link of any type which is not "radio" should not have dBm or noise data *** """
         link = self.link
+        link.type = LINK_TYPES.get('ethernet')
         link.dbm = -70
         link.noise = -90
         self.assertRaises(ValidationError, link.full_clean)
@@ -46,7 +48,7 @@ class LinkTest(BaseTestCase):
     def test_save_radio_link(self):
         """ *** It should be possible to save a new link *** """
         l = self.link
-        l.type = LINK_TYPE.get('radio')
+        l.type = LINK_TYPES.get('radio')
         l.dbm = -70
         l.noise = -90
         l.save()
@@ -59,19 +61,19 @@ class LinkTest(BaseTestCase):
     
     def test_null_interfaces(self):
         """ *** An active link with null 'from interface' and 'to interface' fields should not be saved  *** """
-        l = Link(type=LINK_TYPE.get('radio'), status=LINK_TYPE.get('active'))
+        l = Link(type=LINK_TYPES.get('radio'), status=LINK_TYPES.get('active'))
         self.assertRaises(ValidationError, l.full_clean)
     
     def test_auto_fill_node_fields(self):
         """ *** When a link with any type except for 'planned' is saved it should automatically fill the fields 'from node' and 'to node'  *** """
         l = self.link
-        l.type = LINK_TYPE.get('radio')
+        l.type = LINK_TYPES.get('radio')
         l.save()
         self.assertTrue(l.node_a != None and l.node_b != None, '"from node" and "to node" fields are null')
     
     def test_null_interface_and_node_fields(self):
         """ *** It should not be possible to save a link which has void node and interface info  *** """
-        link = Link(type=LINK_TYPE.get('radio'), status=LINK_STATUS.get('planned'))
+        link = Link(type=LINK_TYPES.get('radio'), status=LINK_STATUS.get('planned'))
         self.assertRaises(ValidationError, link.full_clean)
     
     def test_same_to_and_from_interface(self):
@@ -115,4 +117,25 @@ class LinkTest(BaseTestCase):
         link.type = None
         link.save()
         link = Link.objects.find(link.id)
-        self.assertEqual(link.type, LINK_TYPE.get('radio'))
+        self.assertEqual(link.type, LINK_TYPES.get('radio'))
+    
+    def test_links_api(self):
+        link = self.link
+        link.save()
+        link = Link.objects.find(link.id)
+        
+        url = reverse('api_link_list')
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        
+        url = reverse('api_links_geojson_list')
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        
+        url = reverse('api_link_details', args=[link.id])
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        
+        url = reverse('api_links_geojson_details', args=[link.id])
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)

@@ -63,7 +63,7 @@ USE_TZ = True
 
 SITE_DOMAIN = 'localhost'
 PROTOCOL = 'http'
-BASE_URL = 'http://%s/' % SITE_DOMAIN
+BASE_URL = 'http://%s' % SITE_DOMAIN
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
@@ -171,14 +171,14 @@ INSTALLED_APPS = (
     # nodeshot
     'nodeshot.core.api',
     'nodeshot.community.participation',  # participation must go before layers
+    'nodeshot.community.mailing',        # this too
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
     'nodeshot.core.cms',
     'nodeshot.core.websockets',
     'nodeshot.interoperability',
-    'nodeshot.community.profiles',
     'nodeshot.community.notifications',
-    'nodeshot.community.mailing',
+    'nodeshot.community.profiles',
     'nodeshot.networking.net',
     'nodeshot.networking.links',
     'nodeshot.networking.services',
@@ -214,7 +214,8 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
-AUTH_USER_MODEL = 'profiles.Profile'
+if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
+    AUTH_USER_MODEL = 'profiles.Profile'
 
 # ------ DJANGO LOGGING ------ #
 
@@ -317,7 +318,15 @@ EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025  # 1025 if you are in development mode, while 25 is usually the production port
 DEFAULT_FROM_EMAIL = 'your@email.org'
 
-# ------ CELERY SCHEDULED JOBS ------ #
+# ------ CELERY ------ #
+
+if not DEBUG:
+    EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
+
+BROKER_URL = 'django://'  # defaults to use kombu.transport.django
+
+import djcelery
+djcelery.setup_loader()
 
 #from datetime import timedelta
 #
@@ -464,7 +473,18 @@ NODESHOT = {
     # list that will contain functions to disable and re-enable some signals
     # for large import of data notifications, websockets, participation counts and similar operations
     # might be temporarily disabled to avoid unnecessary database load
-    'DISCONNECTABLE_SIGNALS': []
+    'DISCONNECTABLE_SIGNALS': [],
+    # settings for old nodeshot importer
+    'OLD_IMPORTER':{
+        'DEFAULT_LAYER': 30,
+        'STATUS_MAPPING': {
+            'a': 'active',
+            'h': 'active',
+            'ah': 'active',
+            'p': 'potential',
+            'default': 'potential'
+        }
+    }
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]

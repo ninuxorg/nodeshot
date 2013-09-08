@@ -10,7 +10,7 @@ LINK_STATUS = {
     'active': 2
 }
 
-LINK_TYPE = {
+LINK_TYPES = {
     'radio': 1,
     'ethernet': 2,
     'fiber': 3,

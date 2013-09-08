@@ -24,7 +24,6 @@ SITE = {
     'domain': 'http://test.test.com'
 }
 
-
 NODE_STATUS = (
     ('p', _('potential')),
     ('a', _('active')),

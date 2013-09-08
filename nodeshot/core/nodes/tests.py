@@ -167,6 +167,14 @@ class ModelsTest(TestCase):
             Node.objects.filter(is_published=True, access_level__lte=0).order_by('-id')[0]
         )
     
+    def test_node_point(self):
+        node = Node.objects.first()
+        self.assertEqual(node.point, node.geometry)
+        
+        node = Node()
+        with self.assertRaises(ValueError):
+            node.point
+    
     def test_image_manager(self):
         """ test manager methods of Image model """
         # admin can see all the images
