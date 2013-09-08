@@ -70,3 +70,6 @@ django-debug-toolbar
 
 # migrations
 south
+
+# SSH and shell commands
+spur

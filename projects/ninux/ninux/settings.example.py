@@ -183,7 +183,7 @@ INSTALLED_APPS = (
     'nodeshot.networking.links',
     'nodeshot.networking.services',
     'nodeshot.networking.hardware',
-    #'nodeshot.networking.planning',
+    'nodeshot.networking.puller',
     #'nodeshot.networking.monitor',
     'nodeshot.interface',
     
@@ -484,7 +484,10 @@ NODESHOT = {
             'p': 'potential',
             'default': 'potential'
         }
-    }
+    },
+    'PULLERS': [
+        ('nodeshot.networking.puller.scripts.UbiquityM5', 'UbiquityM5 Series'),
+    ],
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
