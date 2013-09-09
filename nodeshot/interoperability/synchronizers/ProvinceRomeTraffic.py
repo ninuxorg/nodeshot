@@ -1,24 +1,89 @@
+import requests
+import simplejson as json
+from datetime import date, datetime, timedelta
+
 from django.template.defaultfilters import slugify
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.conf import settings
 
 from nodeshot.core.nodes.models import Node, Status
 
-from .base import XMLConverter
+from .base import BaseConverter
 
 if settings.NODESHOT['SETTINGS'].get('HSTORE', False) is False:
-    raise ImproperlyConfigured('HSTORE needs to be enabled for ProvinciaWIFI Converter to work properly')
+    raise ImproperlyConfigured('HSTORE needs to be enabled for this converter to work properly')
 
 
-
-class ProvinciaWIFI(XMLConverter):
-    """ ProvinciaWIFI interoperability class """
+class ProvinceRomeTraffic(BaseConverter):
+    """ Province of Rome Traffic interoperability class """
+    
+    REQUIRED_CONFIG_KEYS = [
+        'streets_url',
+        'measurements_url',
+        'check_streets_every_n_days'
+    ]
+    
+    def retrieve_data(self):
+        """ retrieve data """
+        # shortcuts for readability
+        streets_url = self.config.get('streets_url')
+        check_streets_every_n_days = int(self.config.get('check_streets_every_n_days', 2))
+        last_time_streets_checked = self.config.get('last_time_streets_checked', None)
+        measurements_url = self.config.get('measurements_url')
+        verify_SSL = self.config.get('verify_SSL', True)
+        
+        # do HTTP request and store content
+        self.measurements = requests.get(measurements_url, verify=verify_SSL).content
+        
+        try:
+            last_time_streets_checked = datetime.strptime(last_time_streets_checked,
+                                                          '%Y-%m-%d').date()    
+        except TypeError:
+            pass
+        
+        # if last time checked more than days specified
+        if last_time_streets_checked is None or last_time_streets_checked < date.today() - timedelta(days=check_streets_every_n_days):
+            # get huge streets file
+            self.streets = requests.get(streets_url, verify=verify_SSL).content
+        else:
+            self.streets = False
+    
+    def parse(self):
+        """ parse data """
+        self.measurements = json.loads(self.measurements)["features"]
+        if self.streets:
+            self.streets = json.loads(self.streets)["features"]
     
     def save(self):
         """ synchronize DB """
+        self.process_streets()
+        self.process_measurements()
+    
+    def process_measurements(self):
+        items = self.measurements
+        if len(items) < 1:
+            self.message += """
+            No measurements found.
+            """
+        else:
+            for item in items:
+                node = Node.objects.get(pk=item['id'])
+                node.data['last_measurement'] = item['properties']['TIMESTAMP']
+                node.data['velocity'] = item['properties']['VELOCITY']
+                node.save()
+            self.message += """
+            Saved %d measurements.
+            """ % len(items)
+        
+    def process_streets(self):
+        if not self.streets:
+            self.message = """
+            Street data not processed.
+            """
+            return False
         # retrieve all items
-        items = self.parsed_data.getElementsByTagName('AccessPoint')
+        items = self.streets
         
         # init empty lists
         added_nodes = []
@@ -40,7 +105,9 @@ class ProvinciaWIFI(XMLConverter):
         for item in items:
             # retrieve info in auxiliary variables
             # readability counts!
-            name = self.get_text(item, 'Denominazione')[0:70]
+            id = item['id']
+            name = item['properties'].get('LOCATION', '')[0:70]
+            address = name
             slug = slugify(name)
             
             number = 1
@@ -59,20 +126,8 @@ class ProvinciaWIFI(XMLConverter):
                         self.verbose('needed a different name for %s, trying "%s"' % (original_name, name))
                     break
             
-            lat = self.get_text(item, 'Latitudine')
-            lng = self.get_text(item, 'longitudine')
-            description = 'Indirizzo: %s, %s; Tipologia: %s' % (
-                self.get_text(item, 'Indirizzo'),
-                self.get_text(item, 'Comune'),
-                self.get_text(item, 'Tipologia')
-            )
-            address = '%s, %s' % (
-                self.get_text(item, 'Indirizzo'),
-                self.get_text(item, 'Comune')
-            )
-            
-            # point object
-            point = Point(float(lng), float(lat))
+            # geometry object
+            geometry = GEOSGeometry(json.dumps(item["geometry"]))
             
             # default values
             added = False
@@ -80,12 +135,14 @@ class ProvinciaWIFI(XMLConverter):
             
             try:
                 # edit existing node
-                node = Node.objects.get(slug=slug)
+                node = Node.objects.get(pk=id)
             except Node.DoesNotExist:
                 # add a new node
                 node = Node()
+                node.id = id
                 node.layer = self.layer
                 node.status = self.status
+                node.data = {}
                 added = True
             
             if node.name != name:
@@ -96,22 +153,12 @@ class ProvinciaWIFI(XMLConverter):
                 node.slug = slug
                 changed = True
             
-            if added is True or node.geometry.equals(point) is False:
-                node.geometry = point
-                changed = True
-            
-            if node.description != description:
-                node.description = description
+            if added is True or node.geometry.equals(geometry) is False:
+                node.geometry = geometry
                 changed = True
             
             if node.address != address:
-                node.address = address  # complete address
-                node.data = {
-                    'address': self.get_text(item, 'Indirizzo'),
-                    'city': self.get_text(item, 'Comune'),
-                    'province': 'Roma',
-                    'country': 'Italia'
-                }
+                node.address = address
                 changed = True
             
             # perform save or update only if necessary
@@ -148,14 +195,18 @@ class ProvinciaWIFI(XMLConverter):
                 deleted_nodes_count = deleted_nodes_count + 1
                 self.verbose('node "%s" deleted' % node_name)
         
+        self.config['last_time_streets_checked'] = str(date.today())
+        self.layer.external.config = json.dumps(self.config, indent=4, sort_keys=True)
+        self.layer.external.save()
+        
         # message that will be returned
         self.message = """
-            %s nodes added
-            %s nodes changed
-            %s nodes deleted
-            %s nodes unmodified
+            %s streets added
+            %s streets changed
+            %s streets deleted
+            %s streets unmodified
             %s total external records processed
-            %s total local nodes for this layer
+            %s total local records for this layer
         """ % (
             len(added_nodes),
             len(changed_nodes),

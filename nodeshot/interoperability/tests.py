@@ -3,13 +3,15 @@ nodeshot.interoperability unit tests
 """
 
 import sys
+import simplejson as json
 from cStringIO import StringIO
+from datetime import date, timedelta
 
 from django.test import TestCase
 from django.core import management
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, GEOSGeometry
 
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
@@ -238,3 +240,124 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(node.description, 'Indirizzo: Via G. Pullino 97, Roma; Tipologia: Privati federati')
         point = Point(12.484, 41.8641)
         self.assertTrue(node.geometry.equals(point))
+    
+    def test_province_rome_traffic(self):
+        """ test ProvinceRomeTraffic converter """
+        
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        
+        streets_url = '%snodeshot/testing/CitySDK_WP4_streets.json' % settings.STATIC_URL
+        measurements_url = '%snodeshot/testing/CitySDK_WP4_measurements.json' % settings.STATIC_URL
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinceRomeTraffic'
+        external.config = json.dumps({
+            "streets_url": streets_url,
+            "measurements_url": measurements_url,
+            "check_streets_every_n_days": 2
+        })
+        external.save()
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('18 streets added', output.getvalue())
+        self.assertIn('0 streets changed', output.getvalue())
+        self.assertIn('18 total external', output.getvalue())
+        self.assertIn('18 total local', output.getvalue())
+        self.assertIn('Saved 4 measurements', output.getvalue())
+        
+        # start checking DB too
+        nodes = layer.node_set.all()
+        
+        # ensure all nodes have been imported
+        self.assertEqual(nodes.count(), 18)
+        
+        # check one particular node has the data we expect it to have
+        node = Node.objects.get(slug='via-di-santa-prisca')
+        self.assertEqual(node.name, 'VIA DI SANTA PRISCA')
+        self.assertEqual(node.address, 'VIA DI SANTA PRISCA')
+        geometry = GEOSGeometry('SRID=4326;LINESTRING (12.4837894439700001 41.8823699951170028, 12.4839096069340005 41.8820686340329971, 12.4839801788330007 41.8818206787110014)')
+        self.assertTrue(node.geometry.equals(geometry))
+        
+        # check measurements
+        node = Node.objects.get(slug='via-casilina')
+        self.assertEqual(node.name, 'VIA CASILINA')
+        self.assertEqual(node.data['last_measurement'], '09-09-2013 22:31:00')
+        self.assertEqual(node.data['velocity'], '44')
+        
+        # ensure last_time_streets_checked is today
+        layer = Layer.objects.get(pk=layer.id)
+        layer.external.config = json.loads(layer.external.config)
+        self.assertEqual(layer.external.config['last_time_streets_checked'], str(date.today()))
+        
+        ### --- not much should happen --- ###
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('Street data not processed', output.getvalue())
+        
+        # set last_time_streets_checked to 6 days ago
+        layer.external.config['last_time_streets_checked'] = str(date.today() - timedelta(days=6))
+        layer.external.config = json.dumps(layer.external.config)
+        layer.external.save()
+        
+        ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
+        
+        streets_url = '%snodeshot/testing/CitySDK_WP4_streets_2.json' % settings.STATIC_URL
+        measurements_url = '%snodeshot/testing/CitySDK_WP4_measurements_2.json' % settings.STATIC_URL
+        
+        external.config = json.loads(external.config)
+        external.config['streets_url'] = streets_url
+        external.config['measurements_url'] = measurements_url
+        external.config = json.dumps(external.config)
+        external.save()
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('3 streets added', output.getvalue())
+        self.assertIn('16 streets unmodified', output.getvalue())
+        self.assertIn('2 streets deleted', output.getvalue())
+        self.assertIn('0 streets changed', output.getvalue())
+        self.assertIn('19 total external', output.getvalue())
+        self.assertIn('19 total local', output.getvalue())
+        self.assertIn('No measurements found', output.getvalue())
+        
+        # ensure all nodes have been imported
+        self.assertEqual(nodes.count(), 19)
+        
+        # ensure last_time_streets_checked is today
+        layer = Layer.objects.get(pk=layer.id)
+        layer.external.config = json.loads(layer.external.config)
+        self.assertEqual(layer.external.config['last_time_streets_checked'], str(date.today()))
