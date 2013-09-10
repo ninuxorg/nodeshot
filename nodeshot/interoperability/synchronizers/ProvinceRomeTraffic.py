@@ -67,14 +67,24 @@ class ProvinceRomeTraffic(BaseConverter):
             No measurements found.
             """
         else:
+            saved_measurements = 0
             for item in items:
-                node = Node.objects.get(pk=item['id'])
-                node.data['last_measurement'] = item['properties']['TIMESTAMP']
-                node.data['velocity'] = item['properties']['VELOCITY']
-                node.save()
+                try:
+                    node = Node.objects.get(pk=int(item['id']))
+                except Node.DoesNotExist:
+                    print "Could not retrieve node #%s" % item['id']
+                    continue
+                try:
+                    node.data['last_measurement'] = item['properties']['TIMESTAMP']
+                    node.data['velocity'] = item['properties']['VELOCITY']
+                    node.save()
+                    self.verbose('Updated measurement for node %s' % node.id)
+                    saved_measurements += 1
+                except KeyError:
+                    pass
             self.message += """
-            Saved %d measurements.
-            """ % len(items)
+            Updated %d measurements out of %d.
+            """ % (saved_measurements, len(items))
         
     def process_streets(self):
         if not self.streets:

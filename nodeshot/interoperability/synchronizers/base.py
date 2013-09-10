@@ -84,7 +84,7 @@ class BaseConverter(object):
     
     def verbose(self, message):
         if self.verbosity == 2:
-            print(message) 
+            print(message)
     
 
 class HttpRetrieverMixin(object):
