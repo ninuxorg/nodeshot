@@ -31,7 +31,7 @@ If you want to do a quick install to play with nodeshot just follow this routine
     cd mapserver
     pip install -r requirements.txt
     cp settings.example.py settings.py
-    
+    export DJANGO_SETTINGS_MODULE=settings
     ./manage.py syncdb && ./manage.py collectstatic && ./manage.py runserver
 
 Enjoy on http://localhost:8000/ !
