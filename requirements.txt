@@ -1,3 +1,10 @@
 Django==1.4.1
 distribute==0.6.10
 wsgiref==0.1.2
+MySQL-Python
+django-debug-toolbar
+south
+
+Celery
+django-celery
+django-celery-email
