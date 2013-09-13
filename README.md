@@ -4,6 +4,16 @@
     | | | | (_) | (_| |  __/\__ \ | | | (_) | |_ 
     |_| |_|\___/ \__,_|\___||___/_| |_|\___/ \__|
 
+
+CURRENT STATUS
+--------------
+
+New refactored major version under active development here:
+https://github.com/nemesisdesign/nodeshot/tree/refactoring
+
+Stay tuned.
+
+
 A nice snapshot of your wireless community network
 ---------------------------------------------------------
 Nodeshot is a web tool for wireless community network.  It allows
