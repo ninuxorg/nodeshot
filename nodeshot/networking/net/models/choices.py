@@ -124,6 +124,7 @@ ETHERNET_STANDARDS = (
     ('legacy', 'Legacy Ethernet'),
     ('fast', '10/100 Fast Ethernet'),
     ('gigabit', '10/100/1000 Gigabit Ethernet'),
+    ('basefx', '100/1000 BaseFX (Fiber)'),
 )
 
 DUPLEX_CHOICES = (
