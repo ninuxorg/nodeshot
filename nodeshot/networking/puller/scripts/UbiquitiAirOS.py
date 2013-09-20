@@ -1,8 +1,8 @@
 """
-Classes to extract information from Ubiquity Devices
+Class to extract information from Ubiquiti AirOS devices
 """
 
-__all__ = ['UbiquityM5']
+__all__ = ['UbiquitiAirOS']
 
 
 import spur
@@ -12,9 +12,9 @@ from nodeshot.networking.net.models import *
 from nodeshot.networking.net.models.choices import DEVICE_STATUS, DEVICE_TYPES
 
 
-class UbiquityM5AirOS(object):
+class UbiquitiAirOS(object):
     """
-    Ubiquity M5 series mounting AirOS
+    Ubiquiti AirOS SSH puller
     """
     
     def __init__(self, device_login):
@@ -28,11 +28,22 @@ class UbiquityM5AirOS(object):
     
     def restart(self):
         """ delete db objects and start from scratch """
-        original_login = self.device_login
+        # retrieve model indirectly because is needed only here
+        DeviceLogin = self.device_login.__class__
+        # store original login info
+        original_login = DeviceLogin(**{
+            "node_id": self.device_login.node_id,
+            "host": self.device_login.host,
+            "username": self.device_login.username,
+            "password": self.device_login.password,
+            "store": True,
+            "port": self.device_login.port,
+            "puller_class": self.device_login.puller_class
+        })
+        # delete device
         self.device_login.device.delete()
-        original_login.id = None
+        # save login and restart
         original_login.save()
-        self.start()
     
     def start(self):
         """ start extracting info from device """
@@ -125,6 +136,25 @@ class UbiquityM5AirOS(object):
                 info[parts[0]] = parts[1]
         
         return info
+    
+    def get_ipv6_of_interface(self, interface_name):
+        """ return ipv6 address for specified interface """
+        command = "ip -6 addr show %s" % interface_name
+        
+        try:
+            output = self.output(command)
+        except spur.RunProcessError:
+            return None
+        
+        for line in output.split('\n'):
+            line = line.strip()
+            
+            if 'global' in line:
+                parts = line.split(' ')
+                ipv6 = parts[1]
+                break
+        
+        return ipv6
         
     def get_interfaces(self):
         """ get device interfaces """
@@ -187,11 +217,22 @@ class UbiquityM5AirOS(object):
                     })
                     # save into DB
                     obj.save()
+                    
+                    
                 
-                # save ip address if necessary
+                # save ipv4 address if necessary
                 if obj:
                     Ip.objects.create(**{
                         'interface': obj,
                         'address': interface['ip_address'],
                     })
                 
+                # save ipv6 address if any
+                ipv6_address = self.get_ipv6_of_interface(interface['interface'])
+                if ipv6_address and ipv6_address != 'None':
+                    # subtract netmask
+                    ipv6_address = ipv6_address.split('/')[0]
+                    Ip.objects.create(**{
+                        'interface': obj,
+                        'address': ipv6_address,
+                    })

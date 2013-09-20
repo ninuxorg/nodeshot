@@ -486,7 +486,7 @@ NODESHOT = {
         }
     },
     'PULLERS': [
-        ('nodeshot.networking.puller.scripts.UbiquityM5', 'UbiquityM5 Series'),
+        ('nodeshot.networking.puller.scripts.UbiquitiAirOS', 'Ubiquiti AirOS'),
     ],
 }
 

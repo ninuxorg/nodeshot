@@ -44,7 +44,7 @@ class VapInline(BaseStackedInline):
 
 
 class DeviceAdmin(BaseGeoAdmin):
-    list_filter   = ('added', 'updated', 'node')
+    list_filter   = ('added', 'updated',)
     list_display  = ('name', 'node', 'type', 'access_level', 'added', 'updated')
     search_fields = ('name', 'type')
     inlines = [EthernetInline, WirelessInline, BridgeInline, TunnelInline, VlanInline]
