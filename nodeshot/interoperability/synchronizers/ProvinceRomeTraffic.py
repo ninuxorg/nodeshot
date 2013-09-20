@@ -83,7 +83,7 @@ class ProvinceRomeTraffic(BaseConverter):
                 except KeyError:
                     pass
             self.message += """
-            Updated %d measurements out of %d.
+            Updated measurements of %d street segments out of %d
             """ % (saved_measurements, len(items))
         
     def process_streets(self):

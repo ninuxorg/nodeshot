@@ -278,7 +278,7 @@ class InteroperabilityTest(TestCase):
         self.assertIn('0 streets changed', output.getvalue())
         self.assertIn('18 total external', output.getvalue())
         self.assertIn('18 total local', output.getvalue())
-        self.assertIn('Saved 4 measurements', output.getvalue())
+        self.assertIn('Updated measurements of 4 street segments', output.getvalue())
         
         # start checking DB too
         nodes = layer.node_set.all()
