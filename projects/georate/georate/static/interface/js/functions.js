@@ -112,8 +112,8 @@ var allLayers= []
 		//Creates a Leaflet cluster group styled with layer's colour
 		var newCluster = createCluster(clusterClass);
 		//Loads nodes in the cluster
-		newClusterNodes =   getData(window.__BASEURL__+'api/v1/layers/'+layers[i].slug+'/nodes.geojson');
-		var newClusterLayer=loadNodes(newClusterNodes.nodes.results,color)	;
+		var newClusterNodes=   getData(window.__BASEURL__+'api/v1/layers/'+layers[i].slug+'/geojson/');
+		var newClusterLayer=loadNodes(newClusterNodes,color)	;
 		newCluster.addLayer(newClusterLayer);
 		//Adds cluster to map
 		map.addLayer(newCluster);

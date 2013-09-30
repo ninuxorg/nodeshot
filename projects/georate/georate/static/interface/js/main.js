@@ -14,7 +14,7 @@ var popup = L.popup();
 //Layer insert on map
 var overlaymaps={};
 var layers= getData(window.__BASEURL__+'api/v1/layers/'); //nodes
-var geojsonlayers=getData(window.__BASEURL__+'api/v1/layers.geojson'); //layers' area
+var geojsonlayers=getData(window.__BASEURL__+'api/v1/layers-geojson/'); //layers' area
 //console.log(layers)
 var mapLayersArea=loadLayersArea(geojsonlayers);
 

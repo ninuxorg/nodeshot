@@ -1,0 +1,188 @@
+/*
+ * Extra editing icons
+ */
+.olControlNoSelect {
+    cursor: auto;
+}
+.olControlEditingToolbar .olControlModifyFeatureItemInactive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -48px 0px;
+}
+.olControlEditingToolbar .olControlModifyFeatureItemActive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -24px 0px;
+}
+.olControlEditingToolbar .olControlClearFeaturesItemInactive,
+.olControlEditingToolbar .olControlClearFeaturesItemActive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -0px 0px;
+}
+.olControlEditingToolbar .olControlUndoItemActive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -72px 0px;
+}
+.olControlEditingToolbar .olControlUndoItemInactive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -96px 0px;
+}
+.olControlEditingToolbar .olControlRedoItemActive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -120px 0px;
+}
+.olControlEditingToolbar .olControlRedoItemInactive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -144px 0px;
+}
+.olControlEditingToolbar .olwidgetDeleteVertexItemActive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -168px 0px;
+}
+.olControlEditingToolbar .olwidgetDeleteVertexItemInactive {
+    background: url("../img/extra_edit_icons.png") no-repeat scroll -192px 0px;
+}
+.olwidgetDeleteVertexOver {
+    cursor: pointer;
+}
+
+.olwidgetEditableLayerSwitcher {
+    right: 0;
+    cursor: auto;
+}
+.olwidgetEditableLayerSwitcher .olwidgetMaxMin, .olwidgetEditableLayerSwitcher .olwidgetLabel {
+    color: white;
+    font-weight: bold;
+    font-size: smaller;
+}
+.olwidgetEditableLayerSwitcher .olwidgetContainer {
+    background-color: darkblue;
+}
+.olwidgetEditableLayerSwitcher .olwidgetMaxMin {
+    cursor: pointer;
+    padding: 0.5em;
+    float: left;
+}
+.olwidgetEditableLayerSwitcher .editingControls {
+    float: left;
+}
+.olwidgetEditableLayerSwitcher .olControlEditingToolbar {
+    position: relative !important;
+    float: left;
+    width: auto !important;
+}
+.olwidgetEditableLayerSwitcher .layersDiv {
+    clear: both;
+}
+.olwidgetEditableLayerSwitcher input {
+    padding-left: 0.5em;
+    padding-bottom: 0.5em;
+}
+.olwidgetEditableLayerSwitcher .olwidgetLabel {
+    padding-right: 2em;
+}
+.olwidgetEditableLayerSwitcher .olwidgetDisabled {
+    font-style: italic;
+    color: gray;
+}
+
+/* Move layer switcher out of the way of editableLayerSwitcher */
+.olControlLayerSwitcher {
+    top: 30px !important;
+}
+
+/* Override padding to avoid position computation errors */
+.olPopupContent {
+    padding: 0px !important;
+    overflow: visible !important;
+}
+/* Show popups over other controls */
+.olPopup {
+    z-index: 1005 !important;
+}
+
+/* Div containing all popup elements */
+.olwidgetPopupContent {
+    overflow: visible;
+    padding: 2px;
+    border: 2px solid #777;
+    background-color: #777;
+}
+
+.olwidgetPopupCloseBox {
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: #fff url("../img/popup_icons.png") no-repeat scroll -80px 0px;
+    padding-top: 16px;
+    width: 16px;
+    height: 0px;
+    overflow: hidden;
+}
+.olwidgetPopupCloseBox:hover {
+    background-position: -64px 0px;
+}
+/* Div containing content user HTML */
+.olwidgetPopupPage {
+    overflow: auto;
+    background: #fff;
+    padding: 8px;
+    padding-top: 23px;
+
+    /* IE6 fix */
+    zoom: 1;
+}
+
+.olwidgetPopupPagination {
+    clear: both;
+    float: right;
+    background: #fff;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.olwidgetPaginationPrevious {
+    float: left;
+    cursor: pointer;
+    /* Replace text with background image trick */
+    background: url("../img/popup_icons.png") no-repeat scroll -48px 0px;
+    padding-top: 16px;
+    width: 16px;
+    height: 0px;
+    overflow: hidden;
+}
+.olwidgetPaginationPrevious:hover {
+    background-position: -32px 0px;
+}
+
+/* Div containing page count, e.g. "1 of 5". */
+.olwidgetPaginationCount {
+    float: left;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+.olwidgetPaginationNext {
+    float: left;
+    cursor: pointer;
+    /* Replace text with background image trick */
+    background: url("../img/popup_icons.png") no-repeat scroll -16px 0px;
+    padding-top: 16px;
+    width: 16px;
+    height: 0px;
+    overflow: hidden;
+}
+.olwidgetPaginationNext:hover {
+    background-position: 0px 0px;
+}
+.olwidgetClusterList {
+    margin: 0;
+    padding-left: 1em;
+}
+
+/* position blocks */
+.olwidgetPopupStemTL, .olwidgetPopupStemTR {
+    background: url("../img/popup_icons.png") no-repeat scroll -124px 0px;
+}
+.olwidgetPopupStemBL, .olwidgetPopupStemBR {
+    background: url("../img/popup_icons.png") no-repeat scroll -96px 0px;
+}
+/* Put the attribution in a less obtrusive position. */
+.olControlAttribution {
+    bottom: 0em !important;
+    right: 0;
+}
+
+/* Hide the erroneous OpenLayers Google copyright popup */
+.olLayerGoogleCopyright {
+    display: none;
+}
