@@ -121,6 +121,7 @@
 -->
 	 <script>window.__BASEURL__ = '{% url "home" %}'</script>
 	<script>window.participation = '{{ participation }}'</script>
+	<script src="{% static 'interface/js/vendor/underscore-min.js' %}"></script>
         <script src="{% static 'interface/js/vendor/jquery-1.8.3.min.js' %}"></script>
 	<script src="{% static 'interface/js/vendor/jquery.tools.min.js' %}"></script>
 	<script src="{% static 'interface/js/vendor/jquery.cookie.js' %}"></script>
@@ -139,7 +140,63 @@
         <!--<script type="text/javascript" src="leaflet/leaflet.ajax.js"></script>-->
         <script src="{% static 'interface/js/functions.js' %}"></script>
         <script src="{% static 'interface/js/main.js' %}"></script>
- 
+	
+<!-- Templates -->
+
+<script id="tmplNodelist" type="text/template">
+  <ul>Nodi trovati: <%= nodes.length %>
+    <% for (var i = 0; i < nodes.length; i++) { %>
+      <% var node = nodes[i]; %>
+      <li>
+      <a href="#" class="list-link" data-slug='<%= node.slug %>' ><%= node.name %></a>
+      </li>
+    <% } %>
+  </ul>
+</script>
+
+<script id="tmplComments" type="text/template">
+     Comments on node: <strong><%= node %></strong><br>
+	<div id="comment" >
+    <% for (var i = 0; i < comments.length; i++) { %>
+     <% console.log(comments.length); %>
+      <% var comment = comments[i]; %>
+      <% console.log(comment.username ); %>
+		<div  class="comment_div">
+		<span class="comment_user">
+		    <%= comment.username %>
+		</span>
+		<div class="comment_text">
+		<%- comment.text %>
+		</div>
+		<span class="comment_date"><%= comment.added %></span>	
+		</div>
+		
+    <% }
+    
+    %>
+  </div><div id="pagingControls"></div>
+<hr>Add your:<br>
+<textarea id="commentText"></textarea><br>
+<button onclick=postComment("<%= node %>");>Add comment</button>
+</script>
+
+<script id="tmplInsertNode" type="text/template">
+<strong>Insert node details</strong><br>
+	<div class="label" >Layer</div>
+	<input class="input" id="layerToInsert" >
+	<input type="hidden" id="layerIdToInsert" >
+	<div class="label" >Name</div>
+	<input class="input" id="nodeToInsertName">
+	<div class="label" >Address </div>
+	<div id="loadingAddress" >Loading...</div>
+	<textarea class="input" id="nodeToInsertAddress"></textarea>
+    	<div class="label" >Lat</div>    
+	<input class="input" id="nodeToInsertLat"><br>
+	<div class="label" >Lng</div>
+	<input class="input" id="nodeToInsertLng">
+	<button class="vote" onclick=postNode();>Insert node</button>
+</script>
+
 
     </body>
 </html>

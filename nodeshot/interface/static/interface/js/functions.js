@@ -1,11 +1,7 @@
 var csrftoken = $.cookie('csrftoken');
-
 var markerToRemove //If users insert a new marker previous one has to be deleted from map
 var nodeRatingAVG // Rating data has to be globally available for rating plugin to correctly work
-
 var markerMap={} //Object holding all nodes'slug and a reference to their marker
-
-
 
  /* LAYERS LIST CREATION
   * ====================*/
@@ -299,25 +295,11 @@ function openInsertDiv(latlng,layerID,layerName){
 	var lat=arrayLatLng[0].slice(7);
 	var lng=arrayLatLng[1].slice(0,-1);
 
-	$("#valori").html('');
-	htmlText='<strong>Insert node details</strong><br>';
-	htmlText+='<div class="label" >Layer</div>';
-	htmlText+='<input class="input" id="layerToInsert" >';
-	htmlText+='<input type="hidden" id="layerIdToInsert" >';
-	htmlText+='<div class="label" >Name</div>';
-	htmlText+='<input class="input" id="nodeToInsertName">';
-	htmlText+='<div class="label" >Address </div>';
-	htmlText+='<div id="loadingAddress" >Loading...</div>';
-	htmlText+='<textarea class="input" id="nodeToInsertAddress"></textarea>';
-    	htmlText+='<div class="label" >Lat</div>';    
-	htmlText+='<input class="input" id="nodeToInsertLat"><br>';
-	htmlText+='<div class="label" >Lng</div>';
-	htmlText+='<input class="input" id="nodeToInsertLng">';
-	htmlText+='<button class="vote" onclick=postNode();>Insert node</button>';
+	var tmplMarkup = $('#tmplInsertNode').html();
+	var compiledTmpl = _.template(tmplMarkup);
 	var nodeInsertDiv = $("<div>", {id: "nodeInsertDiv"});
 	
-	$(nodeInsertDiv).append(htmlText);
-	$("#valori").append(nodeInsertDiv);
+	$("#valori").html(compiledTmpl);
 	$("#nodeToInsertLng").val(lng);
 	$("#nodeToInsertLat").val(lat);
 	$("#layerToInsert").val(layerName);
@@ -330,7 +312,6 @@ function openInsertDiv(latlng,layerID,layerName){
 	
         }
 	
-
 function postNode() {
 /*
  * Inserts node in DB and displays it on map
@@ -343,7 +324,7 @@ function postNode() {
 	nodeToInsert["name"]=$("#nodeToInsertName").val();
 	nodeToInsert["slug"]=convertToSlug($("#nodeToInsertName").val())
 	nodeToInsert["address"]=$("#nodeToInsertAddress").val();
-	nodeToInsert["coords"]=latlngToInsert;
+	nodeToInsert["geometry"]=latlngToInsert;
 
 	var latlng=new L.LatLng(lat, lng);
 	var ok=confirm("Add node?");
@@ -483,33 +464,13 @@ function showComments(nodeSlug) {
 
 	$("#valori").html('');
 	var commentsDiv = $("<div>", {id: "comments"});
-	var node=nodeSlug
-	url=window.__BASEURL__+'api/v1/nodes/'+node+'/comments/?format=json';
-	comments=   getData(url);
+	//var node=nodeSlug
+	url=window.__BASEURL__+'api/v1/nodes/'+nodeSlug+'/comments/?format=json';
+	var comments=   getData(url);
+	var tmplMarkup = $('#tmplComments').html();
+	var compiledTmpl = _.template(tmplMarkup, { comments : comments,node : nodeSlug }); //Template should also get node name 
+	$(commentsDiv).html(compiledTmpl);
 	
-	htmlText='Comments on node: <strong>'+node+'</strong><br>';
-	htmlText+='<div id="comment" >';
-	for (var i = 0; i < comments.length; i++) { 
-		var comment=comments[i].text;
-		var username=comments[i].username;
-		var added=comments[i].added;
-		htmlText+='<div  class="comment_div">';
-		htmlText+='<span class="comment_user">'+username+'</span>';	
-		htmlText+='<div class="comment_text">';
-		htmlText+=escapeHtml(comment);
-		htmlText+='</div>';
-		htmlText+='<span class="comment_date">'+added+'</span>';	
-		htmlText+='</div>';
-		}
-	htmlText+='</div><div id="pagingControls"></div>'
-	
-	$(commentsDiv).html(htmlText);
-	
-	
-	htmlText='<hr>Add your:<br>';
-	htmlText+='<textarea id="commentText"></textarea><br>';
-	htmlText+='<button onclick=postComment("'+node+'");>Add comment</button>';
-	$(commentsDiv).append(htmlText);
 	$("#valori").append(commentsDiv);
 	
 	pager = new Imtech.Pager();//Paging of comments in div
@@ -635,10 +596,11 @@ function createNodeList() {
 function addToList(data) {
 	$("#valori").html('');
 	$("#nodelist").html('');
-    for (var i = 0; i < data.nodes["results"].length; i++) {
-        var nodes = data.nodes["results"][i];
-        $("#nodelist").append('<a href="#" class="list-link" data-slug='+nodes["slug"]+' >' + nodes.name + '</a><br>')
-    }
+        var nodes = data.nodes.results;
+	var tmplMarkup = $('#tmplNodelist').html();
+	var compiledTmpl = _.template(tmplMarkup, { nodes : nodes });
+	$("#nodelist").append(compiledTmpl);
+
     $('a.list-link').click(function (e) {
         var slug = $(this).data( 'slug' );
         var marker = markerMap[slug];
@@ -794,7 +756,7 @@ var lng=$("#nodeToInsertLng").val();
 var lat=$("#nodeToInsertLat").val();
 var url='http://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1';
     $.ajax({
-        async: true, //thats the trick
+        async: true, 
         url: url,
         dataType: 'json',
         success: function(response){
