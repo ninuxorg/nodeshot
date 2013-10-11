@@ -4,13 +4,17 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-
+import simplejson as json
 from django.test import TestCase
 
 
-class SimpleTest(TestCase):
+class Open311Request(TestCase):
     def test_basic_addition(self):
         """
-        Tests that 1 + 1 always equals 2.
+        open311 request
         """
-        self.assertEqual(1 + 1, 2)
+        request = {"action" : "node_insert"}
+        
+        self.client.login(username='admin', password='tester')
+        response = self.client.post(url, json.dumps(request), content_type='application/json')
+        self.assertEqual('pippo', response.data)
