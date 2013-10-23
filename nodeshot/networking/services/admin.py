@@ -35,6 +35,11 @@ class ServiceAdmin(BaseAdmin):
     search_fields = ('name', 'description', 'documentation_url')
     inlines = (UrlInline, LoginInline,)
 
+    raw_id_fields = ('device',)
+    autocomplete_lookup_fields = {
+        'fk': ('device',),
+    }
+
     if 'grappelli' in settings.INSTALLED_APPS:
         class Media:
             js = [

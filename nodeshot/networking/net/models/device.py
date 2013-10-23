@@ -123,3 +123,8 @@ class Device(BaseAccessLevel):
             return self.shortcuts['layer']
         else:
             return self.node.layer
+    
+    if 'grappelli' in settings.INSTALLED_APPS:
+        @staticmethod
+        def autocomplete_search_fields():
+            return ('name__icontains',)

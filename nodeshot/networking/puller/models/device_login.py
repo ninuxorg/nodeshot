@@ -49,8 +49,11 @@ class DeviceLogin(BaseDate):
     def save(self, *args, **kwargs):
         """
         Custom save does the following:
-            * 
+            * start puller class
+            * store device if store flag is True
         """
+        
+        self.host = self.host.strip()
         
         if not self.id:
             self.puller.start()

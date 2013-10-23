@@ -7,10 +7,17 @@ __all__ = ['UbiquitiAirOS']
 
 import spur
 
+from django.conf import settings
+
 from nodeshot.networking.base.utils import ifconfig_to_dict
 from nodeshot.networking.net.models import *
 from nodeshot.networking.net.models.choices import DEVICE_STATUS, DEVICE_TYPES
 
+if 'nodeshot.networking.hardware' in settings.INSTALLED_APPS:
+    HARDWARE_INSTALLED = True
+    from nodeshot.networking.hardware.models import DeviceModel, Manufacturer, DeviceToModelRel
+else:
+    HARDWARE_INSTALLED = False
 
 class UbiquitiAirOS(object):
     """
@@ -58,16 +65,42 @@ class UbiquitiAirOS(object):
         device.type = 'radio'
         device.status = DEVICE_STATUS.get('reachable')
         device.save()
+        
+        if HARDWARE_INSTALLED:
+            # try getting device model from db
+            try:
+                device_model = DeviceModel.objects.filter(name=self.ubntbox['platform'])[0]
+            except IndexError as e:
+                try:
+                    manufacturer = Manufacturer.objects.filter(name__icontains='ubiquiti')[0]
+                    device_model = DeviceModel(
+                        manufacturer=manufacturer,
+                        name=self.ubntbox['platform']
+                    )
+                    device_model.ram = self.ubntbox['memTotal']
+                except IndexError as e:
+                    device_model = False
+            
+            if device_model:
+                device_model.save()
+                rel = DeviceToModelRel(device=device, model=device_model)
+                rel.save()
+        
         self.check_if_olsr_and_which_version(device)
         self.device = device
         
         self.save_interfaces(device)
+        
+        #self.self.ubntbox['platform']
     
     def run(self, command, **kwargs):
         return self.shell.run(command.split(' '), **kwargs)
     
     def output(self, command, **kwargs):
-        return self.run(command, **kwargs).output.strip()
+        try:
+            return self.run(command, **kwargs).output.strip()
+        except spur.RunProcessError as e:
+            return e.output.strip()
     
     def get_os(self):
         return self.output('cat /proc/version').split('#')[0]
@@ -229,7 +262,7 @@ class UbiquitiAirOS(object):
                 
                 # save ipv6 address if any
                 ipv6_address = self.get_ipv6_of_interface(interface['interface'])
-                if ipv6_address and ipv6_address != 'None':
+                if ipv6_address:
                     # subtract netmask
                     ipv6_address = ipv6_address.split('/')[0]
                     Ip.objects.create(**{

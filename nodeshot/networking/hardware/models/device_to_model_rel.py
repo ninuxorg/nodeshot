@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.networking.net.models import Device
-from . import DeviceModel, Antenna
+from . import DeviceModel, Antenna, AntennaModel
 
 
 class DeviceToModelRel(models.Model):
