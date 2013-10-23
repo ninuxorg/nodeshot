@@ -42,6 +42,12 @@ class BaseConverter(object):
         for field in self.REQUIRED_CONFIG_KEYS:
             if not self.config.get(field, False):
                 raise ImproperlyConfigured('Required %s parameter missing from configuration' % field)
+        
+        self.clean()
+    
+    def clean(self):
+        """ complex ad hoc validation here """
+        pass
     
     def process(self):
         """

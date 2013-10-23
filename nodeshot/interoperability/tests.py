@@ -10,6 +10,7 @@ from datetime import date, timedelta
 from django.test import TestCase
 from django.core import management
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib.gis.geos import Point, GEOSGeometry
 
@@ -33,7 +34,7 @@ class InteroperabilityTest(TestCase):
     def setUp(self):
         pass
     
-    def test_not_ineroperable(self):
+    def test_not_interoperable(self):
         """ test not interoperable """
         # start capturing print statements
         output = StringIO()
@@ -70,6 +71,20 @@ class InteroperabilityTest(TestCase):
         url = reverse('admin:layers_layer_change', args=[layer.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+    
+    def test_config_validation(self):
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISP'
+        external.config = '{ "WRONG_parameter_name": "foo" }'
+        
+        with self.assertRaises(ValidationError):
+            external.clean()
     
     def test_openwisp(self):
         """ test OpenWISP converter """

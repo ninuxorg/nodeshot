@@ -3,7 +3,7 @@ import simplejson as json
 from time import sleep
 from random import randint
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 
 from ..models import NodeExternal
 from .base import XMLConverter
@@ -31,11 +31,14 @@ class CitySDKMixin(object):
         'citysdk_term',
     ]
     
+    def clean(self):
+        """ Verify username and password before saving """
+        self.authenticate()
+    
     def __init__(self, *args, **kwargs):
         super(CitySDKMixin, self).__init__(*args, **kwargs)
         
         # CitySDK urls
-        self.citysdk_auth_url = '%sauth?format=json' % self.config['citysdk_url']
         self.citysdk_resource_url = '%s%ss/' % (self.config['citysdk_url'],
                                                 self.config['citysdk_type'])
         self.citysdk_categories_url= '%scategories?List=%s&format=json' % (self.config['citysdk_url'],
@@ -44,13 +47,15 @@ class CitySDKMixin(object):
     def authenticate(self):
         self.verbose('authenticating to CitySDK API')
         
-        response = requests.post(self.citysdk_auth_url, {
+        citysdk_auth_url = '%sauth?format=json' % self.config['citysdk_url']
+        
+        response = requests.post(citysdk_auth_url, {
             'username': self.config['citysdk_username'],
             'password': self.config['citysdk_password'],
         })
         
         if response.status_code != 200:
-            raise ImproperlyConfigured(json.loads(response.content)['ResponseStatus']['Message'])
+            raise ImproperlyConfigured('API Error: "%s"' % json.loads(response.content)['ResponseStatus']['Message'])
         
         self.cookies = response.cookies.get_dict()
         
