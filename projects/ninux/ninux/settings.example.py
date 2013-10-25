@@ -425,6 +425,7 @@ NODESHOT = {
             'nodeshot.community.mailing',
             'nodeshot.networking.net',
             'nodeshot.networking.links',
+            'nodeshot.networking.services'
         ]
     },
     'INTEROPERABILITY': [

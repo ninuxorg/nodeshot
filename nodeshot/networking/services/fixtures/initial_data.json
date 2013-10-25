@@ -1,0 +1,34 @@
+[
+    {
+        "model": "services.Category",
+        "pk": 1,
+        "fields": {
+            "name": "Storage",
+            "description": "Shared storage systems"
+        }
+    },
+    {
+        "model": "services.Category",
+        "pk": 2,
+        "fields": {
+            "name": "IM, VOIP & Video conference",
+            "description": "Instant messaging, voip or video conference"
+        }
+    },
+    {
+        "model": "services.Category",
+        "pk": 3,
+        "fields": {
+            "name": "Games",
+            "description": "Games"
+        }
+    },
+    {
+        "model": "services.Category",
+        "pk": 4,
+        "fields": {
+            "name": "Other",
+            "description": "Other"
+        }
+    }
+]

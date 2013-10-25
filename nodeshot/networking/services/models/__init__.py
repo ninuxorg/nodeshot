@@ -8,6 +8,6 @@ if 'nodeshot.networking.net' not in settings.INSTALLED_APPS:
 from category import Category
 from service import Service
 from url import Url
-from login import Login
+from service_login import ServiceLogin
 
-__all__ = ['Service', 'Category', 'Url', 'Login']
+__all__ = ['Service', 'Category', 'Url', 'ServiceLogin']

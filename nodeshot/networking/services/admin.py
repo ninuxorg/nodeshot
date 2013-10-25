@@ -4,7 +4,7 @@ from django.conf import settings
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
 from nodeshot.networking.net.models import Ip
 
-from .models import Category, Service, Login, Url
+from .models import Category, Service, ServiceLogin, Url
 
 
 class CategoryAdmin(BaseAdmin):
@@ -25,15 +25,15 @@ class UrlInline(BaseStackedInline):
         }
 
 
-class LoginInline(BaseStackedInline):
-    model = Login
+class ServiceLoginInline(BaseStackedInline):
+    model = ServiceLogin
 
 
 class ServiceAdmin(BaseAdmin):
     list_display  = ('name', 'device', 'category', 'access_level', 'status', 'is_published', 'added', 'updated')
     list_filter   = ('category', 'status', 'is_published')
     search_fields = ('name', 'description', 'documentation_url')
-    inlines = (UrlInline, LoginInline,)
+    inlines = (UrlInline, ServiceLoginInline,)
 
     raw_id_fields = ('device',)
     autocomplete_lookup_fields = {
