@@ -14,8 +14,8 @@ class DeviceLogin(BaseDate):
     """
     node = models.ForeignKey('nodes.Node', verbose_name=_('node'))
     host = models.CharField(_('host'), max_length=128)
-    username = models.CharField(_('username'), max_length=128)
-    password = models.CharField(_('password'), max_length=128)
+    username = models.CharField(_('username'), max_length=128, blank=True)
+    password = models.CharField(_('password'), max_length=128, blank=True)
     port = models.IntegerField(_('port'), default=22)
     store = models.BooleanField(_('store in DB?'),
                                 default=False,
@@ -44,7 +44,7 @@ class DeviceLogin(BaseDate):
         Custom validation
             1.
         """
-        pass
+        self.puller.clean()
     
     def save(self, *args, **kwargs):
         """

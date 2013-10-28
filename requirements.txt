@@ -72,4 +72,4 @@ django-debug-toolbar
 south
 
 # SSH and shell commands
-spur
+paramiko
