@@ -34,6 +34,7 @@ class BaseUtilityMixin(object):
             return queryset[0:n]
     
     def last(self, n=None):
+        """ return last object of a collection or last n specified objects """
         return self.slice('-id', n)
     
     def first(self, n=None):
