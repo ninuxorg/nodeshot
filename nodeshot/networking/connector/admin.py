@@ -1,3 +1,5 @@
+import os
+
 from django.contrib import admin
 from django.conf import settings
 from django.forms import ModelForm, CharField, PasswordInput
@@ -15,9 +17,9 @@ class DeviceLoginForm(ModelForm):
 
 class DeviceLoginAdmin(BaseAdmin):
     list_display  = ('__unicode__', 'device', 'node',
-                     'host', 'username', 'port', 'puller_class',
+                     'host', 'username', 'port', 'connector_class',
                      'added', 'updated')
-    list_filter   = ('puller_class', 'added')
+    list_filter   = ('connector_class', 'added')
     date_hierarchy = 'added'
     ordering = ('-id',)
     search_fields = ('username', 'host')
@@ -28,5 +30,7 @@ class DeviceLoginAdmin(BaseAdmin):
     autocomplete_lookup_fields = {
         'fk': ('node', 'device'),
     }
+    
+    change_form_template = '%s/templates/admin/device_login_customization.html' % os.path.dirname(os.path.realpath(__file__))
 
 admin.site.register(DeviceLogin, DeviceLoginAdmin)

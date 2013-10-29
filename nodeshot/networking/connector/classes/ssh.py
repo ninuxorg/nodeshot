@@ -27,32 +27,11 @@ class SSH(object):
     SSH base connector class
     """
     
+    # costant
     REQUIRED_FIELDS = ['username', 'password']
     
-    def clean(self):
-        """ validation method which will be called before saving the model in the django admin """
-        self.check_required_fields()
-        self.check_username_and_password()
-        self.ensure_no_duplicate()
-    
-    def check_required_fields(self):
-        for field in self.REQUIRED_FIELDS:
-            value = getattr(self.device_login, field, None)
-            
-            if not value:
-                raise ValidationError(_('%s is required for this connector class') % field)
-    
-    def check_username_and_password(self):
-        result = self.connect()
-        
-        if result is False:
-            raise ValidationError(_('wrong SSH username or password'))
-        else:
-            # close SSH connection
-            self.close()
-    
-    def ensure_no_duplicate(self):
-        pass
+    # SSH connection error message
+    connection_error = None
     
     def __init__(self, device_login):
         """
@@ -60,8 +39,61 @@ class SSH(object):
         """
         self.device_login = device_login
     
+    def clean(self):
+        """ validation method which will be called before saving the model in the django admin """
+        self.check_required_fields()
+        self.check_SSH_connection()
+        self.ensure_no_duplicate()
+        # close SSH connection
+        self.close()
+    
+    def check_required_fields(self):
+        """ check REQUIRED_FIELDS are filled """
+        for field in self.REQUIRED_FIELDS:
+            value = getattr(self.device_login, field, None)
+            
+            if not value:
+                raise ValidationError(_('%s is required for this connector class') % field)
+    
+    def check_SSH_connection(self):
+        """ check SSH connection works """
+        result = self.connect()
+        
+        if result is False:
+            raise ValidationError(self.connection_error)
+    
+    def ensure_no_duplicate(self):
+        """
+        Ensure we're not creating a device that already exists
+        Runs only when the DeviceLogin object is created, not when is updated
+        """
+        # if device_login is being created right now
+        if not self.device_login.id:
+            duplicates = []
+            # loop over interfaces and check mac address
+            for interface in self.get_interfaces():
+                # shortcut for readability
+                mac_address = interface['hardware_address']
+                # avoid checking twice for the same interface (often ifconfig returns duplicates)
+                if mac_address in duplicates:
+                    continue
+                # check in DB
+                if Interface.objects.filter(mac__iexact=mac_address).count() > 0:
+                    duplicates.append(mac_address)
+            
+            # if we have duplicates raise validation error
+            if len(duplicates) > 0:
+                # format list ['a', 'b', 'c'] as "a, b, c"
+                mac_address_string = ', '.join(duplicates)
+                raise ValidationError(_('interfaces with the following mac addresses already exist: %s') % mac_address_string)
+    
     def connect(self):
-        """ initialize SSH session """
+        """
+        Initialize SSH session
+        
+            returns True if success
+            returns False and sets self.connection_error if something goes wrong
+        """
         device_login = self.device_login
         
         shell = paramiko.SSHClient()
@@ -78,8 +110,9 @@ class SSH(object):
             self.shell = shell
             # ok!
             return True
-        # wrong username or password 
-        except paramiko.AuthenticationException:
+        # something went wrong
+        except Exception as e:
+            self.connection_error = e.message or e.strerror
             return False
     
     def exec_command(self, command, **kwargs):
@@ -138,7 +171,7 @@ class SSH(object):
             "password": self.device_login.password,
             "store": True,
             "port": self.device_login.port,
-            "puller_class": self.device_login.puller_class
+            "connector_class": self.device_login.connector_class
         })
         # delete device
         self.device_login.device.delete()

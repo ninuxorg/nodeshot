@@ -19,7 +19,7 @@ class UbiquitiAirOS(SSH):
     @property
     def ubntbox(self):
         """
-        returns ubntbox mca-status output
+        returns "ubntbox mca-status" output in a python dictionary
         """
         # get result if not present in memory yet
         if not self._ubntbox:
@@ -50,7 +50,7 @@ class UbiquitiAirOS(SSH):
     @property
     def systemcfg(self):
         """
-        return main system configuration
+        return main system configuration in a python dictionary
         """
         # if config hasn't been retrieved yet do it now
         if not self._systemcfg:

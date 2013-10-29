@@ -183,7 +183,7 @@ INSTALLED_APPS = (
     'nodeshot.networking.links',
     'nodeshot.networking.services',
     'nodeshot.networking.hardware',
-    'nodeshot.networking.puller',
+    'nodeshot.networking.connector',
     #'nodeshot.networking.monitor',
     'nodeshot.interface',
     
@@ -487,7 +487,7 @@ NODESHOT = {
         }
     },
     'PULLERS': [
-        ('nodeshot.networking.puller.scripts.UbiquitiAirOS', 'Ubiquiti AirOS'),
+        ('nodeshot.networking.connector.classes.UbiquitiAirOS', 'Ubiquiti AirOS'),
     ],
 }
 

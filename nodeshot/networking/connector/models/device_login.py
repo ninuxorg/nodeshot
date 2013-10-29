@@ -20,16 +20,16 @@ class DeviceLogin(BaseDate):
     store = models.BooleanField(_('store in DB?'),
                                 default=False,
                                 help_text=_('is adviced to store read-only credentials only'))
-    puller_class = models.CharField(_('puller class'), max_length=128,
+    connector_class = models.CharField(_('connector class'), max_length=128,
                               choices=settings.NODESHOT['PULLERS'])
     device = models.ForeignKey('net.Device', verbose_name=_('device'),
                                blank=True, null=True,
                                help_text=_('leave blank, will be created automatically'))
     
-    _puller = None
+    _connector = None
     
     class Meta:
-        app_label = 'puller'
+        app_label = 'connector'
         verbose_name = _('device login')
         verbose_name_plural = _('device logins')
     
@@ -41,37 +41,41 @@ class DeviceLogin(BaseDate):
     
     def clean(self, *args, **kwargs):
         """
-        Custom validation
-            1.
+        Call relative connector's clean method
         """
-        self.puller.clean()
+        if self.connector:
+            self.connector.clean()
     
     def save(self, *args, **kwargs):
         """
         Custom save does the following:
-            * start puller class
+            * start connector class
             * store device if store flag is True
         """
         
         self.host = self.host.strip()
         
         if not self.id:
-            self.puller.start()
-            self.device = self.puller.device
+            self.connector.start()
+            self.device = self.connector.device
         
         if self.store is True:
             super(DeviceLogin, self).save(*args, **kwargs)
     
     @property
-    def puller(self):
+    def connector(self):
         """ access script class """
-        # init puller class if not already done
-        if not self._puller:
-            script_module = import_module(self.puller_class)
+        # return None if nothing has been chosen yet
+        if not self.connector_class:
+            return None
+        
+        # init connector class if not already done
+        if not self._connector:
+            script_module = import_module(self.connector_class)
             # retrieve class name (split and get last piece)
-            class_name = self.puller_class.split('.')[-1]
+            class_name = self.connector_class.split('.')[-1]
             # retrieve class
             ScriptClass = getattr(script_module, class_name)
-            self._puller = ScriptClass(self)
+            self._connector = ScriptClass(self)
         
-        return self._puller
+        return self._connector
