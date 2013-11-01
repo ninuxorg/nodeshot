@@ -47,7 +47,7 @@ django-social-auth
 django-reversion==1.7.1
 
 # asynchronous tasks
-kombu
+kombu==2.5.12
 Celery
 django-celery
 django-celery-email
