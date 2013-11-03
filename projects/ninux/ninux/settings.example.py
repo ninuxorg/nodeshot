@@ -491,6 +491,7 @@ NODESHOT = {
     },
     'PULLERS': [
         ('nodeshot.networking.connector.classes.UbiquitiAirOS', 'Ubiquiti AirOS'),
+        ('nodeshot.networking.connector.classes.OpenWRT', 'OpenWRT'),
     ],
 }
 
