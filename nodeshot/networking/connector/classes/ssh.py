@@ -98,7 +98,7 @@ class SSH(object):
         
         shell = paramiko.SSHClient()
         shell.load_system_host_keys()
-        shell.set_missing_host_key_policy(paramiko.WarningPolicy)
+        shell.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         
         try:
             shell.connect(
