@@ -75,6 +75,19 @@ Copy settings.example.py and modify according to needs
 	cp settings.example.py settings.py
 	vim settings.py
 
+The minimum configuration keys that you need to ensure are set according to your configuration are the following:
+
+	DATABASE (host, db, user and pwd)
+	SITE_DOMAIN (domain or ip address)
+	PROTOCOL (http or https)
+	SECRET_KEY (see below)
+
+Remember to uncomment the secret key setting and slighlty change it:
+
+	#SECRET_KEY = .....
+	# must be uncommented
+	SECRET_KEY = 'keep same length but change some characters'
+
 Create virtual environment, activate and install dependencies:
 
 	cd /var/django/nodeshot/projects/ninux
@@ -89,9 +102,9 @@ Create virtual environment, activate and install dependencies:
 Install and configure supervisord:
 
 	sudo apt-get install supervisor
-	vim /etc/supervisor/conf.d/nodeshot
+	vim /etc/supervisor/conf.d/nodeshot.conf
 
-Save this in /etc/supervisor/conf.d/nodeshot
+Save this in /etc/supervisor/conf.d/nodeshot.conf
 
 	[program:nodeshot]
 	command=/var/django/nodeshot/projects/ninux/python/bin/python /var/django/nodeshot/projects/ninux/server.py
@@ -104,10 +117,32 @@ Then run:
 
 	supervisorctl update
 
+You can check the status with:
+
+	supervisorctl status nodeshot
+
+And you can also start, stop and restart.
+
+Now create a dummy public folder:
+
+	mkdir /var/www/nodeshot	
+
+Create a temporary self signed SSL certificate:
+
+	mkdir /etc/nginx/ssl
+	cd /etc/nginx/ssl
+	openssl req -new -x509 -nodes -out server.crt -keyout server.key 
 
 Configure nginx with SSL and reverse proxy to tornado
 
+The simplest configuration is to edit the default virtualhost:
+
+	vim /etc/nginx/sites-available/default
+
+and paste:
+
 	upstream nodeshot{
+		# don't change here
 		server 127.0.0.1:8080  max_fails=5  fail_timeout=5s;
 	}
 	
@@ -119,11 +154,12 @@ Configure nginx with SSL and reverse proxy to tornado
 		index index.html index.htm;
 	
 		# Make site accessible from domain
+		# change this according to your domain
 		server_name nodeshot.yourdomain.com;
 	
 		ssl on;
-			ssl_certificate cert.pem;
-			ssl_certificate_key cert.key;
+			ssl_certificate ssl/server.crt;
+			ssl_certificate_key ssl/server.key;
 	
 			ssl_session_timeout 5m;
 	
@@ -159,6 +195,7 @@ Configure nginx with SSL and reverse proxy to tornado
 			listen   [::]:80 default ipv6only=on; ## listen for ipv6
 	
 			# Make site accessible from domain
+			# change this according to your domain
 			server_name nodeshot.yourdomain.com;
 	
 		return 301 https://$host$request_uri;
