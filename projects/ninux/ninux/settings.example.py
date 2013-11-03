@@ -1,6 +1,9 @@
 # Django settings for nodeshot project.
 
 import os
+import sys
+
+sys.path.append('/var/django/nodeshot/')
 
 DEBUG = True
 SERVE_STATIC = DEBUG
@@ -16,9 +19,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django_hstore.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'nodeshot',                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'USER': 'nodeshot',                      # Not used with sqlite3.
+        'PASSWORD': 'your_password',                  # Not used with sqlite3.
+        'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
     # uncomment if you need to use nodeshot.extra.oldimporter
@@ -61,7 +64,7 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-SITE_DOMAIN = 'localhost'
+SITE_DOMAIN = 'localhost:8000'
 PROTOCOL = 'http'
 BASE_URL = 'http://%s' % SITE_DOMAIN
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -102,7 +105,7 @@ STATICFILES_FINDERS = (
 
 # CHANGE THIS KEY AND UNCOMMENT
 # Make this unique, and don't share it with anybody.
-#SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
+#SECRET_KEY = 'da)t*+$)ugeyip6-#tuyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -214,7 +217,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
-if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
+if 'nodeshot.community.profiles' in INSTALLED_APPS:
     AUTH_USER_MODEL = 'profiles.Profile'
 
 # ------ DJANGO LOGGING ------ #
