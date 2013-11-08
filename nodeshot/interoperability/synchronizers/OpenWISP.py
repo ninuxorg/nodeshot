@@ -46,6 +46,27 @@ class OpenWISP(XMLConverter):
             description = self.get_text(item, 'title')
             address = self.get_text(item, 'description')
             
+            # TODO: this synchronizing stuff needs to be D.R.Y.ed up
+            # --- avoid name collisions --- #
+            
+            number = 1
+            original_name = name
+            needed_different_name = False
+            
+            while True:
+                # items might have the same name... so we add a number..
+                if slug in external_nodes_slug:
+                    needed_different_name = True
+                    number = number + 1
+                    name = "%s - %d" % (original_name, number)
+                    slug = slug = slugify(name)                    
+                else:
+                    if needed_different_name:
+                        self.verbose('needed a different name for %s, trying "%s"' % (original_name, name))
+                    break
+            
+            # --- end avoid name collisions --- #
+            
             # point object
             point = Point(float(lng), float(lat))
             
