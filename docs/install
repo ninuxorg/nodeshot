@@ -1,3 +1,7 @@
+This file describes how to install nodeshot in a production environment.
+
+This doc is a work in progress.
+
 Ubuntu 12.04 LTS
 
 Become root:
@@ -81,6 +85,7 @@ The minimum configuration keys that you need to ensure are set according to your
 	SITE_DOMAIN (domain or ip address)
 	PROTOCOL (http or https)
 	SECRET_KEY (see below)
+	ALLOWED_HOSTS
 
 Remember to uncomment the secret key setting and slighlty change it:
 
@@ -99,105 +104,175 @@ Create virtual environment, activate and install dependencies:
 	# static files (css, js, images)
 	python manage.py collectstatic
 
-Install and configure supervisord:
+Install uWSGI (for production)
+
+    # deactivate python virtual environment
+    deactivate
+    # install uwsgi globally
+    pip install uwsgi
+
+Create a new ini file:
+
+    vim /var/django/nodeshot/projects/ninux/wsgi.ini
+    
+With this config:
+
+    [uwsgi]
+    chdir=/var/django/nodeshot/projects/ninux
+    module=ninux.wsgi:application
+    master=True
+    pidfile=/var/django/nodeshot/projects/ninux/uwsgi.pid
+    socket=127.0.0.1:3031
+    processes=2
+    harakiri=20
+    max-requests=5000
+    vacuum=True
+    home=/var/django/nodeshot/projects/ninux/python
+    enable-threads=True
+
+Install supervisord:
 
 	sudo apt-get install supervisor
-	vim /etc/supervisor/conf.d/nodeshot.conf
+
+Create new config file:
+
+    vim /etc/supervisor/conf.d/nodeshot.conf
 
 Save this in /etc/supervisor/conf.d/nodeshot.conf
 
-	[program:nodeshot]
-	command=/var/django/nodeshot/projects/ninux/python/bin/python /var/django/nodeshot/projects/ninux/server.py
-	process_name=nodeshot
-	user=www-data
-	autostart=true
-	autorestart=true
+    [program:uwsgi]
+    user=uwsgi
+    directory=/var/django/nodeshot/projects/ninux
+    command=uwsgi --ini uwsgi.ini
+    autostart=true
+    autorestart=true
+    stopsignal=INT
+    redirect_stderr=true
+    stdout_logfile=/var/django/nodeshot/projects/ninux/uwsgi.log
+    stdout_logfile_maxbytes=30MB
+    stdout_logfile_backups=5
+
+Repeat the same for celery:
+
+    vim /etc/supervisor/conf.d/celery.conf
+
+And paste:
+
+    [program:celery]
+    directory=/var/django/nodeshot/projects/ninux
+    command=/var/django/nodeshot/projects/ninux/python/bin/python /var/django/nodeshot/projects/ninux/manage.py celery worker --loglevel=INFO
+    autostart=true
+    autorestart=true
+    redirect_stderr=true
+    stdout_logfile=/var/django/nodeshot/projects/ninux/celery.log
+    stdout_logfile_maxbytes=30MB
+    stdout_logfile_backups=10
+    startsecs=10
+    stopwaitsecs=600
+    numprocs=1
+
+And celery-beat:
+
+    vim /etc/supervisor/conf.d/celery-beat.conf
+
+And paste:
+
+    [program:celery-beat]
+    directory=/var/django/nodeshot/projects/ninux
+    command=/var/django/nodeshot/projects/ninux/python/bin/python /var/django/nodeshot/projects/ninux/manage.py celery beat --loglevel=INFO
+    autostart=true
+    autorestart=true
+    redirect_stderr=true
+    stdout_logfile=/var/django/nodeshot/projects/ninux/celery-beat.log
+    stdout_logfile_maxbytes=30MB
+    stdout_logfile_backups=10
+    startsects=10
+    numprocs=1
 
 Then run:
 
-	supervisorctl update
+    supervisorctl update
 
 You can check the status with:
 
-	supervisorctl status nodeshot
+    supervisorctl status
 
 And you can also start, stop and restart.
 
 Now create a dummy public folder:
 
-	mkdir /var/www/nodeshot	
+    mkdir /var/www/nodeshot	
 
 Create a temporary self signed SSL certificate:
 
-	mkdir /etc/nginx/ssl
-	cd /etc/nginx/ssl
-	openssl req -new -x509 -nodes -out server.crt -keyout server.key 
+    mkdir /etc/nginx/ssl
+    cd /etc/nginx/ssl
+    openssl req -new -x509 -nodes -out server.crt -keyout server.key 
 
-Configure nginx with SSL and reverse proxy to tornado
+Copy uwsgi_params file:
+
+    cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/
+
+Configure nginx with SSL and uWSGI
 
 The simplest configuration is to edit the default virtualhost:
 
-	vim /etc/nginx/sites-available/default
+    vim /etc/nginx/sites-available/default
 
 and paste:
-
-	upstream nodeshot{
-		# don't change here
-		server 127.0.0.1:8080  max_fails=5  fail_timeout=5s;
-	}
 	
-	server {
-		listen   443; ## listen for ipv4; this line is default and implied
-		listen   [::]:443 default ipv6only=on; ## listen for ipv6
+    server {
+        listen   443; ## listen for ipv4; this line is default and implied
+        listen   [::]:443 default ipv6only=on; ## listen for ipv6
+        
+        root /var/www/nodeshot;
+        index index.html index.htm;
+        
+        # Make site accessible from domain
+        # change this according to your domain
+        server_name nodeshot.yourdomain.com;
+        
+        ssl on;
+        ssl_certificate ssl/server.crt;
+        ssl_certificate_key ssl/server.key;
+        
+        ssl_session_timeout 5m;
+        
+        ssl_protocols SSLv3 TLSv1;
+        ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
+        ssl_prefer_server_ciphers on;
+        
+        location / {
+            uwsgi_pass 127.0.0.1:3031;
+            include uwsgi_params;
+            uwsgi_param HTTP_X_FORWARDED_PROTO https;
+        }
+        
+        #error_page 404 /404.html;
+        
+        # redirect server error pages to the static page /50x.html
+        #
+        #error_page 500 502 503 504 /50x.html;
+        #location = /50x.html {
+        #	root /usr/share/nginx/www;
+        #}
+        
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #	deny all;
+        #}
+    }
 	
-		root /var/www/nodeshot;
-		index index.html index.htm;
-	
-		# Make site accessible from domain
-		# change this according to your domain
-		server_name nodeshot.yourdomain.com;
-	
-		ssl on;
-			ssl_certificate ssl/server.crt;
-			ssl_certificate_key ssl/server.key;
-	
-			ssl_session_timeout 5m;
-	
-			ssl_protocols SSLv3 TLSv1;
-			ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
-			ssl_prefer_server_ciphers on;
-	
-		location / {
-			proxy_set_header Host		$host;
-			proxy_set_header X-Real-Ip	$remote_addr;
-			proxy_pass http://nodeshot;	# tornado and django
-		}
-	
-		#error_page 404 /404.html;
-	
-		# redirect server error pages to the static page /50x.html
-		#
-		#error_page 500 502 503 504 /50x.html;
-		#location = /50x.html {
-		#	root /usr/share/nginx/www;
-		#}
-	
-		# deny access to .htaccess files, if Apache's document root
-		# concurs with nginx's one
-		#
-		#location ~ /\.ht {
-		#	deny all;
-		#}
-	}
-	
-	server {
-			listen   80; ## listen for ipv4; this line is default and implied
-			listen   [::]:80 default ipv6only=on; ## listen for ipv6
-	
-			# Make site accessible from domain
-			# change this according to your domain
-			server_name nodeshot.yourdomain.com;
-	
-		return 301 https://$host$request_uri;
-	}
+    server {
+        listen   80; ## listen for ipv4; this line is default and implied
+        listen   [::]:80 default ipv6only=on; ## listen for ipv6
+        
+        # Make site accessible from domain
+        # change this according to your domain
+        server_name nodeshot.yourdomain.com;
+        
+        return 301 https://$host$request_uri;
+    }
 	

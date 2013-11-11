@@ -64,9 +64,15 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-SITE_DOMAIN = 'localhost:8000'
-PROTOCOL = 'http'
-BASE_URL = 'http://%s' % SITE_DOMAIN
+PROTOCOL = 'http' if DEBUG else 'https'
+DOMAIN = 'localhost'
+PORT = '8000' if DEBUG else None
+SITE_URL = '%s://%s' % (PROTOCOL, DOMAIN)
+ALLOWED_HOSTS = [DOMAIN]  # check https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts for more info
+
+if PORT != '80':
+    SITE_URL = '%s:%s' % (SITE_URL, PORT)
+
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
@@ -76,7 +82,7 @@ MEDIA_ROOT = '%s/media/' % SITE_ROOT
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = '%s/media/' % BASE_URL
+MEDIA_URL = '%s/media/' % SITE_URL
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -86,7 +92,7 @@ STATIC_ROOT = '%s/static/' % SITE_ROOT
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '%s/static/' % BASE_URL
+STATIC_URL = '%s/static/' % SITE_URL
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -94,6 +100,12 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+if PROTOCOL == 'https':
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    os.environ['HTTPS'] = 'on'
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -467,7 +479,7 @@ NODESHOT = {
     'WEBSOCKETS': {
         'PUBLIC_PIPE': '%s/nodeshot.websockets.public' % os.path.dirname(SITE_ROOT),
         'PRIVATE_PIPE': '%s/nodeshot.websockets.private' % os.path.dirname(SITE_ROOT),
-        'DOMAIN': SITE_DOMAIN,
+        'DOMAIN': DOMAIN,
         'LISTENING_ADDRESS': '0.0.0.0',  # set to 127.0.0.1 to accept only local calls (used for proxying to port 80 with nginx or apache mod_proxy)
         'LISTENING_PORT': 9090,
         'REGISTRARS': (
