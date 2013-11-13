@@ -1,5 +1,7 @@
 from django.contrib.gis import admin
+from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from nodeshot.core.base.admin import BaseGeoAdmin
 from models import Layer
@@ -18,17 +20,32 @@ else:
 
 
 class LayerAdmin(GeoAdmin):
-    list_display = ('name', 'is_published', 'organization', 'email', 'is_external', 'new_nodes_allowed', 'added', 'updated')
+    list_display = (
+        'name', 'is_published', 'view_nodes',
+        'organization', 'email', 'is_external',
+        'new_nodes_allowed', 'added', 'updated'
+    )
     list_filter   = ('is_external', 'is_published')
     search_fields = ('name', 'description', 'organization', 'email')
     filter_horizontal = ('mantainers',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = []
     
+    def view_nodes(self, obj):
+        return '<a href="%s?layer__id__exact=%s">%s</a>' % (
+            reverse('admin:nodes_node_changelist'),
+            obj.pk,
+            _('view nodes')
+        )
+    view_nodes.allow_tags = True
+    
     # Enable TinyMCE HTML Editor according to settings, defaults to True
     if settings.NODESHOT['SETTINGS'].get('LAYER_TEXT_HTML', True) is True: 
         if 'grappelli' not in settings.INSTALLED_APPS:
-            raise ImproperlyConfigured(_("settings.NODESHOT['SETTINGS']['LAYER_TEXT_HTML'] is set to True but grappelli is not in settings.INSTALLED_APPS"))
+            raise ImproperlyConfigured(
+                _("settings.NODESHOT['SETTINGS']['LAYER_TEXT_HTML'] is set to\
+                  True but grappelli is not in settings.INSTALLED_APPS")
+            )
         
         class Media:
             js = [
@@ -41,7 +58,8 @@ class LayerAdmin(GeoAdmin):
             field = super(LayerAdmin, self).formfield_for_dbfield(db_field, **kwargs)
             
             if db_field.name == 'text':
-                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
+                _class = 'html-editor %s' % field.widget.attrs.get('class', '')
+                field.widget.attrs['class'] = _class
             
             return field
 
