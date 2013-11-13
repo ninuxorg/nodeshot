@@ -59,7 +59,7 @@ class LayerExternal(models.Model):
                 raise ValidationError(_('The specified configuration is not valid JSON'))
             
             # ensure good indentation
-            self.config = json.dumps(config, indent=4)
+            self.config = json.dumps(config, indent=4, sort_keys=True)
             
             # ensure REQUIRED_CONFIG_KEYS are filled
             for key in self.synchronizer_class.REQUIRED_CONFIG_KEYS:

@@ -14,7 +14,7 @@ def _extract(ifconfig_output):
                      r'(\s+inet6 addr:(?P<ipv6_address>\S+)Scope:Global)?' +
                      r'(\s+Bcast:(?P<broadcast_address>\S+)\s+)?' +
                      r'(Mask:(?P<net_mask>\S+)\s+)?',
-                     ifconfig_output, re.MULTILINE )
+                     ifconfig_output, re.MULTILINE|re.IGNORECASE )
     if mo:
         info = mo.groupdict('')
         info['running'] = False

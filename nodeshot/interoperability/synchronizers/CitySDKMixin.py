@@ -134,7 +134,7 @@ class CitySDKMixin(object):
             
             # now store ID in the database both in case category has been created or not
             self.config['citysdk_category_id'] = citysdk_category_id
-            self.layer.external.config = json.dumps(self.config)
+            self.layer.external.config = json.dumps(self.config, indent=4, sort_keys=True)
             self.layer.external.save()
             # verbose output
             self.verbose('category with ID "%s" has been stored in config' % citysdk_category_id)

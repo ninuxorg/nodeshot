@@ -275,7 +275,7 @@ class InteroperabilityTest(TestCase):
             "streets_url": streets_url,
             "measurements_url": measurements_url,
             "check_streets_every_n_days": 2
-        })
+        }, indent=4, sort_keys=True)
         external.save()
         
         # start capturing print statements
@@ -336,7 +336,7 @@ class InteroperabilityTest(TestCase):
         
         # set last_time_streets_checked to 6 days ago
         layer.external.config['last_time_streets_checked'] = str(date.today() - timedelta(days=6))
-        layer.external.config = json.dumps(layer.external.config)
+        layer.external.config = json.dumps(layer.external.config, indent=4, sort_keys=True)
         layer.external.save()
         
         ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
@@ -347,7 +347,7 @@ class InteroperabilityTest(TestCase):
         external.config = json.loads(external.config)
         external.config['streets_url'] = streets_url
         external.config['measurements_url'] = measurements_url
-        external.config = json.dumps(external.config)
+        external.config = json.dumps(external.config, indent=4, sort_keys=True)
         external.save()
         
         # start capturing print statements
