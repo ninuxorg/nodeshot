@@ -9,6 +9,12 @@ from ..models import NodeExternal
 from .base import XMLConverter
 
 
+from cineca import app
+logger = app.log.get_default_logger()
+
+logger.info('=== DEBUG: %s ===' % 'importing CitySDKMixin')
+
+
 class CitySDKMixin(object):
     """
     CitySDKMixin interoperability mixin
@@ -34,19 +40,25 @@ class CitySDKMixin(object):
     def clean(self):
         """ Verify username and password before saving """
         self.authenticate()
-    
-    def __init__(self, *args, **kwargs):
-        super(CitySDKMixin, self).__init__(*args, **kwargs)
-        
+        logger.info('=== DEBUG: calling self.find_citysdk_category() - find category  ===')
+        self.find_citysdk_category()
+
+    def init_config(self):
         # CitySDK urls
         self.citysdk_resource_url = '%s%ss/' % (self.config['citysdk_url'],
                                                 self.config['citysdk_type'])
-        self.citysdk_categories_url= '%scategories?List=%s&format=json' % (self.config['citysdk_url'],
+        self.citysdk_categories_url = '%scategories?List=%s&format=json' % (self.config['citysdk_url'],
                                                                             self.config['citysdk_type'])
+        self.citysdk_category_id = self.config.get('citysdk_category_id')    
+ 
+    def __init__(self, *args, **kwargs):
+        super(CitySDKMixin, self).__init__(*args, **kwargs)
+        self.init_config()
     
     def authenticate(self):
         self.verbose('authenticating to CitySDK API')
-        
+        logger.info('=== DEBUG: %s ===' % 'authenticating to CitySDK')        
+
         citysdk_auth_url = '%sauth?format=json' % self.config['citysdk_url']
         
         response = requests.post(citysdk_auth_url, {
@@ -63,7 +75,10 @@ class CitySDKMixin(object):
     
     def find_citysdk_category(self):
         # category check
-        
+
+        if getattr(self, 'citysdk_categories_url', None) is None:
+            self.init_config()        
+
         citysdk_category_id = self.config.get('citysdk_category_id', False)
         response = requests.get(self.citysdk_categories_url, cookies=self.cookies)
         
@@ -73,7 +88,7 @@ class CitySDKMixin(object):
             citysdk_category_id = self.config['citysdk_category_id']
             
             self.verbose('category with ID "%s" already present in config' % citysdk_category_id)
-        
+            logger.info('=== DEBUG: %s ===' % 'category already present in config')
         # if not go and find it!
         else:
             # if category does not exist
@@ -105,7 +120,7 @@ class CitySDKMixin(object):
                 }
                 
                 self.verbose('Creating new category in CitySDK DB')
-                
+                logger.info('=== DEBUG: %s ===' % 'creating new category')                
                 # put to create
                 response = requests.put(self.citysdk_categories_url, data=json.dumps(category),
                                         headers={'content-type': 'application/json'},
@@ -119,7 +134,7 @@ class CitySDKMixin(object):
                 citysdk_category_id = json.loads(response.content)
                 
                 self.verbose('category with ID "%s" has been created' % citysdk_category_id)
-            
+                logger.info('=== DEBUG: %s ===' % 'category created')           
             # category already exists, find ID
             else:
                 categories = json.loads(response.content)['categories']
@@ -138,8 +153,7 @@ class CitySDKMixin(object):
             self.layer.external.save()
             # verbose output
             self.verbose('category with ID "%s" has been stored in config' % citysdk_category_id)
-            
-        self.citysdk_category_id = citysdk_category_id
+            logger.info('=== DEBUG: %s ===' % 'category stored in config')
     
     def convert_format(self, node):
         return {
@@ -204,9 +218,11 @@ END:VCARD""" % (
         if authenticate:
             self.authenticate()
         
-        self.find_citysdk_category()
+        #self.find_citysdk_category()
         citysdk_record = self.convert_format(node)
         
+        logger.info('=== DEBUG: adding record "%s" through HTTP API ===' % node.name)
+
         # citysdk sync
         response = requests.put(self.citysdk_resource_url, data=json.dumps(citysdk_record),
                      headers={ 'content-type': 'application/json' }, cookies=self.cookies)
@@ -226,9 +242,9 @@ END:VCARD""" % (
         if authenticate:
             self.authenticate()
         
-        self.find_citysdk_category()
+        #self.find_citysdk_category()
         citysdk_record = self.convert_format(node)
-        
+        logger.info('=== DEBUG: changing record "%s" through HTTP API ===' % node.name)
         # citysdk sync
         try:
             citysdk_record['poi']['id'] = node.external.external_id
@@ -250,7 +266,7 @@ END:VCARD""" % (
     def delete(self, external_id, authenticate=True):
         if authenticate:
             self.authenticate()
-        
+        logger.info('=== DEBUG: %s ===' % 'deleting record through HTTP API')
         response = requests.delete(self.citysdk_resource_url, data='{"id":"%s"}' % external_id,
                             headers={ 'content-type': 'application/json' }, cookies=self.cookies)
         

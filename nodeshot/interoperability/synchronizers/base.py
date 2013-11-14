@@ -35,10 +35,9 @@ class BaseConverter(object):
         self.layer = layer
         self.verbosity = kwargs.get('verbosity', 1)
         self.config = json.loads(layer.external.config)
-        self.validate()
     
     def validate(self):
-        """ Ensure required config keys are present """
+        """ External Layer config validation, must be called before saving the external layer instance """
         for field in self.REQUIRED_CONFIG_KEYS:
             if not self.config.get(field, False):
                 raise ImproperlyConfigured('Required %s parameter missing from configuration' % field)
