@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.5.4
+Django==1.5.5
 
 # python libraries
 PIL
@@ -47,9 +47,7 @@ django-social-auth
 django-reversion==1.7.1
 
 # asynchronous tasks
-kombu==2.5.12
-Celery
-django-celery
+celery==3.1
 django-celery-email
 
 # websockets

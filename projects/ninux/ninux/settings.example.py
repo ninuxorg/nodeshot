@@ -23,23 +23,24 @@ DATABASES = {
         'PASSWORD': 'your_password',                  # Not used with sqlite3.
         'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    },
-    # uncomment if you need to use nodeshot.extra.oldimporter
-    #'old_nodeshot': {
-    #   'ENGINE': 'django.db.backends.mysql',
-    #   'NAME': 'nodeshot',
-    #   'USER': 'nodeshot-readonly',
-    #   'PASSWORD': '*********',
-    #   'HOST': 'remote-ip',
-    #   'PORT': 'remote-port',
-    #}
+    }
 }
 
 # uncomment if you need to use nodeshot.extra.oldimporter
-#DATABASE_ROUTERS = [
-#    'nodeshot.extra.oldimporter.db.DefaultRouter',
-#    'nodeshot.extra.oldimporter.db.OldNodeshotRouter'
-#]
+#if 'test' not in sys.argv:
+#    DATABASES['old_nodeshot'] = {
+#       'ENGINE': 'django.db.backends.mysql',  # might be also postgresql or sqlite
+#       'NAME': 'nodeshot',
+#       'USER': 'nodeshot-readonly',
+#       'PASSWORD': '*********',
+#       'HOST': 'remote-ip',
+#       'PORT': 'remote-port',
+#    }
+#    DATABASE_ROUTERS = [
+#        'nodeshot.extra.oldimporter.db.DefaultRouter',
+#        'nodeshot.extra.oldimporter.db.OldNodeshotRouter'
+#    ]
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -159,7 +160,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.messages.context_processors.messages"
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -176,12 +177,6 @@ INSTALLED_APPS = (
     
     # --- background jobs --- #
     'djcelery_email',  # Celery Django Email Backend
-    'djcelery',  # Celery database scheduling for Django
-    # this app makes it possible to use django as a queue system for celery
-    # so you don't need to install RabbitQM or Redis
-    # pretty cool for development, but might not suffice for production if your system is heavily used
-    # our suggestion is to switch only if you start experiencing issues
-    'kombu.transport.django',
     
     # nodeshot
     'nodeshot.core.api',
@@ -227,7 +222,7 @@ INSTALLED_APPS = (
     
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-)
+]
 
 if 'nodeshot.community.profiles' in INSTALLED_APPS:
     AUTH_USER_MODEL = 'profiles.Profile'
@@ -330,18 +325,32 @@ CACHES = {
 EMAIL_HOST = 'localhost'
 #EMAIL_HOST_USER = 'your@email.org'
 #EMAIL_HOST_PASSWORD = '***********'
-EMAIL_PORT = 1025  # 1025 if you are in development mode, while 25 is usually the production port
+EMAIL_PORT = 1025 if DEBUG else 25  # 1025 if you are in development mode, while 25 is usually the production port
 DEFAULT_FROM_EMAIL = 'your@email.org'
 
 # ------ CELERY ------ #
 
-if not DEBUG:
+if DEBUG:
+    # this app makes it possible to use django as a queue system for celery
+    # so you don't need to install RabbitQM or Redis
+    # pretty cool for development, but might not suffice for production if your system is heavily used
+    # our suggestion is to switch only if you start experiencing issues
+    INSTALLED_APPS.append('kombu.transport.django')
+    BROKER_URL = 'django://'  
+    # synchronous behaviour for development
+    # more info here: http://docs.celeryproject.org/en/latest/configuration.html#celery-always-eager
+    CELERY_ALWAYS_EAGER = True
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+else:
+    # in production the default background queue manager is Redis
+    BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+    BROKER_TRANSPORT_OPTIONS = {
+        "visibility_timeout": 3600,  # 1 hour
+        "fanout_prefix": True
+    }
+    # in production emails are sent in the background
     EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
-
-BROKER_URL = 'django://'  # defaults to use kombu.transport.django
-
-import djcelery
-djcelery.setup_loader()
 
 #from datetime import timedelta
 #

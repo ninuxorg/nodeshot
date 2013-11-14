@@ -276,3 +276,24 @@ and paste:
         return 301 https://$host$request_uri;
     }
 	
+
+Install Redis (we will use it as an AMQP Broker for Celery)
+
+    pip install -U celery[redis]
+	
+	add-apt-repository ppa:chris-lea/redis-server
+	apt-get update
+	apt-get install redis-server
+	
+Test your installation and if everything works as expected change the DEBUG setting to False (leaving it to True might lead to poor performance or security issues)
+
+    vim settings.py
+	
+	# set DEBUG to False
+	DEBUG = False
+	
+	# save and exit
+
+Restart all the processes
+
+    service nginx restart && supervisorctl restart all
