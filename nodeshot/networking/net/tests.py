@@ -4,6 +4,8 @@ from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
@@ -114,7 +116,8 @@ class NetTest(BaseTestCase):
         
         self.client.login(username='admin', password='tester')
         response = self.client.get(url)
-        self.assertEqual(len(response.data['results']), Device.objects.accessible_to(1).count())
+        user_1 = User.objects.get(pk=1)
+        self.assertEqual(len(response.data['results']), Device.objects.accessible_to(user_1).count())
     
     def test_device_details_api(self):
         url = reverse('api_device_details', args=[1])
@@ -184,7 +187,8 @@ class NetTest(BaseTestCase):
         
         self.client.login(username='admin', password='tester')
         response = self.client.get(url)
-        self.assertEqual(len(response.data['results']), Device.objects.filter(node_id=node.id).accessible_to(1).count())
+        user_1 = User.objects.get(pk=1)
+        self.assertEqual(len(response.data['results']), Device.objects.filter(node_id=node.id).accessible_to(user_1).count())
     
     def test_device_creation_api_permissions(self):
         """ create device permissions: only node owner or admins can add devices """

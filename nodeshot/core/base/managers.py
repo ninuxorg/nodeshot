@@ -1,9 +1,5 @@
 import sys
 
-if not 'synchronize' in sys.argv and not 'celery' in sys.argv:
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-
 from django.db.models import Manager, Q
 from django.contrib.gis.db.models import GeoManager
 from django.db.models.query import QuerySet
@@ -72,12 +68,8 @@ class ACLMixin(BaseUtilityMixin):
         returns all the items that are accessible to the specified user
         if user is not authenticated will return public items
         
-        :param user: an user instance or integer representing user id
+        :param user: an user instance
         """
-        # if user param is an integer
-        if isinstance(user, int):
-            user = User.objects.get(pk=user)
-        
         if user.is_superuser:
             try:
                 queryset = self.get_query_set()

@@ -5,8 +5,6 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 
-from nodeshot.core.layers.models import Layer
-
 import simplejson as json
 
 
@@ -21,7 +19,7 @@ class LayerExternal(models.Model):
     External Layers, extend 'Layers' with additional files
     These are the layers that are managed by local groups or other organizations
     """
-    layer = models.OneToOneField(Layer, verbose_name=_('layer'), parent_link=True, related_name='external')
+    layer = models.OneToOneField('layers.Layer', verbose_name=_('layer'), parent_link=True, related_name='external')
     interoperability = models.CharField(_('interoperability'), max_length=128, choices=INTEROPERABILITY, default=False)
     config = models.TextField(_('configuration'), blank=True,
                               help_text=_('JSON format, will be parsed by the interoperability class to retrieve config keys'))

@@ -26,7 +26,7 @@ class Layer(BaseDate):
     is_external = models.BooleanField(_('is it external?'))
     
     # geographic related fields
-    center = models.PointField(_('center coordinates'),null=True, blank=True)
+    center = models.PointField(_('center coordinates'), null=True, blank=True)
     area = models.PolygonField(_('area'), null=True, blank=True)
     zoom = models.SmallIntegerField(_('default zoom level'), choices=MAP_ZOOM, default=settings.NODESHOT['DEFAULTS']['LAYER_ZOOM'])
     
