@@ -160,7 +160,8 @@ And paste:
 
     [program:celery]
     directory=/var/django/nodeshot/projects/ninux
-    command=/var/django/nodeshot/projects/ninux/python/bin/python /var/django/nodeshot/projects/ninux/manage.py celery worker --loglevel=INFO
+	user=nobody
+    command=/var/django/nodeshot/projects/ninux/python/bin/celery -A cineca worker -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
@@ -179,7 +180,7 @@ And paste:
 
     [program:celery-beat]
     directory=/var/django/nodeshot/projects/ninux
-    command=/var/django/nodeshot/projects/ninux/python/bin/python /var/django/nodeshot/projects/ninux/manage.py celery beat --loglevel=INFO
+    command=/var/django/nodeshot/projects/ninux/python/bin/celery -A cineca beat -s ./celerybeat-schedule -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
