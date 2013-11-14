@@ -174,6 +174,52 @@ class TopologyParser(object):
                 iplist = self.aliasmanager.getAliasesFromIP(ipaddress)
                 self.hnainfo.append( (iplist, hna) )
 
+def isinsubnet(ip, subnet, mask_threshold):
+    """
+    Check if the IPv4 address "ip" is in the given subnet "subnet".
+    If the subnet mask is less than "mask_threshold" then return False.
+
+    """
+    # take the IPv4 address and transform it into binary
+    try:
+        ibs = ip.split(".")
+    except:
+        return False
+    bip = 0
+    for ib in ibs:
+        bip |= int(ib)
+        bip = bip << 8
+    bip = bip >> 8
+
+    # the parsed IP address is now in bip
+    try:
+        net = subnet.split("/")[0]
+        mask = subnet.split("/")[1]
+        nbs = net.split(".")
+    except:
+        return False
+    bnet = 0
+    for nb in nbs:
+        bnet |= int(nb)
+        bnet = bnet << 8
+    bnet = bnet >> 8
+
+    intmask = int(mask)
+    if intmask < mask_threshold:
+        return False
+
+    bmask = 0
+    for i in range(32):
+        if i < intmask:
+            bmask |= 1
+        bmask = bmask << 1
+    bmask = bmask >> 1
+
+    #print "%s %s %s" % (hex(bip), hex(bnet), hex(bmask))
+
+    return bip & bmask == bnet & bmask
+
+
 #OLSR
 if __name__ == "__main__":
     #Link.objects.all().delete()
@@ -195,7 +241,8 @@ if __name__ == "__main__":
             #values = False
         old_links = dict([ (l.id, False) for l in Link.objects.all()])
         #print tp.linkdict
-        # record nodes
+    # record nodes
+    activenodes = set()
     if values:
         for v in values:
             ipsA, ipsB, etx = v
@@ -217,6 +264,8 @@ if __name__ == "__main__":
                             old_links[l.id] = True
                             found = True
                             print "Updated link: %s" % l
+                            activenodes.add(l.from_interface.device.node.id)
+                            activenodes.add(l.to_interface.device.node.id)
                         else:
                             # otherwise create a new link
                             fi = Interface.objects.filter(ipv4_address = ipA).exclude(type='vpn').exclude(draw_link=False)
@@ -228,9 +277,12 @@ if __name__ == "__main__":
                                 l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
                                 print "Saved new link: %s" % l
                                 found = True
+                                activenodes.add(fi.get().device.node.id)
+                                activenodes.add(to.get().device.node.id)
                             elif fi.count() > 1 or to.count() >1:
                                 print "Anomaly: More than one interface for ip address"
                                 print fi, to
+
     # record hnas
     old_hnas = dict([ (h.id, False) for h in Hna.objects.all()])
 
@@ -253,6 +305,42 @@ if __name__ == "__main__":
         if not v:
             Hna.objects.get(id=h).delete()
             print "Deleted hna %d" % h
+
+    # take into account L2 only / bridged links
+    # iterate over all devices, and see if the IP address of one of the interfaces belongs to an HNA
+
+    # don't do this in nodeshot2
+    l2links = []
+    for interface in Interface.objects.all().exclude(type='vpn').exclude(draw_link=False):
+        for hna in Hna.objects.all().exclude(route="0.0.0.0/0"):
+            if isinsubnet(interface.ipv4_address, hna.route, 16):
+                try:
+                    # get one interface associated to this HNA
+                    hna_device_interface = hna.device.interface_set.all()[0]
+                    nodeA = interface.device.node
+                    nodeB = hna_device_interface.device.node
+                except:
+                    continue
+                # check if source and destination are on the same node
+                if nodeA == nodeB:
+                    continue
+                # check if we are linking an active node on the HNA side
+                if not nodeB.id in activenodes:
+                    print "Node %s is not active" % nodeB
+                    continue
+                # check if the link already exists
+                if Link.objects.filter(Q(from_interface__device__node__id = nodeA.id, to_interface__device__node__id = nodeB.id) |\
+                        Q(from_interface__device__node__id = nodeB.id, to_interface__device__node__id = nodeA.id)).count() > 1:
+                    print "Link already exists: %s <--> %s" % (nodeA, nodeB)
+                    continue
+                # don't do this in nodeshot2
+                if (nodeA.id, nodeB.id) in l2links or (nodeB.id, nodeA.id) in l2links:
+                    print "Link already exists (inserted by us): %s <--> %s" % (nodeA, nodeB)
+                    continue
+                l = Link(from_interface = interface, to_interface = hna_device_interface, etx = 1.042)
+                l.save()
+                l2links.append((nodeA.id, nodeB.id))
+                print "Found that %s is in %s. Added Link from %s to %s." % (interface.ipv4_address, hna.route, nodeA, nodeB)
 
     # BATMAN
     for topology_url in settings.BATMAN_URLS:
