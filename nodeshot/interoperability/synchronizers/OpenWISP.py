@@ -38,13 +38,19 @@ class OpenWISP(XMLConverter):
             # retrieve info in auxiliary variables
             # readability counts!
             guid = self.get_text(item, 'guid')
-            name, created_at = guid.split('201', 1)
+            name, created_at = guid.split('201', 1)  # I bet by 2020 OWGM wont' be use anymore :P 
             slug = slugify(name)
             created_at = "201%s" % created_at
-            updated_at = self.get_text(item, 'updated')            
-            lat, lng = self.get_text(item, 'georss:point').split(' ')
+            updated_at = self.get_text(item, 'updated')
             description = self.get_text(item, 'title')
             address = self.get_text(item, 'description')
+            
+            try:
+                lat, lng = self.get_text(item, 'georss:point').split(' ')
+            except IndexError:
+                # detail view
+                lat = self.get_text(item, 'georss:lat')
+                lng = self.get_text(item, 'georss:long')
             
             # TODO: this synchronizing stuff needs to be D.R.Y.ed up
             # --- avoid name collisions --- #
