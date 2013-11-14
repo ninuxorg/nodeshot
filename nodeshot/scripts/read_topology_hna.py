@@ -328,6 +328,10 @@ if __name__ == "__main__":
                 if not nodeB.id in activenodes:
                     print "Node %s is not active" % nodeB
                     continue
+                if nodeB.status in "pu" or nodeA.status in "pu":
+                    print "Node %s or %s is not active" % (nodeA, nodeB)
+                    continue
+
                 # check if the link already exists
                 if Link.objects.filter(Q(from_interface__device__node__id = nodeA.id, to_interface__device__node__id = nodeB.id) |\
                         Q(from_interface__device__node__id = nodeB.id, to_interface__device__node__id = nodeA.id)).count() > 1:
