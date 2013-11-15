@@ -45,7 +45,19 @@ class BaseConverter(object):
         self.clean()
     
     def clean(self):
-        """ complex ad hoc validation here """
+        """ complex ad hoc validation here, will be executed before the external layer is saved """
+        pass
+    
+    def after_external_layer_saved(self, *args, **kwargs):
+        """ anything that should be executed after the external layer is saved goes here """
+        pass
+    
+    def before_start(self, *args, **kwargs):
+        """ anything that should be executed before the import starts goes here """
+        pass
+    
+    def after_complete(self, *args, **kwargs):
+        """ anything that should be executed after the import is complete goes here """
         pass
     
     def process(self):
@@ -53,10 +65,13 @@ class BaseConverter(object):
         This is the method that does everything automatically (at least attempts to).
         
         Steps:
+            0. Call "before_start" method (which might be implemented by children classes)
             1. Retrieve data from external source
             2. Parse the data
             3. Save the data locally
+            4. Call "after_complete" method (which might be implemented by children classes)
         """
+        self.before_start()
         self.retrieve_data()
         self.parse()
         
@@ -71,6 +86,8 @@ class BaseConverter(object):
         Node._additional_validation.insert(0, 'new_nodes_allowed_for_layer')
         # reconnect signals
         resume_disconnectable_signals()
+        
+        self.after_complete()
         
         # return message as a list because more than one messages might be returned
         return [self.message]

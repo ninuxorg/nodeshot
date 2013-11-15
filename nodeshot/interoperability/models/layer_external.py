@@ -39,7 +39,14 @@ class LayerExternal(models.Model):
         return '%s additional data' % self.layer.name
 
     def clean(self, *args, **kwargs):
-        """ Custom Validation """
+        """
+        Custom Validation:
+        
+            * must specify config if interoperability class is not none
+            * indent json config nicely
+            * validate any synchronizer.REQUIRED_CONFIG_KEYS
+            * call synchronizer clean method for any third party validation
+        """
         
         # if is interoperable some configuration needs to be specified
         if self.interoperability != 'None' and not self.config:
@@ -68,6 +75,18 @@ class LayerExternal(models.Model):
                 self.synchronizer.clean()
             except ImproperlyConfigured as e:
                 raise ValidationError(e.message)
+    
+    def save(self, *args, **kwargs):
+        """
+        call synchronizer "after_external_layer_saved" method
+        for any additional operation that must be executed after save
+        """
+        after_save = kwargs.pop('after_save', True)
+        
+        super(LayerExternal, self).save(*args, **kwargs)
+        
+        if after_save:
+            self.synchronizer.after_external_layer_saved(self.config)
     
     @property
     def synchronizer(self):
