@@ -18,7 +18,7 @@ def purge_notifications():
 @task
 def create_notifications(users, notification_model, notification_type, related_object):
     """
-    create notifications in background
+    create notifications in a background job to avoid slowing down users
     """
     # shortcuts for readability
     Notification = notification_model
@@ -29,6 +29,7 @@ def create_notifications(users, notification_model, notification_type, related_o
     
     # loop users, notification settings check is done in Notification model
     for user in users:
+        
         n = Notification(
             to_user=user,
             type=notification_type,

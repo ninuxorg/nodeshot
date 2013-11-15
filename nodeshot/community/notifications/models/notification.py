@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext as __
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
@@ -83,13 +83,20 @@ class Notification(BaseDate):
     def check_user_settings(self, medium='email'):
         """
         Ensure user is ok with receiving this notification through the specified medium.
-        Default medium is 'email', 'mobile' notifications will be implemented in the future.
+        Available mediums are 'web' and 'email', while 'mobile' notifications will
+        hopefully be implemented in the future.
         """
         # custom notifications are always sent
         if self.type == 'custom':
             return True
         
-        user_settings = getattr(self.to_user, '%s_notification_settings' % medium)
+        try:
+            user_settings = getattr(self.to_user, '%s_notification_settings' % medium)
+        except ObjectDoesNotExist:
+            # user has no settings specified
+            # TODO: it would be better to create the settings with default values
+            return False
+        
         user_setting_type = getattr(user_settings.__class__, self.type).user_setting_type
         
         if user_setting_type == 'boolean':
