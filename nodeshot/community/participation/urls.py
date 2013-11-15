@@ -1,8 +1,6 @@
 from django.conf.urls import patterns, include, url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from nodeshot.community.participation import views
-
 
 urlpatterns = patterns('nodeshot.community.participation.views',
     #url(r'^comments/add/$', views.CommentCreate.as_view(), name='api_comments_add'),

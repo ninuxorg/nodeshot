@@ -89,7 +89,7 @@ class BaseConverter(object):
         raise NotImplementedError("BaseConverter child class does not implement a save method")
     
     def verbose(self, message):
-        if self.verbosity == 2:
+        if self.verbosity >= 2:
             print(message)
     
 
