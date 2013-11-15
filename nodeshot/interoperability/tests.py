@@ -126,8 +126,8 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(nodes.count(), 42)
         
         # check one particular node has the data we expect it to have
-        node = Node.objects.get(slug='podesta1_ced')
-        self.assertEqual(node.name, 'Podesta1_CED')
+        node = Node.objects.get(slug='podesta1-ced')
+        self.assertEqual(node.name, 'Podesta1 CED')
         self.assertEqual(node.address, 'Test WISP')
         point = Point(8.96166, 44.4185)
         self.assertTrue(node.geometry.equals(point))
@@ -161,8 +161,8 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(nodes.count(), 4)
         
         # check one particular node has the data we expect it to have
-        node = Node.objects.get(slug='lercari2_42')
-        self.assertEqual(node.name, 'Lercari2_42')
+        node = Node.objects.get(slug='lercari2-42')
+        self.assertEqual(node.name, 'Lercari2 42')
         self.assertEqual(node.address, 'Test WISP')
         point = Point(8.96147, 44.4076)
         self.assertTrue(node.geometry.equals(point))

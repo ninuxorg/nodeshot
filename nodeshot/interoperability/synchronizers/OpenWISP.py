@@ -38,7 +38,8 @@ class OpenWISP(XMLConverter):
             # retrieve info in auxiliary variables
             # readability counts!
             guid = self.get_text(item, 'guid')
-            name, created_at = guid.split('201', 1)  # I bet by 2020 OWGM wont' be use anymore :P 
+            name, created_at = guid.split('201', 1)  # I bet by 2020 OWGM wont' be use anymore :P
+            name = name.replace('_', ' ')
             slug = slugify(name)
             created_at = "201%s" % created_at
             updated_at = self.get_text(item, 'updated')

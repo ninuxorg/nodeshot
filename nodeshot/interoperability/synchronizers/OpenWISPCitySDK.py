@@ -9,6 +9,12 @@ class OpenWISPCitySDK(CitySDKMixin, OpenWISP):
     """
     
     def convert_format(self, node):
+        # determine description or fill some hopefully useful value
+        if node.description.strip() == '':
+            description = '%s in %s' % (node.name, node.address)
+        else:
+            description = node.description
+            
         return {
             self.config['citysdk_type'] :{
                 "location":{
@@ -40,7 +46,7 @@ END:VCARD""" % (
                 ],
                 "description":[
                     {
-                        "value": node.description,
+                        "value": description,
                         "lang": self.config['citysdk_lang']
                     },
                 ],
