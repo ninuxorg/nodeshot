@@ -9,9 +9,6 @@ from .base import XMLConverter
 from celery.utils.log import get_logger
 logger = get_logger(__name__)
 
-# TODO: eliminate this line
-logger.info('== IMPORTING CITYSDK MIXIN ==')
-
 
 class CitySDKMixin(object):
     """
@@ -71,14 +68,6 @@ class CitySDKMixin(object):
         # save config
         self.layer.external.config = json.dumps(self.config, indent=4, sort_keys=True)
         self.layer.external.save(after_save=False)
-    
-    #def after_complete(self, *args, **kwargs):
-    #    """ after import is complete delete auth session key from db """
-    #    # store cookies in a string
-    #    del self.config['cookies']
-    #    # save config
-    #    self.layer.external.config = json.dumps(self.config, indent=4, sort_keys=True)
-    #    self.layer.external.save(after_save=False)
     
     def authenticate(self, force_http_request=False):
         """ authenticate into the CitySDK API if necessary """
