@@ -180,44 +180,27 @@ def isinsubnet(ip, subnet, mask_threshold):
     If the subnet mask is less than "mask_threshold" then return False.
 
     """
-    # take the IPv4 address and transform it into binary
-    try:
-        ibs = ip.split(".")
-    except:
+    # validation
+    if ip == None or subnet == None or len(ip) < 7 or len(subnet) < 9:
         return False
-    bip = 0
-    for ib in ibs:
-        bip |= int(ib)
-        bip = bip << 8
-    bip = bip >> 8
-
-    # the parsed IP address is now in bip
-    try:
-        net = subnet.split("/")[0]
-        mask = subnet.split("/")[1]
-        nbs = net.split(".")
-    except:
+    # TODO: more validation
+    # separate the net from the netmask
+    net = subnet.split("/")[0]
+    mask = int(subnet.split("/")[1])
+    # check if the mask is below mask_threshold
+    if mask < mask_threshold:
         return False
-    bnet = 0
-    for nb in nbs:
-        bnet |= int(nb)
-        bnet = bnet << 8
-    bnet = bnet >> 8
+    # convert the net into an int
+    netb = [int(b) for b in net.split(".")]
+    intnet = sum([octect << lshift for (octect, lshift) in zip(netb, range(24, -1, -8))])
+    # convert the netmask into an int
+    maskbits = [1] * mask
+    intmask = sum([octect << lshift for (octect, lshift) in zip(maskbits, range(31, 31 - mask, -1))])
+    # convert the IPv4 address into an int
+    ipb = [int(b) for b in ip.split(".")]
+    intip = sum([octect << lshift for (octect, lshift) in zip(ipb, range(24, -1, -8))])
 
-    intmask = int(mask)
-    if intmask < mask_threshold:
-        return False
-
-    bmask = 0
-    for i in range(32):
-        if i < intmask:
-            bmask |= 1
-        bmask = bmask << 1
-    bmask = bmask >> 1
-
-    #print "%s %s %s" % (hex(bip), hex(bnet), hex(bmask))
-
-    return bip & bmask == bnet & bmask
+    return intip & intmask == intnet & intmask
 
 
 #OLSR
