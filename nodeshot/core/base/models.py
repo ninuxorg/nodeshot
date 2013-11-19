@@ -26,6 +26,14 @@ class BaseShortcut(models.Model):
     def filter(cls, *args, **kwargs):
         return cls.objects.filter(*args, **kwargs)
     
+    @classmethod
+    def exclude(cls, *args, **kwargs):
+        return cls.objects.exclude(*args, **kwargs)
+    
+    @classmethod
+    def count(cls, *args, **kwargs):
+        return cls.objects.count(*args, **kwargs)
+    
     # --- custom methods, copying Rails :) --- #
     
     @classmethod
