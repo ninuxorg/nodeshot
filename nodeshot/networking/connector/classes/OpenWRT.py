@@ -52,6 +52,9 @@ class OpenWRT(SSH):
        
         return (os, version)
     
+    def save_device_model(self):
+        pass
+    
     def get_device_model(self):
         """ get device model name, eg: Nanostation M5, Rocket M5 """
         output = output = self.output('iwinfo | grep -i hardware')
@@ -60,37 +63,39 @@ class OpenWRT(SSH):
         # and we'll extract only the string between square brackets
         return output.split('[')[1].replace(']','')
     
+    # TODO follows
+    
     def get_device_RAM(self):
-        return ''
+        return 0
     
     def get_ethernet_standard(self):
         """ determine ethernet standard """
-        return ''
+        return 'fast'
     
     def get_ethernet_duplex(self):
         """ determine if ethernet interface is full-duplex or not """
-        return ''
+        return 'duplex'
     
     def get_wireless_mode(self):
         """ retrieve wireless mode (AP/STA) """
-        return ''
+        return 'ap'
     
     def get_wireless_channel(self):
         """ retrieve wireless channel / frequency """
-        return ''
+        return '2412'
     
     def get_wireless_channel_width(self):
         """ retrieve wireless channel width """
-        return ''
+        return '20'
     
     def get_wireless_output_power(self):
         """ retrieve output power """
-        return ''
+        return None
     
     def get_wireless_dbm(self):
         """ get dbm """
-        return ''
+        return None
     
     def get_wireless_noise(self):
         """ retrieve noise """
-        return ''
+        return None

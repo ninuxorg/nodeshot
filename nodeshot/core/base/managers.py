@@ -150,6 +150,11 @@ if HSTORE_ENABLED:
 ### ------ MANAGERS ------ ###
 
 
+class NodeshotDefaultManager(Manager, BaseUtilityMixin):
+    """ Simple Manager that implements the BaseUtilityMixin methods """
+    pass
+
+
 class PublishedManager(Manager, ExtendedManagerMixin, PublishedMixin):
     """ Returns published items """
     

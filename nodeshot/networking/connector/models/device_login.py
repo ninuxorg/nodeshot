@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate
+from nodeshot.core.base.managers import NodeshotDefaultManager
 
 
 class DeviceLogin(BaseDate):
@@ -25,6 +26,9 @@ class DeviceLogin(BaseDate):
     device = models.ForeignKey('net.Device', verbose_name=_('device'),
                                blank=True, null=True,
                                help_text=_('leave blank, will be created automatically'))
+    
+    # django manager
+    objects = NodeshotDefaultManager()
     
     _connector = None
     
