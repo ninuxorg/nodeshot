@@ -70,16 +70,12 @@ class UbiquitiAirOS(SSH):
         return self._systemcfg
     
     def get_os(self):
-        """ get OS string """
-        return self.output('cat /proc/version').split('#')[0]
+        """ get OS string, return tuple with OS name and OS version """
+        return ('AirOS', self.ubntbox['firmwareVersion'])
     
     def get_device_name(self):
         """ get device name """
         return self.output('uname -a').split(' ')[1]
-    
-    def get_firmware(self):
-        """ get firmware name and version """
-        return self.ubntbox['firmwareVersion']
     
     def get_device_model(self):
         """ get device model name, eg: Nanostation M5, Rocket M5 """

@@ -12,22 +12,18 @@ class OpenWRT(SSH):
     """
     OpenWRT SSH connector
     """
-    
-    def get_os(self):
-        """ get OS string """
-        return self.output('cat /proc/version').split('#')[0]
-    
+       
     def get_device_name(self):
         """ get device name """
         return self.output('uname -a').split(' ')[1]
     
-    def get_firmware(self):
-        """ get firmware name and version """
+    def get_os(self):
+        """ get os name and version, return as tuple """
         # cache command output
         output = self.output('cat /etc/openwrt_release')
         
         # init empty dict
-        release = {}
+        info = {}
         
         # loop over lines of output
         # parse output and store in python dict
@@ -37,23 +33,24 @@ class OpenWRT(SSH):
             key = key.replace('DISTRIB_', '').lower()
             value = value.replace('"', '')
             # fill!
-            release[key] = value
+            info[key] = value
         
-        main_name = "%(id)s %(release)s" % release
+        os = info['id']
+        version = info['release']
         
-        if release['description']:
+        if info['description']:
             
-            if release['revision']:
-                additional_info = "%(description)s, %(revision)s" % release
+            if info['revision']:
+                additional_info = "%(description)s, %(revision)s" % info
             else:
-                additional_info = "%(description)s" % release
+                additional_info = "%(description)s" % info
             
             # remove redundant OpenWRT occuerrence
             additional_info = additional_info.replace('OpenWrt ', '')
             
-            result = "%s (%s)" % (main_name, additional_info)
+            version = "%s (%s)" % (version, additional_info)
        
-        return result
+        return (os, version)
     
     def get_device_model(self):
         """ get device model name, eg: Nanostation M5, Rocket M5 """

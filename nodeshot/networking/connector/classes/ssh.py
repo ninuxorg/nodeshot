@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+from nodeshot.core.base.utils import now
 from nodeshot.networking.base.utils import ifconfig_to_dict
 from nodeshot.networking.net.models import *
 from nodeshot.networking.net.models.choices import DEVICE_STATUS
@@ -184,10 +185,16 @@ class SSH(object):
         device = Device()
         device.node = self.device_login.node
         device.name = self.get_device_name()
-        device.firmware = self.get_firmware()
-        device.os = self.get_os()
+        # get_os() returns a tuple
+        device.os, device.os_version = self.get_os()
+        # we are pretty sure the device is a radio device :)
         device.type = 'radio'
+        # we are pretty sure the device is reachable too!
         device.status = DEVICE_STATUS.get('reachable')
+        # this is the first time the device is seen by the system because we are just adding it
+        device.first_seen = now()
+        # and is also the latest
+        device.last_seen = now()
         device.save()
         
         self.device = device
@@ -350,13 +357,15 @@ class SSH(object):
                 rel.save()
     
     def get_os(self):
+        """
+        should return a tuple in which
+            the first element is the OS name and
+            the second element is the OS version
+        """
         raise NotImplementedError('get_os method must be overridden')
     
     def get_device_name(self):
         raise NotImplementedError('get_device_name method must be overridden')
-    
-    def get_firmware(self):
-        raise NotImplementedError('get_firmware method must be overridden')
     
     def get_device_model(self):
         raise NotImplementedError('get_device_model method must be overridden')
