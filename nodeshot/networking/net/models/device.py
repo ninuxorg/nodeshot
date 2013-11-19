@@ -36,8 +36,9 @@ class Device(BaseAccessLevel):
     
     # device specific
     routing_protocols = models.ManyToManyField('net.RoutingProtocol', blank=True)
-    firmware = models.CharField(_('firmware'), max_length=128, blank=True, null=True)
+    
     os = models.CharField(_('operating system'), max_length=128, blank=True, null=True)
+    os_version = models.CharField(_('operating system version'), max_length=128, blank=True, null=True)
     
     first_seen = models.DateTimeField(_('first time seen on'), blank=True, null=True, default=None)
     last_seen = models.DateTimeField(_('last time seen on'), blank=True, null=True, default=None)
