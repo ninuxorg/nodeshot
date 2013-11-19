@@ -39,6 +39,9 @@ class Device(BaseAccessLevel):
     firmware = models.CharField(_('firmware'), max_length=128, blank=True, null=True)
     os = models.CharField(_('operating system'), max_length=128, blank=True, null=True)
     
+    first_seen = models.DateTimeField(_('first time seen on'), blank=True, null=True, default=None)
+    last_seen = models.DateTimeField(_('last time seen on'), blank=True, null=True, default=None)
+    
     # text
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
     notes = models.TextField(_('notes'), blank=True, null=True)

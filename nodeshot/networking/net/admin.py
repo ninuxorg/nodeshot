@@ -57,7 +57,9 @@ class DeviceAdmin(BaseGeoAdmin):
     exclude = ('shortcuts',)
     
     if not settings.DEBUG:
-        readonly_fields = BaseAdmin.readonly_fields + ['status']
+        readonly_fields =  [
+            'status', 'first_seen', 'last_seen'
+        ] + BaseAdmin.readonly_fields
 
 
 class InterfaceAdmin(BaseAdmin):
