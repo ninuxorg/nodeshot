@@ -34,11 +34,11 @@ class SSH(object):
     # SSH connection error message
     connection_error = None
     
-    def __init__(self, device_login):
+    def __init__(self, device_connector):
         """
-        store device_login as an attribute
+        store device_connector as an attribute
         """
-        self.device_login = device_login
+        self.device_connector = device_connector
     
     def clean(self):
         """ validation method which will be called before saving the model in the django admin """
@@ -51,7 +51,7 @@ class SSH(object):
     def check_required_fields(self):
         """ check REQUIRED_FIELDS are filled """
         for field in self.REQUIRED_FIELDS:
-            value = getattr(self.device_login, field, None)
+            value = getattr(self.device_connector, field, None)
             
             if not value:
                 raise ValidationError(_('%s is required for this connector class') % field)
@@ -66,10 +66,10 @@ class SSH(object):
     def ensure_no_duplicate(self):
         """
         Ensure we're not creating a device that already exists
-        Runs only when the DeviceLogin object is created, not when is updated
+        Runs only when the DeviceConnector object is created, not when is updated
         """
-        # if device_login is being created right now
-        if not self.device_login.id:
+        # if device_connector is being created right now
+        if not self.device_connector.id:
             duplicates = []
             # loop over interfaces and check mac address
             for interface in self.get_interfaces():
@@ -95,7 +95,7 @@ class SSH(object):
             returns True if success
             returns False and sets self.connection_error if something goes wrong
         """
-        device_login = self.device_login
+        device_connector = self.device_connector
         
         shell = paramiko.SSHClient()
         shell.load_system_host_keys()
@@ -103,10 +103,10 @@ class SSH(object):
         
         try:
             shell.connect(
-                device_login.host,
-                username=device_login.username,
-                password=device_login.password,
-                port=device_login.port
+                device_connector.host,
+                username=device_connector.username,
+                password=device_connector.password,
+                port=device_connector.port
             )
             self.shell = shell
             # ok!
@@ -162,20 +162,20 @@ class SSH(object):
         This method is used mainly for development purposes
         """
         # retrieve model indirectly because is needed only here
-        DeviceLogin = self.device_login.__class__
+        DeviceConnector = self.device_connector.__class__
         
         # store original login info
-        original_login = DeviceLogin(**{
-            "node_id": self.device_login.node_id,
-            "host": self.device_login.host,
-            "username": self.device_login.username,
-            "password": self.device_login.password,
+        original_login = DeviceConnector(**{
+            "node_id": self.device_connector.node_id,
+            "host": self.device_connector.host,
+            "username": self.device_connector.username,
+            "password": self.device_connector.password,
             "store": True,
-            "port": self.device_login.port,
-            "connector_class": self.device_login.connector_class
+            "port": self.device_connector.port,
+            "connector_class": self.device_connector.connector_class
         })
         # delete device
-        self.device_login.device.delete()
+        self.device_connector.device.delete()
         
         # save login and restart
         original_login.save()
@@ -183,7 +183,7 @@ class SSH(object):
     def save_device(self):
         """ save Device object """
         device = Device()
-        device.node = self.device_login.node
+        device.node = self.device_connector.node
         device.name = self.get_device_name()
         # get_os() returns a tuple
         device.os, device.os_version = self.get_os()

@@ -1,5 +1,5 @@
 """
-nodeshot.core.links unit tests
+nodeshot.networking.links unit tests
 """
 
 import simplejson as json

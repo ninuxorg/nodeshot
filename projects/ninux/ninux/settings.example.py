@@ -193,7 +193,7 @@ INSTALLED_APPS = [
     'nodeshot.networking.links',
     'nodeshot.networking.services',
     'nodeshot.networking.hardware',
-    'nodeshot.networking.connector',
+    'nodeshot.networking.connectors',
     #'nodeshot.networking.monitor',
     'nodeshot.interface',
     
@@ -510,9 +510,9 @@ NODESHOT = {
             'default': 'potential'
         }
     },
-    'PULLERS': [
-        ('nodeshot.networking.connector.classes.UbiquitiAirOS', 'Ubiquiti AirOS'),
-        ('nodeshot.networking.connector.classes.OpenWRT', 'OpenWRT'),
+    'CONNECTORS': [
+        ('nodeshot.networking.connectors.classes.UbiquitiAirOS', 'Ubiquiti AirOS'),
+        ('nodeshot.networking.connectors.classes.OpenWRT', 'OpenWRT'),
     ],
 }
 

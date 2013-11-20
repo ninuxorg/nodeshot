@@ -12,8 +12,8 @@ check_dependencies(
 )
 
 
-from .device_login import DeviceLogin
+from .device_connector import DeviceConnector
 
 
-__all__ = ['DeviceLogin']
+__all__ = ['DeviceConnector']
 
