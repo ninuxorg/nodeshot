@@ -46,7 +46,7 @@ class SSH(object):
         self.check_SSH_connection()
         self.ensure_no_duplicate()
         # close SSH connection
-        self.close()
+        self.disconnect()
     
     def check_required_fields(self):
         """ check REQUIRED_FIELDS are filled """
@@ -116,6 +116,10 @@ class SSH(object):
             self.connection_error = e.message or e.strerror
             return False
     
+    def disconnect(self):
+        """ closes SSH connection """
+        self.shell.close()
+    
     def exec_command(self, command, **kwargs):
         """ alias to paramiko.SSHClient.exec_command """
         return self.shell.exec_command(command, **kwargs)
@@ -136,10 +140,6 @@ class SSH(object):
         else:
             return output
     
-    def close(self):
-        """ closes SSH connection """
-        self.shell.close()
-    
     def start(self):
         """ start extracting info from device """
         # connect
@@ -154,7 +154,7 @@ class SSH(object):
         self.save_device_model()
         
         # close SSH connection
-        self.close()
+        self.disconnect()
     
     def restart(self):
         """

@@ -16,4 +16,3 @@ from .device_connector import DeviceConnector
 
 
 __all__ = ['DeviceConnector']
-

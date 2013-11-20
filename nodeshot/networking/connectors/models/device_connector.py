@@ -7,6 +7,7 @@ from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate, BaseOrdered
 from nodeshot.core.base.managers import NodeshotDefaultManager
+from nodeshot.networking.net.models import Device
 
 
 class DeviceConnector(BaseDate, BaseOrdered):
@@ -23,7 +24,7 @@ class DeviceConnector(BaseDate, BaseOrdered):
                                 help_text=_('is adviced to store read-only credentials only'))
     connector_class = models.CharField(_('connector class'), max_length=128,
                               choices=settings.NODESHOT['CONNECTORS'])
-    device = models.ForeignKey('net.Device', verbose_name=_('device'),
+    device = models.ForeignKey(Device, verbose_name=_('device'),
                                blank=True, null=True,
                                help_text=_('leave blank, will be created automatically'))
     
@@ -93,3 +94,34 @@ class DeviceConnector(BaseDate, BaseOrdered):
         
         # return connector instance
         return self._connector
+
+
+# ------ Extend Device Model with some useful shortcuts related to this module ------ #
+
+
+@property
+def connectors(self):
+    """ Nice shortcut to self.deviceconnector_set.all() """ 
+    return self.deviceconnector_set.all()
+
+_connector = False
+
+@property
+def connector(self):
+    """
+    TODO: better explaination
+    Returns the first connector in the order of priority assigned or None if no connector present """
+    # if not retrieved yet
+    if self._connector is False:
+        try:
+            self._connector = self.connectors[0].connector
+        except IndexError:
+            self._connector = None
+    
+    return self._connector
+
+Device.connectors = connectors
+Device._connector = _connector
+Device.connector = connector
+
+Device.extended_by.append('nodeshot.networking.connectors.models.device_connector')

@@ -55,6 +55,9 @@ class Device(BaseAccessLevel):
     
     objects = DeviceManager()
     
+    # list indicating if any other module has extended this model
+    extended_by = []
+    
     class Meta:
         app_label = 'net'
         
