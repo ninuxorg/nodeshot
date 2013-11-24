@@ -87,6 +87,8 @@ The minimum configuration keys that you need to ensure are set according to your
 	SECRET_KEY (see below)
 	ALLOWED_HOSTS
 
+If you are installing for development, you can put "localhost:8000" as SITE_DOMAIN and comment the ALLOWED_HOSTS directive.
+
 Remember to uncomment the secret key setting and slighlty change it:
 
 	#SECRET_KEY = .....
@@ -104,7 +106,23 @@ Create virtual environment, activate and install dependencies:
 	# static files (css, js, images)
 	python manage.py collectstatic
 
-Install uWSGI (for production)
+If you are installing for development, you are done!
+You just need to run the django development server in order to see the web application:
+
+    # for development only!
+    # listens only on 127.0.0.1
+    python manage.py runserver
+    # open browser at http://localhost:8000/admin/
+    
+    # alternatively, if you need to reach the dev server for other computers
+    # on the same LAN, tell it to listen on all the interfaces:
+    python manage.py runserver 0.0.0.0:8000
+
+PRODUCTION INSTALL
+
+In production you will need more reliable instruments, here's how to set them up:
+
+Install uWSGI
 
     # deactivate python virtual environment
     deactivate
@@ -161,7 +179,7 @@ And paste:
     [program:celery]
     directory=/var/django/nodeshot/projects/ninux
 	user=nobody
-    command=/var/django/nodeshot/projects/ninux/python/bin/celery -A cineca worker -l info
+    command=/var/django/nodeshot/projects/ninux/python/bin/celery -A ninux worker -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
@@ -180,7 +198,7 @@ And paste:
 
     [program:celery-beat]
     directory=/var/django/nodeshot/projects/ninux
-    command=/var/django/nodeshot/projects/ninux/python/bin/celery -A cineca beat -s ./celerybeat-schedule -l info
+    command=/var/django/nodeshot/projects/ninux/python/bin/celery -A ninux beat -s ./celerybeat-schedule -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
@@ -298,3 +316,6 @@ Test your installation and if everything works as expected change the DEBUG sett
 Restart all the processes
 
     service nginx restart && supervisorctl restart all
+
+You should be done!
+If you have any issue and you need support we have a mailing list: http://ml.ninux.org/mailman/listinfo/nodeshot
