@@ -16,6 +16,10 @@ class UbiquitiAirOS(SSH):
     _ubntbox = None
     _systemcfg = None
     
+    def __unicode__(self):
+        """ print a human readable object description """
+        return u"<SSH Connector (Ubiquity AirOS): %s@%s>" % (self.username, self.host)
+    
     @property
     def ubntbox(self):
         """

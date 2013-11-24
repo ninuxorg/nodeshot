@@ -12,7 +12,11 @@ class OpenWRT(SSH):
     """
     OpenWRT SSH connector
     """
-       
+    
+    def __unicode__(self):
+        """ print a human readable object description """
+        return u"<SSH Connector (OpenWRT): %s@%s>" % (self.username, self.host)
+    
     def get_device_name(self):
         """ get device name """
         return self.output('uname -a').split(' ')[1]

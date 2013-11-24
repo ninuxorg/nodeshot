@@ -29,7 +29,7 @@ class SSH(object):
     """
     
     # costant
-    REQUIRED_FIELDS = ['username', 'password']
+    REQUIRED_FIELDS = ('username', 'password')
     
     # SSH connection error message
     connection_error = None
@@ -38,7 +38,32 @@ class SSH(object):
         """
         store device_connector as an attribute
         """
+        self.shell = None
         self.device_connector = device_connector
+        self.host = device_connector.host
+        self.username = device_connector.username
+        self.password = device_connector.password
+        self.port = device_connector.port
+    
+    def __unicode__(self):
+        """ print a human readable object description """
+        return u"<SSH Connector: %s@%s>" % (self.username, self.host)
+    
+    def __repr__(self):
+        """ return unicode string represantation """
+        return self.__unicode__()
+    
+    __str__ = __repr__
+    
+    def __del__(self):
+        """
+        when the instance is garbage collected
+        ensure SSH connection is closed
+        """
+        try:
+            self.disconnect()
+        except AttributeError:
+            pass
     
     def clean(self):
         """ validation method which will be called before saving the model in the django admin """
@@ -103,10 +128,10 @@ class SSH(object):
         
         try:
             shell.connect(
-                device_connector.host,
-                username=device_connector.username,
-                password=device_connector.password,
-                port=device_connector.port
+                self.host,
+                username=self.username,
+                password=self.password,
+                port=self.port
             )
             self.shell = shell
             # ok!
@@ -122,6 +147,10 @@ class SSH(object):
     
     def exec_command(self, command, **kwargs):
         """ alias to paramiko.SSHClient.exec_command """
+        # init connection if necessary
+        if self.shell is None:
+            self.connect()
+        
         return self.shell.exec_command(command, **kwargs)
     
     def output(self, command, **kwargs):
@@ -166,12 +195,12 @@ class SSH(object):
         
         # store original login info
         original_login = DeviceConnector(**{
-            "node_id": self.device_connector.node_id,
-            "host": self.device_connector.host,
-            "username": self.device_connector.username,
-            "password": self.device_connector.password,
+            "host": self.host,
+            "username": self.username,
+            "password": self.password,
             "store": True,
-            "port": self.device_connector.port,
+            "port": self.port,
+            "node_id": self.device_connector.node_id,
             "connector_class": self.device_connector.connector_class
         })
         # delete device

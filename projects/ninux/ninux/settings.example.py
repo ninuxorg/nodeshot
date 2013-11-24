@@ -511,8 +511,8 @@ NODESHOT = {
         }
     },
     'CONNECTORS': [
-        ('nodeshot.networking.connectors.classes.UbiquitiAirOS', 'Ubiquiti AirOS'),
-        ('nodeshot.networking.connectors.classes.OpenWRT', 'OpenWRT'),
+        ('nodeshot.networking.connectors.ssh.UbiquitiAirOS', 'Ubiquiti AirOS (SSH)'),
+        ('nodeshot.networking.connectors.ssh.OpenWRT', 'OpenWRT (SSH)'),
     ],
 }
 

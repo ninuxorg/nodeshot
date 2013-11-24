@@ -49,8 +49,13 @@ class DeviceConnector(BaseDate, BaseOrdered):
         """
         Call relative connector's clean method
         """
-        if self.connector:
-            self.connector.clean()
+        # try calling connector's clean method
+        try:
+            if self.connector:
+                self.connector.clean()
+        # if we get an import error the specified path is wrong
+        except (ImportError, AttributeError) as e:
+            raise ValidationError(_('No valid connector class found, got the following python exception: "%s"') % e)
     
     def save(self, *args, **kwargs):
         """
