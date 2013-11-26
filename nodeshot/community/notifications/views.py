@@ -10,8 +10,6 @@ from .serializers import *
 
 class NotificationList(generics.ListAPIView):
     """
-    ### GET
-    
     Retrieve a list of notifications of the current user.
     
     **Available variations through querystring parameters:**
@@ -71,8 +69,6 @@ notification_list = NotificationList.as_view()
 
 class NotificationDetail(generics.RetrieveAPIView):
     """
-    ### GET
-    
     Retrieve specific notification of current user.
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -92,8 +88,6 @@ notification_detail = NotificationDetail.as_view()
 
 class EmailNotificationSettings(generics.RetrieveUpdateAPIView):
     """
-    ### GET
-    
     Retrieve Email Notification settings.
     
     ### PUT & PATCH
@@ -122,8 +116,6 @@ notification_email_settings = EmailNotificationSettings.as_view()
 
 class WebNotificationSettings(EmailNotificationSettings):
     """
-    ### GET
-    
     Retrieve Web Notification settings.
     
     ### PUT & PATCH

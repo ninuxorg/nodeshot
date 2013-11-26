@@ -10,13 +10,14 @@ from .urls import urlpatterns
 @api_view(('GET',))
 def root_endpoint(request, format=None):
     """
-    Summary of RESTful API.
+    List of all the available resources of this RESTful API.
     """
     endpoints = []
     
     # loop over url modules
     for urlmodule in urlpatterns:
         
+        # is it a urlconf module?
         try:
             urlmodule.urlconf_module
             is_urlconf_module = True
@@ -28,6 +29,11 @@ def root_endpoint(request, format=None):
             
             # loop over urls of that module
             for url in urlmodule.urlconf_module.urlpatterns:
+                
+                # TODO: configurable skip url in settings
+                # skip api-docs url
+                if url.name in ['django.swagger.resources.view']:
+                    continue
                 
                 # try adding url to list of urls to show
                 try:

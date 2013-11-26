@@ -48,9 +48,7 @@ def get_queryset_or_404(queryset, kwargs):
 
 class NodeList(NodeListBase):
     """
-    ### GET
-    
-    Retrieve a list of nodes
+    Retrieve list of all published nodes.
     
     **Pagination**:
     
@@ -123,9 +121,7 @@ node_list = NodeList.as_view()
     
 class NodeDetail(NodeDetailBase):
     """
-    ### GET
-    
-    Retrieve details of specified node
+    Retrieve details of specified node.
     
     ### DELETE
     
@@ -170,9 +166,7 @@ node_details = NodeDetail.as_view()
 
 class NodeGeoJSONList(NodeList):
     """
-    ### GET
-    
-    Retrieve nodes in GeoJSON format.
+    Retrieve list of all published nodes in GeoJSON format.
     
     Parameters:
     
@@ -192,9 +186,7 @@ geojson_list = NodeGeoJSONList.as_view()
 
 class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
     """
-    ### GET
-    
-    Retrieve a list of image of the specified node.
+    Retrieve a list of images of the specified node.
     Node must exist and be published.
     
     ### POST
@@ -248,9 +240,7 @@ node_images = NodeImageList.as_view()
 
 class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     """
-    ### GET
-    
-    Retrieve details of specified image
+    Retrieve details of specified image.
     
     ### DELETE
     
@@ -294,9 +284,7 @@ node_image_detail = ImageDetail.as_view()
 
 class StatusList(generics.ListAPIView):
     """
-    ### GET
-    
-    Retrieve all the status and their relative icons.
+    Retrieve a list of all the available statuses and their relative icons/colors.
     """
     model = Status
     serializer_class = StatusListSerializer

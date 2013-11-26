@@ -20,9 +20,7 @@ CONTACT_PERMISSIONS = (permissions.IsAuthenticated,) if settings.NODESHOT['SETTI
 
 class ContactNode(generics.CreateAPIView):
     """
-    ### POST
-    
-    Contact node owner.
+    Contact owner of specified node.
     
     Might require authentication depending on configuration.
     
@@ -59,7 +57,7 @@ class ContactNode(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         """
-        Sends an email to a user.
+        Contact node owner.
         """
         try:
             self.get_object(**kwargs)
@@ -110,9 +108,7 @@ contact_node = ContactNode.as_view()
 
 class ContactUser(ContactNode):
     """
-    ### POST
-    
-    Contact user.
+    Contact specified user.
     
     Might require authentication depending on configuration.
     
@@ -131,9 +127,7 @@ if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
     
     class ContactLayer(ContactNode):
         """
-        ### POST
-        
-        Contact mantainers of a Layer.
+        Contact mantainers of specified Layer.
         
         Might require authentication depending on configuration.
         

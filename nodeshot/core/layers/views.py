@@ -33,9 +33,7 @@ else:
 
 class LayerList(LayerListBase):
     """
-    ### GET
-    
-    Retrieve list of layers.
+    Retrieve list of all layers.
     
     ### POST
     
@@ -55,8 +53,6 @@ layer_list = LayerList.as_view()
 
 class LayerDetail(LayerDetailBase):
     """
-    ### GET
-    
     Retrieve details of specified layer.
     
     ### PUT & PATCH
@@ -159,9 +155,7 @@ nodes_geojson_list = LayerNodesGeoJSONList.as_view()
 
 class LayerGeoJSONList(generics.ListAPIView):
     """
-    ### GET
-    
-    Retrieve layers in GeoJSON format.
+    Retrieve list of layers in GeoJSON format.
     """
     
     serializer_class = GeoLayerListSerializer

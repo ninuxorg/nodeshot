@@ -28,8 +28,6 @@ def get_queryset_or_404(queryset, kwargs):
     
 class AllNodesParticipationList(generics.ListAPIView):
     """
-    ### GET
-    
     Retrieve participation details for all nodes
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -45,8 +43,6 @@ all_nodes_participation= AllNodesParticipationList.as_view()
 
 class AllNodesCommentList(generics.ListAPIView):
     """
-    ### GET
-    
     Retrieve comments  for all nodes
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -62,8 +58,6 @@ all_nodes_comments= AllNodesCommentList.as_view()
  
 class LayerNodesCommentList(generics.ListAPIView):
     """
-    ### GET
-    
     Retrieve comments  for all nodes of a layer
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -89,8 +83,6 @@ layer_nodes_comments= LayerNodesCommentList.as_view()
 
 class LayerNodesParticipationList(generics.ListAPIView):
     """
-    ### GET
-    
     Retrieve participation details for all nodes of a layer
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -116,8 +108,6 @@ layer_nodes_participation= LayerNodesParticipationList.as_view()
 
 class NodeParticipationDetail(generics.RetrieveAPIView):
     """
-    ### GET
-    
     Retrieve participation details for a node
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -130,8 +120,6 @@ node_participation = NodeParticipationDetail.as_view()
 
 class NodeParticipationSettingsDetail(generics.RetrieveAPIView):
     """
-    ### GET
-    
     Retrieve participation settings for a node
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -144,8 +132,6 @@ node_participation_settings = NodeParticipationSettingsDetail.as_view()
 
 class LayerParticipationSettingsDetail(generics.RetrieveAPIView):
     """
-    ### GET
-    
     Retrieve participation settings for a layer
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -157,8 +143,6 @@ layer_participation_settings = LayerParticipationSettingsDetail.as_view()
 
 class NodeCommentList(CustomDataMixin, generics.ListCreateAPIView):
     """
-    ### GET
-    
     Retrieve a **list** of comments for the specified node
     
     ### POST
@@ -196,8 +180,6 @@ node_comments = NodeCommentList.as_view()
 
 class NodeRatingList(CustomDataMixin,generics.CreateAPIView):
     """
-    ### GET
-    
     Not allowed
     
     ### POST
@@ -235,14 +217,7 @@ node_ratings = NodeRatingList.as_view()
 
 class NodeVotesList(CustomDataMixin,generics.CreateAPIView):
     """
-    ### GET
-    
-    Not allowed
-    
-    ### POST
-    
     Add a vote for the specified node
-
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -271,11 +246,3 @@ class NodeVotesList(CustomDataMixin,generics.CreateAPIView):
         self.queryset = Vote.objects.filter(node_id=self.node.id)
 
 node_votes = NodeVotesList.as_view()
-
-
-from django.shortcuts import render
-from django.conf import settings
-
-def map_view(request):
-    
-    return render(request, 'participation/index.html')
