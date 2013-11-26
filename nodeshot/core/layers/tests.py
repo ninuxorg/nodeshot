@@ -164,7 +164,7 @@ class LayerTest(TestCase):
         
     def test_layers_api_results(self,*args,**kwargs):
         """
-        Layers endpoint should return the expected number of objects
+        layers resources should return the expected number of objects
         """
         layer = Layer.objects.get(pk=1)
         layer_count = Layer.objects.all().count()
@@ -181,12 +181,19 @@ class LayerTest(TestCase):
         layer_public_nodes_count = Node.objects.filter(layer=layer).published().access_level_up_to('public').count()
         self.assertEqual(len(response.data['nodes']['results']), layer_public_nodes_count)
         
-        # api_layer_nodes_geojson
-        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]), { 'limit': 0 })
+        # ensure number of elements is the expected, even by disabling layerinfo and pagination
+        response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]), { 'limit': 0, 'layerinfo': 'false' })
+        self.assertEqual(len(response.data), layer_public_nodes_count)
         
+        # api_layer_nodes_geojson
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]), { 'limit': 0, 'layerinfo': 'true' })
         # each of 'features' values in geojson is a node
-        api_layer_nodes = len(response.data['nodes']['features'])
         self.assertEqual(len(response.data['nodes']['features']), layer_public_nodes_count)
+        
+        # test layer info geojson without layerinfo
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]), { 'limit': 0 })
+        # ensure "features" are at root level
+        self.assertEqual(len(response.data['features']), layer_public_nodes_count)
         
     def test_layers_api_post(self):
         layer_count = Layer.objects.all().count()
