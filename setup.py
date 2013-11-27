@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from setuptools.command.test import test
 
-from .nodeshot import get_version
+from nodeshot import get_version
 
 
 #class TestCommand(test):
@@ -16,7 +16,7 @@ setup(
     description="Extensible Django web application for management of community-led georeferenced data.",
     long_description=open('README.md').read(),
     author='Federico Capoano',
-    author_email='federico[at]nemesisdesign[dot]net',
+    author_email='nemesis[at]ninux[dot]org',
     license='GPL3',
     url='https://github.com/nemesisdesign/nodeshot',
     packages=find_packages(exclude=['docs', 'docs.*']),
