@@ -71,7 +71,7 @@ PORT = '8000' if DEBUG else None
 SITE_URL = '%s://%s' % (PROTOCOL, DOMAIN)
 ALLOWED_HOSTS = [DOMAIN]  # check https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts for more info
 
-if PORT != '80':
+if PORT not in ['80', '433']:
     SITE_URL = '%s:%s' % (SITE_URL, PORT)
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
