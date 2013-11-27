@@ -3,8 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+********
 Nodeshot
-====================================
+********
 
 Nodeshot is an open source platform for **crowdsourcing georeferenced data**.
 
@@ -14,7 +15,17 @@ It is designed to be modular, flexible, configurable and extensible.
 
 **This documentation is a work in progress**.
 
-Contents:
+============
+Mailing list
+============
+
+If you have any issue or you want to follow the development of this software you can reach us at our `Mailing List`_.
+
+.. _Mailing List: http://ml.ninux.org/mailman/listinfo/nodeshot
+
+========
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
@@ -23,7 +34,7 @@ Contents:
    /topics/connectors
 
 
-
+==================
 Indices and tables
 ==================
 
