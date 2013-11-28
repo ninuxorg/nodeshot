@@ -64,6 +64,7 @@ Contents
    /topics/install
    /topics/admin
    /topics/api
+   /topics/interoperability
    /topics/connectors
 
 
