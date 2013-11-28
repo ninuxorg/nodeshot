@@ -1,0 +1,101 @@
+{
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "id":"55508992",
+      "properties":{
+        "LOCATION":"VIA CASILINA",
+        "TIMESTAMP": "09-09-2013 22:31:00",
+        "VELOCITY": 44
+      },
+      "geometry":{
+        "type":"LineString",
+        "coordinates":[
+          [
+            12.533390045166,
+            41.883148193359
+          ],
+          [
+            12.533679962158,
+            41.883079528809
+          ]
+        ]
+      }
+    },
+    {
+      "type":"Feature",
+      "id":"55508993",
+      "properties":{
+        "LOCATION":"VIA PESCARA",
+        "TIMESTAMP": "09-09-2013 22:31:00",
+        "VELOCITY": 42
+      },
+      "geometry":{
+        "type":"LineString",
+        "coordinates":[
+          [
+            12.523180007935,
+            41.882789611816
+          ],
+          [
+            12.523420333862,
+            41.882888793945
+          ],
+          [
+            12.52446937561,
+            41.883251190185
+          ]
+        ]
+      }
+    },
+    {
+      "type":"Feature",
+      "id":"55508994",
+      "properties":{
+        "LOCATION":"VIA ENNA",
+        "TIMESTAMP": "09-09-2013 22:31:00",
+        "VELOCITY": 53
+      },
+      "geometry":{
+        "type":"LineString",
+        "coordinates":[
+          [
+            12.523180007935,
+            41.882789611816
+          ],
+          [
+            12.523159980774,
+            41.882919311523
+          ],
+          [
+            12.522840499878,
+            41.883689880371
+          ]
+        ]
+      }
+    },
+    {
+      "type":"Feature",
+      "id":"55508995",
+      "properties":{
+        "LOCATION":"VIA VISCONTE MAGGIOLO",
+        "TIMESTAMP": "09-09-2013 22:31:00",
+        "VELOCITY": 31
+      },
+      "geometry":{
+        "type":"LineString",
+        "coordinates":[
+          [
+            12.542269706726,
+            41.883331298828
+          ],
+          [
+            12.543259620667,
+            41.883281707764
+          ]
+        ]
+      }
+    }
+  ]
+}

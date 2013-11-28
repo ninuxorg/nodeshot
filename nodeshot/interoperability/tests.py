@@ -289,17 +289,17 @@ class InteroperabilityTest(TestCase):
         sys.stdout = sys.__stdout__
         
         # ensure following text is in output
-        self.assertIn('18 streets added', output.getvalue())
+        self.assertIn('20 streets added', output.getvalue())
         self.assertIn('0 streets changed', output.getvalue())
-        self.assertIn('18 total external', output.getvalue())
-        self.assertIn('18 total local', output.getvalue())
+        self.assertIn('20 total external', output.getvalue())
+        self.assertIn('20 total local', output.getvalue())
         self.assertIn('Updated measurements of 4 street segments', output.getvalue())
         
         # start checking DB too
         nodes = layer.node_set.all()
         
         # ensure all nodes have been imported
-        self.assertEqual(nodes.count(), 18)
+        self.assertEqual(nodes.count(), 20)
         
         # check one particular node has the data we expect it to have
         node = Node.objects.get(slug='via-di-santa-prisca')
@@ -361,16 +361,16 @@ class InteroperabilityTest(TestCase):
         sys.stdout = sys.__stdout__
         
         # ensure following text is in output
-        self.assertIn('3 streets added', output.getvalue())
+        self.assertIn('5 streets added', output.getvalue())
         self.assertIn('16 streets unmodified', output.getvalue())
-        self.assertIn('2 streets deleted', output.getvalue())
+        self.assertIn('4 streets deleted', output.getvalue())
         self.assertIn('0 streets changed', output.getvalue())
-        self.assertIn('19 total external', output.getvalue())
-        self.assertIn('19 total local', output.getvalue())
+        self.assertIn('21 total external', output.getvalue())
+        self.assertIn('21 total local', output.getvalue())
         self.assertIn('No measurements found', output.getvalue())
         
         # ensure all nodes have been imported
-        self.assertEqual(nodes.count(), 19)
+        self.assertEqual(nodes.count(), 21)
         
         # ensure last_time_streets_checked is today
         layer = Layer.objects.get(pk=layer.id)
