@@ -6,20 +6,31 @@ This file describes how to install nodeshot on **Ubuntu Server 12.04 LTS**.
 
 Other linux distributions will work as well but you will need to find the right package names to install for the specific distribution you are using.
 
-If you are installing for a **development environment** you need to follow at least the instructions described in the section :ref:`required-instructions`.
+If you are installing for a **development environment** you need to follow the instructions until the section :ref:`project-configuration`.
+
+If you already have the required dependencies installed you can skip to :ref:`install-python-packages` and follow until :ref:`project-configuration`.
 
 If you are installing for a **production environment** you need to follow all the instructions including :ref:`production-instructions`.
 
 **Required dependencies**:
 
 * Postgresql 9.1+
+* Geospatial libraries and plugins (GEOS, Proj, Postgresql Contrib, ecc)
 * Postgis 2.0+
+* Python 2.6+
+* Python Libraries (Virtualenv, setuptools, python-dev)
 * Git
-* python 2.6+
+
+**Required python packages**:
+
 * Django 1.5.5
-* Python Virtual Environment
- 
-Recommended stack for production environment:
+* Django Rest Framework 2.3.7
+
+A full list is available in the `requirements.txt file`_.
+
+.. _requirements.txt file: https://github.com/nemesisdesign/nodeshot/blob/master/requirements.txt
+
+**Recommended stack for production environment**:
 
 * Nginx
 * uWSGI
@@ -27,13 +38,13 @@ Recommended stack for production environment:
 * Redis
 
 
-.. _required-instructions:
+.. _install-dependencies:
 
-=====================
-Required instructions
-=====================
+====================
+Install dependencies
+====================
 
-First of all, become ``root``::
+First of all I suggest to become ``root`` to avoid typing sudo each time::
 
 	sudo -s
 
@@ -62,6 +73,48 @@ Download and compile **Postgis 2.0**::
 	sudo ldconfig
 	sudo make comments-install
 
+Now you need to install the required python libraries (setup tools, virtual env, python-dev)::
+
+	apt-get install python-setuptools python-virtualenv python-dev
+
+And **Git**::
+
+    apt-get install git-core
+
+
+.. _install-python-packages:
+
+=======================
+Install python packages
+=======================
+
+First of all, create the folder in which we will store the repository::
+
+    # TODO: better naming and directory structure
+	mkdir /var/django
+	cd /var/django
+
+Clone git repository::
+
+    # TODO: best to install via pip when the project is at a more mature stage
+	git clone https://github.com/nemesisdesign/nodeshot.git nodeshot
+	cd nodeshot
+	git checkout refactoring
+
+Create a **python virtual environment**, activate it and install dependencies::
+
+	cd /var/django/nodeshot/projects/ninux
+	virtualenv python
+	source python/bin/activate
+	pip install -r ../../requirements.txt
+
+
+.. _create-database:
+
+===============
+Create database
+===============
+
 Set ``postgres`` user password::
 
 	passwd postgres
@@ -80,24 +133,16 @@ create a user and grant all privileges to the newly created DB::
 	CREATE EXTENSION hstore;
 	CREATE USER nodeshot WITH PASSWORD 'your_password';
 	GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to nodeshot;
+    
+    # exit and go back to being root
 
-Now you need to install the required python libraries::
 
-	apt-get install python-setuptools python-virtualenv python-dev
+.. _project-configuration:
 
-And **Git**::
+=====================
+Project configuration
+=====================
 
-    apt-get install git-core
-
-Clone git repository::
-
-    # TODO: best to install via pip when the project is at a more mature stage
-	mkdir /var/django
-	cd /var/django
-	git clone https://github.com/nemesisdesign/nodeshot.git nodeshot
-	cd nodeshot
-	git checkout refactoring
-	
 .. TODO: write how to:
 ..  * create a project
 ..  * secret key
@@ -128,12 +173,8 @@ Change secret key in ``settings.py``::
 	# must be uncommented
 	SECRET_KEY = 'keep same length but change some characters'
 
-Create a **python virtual environment**, activate it and install dependencies::
+Setup database and static files (images, css, js)
 
-	cd /var/django/nodeshot/projects/ninux
-	virtualenv python
-	source python/bin/activate
-	pip install -r ../../requirements.txt
 	# will prompt you to create a superuser, proceed!
 	python manage.py syncdb && python manage.py migrate
 	# static files (css, js, images)
@@ -167,11 +208,11 @@ In production you will need more reliable instruments, we recommend the followin
 * **Supervisor**: daemon process manager (used to manage uwsgi, celery and celery-beat)
 * **Redis**: in memory key-value store (used as a message broker and cache storage)
 
--------------
-Install Nginx
--------------
+-----
+Nginx
+-----
 
-Nginx is the recommended webserver for nodeshot.
+**Nginx** is the recommended webserver for nodeshot.
 
 Alternatively you could also use any other webserver like apache2 or lighthttpd but it won't be covered in this doc.
 
@@ -256,15 +297,15 @@ and paste::
         return 301 https://$host$request_uri;
     }
 
--------------
-Install uWSGI
--------------
+-----
+uWSGI
+-----
 
-uWSGI is a performant and scalable application server written in C.
+**uWSGI** is a performant and scalable application server written in C.
 
 We will use it to serve requests to the nodeshot django apps.
 
-Install the latest version via pip:
+Install the latest version via pip::
 
     # deactivate python virtual environment
     deactivate
@@ -290,15 +331,21 @@ Paste this config::
     home=/var/django/nodeshot/projects/ninux/python
     enable-threads=True
 
-Install supervisord::
+----------
+Supervisor
+----------
+
+We will use `Supervisor`_ as a process manager. Install it via your package system (or alternatively via pip)::
 
 	sudo apt-get install supervisor
 
+.. _Supervisor: http://supervisord.org/
+
 Create new config file::
 
-    vim /etc/supervisor/conf.d/nodeshot.conf
+    vim /etc/supervisor/conf.d/uwsgi.conf
 
-Save this in ``/etc/supervisor/conf.d/nodeshot.conf``::
+Save this in ``/etc/supervisor/conf.d/uwsgi.conf``::
 
     [program:uwsgi]
     user=uwsgi
@@ -312,7 +359,7 @@ Save this in ``/etc/supervisor/conf.d/nodeshot.conf``::
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=5
 
-Repeat the same for celery::
+Repeat in a similar way for celery::
 
     vim /etc/supervisor/conf.d/celery.conf
 
@@ -332,7 +379,7 @@ And paste::
     stopwaitsecs=600
     numprocs=1
 
-And celery-beat::
+Now repeat in a similar way for celery-beat::
 
     vim /etc/supervisor/conf.d/celery-beat.conf
 
@@ -358,7 +405,11 @@ You can check the status with::
 
     supervisorctl status
 
-And you can also start, stop and restart.
+And you can also use other commands like start, stop and restart.
+
+-----
+Redis
+-----
 
 Install **Redis**, we will use it as a message broker for *Celery* and as a *Cache Storage*::
 
@@ -377,7 +428,11 @@ Change the ``DEBUG`` setting to ``False``, leaving it to ``True`` **might lead t
 	
 	# save and exit
 
-Restart all the processes::
+--------------------
+Restart all processes
+--------------------
+
+Restart all the processes to reload the new configurations::
 
     service nginx restart && supervisorctl restart all
 
