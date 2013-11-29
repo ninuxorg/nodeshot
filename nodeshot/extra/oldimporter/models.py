@@ -113,7 +113,6 @@ class OldInterface(models.Model):
     ipv6_address = models.GenericIPAddressField(protocol='IPv6', verbose_name=_('ipv6 address'), blank=True, null=True, unique=True, default=None)
     mac_address = models.CharField(max_length=17, blank=True, null=True, unique=True, default=None)
     type = models.CharField(max_length=10, choices=INTERFACE_TYPE)
-    # TODO: add translation
     cname = models.SlugField(_('cname'), help_text=_('Name used for DNS resolution. Example: eth0 becomes eth0.devicecname.nodename.domain.org. If left empty the interface type is used as default.'), max_length=30, blank=True, null=True)
     device = models.ForeignKey(OldDevice)
     draw_link = models.BooleanField(_('Draw links'), help_text=_('Draw links from/to this interface (not valid for VPN interfaces)'), default=True, blank=True)
@@ -223,22 +222,3 @@ class OldContact(models.Model):
         verbose_name_plural = _('Contact Logs')
         app_label = 'old_nodeshot'
         db_table = 'nodeshot_contact'
-
-
-# for UserProfile
-#from django.contrib.auth.models import User
-    
-#class UserProfile(models.Model):
-#    """
-#    Extending django's user model so we can have an additional field
-#    where we can specify if admins should receive notifications or not
-#    
-#    https://docs.djangoproject.com/en/dev/topics/auth/#storing-additional-information-about-users
-#    """
-#    
-#    user = models.OneToOneField(User)
-#    receive_notifications = models.BooleanField(_('Email notifications'), help_text=_('Activate/deactivate email notifications about the management of the map server (added nodes, deleted nodes, abuses, ecc).'))
-#    
-#    class Meta:
-#        app_label = 'old_nodeshot'
-#        db_table = 'nodeshot_userprofile'

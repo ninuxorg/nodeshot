@@ -1,0 +1,35 @@
+[
+    {
+        "pk": 1, 
+        "model": "nodes.status", 
+        "fields": {
+            "is_default": true, 
+            "slug": "potential", 
+            "description": "Potential node", 
+            "order": 0, 
+            "name": "Potential"
+        }
+    },
+    {
+        "pk": 2, 
+        "model": "nodes.status", 
+        "fields": {
+            "is_default": false, 
+            "slug": "planned", 
+            "description": "Planned node", 
+            "order": 1, 
+            "name": "Planned"
+        }
+    },
+    {
+        "pk": 3, 
+        "model": "nodes.status", 
+        "fields": {
+            "is_default": false, 
+            "slug": "active", 
+            "description": "Active node", 
+            "order": 2, 
+            "name": "Active"
+        }
+    }
+]

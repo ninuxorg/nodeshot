@@ -59,7 +59,7 @@ Build **GEOS** library from source::
 	cd geos-3.3.8
 	./configure
 	make
-	sudo make install
+	make install
 	cd ..
 
 Download and compile **Postgis 2.0**::
@@ -69,9 +69,9 @@ Download and compile **Postgis 2.0**::
 	cd postgis-2.0.3
 	./configure
 	make
-	sudo make install
-	sudo ldconfig
-	sudo make comments-install
+	make install
+	ldconfig
+	make comments-install
 
 Now you need to install the required python libraries (setup tools, virtual env, python-dev)::
 
@@ -114,6 +114,9 @@ Now install all the required python packages, it will take a bit::
 
     pip install -r /var/www/nodeshot/requirements.txt
 
+And update the distribute python package:
+
+    pip install -U distribute  # -U stands for upgrade
 
 .. _create-database:
 
@@ -360,7 +363,7 @@ Supervisor
 
 We will use `Supervisor`_ as a process manager. Install it via your package system (or alternatively via pip)::
 
-	sudo apt-get install supervisor
+	apt-get install supervisor
 
 .. _Supervisor: http://supervisord.org/
 

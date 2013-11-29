@@ -31,7 +31,7 @@ from nodeshot.core.nodes.models import Node, Status
 from nodeshot.networking.net.models import *
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 from nodeshot.networking.links.models import Link
-from nodeshot.networking.links.choices import LINK_STATUS, LINK_TYPES, METRIC_TYPES
+from nodeshot.networking.links.models.choices import LINK_STATUS, LINK_TYPES, METRIC_TYPES
 from nodeshot.community.mailing.models import Inward
 from nodeshot.extra.oldimporter.models import *
 
@@ -65,14 +65,14 @@ class Command(BaseCommand):
             * USER: assign owner (the link is the email)
             * LAYER: assign layer (layers must be created by hand first!):
                 1. if node has coordinates comprised in a specified layer choose that
-                2. if there are more than one layer prompt the user which one to choose
-                3. if there is no layer in those coordinates:
-                    1. use default layer (configured in settings)
-                    2. discard the node (if no default specified)
+                2. if node has coordinates comprised in more than one layer prompt the user which one to choose
+                3. if node does not have coordinates comprised in any layer:
+                    1. use default layer if specified (configured in settings)
+                    2. discard the node if no default layer specified
             * STATUS: assign status depending on configuration:
                 settings.NODESHOT['OLD_IMPORTER']['STATUS_MAPPING'] must be a dictionary in which the
                 key is the old status value while the value is the new status value
-                if settings.NODESHOT['OLD_IMPORTER']['STATUS_MAPPING'] is False default status will be used
+                if settings.NODESHOT['OLD_IMPORTER']['STATUS_MAPPING'] is False the default status will be used
             * HOSTPOT: if status is hotspot or active and hotspot add this info in HSTORE data field
             
     4.  Import devices
@@ -84,7 +84,7 @@ class Command(BaseCommand):
     
     7.  Import Contacts
     
-    Decide what to do with statistics and hna.
+    TODO: Decide what to do with statistics and hna.
     """
     help = 'Import old nodeshot data. Layers and Status must be created first.'
     
@@ -651,6 +651,8 @@ choose (enter the number of) one of the following layers:
                 self.verbose('Skipping to next cycle')
                 continue
             
+            old_bandwidth = [old_link.sync_tx, old_link.sync_rx]
+            
             link = Link(**{
                 "id": old_link.id,
                 "interface_a": interface_a,
@@ -660,8 +662,8 @@ choose (enter the number of) one of the following layers:
                 "metric_type": 'etx',
                 "metric_value": old_link.etx,
                 "dbm": old_link.dbm,
-                "tx_rate": old_link.sync_tx,
-                "rx_rate": old_link.sync_rx,
+                "min_rate": min(old_bandwidth),
+                "max_rate": max(old_bandwidth),
             })
             if old_link.hide:
                 link.access_level = 3

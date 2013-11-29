@@ -65,6 +65,7 @@ Contents
    /topics/admin
    /topics/api
    /topics/interoperability
+   /topics/oldimporter
    /topics/connectors
 
 
