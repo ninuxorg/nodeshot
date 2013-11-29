@@ -30,8 +30,7 @@ celerybeat-schedule
 runtests
 coverage
 load_fixtures.sh
-
+startup.py
 __GRAFICA
 celery.log
 projects/ninux/server.py
-

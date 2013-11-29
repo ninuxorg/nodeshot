@@ -88,25 +88,31 @@ And **Git**::
 Install python packages
 =======================
 
-First of all, create the folder in which we will store the repository::
+First of all, create the directory structure, a typical web app is usually installed in ``/var/www/``::
 
-    # TODO: better naming and directory structure
-	mkdir /var/django
-	cd /var/django
+	mkdir /var/www/ && cd /var/www/
 
-Clone git repository::
+Clone git repository and cd into the example project.
 
-    # TODO: best to install via pip when the project is at a more mature stage
+*TODO: best to install via pip when the project is at a more mature stage*::
+
 	git clone https://github.com/nemesisdesign/nodeshot.git nodeshot
-	cd nodeshot
-	git checkout refactoring
+	cd nodeshot/projects/ninux
 
-Create a **python virtual environment**, activate it and install dependencies::
+Create a **python virtual environment**, a self-contained python installation
+which will store all our python packages indipendently from the packages installed systemwide.
 
-	cd /var/django/nodeshot/projects/ninux
-	virtualenv python
-	source python/bin/activate
-	pip install -r ../../requirements.txt
+The virtual env needs to be activated in order to be used transparently
+(eg: without having to specify the full path of the python executables each time).
+
+This can be done with two simple commands::
+
+    virtualenv python
+    source python/bin/activate
+
+Now install all the required python packages, it will take a bit::
+
+    pip install -r /var/www/nodeshot/requirements.txt
 
 
 .. _create-database:
@@ -133,8 +139,10 @@ create a user and grant all privileges to the newly created DB::
 	CREATE EXTENSION hstore;
 	CREATE USER nodeshot WITH PASSWORD 'your_password';
 	GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to nodeshot;
-    
-    # exit and go back to being root
+
+exit (press CTRL+D) and go back to being root::
+
+    exit
 
 
 .. _project-configuration:
@@ -149,8 +157,8 @@ Project configuration
 
 Copy ``settings.example.py`` and modify according to needs::
 
-	cp settings.example.py settings.py
-	vim settings.py
+	cp ninux/settings.example.py ninux/settings.py
+	vim ninux/settings.py
 
 The minimum setting keys that you need to change are the following:
 
@@ -173,7 +181,7 @@ Change secret key in ``settings.py``::
 	# must be uncommented
 	SECRET_KEY = 'keep same length but change some characters'
 
-Setup database and static files (images, css, js)
+Setup database and static files (images, css, js)::
 
 	# will prompt you to create a superuser, proceed!
 	python manage.py syncdb && python manage.py migrate
@@ -220,10 +228,6 @@ You can install from the system packages with the following command::
 
 	apt-get install nginx-full nginx-common openssl zlib-bin
 
-Now create a dummy public folder::
-
-    mkdir /var/www/nodeshot	
-
 Create a temporary self signed SSL certificate (or install your own one if you already have it)::
 
     mkdir /etc/nginx/ssl
@@ -234,22 +238,25 @@ Copy ``uwsgi_params`` file::
 
     cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/
 
+Create public folder::
+
+    mkdir /var/www/nodeshot/public_html
+
 Create site configuration (replace ``nodeshot.yourdomain.com`` with your domain)::
 
-    mkdir /etc/nginx/sites-available/nodeshot.yourdomain.com
     vim /etc/nginx/sites-available/nodeshot.yourdomain.com
 
-and paste::
+Paste this configuration and tweak it according to your needs::
 	
     server {
         listen   443; ## listen for ipv4; this line is default and implied
         listen   [::]:443 default ipv6only=on; ## listen for ipv6
         
-        root /var/www/nodeshot;
+        root /var/www/nodeshot/public_html;
         index index.html index.htm;
         
-        # Make site accessible from domain
-        # change this according to your domain
+        # Make site accessible from hostanme
+        # change this according to your domain/hostanme
         server_name nodeshot.yourdomain.com;
         
         ssl on;
@@ -266,6 +273,14 @@ and paste::
             uwsgi_pass 127.0.0.1:3031;
             include uwsgi_params;
             uwsgi_param HTTP_X_FORWARDED_PROTO https;
+        }
+        
+        location /static/ {
+            alias /var/www/nodeshot/projects/ninux/ninux/static/;
+        }
+        
+        location /media/ {
+            alias /var/www/nodeshot/projects/ninux/ninux/media/;
         }
         
         #error_page 404 /404.html;
@@ -289,13 +304,21 @@ and paste::
         listen   80; ## listen for ipv4; this line is default and implied
         listen   [::]:80 default ipv6only=on; ## listen for ipv6
         
-        # Make site accessible from domain on port 80
-        # change this according to your domain
+        # Make site accessible from hostanme on port 80
+        # change this according to your domain/hostanme
         server_name nodeshot.yourdomain.com;
         
         # redirect all requests to https
         return 301 https://$host$request_uri;
     }
+
+Create a symbolic link to sites-enabled directory::
+
+    ln -s /etc/nginx/sites-available/nodeshot.yourdomain.com /etc/nginx/sites-enabled/nodeshot.yourdomain.com
+
+Test config, ensure it does not fail::
+
+    service nginx configtest
 
 -----
 uWSGI
@@ -314,21 +337,21 @@ Install the latest version via pip::
 
 Create a new ini configuration file::
 
-    vim /var/django/nodeshot/projects/ninux/wsgi.ini
+    vim /var/www/nodeshot/projects/ninux/uwsgi.ini
     
 Paste this config::
 
     [uwsgi]
-    chdir=/var/django/nodeshot/projects/ninux
+    chdir=/var/www/nodeshot/projects/ninux
     module=ninux.wsgi:application
     master=True
-    pidfile=/var/django/nodeshot/projects/ninux/uwsgi.pid
+    pidfile=/var/www/nodeshot/projects/ninux/uwsgi.pid
     socket=127.0.0.1:3031
     processes=2
     harakiri=20
     max-requests=5000
     vacuum=True
-    home=/var/django/nodeshot/projects/ninux/python
+    home=/var/www/nodeshot/projects/ninux/python
     enable-threads=True
 
 ----------
@@ -349,13 +372,13 @@ Save this in ``/etc/supervisor/conf.d/uwsgi.conf``::
 
     [program:uwsgi]
     user=uwsgi
-    directory=/var/django/nodeshot/projects/ninux
+    directory=/var/www/nodeshot/projects/ninux
     command=uwsgi --ini uwsgi.ini
     autostart=true
     autorestart=true
     stopsignal=INT
     redirect_stderr=true
-    stdout_logfile=/var/django/nodeshot/projects/ninux/uwsgi.log
+    stdout_logfile=/var/www/nodeshot/projects/ninux/uwsgi.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=5
 
@@ -366,13 +389,13 @@ Repeat in a similar way for celery::
 And paste::
 
     [program:celery]
-    directory=/var/django/nodeshot/projects/ninux
+    directory=/var/www/nodeshot/projects/ninux
     user=nobody
-    command=/var/django/nodeshot/projects/ninux/python/bin/celery -A ninux worker -l info
+    command=/var/www/nodeshot/projects/ninux/python/bin/celery -A ninux worker -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
-    stdout_logfile=/var/django/nodeshot/projects/ninux/celery.log
+    stdout_logfile=/var/www/nodeshot/projects/ninux/celery.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=10
     startsecs=10
@@ -386,12 +409,12 @@ Now repeat in a similar way for celery-beat::
 And paste::
 
     [program:celery-beat]
-    directory=/var/django/nodeshot/projects/ninux
-    command=/var/django/nodeshot/projects/ninux/python/bin/celery -A ninux beat -s ./celerybeat-schedule -l info
+    directory=/var/www/nodeshot/projects/ninux
+    command=/var/www/nodeshot/projects/ninux/python/bin/celery -A ninux beat -s ./celerybeat-schedule -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
-    stdout_logfile=/var/django/nodeshot/projects/ninux/celery-beat.log
+    stdout_logfile=/var/www/nodeshot/projects/ninux/celery-beat.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=10
     startsects=10
@@ -412,21 +435,23 @@ Redis
 -----
 
 Install **Redis**, we will use it as a message broker for *Celery* and as a *Cache Storage*::
+	
+    add-apt-repository ppa:chris-lea/redis-server
+    apt-get update
+    apt-get install redis-server
+	
+Install celery bindings in your virtual environment::
 
+    cd /var/www/nodeshot/projects/ninux
+    source python/bin/activate
     pip install -U celery[redis]
-	
-	add-apt-repository ppa:chris-lea/redis-server
-	apt-get update
-	apt-get install redis-server
-	
+
 Change the ``DEBUG`` setting to ``False``, leaving it to ``True`` **might lead to poor performance or security issues**::
     
-    vim /var/django/nodeshot/projects/ninux/ninux/settings.py
-	
-	# set DEBUG to False
-	DEBUG = False
-	
-	# save and exit
+    vim /var/www/nodeshot/projects/ninux/ninux/settings.py
+    # set DEBUG to False
+    DEBUG = False
+    # save and exit
 
 --------------------
 Restart all processes

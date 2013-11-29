@@ -16,6 +16,16 @@ These strategies are implemented through some Python classes called **"Synchroni
 
 New synchronizers can be written ad hoc for each application that need to be supported.
 
+=====================
+Internal dependencies
+=====================
+
+For the **interoperability** module to work, the following apps must be listed in ``settings.INSTALLED_APPS``:
+
+ * nodeshot.core.layers
+ * nodeshot.core.nodes
+ * nodeshot.interoperability
+
 =================
 Required settings
 =================
@@ -23,7 +33,10 @@ Required settings
 the module ``nodeshot.interoperability`` needs to be in ``settings.INSTALLED_APPS``::
 
     INSTALLED_APPS = [
-        # ...
+        # dependencies
+        'nodeshot.core.layers',
+        'nodeshot.core.nodes',
+        # interoperabiliy module
         'nodeshot.interoperability',
         # ...
     ]

@@ -3,7 +3,7 @@
 import os
 import sys
 
-sys.path.append('/var/django/nodeshot/')
+sys.path.append('/var/www/nodeshot/')
 
 DEBUG = True
 SERVE_STATIC = DEBUG
@@ -70,7 +70,7 @@ PORT = '8000' if DEBUG else None
 SITE_URL = '%s://%s' % (PROTOCOL, DOMAIN)
 ALLOWED_HOSTS = [DOMAIN]  # check https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts for more info
 
-if PORT not in ['80', '433']:
+if PORT and PORT not in ['80', '433']:
     SITE_URL = '%s:%s' % (SITE_URL, PORT)
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -201,7 +201,7 @@ INSTALLED_APPS = [
     # run "pip install MySQL-python"
     # you might need to run also a similar command according to your own OS distribution:
     # sudo apt-get install libmysqlclient-dev
-    #'nodeshot.extra.oldimporter',  
+    #'nodeshot.extra.oldimporter',
     
     # 3d parthy django apps
     'rest_framework',
@@ -253,14 +253,14 @@ LOGGING = {
         #    'formatter': 'verbose',
         #    'filename': 'ninux.log'
         #},
-        'logfile': {
-            'level':'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename': SITE_ROOT + "/debug.log",
-            'maxBytes': 50000,
-            'backupCount': 2,
-            'formatter': 'custom',
-        },
+        #'logfile': {
+        #    'level':'DEBUG',
+        #    'class':'logging.handlers.RotatingFileHandler',
+        #    'filename': SITE_ROOT + "/debug.log",
+        #    'maxBytes': 50000,
+        #    'backupCount': 2,
+        #    'formatter': 'custom',
+        #},
     },
     'loggers': {
         #'django': {
@@ -273,18 +273,18 @@ LOGGING = {
         #    'level': 'DEBUG',
         #    'propagate': True,
         #},
-        'nodeshot.community.mailing': {
-            'handlers': ['logfile'],
-            'level': 'DEBUG',
-        },
-        'nodeshot.core.layers': {
-            'handlers': ['logfile'],
-            'level': 'DEBUG',
-        },
-        'nodeshot.community.profiles': {
-            'handlers': ['logfile'],
-            'level': 'DEBUG',
-        },
+        #'nodeshot.community.mailing': {
+        #    'handlers': ['logfile'],
+        #    'level': 'DEBUG',
+        #},
+        #'nodeshot.core.layers': {
+        #    'handlers': ['logfile'],
+        #    'level': 'DEBUG',
+        #},
+        #'nodeshot.community.profiles': {
+        #    'handlers': ['logfile'],
+        #    'level': 'DEBUG',
+        #},
     },
     'formatters': {
         'verbose': {
