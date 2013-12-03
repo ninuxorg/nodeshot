@@ -9,7 +9,7 @@ CURRENT STATUS
 --------------
 
 New refactored major version under active development here:
-https://github.com/nemesisdesign/nodeshot/tree/refactoring
+https://github.com/nemesisdesign/nodeshot/
 
 Stay tuned.
 
