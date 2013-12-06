@@ -3,12 +3,25 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db.models import Q
 
 from nodeshot.core.layers.models import Layer
+
 from importlib import import_module
+from optparse import make_option
 
 
 class Command(BaseCommand):
     args = '<layer_slug layer_slug ...>'
     help = 'Synchronize external layers with the local database'
+    
+    option_list = BaseCommand.option_list + (
+        make_option('--exclude',
+            action='store',
+            dest='exclude',
+            default=[],
+            help='Exclude specific layers from synchronization\n\
+                 Supply a comma separated string of layer slugs\n\
+                 e.g. --exclude=layer1-slug,layer2-slug,layer3-slug\n\
+                 (works only if no layer has been specified)'),
+    )
 
     def retrieve_layers(self, *args, **options):
         """
@@ -18,10 +31,21 @@ class Command(BaseCommand):
         # init empty Q object
         queryset = Q()
         
-        # if no arguments provided retrieve and return all external layers
+        # if no layer specified
         if len(args) < 1:
-            self.verbose('no layer specified, will retrieve all layers!')
-            return Layer.objects.published().external()
+            # cache queryset
+            all_layers = Layer.objects.published().external()
+            
+            # check if there is any layer to exclude
+            if options['exclude']:
+                # convert comma separated string in python list, ignore spaces
+                exclude_list = options['exclude'].replace(' ', '').split(',')
+                # retrieve all layers except the ones specified in exclude list
+                return all_layers.exclude(slug__in=exclude_list)
+            else:
+                # nothing to exclude, retrieve all layers
+                self.verbose('no layer specified, will retrieve all layers!')
+                return all_layers
         
         # otherwise loop over args and retrieve each specified layer
         for layer_slug in args:
@@ -62,7 +86,11 @@ class Command(BaseCommand):
         # retrieve layers
         layers = self.retrieve_layers(*args, **options)
         
-        self.verbose('going to process %d layers...' % len(layers))
+        if len(layers) < 1:
+            self.stdout.write('no layers to process\n\r')
+            return
+        else:
+            self.verbose('going to process %d layers...' % len(layers))
         
         # loop over
         for layer in layers:

@@ -114,7 +114,7 @@ Now install all the required python packages, it will take a bit::
 
     pip install -r /var/www/nodeshot/requirements.txt
 
-And update the distribute python package:
+And update the distribute python package::
 
     pip install -U distribute  # -U stands for upgrade
 

@@ -73,23 +73,35 @@ Configure a layer
 
 Interoperability is configured at layer level in the admin interface.
 
-A layer must be flagged as **"external"** and can be configured by editing the field config, which is a JSON representation of the required keys.
+A layer must be flagged as **"external"** and can be configured by editing the field **config**, which is a JSON representation of the configuration keys.
 
 ===================
 Synchronize command
 ===================
 
-When developing you can use the specific django management command "synchronize", by specifying the slug of the layers you want to sync::
+When developing you can use the django management command "synchronize", which can be used in several different ways, see the help output::
 
-    python manage.py synchronize my-layer
+    python manage.py synchronize --help
 
-You can sync multiple layer in one line::
+**Sync one layer**::
 
-    python manage.py synchronize rome florence pisa
+    python manage.py synchronize layer-slug
 
-Or you can sync them all by running just::
+**Sync multiple layers** by specifying space separated layer slugs::
+
+    python manage.py synchronize layer1-slug layer2-slug
+
+**Sync all layers** is as simple as that::
 
     python manage.py synchronize
+
+**Sync all layers except those specified in --exclude**::
+
+    python manage.py synchronize --exclude=layer1-slug,layer2-slug
+    
+    # spaces are allowed as long as string is wrapped in quotes/doublequotes
+    
+    python manage.py synchronize --exclude="layer1-slug, layer2-slug"
 
 =========================
 Writing new synchronizers

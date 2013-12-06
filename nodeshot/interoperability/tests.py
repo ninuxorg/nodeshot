@@ -19,6 +19,7 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.core.base.tests import user_fixtures
 
 from .models import LayerExternal
+from .tasks import synchronize_external_layers
 
 
 class InteroperabilityTest(TestCase):
@@ -48,6 +49,72 @@ class InteroperabilityTest(TestCase):
         
         # ensure following text is in output
         self.assertIn('does not have an interoperability class specified', output.getvalue())
+    
+    def test_management_command_exclude(self):
+        """ test --exclude """
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', exclude='vienna,test')
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('no layers to process', output.getvalue())
+    
+    def test_celery_task(self):
+        """ ensure celery task works as expected """
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # call task
+        synchronize_external_layers.apply()
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('does not have an interoperability class specified', output.getvalue())
+    
+    def test_celery_task_with_arg(self):
+        # same output when calling with parameter
+        output = StringIO()
+        sys.stdout = output
+        
+        # call task
+        synchronize_external_layers.apply(['vienna'])
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('does not have an interoperability class specified', output.getvalue())
+    
+    def test_celery_task_with_exclude(self):
+        # same output when calling with parameter
+        output = StringIO()
+        sys.stdout = output
+        
+        # call task
+        synchronize_external_layers.apply(kwargs={ 'exclude': 'vienna,test' })
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('no layers to process', output.getvalue())
+    
+    def test_celery_task_with_error(self):
+        try:
+            synchronize_external_layers.apply(['wrongvalue'])
+            self.fail('should have got exception')
+        except management.CommandError as e:
+            self.assertIn('wrongvalue', e.message)
+            self.assertIn('does not exist', e.message)
     
     def test_layer_admin(self):
         """ ensure layer admin does not return any error """

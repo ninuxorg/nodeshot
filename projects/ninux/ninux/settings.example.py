@@ -358,6 +358,18 @@ else:
 #        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
 #        'schedule': timedelta(hours=12),
 #    },
+#    # example of how to synchronize one of the layers with a different periodicity
+#    'synchronize': {
+#        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
+#        'schedule': timedelta(minutes=30),
+#        'args': ('layer_slug',)
+#    },
+#    # example of how to synchronize all layers except two layers
+#    'synchronize': {
+#        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
+#        'schedule': timedelta(hours=12),
+#        'kwargs': { 'exclude': 'layer1-slug,layer2-slug' }
+#    },
 #    'purge_notifications': {
 #        'task': 'nodeshot.community.notifications.tasks.purge_notifications',
 #        'schedule': timedelta(days=1),

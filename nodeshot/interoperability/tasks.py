@@ -4,11 +4,11 @@ from django.core import management
 
 
 @task()
-def synchronize_external_layers():
+def synchronize_external_layers(*args, **kwargs):
     """
     runs "python manage.py synchronize"
     """
-    management.call_command('synchronize')
+    management.call_command('synchronize', *args, **kwargs)
 
 
 # ------ Asynchronous tasks ------ #
