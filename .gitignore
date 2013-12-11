@@ -1,4 +1,9 @@
 #ignore the follow paths
 *.pyc
-db/
 settings.py
+
+#ignore the staticollected files
+static/*
+
+#ignore sqlite db
+nodeshot.db
