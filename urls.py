@@ -6,6 +6,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^', include('nodeshot.urls')),
     (r'^admin/', include(admin.site.urls)),
+    (r'^rosetta/', include('rosetta.urls')),
 )
 
 # serve static files only if DEBUG and DEVELOPMENT_SERVER are True (in settings.py)
