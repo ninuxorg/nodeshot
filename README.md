@@ -38,7 +38,9 @@ DEVELOPMENT INSTALLATION
 If you want to do a quick install to play with nodeshot just follow this routine:
 
     git clone git://github.com/ninuxorg/nodeshot.git mapserver
+    virtualenv mapserver
     cd mapserver
+    source bin/activate
     pip install -r requirements.txt
     cp settings.example.py settings.py
     export DJANGO_SETTINGS_MODULE=settings

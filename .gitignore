@@ -7,3 +7,9 @@ static/*
 
 #ignore sqlite db
 nodeshot.db
+
+#virtualenv ignore
+bin/*
+lib/*
+local
+include/*
