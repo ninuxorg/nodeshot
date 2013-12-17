@@ -195,6 +195,7 @@ INSTALLED_APPS = [
     'nodeshot.networking.connectors',
     #'nodeshot.networking.monitor',
     'nodeshot.interface',
+    'nodeshot.open311',
     
     # import data from old nodeshot version 0.9
     # needs python MySQL database driver
@@ -525,6 +526,10 @@ NODESHOT = {
         ('nodeshot.networking.connectors.ssh.UbiquitiAirOS', 'Ubiquiti AirOS (SSH)'),
         ('nodeshot.networking.connectors.ssh.OpenWRT', 'OpenWRT (SSH)'),
     ],
+    'OPEN311': {
+        'METADATA': 'true',
+        'TYPE': 'realtime'
+    }
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
