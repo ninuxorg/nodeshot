@@ -11,12 +11,8 @@ from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.nodes.serializers import NodeListSerializer
 
-from .base import Attribute, SERVICES
+from .base import SERVICES
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
-
-if HSTORE_ENABLED:
-    from nodeshot.core.base.fields import HStoreDictionaryField
 
 __all__ = [
     'ServiceRatingSerializer',
@@ -264,7 +260,7 @@ class ServiceRatingSerializer(serializers.Serializer):
     attributes = serializers.SerializerMethodField('get_attributes')
     
     def get_service_code(self, obj):        
-        return 'rating'
+        return 'rate'
     
     def get_attributes(self, obj):        
         return [

@@ -60,7 +60,7 @@ class ServiceDefinition(APIView):
             'node': ServiceNodeSerializer,
             'vote': ServiceVoteSerializer,
             'comment': ServiceCommentSerializer,
-            'rating': ServiceRatingSerializer,
+            'rate': ServiceRatingSerializer,
         }
         
         # init right serializer
