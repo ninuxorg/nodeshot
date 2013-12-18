@@ -25,8 +25,8 @@ __all__ = [
 ]
 
 ACTIONS = ('node_insert','comment','voting','rating',)
-RATING_CHOICES = [ {"key":n,"value":n} for n in range(1, 11) ]
-VOTING_CHOICES = [ {"key":1,"value":1}, {"key":-1,"value":-1} ]
+RATING_CHOICES = [ { "key": n, "value": n } for n in range(1, 11) ]
+VOTING_CHOICES = [ { "key": 1, "value": 1 }, { "key": -1, "value":-1 } ]
 
 
 class ServiceListSerializer(serializers.Serializer):
@@ -95,107 +95,86 @@ class ServiceNodeSerializer(serializers.Serializer):
     Service details
     """
     service_code = serializers.SerializerMethodField('get_service_code')    
-    attributes= serializers.SerializerMethodField('get_attributes')
+    attributes = serializers.SerializerMethodField('get_attributes')
     
     def get_service_code(self, obj):        
         return 'node'
     
-    def create_attributes(self,attribute):
-        return {
-            "description": "%s" % attribute.description,
-            "code": "%s" % attribute.code,
-            "variable":True,
-            "datatype":"%s" % attribute.datatype,
-            "required": attribute.required,
-            "datatype_description":"%s" % attribute.datatype_description,
-            "order": "%s" % attribute.order,
-            "values" :  attribute.values,
-        }
-
-    
-    def get_attributes(self,obj):        
-        attributes = []
-        
-        # Layer
-        node_layer_attributes = Attribute(
-                                    code='layer',
-                                    description='Node layer',
-                                    datatype='string',
-                                    datatype_description='Layer for the node',
-                                    order=1,
-                                    required=True
-                                )
-        new_attribute=self.create_attributes(node_layer_attributes)
-        attributes.append(new_attribute)
-        
-        # Name
-        node_name_attributes = Attribute(
-                                    code='name',
-                                    description='Node name',
-                                    datatype='string',
-                                    datatype_description='Name for the node',
-                                    order=2,
-                                    required=True
-                                )
-        new_attribute=self.create_attributes(node_name_attributes)
-        attributes.append(new_attribute)
-        
-        # Lat
-        node_lat_attributes=Attribute(
-                                    code='lat',
-                                    description='Node latitude',
-                                    datatype='string',
-                                    datatype_description='Latitude for node',
-                                    order=3,
-                                    required=True)
-        new_attribute=self.create_attributes(node_lat_attributes)
-        attributes.append(new_attribute)
-        
-        # Long
-        node_long_attributes=Attribute(code='long',
-                                    description='Node longitude',
-                                    datatype='string',
-                                    datatype_description='Longitude for node',
-                                    order=4,
-                                    required=True)
-        new_attribute=self.create_attributes(node_long_attributes)
-        attributes.append(new_attribute)
-        
-        # Address
-        node_address_attributes = Attribute(code='address',
-                                    description='Node address',
-                                    datatype='string',
-                                    datatype_description='Address for node',
-                                    order=5,
-                                    required=False)
-        new_attribute=self.create_attributes(node_address_attributes)
-        attributes.append(new_attribute)
-        
-        # Elevation
-        node_elev_attributes = Attribute(code='elev',
-                                    description='Node elevation',
-                                    datatype='string',
-                                    datatype_description='Elevation for the node',
-                                    order=6,
-                                    required=False)
-        new_attribute=self.create_attributes(node_elev_attributes)
-        attributes.append(new_attribute)
-        
-        # Description
-        node_desc_attributes = Attribute(code='elev',
-                                    description='Node elevation',
-                                    datatype='string',
-                                    datatype_description='Description for node',
-                                    order=7,
-                                    required=False)
-        new_attribute=self.create_attributes(node_desc_attributes)
-        attributes.append(new_attribute)
-        
-        return (attributes)
+    def get_attributes(self, obj):        
+        return [
+            # layer
+            {
+                'code': 'layer',
+                'description': _('layer'),
+                'datatype': 'string',
+                'datatype_description': _('Specify in which layer you want to insert the node'),
+                'order': 1,
+                'required': True
+            },
+            
+            # name
+            {
+                'code': 'name',
+                'description': _('name'),
+                'datatype': 'string',
+                'datatype_description': _('Name of the node you want to insert'),
+                'order': 2,
+                'required': True
+            },
+            
+            # lat
+            {
+                'code': 'lat',
+                'description': _('latitude'),
+                'datatype': 'string',
+                'datatype_description': _('Latitude of node'),
+                'order': 3,
+                'required': True
+            },
+            
+            # long
+            {
+                'code': 'long',
+                'description': _('longitude'),
+                'datatype': 'string',
+                'datatype_description': _('Longitude of node'),
+                'order': 4,
+                'required': True
+            },
+            
+            # address
+            {
+                'code': 'address',
+                'description': _('address'),
+                'datatype': 'string',
+                'datatype_description': _('Address of node'),
+                'order': 5,
+                'required': False
+            },
+            
+            # elev (elevation)
+            {
+                'code': 'elev',
+                'description': _('elevation'),
+                'datatype': 'string',
+                'datatype_description': _('Elevation of node'),
+                'order': 6,
+                'required': False
+            },
+            
+            # description
+            {
+                'code': 'description',
+                'description': _('description'),
+                'datatype': 'string',
+                'datatype_description': _('Description of node'),
+                'order': 7,
+                'required': False
+            }
+        ]
     
     class Meta:
-        #model = Layer
-        fields = ('service_code', 'attributes', )
+        fields = ('service_code', 'attributes')
 
 
 class RequestListSerializer(serializers.ModelSerializer):

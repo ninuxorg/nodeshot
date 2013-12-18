@@ -18,9 +18,6 @@ class ServiceList(generics.ListAPIView):
     """
     Retrieve list of Open 311 services.
     """
-    #model = Layer
-    #queryset = Layer.objects.published()
-    #permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
     authentication_classes = (authentication.SessionAuthentication,)
     serializer_class = ServiceListSerializer
     
@@ -52,7 +49,7 @@ class ServiceDefinition(APIView):
     """
     Retrieve details of specified serviceNode.
     """
-    
+
     def get(self, request, *args, **kwargs):
         service_type = kwargs['service_type']
         
