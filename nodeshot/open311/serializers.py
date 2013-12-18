@@ -11,7 +11,7 @@ from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.nodes.serializers import NodeListSerializer
 
-from .base import Attribute
+from .base import Attribute, SERVICES
 
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
@@ -29,7 +29,7 @@ RATING_CHOICES = [ {"key":n,"value":n} for n in range(1, 11) ]
 VOTING_CHOICES = [ {"key":1,"value":1}, {"key":-1,"value":-1} ]
 
 
-class ServiceListSerializer(serializers.ModelSerializer):
+class ServiceListSerializer(serializers.Serializer):
     """
     Open 311 service list
     """
@@ -42,61 +42,51 @@ class ServiceListSerializer(serializers.ModelSerializer):
     service_name = serializers.SerializerMethodField('get_service_name')
     service_description = serializers.SerializerMethodField('get_service_description')
     
+    def __init__(self, *args, **kwargs):
+        self.service_type = kwargs.pop('service_type')
+        super(ServiceListSerializer, self).__init__(*args, **kwargs)
+    
     def get_definition(self, obj):
         request = self.context['request']
         format = self.context['format']
         return reverse('api_service_definition',
-                       args=[obj.slug, 'node'],
+                       args=[self.service_type],
                        request=request,
                        format=format) 
     
     def get_service_code(self, obj):        
-        slug=obj.slug
-        service_code="%s-node" %slug
-        return service_code
+        return self.service_type
     
     def get_service_name(self, obj):        
-        name=obj.name
-        service_name = _("Node insertion: %s") % name
-        return service_name
+        return SERVICES[self.service_type]['name']
     
     def get_service_description(self, obj):        
-        name=obj.name
-        service_description = _("Node insertion for layer: %s") % name
-        return service_description    
+        return SERVICES[self.service_type]['description']
     
     def get_keywords(self, obj):        
-        extra_data=obj.data
-        if extra_data is not None:
-            keywords=extra_data.get('keywords', "")
-        else:
-            keywords=""
-        return keywords
+        return SERVICES[self.service_type]['keywords']
     
     def get_group(self,obj):
-        extra_data=obj.data
-        if extra_data is not None:   
-            group=extra_data.get('group', "")
-        else:
-            group=""
-        return group
+        return SERVICES[self.service_type]['group']
     
     def get_metadata(self,obj):
-        """ metadata setting - TODO explain """
-        return settings.NODESHOT['OPEN311']['METADATA']
+        """ Open311 metadata indicates whether there are custom attributes """
+        return 'true'
     
     def get_type(self,obj):
         """ type setting - TODO explain """
         return settings.NODESHOT['OPEN311']['TYPE']
     
     class Meta:
-        model = Layer
-
         fields= (
-            'service_code', 'service_name', 'service_description',
-            'keywords', 'group',
+            'service_code',
+            'service_name',
+            'service_description',
+            'keywords',
+            'group',
             'definition',
-            'metadata','type',
+            'metadata',
+            'type',
         )
 
 
