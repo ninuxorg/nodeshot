@@ -17,7 +17,6 @@ if HSTORE_ENABLED:
 __all__ = [
     'ServiceDetailSerializer',
     'ServiceListSerializer',
-    'PaginatedLayerListSerializer',
     'RequestListSerializer',
 ]
 
