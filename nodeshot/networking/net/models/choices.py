@@ -25,10 +25,10 @@ DEVICE_TYPES = {
 DEVICE_TYPES_CHOICES = choicify(DEVICE_TYPES)
 
 DEVICE_STATUS = {
-    'inactive': -2,         # manually deactivated by user or admin
-    'unknown': -1,          # device has not been seen by the system yet
     'not_reachable': 0,     # device is not reachable
     'reachable': 1,         # device is reachable
+    'unknown': 2,           # device has not been seen by the system yet
+    'inactive': 3,          # manually deactivated by user or admin
 }
 DEVICE_STATUS_CHOICES = choicify(DEVICE_STATUS)
 
