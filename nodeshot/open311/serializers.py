@@ -19,7 +19,7 @@ if HSTORE_ENABLED:
     from nodeshot.core.base.fields import HStoreDictionaryField
 
 __all__ = [
-    'ServiceDetailSerializer',
+    'ServiceNodeSerializer',
     'ServiceListSerializer',
     'RequestListSerializer',
 ]
@@ -90,83 +90,112 @@ class ServiceListSerializer(serializers.Serializer):
         )
 
 
-class ServiceDetailSerializer(ServiceListSerializer):
+class ServiceNodeSerializer(serializers.Serializer):
     """
     Service details
     """
-    service_code = serializers.IntegerField(source='id')
+    service_code = serializers.SerializerMethodField('get_service_code')    
     attributes= serializers.SerializerMethodField('get_attributes')
+    
+    def get_service_code(self, obj):        
+        return 'node'
     
     def create_attributes(self,attribute):
         return {
+            "description": "%s" % attribute.description,
             "code": "%s" % attribute.code,
             "variable":True,
             "datatype":"%s" % attribute.datatype,
             "required": attribute.required,
             "datatype_description":"%s" % attribute.datatype_description,
             "order": "%s" % attribute.order,
-            "description": "%s" % attribute.description,
             "values" :  attribute.values,
         }
 
     
     def get_attributes(self,obj):        
-        layer=Layer.objects.get(pk=obj.id)
         attributes = []
         
-        # Attributes to determine if node is already existing or has to be inserted
-        insert_attributes=Attribute(code='action',description='Action to be taken ',\
-                                    datatype='singlevaluelist',datatype_description=\
-                                    'Specifies the kind of request: node insertion, comment, rating or vote',\
-                                    order=1,required=True,values=ACTIONS)
-        new_attribute=self.create_attributes(insert_attributes)
-        attributes.append(new_attribute)
-        
-        # Attributes for node
-        # Coordinates
-        node_attributes=Attribute(code='node',description='Node identifier',\
-                                    datatype='string',datatype_description=\
-                                    'Coordinates in WKT format if node has to be inserted, node_id for actions on already existing node',order=2,required=True)
-        new_attribute=self.create_attributes(node_attributes)
+        # Layer
+        node_layer_attributes = Attribute(
+                                    code='layer',
+                                    description='Node layer',
+                                    datatype='string',
+                                    datatype_description='Layer for the node',
+                                    order=1,
+                                    required=True
+                                )
+        new_attribute=self.create_attributes(node_layer_attributes)
         attributes.append(new_attribute)
         
         # Name
-        node_name_attributes = Attribute(code='node_name',description='Node name',\
-                                    datatype='string',datatype_description='Name for the node. Required only for node insertion.',order=3,required=False)
+        node_name_attributes = Attribute(
+                                    code='name',
+                                    description='Node name',
+                                    datatype='string',
+                                    datatype_description='Name for the node',
+                                    order=2,
+                                    required=True
+                                )
         new_attribute=self.create_attributes(node_name_attributes)
         attributes.append(new_attribute)
         
-        # Attributes for comments
-        if layer.participation_settings.comments_allowed:
-            comments_attributes = Attribute(code='comment_request',description='Comment request',\
-                                            datatype='string',datatype_description='Comment',order=4) 
-            new_attribute=self.create_attributes(comments_attributes)   
-            attributes.append(new_attribute)
-            
-        # Attributes for voting   
-        if layer.participation_settings.voting_allowed:
-            voting_attributes = Attribute(
-                                    code='vote_request',description='Vote request',
-                                    datatype='singlevaluelist',
-                                    datatype_description='Vote 1 or -1 ( Yes/No)',
+        # Lat
+        node_lat_attributes=Attribute(
+                                    code='lat',
+                                    description='Node latitude',
+                                    datatype='string',
+                                    datatype_description='Latitude for node',
+                                    order=3,
+                                    required=True)
+        new_attribute=self.create_attributes(node_lat_attributes)
+        attributes.append(new_attribute)
+        
+        # Long
+        node_long_attributes=Attribute(code='long',
+                                    description='Node longitude',
+                                    datatype='string',
+                                    datatype_description='Longitude for node',
+                                    order=4,
+                                    required=True)
+        new_attribute=self.create_attributes(node_long_attributes)
+        attributes.append(new_attribute)
+        
+        # Address
+        node_address_attributes = Attribute(code='address',
+                                    description='Node address',
+                                    datatype='string',
+                                    datatype_description='Address for node',
                                     order=5,
-                                    values=VOTING_CHOICES
-                                ) 
-            new_attribute=self.create_attributes(voting_attributes)   
-            attributes.append(new_attribute)
-            
-        # Attributes for rating
-        if layer.participation_settings.rating_allowed:
-            rating_attributes = Attribute(code='rating_request',description='rating request',\
-                                            datatype='singlevaluelist',datatype_description='Rating from 1 to 10',order=6\
-                                            ,values=RATING_CHOICES) 
-            new_attribute=self.create_attributes(rating_attributes)   
-            attributes.append(new_attribute)
+                                    required=False)
+        new_attribute=self.create_attributes(node_address_attributes)
+        attributes.append(new_attribute)
+        
+        # Elevation
+        node_elev_attributes = Attribute(code='elev',
+                                    description='Node elevation',
+                                    datatype='string',
+                                    datatype_description='Elevation for the node',
+                                    order=6,
+                                    required=False)
+        new_attribute=self.create_attributes(node_elev_attributes)
+        attributes.append(new_attribute)
+        
+        # Description
+        node_desc_attributes = Attribute(code='elev',
+                                    description='Node elevation',
+                                    datatype='string',
+                                    datatype_description='Description for node',
+                                    order=7,
+                                    required=False)
+        new_attribute=self.create_attributes(node_desc_attributes)
+        attributes.append(new_attribute)
+        
         return (attributes)
     
     class Meta:
-        model = Layer
-        fields = ('service_code', 'attributes')
+        #model = Layer
+        fields = ('service_code', 'attributes', )
 
 
 class RequestListSerializer(serializers.ModelSerializer):

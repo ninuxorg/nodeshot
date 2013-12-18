@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from rest_framework import generics, permissions, authentication
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 
@@ -47,20 +48,29 @@ class ServiceList(generics.ListAPIView):
 service_list = ServiceList.as_view()
 
 
-class ServiceDefinition(generics.RetrieveAPIView):
+class ServiceDefinition(APIView):
     """
-    ### GET
-    
     Retrieve details of specified serviceNode.
-    
     """
-    permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
-    authentication_classes = (authentication.SessionAuthentication,)
-    model= Layer
-    queryset = Layer.objects.published()
-    serializer_class= ServiceDetailSerializer
-    lookup_field = 'slug'
-
+    
+    def get(self, request, *args, **kwargs):
+        service_type = kwargs['service_type']
+        
+        if service_type not in SERVICES.keys():
+            return Response({ 'detail': _('Not found') }, status=404)
+        
+        serializers = {
+            'node': ServiceNodeSerializer,
+            'vote': ServiceNodeSerializer,
+            'comment': ServiceNodeSerializer,
+            'rating': ServiceNodeSerializer,
+        }
+        
+        # init right serializer
+        data = serializers[service_type]().data
+        
+        return Response(data)
+    
 service_definition = ServiceDefinition.as_view()
 
 
