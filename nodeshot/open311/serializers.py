@@ -1,6 +1,10 @@
-from django.conf import settings
 import simplejson as json
-from rest_framework import serializers, pagination
+
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+
+from rest_framework import serializers
+from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers
 
 from nodeshot.core.layers.models import Layer
@@ -29,13 +33,37 @@ class ServiceListSerializer(serializers.ModelSerializer):
     """
     Open 311 service list
     """
-    definition = serializers.HyperlinkedIdentityField(view_name='api_service_detail', slug_field='slug')
+    definition = serializers.SerializerMethodField('get_definition')
     metadata = serializers.SerializerMethodField('get_metadata')
     keywords = serializers.SerializerMethodField('get_keywords')
     group = serializers.SerializerMethodField('get_group')
     type = serializers.SerializerMethodField('get_type')
-    service_code = serializers.IntegerField(source='id')
-    service_name = serializers.CharField(source='name')
+    service_code = serializers.SerializerMethodField('get_service_code')
+    service_name = serializers.SerializerMethodField('get_service_name')
+    service_description = serializers.SerializerMethodField('get_service_description')
+    
+    def get_definition(self, obj):
+        request = self.context['request']
+        format = self.context['format']
+        return reverse('api_service_definition',
+                       args=[obj.slug, 'node'],
+                       request=request,
+                       format=format) 
+    
+    def get_service_code(self, obj):        
+        slug=obj.slug
+        service_code="%s-node" %slug
+        return service_code
+    
+    def get_service_name(self, obj):        
+        name=obj.name
+        service_name = _("Node insertion: %s") % name
+        return service_name
+    
+    def get_service_description(self, obj):        
+        name=obj.name
+        service_description = _("Node insertion for layer: %s") % name
+        return service_description    
     
     def get_keywords(self, obj):        
         extra_data=obj.data
@@ -65,8 +93,9 @@ class ServiceListSerializer(serializers.ModelSerializer):
         model = Layer
 
         fields= (
-            'service_code', 'service_name', 'description',
-            'keywords', 'group', 'definition',
+            'service_code', 'service_name', 'service_description',
+            'keywords', 'group',
+            'definition',
             'metadata','type',
         )
 

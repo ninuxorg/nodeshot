@@ -37,7 +37,7 @@ class ServiceList(generics.ListCreateAPIView):
 service_list = ServiceList.as_view()
 
 
-class ServiceDetail(generics.RetrieveAPIView):
+class ServiceDefinition(generics.RetrieveAPIView):
     """
     ### GET
     
@@ -51,7 +51,7 @@ class ServiceDetail(generics.RetrieveAPIView):
     serializer_class= ServiceDetailSerializer
     lookup_field = 'slug'
 
-service_detail = ServiceDetail.as_view()
+service_definition = ServiceDefinition.as_view()
 
 
 class RequestList(generics.ListCreateAPIView):
