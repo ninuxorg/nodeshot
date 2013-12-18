@@ -19,14 +19,16 @@ if HSTORE_ENABLED:
     from nodeshot.core.base.fields import HStoreDictionaryField
 
 __all__ = [
+    'ServiceRatingSerializer',
+    'ServiceCommentSerializer',
     'ServiceNodeSerializer',
+    'ServiceVoteSerializer',
     'ServiceListSerializer',
     'RequestListSerializer',
 ]
 
-ACTIONS = ('node_insert','comment','voting','rating',)
-RATING_CHOICES = [ { "key": n, "value": n } for n in range(1, 11) ]
-VOTING_CHOICES = [ { "key": 1, "value": 1 }, { "key": -1, "value":-1 } ]
+RATING_CHOICES = [ n for n in range(1, 11) ]
+VOTING_CHOICES = [ -1, 1 ]
 
 
 class ServiceListSerializer(serializers.Serializer):
@@ -175,6 +177,122 @@ class ServiceNodeSerializer(serializers.Serializer):
     
     class Meta:
         fields = ('service_code', 'attributes')
+
+
+class ServiceVoteSerializer(serializers.Serializer):
+    """
+    Service details
+    """
+    service_code = serializers.SerializerMethodField('get_service_code')    
+    attributes = serializers.SerializerMethodField('get_attributes')
+    
+    def get_service_code(self, obj):        
+        return 'vote'
+    
+    def get_attributes(self, obj):        
+        return [
+            # node_id
+            {
+                'code': 'node_id',
+                'description': _('Node id'),
+                'datatype': 'string',
+                'datatype_description': _('Specify for which node you want to insert the vote'),
+                'order': 1,
+                'required': True
+            },
+            
+            # vote
+            {
+                'code': 'vote',
+                'description': _('vote on a node'),
+                'datatype': 'string',
+                'datatype_description': _('Vote 1 or -1 (Like/Dislike)'),
+                'order': 2,
+                'required': True,
+                'values' : [1,-1]
+            },
+
+        ]
+    
+    class Meta:
+        fields = ('service_code', 'attributes')
+
+
+class ServiceCommentSerializer(serializers.Serializer):
+    """
+    Service details
+    """
+    service_code = serializers.SerializerMethodField('get_service_code')    
+    attributes = serializers.SerializerMethodField('get_attributes')
+    
+    def get_service_code(self, obj):        
+        return 'comment'
+    
+    def get_attributes(self, obj):        
+        return [
+            # node_id
+            {
+                'code': 'node_id',
+                'description': _('Node id'),
+                'datatype': 'string',
+                'datatype_description': _('Specify for which node you want to insert the comment'),
+                'order': 1,
+                'required': True
+            },
+            
+            # vote
+            {
+                'code': 'comment',
+                'description': _('comment on a node'),
+                'datatype': 'string',
+                'datatype_description': _('text of the comment'),
+                'order': 2,
+                'required': True,
+            },
+
+        ]
+    
+    class Meta:
+        fields = ('service_code', 'attributes')
+
+
+class ServiceRatingSerializer(serializers.Serializer):
+    """
+    Service details
+    """
+    service_code = serializers.SerializerMethodField('get_service_code')    
+    attributes = serializers.SerializerMethodField('get_attributes')
+    
+    def get_service_code(self, obj):        
+        return 'rating'
+    
+    def get_attributes(self, obj):        
+        return [
+            # node_id
+            {
+                'code': 'node_id',
+                'description': _('Node id'),
+                'datatype': 'string',
+                'datatype_description': _('Specify which node you want to rate'),
+                'order': 1,
+                'required': True
+            },
+            
+            # rating
+            {
+                'code': 'rating',
+                'description': _('rating of a node'),
+                'datatype': 'string',
+                'datatype_description': _('rate node from 1 to 10'),
+                'order': 2,
+                'required': True,
+                'values' : RATING_CHOICES
+            },
+
+        ]
+    
+    class Meta:
+        fields = ('service_code', 'attributes') 
 
 
 class RequestListSerializer(serializers.ModelSerializer):

@@ -58,9 +58,9 @@ class ServiceDefinition(APIView):
         
         serializers = {
             'node': ServiceNodeSerializer,
-            'vote': ServiceNodeSerializer,
-            'comment': ServiceNodeSerializer,
-            'rating': ServiceNodeSerializer,
+            'vote': ServiceVoteSerializer,
+            'comment': ServiceCommentSerializer,
+            'rating': ServiceRatingSerializer,
         }
         
         # init right serializer
