@@ -68,7 +68,7 @@ tinyMCE.init({
     
     // Content CSS
     // customize your content ...
-    content_css : window.__admin_media_prefix__ + "tinymce/jscripts/tiny_mce/themes/advanced/skins/grappelli/nodeshot_customization.css",
+    content_css : window.__admin_media_prefix__ + "tinymce/nodeshot_customization.css",
     
     // Theme Advanced
     theme_advanced_toolbar_location: 'top',
