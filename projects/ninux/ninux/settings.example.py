@@ -17,7 +17,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django_hstore.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'nodeshot',                      # Or path to database file if using sqlite3.
         'USER': 'nodeshot',                      # Not used with sqlite3.
         'PASSWORD': 'your_password',                  # Not used with sqlite3.
@@ -167,6 +167,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    
+    # PostgreSQL HStore extension support
+    'django_hstore',
     
     # admin site
     'grappelli.dashboard',
