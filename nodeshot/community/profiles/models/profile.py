@@ -97,3 +97,12 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         self.save()
         password_changed.send(sender=self.__class__, user=self)
     
+    if 'grappelli' in settings.INSTALLED_APPS:
+        @staticmethod
+        def autocomplete_search_fields():
+            return (
+                'username__icontains',
+                'first_name__icontains',
+                'last_name__icontains',
+                'email__icontains'
+            )

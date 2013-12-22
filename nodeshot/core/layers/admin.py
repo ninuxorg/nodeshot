@@ -31,6 +31,12 @@ class LayerAdmin(GeoAdmin):
     prepopulated_fields = {'slug': ('name',)}
     inlines = []
     
+     # django-grappelli usability improvements
+    raw_id_fields = ('mantainers',)
+    autocomplete_lookup_fields = {
+        'm2m': ['mantainers'],
+    }
+    
     if settings.NODESHOT['SETTINGS'].get('LAYER_TEXT_HTML', True) is True:  
         # enable editor for "extended text description" only
         html_editor_fields = ['text']
