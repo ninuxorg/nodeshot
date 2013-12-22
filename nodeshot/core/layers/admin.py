@@ -31,6 +31,10 @@ class LayerAdmin(GeoAdmin):
     prepopulated_fields = {'slug': ('name',)}
     inlines = []
     
+    if settings.NODESHOT['SETTINGS'].get('LAYER_TEXT_HTML', True) is True:  
+        # enable editor for "extended text description" only
+        html_editor_fields = ['text']
+    
     def view_nodes(self, obj):
         return '<a href="%s?layer__id__exact=%s">%s</a>' % (
             reverse('admin:nodes_node_changelist'),
@@ -38,30 +42,6 @@ class LayerAdmin(GeoAdmin):
             _('view nodes')
         )
     view_nodes.allow_tags = True
-    
-    # Enable TinyMCE HTML Editor according to settings, defaults to True
-    if settings.NODESHOT['SETTINGS'].get('LAYER_TEXT_HTML', True) is True: 
-        if 'grappelli' not in settings.INSTALLED_APPS:
-            raise ImproperlyConfigured(
-                _("settings.NODESHOT['SETTINGS']['LAYER_TEXT_HTML'] is set to\
-                  True but grappelli is not in settings.INSTALLED_APPS")
-            )
-        
-        class Media:
-            js = [
-                '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
-                '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
-            ]
-        
-        # enable editor for "extended text description" only
-        def formfield_for_dbfield(self, db_field, **kwargs):
-            field = super(LayerAdmin, self).formfield_for_dbfield(db_field, **kwargs)
-            
-            if db_field.name == 'text':
-                _class = 'html-editor %s' % field.widget.attrs.get('class', '')
-                field.widget.attrs['class'] = _class
-            
-            return field
 
 
 admin.site.register(Layer, LayerAdmin)

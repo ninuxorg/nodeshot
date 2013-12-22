@@ -43,6 +43,25 @@ class BaseAdmin(admin.ModelAdmin):
     """
     save_on_top = True
     readonly_fields = ['added', 'updated']
+    
+    html_editor_fields = []
+    
+    # preload tinymce editor static files
+    if 'grappelli' in settings.INSTALLED_APPS:  
+        class Media:
+            js = [
+                '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
+                '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
+            ]
+        
+        # enable editor for "node description" only
+        def formfield_for_dbfield(self, db_field, **kwargs):
+            field = super(BaseAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+            
+            if db_field.name in self.html_editor_fields:
+                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
+            
+            return field
 
 
 class BaseGeoAdmin(BaseAdmin, GeoModelAdmin):

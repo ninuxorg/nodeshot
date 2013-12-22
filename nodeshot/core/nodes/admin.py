@@ -61,25 +61,9 @@ class NodeAdmin(GeoAdmin):
     def queryset(self, request):
         return super(NodeAdmin, self).queryset(request).select_related('user', 'layer', 'status')
     
-    # Enable TinyMCE HTML Editor according to settings, defaults to True
-    if settings.NODESHOT['SETTINGS'].get('NODE_DESCRIPTION_HTML', True) is True: 
-        if 'grappelli' not in settings.INSTALLED_APPS:
-            raise ImproperlyConfigured(_("settings.NODESHOT['SETTINGS']['NODE_DESCRIPTION_HTML'] is set to True but grappelli is not in settings.INSTALLED_APPS"))
-        
-        class Media:
-            js = [
-                '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
-                '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
-            ]
-        
+    if settings.NODESHOT['SETTINGS'].get('NODE_DESCRIPTION_HTML', True) is True:  
         # enable editor for "node description" only
-        def formfield_for_dbfield(self, db_field, **kwargs):
-            field = super(NodeAdmin, self).formfield_for_dbfield(db_field, **kwargs)
-            
-            if db_field.name == 'description':
-                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
-            
-            return field
+        html_editor_fields = ['description']
 
 
 class StatusIconInline(admin.StackedInline):

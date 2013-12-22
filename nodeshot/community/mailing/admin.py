@@ -52,25 +52,10 @@ class OutwardAdmin(BaseAdmin):
             kwargs['queryset'] = User.objects.filter(is_active=True)
         return super(OutwardAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
     
-    if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True: 
-        if 'grappelli' not in settings.INSTALLED_APPS:
-            raise ImproperlyConfigured(_("settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is set to True but grappelli is not in settings.INSTALLED_APPS"))
-        
-        class Media:
-            js = [
-                '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
-                '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
-            ]
-        
-        # enable editor for "message" field only
-        def formfield_for_dbfield(self, db_field, **kwargs):
-            field = super(OutwardAdmin, self).formfield_for_dbfield(db_field, **kwargs)
-            
-            if db_field.name == 'message':
-                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
-            
-            return field
-
+    # Enable TinyMCE HTML Editor according to settings, defaults to True
+    if (settings.NODESHOT['SETTINGS'].get('CONTACT_OUTWARD_HTML', True) is True):
+        # enable editor for "description" only
+        html_editor_fields = ['message']
 
 admin.site.register(Inward, InwardAdmin)
 admin.site.register(Outward, OutwardAdmin)

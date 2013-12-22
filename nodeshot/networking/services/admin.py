@@ -39,22 +39,9 @@ class ServiceAdmin(BaseAdmin):
     autocomplete_lookup_fields = {
         'fk': ('device',),
     }
-
-    if 'grappelli' in settings.INSTALLED_APPS:
-        class Media:
-            js = [
-                '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
-                '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
-            ]
-        
-        # enable editor for "node description" only
-        def formfield_for_dbfield(self, db_field, **kwargs):
-            field = super(ServiceAdmin, self).formfield_for_dbfield(db_field, **kwargs)
-            
-            if db_field.name == 'description':
-                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
-            
-            return field
+    
+    # enable editor for "description" only
+    html_editor_fields = ['description']
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Service, ServiceAdmin)
