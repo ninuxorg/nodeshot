@@ -49,9 +49,10 @@ class DeviceAdmin(BaseGeoAdmin):
     search_fields = ('name', 'type')
     inlines = [EthernetInline, WirelessInline, BridgeInline, TunnelInline, VlanInline]
     
-    raw_id_fields = ('node',)
+    raw_id_fields = ('node', 'routing_protocols')
     autocomplete_lookup_fields = {
         'fk': ['node'],
+        'm2m': ['routing_protocols']
     }
     
     exclude = ('shortcuts',)

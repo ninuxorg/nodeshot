@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.forms import ModelForm, CharField, PasswordInput
 
-from nodeshot.core.base.admin import BaseAdmin
+from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
 from .models import DeviceConnector
 
 
@@ -34,3 +34,30 @@ class DeviceConnectorAdmin(BaseAdmin):
     change_form_template = '%s/templates/admin/device_connector_customization.html' % os.path.dirname(os.path.realpath(__file__))
 
 admin.site.register(DeviceConnector, DeviceConnectorAdmin)
+
+
+# ------ Extend Default Device Admin ------ #
+
+
+from nodeshot.networking.net.models import Device
+from nodeshot.networking.net.admin import DeviceAdmin as BaseDeviceAdmin
+
+
+class DeviceConnectorInline(BaseStackedInline):
+    model = DeviceConnector
+    form = DeviceConnectorForm
+    extra = 0
+    sortable_field_name = 'order'
+    exclude = ['node']
+
+
+class DeviceAdmin(BaseDeviceAdmin):
+    """
+    add DeviceConnectorInline to inlines of DeviceAmin
+    """
+    inlines = BaseDeviceAdmin.inlines + [DeviceConnectorInline]
+
+
+# unregister BaseDeviceAdmin
+admin.site.unregister(Device)
+admin.site.register(Device, DeviceAdmin)
