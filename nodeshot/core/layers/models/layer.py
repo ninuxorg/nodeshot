@@ -9,13 +9,13 @@ from nodeshot.core.base.choices import MAP_ZOOM, ACCESS_LEVELS
 from nodeshot.core.base.utils import choicify
 from nodeshot.core.nodes.models import Node
 
+from ..managers import LayerManager
+
+
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 if HSTORE_ENABLED:
     from django_hstore.fields import DictionaryField
-    from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as LayerManager
-else:
-    from ..managers import LayerManager
 
 
 class Layer(BaseDate):

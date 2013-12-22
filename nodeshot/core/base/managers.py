@@ -136,6 +136,11 @@ if HSTORE_ENABLED:
         pass
     
     
+    class HStoreGeoPublishedQuerySet(HStoreGeoQuerySet, PublishedMixin):
+        """ HStoreGeoQuerySet and PublishedMixin """
+        pass
+    
+    
     class HStoreGeoAccessLevelQuerySet(HStoreGeoQuerySet, ACLMixin):
         """ HStoreGeoQuerySet and AccessLevel """
         pass
@@ -212,6 +217,15 @@ if HSTORE_ENABLED:
         
         def get_query_set(self): 
             return HStoreAccessLevelQuerySet(self.model, using=self._db)
+    
+    
+    class HStoreGeoPublishedManager(HStoreGeoManager, ExtendedManagerMixin, PublishedMixin):
+        """
+        HStoreGeoManager and PublishedMixin in one
+        """
+        
+        def get_query_set(self): 
+            return HStoreGeoPublishedQuerySet(self.model, using=self._db)
     
     
     class HStoreGeoAccessLevelManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin):
