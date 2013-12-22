@@ -6,7 +6,15 @@ from .models import Link
 
 
 class LinkAdmin(BaseGeoAdmin):
-    list_display  = ('__unicode__', 'type', 'status', 'interface_a', 'interface_b', 'added', 'updated')
+    list_display  = (
+        '__unicode__',
+        'type',
+        'status',
+        'interface_a_mac',
+        'interface_b_mac',
+        'added',
+        'updated'
+    )
     list_filter   = ('status', 'type')
     date_hierarchy = 'added'
     ordering = ('-id',)

@@ -73,7 +73,7 @@ class Link(BaseAccessLevel):
         app_label = 'links'
     
     def __unicode__(self):
-        return _(u'Link between %s and %s') % (self.node_a_name, self.node_b_name)
+        return _(u'%s <> %s') % (self.node_a_name, self.node_b_name)
     
     def clean(self, *args, **kwargs):
         """
