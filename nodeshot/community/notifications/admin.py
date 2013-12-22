@@ -8,6 +8,11 @@ from .models import *
 class NotificationAdmin(BaseAdmin):
     list_display = ('to_user', 'type', 'text', 'is_read', 'added', 'updated')
     list_filter = ('type', 'is_read', 'added')
+    
+    raw_id_fields = ('from_user', 'to_user')
+    autocomplete_lookup_fields = {
+        'fk': ['from_user', 'to_user'],
+    }
 
 
 admin.site.register(Notification, NotificationAdmin)
