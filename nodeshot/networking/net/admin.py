@@ -11,6 +11,11 @@ from .models import *
 class DeviceInline(BaseStackedInline):
     model = Device
     
+    raw_id_fields = ('routing_protocols',)
+    autocomplete_lookup_fields = {
+        'm2m': ['routing_protocols']
+    }
+    
     if 'grappelli' in settings.INSTALLED_APPS:
         classes = ('grp-collapse grp-open', )
 

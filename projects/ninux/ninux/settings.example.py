@@ -527,8 +527,9 @@ NODESHOT = {
         }
     },
     'CONNECTORS': [
-        ('nodeshot.networking.connectors.ssh.UbiquitiAirOS', 'Ubiquiti AirOS (SSH)'),
-        ('nodeshot.networking.connectors.ssh.OpenWRT', 'OpenWRT (SSH)'),
+        ('netengine.backends.ssh.AirOS', 'AirOS (SSH)'),
+        ('netengine.backends.ssh.OpenWRT', 'OpenWRT (SSH)'),
+        ('netengine.backends.snmp.AirOS', 'AirOS (SNMP)'),
     ],
     'OPEN311': {
         'METADATA': 'true',
@@ -537,6 +538,11 @@ NODESHOT = {
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
+
+if 'test' in sys.argv:
+    NODESHOT['CONNECTORS'].append(
+        ('netengine.backends.Dummy', 'Dummy')
+    )
 
 # ------ GRAPPELLI ------ #
 

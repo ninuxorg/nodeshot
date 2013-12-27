@@ -85,7 +85,7 @@ class ACLMixin(BaseUtilityMixin):
 
 
 class ExtendedManagerMixin(BaseUtilityMixin):
-    """ add this mixin to chainable custom methods support to your manager """
+    """ add this mixin to add  support for chainable custom methods to your manager """
     
     def __getattr__(self, attr, *args):
         try:
@@ -155,7 +155,7 @@ if HSTORE_ENABLED:
 ### ------ MANAGERS ------ ###
 
 
-class NodeshotDefaultManager(Manager, BaseUtilityMixin):
+class NodeshotDefaultManager(Manager, ExtendedManagerMixin):
     """ Simple Manager that implements the BaseUtilityMixin methods """
     pass
 
@@ -208,6 +208,11 @@ class GeoAccessLevelPublishedManager(GeoManager, ExtendedManagerMixin, ACLMixin,
 
 if HSTORE_ENABLED:
     from django_hstore.managers import HStoreManager, HStoreGeoManager
+    
+    
+    class HStoreNodeshotManager(HStoreManager, ExtendedManagerMixin):
+        """ HStoreManager + ExtendedManagerMixin """
+        pass
     
     
     class HStoreAccessLevelManager(HStoreManager, ExtendedManagerMixin, ACLMixin):
