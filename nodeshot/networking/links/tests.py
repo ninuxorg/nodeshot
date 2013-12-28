@@ -12,7 +12,7 @@ from nodeshot.core.base.tests import user_fixtures
 from nodeshot.networking.net.models import Interface
 
 from .models import Link
-from .choices import LINK_STATUS, LINK_TYPES
+from .models.choices import LINK_STATUS, LINK_TYPES
 
 
 class LinkTest(BaseTestCase):
