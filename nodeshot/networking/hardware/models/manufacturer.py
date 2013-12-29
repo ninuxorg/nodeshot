@@ -11,7 +11,7 @@ class Manufacturer(BaseDate, ImageMixin):
     Eg: Ubiquiti, Mikrotic, Dlink, ecc.
     """
     name = models.CharField(_('name'), max_length=50, unique=True)
-    url = models.URLField(_('url'))
+    url = models.URLField(_('url'), blank=True)
     image = models.ImageField(_('logo'), blank=True, upload_to='manufacturers/')
     image_width = 180
     
