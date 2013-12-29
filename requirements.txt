@@ -69,5 +69,5 @@ django-debug-toolbar
 # migrations
 south
 
-# SSH and shell commands
-paramiko
+# retrieve info from network devices
+-e git+git://github.com/nemesisdesign/netengine#egg=netengine

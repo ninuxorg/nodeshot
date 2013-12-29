@@ -526,7 +526,7 @@ NODESHOT = {
             'default': 'potential'
         }
     },
-    'CONNECTORS': [
+    'NETENGINE_BACKENDS': [
         ('netengine.backends.ssh.AirOS', 'AirOS (SSH)'),
         ('netengine.backends.ssh.OpenWRT', 'OpenWRT (SSH)'),
         ('netengine.backends.snmp.AirOS', 'AirOS (SNMP)'),
@@ -540,7 +540,7 @@ NODESHOT = {
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
 
 if 'test' in sys.argv:
-    NODESHOT['CONNECTORS'].append(
+    NODESHOT['NETENGINE_BACKENDS'].append(
         ('netengine.backends.Dummy', 'Dummy')
     )
 
