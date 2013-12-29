@@ -11,13 +11,18 @@ from .models import *
 class DeviceInline(BaseStackedInline):
     model = Device
     
-    raw_id_fields = ('routing_protocols',)
-    autocomplete_lookup_fields = {
-        'm2m': ['routing_protocols']
-    }
+    if not settings.DEBUG:
+        readonly_fields =  [
+            'status', 'first_seen', 'last_seen'
+        ] + BaseStackedInline.readonly_fields
     
     if 'grappelli' in settings.INSTALLED_APPS:
         classes = ('grp-collapse grp-open', )
+        
+        raw_id_fields = ('routing_protocols',)
+        autocomplete_lookup_fields = {
+            'm2m': ['routing_protocols']
+        }
 
 
 class EthernetInline(BaseStackedInline):
@@ -85,7 +90,7 @@ class WirelessAdmin(InterfaceAdmin):
 
 
 class RoutingProtocolAdmin(BaseAdmin):
-    list_display   = ('name', 'version', 'url')
+    list_display   = ('name', 'version')
 
 
 class IpAdmin(BaseAdmin):

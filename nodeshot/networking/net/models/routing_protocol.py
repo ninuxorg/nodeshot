@@ -8,11 +8,11 @@ class RoutingProtocol(BaseDate):
     """ Routing Protocol Model """
     name = models.CharField(_('name'), max_length=50, choices=ROUTING_PROTOCOLS)
     version = models.CharField(_('version'), max_length=128, blank=True)
-    url = models.URLField(_('url'), blank=True)
     
     class Meta:
         app_label = 'net'
         db_table = 'net_routing_protocol'
+        unique_together = ('name', 'version')
     
     def __unicode__(self):
         return '%s %s' % (self.name, self.version)
