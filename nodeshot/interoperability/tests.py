@@ -35,6 +35,23 @@ class InteroperabilityTest(TestCase):
     def setUp(self):
         pass
     
+    def test_external_layer_creation(self):
+        layer = Layer()
+        layer.name = 'test'
+        layer.slug = 'test'
+        layer.description = 'test'
+        layer.is_external = True
+        layer.organization = 'test'
+        layer.center = Point(8.96166, 44.4185)
+        layer.full_clean()
+        layer.save()
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'None'
+        external.config = ''
+        external.full_clean()
+        external.save()
+    
     def test_not_interoperable(self):
         """ test not interoperable """
         # start capturing print statements
@@ -113,8 +130,8 @@ class InteroperabilityTest(TestCase):
             synchronize_external_layers.apply(['wrongvalue'])
             self.fail('should have got exception')
         except management.CommandError as e:
-            self.assertIn('wrongvalue', e.message)
-            self.assertIn('does not exist', e.message)
+            self.assertIn('wrongvalue', str(e))
+            self.assertIn('does not exist', str(e))
     
     def test_layer_admin(self):
         """ ensure layer admin does not return any error """

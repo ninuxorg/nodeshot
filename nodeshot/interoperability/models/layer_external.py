@@ -85,7 +85,7 @@ class LayerExternal(models.Model):
         
         super(LayerExternal, self).save(*args, **kwargs)
         
-        if after_save:
+        if after_save and self.synchronizer:
             self.synchronizer.after_external_layer_saved(self.config)
     
     @property
