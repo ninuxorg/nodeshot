@@ -460,3 +460,192 @@ class InteroperabilityTest(TestCase):
         layer = Layer.objects.get(pk=layer.id)
         layer.external.config = json.loads(layer.external.config)
         self.assertEqual(layer.external.config['last_time_streets_checked'], str(date.today()))
+    
+    def test_geojson_sync(self):
+        """ test GeoJSON sync """
+        
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        
+        url = '%snodeshot/testing/simple-geojson-test1.json' % settings.STATIC_URL
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.config = '{ "url": "%s", "map": {} }' % url
+        external.full_clean()
+        external.save()
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('2 nodes added', output.getvalue())
+        self.assertIn('0 nodes changed', output.getvalue())
+        self.assertIn('2 total external', output.getvalue())
+        self.assertIn('2 total local', output.getvalue())
+        
+        # start checking DB too
+        nodes = layer.node_set.all()
+        
+        # ensure all nodes have been imported
+        self.assertEqual(nodes.count(), 2)
+        
+        # check one particular node has the data we expect it to have
+        node = Node.objects.get(slug='simplegeojson')
+        self.assertEqual(node.name, 'simplegeojson')
+        self.assertEqual(node.address, 'simplegeojson')
+        geometry = GEOSGeometry('{"type":"Polygon","coordinates":[[[12.501493164066,41.990441051094],[12.583890625003,41.957770034531],[12.618222900394,41.912820024702],[12.607923217778,41.877552973685],[12.582088180546,41.82423212474],[12.574148841861,41.813357913568],[12.551532455447,41.799730560554],[12.525053688052,41.795155470656],[12.510505386356,41.793715689492],[12.43308610535,41.803249638226],[12.388883300784,41.813613798573],[12.371030517581,41.870906276755],[12.382016845706,41.898511105474],[12.386136718753,41.912820024702],[12.38064355469,41.926104006681],[12.38064355469,41.955727539561],[12.413602539065,41.974107637675],[12.445188232426,41.983295698272],[12.45617456055,41.981254021593],[12.476773925785,41.985337309484],[12.490506835941,41.985337309484],[12.506986328129,41.990441051094],[12.501493164066,41.990441051094]]]}')
+        self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
+        self.assertEqual(node.elev, 10.0)
+        
+        ### --- repeat --- ###
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('2 nodes unmodified', output.getvalue())
+        self.assertIn('0 nodes deleted', output.getvalue())
+        self.assertIn('0 nodes changed', output.getvalue())
+        self.assertIn('2 total external', output.getvalue())
+        self.assertIn('2 total local', output.getvalue())
+        
+        ### --- repeat with slightly different input --- ###
+        
+        url = '%snodeshot/testing/simple-geojson-test2.json' % settings.STATIC_URL
+        external.config = '{ "url": "%s", "map": {} }' % url
+        external.full_clean()
+        external.save()
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('1 nodes unmodified', output.getvalue())
+        self.assertIn('0 nodes deleted', output.getvalue())
+        self.assertIn('1 nodes changed', output.getvalue())
+        self.assertIn('2 total external', output.getvalue())
+        self.assertIn('2 total local', output.getvalue())
+    
+    def test_preexisting_name(self):
+        """ test preexisting names """
+        
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        
+        node = Node.first()
+        self.assertNotEqual(layer.id, node.layer.id)
+        node.name = 'simplejson'
+        node.save()
+        
+        url = '%snodeshot/testing/simple-geojson-test1.json' % settings.STATIC_URL
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.config = '{ "url": "%s", "map": {} }' % url
+        external.full_clean()
+        external.save()
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('2 nodes added', output.getvalue())
+        self.assertIn('0 nodes changed', output.getvalue())
+        self.assertIn('2 total external', output.getvalue())
+        self.assertIn('2 total local', output.getvalue())
+    
+    def test_key_mappings(self):
+        """ importing a file with different keys """
+        
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        
+        node = Node.first()
+        self.assertNotEqual(layer.id, node.layer.id)
+        node.name = 'simplejson'
+        node.save()
+        
+        url = '%snodeshot/testing/simple-geojson-test3.json' % settings.STATIC_URL
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.config = json.dumps({
+            "url": url,
+            "map": {
+                "name": "nome",
+                "description": "descrizione",
+                "address": "indirizzo",
+                "elevation": "altitudine"
+            }
+        })
+        external.full_clean()
+        external.save()
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('2 nodes added', output.getvalue())
+        self.assertIn('0 nodes changed', output.getvalue())
+        self.assertIn('2 total external', output.getvalue())
+        self.assertIn('2 total local', output.getvalue())
+        
+        node = Node.objects.get(slug='verycool')
+        self.assertEqual(node.name, 'veryCool')
+        self.assertEqual(node.address, 'veryCool indirizzo')
+        self.assertEqual(node.description, 'veryCool descrizione')
+        self.assertEqual(node.elev, 10.0)
+        
+        node = Node.objects.get(slug='secondo')
+        self.assertEqual(node.name, 'secondo')
+        self.assertEqual(node.address, 'secondo indirizzo')
+        self.assertEqual(node.description, 'secondo descrizione')
+        self.assertEqual(node.elev, 20.0)
