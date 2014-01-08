@@ -27,7 +27,6 @@ class Node(BaseAccessLevel):
     """
     name = models.CharField(_('name'), max_length=75, unique=True)
     slug = models.SlugField(max_length=75, db_index=True, unique=True)
-    address = models.CharField(_('address'), max_length=150, blank=True, null=True)
     status = models.ForeignKey(Status, blank=True, null=True)
     is_published = models.BooleanField(default=settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True))
     
@@ -35,13 +34,15 @@ class Node(BaseAccessLevel):
         # layer might need to be able to be blank, would require custom validation
         layer = models.ForeignKey('layers.Layer')
     
-    # nodes might be assigned to a foreign layer, therefore user can be left blank, requires custom validation
+    # owner, allow NULL
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     
-    # positioning
+    # geographic information
     geometry = models.GeometryField(_('geometry'), help_text=_('geometry of the node (point, polygon, line)'))
     elev = models.FloatField(_('elevation'), blank=True, null=True)
+    address = models.CharField(_('address'), max_length=150, blank=True, null=True)
     
+    # descriptive information
     description = models.TextField(_('description'), max_length=255, blank=True, null=True)
     notes = models.TextField(_('notes'), blank=True, null=True, help_text=_('for internal use only'))
     

@@ -9,13 +9,13 @@ from django.conf import settings
 
 from nodeshot.core.nodes.models import Node, Status
 
-from .base import BaseConverter
+from .base import BaseSynchronizer
 
 if settings.NODESHOT['SETTINGS'].get('HSTORE', False) is False:
     raise ImproperlyConfigured('HSTORE needs to be enabled for this converter to work properly')
 
 
-class ProvinceRomeTraffic(BaseConverter):
+class ProvinceRomeTraffic(BaseSynchronizer):
     """ Province of Rome Traffic interoperability class """
     
     REQUIRED_CONFIG_KEYS = [

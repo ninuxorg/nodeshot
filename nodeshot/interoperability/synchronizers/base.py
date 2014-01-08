@@ -10,8 +10,8 @@ from nodeshot.core.nodes.models import Node
 
 __all__ = [
     # classes
-    'BaseConverter',
-    'XMLConverter',
+    'BaseSynchronizer',
+    'XmlSynchronizer',
     
     # mixins
     'HttpRetrieverMixin',
@@ -19,8 +19,18 @@ __all__ = [
 ]
 
 
-class BaseConverter(object):
-    """ Base interoperability class that converts an XML file to JSON format and saves it in ''{{ MEDIA_ROOT }}/external/nodes/<layer_slug>.json'' """
+class BaseSynchronizer(object):
+    """
+    Base Synchronizer
+    Provides methods for:
+        * config validation
+        * django validation
+        * executing actions before or after specific events
+        * retrieve data
+        * extract data from imported source
+        * save data into DB
+        * log messages with different levels of verbosity
+    """
     
     REQUIRED_CONFIG_KEYS = []
     
@@ -90,15 +100,15 @@ class BaseConverter(object):
     
     def retrieve_data(self):
         """ retrieve data """
-        raise NotImplementedError("BaseConverter child class does not implement a retrieve_data method")
+        raise NotImplementedError("BaseSynchronizer child class does not implement a retrieve_data method")
     
     def parse(self):
         """ parse data """
-        raise NotImplementedError("BaseConverter child class does not implement a parse method")
+        raise NotImplementedError("BaseSynchronizer child class does not implement a parse method")
     
     def save(self):
         """ save output file on server's hard drive """
-        raise NotImplementedError("BaseConverter child class does not implement a save method")
+        raise NotImplementedError("BaseSynchronizer child class does not implement a save method")
     
     def verbose(self, message):
         if self.verbosity >= 2:
@@ -137,7 +147,7 @@ class XMLParserMixin(object):
             return ''
 
 
-class XMLConverter(HttpRetrieverMixin, XMLParserMixin, BaseConverter):
-    """ XML HTTP converter """
+class XmlSynchronizer(HttpRetrieverMixin, XMLParserMixin, BaseSynchronizer):
+    """ XML HTTP syncrhonizer """
     
     REQUIRED_CONFIG_KEYS = ['url']

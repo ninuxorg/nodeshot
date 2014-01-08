@@ -7,11 +7,11 @@ from django.conf import settings
 
 from nodeshot.core.nodes.models import Node, Status
 
-from .base import BaseConverter, HttpRetrieverMixin
+from .base import BaseSynchronizer, HttpRetrieverMixin
 
 
 
-class GeoJson(HttpRetrieverMixin, BaseConverter):
+class GeoJson(HttpRetrieverMixin, BaseSynchronizer):
     """ GeoJSON synchronizer """
     
     REQUIRED_CONFIG_KEYS = [

@@ -4,7 +4,7 @@ import simplejson as json
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 
 from ..models import NodeExternal
-from .base import XMLConverter
+from .base import XmlSynchronizer
 
 from celery.utils.log import get_logger
 logger = get_logger(__name__)

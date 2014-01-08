@@ -6,10 +6,10 @@ from django.contrib.gis.geos import Point
 
 from nodeshot.core.nodes.models import Node, Status
 
-from .base import XMLConverter
+from .base import XmlSynchronizer
 
 
-class OpenWISP(XMLConverter):
+class OpenWISP(XmlSynchronizer):
     """ OpenWISP GeoRSS interoperability class """
     
     def save(self):
