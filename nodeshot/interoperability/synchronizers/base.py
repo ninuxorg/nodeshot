@@ -3,9 +3,6 @@ import simplejson as json
 from xml.dom import minidom
 
 from django.core.exceptions import ImproperlyConfigured
-from django.conf import settings
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 
 from nodeshot.core.base.utils import pause_disconnectable_signals, resume_disconnectable_signals
 from nodeshot.core.nodes.models import Node
@@ -19,7 +16,6 @@ __all__ = [
     # mixins
     'HttpRetrieverMixin',
     'XMLParserMixin',
-    'JSONFileStorageMixin'
 ]
 
 
@@ -139,33 +135,6 @@ class XMLParserMixin(object):
         # empty tag
         else:
             return ''
-
-
-class JSONFileStorageMixin(object):
-    """
-    Mixin for saving a JSON file
-    
-    DEPRECATED
-    """
-    
-    def save(self, resource_name='nodes'):
-        """ save output file on server's hard drive """
-        name = self.layer.slug
-        content = self.parsed_data
-        
-        file_name = '%s.json' % name
-        file_contents = ContentFile(content)
-        path = '%sexternal/%s/%s' % (settings.MEDIA_ROOT, resource_name, file_name)
-        
-        # delete file if already exists
-        if default_storage.exists(path):
-            default_storage.delete(path)
-            
-        # save file on disk
-        file = default_storage.save(path, file_contents)
-        
-        # message that will be returned
-        self.message = 'JSON file saved in "%s"' % path
 
 
 class XMLConverter(HttpRetrieverMixin, XMLParserMixin, BaseConverter):
