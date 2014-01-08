@@ -171,7 +171,7 @@ class InteroperabilityTest(TestCase):
             external.clean()
     
     def test_openwisp(self):
-        """ test OpenWISP converter """
+        """ test OpenWISP synchronizer """
         
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
