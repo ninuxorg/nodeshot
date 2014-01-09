@@ -470,6 +470,8 @@ NODESHOT = {
     },
     'INTEROPERABILITY': [
         ('nodeshot.interoperability.synchronizers.Nodeshot', 'Nodeshot'),
+        ('nodeshot.interoperability.synchronizers.GeoJson', 'GeoJSON'),
+        ('nodeshot.interoperability.synchronizers.GeoRss', 'GeoRSS'),
         ('nodeshot.interoperability.synchronizers.OpenWISP', 'OpenWISP'),
         ('nodeshot.interoperability.synchronizers.OpenWISPCitySDK', 'OpenWISPCitySDK'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),

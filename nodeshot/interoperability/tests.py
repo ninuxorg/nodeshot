@@ -649,3 +649,69 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(node.address, 'secondo indirizzo')
         self.assertEqual(node.description, 'secondo descrizione')
         self.assertEqual(node.elev, 20.0)
+    
+    def test_georss_sync(self):
+        """ test GeoRSS sync """
+        
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        
+        url = '%snodeshot/testing/georss-simple-1.xml' % settings.STATIC_URL
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoRss'
+        external.config = '{ "url": "%s", "map": {} }' % url
+        external.full_clean()
+        external.save()
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('3 nodes added', output.getvalue())
+        self.assertIn('0 nodes changed', output.getvalue())
+        self.assertIn('3 total external', output.getvalue())
+        self.assertIn('3 total local', output.getvalue())
+        
+        # start checking DB too
+        nodes = layer.node_set.all()
+        
+        # ensure all nodes have been imported
+        self.assertEqual(nodes.count(), 3)
+        
+        # check one particular node has the data we expect it to have
+        node = Node.objects.get(slug='item-2')
+        self.assertEqual(node.name, 'item 2')
+        self.assertEqual(node.address, '')
+        geometry = GEOSGeometry('POINT (44.256 -70.92)')
+        self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
+        
+        ### --- repeat --- ###
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('3 nodes unmodified', output.getvalue())
+        self.assertIn('0 nodes deleted', output.getvalue())
+        self.assertIn('0 nodes changed', output.getvalue())
+        self.assertIn('3 total external', output.getvalue())
+        self.assertIn('3 total local', output.getvalue())
