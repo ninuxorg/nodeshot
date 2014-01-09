@@ -1,4 +1,3 @@
-from dateutil import parser as DateParser
 from django.contrib.gis.geos import Point
 from .base import XMLParserMixin, GenericGisSynchronizer
 
@@ -19,9 +18,6 @@ class OpenWISP(XMLParserMixin, GenericGisSynchronizer):
         updated_at = self.get_text(item, 'updated')
         description = self.get_text(item, 'title')
         address = self.get_text(item, 'description')
-        # convert dates to python datetime
-        created_at = DateParser.parse(created_at)
-        updated_at = DateParser.parse(updated_at)
         
         try:
             lat, lng = self.get_text(item, 'georss:point').split(' ')

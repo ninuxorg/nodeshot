@@ -1,6 +1,7 @@
 import requests
 import simplejson as json
 from xml.dom import minidom
+from dateutil import parser as DateParser
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template.defaultfilters import slugify
@@ -86,14 +87,20 @@ class BaseSynchronizer(object):
         self.parse()
         
         # TRICK: disable new_nodes_allowed_for_layer validation
-        Node._additional_validation.remove('new_nodes_allowed_for_layer')
+        try:
+            Node._additional_validation.remove('new_nodes_allowed_for_layer')
+        except ValueError as e:
+            print "WARNING! got exception: %s" % e
         # avoid sending zillions of notifications
         pause_disconnectable_signals()
         
         self.save()
         
         # Re-enable new_nodes_allowed_for_layer validation
-        Node._additional_validation.insert(0, 'new_nodes_allowed_for_layer')
+        try:
+            Node._additional_validation.insert(0, 'new_nodes_allowed_for_layer')
+        except ValueError as e:
+            print "WARNING! got exception: %s" % e
         # reconnect signals
         resume_disconnectable_signals()
         
@@ -181,8 +188,8 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             "elev": "float or none",
             "description": "string or empty string",
             "notes": "string or empty string",
-            "added", "date object",
-            "updated", "date object",
+            "added", "string date representation",
+            "updated", "string date representation",
             "data": {}  # dictionary with additional key/values or empty dict
         }
         """
@@ -238,6 +245,18 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         if not item['notes']:
             item['notes'] = ''
         
+        # convert dates to python datetime
+        try:
+            item['added'] = DateParser.parse(item['added'])
+        except Exception as e:
+            added = None
+            print "Exception while parsing 'added' date: %s" % e
+        try:
+            item['updated'] = DateParser.parse(item['updated'])
+        except Exception as e:
+            updated = None
+            print "Exception while parsing 'updated' date: %s" % e
+        
         result = {
             "name": item['name'],
             "slug": item['slug'],
@@ -249,8 +268,8 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             "elev": item['elev'],
             "description": item['description'],
             "notes": item['notes'],
-            "added": item.get('added', None),
-            "updated": item.get('updated', None),
+            "added": item['added'],
+            "updated": item['updated'],
             "data": {}
         }
         
