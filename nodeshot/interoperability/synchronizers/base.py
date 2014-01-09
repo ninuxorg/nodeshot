@@ -279,20 +279,7 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         
         return result
     
-    def save(self):
-        """
-        save data into DB:
-        
-         1. save new (missing) data
-         2. update only when needed
-         3. delete old data
-         4. generate report that will be printed
-        
-        constraints:
-         * ensure new nodes do not take a name/slug which is already used
-         * validate through django before saving
-         * use good defaults
-        """
+    def key_mapping(self, ):
         key_map = self.config.get('map', {})
         self.keys = {
             "name": key_map.get('name', 'name'),
@@ -307,7 +294,22 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             "updated": key_map.get('updated', 'updated'),
         }
         self.default_status = self.config.get('default_status', '')
+    
+    def save(self):
+        """
+        save data into DB:
         
+         1. save new (missing) data
+         2. update only when needed
+         3. delete old data
+         4. generate report that will be printed
+        
+        constraints:
+         * ensure new nodes do not take a name/slug which is already used
+         * validate through django before saving
+         * use good defaults
+        """
+        self.key_mapping()
         # retrieve all items
         items = self.parsed_data
         
