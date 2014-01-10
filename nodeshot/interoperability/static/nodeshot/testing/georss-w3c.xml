@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="/eqcenter/catalogs/rssxsl.php?feed=eqs7day-M5.xml" type="text/xsl" 
+                 media="screen"?>
+<rss version="2.0" 
+    xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" 
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+ <channel>
+    <title>USGS M5+ Earthquakes</title>
+    <description>Real-time, worldwide earthquake list for the past 7 days</description>
+    <link>http://earthquake.usgs.gov/eqcenter/</link>
+    <dc:publisher>U.S. Geological Survey</dc:publisher>
+    <pubDate>Thu, 27 Dec 2007 23:56:15 PST</pubDate>
+    <item>
+        <pubDate>Fri, 28 Dec 2007 05:24:17 GMT</pubDate>
+        <title>M 5.3, northern Sumatra, Indonesia</title>
+        <description>December 28, 2007 05:24:17 GMT</description>
+        <link>http://earthquake.usgs.gov/eqcenter/recenteqsww/Quakes/us2007llai.php</link>
+        <geo:lat>5.5319</geo:lat>
+        <geo:long>95.8972</geo:long>
+    </item>
+    <item>
+        <pubDate>Fri, 28 Dec 2008 05:24:17 GMT</pubDate>
+        <title>test 2</title>
+        <description>December 28, 2007 05:24:17 GMT</description>
+        <link>http://earthquake.usgs.gov/eqcenter/recenteqsww/Quakes/us2007llai.php</link>
+        <geo:lat>5.6319</geo:lat>
+        <geo:long>95.8932</geo:long>
+    </item>
+  </channel>
+ </rss>

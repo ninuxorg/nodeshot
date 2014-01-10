@@ -180,7 +180,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         
-        xml_url = '%snodeshot/testing/OpenWISP_external_layer.xml' % settings.STATIC_URL
+        xml_url = '%snodeshot/testing/openwisp-georss.xml' % settings.STATIC_URL
         
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISP'
@@ -220,7 +220,7 @@ class InteroperabilityTest(TestCase):
         
         ### --- with the following step we expect some nodes to be deleted --- ###
         
-        xml_url = '%snodeshot/testing/OpenWISP_external_layer2.xml' % settings.STATIC_URL
+        xml_url = '%snodeshot/testing/openwisp-georss2.xml' % settings.STATIC_URL
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
         
@@ -263,7 +263,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         
-        xml_url = '%snodeshot/testing/ProvinciaWIFI_external_layer.xml' % settings.STATIC_URL
+        xml_url = '%snodeshot/testing/provincia-wifi.xml' % settings.STATIC_URL
         
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWIFI'
@@ -307,7 +307,7 @@ class InteroperabilityTest(TestCase):
         
         ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
         
-        xml_url = '%snodeshot/testing/ProvinciaWIFI_external_layer2.xml' % settings.STATIC_URL
+        xml_url = '%snodeshot/testing/provincia-wifi2.xml' % settings.STATIC_URL
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
         
@@ -350,8 +350,8 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         
-        streets_url = '%snodeshot/testing/CitySDK_WP4_streets.json' % settings.STATIC_URL
-        measurements_url = '%snodeshot/testing/CitySDK_WP4_measurements.json' % settings.STATIC_URL
+        streets_url = '%snodeshot/testing/citysdk-wp4-streets.json' % settings.STATIC_URL
+        measurements_url = '%snodeshot/testing/citysdk-wp4-measurements.json' % settings.STATIC_URL
         
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinceRomeTraffic'
@@ -425,8 +425,8 @@ class InteroperabilityTest(TestCase):
         
         ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
         
-        streets_url = '%snodeshot/testing/CitySDK_WP4_streets_2.json' % settings.STATIC_URL
-        measurements_url = '%snodeshot/testing/CitySDK_WP4_measurements_2.json' % settings.STATIC_URL
+        streets_url = '%snodeshot/testing/citysdk-wp4-streets2.json' % settings.STATIC_URL
+        measurements_url = '%snodeshot/testing/citysdk-wp4-measurements2.json' % settings.STATIC_URL
         
         external.config = json.loads(external.config)
         external.config['streets_url'] = streets_url
@@ -471,7 +471,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         
-        url = '%snodeshot/testing/simple-geojson-test1.json' % settings.STATIC_URL
+        url = '%snodeshot/testing/geojson1.json' % settings.STATIC_URL
         
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
@@ -530,7 +530,7 @@ class InteroperabilityTest(TestCase):
         
         ### --- repeat with slightly different input --- ###
         
-        url = '%snodeshot/testing/simple-geojson-test2.json' % settings.STATIC_URL
+        url = '%snodeshot/testing/geojson2.json' % settings.STATIC_URL
         external.config = '{ "url": "%s", "map": {} }' % url
         external.full_clean()
         external.save()
@@ -567,7 +567,7 @@ class InteroperabilityTest(TestCase):
         node.name = 'simplejson'
         node.save()
         
-        url = '%snodeshot/testing/simple-geojson-test1.json' % settings.STATIC_URL
+        url = '%snodeshot/testing/geojson1.json' % settings.STATIC_URL
         
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
@@ -606,7 +606,7 @@ class InteroperabilityTest(TestCase):
         node.name = 'simplejson'
         node.save()
         
-        url = '%snodeshot/testing/simple-geojson-test3.json' % settings.STATIC_URL
+        url = '%snodeshot/testing/geojson3.json' % settings.STATIC_URL
         
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
@@ -650,8 +650,8 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(node.description, 'secondo descrizione')
         self.assertEqual(node.elev, 20.0)
     
-    def test_georss_sync(self):
-        """ test GeoRSS sync """
+    def test_georss_simple(self):
+        """ test GeoRSS simple """
         
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
@@ -660,7 +660,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         
-        url = '%snodeshot/testing/georss-simple-1.xml' % settings.STATIC_URL
+        url = '%snodeshot/testing/georss-simple.xml' % settings.STATIC_URL
         
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoRss'
@@ -694,6 +694,7 @@ class InteroperabilityTest(TestCase):
         node = Node.objects.get(slug='item-2')
         self.assertEqual(node.name, 'item 2')
         self.assertEqual(node.address, '')
+        self.assertEqual(node.updated.strftime('%Y-%m-%d'), '2006-08-17')
         geometry = GEOSGeometry('POINT (-70.92 44.256)')
         self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
         
@@ -715,3 +716,70 @@ class InteroperabilityTest(TestCase):
         self.assertIn('0 nodes changed', output.getvalue())
         self.assertIn('3 total external', output.getvalue())
         self.assertIn('3 total local', output.getvalue())
+    
+    def test_georss_w3c(self):
+        """ test GeoRSS w3c """
+        
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        
+        url = '%snodeshot/testing/georss-w3c.xml' % settings.STATIC_URL
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoRss'
+        external.config = '{ "url": "%s", "map": {} }' % url
+        external.full_clean()
+        external.save()
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('2 nodes added', output.getvalue())
+        self.assertIn('0 nodes changed', output.getvalue())
+        self.assertIn('2 total external', output.getvalue())
+        self.assertIn('2 total local', output.getvalue())
+        
+        # start checking DB too
+        nodes = layer.node_set.all()
+        
+        # ensure all nodes have been imported
+        self.assertEqual(nodes.count(), 2)
+        
+        # check one particular node has the data we expect it to have
+        node = Node.objects.get(slug='test-2')
+        self.assertEqual(node.name, 'test 2')
+        self.assertEqual(node.address, '')
+        #self.assertEqual(node.updated.strftime('%Y-%m-%d'), '2006-08-17')
+        geometry = GEOSGeometry('POINT (95.8932 5.6319)')
+        self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
+        
+        ### --- repeat --- ###
+        
+        # start capturing print statements
+        output = StringIO()
+        sys.stdout = output
+        
+        # execute command
+        management.call_command('synchronize', 'vienna', verbosity=0)
+        
+        # stop capturing print statements
+        sys.stdout = sys.__stdout__
+        
+        # ensure following text is in output
+        self.assertIn('2 nodes unmodified', output.getvalue())
+        self.assertIn('0 nodes deleted', output.getvalue())
+        self.assertIn('0 nodes changed', output.getvalue())
+        self.assertIn('2 total external', output.getvalue())
+        self.assertIn('2 total local', output.getvalue())
