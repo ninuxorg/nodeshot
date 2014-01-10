@@ -147,9 +147,15 @@ class XMLParserMixin(object):
         self.parsed_data = minidom.parseString(self.data)
     
     @staticmethod
-    def get_text(item, tag):
+    def get_text(item, tag, default=False):
         """ returns text content of an xml tag """
-        xmlnode = item.getElementsByTagName(tag)[0].firstChild
+        try:
+            xmlnode = item.getElementsByTagName(tag)[0].firstChild
+        except IndexError as e:
+            if default is not False:
+                return default
+            else:
+                raise IndexError(e)
         
         if xmlnode is not None:
             return unicode(xmlnode.nodeValue)

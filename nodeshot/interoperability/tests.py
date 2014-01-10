@@ -694,7 +694,7 @@ class InteroperabilityTest(TestCase):
         node = Node.objects.get(slug='item-2')
         self.assertEqual(node.name, 'item 2')
         self.assertEqual(node.address, '')
-        geometry = GEOSGeometry('POINT (44.256 -70.92)')
+        geometry = GEOSGeometry('POINT (-70.92 44.256)')
         self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
         
         ### --- repeat --- ###

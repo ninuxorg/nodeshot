@@ -1,5 +1,5 @@
 from dateutil import parser as DateParser
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import GEOSGeometry
 from .base import XMLParserMixin, GenericGisSynchronizer
 
 
@@ -58,10 +58,10 @@ class GeoRss(XMLParserMixin, GenericGisSynchronizer):
             "user": None,
             "geometry": GEOSGeometry('POINT (%s %s)' % (lng, lat)),
             "elev": None,
-            "description": self.get_text(item, self.keys['description']),
+            "description": self.get_text(item, self.keys['description'], ''),
             "notes": '',
-            "added": self.get_text(item, self.keys['added']),
-            "updated": self.get_text(item, self.keys['updated']),
+            "added": self.get_text(item, self.keys['added'], None),
+            "updated": self.get_text(item, self.keys['updated'], None),
             "data": {}
         }
         
