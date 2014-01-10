@@ -16,7 +16,9 @@ Replace *http://localhost:8000* with your actual hostname.
 Settings
 ========
 
-The API is enabled by default in ``settings.py``::
+The API is enabled by default in ``settings.py``:
+
+.. code-block:: python
 
     INSTALLED_APPS = [
         # ...

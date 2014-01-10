@@ -4,6 +4,11 @@ Import data from older versions
 
 The new version provides an integrated tool that allows to import data from older nodeshot versions (0.9.x).
 
+.. warning::
+    this tool is a work in progress, please report any bug in our `Mailing List`_.
+
+.. _Mailing List: http://ml.ninux.org/mailman/listinfo/nodeshot.
+
 =====================
 Internal dependencies
 =====================
@@ -77,7 +82,9 @@ Enable in settings.py
 
 Uncomment the following section in ``settings.py`` and tweak the settings
 ``ENGINE``, ``NAME``, ``USER``, ``PASSWORD``, ``HOST`` and ``PORT``
-according to your configuration, but leave ``DATABASE_ROUTERS`` unchanged::
+according to your configuration, but leave ``DATABASE_ROUTERS`` unchanged:
+
+.. code-block:: python
 
     if 'test' not in sys.argv:
         DATABASES['old_nodeshot'] = {
@@ -93,7 +100,9 @@ according to your configuration, but leave ``DATABASE_ROUTERS`` unchanged::
             'nodeshot.extra.oldimporter.db.OldNodeshotRouter'
         ]
 
-Uncomment ``nodeshot.extra.oldimporter`` in ``settings.INSTALLED_APPS``::
+Uncomment ``nodeshot.extra.oldimporter`` in ``settings.INSTALLED_APPS``:
+
+.. code-block:: python
 
     INSTALLED_APPS = [
         # dependencies
@@ -110,7 +119,9 @@ Uncomment ``nodeshot.extra.oldimporter`` in ``settings.INSTALLED_APPS``::
         # ...
     ]
 
-And set the ``DEFAULT_LAYER`` (object id/primary key)::
+And set the ``DEFAULT_LAYER`` (object id/primary key):
+
+.. code-block:: python
 
     # ...
 

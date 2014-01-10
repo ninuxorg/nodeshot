@@ -2,7 +2,10 @@
 Install 
 *******
 
-This file describes how to install nodeshot on **Ubuntu Server 12.04 LTS**.
+.. warning::
+    This file describes how to install nodeshot on **Ubuntu Server 12.04 LTS**.
+    
+    Other Linux distribution will be good as well but you will have to use the package names according to your distribution package manager.
 
 Other linux distributions will work as well but you will need to find the right package names to install for the specific distribution you are using.
 
@@ -178,13 +181,17 @@ For more information about the secret settings, see the relative `Django Documen
 
 .. _Django Documentation: https://docs.djangoproject.com/en/1.5/ref/settings/#std:setting-SECRET_KEY
 
-Change secret key in ``settings.py``::
+Change secret key in ``settings.py``:
+
+.. code-block:: python
 
 	#SECRET_KEY = .....
 	# must be uncommented
 	SECRET_KEY = 'keep same length but change some characters'
 
-Setup database and static files (images, css, js)::
+Setup database and static files (images, css, js):
+
+.. code-block:: bash
 
 	# will prompt you to create a superuser, proceed!
 	python manage.py syncdb && python manage.py migrate
@@ -193,7 +200,9 @@ Setup database and static files (images, css, js)::
 
 If you are installing for **development**, you are done!
 
-You just need to **run the django development server** in order to see the web application::
+You just need to **run the django development server** in order to see the web application:
+
+.. code-block:: bash
 
     # for development only!
     # listens only on 127.0.0.1
@@ -203,7 +212,6 @@ You just need to **run the django development server** in order to see the web a
     # alternatively, if you need to reach the dev server for other computers
     # on the same LAN, tell it to listen on all the interfaces:
     python manage.py runserver 0.0.0.0:8000
-
 
 
 .. _production-instructions:
@@ -218,6 +226,9 @@ In production you will need more reliable instruments, we recommend the followin
 * **uWSGI**: application server (serves requests to django)
 * **Supervisor**: daemon process manager (used to manage uwsgi, celery and celery-beat)
 * **Redis**: in memory key-value store (used as a message broker and cache storage)
+
+.. note::
+    If you are installing for development you can skip to the next chapter.
 
 -----
 Nginx

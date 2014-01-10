@@ -107,19 +107,26 @@ When developing you can use the django management command "synchronize", which c
 Writing new synchronizers
 =========================
 
-To write new synchronizers, you should extend the class ``BaseConverter`` in ``/nodeshot/interoperability/synchronizers/base.py``::
+To write new synchronizers, you should extend the class ``GenericGisSynchronizer`` in ``/nodeshot/interoperability/synchronizers/base.py``:
 
-    class MyVeryCoolApp(BaseConverter):
+.. code-block:: python
+
+    from nodeshot.interoperability.synchronizer.base import GenericGisSynchronizer
+    
+    class MyVeryCoolApp(GenericGisSynchronizer):
         """ Synchronizer for my MyVeryCoolApp """
         pass
 
-TODO...
+.. note::
+    this section is a work in progress.
 
 Save the synchronizer in your python path, name it exactly as you named the class, in our example that would be ``MyVeryCoolApp.py``:
 
 Once the file is saved and you are sure it's on your pythonpath you should add a
 tuple in your settings.py in which the first element is the path to the file and
-the second element is the name you want to show in the admin interface in the list *"synchronizer_class"*::
+the second element is the name you want to show in the admin interface in the list *"synchronizer_class"*:
+
+.. code-block:: python
 
     NODESHOT = {
         # ...
