@@ -72,6 +72,7 @@ class LayerExternal(models.Model):
                     raise ValidationError(_('Required config key "%s" missing from external layer configuration' % key))
             
             try:
+                self.synchronizer.config = config
                 self.synchronizer.clean()
             except ImproperlyConfigured as e:
                 raise ValidationError(e.message)
