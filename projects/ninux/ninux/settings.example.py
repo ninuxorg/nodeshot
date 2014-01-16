@@ -307,9 +307,7 @@ LOGGING = {
 
 CACHES = {
     'default': {
-        #'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        'LOCATION': '%s/cache' % os.path.dirname(os.path.realpath(__file__)),
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'TIMEOUT': 172800 if not DEBUG else 300,
         'OPTIONS': {
             'MAX_ENTRIES': 1000
