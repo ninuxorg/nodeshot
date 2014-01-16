@@ -76,6 +76,7 @@ class NodeListSerializer(NodeDetailSerializer):
         
         read_only_fields = ['added', 'updated']
         geo_field = 'geometry'
+        id_field = 'slug'
 
 
 class PaginatedNodeListSerializer(pagination.PaginationSerializer):
