@@ -783,3 +783,40 @@ class InteroperabilityTest(TestCase):
         self.assertIn('0 nodes changed', output.getvalue())
         self.assertIn('2 total external', output.getvalue())
         self.assertIn('2 total local', output.getvalue())
+    
+    def test_openlabor_get_nodes(self):
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = True
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        
+        url = '%snodeshot/testing/requests.json' % settings.STATIC_URL
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenLabor'
+        external.config = json.dumps({
+            "open311_url": '%snodeshot/testing/' % settings.STATIC_URL,
+            "service_code_get": "001",
+            "service_code_post": "002"
+        })
+        external.full_clean()
+        external.save()
+        
+        url = reverse('api_layer_nodes_list', args=[layer.slug])
+        response = self.client.get(url)
+        nodes = response.data['nodes']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(nodes[0]['name'], 'SARTO CONFEZIONISTA')
+        self.assertEqual(nodes[0]['address'], 'Via Lussemburgo snc, Anzio - 00042')
+        
+        # test geojson
+        url = reverse('api_layer_nodes_geojson', args=[layer.slug])
+        response = self.client.get(url)
+        nodes = response.data['features']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(nodes[0]['properties']['name'], 'SARTO CONFEZIONISTA')
+        self.assertEqual(nodes[0]['properties']['address'], 'Via Lussemburgo snc, Anzio - 00042')
