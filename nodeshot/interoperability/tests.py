@@ -792,8 +792,6 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         
-        url = '%snodeshot/testing/requests.json' % settings.STATIC_URL
-        
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.OpenLabor'
         external.config = json.dumps({
@@ -820,3 +818,42 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(len(nodes), 2)
         self.assertEqual(nodes[0]['properties']['name'], 'SARTO CONFEZIONISTA')
         self.assertEqual(nodes[0]['properties']['address'], 'Via Lussemburgo snc, Anzio - 00042')
+    
+    def test_openlabor_add_node(self):
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = True
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+        
+        url = 'http://devopenlabor.lynxlab.com/api/v1'
+        
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenLabor'
+        external.config = json.dumps({
+            "open311_url": url,
+            "service_code_get": "001",
+            "service_code_post": "002"
+        })
+        external.full_clean()
+        external.save()
+        
+        node = Node()
+        node.name = 'offerta di lavoro di test'
+        node.description = 'offerta di lavoro inserita automaticamente tramite unit test'
+        node.geometry = 'POINT (12.5823391919000012 41.8721429276999820)'
+        node.layer = layer
+        node.user_id = 1
+        node.address = 'via del test'
+        node.data = {
+            "professional_profile": "professional_profile test",
+            "qualification_required": "qualification_required test",
+            "contract_type": "contract_type test",
+            "zip_code": "zip code test",
+            "city": "city test"
+        }
+        
+        node.save()
+        self.assertIsNotNone(node.external.external_id)
+    

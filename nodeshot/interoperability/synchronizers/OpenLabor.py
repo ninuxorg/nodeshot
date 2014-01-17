@@ -8,10 +8,16 @@ from django.core.cache import cache
 
 from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
+
+from nodeshot.core.base.utils import now_after
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.nodes.serializers import NodeListSerializer
+from nodeshot.interoperability.models import NodeExternal
 
 from .base import BaseSynchronizer
+
+from celery.utils.log import get_logger
+logger = get_logger(__name__)
 
 
 class OpenLaborSerializer(NodeListSerializer):
@@ -21,7 +27,7 @@ class OpenLaborSerializer(NodeListSerializer):
     details = serializers.SerializerMethodField('get_details')
     
     def get_details(self, obj):
-        """ returns url to image file or empty string otherwise """
+        """ return job detail """
         return obj.data.get('more_info', None)
 
 
@@ -51,6 +57,103 @@ class OpenLabor(BaseSynchronizer):
             self.open311_url = self.config['open311_url']
         else:
             self.open311_url = '%s/' % self.config['open311_url']
+        
+        # url from where to fetch nodes
+        self.get_url = '%srequests.json?service_code=%s' % (
+            self.open311_url,
+            self.config['service_code_get']
+        )
+        
+        # url for POST
+        self.post_url = '%srequests.json' % self.open311_url
+    
+    def to_nodeshot(self, node):
+        """
+        takes an openlabor structure as input
+        and returns a dictionary representing a nodeshot node model instance
+        """
+        latitude = node.get('latitude', False)
+        longitude = node.get('longitude', False)
+        
+        address = node.get('address', None)
+        city = node.get('city', None)
+        cap = node.get('CAP', None)
+        
+        full_address = address
+        # if city info available insert it in full_address
+        if city:
+            full_address = '%s, %s' % (full_address, city)
+        # same for cap
+        if cap:
+            full_address = '%s - %s' % (full_address, cap)
+        
+        additional_data = {
+            "professional_profile": node.get('professionalProfile', None),
+            "qualification_required": node.get('qualificationRequired', None),
+            "phone": node.get('phone', None),
+            "fax": node.get('fax', None),
+            "email": node.get('email', None),
+            "address": address,
+            "city": city,
+            "cap": cap,
+            "more_info": node.get('linkMoreInfo', None)
+        }
+        
+        added = node.get('dateInsert', None)
+        # convert timestamp to date
+        if added:
+            added = datetime.utcfromtimestamp(int(added))
+        
+        return {
+            "name": node.get('position', ''), 
+            "slug": node.get('idJobOriginal', None), 
+            "layer_id": self.layer.id,
+            "user": None, 
+            "status": None,
+            "geometry": Point(float(longitude), float(latitude)), 
+            "elev": None, 
+            "address": full_address, 
+            "description": node.get('notes', ''), 
+            "data": additional_data, 
+            "updated": added, 
+            "added": added,  # no updated info, set insertion date as last update
+        }
+    
+    def to_external(self, node):
+        """
+        takes a nodeshot Node instance as input
+        and returns a dictionary representing JSON structure of OpenLabor
+        """
+        # calculated automatically 1 month after now
+        job_expiration = int(now_after(days=30).strftime('%s'))
+        
+        return {
+            "service_code": self.config['service_code_post'],
+            "lat": node.point[1],
+            "long": node.point[0],
+            "address_string": node.address,
+            "email": node.user.email,
+            "first_name": node.user.first_name,
+            "last_name": node.user.last_name,
+            "description": node.description,
+            "attributes": {
+                "api_key": "temporarily_not_used",
+                "locale": "it_IT",
+                "position": node.name,
+                "professionalProfile": node.data.get('professional_profile'),
+                "qualificationRequired": node.data.get('qualification_required'),
+                "contractType": node.data.get('contract_type', ''),
+                "workersRequired": node.data.get('workers_required', 1),
+                "jobExpiration": job_expiration,
+                "notes": node.description,
+                "address": node.address,
+                "zipCode": node.data.get('zip_code', None),
+                "cityCompany": node.data.get('city', None),
+                "sourceJob": node.user.email,
+                "sourceJobName": node.user.first_name,
+                "sourceJobSurname": node.user.last_name
+            }
+        }
     
     def get_nodes(self, class_name, params):
         """ get nodes """
@@ -62,17 +165,16 @@ class OpenLabor(BaseSynchronizer):
             response_format = 'json'
             SerializerClass = OpenLaborSerializer
         
-        layer_id = self.layer.id
         layer_name = self.layer.name
-        cache_key = 'layer_%s_nodes.%s' % (layer_id, response_format)
+        cache_key = 'layer_%s_nodes.%s' % (self.layer.id, response_format)
         serialized_nodes = cache.get(cache_key, False)
         
-        if serialized_nodes is False:
-            # url from where to fetch nodes
-            url = '%srequests.json?service_code=%s' % (self.open311_url, self.config['service_code_get'])
-            
+        if serialized_nodes is False:            
             try:
-                response = requests.get(url, params=params)
+                response = requests.get(
+                    self.get_url,
+                    verify=self.config.get('verify_SSL', True)
+                )
             except requests.exceptions.ConnectionError as e:
                 return {
                     'error': _('external layer not reachable'),
@@ -91,57 +193,13 @@ class OpenLabor(BaseSynchronizer):
             
             # loop over all the entries and convert to nodeshot format
             for job in response.data:
-                latitude = job.get('latitude', False)
-                longitude = job.get('longitude', False)
-                
-                if not latitude or not longitude:
+                # skip records which do not have geographic information
+                if not job.get('latitude', False) or not job.get('longitude', False):
                     continue
-                
-                address = job.get('address', None)
-                city = job.get('city', None)
-                cap = job.get('CAP', None)
-                
-                full_address = address
-                # if city info available insert it in full_address
-                if city:
-                    full_address = '%s, %s' % (full_address, city)
-                # same for cap
-                if cap:
-                    full_address = '%s - %s' % (full_address, cap)
-                
-                additional_data = {
-                    "professional_profile": job.get('professionalProfile', None),
-                    "qualification_required": job.get('qualificationRequired', None),
-                    "phone": job.get('phone', None),
-                    "fax": job.get('fax', None),
-                    "email": job.get('email', None),
-                    "address": address,
-                    "city": city,
-                    "cap": cap,
-                    "more_info": job.get('linkMoreInfo', None)
-                }
-                
-                added = job.get('dateInsert', None)
-                # convert timestamp to date
-                if added:
-                    added = datetime.utcfromtimestamp(int(added))
-                
+                # convert response in nodeshot format
+                node_dictionary = self.to_nodeshot(job)
                 # create Node model instance (needed for rest_framework serializer)
-                node = Node(**{
-                    "name": job.get('position', ''), 
-                    "slug": job.get('idJobOriginal', None), 
-                    "layer_id": layer_id,
-                    "user": None, 
-                    "status": None,
-                    "geometry": Point(float(longitude), float(latitude)), 
-                    "elev": None, 
-                    "address": full_address, 
-                    "description": job.get('notes', ''), 
-                    "data": additional_data, 
-                    "updated": added, 
-                    "added": added,  # no updated info, set insertion date as last update
-                    #"details": job.get('linkMoreInfo', None)
-                })
+                node = Node(**node_dictionary)
                 node.layer_name = layer_name  # hack to avoid too many queries to get layer name each time
                 nodes.append(node)
             
@@ -150,3 +208,32 @@ class OpenLabor(BaseSynchronizer):
             cache.set(cache_key, serialized_nodes, 86400)  # cache for 1 day
         
         return serialized_nodes
+    
+    def add(self, node):
+        """ Add a new record into OpenLabor db """
+        openlabor_record = self.to_external(node)
+        
+        # openlabor sync
+        response = requests.post(
+                        self.post_url,
+                        data=openlabor_record,
+                        verify=self.config.get('verify_SSL', True)
+                    )
+        
+        if response.status_code != 200:
+            message = 'ERROR while creating "%s". Response: %s' % (node.name, response.content)
+            logger.error('== %s ==' % message)
+            return False
+        
+        try:
+            data = response.json()
+        except json.JSONDecodeError as e:
+            logger.error('== ERROR: JSONDecodeError %s ==' % e)
+            return False
+        
+        external = NodeExternal.objects.create(node=node, external_id=int(data))
+        message = 'New record "%s" saved in CitySDK through the HTTP API"' % node.name
+        self.verbose(message)
+        logger.info('== %s ==' % message)
+        
+        return True
