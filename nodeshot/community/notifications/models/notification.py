@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext as __
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.sites.models import Site
@@ -152,6 +152,9 @@ class Notification(BaseDate):
             return ''
         
         if action.startswith('reverse'):
-            return eval(action)
+            try:
+                return eval(action)
+            except NoReverseMatch:
+                return ''
         
         return action

@@ -204,7 +204,7 @@ class OpenLabor(BaseSynchronizer):
                 nodes.append(node)
             
             # serialize with rest framework to achieve consistency
-            serialized_nodes = SerializerClass(nodes).data
+            serialized_nodes = SerializerClass(nodes, many=True).data
             cache.set(cache_key, serialized_nodes, 86400)  # cache for 1 day
         
         return serialized_nodes
@@ -235,5 +235,10 @@ class OpenLabor(BaseSynchronizer):
         message = 'New record "%s" saved in CitySDK through the HTTP API"' % node.name
         self.verbose(message)
         logger.info('== %s ==' % message)
+        
+        # clear cache
+        cache_key1 = 'layer_%s_nodes.json' % self.layer.id
+        cache_key2 = 'layer_%s_nodes.geojson' % self.layer.id
+        cache.delete_many([cache_key1, cache_key2])
         
         return True
