@@ -129,30 +129,32 @@ class OpenLabor(BaseSynchronizer):
         
         return {
             "service_code": self.config['service_code_post'],
-            "lat": node.point[1],
-            "long": node.point[0],
+            #"lat": node.point[1],
+            #"long": node.point[0],
+            #"latitude": node.point[1],
+            #"longitude": node.point[0],
+            "j_latitude": node.point[1],
+            "j_longitude": node.point[0],
+            "address": node.address,
             "address_string": node.address,
             "email": node.user.email,
             "first_name": node.user.first_name,
             "last_name": node.user.last_name,
             "description": node.description,
-            "attributes": {
-                "api_key": "temporarily_not_used",
-                "locale": "it_IT",
-                "position": node.name,
-                "professionalProfile": node.data.get('professional_profile'),
-                "qualificationRequired": node.data.get('qualification_required'),
-                "contractType": node.data.get('contract_type', ''),
-                "workersRequired": node.data.get('workers_required', 1),
-                "jobExpiration": job_expiration,
-                "notes": node.description,
-                "address": node.address,
-                "zipCode": node.data.get('zip_code', None),
-                "cityCompany": node.data.get('city', None),
-                "sourceJob": node.user.email,
-                "sourceJobName": node.user.first_name,
-                "sourceJobSurname": node.user.last_name
-            }
+            "api_key": "temporarily_not_used",
+            "locale": "it_IT",
+            "position": node.name,
+            "professionalProfile": node.data.get('professional_profile'),
+            "qualificationRequired": node.data.get('qualification_required'),
+            "contractType": node.data.get('contract_type', ''),
+            "workersRequired": node.data.get('workers_required', 1),
+            "jobExpiration": job_expiration,
+            "notes": node.description,
+            "zipCode": node.data.get('zip_code', None),
+            "cityCompany": node.data.get('city', None),
+            "sourceJob": node.user.email,
+            "sourceJobName": node.user.first_name,
+            "sourceJobSurname": node.user.last_name
         }
     
     def get_nodes(self, class_name, params):
@@ -216,7 +218,8 @@ class OpenLabor(BaseSynchronizer):
         # openlabor sync
         response = requests.post(
                         self.post_url,
-                        data=openlabor_record,
+                        data=json.dumps(openlabor_record),
+                        headers={ 'Content-type': 'application/json' },
                         verify=self.config.get('verify_SSL', True)
                     )
         
