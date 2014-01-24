@@ -28,6 +28,10 @@ class CustomDataMixin(object):
         * self.get_custom_data(): method that specifies the custom data to pass to the custom serializer
     """
     
+    def get_custom_data(self):
+        """ automatically determine user on creation """
+        raise NotImplementedError('CustomDataMixin needs a get_custom_data method')
+    
     def get_custom_serializer(self, **kwargs):
         """ returns the custom serializer class """
         try:
