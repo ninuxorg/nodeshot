@@ -11,6 +11,10 @@ urlpatterns = patterns('nodeshot.open311.views',
         name='api_service_definition'),
     
     url(r'^open311/requests/$',
-        'request_list',
+        'service_request',
         name='api_request_list'),
+    #
+    #url(r'^open311/requests/$',
+    #    'request_list',
+    #    name='api_request_list'),
 )

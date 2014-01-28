@@ -4,6 +4,7 @@ nodeshot.open311.tests
 
 import simplejson as json
 from django.core.urlresolvers import reverse
+from django.contrib.gis.geos import GEOSGeometry
 
 from nodeshot.core.base.tests import BaseTestCase, user_fixtures
 from nodeshot.open311.base import SERVICES
@@ -64,3 +65,123 @@ class Open311Request(BaseTestCase):
         
         # ensure 7 attributes
         self.assertEqual(len(response.data['attributes']), 2)
+        
+    def test_service_request_wrong_service(self):
+        login = self.client.login(username='admin', password='tester')
+        service_request={'service_code':'not_exists'}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        self.assertEqual(response.status_code, 404)
+        
+    def test_service_request_node(self):
+        login = self.client.login(username='admin', password='tester')
+        
+        #Node
+        service_request={
+                        'service_code':"node",
+                        "name": "montesacro4",
+                        "slug": "montesacro4",
+                        "layer": "rome",
+                        "lat": "22.5253",
+                        "lng": "41.8890",
+                        "description": "test",
+                        "geometry": "POINT (22.5253334454477372 41.8890404543067518)"
+                        }
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 201)
+        
+    def test_service_request_node_incomplete(self):
+        login = self.client.login(username='admin', password='tester')
+               
+        service_request={
+                        'service_code':"node",
+                        "slug": "montesacro4",
+                        "layer": "rome",
+                        "lat": "22.5253",
+                        "lng": "41.8890",
+                        "description": "test",
+                        "geometry": "POINT (22.5253334454477372 41.8890404543067518)"
+                        }
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 400)
+    
+    def test_service_request_vote(self):
+        login = self.client.login(username='admin', password='tester')   
+        #Vote
+        service_request={'service_code':"vote","node": 1,"vote":1}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 201)
+        
+    def test_service_request_vote_incomplete(self):
+        login = self.client.login(username='admin', password='tester')   
+        #Vote
+        service_request={'service_code':"vote","vote":1}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 400)
+        
+    def test_service_request_vote_incorrect(self):
+        login = self.client.login(username='admin', password='tester')   
+        #Vote
+        service_request={'service_code':"vote","node": 1,"vote":10}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 400)
+        
+    def test_service_request_rating(self):
+        login = self.client.login(username='admin', password='tester')   
+        #Vote
+        service_request={'service_code':"rate","node": 1,"value":1}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 201)
+        
+    def test_service_request_rating_incomplete(self):
+        login = self.client.login(username='admin', password='tester')   
+        #Vote
+        service_request={'service_code':"rate","value":1}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 400)
+        
+    def test_service_request_rating_incorrect(self):
+        login = self.client.login(username='admin', password='tester')   
+        #Vote
+        service_request={'service_code':"rate","node": 1,"value":20}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 400)
+        
+    def test_service_request_comment(self):
+        login = self.client.login(username='admin', password='tester')   
+        #Vote
+        service_request={'service_code':"comment","node": 1,"text":"OK"}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 201)
+        
+    def test_service_request_comment_incomplete(self):
+        login = self.client.login(username='admin', password='tester')   
+        #Vote
+        service_request={'service_code':"comment","text":"OK"}
+        url = "%s" % reverse('api_request_list')
+        response = self.client.post(url,service_request)
+        print response.content
+        self.assertEqual(response.status_code, 400)
+        
+    
+        
+        
+        

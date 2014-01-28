@@ -2,7 +2,7 @@ from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from rest_framework import generics, permissions, authentication
+from rest_framework import generics, permissions, authentication, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -71,7 +71,7 @@ class ServiceDefinition(APIView):
 service_definition = ServiceDefinition.as_view()
 
 
-class RequestList(generics.ListCreateAPIView):
+class RequestInsert(generics.ListCreateAPIView):
     """
     ### GET
     
@@ -81,50 +81,91 @@ class RequestList(generics.ListCreateAPIView):
     
     Post a request
     """
-    permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
     authentication_classes = (authentication.SessionAuthentication,)
-    #model= Node
-    queryset = Node.objects.published()
-    serializer_class= RequestListSerializer
-    renderer_classes = (JSONRenderer,)
+    #serializer_class= NodeRequestSerializer
+    model=Node
     
-    def post(self, request, format=None):
-        attributes = self.request.POST
-        if not 'action' in attributes.keys():
-            response="Please specify an action"
-            return Response(response)
-        else:
-            #action=attributes.action
-            return Response('ok')
-        #nodes_count = Node.objects.count()
-        #content = {'nodes': nodes_count}
-        return Response(attributes)
+    def get_custom_data(self):
+        """ additional request.DATA """
+        
+        return {
+            'user': self.request.user.id
+        }
     
-    #def get_queryset(self):
-    #    """
-    #    Optionally restricts the returned nodes
-    #    by filtering against a `search` query parameter in the URL.
-    #    """
-    #    # retrieve all nodes which are published and accessible to current user
-    #    # and use joins to retrieve related fields
-    #    queryset = super(RequestList, self).get_queryset().select_related('layer', 'status', 'user')
-    #    
-    #    # Control on attributes inserted
-    #    attributes = self.request.QUERY_PARAMS
-    #    
-    #    #if search is not None:
-    #    #    search_query = (
-    #    #        Q(name__icontains=search) |
-    #    #        Q(slug__icontains=search) |
-    #    #        Q(description__icontains=search) |
-    #    #        Q(address__icontains=search)
-    #    #    )
-    #    #    # add instructions for search to queryset
-    #    #    queryset = queryset.filter(search_query)
-    #    
-    #    #return queryset
-    #    return Response('no')
+    def get(self, request, *args, **kwargs):
+        service_code = request.GET['service_code']
+        
+        if service_code not in SERVICES.keys():
+            return Response({ 'detail': _('Service not found') }, status=404)
+        
+        #serializers = {
+        #    'node': ServiceNodeSerializer,
+        #    'vote': ServiceVoteSerializer,
+        #    'comment': ServiceCommentSerializer,
+        #    'rate': ServiceRatingSerializer,
+        #}
+        #
+        ## init right serializer
+        #data = serializers[service_type]().data
+        return self.list(request, *args, **kwargs)
     
-request_list = RequestList.as_view()
+    def post(self, request, *args, **kwargs):
+        service_code = request.POST['service_code']
+        
+        if service_code not in SERVICES.keys():
+            return Response({ 'detail': _('Service not found') }, status=404)
+        
+        serializers = {
+            'node': NodeRequestSerializer,
+            'vote': VoteRequestSerializer,
+            'comment': CommentRequestSerializer,
+            'rate': RatingRequestSerializer,
+        }
+        
+        # init right serializer
+        kwargs['service_code'] = service_code
+        kwargs['serializer'] = serializers[service_code]
+        
+        user=self.get_custom_data()
+        
+        request.UPDATED = request.POST.copy()
+        request.UPDATED['user'] = user['user']
+        
+        if service_code == 'node':
+            layer=Layer.objects.get(slug=request.POST['layer'])           
+            request.UPDATED['layer'] = layer.id
+
+        return self.create(request, *args, **kwargs)
+   
+    def create(self, request, *args, **kwargs):
+        
+        #service_request={'service_code':"node","name": "montesacro10","slug":"montesacro10","layer": 1,"lat": "22.5253","lng": "41.8890","description": "test","geometry": "POINT (22.5253334454477372 41.8890404543067518)"}
+        serializer = kwargs['serializer']( data=request.UPDATED, files=request.FILES)
+        
+        if serializer.is_valid():
+            self.pre_save(serializer.object)
+            self.object = serializer.save(force_insert=True)
+            self.post_save(self.object, created=True)
+            headers = self.get_success_headers(serializer.data)
+            response_311=kwargs['service_code'] + '-' + str(self.object.id)
+            return Response(response_311, status=status.HTTP_201_CREATED,
+                            headers=headers)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    #def create(self, request, *args, **kwargs):
+    #    serializer = self.get_serializer(data=request.DATA, files=request.FILES)
+    #
+    #    if serializer.is_valid():
+    #        self.pre_save(serializer.object)
+    #        self.object = serializer.save(force_insert=True)
+    #        self.post_save(self.object, created=True)
+    #        headers = self.get_success_headers(serializer.data)
+    #        return Response(serializer.data, status=status.HTTP_201_CREATED,
+    #                        headers=headers)
+    #
+    #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+service_request = RequestInsert.as_view()
 
 

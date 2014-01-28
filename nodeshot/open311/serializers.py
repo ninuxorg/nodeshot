@@ -9,6 +9,7 @@ from rest_framework_gis import serializers as geoserializers
 
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
+from nodeshot.community.participation.models import Vote,Comment,Rating
 from nodeshot.core.nodes.serializers import NodeListSerializer
 
 from .base import SERVICES
@@ -20,7 +21,10 @@ __all__ = [
     'ServiceNodeSerializer',
     'ServiceVoteSerializer',
     'ServiceListSerializer',
-    'RequestListSerializer',
+    'NodeRequestSerializer',
+    'VoteRequestSerializer',
+    'CommentRequestSerializer',
+    'RatingRequestSerializer',
 ]
 
 RATING_CHOICES = [ n for n in range(1, 11) ]
@@ -291,48 +295,39 @@ class ServiceRatingSerializer(serializers.Serializer):
         fields = ('service_code', 'attributes') 
 
 
-class RequestListSerializer(serializers.ModelSerializer):
+class NodeRequestSerializer(serializers.ModelSerializer):
     """
-    Open 311 service request list
+    Open 311 node request 
     """
-    #definition = serializers.HyperlinkedIdentityField(view_name='api_service_detail', slug_field='slug')
-    #metadata = serializers.SerializerMethodField('get_metadata')
-    #keywords = serializers.SerializerMethodField('get_keywords')
-    #group = serializers.SerializerMethodField('get_group')
-    #type = serializers.SerializerMethodField('get_type')
-    #service_code = serializers.IntegerField(source='id')
-    #service_name = serializers.CharField(source='name')
-    
-    #def get_keywords(self,obj):        
-    #    extra_data=obj.data
-    #    if  extra_data is not None:
-    #        keywords=extra_data.get('keywords', "")
-    #    else:
-    #        keywords=""
-    #    return keywords
-    #
-    #def get_group(self,obj):        
-    #    extra_data=obj.data
-    #    if  extra_data is not None:   
-    #        group=extra_data.get('group', "")
-    #    else:
-    #        group=""
-    #    return group
-    #
-    #def get_metadata(self,obj):
-    #    metadata = settings.NODESHOT['OPEN311']['METADATA']
-    #    return metadata
-    #
-    #def get_type(self,obj):
-    #    type = settings.NODESHOT['OPEN311']['TYPE']
-    #    return type
-    
     
     class Meta:
         model = Node
+        
+        
+class VoteRequestSerializer(serializers.ModelSerializer):
+    """
+    Open 311 vote request 
+    """
+    
+    class Meta:
+        model = Vote
+        
+        
+class CommentRequestSerializer(serializers.ModelSerializer):
+    """
+    Open 311 comment request 
+    """
+    
+    class Meta:
+        model = Comment
+        
+        
+class RatingRequestSerializer(serializers.ModelSerializer):
+    """
+    Open 311 rating request 
+    """
+    
+    class Meta:
+        model = Rating
 
-        #fields= (
-        #    'service_code', 'service_name', 'description', 'keywords','group',
-        #    'definition', 'metadata','type',
-        #)
 
