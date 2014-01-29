@@ -1,17 +1,39 @@
+import datetime
+
 from django.http import Http404
-from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
+from django.utils.dateformat import DateFormat
+from django.utils.translation import ugettext_lazy as _ 
 from django.conf import settings
+from django.shortcuts import get_object_or_404
+from django.contrib.gis.geos import fromstr
 
 from rest_framework import generics, permissions, authentication, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 
-from nodeshot.core.nodes.models import Node
+from nodeshot.core.nodes.models import Node,Status
 from nodeshot.core.layers.models import Layer
+from nodeshot.community.participation.models import Vote,Comment,Rating
 
 from .base import SERVICES
 from .serializers import *
+
+STATUS = {
+            'Potenziale' : 'Open',
+            'Pianificato' : 'Open',
+            'Attivo' : 'Closed',
+        }
+
+
+
+MODELS = {
+            'node': Node,
+            'vote': Vote,
+            'comment': Comment,
+            'rate': Rating,
+        }
 
 
 class ServiceList(generics.ListAPIView):
@@ -47,7 +69,7 @@ service_list = ServiceList.as_view()
 
 class ServiceDefinition(APIView):
     """
-    Retrieve details of specified serviceNode.
+    Retrieve details of specified service.
     """
 
     def get(self, request, *args, **kwargs):
@@ -71,7 +93,7 @@ class ServiceDefinition(APIView):
 service_definition = ServiceDefinition.as_view()
 
 
-class RequestInsert(generics.ListCreateAPIView):
+class ServiceRequests(generics.ListCreateAPIView):
     """
     ### GET
     
@@ -82,8 +104,8 @@ class RequestInsert(generics.ListCreateAPIView):
     Post a request
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    #serializer_class= NodeRequestSerializer
-    model=Node
+    serializer_class= NodeRequestSerializer
+    #model=Node
     
     def get_custom_data(self):
         """ additional request.DATA """
@@ -93,21 +115,120 @@ class RequestInsert(generics.ListCreateAPIView):
         }
     
     def get(self, request, *args, **kwargs):
+        if 'service_code' not in request.GET.keys():
+        #if not request.GET['service_code']:
+            return Response({ 'detail': _('A service code must be inserted') }, status=404)
         service_code = request.GET['service_code']
         
         if service_code not in SERVICES.keys():
             return Response({ 'detail': _('Service not found') }, status=404)
         
-        #serializers = {
-        #    'node': ServiceNodeSerializer,
-        #    'vote': ServiceVoteSerializer,
-        #    'comment': ServiceCommentSerializer,
-        #    'rate': ServiceRatingSerializer,
-        #}
-        #
+        start_date=None
+        end_date = None
+        REVERSE_STATUS = [k for k, v in STATUS.items() if v == 'Open']
+        print REVERSE_STATUS
+        
+        if 'start_date' in request.GET.keys():
+            start_date = request.GET['start_date']
+            
+        if 'end_date' in request.GET.keys():
+            end_date = request.GET['end_date']
+        
+        serializers = {
+            'node': NodeRequestDetailSerializer,
+            'vote': VoteRequestDetailSerializer,
+            'comment': CommentRequestDetailSerializer,
+            'rate': RatingRequestDetailSerializer,
+        }
+        
+        service_model = MODELS[service_code]
+        self.queryset = service_model.objects.all()
+        
+        if start_date is not None and end_date is not None:
+            print start_date
+            self.queryset = self.queryset.filter(added__gte = start_date).filter(added__lte = end_date)
+            
+        if start_date is not None and end_date is None:
+            print start_date
+            self.queryset = self.queryset.filter(added__gte = start_date)
+            
+        if start_date is None and end_date is not None:
+            print start_date
+            self.queryset = self.queryset.filter(added__lte = end_date)
+            
+        
+        
         ## init right serializer
-        #data = serializers[service_type]().data
+        kwargs['serializer'] = serializers[service_code]
+        kwargs['service_code'] = service_code
         return self.list(request, *args, **kwargs)
+    
+    def list(self, request, *args, **kwargs):
+        self.object_list = self.filter_queryset(self.get_queryset())
+        service_code = kwargs['service_code']
+        # Default is to allow empty querysets.  This can be altered by setting
+        # `.allow_empty = False`, to raise 404 errors on empty querysets.
+        if not self.allow_empty and not self.object_list:
+            warnings.warn(
+                'The `allow_empty` parameter is due to be deprecated. '
+                'To use `allow_empty=False` style behavior, You should override '
+                '`get_queryset()` and explicitly raise a 404 on empty querysets.',
+                PendingDeprecationWarning
+            )
+            class_name = self.__class__.__name__
+            error_msg = self.empty_error % {'class_name': class_name}
+            raise Http404(error_msg)
+
+        # Switch between paginated or standard style responses
+        page = self.paginate_queryset(self.object_list)
+        if page is not None:
+            serializer = self.get_pagination_serializer(page)
+        else:
+            serializer = kwargs['serializer'](self.object_list, many=True)
+            
+        data = serializer.data
+            
+        if kwargs['service_code'] == 'node':
+            for item in data:
+                item['service_code'] = kwargs['service_code'] 
+                item['service_name'] = SERVICES[service_code]['name']
+                pnt = fromstr(item['geometry'])
+                del item['geometry']
+                item['lat'] = pnt[0]
+                item['lng'] = pnt[1]
+                status_id = item['status']
+                status = get_object_or_404(Status, pk=status_id)
+                item['status'] = STATUS[status.name]
+        else:
+            pass                       
+        
+        
+        return Response(data)
+    
+    #def list(self, request, *args, **kwargs):
+    #    self.object_list = self.filter_queryset(self.get_queryset())
+    #
+    #    # Default is to allow empty querysets.  This can be altered by setting
+    #    # `.allow_empty = False`, to raise 404 errors on empty querysets.
+    #    if not self.allow_empty and not self.object_list:
+    #        warnings.warn(
+    #            'The `allow_empty` parameter is due to be deprecated. '
+    #            'To use `allow_empty=False` style behavior, You should override '
+    #            '`get_queryset()` and explicitly raise a 404 on empty querysets.',
+    #            PendingDeprecationWarning
+    #        )
+    #        class_name = self.__class__.__name__
+    #        error_msg = self.empty_error % {'class_name': class_name}
+    #        raise Http404(error_msg)
+    #
+    #    # Switch between paginated or standard style responses
+    #    page = self.paginate_queryset(self.object_list)
+    #    if page is not None:
+    #        serializer = self.get_pagination_serializer(page)
+    #    else:
+    #        serializer = self.get_serializer(self.object_list, many=True)
+    #
+    #    return Response(serializer.data)
     
     def post(self, request, *args, **kwargs):
         service_code = request.POST['service_code']
@@ -166,6 +287,46 @@ class RequestInsert(generics.ListCreateAPIView):
     #
     #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-service_request = RequestInsert.as_view()
+service_requests = ServiceRequests.as_view()
+
+
+class ServiceRequest(generics.RetrieveAPIView):
+    
+    def get(self, request, *args, **kwargs):
+        #
+        service_code = kwargs['service_code']
+        request_id = kwargs['request_id']
+        
+        if service_code not in SERVICES.keys():
+            return Response({ 'detail': _('Service not found') }, status=404)
+        
+        serializers = {
+            'node': NodeRequestDetailSerializer,
+            'vote': VoteRequestDetailSerializer,
+            'comment': CommentRequestDetailSerializer,
+            'rate': RatingRequestDetailSerializer,
+        }
+        
+        service_model = MODELS[service_code]
+        request_object = get_object_or_404(service_model, pk=request_id)
+        data = serializers[service_code](request_object).data
+        
+        if service_code == 'node':
+            pnt = fromstr(data['geometry'])
+            del data['geometry']
+            data['lng'] = pnt[0]
+            data['lat'] = pnt[1]
+            status_id = data['status']
+            status = get_object_or_404(Status, pk=status_id)
+            data['status'] = STATUS[status.name]
+        else:
+            data['status'] = 'Closed'                       
+        
+        data['service_code'] = service_code
+        data['service_name'] = SERVICES[service_code]['name']
+        
+        return Response(data)
+
+service_request = ServiceRequest.as_view()
 
 

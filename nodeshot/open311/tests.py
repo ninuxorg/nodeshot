@@ -69,7 +69,7 @@ class Open311Request(BaseTestCase):
     def test_service_request_wrong_service(self):
         login = self.client.login(username='admin', password='tester')
         service_request={'service_code':'not_exists'}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         self.assertEqual(response.status_code, 404)
         
@@ -87,7 +87,7 @@ class Open311Request(BaseTestCase):
                         "description": "test",
                         "geometry": "POINT (22.5253334454477372 41.8890404543067518)"
                         }
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 201)
@@ -104,7 +104,7 @@ class Open311Request(BaseTestCase):
                         "description": "test",
                         "geometry": "POINT (22.5253334454477372 41.8890404543067518)"
                         }
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 400)
@@ -113,7 +113,7 @@ class Open311Request(BaseTestCase):
         login = self.client.login(username='admin', password='tester')   
         #Vote
         service_request={'service_code':"vote","node": 1,"vote":1}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 201)
@@ -122,7 +122,7 @@ class Open311Request(BaseTestCase):
         login = self.client.login(username='admin', password='tester')   
         #Vote
         service_request={'service_code':"vote","vote":1}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 400)
@@ -131,7 +131,7 @@ class Open311Request(BaseTestCase):
         login = self.client.login(username='admin', password='tester')   
         #Vote
         service_request={'service_code':"vote","node": 1,"vote":10}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 400)
@@ -140,7 +140,7 @@ class Open311Request(BaseTestCase):
         login = self.client.login(username='admin', password='tester')   
         #Vote
         service_request={'service_code':"rate","node": 1,"value":1}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 201)
@@ -149,7 +149,7 @@ class Open311Request(BaseTestCase):
         login = self.client.login(username='admin', password='tester')   
         #Vote
         service_request={'service_code':"rate","value":1}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 400)
@@ -158,7 +158,7 @@ class Open311Request(BaseTestCase):
         login = self.client.login(username='admin', password='tester')   
         #Vote
         service_request={'service_code':"rate","node": 1,"value":20}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 400)
@@ -167,7 +167,7 @@ class Open311Request(BaseTestCase):
         login = self.client.login(username='admin', password='tester')   
         #Vote
         service_request={'service_code':"comment","node": 1,"text":"OK"}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 201)
@@ -176,7 +176,7 @@ class Open311Request(BaseTestCase):
         login = self.client.login(username='admin', password='tester')   
         #Vote
         service_request={'service_code':"comment","text":"OK"}
-        url = "%s" % reverse('api_request_list')
+        url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
         print response.content
         self.assertEqual(response.status_code, 400)

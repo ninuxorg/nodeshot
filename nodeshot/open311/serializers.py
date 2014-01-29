@@ -25,6 +25,10 @@ __all__ = [
     'VoteRequestSerializer',
     'CommentRequestSerializer',
     'RatingRequestSerializer',
+    'NodeRequestDetailSerializer',
+    'VoteRequestDetailSerializer',
+    'CommentRequestDetailSerializer',
+    'RatingRequestDetailSerializer',
 ]
 
 RATING_CHOICES = [ n for n in range(1, 11) ]
@@ -329,5 +333,45 @@ class RatingRequestSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Rating
+
+
+
+class NodeRequestDetailSerializer(serializers.ModelSerializer):
+    """
+    Open 311 node request 
+    """
+    
+    class Meta:
+        model = Node
+        fields= ('status','geometry','description','address','added','updated')
+        
+        
+class VoteRequestDetailSerializer(serializers.ModelSerializer):
+    """
+    Open 311 vote request 
+    """
+    
+    class Meta:
+        model = Vote
+        fields= ('added','updated')
+        
+        
+class CommentRequestDetailSerializer(serializers.ModelSerializer):
+    """
+    Open 311 comment request 
+    """
+    
+    class Meta:
+        model = Comment
+        fields= ('added','updated')
+        
+class RatingRequestDetailSerializer(serializers.ModelSerializer):
+    """
+    Open 311 rating request 
+    """
+    
+    class Meta:
+        model = Rating
+        fields= ('added','updated')
 
 
