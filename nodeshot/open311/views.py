@@ -1,9 +1,12 @@
 import datetime
+import operator
+import re
 
 from django.http import Http404
 from django.utils import timezone
 from django.utils.dateformat import DateFormat
-from django.utils.translation import ugettext_lazy as _ 
+from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.gis.geos import fromstr
@@ -21,12 +24,10 @@ from .base import SERVICES
 from .serializers import *
 
 STATUS = {
-            'Potenziale' : 'Open',
-            'Pianificato' : 'Open',
-            'Attivo' : 'Closed',
+            'Potenziale' : 'open',
+            'Pianificato' : 'open',
+            'Attivo' : 'closed',
         }
-
-
 
 MODELS = {
             'node': Node,
@@ -99,13 +100,22 @@ class ServiceRequests(generics.ListCreateAPIView):
     
     Retrieve requests.
     
+    ####Parameters:
+    
+    service_code: defaults to 'node'
+    
+    status: 'open' or 'closed'
+    
+    start_date: date in w3 format, eg 2010-01-01T00:00:00Z
+    
+    end_date: date in w3 format, eg 2010-01-01T00:00:00Z
+    
     ### POST
     
     Post a request
     """
     authentication_classes = (authentication.SessionAuthentication,)
     serializer_class= NodeRequestSerializer
-    #model=Node
     
     def get_custom_data(self):
         """ additional request.DATA """
@@ -115,24 +125,40 @@ class ServiceRequests(generics.ListCreateAPIView):
         }
     
     def get(self, request, *args, **kwargs):
-        if 'service_code' not in request.GET.keys():
-        #if not request.GET['service_code']:
-            return Response({ 'detail': _('A service code must be inserted') }, status=404)
-        service_code = request.GET['service_code']
         
-        if service_code not in SERVICES.keys():
-            return Response({ 'detail': _('Service not found') }, status=404)
+        #if 'service_code' not in request.GET.keys():
+        ##if not request.GET['service_code']:
+        #    return Response({ 'detail': _('A service code must be inserted') }, status=404)
+        #service_code = request.GET['service_code']
+        #
+        #if service_code not in SERVICES.keys():
+        #    return Response({ 'detail': _('Service not found') }, status=404)
         
+        service_code='node'
         start_date=None
         end_date = None
-        REVERSE_STATUS = [k for k, v in STATUS.items() if v == 'Open']
-        print REVERSE_STATUS
+        status = None
+        
+        iso8601_regexp=re.compile("^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])?T(2[0-3]|[0-1][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)??(Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$")
+        
+        STATUSES = {}
+        for status_type in ('open','closed'):
+            STATUSES[status_type] = [k for k, v in STATUS.items() if v == status_type]
         
         if 'start_date' in request.GET.keys():
             start_date = request.GET['start_date']
+            if iso8601_regexp.match(start_date) is None:
+                return Response({ 'detail': _('Invalid date inserted') }, status=404)
             
         if 'end_date' in request.GET.keys():
             end_date = request.GET['end_date']
+            if iso8601_regexp.match(end_date) is None:
+                return Response({ 'detail': _('Invalid date inserted') }, status=404)
+            
+        if 'status' in request.GET.keys():
+            if request.GET['status'] not in ('open','closed'):
+                return Response({ 'detail': _('Invalid status inserted') }, status=404)
+            status = request.GET['status']
         
         serializers = {
             'node': NodeRequestDetailSerializer,
@@ -144,20 +170,23 @@ class ServiceRequests(generics.ListCreateAPIView):
         service_model = MODELS[service_code]
         self.queryset = service_model.objects.all()
         
+        #Check of date parameters
+        
         if start_date is not None and end_date is not None:
-            print start_date
             self.queryset = self.queryset.filter(added__gte = start_date).filter(added__lte = end_date)
             
         if start_date is not None and end_date is None:
-            print start_date
             self.queryset = self.queryset.filter(added__gte = start_date)
             
         if start_date is None and end_date is not None:
-            print start_date
             self.queryset = self.queryset.filter(added__lte = end_date)
             
+        #Check of status parameter
         
-        
+        if status is not None:
+            q_list = [Q(status__name__exact = s) for s in STATUSES[status]]
+            self.queryset = self.queryset.filter(reduce(operator.or_, q_list))            
+                    
         ## init right serializer
         kwargs['serializer'] = serializers[service_code]
         kwargs['service_code'] = service_code
@@ -260,7 +289,6 @@ class ServiceRequests(generics.ListCreateAPIView):
    
     def create(self, request, *args, **kwargs):
         
-        #service_request={'service_code':"node","name": "montesacro10","slug":"montesacro10","layer": 1,"lat": "22.5253","lng": "41.8890","description": "test","geometry": "POINT (22.5253334454477372 41.8890404543067518)"}
         serializer = kwargs['serializer']( data=request.UPDATED, files=request.FILES)
         
         if serializer.is_valid():

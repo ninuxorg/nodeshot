@@ -17,8 +17,4 @@ urlpatterns = patterns('nodeshot.open311.views',
     url(r'^open311/requests/(?P<service_code>[-\w]+)-(?P<request_id>[-\w]+)$',
         'service_request',
         name='api_service_request'),
-    #
-    #url(r'^open311/requests/$',
-    #    'request_list',
-    #    name='api_request_list'),
 )
