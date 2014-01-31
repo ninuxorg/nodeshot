@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from django.contrib.gis.geos import fromstr
+from django.contrib.gis.geos import *
 
 from rest_framework import generics, permissions, authentication, status
 from rest_framework.views import APIView
@@ -281,8 +281,15 @@ class ServiceRequests(generics.ListCreateAPIView):
         request.UPDATED['user'] = user['user']
         
         if service_code == 'node':
+            #Get layer id
             layer=Layer.objects.get(slug=request.POST['layer'])           
             request.UPDATED['layer'] = layer.id
+            
+            #Transform coords in geometry
+            lat = float(request.UPDATED['lat'])
+            lng = float(request.UPDATED['lng'])
+            point = Point((lng,lat))
+            request.UPDATED['geometry'] = point.wkt
 
         return self.create(request, *args, **kwargs)
    
