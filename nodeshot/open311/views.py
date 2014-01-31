@@ -14,9 +14,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 
-from nodeshot.core.nodes.models import Node,Status
+from nodeshot.core.nodes.models import Node, Status, Image
 from nodeshot.core.layers.models import Layer
-from nodeshot.community.participation.models import Vote,Comment,Rating
+from nodeshot.community.participation.models import Vote, Comment, Rating
 
 from .base import SERVICES
 from .serializers import *
@@ -113,7 +113,7 @@ class ServiceRequests(generics.ListCreateAPIView):
     Post a request
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    serializer_class= NodeRequestSerializer
+    serializer_class= NodeRequestListSerializer
     
     def get_custom_data(self):
         """ additional request.DATA """
@@ -212,7 +212,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         if page is not None:
             serializer = self.get_pagination_serializer(page)
         else:
-            serializer = kwargs['serializer'](self.object_list, many=True,context=context)
+            serializer = kwargs['serializer'](self.object_list, many=True, context=context)
             
         data = serializer.data
             
@@ -289,17 +289,27 @@ class ServiceRequests(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         
         serializer = kwargs['serializer']( data=request.UPDATED, files=request.FILES)
-        
+        service_code= kwargs['service_code']
         if serializer.is_valid():
             self.pre_save(serializer.object)
             self.object = serializer.save(force_insert=True)
-            self.post_save(self.object, created=True)
+            self.post_save(self.object, created=True,
+                           files=request.FILES,
+                           service_code=service_code
+                           )
             headers = self.get_success_headers(serializer.data)
-            response_311=kwargs['service_code'] + '-' + str(self.object.id)
+            response_311 = service_code + '-' + str(self.object.id)
             return Response(response_311, status=status.HTTP_201_CREATED,
                             headers=headers)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post_save(self,obj, created, files, service_code):
+        if service_code == 'node' and files:
+            #print obj.id
+            for file,image_file in files.iteritems():
+                image=Image(node=obj, file=image_file)
+                image.save()
     
     #def create(self, request, *args, **kwargs):
     #    serializer = self.get_serializer(data=request.DATA, files=request.FILES)
@@ -320,6 +330,7 @@ service_requests = ServiceRequests.as_view()
 class ServiceRequest(generics.RetrieveAPIView):
     
     def get(self, request, *args, **kwargs):
+        context = self.get_serializer_context()
         #
         service_code = kwargs['service_code']
         request_id = kwargs['request_id']
@@ -336,7 +347,7 @@ class ServiceRequest(generics.RetrieveAPIView):
         
         service_model = MODELS[service_code]
         request_object = get_object_or_404(service_model, pk=request_id)
-        data = serializers[service_code](request_object).data
+        data = serializers[service_code](request_object,context=context).data
         
         if service_code == 'node':
             pnt = fromstr(data['geometry'])
@@ -351,6 +362,7 @@ class ServiceRequest(generics.RetrieveAPIView):
         
         data['service_code'] = service_code
         data['service_name'] = SERVICES[service_code]['name']
+        
         
         return Response(data)
 

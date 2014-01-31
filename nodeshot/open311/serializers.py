@@ -8,7 +8,7 @@ from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers
 
 from nodeshot.core.layers.models import Layer
-from nodeshot.core.nodes.models import Node
+from nodeshot.core.nodes.models import Node, Image
 from nodeshot.community.participation.models import Vote,Comment,Rating
 from nodeshot.core.nodes.serializers import NodeListSerializer
 
@@ -177,6 +177,17 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype_description': _('Description of node'),
                 'order': 7,
                 'required': False
+            },
+            
+            # images
+            {
+                'code': 'images',
+                'description': _('images'),
+                'datatype': 'string',
+                'datatype_description': _('Images related to node. A client may POST multiple files as multipart/form-data. Requests return the URL for this images via the image_url field\
+                                          '),
+                'order': 8,
+                'required': False
             }
         ]
     
@@ -334,17 +345,6 @@ class RatingRequestSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Rating
-
-
-
-class NodeRequestDetailSerializer(serializers.ModelSerializer):
-    """
-    Open 311 node request 
-    """  
-   
-    class Meta:
-        model = Node
-        fields= ('status','geometry','description','address','added','updated',)
         
         
 class VoteRequestDetailSerializer(serializers.ModelSerializer):
@@ -381,6 +381,28 @@ class NodeRequestListSerializer(serializers.ModelSerializer):
     Open 311 node request 
     """  
     details = serializers.SerializerMethodField('get_details')
+    image_urls = serializers.SerializerMethodField('get_image_urls')
+    requested_datetime = serializers.Field(source='added')
+    updated_datetime = serializers.Field(source='updated')
+    #expired = serializers.Field(source='has_expired')
+    
+    def get_image_urls(self,obj):
+        request = self.context['request']
+        format = self.context['format']
+        
+        image_url =[]
+        
+        try:
+            image = Image.objects.all().filter(node=obj.id)
+        except:
+            image=None
+        
+        if image is not None:
+            for i in image:
+                    image_url.append( '%s%s' % (settings.MEDIA_URL, i))
+            return image_url
+        else:
+            return ""
     
     def get_details(self, obj):
         #self.get_serializer_context()
@@ -394,7 +416,18 @@ class NodeRequestListSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = Node
-        fields= ('status','geometry','description','address','added','updated','details',)
+        fields= ('status','geometry','description','address','requested_datetime','updated_datetime','image_urls','details',)
+        read_only_fields = ('status','geometry','description','address','added','updated',)
+        
+
+class NodeRequestDetailSerializer(NodeRequestListSerializer):
+    """
+    Open 311 node request 
+    """  
+   
+    class Meta:
+        model = Node
+        fields= ('status','geometry','description','address','requested_datetime','updated_datetime', 'image_urls')
     
 
 

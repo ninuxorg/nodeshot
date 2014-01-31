@@ -1,8 +1,9 @@
 """
 nodeshot.open311.tests
 """
-
+import os
 import simplejson as json
+
 from django.core.urlresolvers import reverse
 from django.contrib.gis.geos import GEOSGeometry
 
@@ -37,7 +38,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.data['service_code'], 'node')
         
         # ensure 7 attributes
-        self.assertEqual(len(response.data['attributes']), 7)
+        self.assertEqual(len(response.data['attributes']), 8)
         
     def test_vote_service_definition(self):
         response = self.client.get(reverse('api_service_definition', args=['vote']))
@@ -225,6 +226,25 @@ class Open311Request(BaseTestCase):
         response = self.client.get(reverse('api_service_requests'),{'start_date':'2015-01-01T17:57:02Z'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+        
+    def test_file_upload(self):   
+        
+        login = self.client.login(username='admin', password='tester')
+        service_request={
+                        'service_code':"node",
+                        "name": "montesacro4",
+                        "slug": "montesacro4",
+                        "layer": "rome",
+                        "lat": "22.5253",
+                        "lng": "41.8890",
+                        "description": "test",
+                        "geometry": "POINT (22.5253334454477372 41.8890404543067518)"
+                        }
+        with open("%s/templates/image_unit_test.gif" % os.path.dirname(os.path.realpath(__file__)), 'rb') as image_file:
+            service_request['file'] = image_file
+            url = "%s" % reverse('api_service_requests')
+            response = self.client.post(url,service_request)        
+            self.assertEqual(response.status_code, 201)
         
         
     
