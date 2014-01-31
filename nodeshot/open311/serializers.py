@@ -29,6 +29,7 @@ __all__ = [
     'VoteRequestDetailSerializer',
     'CommentRequestDetailSerializer',
     'RatingRequestDetailSerializer',
+    'NodeRequestListSerializer',
 ]
 
 RATING_CHOICES = [ n for n in range(1, 11) ]
@@ -339,11 +340,11 @@ class RatingRequestSerializer(serializers.ModelSerializer):
 class NodeRequestDetailSerializer(serializers.ModelSerializer):
     """
     Open 311 node request 
-    """
-    
+    """  
+   
     class Meta:
         model = Node
-        fields= ('status','geometry','description','address','added','updated')
+        fields= ('status','geometry','description','address','added','updated',)
         
         
 class VoteRequestDetailSerializer(serializers.ModelSerializer):
@@ -373,5 +374,28 @@ class RatingRequestDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields= ('added','updated')
+        
+
+class NodeRequestListSerializer(serializers.ModelSerializer):
+    """
+    Open 311 node request 
+    """  
+    details = serializers.SerializerMethodField('get_details')
+    
+    def get_details(self, obj):
+        #self.get_serializer_context()
+        request = self.context['request']
+        format = self.context['format']
+        
+        return reverse('api_service_request',
+                       args=['node',obj.id],
+                       request=request,
+                       format=format)
+   
+    class Meta:
+        model = Node
+        fields= ('status','geometry','description','address','added','updated','details',)
+    
+
 
 

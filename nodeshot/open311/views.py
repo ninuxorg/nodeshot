@@ -3,8 +3,6 @@ import operator
 import re
 
 from django.http import Http404
-from django.utils import timezone
-from django.utils.dateformat import DateFormat
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from django.conf import settings
@@ -161,7 +159,7 @@ class ServiceRequests(generics.ListCreateAPIView):
             status = request.GET['status']
         
         serializers = {
-            'node': NodeRequestDetailSerializer,
+            'node': NodeRequestListSerializer,
             'vote': VoteRequestDetailSerializer,
             'comment': CommentRequestDetailSerializer,
             'rate': RatingRequestDetailSerializer,
@@ -195,6 +193,7 @@ class ServiceRequests(generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         self.object_list = self.filter_queryset(self.get_queryset())
         service_code = kwargs['service_code']
+        context = self.get_serializer_context()
         # Default is to allow empty querysets.  This can be altered by setting
         # `.allow_empty = False`, to raise 404 errors on empty querysets.
         if not self.allow_empty and not self.object_list:
@@ -213,7 +212,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         if page is not None:
             serializer = self.get_pagination_serializer(page)
         else:
-            serializer = kwargs['serializer'](self.object_list, many=True)
+            serializer = kwargs['serializer'](self.object_list, many=True,context=context)
             
         data = serializer.data
             
