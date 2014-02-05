@@ -36,10 +36,13 @@ def get_service_name(service_code):
     return SERVICES[service_code]['name']
 
 def create_output_data(data):
+    geom = fromstr(data['geometry'])
+    if geom.geom_type != 'point':
+        geom = geom.centroid
     pnt = fromstr(data['geometry'])
     del data['geometry']
-    data['lng'] = pnt[0]
-    data['lat'] = pnt[1]
+    data['lng'] = geom[0]
+    data['lat'] = geom[1]
     status_id = data['status']
     status = get_object_or_404(Status, pk=status_id)
     data['status'] = STATUS[status.name]

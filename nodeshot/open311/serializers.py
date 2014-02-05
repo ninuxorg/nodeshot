@@ -417,7 +417,7 @@ class NodeRequestListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields= ('status','geometry','description','address','requested_datetime','updated_datetime','image_urls','details',)
-        read_only_fields = ('status','geometry','description','address','added','updated',)
+        
         
 
 class NodeRequestDetailSerializer(NodeRequestListSerializer):
