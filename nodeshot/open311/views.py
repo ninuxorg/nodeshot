@@ -1,6 +1,5 @@
 import datetime
 import operator
-import re
 
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
@@ -12,13 +11,12 @@ from django.contrib.gis.geos import *
 from rest_framework import generics, permissions, authentication, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
 
 from nodeshot.core.nodes.models import Node, Status, Image
 from nodeshot.core.layers.models import Layer
 from nodeshot.community.participation.models import Vote, Comment, Rating
 
-from .base import SERVICES
+from .base import SERVICES, iso8601_REGEXP
 from .serializers import *
 
 STATUS = {
@@ -34,6 +32,18 @@ MODELS = {
             'rate': Rating,
         }
 
+def get_service_name(service_code):
+    return SERVICES[service_code]['name']
+
+def create_output_data(data):
+    pnt = fromstr(data['geometry'])
+    del data['geometry']
+    data['lng'] = pnt[0]
+    data['lat'] = pnt[1]
+    status_id = data['status']
+    status = get_object_or_404(Status, pk=status_id)
+    data['status'] = STATUS[status.name]
+    return data
 
 class ServiceList(generics.ListAPIView):
     """
@@ -113,7 +123,41 @@ class ServiceRequests(generics.ListCreateAPIView):
     Post a request
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    serializer_class= NodeRequestListSerializer
+    #serializer_class= NodeRequestListSerializer
+    
+    def get_serializer_class(self):
+        """
+        Return the class to use for the serializer.
+        Defaults to using `self.serializer_class`.
+
+        You may want to override this if you need to provide different
+        serializations depending on the incoming request.
+
+        (Eg. admins get full serialization, others get basic serialization)
+        """
+        service_code = 'node'
+        
+        serializers = {
+            'node': NodeRequestListSerializer,
+            'vote': VoteRequestDetailSerializer,
+            'comment': CommentRequestDetailSerializer,
+            'rate': RatingRequestDetailSerializer,
+        }
+        
+        serializer_class = serializers[service_code]
+        if serializer_class is not None:
+            return serializer_class
+
+        assert self.model is not None, \
+            "'%s' should either include a 'serializer_class' attribute, " \
+            "or use the 'model' attribute as a shortcut for " \
+            "automatically generating a serializer class." \
+            % self.__class__.__name__
+
+        class DefaultSerializer(self.model_serializer_class):
+            class Meta:
+                model = self.model
+        return DefaultSerializer
     
     def get_custom_data(self):
         """ additional request.DATA """
@@ -132,25 +176,23 @@ class ServiceRequests(generics.ListCreateAPIView):
         #if service_code not in SERVICES.keys():
         #    return Response({ 'detail': _('Service not found') }, status=404)
         
-        service_code='node'
-        start_date=None
+        service_code = 'node'
+        start_date = None
         end_date = None
         status = None
-        
-        iso8601_regexp=re.compile("^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])?T(2[0-3]|[0-1][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)??(Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$")
-        
+                
         STATUSES = {}
         for status_type in ('open','closed'):
             STATUSES[status_type] = [k for k, v in STATUS.items() if v == status_type]
         
         if 'start_date' in request.GET.keys():
             start_date = request.GET['start_date']
-            if iso8601_regexp.match(start_date) is None:
+            if iso8601_REGEXP.match(start_date) is None:
                 return Response({ 'detail': _('Invalid date inserted') }, status=404)
             
         if 'end_date' in request.GET.keys():
             end_date = request.GET['end_date']
-            if iso8601_regexp.match(end_date) is None:
+            if iso8601_REGEXP.match(end_date) is None:
                 return Response({ 'detail': _('Invalid date inserted') }, status=404)
             
         if 'status' in request.GET.keys():
@@ -158,12 +200,12 @@ class ServiceRequests(generics.ListCreateAPIView):
                 return Response({ 'detail': _('Invalid status inserted') }, status=404)
             status = request.GET['status']
         
-        serializers = {
-            'node': NodeRequestListSerializer,
-            'vote': VoteRequestDetailSerializer,
-            'comment': CommentRequestDetailSerializer,
-            'rate': RatingRequestDetailSerializer,
-        }
+        #serializers = {
+        #    'node': NodeRequestListSerializer,
+        #    'vote': VoteRequestDetailSerializer,
+        #    'comment': CommentRequestDetailSerializer,
+        #    'rate': RatingRequestDetailSerializer,
+        #}
         
         service_model = MODELS[service_code]
         self.queryset = service_model.objects.all()
@@ -186,7 +228,7 @@ class ServiceRequests(generics.ListCreateAPIView):
             self.queryset = self.queryset.filter(reduce(operator.or_, q_list))            
                     
         ## init right serializer
-        kwargs['serializer'] = serializers[service_code]
+        #kwargs['serializer'] = serializers[service_code]
         kwargs['service_code'] = service_code
         return self.list(request, *args, **kwargs)
     
@@ -212,21 +254,13 @@ class ServiceRequests(generics.ListCreateAPIView):
         if page is not None:
             serializer = self.get_pagination_serializer(page)
         else:
-            serializer = kwargs['serializer'](self.object_list, many=True, context=context)
+            serializer = self.get_serializer(self.object_list, many=True)
             
         data = serializer.data
             
-        if kwargs['service_code'] == 'node':
+        if service_code == 'node':
             for item in data:
-                item['service_code'] = kwargs['service_code'] 
-                item['service_name'] = SERVICES[service_code]['name']
-                pnt = fromstr(item['geometry'])
-                del item['geometry']
-                item['lat'] = pnt[0]
-                item['lng'] = pnt[1]
-                status_id = item['status']
-                status = get_object_or_404(Status, pk=status_id)
-                item['status'] = STATUS[status.name]
+                item = create_output_data(item)
         else:
             pass                       
         
@@ -285,7 +319,7 @@ class ServiceRequests(generics.ListCreateAPIView):
             layer=Layer.objects.get(slug=request.POST['layer'])           
             request.UPDATED['layer'] = layer.id
             
-            #Transform coords in geometry
+            #Transform coords in wkt geometry
             lat = float(request.UPDATED['lat'])
             lng = float(request.UPDATED['lng'])
             point = Point((lng,lat))
@@ -338,7 +372,6 @@ class ServiceRequest(generics.RetrieveAPIView):
     
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        #
         service_code = kwargs['service_code']
         request_id = kwargs['request_id']
         
@@ -357,13 +390,7 @@ class ServiceRequest(generics.RetrieveAPIView):
         data = serializers[service_code](request_object,context=context).data
         
         if service_code == 'node':
-            pnt = fromstr(data['geometry'])
-            del data['geometry']
-            data['lng'] = pnt[0]
-            data['lat'] = pnt[1]
-            status_id = data['status']
-            status = get_object_or_404(Status, pk=status_id)
-            data['status'] = STATUS[status.name]
+            data = create_output_data(data)
         else:
             data['status'] = 'Closed'                       
         
@@ -375,4 +402,7 @@ class ServiceRequest(generics.RetrieveAPIView):
 
 service_request = ServiceRequest.as_view()
 
+
+
+    
 
