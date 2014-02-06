@@ -1,6 +1,3 @@
-import simplejson as json
-from django.contrib.gis.geos import GEOSGeometry
-
 from .GeoJson import GeoJson
 from .CitySdkMobility import CitySdkMobilityMixin
 
