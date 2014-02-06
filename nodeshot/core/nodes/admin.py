@@ -32,7 +32,7 @@ class ImageInline(BaseStackedInline):
         classes = ('grp-collapse grp-open', )
 
 
-NODE_FILTERS = ['is_published', 'status', 'access_level', 'added']
+NODE_FILTERS = ['is_published', 'status', 'access_level', 'added', 'updated']
 NODE_LIST_DISPLAY = ['name', 'user', 'status', 'access_level', 'is_published', 'added', 'updated']
 NODE_FIELDS_LOOKEDUP = [
     'user__id', 'user__username',
