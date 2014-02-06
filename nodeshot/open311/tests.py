@@ -88,13 +88,12 @@ class Open311Request(BaseTestCase):
                         "lat": "22.5253",
                         "lng": "41.8890",
                         "description": "test",
-                        "geometry": "POINT (22.5253334454477372 41.8890404543067518)"
                         }
         url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)        
         self.assertEqual(response.status_code, 201)
         
-    def test_service_request_node_incomplete(self):
+    def test_service_request_node_incomplete_key(self):
         #POST requests
         
         #incorrect service_request for nodes
@@ -107,7 +106,25 @@ class Open311Request(BaseTestCase):
                         "lat": "22.5253",
                         "lng": "41.8890",
                         "description": "test",
-                        "geometry": "POINT (22.5253334454477372 41.8890404543067518)"
+                        }
+        url = "%s" % reverse('api_service_requests')
+        response = self.client.post(url,service_request)
+        self.assertEqual(response.status_code, 400)
+        
+    def test_service_request_node_incomplete_value(self):
+        #POST requests
+        
+        #incorrect service_request for nodes
+        login = self.client.login(username='admin', password='tester')
+               
+        service_request={
+                        'service_code':"node",
+                        "name": "",
+                        "slug": "montesacro4",
+                        "layer": "rome",
+                        "lat": "22.5253",
+                        "lng": "41.8890",
+                        "description": "test",
                         }
         url = "%s" % reverse('api_service_requests')
         response = self.client.post(url,service_request)
@@ -198,32 +215,45 @@ class Open311Request(BaseTestCase):
     def test_get_service_requests(self):
         #GET requests list
         response = self.client.get(reverse('api_service_requests'))
+        self.assertEqual(response.status_code, 404)
+        
+        parameters = {'service_code':'node'}
+        response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 10)
         
-        response = self.client.get(reverse('api_service_requests'),{'status':'open'})
+        parameters['status'] = 'open'
+        response = self.client.get(reverse('api_service_requests'),parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
         
-        response = self.client.get(reverse('api_service_requests'),{'status':'closed'})
+        parameters['status'] = 'closed'       
+        response = self.client.get(reverse('api_service_requests'),parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 7)
         
-        response = self.client.get(reverse('api_service_requests'),{'status':'wrong'})
+        parameters['status'] = 'wrong'       
+        response = self.client.get(reverse('api_service_requests'),parameters)
         self.assertEqual(response.status_code, 404)
         
-        response = self.client.get(reverse('api_service_requests'),{'start_date':'wrong'})
+        #check date parameters
+        parameters = {'service_code':'node','start_date':'wrong'}
+        
+        response = self.client.get(reverse('api_service_requests'),parameters)
         self.assertEqual(response.status_code, 404)
         
-        response = self.client.get(reverse('api_service_requests'),{'start_date':'2013-01-01T17:57:02Z'})
+        parameters['start_date'] = '2013-01-01T17:57:02Z'
+        response = self.client.get(reverse('api_service_requests'),parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 10)
         
-        response = self.client.get(reverse('api_service_requests'),{'start_date':'2013-01-01T17:57:02Z','end_date':'2013-04-01T17:57:02Z'})
+        parameters['end_date'] = '2013-04-01T17:57:02Z'
+        response = self.client.get(reverse('api_service_requests'),parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
         
-        response = self.client.get(reverse('api_service_requests'),{'start_date':'2015-01-01T17:57:02Z'})
+        parameters['start_date'] = '2015-01-01T17:57:02Z'
+        response = self.client.get(reverse('api_service_requests'),parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
         

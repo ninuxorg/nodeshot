@@ -3,6 +3,7 @@ import operator
 
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
+from django.utils.text import slugify
 from django.db.models import Q
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -31,22 +32,6 @@ MODELS = {
             'comment': Comment,
             'rate': Rating,
         }
-
-def get_service_name(service_code):
-    return SERVICES[service_code]['name']
-
-def create_output_data(data):
-    geom = fromstr(data['geometry'])
-    if geom.geom_type != 'point':
-        geom = geom.centroid
-    pnt = fromstr(data['geometry'])
-    del data['geometry']
-    data['lng'] = geom[0]
-    data['lat'] = geom[1]
-    status_id = data['status']
-    status = get_object_or_404(Status, pk=status_id)
-    data['status'] = STATUS[status.name]
-    return data
 
 class ServiceList(generics.ListAPIView):
     """
@@ -104,6 +89,21 @@ class ServiceDefinition(APIView):
     
 service_definition = ServiceDefinition.as_view()
 
+def get_service_name(service_code):
+    return SERVICES[service_code]['name']
+
+def create_output_data(data):
+    geom = fromstr(data['geometry'])
+    if geom.geom_type != 'point':
+        geom = geom.centroid
+    pnt = fromstr(data['geometry'])
+    del data['geometry']
+    data['lng'] = geom[0]
+    data['lat'] = geom[1]
+    status_id = data['status']
+    status = get_object_or_404(Status, pk=status_id)
+    data['status'] = STATUS[status.name]
+    return data
 
 class ServiceRequests(generics.ListCreateAPIView):
     """
@@ -128,39 +128,26 @@ class ServiceRequests(generics.ListCreateAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     #serializer_class= NodeRequestListSerializer
     
-    def get_serializer_class(self):
+    def get_serializer(self, instance=None, data=None,
+                       files=None, many=False, partial=False):
         """
-        Return the class to use for the serializer.
-        Defaults to using `self.serializer_class`.
-
-        You may want to override this if you need to provide different
-        serializations depending on the incoming request.
-
-        (Eg. admins get full serialization, others get basic serialization)
+        Return the serializer instance that should be used for validating and
+        deserializing input, and for serializing output.
         """
-        service_code = 'node'
-        
+        context = self.get_serializer_context()
+        service_code = context['request'].QUERY_PARAMS.get('service_code', 'node')
+
         serializers = {
             'node': NodeRequestListSerializer,
-            'vote': VoteRequestDetailSerializer,
-            'comment': CommentRequestDetailSerializer,
-            'rate': RatingRequestDetailSerializer,
+            'vote': VoteRequestListSerializer,
+            'comment': CommentRequestListSerializer,
+            'rate': RatingRequestListSerializer,
         }
         
         serializer_class = serializers[service_code]
-        if serializer_class is not None:
-            return serializer_class
-
-        assert self.model is not None, \
-            "'%s' should either include a 'serializer_class' attribute, " \
-            "or use the 'model' attribute as a shortcut for " \
-            "automatically generating a serializer class." \
-            % self.__class__.__name__
-
-        class DefaultSerializer(self.model_serializer_class):
-            class Meta:
-                model = self.model
-        return DefaultSerializer
+        
+        return serializer_class(instance, data=data, files=files,
+                                many=many, partial=partial, context=context)
     
     def get_custom_data(self):
         """ additional request.DATA """
@@ -171,18 +158,19 @@ class ServiceRequests(generics.ListCreateAPIView):
     
     def get(self, request, *args, **kwargs):
         
-        #if 'service_code' not in request.GET.keys():
-        ##if not request.GET['service_code']:
-        #    return Response({ 'detail': _('A service code must be inserted') }, status=404)
-        #service_code = request.GET['service_code']
-        #
-        #if service_code not in SERVICES.keys():
-        #    return Response({ 'detail': _('Service not found') }, status=404)
+        if 'service_code' not in request.GET.keys():
+        #if not request.GET['service_code']:
+            return Response({ 'detail': _('A service code must be inserted') }, status=404)
+        service_code = request.GET['service_code']
         
-        service_code = 'node'
+        if service_code not in SERVICES.keys():
+            return Response({ 'detail': _('Service not found') }, status=404)
+        
+        #service_code = 'node'
         start_date = None
         end_date = None
         status = None
+        category = None
                 
         STATUSES = {}
         for status_type in ('open','closed'):
@@ -202,27 +190,33 @@ class ServiceRequests(generics.ListCreateAPIView):
             if request.GET['status'] not in ('open','closed'):
                 return Response({ 'detail': _('Invalid status inserted') }, status=404)
             status = request.GET['status']
-        
-        #serializers = {
-        #    'node': NodeRequestListSerializer,
-        #    'vote': VoteRequestDetailSerializer,
-        #    'comment': CommentRequestDetailSerializer,
-        #    'rate': RatingRequestDetailSerializer,
-        #}
+            
+        if 'category' in request.GET.keys():
+            try:
+                layer = Layer.objects.all().filter(slug=category)
+            except:
+                return Response({ 'detail': _('Invalid category inserted') }, status=404)
+
         
         service_model = MODELS[service_code]
-        self.queryset = service_model.objects.all()
+        if service_code in ('vote', 'comment', 'rating'):
+            self.queryset = service_model.objects.none()
+        else: 
+            self.queryset = service_model.objects.all()
         
+        #Filter by category
+            if category is not None:
+                self.queryset = self.queryset.filter(layer = layer)
         #Check of date parameters
         
-        if start_date is not None and end_date is not None:
-            self.queryset = self.queryset.filter(added__gte = start_date).filter(added__lte = end_date)
+            if start_date is not None and end_date is not None:
+                self.queryset = self.queryset.filter(added__gte = start_date).filter(added__lte = end_date)
             
-        if start_date is not None and end_date is None:
-            self.queryset = self.queryset.filter(added__gte = start_date)
+            if start_date is not None and end_date is None:
+                self.queryset = self.queryset.filter(added__gte = start_date)
             
-        if start_date is None and end_date is not None:
-            self.queryset = self.queryset.filter(added__lte = end_date)
+            if start_date is None and end_date is not None:
+                self.queryset = self.queryset.filter(added__lte = end_date)
             
         #Check of status parameter
         
@@ -257,7 +251,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         if page is not None:
             serializer = self.get_pagination_serializer(page)
         else:
-            serializer = self.get_serializer(self.object_list, many=True)
+            serializer = self.get_serializer(self.object_list, many=True, )
             
         data = serializer.data
             
@@ -269,31 +263,6 @@ class ServiceRequests(generics.ListCreateAPIView):
         
         
         return Response(data)
-    
-    #def list(self, request, *args, **kwargs):
-    #    self.object_list = self.filter_queryset(self.get_queryset())
-    #
-    #    # Default is to allow empty querysets.  This can be altered by setting
-    #    # `.allow_empty = False`, to raise 404 errors on empty querysets.
-    #    if not self.allow_empty and not self.object_list:
-    #        warnings.warn(
-    #            'The `allow_empty` parameter is due to be deprecated. '
-    #            'To use `allow_empty=False` style behavior, You should override '
-    #            '`get_queryset()` and explicitly raise a 404 on empty querysets.',
-    #            PendingDeprecationWarning
-    #        )
-    #        class_name = self.__class__.__name__
-    #        error_msg = self.empty_error % {'class_name': class_name}
-    #        raise Http404(error_msg)
-    #
-    #    # Switch between paginated or standard style responses
-    #    page = self.paginate_queryset(self.object_list)
-    #    if page is not None:
-    #        serializer = self.get_pagination_serializer(page)
-    #    else:
-    #        serializer = self.get_serializer(self.object_list, many=True)
-    #
-    #    return Response(serializer.data)
     
     def post(self, request, *args, **kwargs):
         service_code = request.POST['service_code']
@@ -316,10 +285,17 @@ class ServiceRequests(generics.ListCreateAPIView):
         
         request.UPDATED = request.POST.copy()
         request.UPDATED['user'] = user['user']
-        
         if service_code == 'node':
+            for checkPOSTdata in ('layer','name','lat','lng'):
+                #Check if mandatory parameters key exists
+                if checkPOSTdata not in request.POST.keys():
+                    return Response({ 'detail': _('Mandatory parameter not found') }, status=400)
+                else:
+                    #Check if mandatory parameters values have been inserted
+                    if not request.POST[checkPOSTdata] :
+                        return Response({ 'detail': _('Mandatory parameter not found') }, status=400)
             #Get layer id
-            layer=Layer.objects.get(slug=request.POST['layer'])           
+            layer=Layer.objects.get(slug=request.UPDATED['layer'])           
             request.UPDATED['layer'] = layer.id
             
             #Transform coords in wkt geometry
@@ -327,6 +303,7 @@ class ServiceRequests(generics.ListCreateAPIView):
             lng = float(request.UPDATED['lng'])
             point = Point((lng,lat))
             request.UPDATED['geometry'] = point.wkt
+            request.UPDATED['slug'] = slugify(request.UPDATED['name'])
 
         return self.create(request, *args, **kwargs)
    
@@ -354,19 +331,6 @@ class ServiceRequests(generics.ListCreateAPIView):
             for file,image_file in files.iteritems():
                 image=Image(node=obj, file=image_file)
                 image.save()
-    
-    #def create(self, request, *args, **kwargs):
-    #    serializer = self.get_serializer(data=request.DATA, files=request.FILES)
-    #
-    #    if serializer.is_valid():
-    #        self.pre_save(serializer.object)
-    #        self.object = serializer.save(force_insert=True)
-    #        self.post_save(self.object, created=True)
-    #        headers = self.get_success_headers(serializer.data)
-    #        return Response(serializer.data, status=status.HTTP_201_CREATED,
-    #                        headers=headers)
-    #
-    #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 service_requests = ServiceRequests.as_view()
 
@@ -383,9 +347,9 @@ class ServiceRequest(generics.RetrieveAPIView):
         
         serializers = {
             'node': NodeRequestDetailSerializer,
-            'vote': VoteRequestDetailSerializer,
-            'comment': CommentRequestDetailSerializer,
-            'rate': RatingRequestDetailSerializer,
+            'vote': VoteRequestSerializer,
+            'comment': CommentRequestSerializer,
+            'rate': RatingRequestSerializer,
         }
         
         service_model = MODELS[service_code]

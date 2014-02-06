@@ -1,7 +1,8 @@
 import re
 from django.utils.translation import ugettext_lazy as _
+from nodeshot.core.layers.models import Layer
 
-
+LAYER_CHOICES = [layer.slug for layer in Layer.objects.all()]
 
 SERVICES = {
     'node': {
