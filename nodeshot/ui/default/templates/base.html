@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nodeshot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap.switch.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/lib/css/scroller.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-layout.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-colors.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-typography.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-typography.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/fontello/css/nodeshot.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/fontello/css/animation.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body style="overflow:hidden">
+    <div id="preloader">
+        <p class="inner">
+            <span class="icon-loading animate-spin"></span> Loading &hellip;
+        </p>
+    </div>
+    <header>
+        <nav id="top-bar">
+            <h1><a href="#">Nodeshot</a></h1>
+            
+            <div id="general-search">
+                <input type="text" id="general-search-input" placeholder="Search for data">
+                <span class="icon-search">&nbsp;</span>
+                <span class="icon-spinner animate-spin"></span>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="icon-pin">Zioproto Gallia</a></li>
+                    <li><a href="#" class="icon-pin">Hotspot Gallicano</a></li>
+                    <li><a href="#" class="icon-pin">Pisa::Galluppi</a></li>
+                    <li><a href="#" class="icon-user">galluswifi</a></li>
+                    <li><a href="#" class="icon-user">Alberto gallo</a></li>
+                </ul>
+            </div>
+            
+            <ul id="main-actions">
+                <li>
+                    <a href="#" class="icon-search">&nbsp;</a>
+                </li>
+                <!--<li><a href="#"><span class="icon-user-add"></span><span class="text">Sign up</span></a></li>
+                <li><a href="#"><span class="icon-user"></span><span class="text">Sign in</span></a></li>-->
+                <li>
+                    <a href="#" class="notifications">
+                        <span class="icon-globe">&nbsp;</span>
+                        &nbsp;
+                        <span class="bg">3</span>
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="icon-user"></span>
+                        <span class="text" id="username-js">nemesisdesign</span>
+                        <span class="caret"></span>
+                    </a>
+                    
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><span class="icon-user"></span>My profile</a></li>
+                        <li><a href="#"><span class="icon-wrench"></span>Settings</a></li>
+                        <li><a href="#"><span class="icon-off"></span>Logout</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="icon-menu"
+                       data-toggle="collapse"
+                       data-target="#ns-top-nav-links">&nbsp;</a>
+                </li>
+            </ul>
+            <div id="notifications">
+                <span class="arrow"></span>
+                <div class="header">
+                    <div class="left">
+                        Notifications
+                    </div>
+                    <div class="right">
+                        <a href="#">See all</a> <span>-</span>
+                        <a href="#">Settings</a>
+                    </div>
+                </div>
+                <div class="scroller">
+                    <ul>
+                        <li class="unread">
+                            <span class="icon-pin"></span>
+                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
+                            <p class="time">12 hours ago</p>
+                        </li>
+                        <li class="unread">
+                            <span class="icon-pin"></span>
+                            <p class="message">The status of your node <strong>Pomezia</strong> has changed from <strong>"proposed"</strong> to <strong>"approved"</strong></p>
+                            <p class="time">yesterday</p>
+                        </li>
+                        <li class="unread">
+                            <span class="icon-user"></span>
+                            <p class="message"><strong>Some event</strong> has just happened</p>
+                            <p class="time">Jan 24th 2014</p>
+                        </li>
+                        <li class="read">
+                            <span class="icon-mail"></span>
+                            <p class="message">Some <strong> other event</strong> has just happened</p>
+                            <p class="time">Jan 24th 2014</p>
+                        </li>
+                        <li class="read">
+                            <span class="icon-pin"></span>
+                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
+                            <p class="time">12 hours ago</p>
+                        </li>
+                        <li class="read">
+                            <span class="icon-pin"></span>
+                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
+                            <p class="time">12 hours ago</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <nav id="nav-bar" class="navbar navbar-inverse" role="navigation">
+            <div class="collapse navbar-collapse" id="ns-top-nav-links">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#"><span class="icon-squares"></span>Dashboard</a></li>
+                    <li><a href="#"><span class="icon-globe"></span>Map</a></li>
+                    <li><a href="#"><span class="icon-nodes"></span>Nodes</a></li>
+                    <li><a href="#"><span class="icon-layer"></span>Layers</a></li>
+                    <li><a href="#"><span class="icon-chart-bar"></span>Statistics</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-info-circle"></span>About
+                            <span class="caret"></span>
+                        </a>
+            
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-plus-squared"></span>More
+                            <span class="caret"></span>
+                        </a>
+            
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <ol class="breadcrumb center-stage visible-xs invert">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li class="active">Something</li>
+    </ol>
+    <article class="center-stage multicolumn-md">
+        <h1>Nodeshot Heading 1</h1>
+        
+        <!-- Modal -->
+        <div class="modal fade autocenter" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-content modal-body modal-slim">
+                <span class="message">This is a simple modal confirmation</span>
+                <button type="button" class="btn btn-success">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+        
+        <p>Lorem ipsum dolor sit amet consectetuer vel pellentesque orci auctor non. At et gravida habitasse non Aliquam lacus nibh sem elit nec. Lacinia metus interdum porttitor Sed ipsum nascetur hendrerit dis gravida semper. Interdum nibh enim ipsum Nulla In Nam venenatis hac diam massa. Hendrerit tellus condimentum congue pretium Donec consectetuer metus Ut neque Vivamus. Dolor turpis.</p>
+        
+        <!-- Button trigger modal -->
+        <p class="text-center">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                Launch demo modal
+            </button>
+        </p>
+        
+        <blockquote>Alternative style... morbi congue massa Cum cursus et odio metus id In nec. Parturient magna pede Nulla leo enim ut auctor elit nunc lobortis. Fringilla et lobortis justo ut condimentum felis porta elit Pellentesque Nam. Dui lacus cursus eget Curabitur urna hendrerit lobortis Nam velit fames. Lacus Vestibulum laoreet auctor Mauris metus non Ut Aenean Lorem Maecenas.</blockquote>
+        
+        <p>Hendrerit pede Morbi fringilla senectus elit ultrices nibh velit Sed turpis. Gravida Curabitur quis enim tincidunt lobortis Curabitur ut dapibus Donec eu. Congue habitant enim Curabitur Lorem in id neque risus gravida convallis. Molestie tincidunt id ultrices Nam rhoncus Integer consequat et laoreet Nam. Suspendisse ut nunc Sed iaculis Phasellus Vestibulum elit sollicitudin consequat lobortis. Ornare semper elit eu libero malesuada sit Nulla Pellentesque Sed Quisque. Tellus.
+        Mi non suscipit ut <a href="#">this is a link</a> congue platea risus pulvinar Sed orci eros. Enim id tellus Phasellus convallis lorem et elit et et gravida. Lobortis hendrerit at Nulla cursus mauris pede eget id hendrerit wisi. Nulla Morbi sem Aliquam in massa consectetuer Nam nunc Vivamus et. Vestibulum risus semper nulla Phasellus nunc Vestibulum Donec ut wisi sit. Aliquam Cum justo Vestibulum rhoncus dapibus ut.</p>
+        <h2>Heading 2</h2>
+        <p>Morbi eleifend vitae a mauris nascetur ut natoque sit egestas mi. Vivamus risus Suspendisse justo Aliquam auctor dolor eu consequat pellentesque tristique. Mauris adipiscing et Vivamus Curabitur Vestibulum tempus Phasellus sem morbi Phasellus. Vitae quis lacinia gravida massa orci tellus eleifend Pellentesque Integer aliquam. Nisl velit elit ipsum Vestibulum id pharetra metus semper nibh Nam. Augue felis id lorem pulvinar lobortis diam tellus mauris quis elit. Ac elit.</p>
+        <p>Velit nec ut Nulla eu pharetra justo congue laoreet vel tellus. Non id leo libero accumsan Suspendisse eget et Duis Vestibulum cursus. Nibh eu ligula vel lorem ut commodo dui amet enim metus. Justo id accumsan nunc et Pellentesque ipsum porttitor lorem vel et. Ut mus Vestibulum Curabitur nulla eleifend feugiat a elit adipiscing tristique. </p>
+        <h3>Heading 3</h3>
+        <p>Curabitur pretium malesuada tempus Vestibulum libero id diam justo sit ac. Justo Curabitur mauris diam Vivamus accumsan tempor ut libero Vestibulum Sed. Non ligula leo est Vestibulum tincidunt ac dolor Lorem sem tellus. Lacus id porttitor Fusce nunc faucibus Curabitur leo vel Nulla elit. Nibh Aenean quis ipsum libero libero hendrerit Praesent fringilla id euismod. Morbi fringilla consequat cursus magnis est adipiscing.</p>
+        <blockquote class="style2">
+            <p>Alternative style 2... Lorem ipsum dolor sit amet consectetuer ut et molestie ut sagittis. Eget nunc orci Aenean tortor hendrerit dolor semper justo nibh sapien.
+            <p>Leo eros quis et Vestibulum ut cursus sagittis velit sodales volutpat.</p>
+        </blockquote>
+        <p>Nam velit fringilla porta quis est convallis Maecenas leo Vestibulum orci. Penatibus et pretium faucibus eu justo dui a tristique Aenean porttitor. In dignissim consequat Nunc nibh justo Quisque at elit congue vel. Aliquam nibh ante ipsum porta tempus tortor Aliquam justo facilisi ut. Vitae egestas leo vitae et euismod suscipit nunc malesuada ipsum metus. Purus sit eros at neque enim ante magna sociis hendrerit Nulla. Wisi lorem.</p>
+        <h4>Heading 4</h3>
+        <p>Ut id tincidunt non orci amet congue ac vel condimentum Aliquam. Donec eros tempor Suspendisse tincidunt Nunc Aenean sit scelerisque In quis. Fermentum aliquet ipsum massa nulla tempor quis est condimentum dolor mauris. Semper nascetur ac vel consectetuer mauris sem Morbi tellus sed Vestibulum. Tempus tempor felis elit feugiat Morbi leo.</p>
+        
+        <div id="loading" class="overlay loading">
+            <span class="icon-loading animate-spin"></span>
+            <span class="text">Loading &hellip;</span>
+            <a class="icon-close" title="cancel operation"></a>
+        </div>
+    </article>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.switch.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/pwstrength.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/scroller.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>
+</body>
+</html>
