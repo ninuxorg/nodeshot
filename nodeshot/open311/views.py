@@ -93,10 +93,7 @@ def get_service_name(service_code):
     return SERVICES[service_code]['name']
 
 def create_output_data(data):
-    geom = fromstr(data['geometry'])
-    if geom.geom_type != 'point':
-        geom = geom.centroid
-    pnt = fromstr(data['geometry'])
+    geom = fromstr(data['geometry']).centroid
     del data['geometry']
     data['lng'] = geom[0]
     data['lat'] = geom[1]
@@ -107,26 +104,26 @@ def create_output_data(data):
 
 class ServiceRequests(generics.ListCreateAPIView):
     """
-    ### GET
+    Retrieve list of service requests.
     
-    Retrieve requests.
+    Required parameters:
     
-    ####Parameters:
+     * `service_code=<string>`: possible values are: 'node', 'vote', 'rate' , 'comment'
+     
+    ####Note:    List is displayed only for 'node' service requests
+     
+    Optional  parameters ( relevant only if service_code = node ):
     
-    service_code: defaults to 'node'
-    
-    status: 'open' or 'closed'
-    
-    start_date: date in w3 format, eg 2010-01-01T00:00:00Z
-    
-    end_date: date in w3 format, eg 2010-01-01T00:00:00Z
-    
+     * `status=<string>`: possible values are: 'open' or 'closed'
+     * `start_date=<date>`: date in w3 format, eg 2010-01-01T00:00:00Z
+     * `end_date=<date>`: date in w3 format, eg 2010-01-01T00:00:00Z
+     
     ### POST
     
-    Post a request
+    Create a new service request. Requires authentication.
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    #serializer_class= NodeRequestListSerializer
+    serializer_class= NodeRequestListSerializer
     
     def get_serializer(self, instance=None, data=None,
                        files=None, many=False, partial=False):
@@ -134,17 +131,19 @@ class ServiceRequests(generics.ListCreateAPIView):
         Return the serializer instance that should be used for validating and
         deserializing input, and for serializing output.
         """
-        context = self.get_serializer_context()
-        service_code = context['request'].QUERY_PARAMS.get('service_code', 'node')
-
         serializers = {
             'node': NodeRequestListSerializer,
             'vote': VoteRequestListSerializer,
             'comment': CommentRequestListSerializer,
             'rate': RatingRequestListSerializer,
         }
+        context = self.get_serializer_context()
+        service_code = context['request'].QUERY_PARAMS.get('service_code', 'node')
         
-        serializer_class = serializers[service_code]
+        if service_code not in serializers.keys():
+            serializer_class = self.get_serializer_class()
+        else:
+            serializer_class = serializers[service_code]
         
         return serializer_class(instance, data=data, files=files,
                                 many=many, partial=partial, context=context)
@@ -159,7 +158,6 @@ class ServiceRequests(generics.ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         
         if 'service_code' not in request.GET.keys():
-        #if not request.GET['service_code']:
             return Response({ 'detail': _('A service code must be inserted') }, status=404)
         service_code = request.GET['service_code']
         
