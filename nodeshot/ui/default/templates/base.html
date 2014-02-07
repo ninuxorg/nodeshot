@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>{% load i18n %}
 <html>
 <head>
     <title>Nodeshot</title>
@@ -24,7 +24,7 @@
 <body style="overflow:hidden">
     <div id="preloader">
         <p class="inner">
-            <span class="icon-loading animate-spin"></span> Loading &hellip;
+            <span class="icon-loading animate-spin"></span> {% trans 'Loading' %} &hellip;
         </p>
     </div>
     <header>
@@ -48,26 +48,25 @@
                 <li>
                     <a href="#" class="icon-search">&nbsp;</a>
                 </li>
-                <!--<li><a href="#"><span class="icon-user-add"></span><span class="text">Sign up</span></a></li>
-                <li><a href="#"><span class="icon-user"></span><span class="text">Sign in</span></a></li>-->
+                {% if request.user.is_authenticated %}
                 <li>
                     <a href="#" class="notifications">
                         <span class="icon-globe">&nbsp;</span>
                         &nbsp;
-                        <span class="bg">3</span>
+                        <span class="bg">0</span>
                     </a>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <span class="icon-user"></span>
-                        <span class="text" id="username-js">nemesisdesign</span>
+                        <span class="text" id="username-js">{{ request.user.username }}</span>
                         <span class="caret"></span>
                     </a>
                     
                     <ul class="dropdown-menu">
-                        <li><a href="#"><span class="icon-user"></span>My profile</a></li>
-                        <li><a href="#"><span class="icon-wrench"></span>Settings</a></li>
-                        <li><a href="#"><span class="icon-off"></span>Logout</a></li>
+                        <li><a href="#"><span class="icon-user"></span>{% trans 'My profile' %}</a></li>
+                        <li><a href="#"><span class="icon-wrench"></span>{% trans 'Settings' %}</a></li>
+                        <li><a href="#"><span class="icon-off"></span>{% trans 'Logout' %}</a></li>
                     </ul>
                 </li>
                 <li>
@@ -75,16 +74,20 @@
                        data-toggle="collapse"
                        data-target="#ns-top-nav-links">&nbsp;</a>
                 </li>
+                {% else %}
+                <li><a href="#"><span class="icon-user-add"></span><span class="text">{% trans 'Sign up' %}</span></a></li>
+                <li><a href="#"><span class="icon-user"></span><span class="text">{% trans 'Sign in' %}</span></a></li>
+                {% endif %}
             </ul>
             <div id="notifications">
                 <span class="arrow"></span>
                 <div class="header">
                     <div class="left">
-                        Notifications
+                        {% trans 'Notifications' %}
                     </div>
                     <div class="right">
-                        <a href="#">See all</a> <span>-</span>
-                        <a href="#">Settings</a>
+                        <a href="#">{% trans 'See all' %}</a> <span>-</span>
+                        <a href="#">{% trans 'Settings' %}</a>
                     </div>
                 </div>
                 <div class="scroller">
@@ -163,62 +166,40 @@
             </div>
         </nav>
     </header>
+    {% block breadcrumb %}
     <ol class="breadcrumb center-stage visible-xs invert">
         <li><a href="#">Home</a></li>
         <li><a href="#">About</a></li>
         <li class="active">Something</li>
     </ol>
-    <article class="center-stage multicolumn-md">
-        <h1>Nodeshot Heading 1</h1>
-        
-        <!-- Modal -->
-        <div class="modal fade autocenter" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-content modal-body modal-slim">
-                <span class="message">This is a simple modal confirmation</span>
-                <button type="button" class="btn btn-success">Yes</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal -->
-        
-        <p>Lorem ipsum dolor sit amet consectetuer vel pellentesque orci auctor non. At et gravida habitasse non Aliquam lacus nibh sem elit nec. Lacinia metus interdum porttitor Sed ipsum nascetur hendrerit dis gravida semper. Interdum nibh enim ipsum Nulla In Nam venenatis hac diam massa. Hendrerit tellus condimentum congue pretium Donec consectetuer metus Ut neque Vivamus. Dolor turpis.</p>
-        
-        <!-- Button trigger modal -->
-        <p class="text-center">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-                Launch demo modal
-            </button>
-        </p>
-        
-        <blockquote>Alternative style... morbi congue massa Cum cursus et odio metus id In nec. Parturient magna pede Nulla leo enim ut auctor elit nunc lobortis. Fringilla et lobortis justo ut condimentum felis porta elit Pellentesque Nam. Dui lacus cursus eget Curabitur urna hendrerit lobortis Nam velit fames. Lacus Vestibulum laoreet auctor Mauris metus non Ut Aenean Lorem Maecenas.</blockquote>
-        
-        <p>Hendrerit pede Morbi fringilla senectus elit ultrices nibh velit Sed turpis. Gravida Curabitur quis enim tincidunt lobortis Curabitur ut dapibus Donec eu. Congue habitant enim Curabitur Lorem in id neque risus gravida convallis. Molestie tincidunt id ultrices Nam rhoncus Integer consequat et laoreet Nam. Suspendisse ut nunc Sed iaculis Phasellus Vestibulum elit sollicitudin consequat lobortis. Ornare semper elit eu libero malesuada sit Nulla Pellentesque Sed Quisque. Tellus.
-        Mi non suscipit ut <a href="#">this is a link</a> congue platea risus pulvinar Sed orci eros. Enim id tellus Phasellus convallis lorem et elit et et gravida. Lobortis hendrerit at Nulla cursus mauris pede eget id hendrerit wisi. Nulla Morbi sem Aliquam in massa consectetuer Nam nunc Vivamus et. Vestibulum risus semper nulla Phasellus nunc Vestibulum Donec ut wisi sit. Aliquam Cum justo Vestibulum rhoncus dapibus ut.</p>
-        <h2>Heading 2</h2>
-        <p>Morbi eleifend vitae a mauris nascetur ut natoque sit egestas mi. Vivamus risus Suspendisse justo Aliquam auctor dolor eu consequat pellentesque tristique. Mauris adipiscing et Vivamus Curabitur Vestibulum tempus Phasellus sem morbi Phasellus. Vitae quis lacinia gravida massa orci tellus eleifend Pellentesque Integer aliquam. Nisl velit elit ipsum Vestibulum id pharetra metus semper nibh Nam. Augue felis id lorem pulvinar lobortis diam tellus mauris quis elit. Ac elit.</p>
-        <p>Velit nec ut Nulla eu pharetra justo congue laoreet vel tellus. Non id leo libero accumsan Suspendisse eget et Duis Vestibulum cursus. Nibh eu ligula vel lorem ut commodo dui amet enim metus. Justo id accumsan nunc et Pellentesque ipsum porttitor lorem vel et. Ut mus Vestibulum Curabitur nulla eleifend feugiat a elit adipiscing tristique. </p>
-        <h3>Heading 3</h3>
-        <p>Curabitur pretium malesuada tempus Vestibulum libero id diam justo sit ac. Justo Curabitur mauris diam Vivamus accumsan tempor ut libero Vestibulum Sed. Non ligula leo est Vestibulum tincidunt ac dolor Lorem sem tellus. Lacus id porttitor Fusce nunc faucibus Curabitur leo vel Nulla elit. Nibh Aenean quis ipsum libero libero hendrerit Praesent fringilla id euismod. Morbi fringilla consequat cursus magnis est adipiscing.</p>
-        <blockquote class="style2">
-            <p>Alternative style 2... Lorem ipsum dolor sit amet consectetuer ut et molestie ut sagittis. Eget nunc orci Aenean tortor hendrerit dolor semper justo nibh sapien.
-            <p>Leo eros quis et Vestibulum ut cursus sagittis velit sodales volutpat.</p>
-        </blockquote>
-        <p>Nam velit fringilla porta quis est convallis Maecenas leo Vestibulum orci. Penatibus et pretium faucibus eu justo dui a tristique Aenean porttitor. In dignissim consequat Nunc nibh justo Quisque at elit congue vel. Aliquam nibh ante ipsum porta tempus tortor Aliquam justo facilisi ut. Vitae egestas leo vitae et euismod suscipit nunc malesuada ipsum metus. Purus sit eros at neque enim ante magna sociis hendrerit Nulla. Wisi lorem.</p>
-        <h4>Heading 4</h3>
-        <p>Ut id tincidunt non orci amet congue ac vel condimentum Aliquam. Donec eros tempor Suspendisse tincidunt Nunc Aenean sit scelerisque In quis. Fermentum aliquet ipsum massa nulla tempor quis est condimentum dolor mauris. Semper nascetur ac vel consectetuer mauris sem Morbi tellus sed Vestibulum. Tempus tempor felis elit feugiat Morbi leo.</p>
-        
+    {% endblock %}
+    
+    {% block body %}{% endblock %}
+    
+    <script id="page-template" type="text/template">
+        <h1><%= title %></h1>
+        <%= content %>
+    </script>
+    
+    <script id="loading-template" type="text/template">
         <div id="loading" class="overlay loading">
             <span class="icon-loading animate-spin"></span>
             <span class="text">Loading &hellip;</span>
             <a class="icon-close" title="cancel operation"></a>
         </div>
-    </article>
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    </script>
+    
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.switch.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/pwstrength.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/scroller.min.js"></script>
+    
+    <script src="{{ STATIC_URL }}ui/lib/js/underscore.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/backbone.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/backbone.marionette.min.js"></script>
+    
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>
 </body>
 </html>
