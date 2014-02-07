@@ -1,6 +1,9 @@
 import re
+
 from django.utils.translation import ugettext_lazy as _
+from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
+from nodeshot.community.participation.models import Vote, Comment, Rating
 
 LAYER_CHOICES = [layer.slug for layer in Layer.objects.all()]
 
@@ -30,5 +33,12 @@ SERVICES = {
         'group': ''
     }
 }
+
+MODELS = {
+            'node': Node,
+            'vote': Vote,
+            'comment': Comment,
+            'rate': Rating,
+        }
 
 iso8601_REGEXP = re.compile("^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])?T(2[0-3]|[0-1][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)??(Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$")

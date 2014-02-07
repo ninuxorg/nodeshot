@@ -436,7 +436,6 @@ class NodeRequestListSerializer(PostModelSerializer):
     image_urls = serializers.SerializerMethodField('get_image_urls')
     requested_datetime = serializers.Field(source='added')
     updated_datetime = serializers.Field(source='updated')
-    title = serializers.CharField()
     lat = serializers.CharField()
     lng = serializers.CharField()
     image = serializers.ImageField()

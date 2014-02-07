@@ -1,4 +1,3 @@
-import datetime
 import operator
 
 from django.http import Http404
@@ -17,20 +16,13 @@ from nodeshot.core.nodes.models import Node, Status, Image
 from nodeshot.core.layers.models import Layer
 from nodeshot.community.participation.models import Vote, Comment, Rating
 
-from .base import SERVICES, iso8601_REGEXP
+from .base import SERVICES, MODELS, iso8601_REGEXP
 from .serializers import *
 
 STATUS = {
             'Potenziale' : 'open',
             'Pianificato' : 'open',
             'Attivo' : 'closed',
-        }
-
-MODELS = {
-            'node': Node,
-            'vote': Vote,
-            'comment': Comment,
-            'rate': Rating,
         }
 
 class ServiceList(generics.ListAPIView):
@@ -168,7 +160,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         start_date = None
         end_date = None
         status = None
-        category = None
+        layer = None
                 
         STATUSES = {}
         for status_type in ('open','closed'):
@@ -189,22 +181,19 @@ class ServiceRequests(generics.ListCreateAPIView):
                 return Response({ 'detail': _('Invalid status inserted') }, status=404)
             status = request.GET['status']
             
-        if 'category' in request.GET.keys():
-            try:
-                layer = Layer.objects.all().filter(slug=category)
-            except:
-                return Response({ 'detail': _('Invalid category inserted') }, status=404)
+        if 'layer' in request.GET.keys():
+            layer = request.GET['layer']
+            node_layer = get_object_or_404(Layer, slug=layer)
 
-        
         service_model = MODELS[service_code]
         if service_code in ('vote', 'comment', 'rating'):
             self.queryset = service_model.objects.none()
         else: 
             self.queryset = service_model.objects.all()
         
-        #Filter by category
-            if category is not None:
-                self.queryset = self.queryset.filter(layer = layer)
+        #Filter by layer
+            if layer is not None:
+                self.queryset = self.queryset.filter(layer = node_layer)
         #Check of date parameters
         
             if start_date is not None and end_date is not None:
