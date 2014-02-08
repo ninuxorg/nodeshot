@@ -11,23 +11,75 @@ var Page = Backbone.Model.extend({
 });
 
 var PageView = Backbone.Marionette.ItemView.extend({
-    el: '#content',
-    template: '#page-template',
+    tagName: 'article',
+    className: 'center-stage multicolumn-md',
+    template: '#page-template'
+});
 
-    initialize: function(){
-        this.model.on("sync", this.render, this);
+var MapView = Backbone.Marionette.ItemView.extend({
+    id: 'map-container',
+    template: '#map-template',
+    
+    onRender: function(){
+        
+    },
+    
+    onDomRefresh: function(){
+        this.map = L.mapbox.map('map-js', 'examples.map-9ijuk24y').setView([42.12, 12.45], 9);
+        setMapDimensions();
     }
 });
 
 Nodeshot.addRegions({
-    content: '#content'
+    body: '#body'
 });
 
 Nodeshot.addInitializer(function(){
-    Nodeshot.page = new Page({ slug: 'home' });
+    Nodeshot.page = new Page();
     
-    var view = new PageView({ model: Nodeshot.page });
-    Nodeshot.page.fetch();
+    Nodeshot.page.on('sync', function(){
+        Nodeshot.body.show(new PageView({ model: Nodeshot.page }));
+    });
+    
+    Nodeshot.page.on('error', function(model, http){
+        if(http.status === 404){
+            alert('the requested page was not found');
+        }
+        else{
+            alert('there was an error while retrieving the page');
+        }
+    });
+    
+    Backbone.history.start();
 });
 
-Nodeshot.start();
+var NodeshotController = {
+    index: function(){
+        Backbone.history.navigate('#pages/home');
+    },
+    
+    page: function(slug){
+        Nodeshot.page.set('slug', slug);
+        Nodeshot.page.fetch();
+        
+        var link = $('#nav-bar a[href="#/pages/'+slug+'"]');
+        if(link.length && link.parents('.dropdown').length){
+            link.parents('.dropdown').addClass('active');
+        }
+        else{
+            link.trigger('click');
+        }
+    }
+}
+
+var NodeshotRouter = new Marionette.AppRouter({
+    controller: NodeshotController,
+    appRoutes: {
+        "": "index",
+        "pages/:slug": "page"
+    }
+});
+
+$(document).ready(function($){
+    Nodeshot.start();
+});
