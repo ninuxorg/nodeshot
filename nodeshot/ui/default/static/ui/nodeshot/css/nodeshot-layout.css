@@ -131,7 +131,6 @@
 #main-actions .caret{ position: relative; top: -2px }
 #main-actions .icon-search,
 #main-actions .icon-menu{ display: none }
-#main-actions a.dropdown-toggle{ min-width: 170px }
 
 #top-bar .notifications{ width: 89px }
 #top-bar .notifications .bg{
@@ -302,6 +301,8 @@ article.center-stage{
         padding: 18px 25px;
     }
     
+    #main-actions a.dropdown-toggle{ min-width: 170px }
+    
     #top-bar .icon-globe{
         position: absolute;
         top: 19px;
@@ -336,6 +337,8 @@ article.center-stage{
         width: 210px;
         margin-right: 1.8%;
     }
+    
+    #main-actions a.dropdown-toggle{ min-width: 0 }
 }
 
 /* --- adjustments for small sizes  --- */

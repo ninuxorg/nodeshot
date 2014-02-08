@@ -37,11 +37,10 @@ var setMapDimensions = function(){
 }
 
 var setNotificationsLeft = function(){
-	//var 
 	var left = $('#top-bar .notifications').offset().left,
 		button_width = $('#top-bar .notifications').outerWidth();
 		notifications_width = $('#notifications').getHiddenDimensions().width;
-	//left
+	
 	$('#notifications').css('left', left - notifications_width/2 + button_width/2);
 }
 
@@ -52,106 +51,6 @@ var toggleLoading = function(){
 // close loading
 $('#loading .icon-close').click(function(e){
 	toggleLoading();
-});
-
-// init tooltip
-$('#map-toolbar a, .hastip').tooltip();
-
-// map toolbar buttons
-$('#map-toolbar a').click(function(e){
-	e.preventDefault();
-	
-	var button = $(this),
-		panel_id = button.attr('data-panel'),
-		panel = $('#' + panel_id),
-		other_panels = $('.side-panel:not(#'+panel_id+')');
-	
-	// if no panel return here
-	if (!panel.length) {
-		return;
-	}
-	
-	// hide all other open panels
-	other_panels.hide();
-	// hide any open tooltip
-	$('#map-toolbar .tooltip').hide();
-	$('#map-toolbar a').removeClass('active');
-	
-	if (panel.is(':hidden')) {
-		var distance_from_top = button.offset().top - $('body > header').eq(0).outerHeight();
-		panel.css('top', distance_from_top);
-		
-		
-		// here we should use an event
-		if (panel.hasClass('adjust-height')) {
-			var preferences_height = $('#map-container').height() - distance_from_top -18;
-			panel.height(preferences_height);
-		}
-		
-		panel.show();
-		$('.scroller').scroller('reset');
-		button.addClass('active');
-		button.tooltip('disable');
-	}
-	else{
-		panel.hide();
-		button.tooltip('enable');
-	}
-});
-
-// correction for map tools
-$('#map-toolbar a.icon-tools').click(function(e){
-	var button = $(this),
-		preferences_button = $('#map-toolbar a.icon-config');
-	if(button.hasClass('active')) {
-		preferences_button.tooltip('disable');
-	}
-	else{
-		preferences_button.tooltip('enable');
-	}
-});
-
-// correction for map-filter
-$('#map-toolbar a.icon-layer-2').click(function(e){
-	var button = $(this),
-		other_buttons = $('a.icon-config, a.icon-3d, a.icon-tools', '#map-toolbar');
-	if(button.hasClass('active')) {
-		other_buttons.tooltip('disable');
-	}
-	else{
-		other_buttons.tooltip('enable');
-	}
-});
-
-// disable map stuff
-$('#map-legend a:not(.icon-close)').click(function(e){
-	e.preventDefault();
-	
-	var li = $(this).parent();
-	
-	if (li.hasClass('disabled')) {
-		li.removeClass('disabled');
-	}
-	else{
-		li.addClass('disabled');
-	}
-	
-});
-
-$('#btn-legend, #map-legend .icon-close').click(function(e){
-	var legend = $('#map-legend'),
-		button = $('#btn-legend');
-	
-	if(legend.is(':visible')){
-		legend.fadeOut(255);
-		button.removeClass('disabled');
-		button.tooltip('enable');
-	}
-	else{
-		legend.fadeIn(255);
-		button.addClass('disabled');
-		button.tooltip('disable').tooltip('hide');
-	}
 });
 
 // automatically center modal depending on its width
@@ -234,65 +133,6 @@ clearPreloader = function(){
     });
 }
 
-// add node
-$('#map-toolbar .icon-pin-add').click(function(e){
-    $('#map-legend .icon-close').trigger('click');
-    
-    var dialog = $('#step1'),
-        dialog_dimensions = dialog.getHiddenDimensions();
-    
-    dialog.css({
-        width: dialog_dimensions.width,
-        right: 0
-    });
-    
-    // vertically align to center
-    //dialog.css('top', $(window).height()/2.1 - dialog_dimensions.height);
-    dialog.fadeIn(255);
-    
-    $('#step1 button').click(function(e){
-        $('#step1').hide();
-        var dialog = $('#step2'),
-        dialog_dimensions = dialog.getHiddenDimensions();
-    
-        dialog.css({
-            width: dialog_dimensions.width,
-            right: 0
-        });
-        
-        // vertically align to center
-        //dialog.css('top', $(window).height()/2.1 - dialog_dimensions.height);
-        dialog.fadeIn(255);
-    });
-});
-
-$('#fn-map-tools .tool').click(function(e){
-	e.preventDefault();
-	var button = $(this),
-		active_buttons = $('#fn-map-tools .tool.active');
-	
-	if(!button.hasClass('active')){
-		// deactivate any other
-		active_buttons.removeClass('active');
-		active_buttons.tooltip('enable');
-		
-		button.addClass('active');
-		button.tooltip('hide');
-		button.tooltip('disable');
-	}
-	else{
-		button.removeClass('active');
-		button.tooltip('enable');
-	}
-});
-
-// show map toolbar on mobile
-$('#toggle-toolbar').click(function(e){
-    e.preventDefault();
-    $('#map-toolbar').toggle();
-    setMapDimensions();
-});
-
 // search (ugly global var!)
 var searchLoadingIndicator = $('#general-search .animate-spin'),
     searchIcon = $('#general-search .icon-search'),
@@ -329,13 +169,7 @@ $(window).resize(function(e){
     clearPreloader();
 });
 
-$(document).ready(function($){
-    // The axis option is for setting the dimension in
-    // which the scrollbar should operate.
-	$(".scroller").scroller({
-		trackMargin: 6
-	});
-    
+$(document).ready(function($){   
     $('#js-signup-password').pwstrength({
         common: {
             minChar: 1
@@ -354,9 +188,13 @@ $(document).ready(function($){
         $('#js-password-strength-message').fadeIn(255);
     });
     
-    // activate switch
-    $('input.switch').bootstrapSwitch();
-	$('input.switch').bootstrapSwitch('setSizeClass', 'switch-small');
+    $('#mobile-nav').click(function(e){
+        e.preventDefault();
+    });
+    
+    $('#nav-bar').delegate('#ns-top-nav-links.in a:not(.dropdown-toggle)', 'click', function(e){
+        $('#ns-top-nav-links').collapse('hide');
+    });
 });
 
 $('#main-actions .notifications').click(function(e){
@@ -389,6 +227,8 @@ $('#notifications .scroller').mouseenter(function(e){
 }).mouseleave(function(e){
 	$('.scroller-bar').fadeOut(255);
 });
+
+/* --- settings --- */
 
 // implement String trim for older browsers
 if (!String.prototype.trim) {
