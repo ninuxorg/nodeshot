@@ -22,7 +22,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
     
     ui: {
         'toolbarButtons': '#map-toolbar a',
-        'legendTogglers': '#btn-legend, #map-legend a.icon-close'
+        'legendTogglers': '#btn-legend, #map-legend a.icon-close',
+        'toggleMapMode': '#btn-map-mode'
     },
     
     events: {
@@ -32,14 +33,16 @@ var MapView = Backbone.Marionette.ItemView.extend({
         'click #map-legend li a': 'toggleLegendControl',
         'click #fn-map-tools .tool': 'toggleTool',
         'click #toggle-toolbar': 'toggleToolbar',
-        'click #btn-toggle-3D': 'toggle3D'
+        'click @ui.toggleMapMode': 'toggleMapMode'
     },
     
     onDomRefresh: function(){
         $('#breadcrumb').removeClass('visible-xs').hide();
         
-        setMapDimensions();
-        this.map = L.mapbox.map('map-js', 'examples.map-9ijuk24y').setView([42.12, 12.45], 9);
+        // init tooltip
+        $('#map-toolbar a, .hastip').tooltip();
+        
+        this.initMap();
         
         // activate switch
         $('#map-container input.switch').bootstrapSwitch();
@@ -50,8 +53,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             trackMargin: 6
         });
         
-        // init tooltip
-        $('#map-toolbar a, .hastip').tooltip();
+        
         
         // correction for map tools
         $('#map-toolbar a.icon-tools').click(function(e){
@@ -230,40 +232,102 @@ var MapView = Backbone.Marionette.ItemView.extend({
     },
     
     /*
-     * toggle 3D or 2D map
+     * initMap according to mode argument
+     * mode can be undefined, 2D or 3D
      */
-    toggle3D: function(e){
-        e.preventDefault();
-        var button = $(e.currentTarget);
+    initMap: function(mode){
+        var button = this.ui.toggleMapMode,
+            unloadMethod,
+            replacedString,
+            replacerString,
+            removedClass,
+            addedClass,
+            buttonTitle = button.attr('data-original-title'),
+            preferences = Nodeshot.preferences;
         
-        // toggle 3D
-        if(button.hasClass('icon-3d')){
-            this.map.remove();
-            $('#map-js').html('');
-            this.map = new Cesium.CesiumWidget('map-js');
-            this.map.centralBody.terrainProvider = new Cesium.CesiumTerrainProvider({
-                url : 'http://cesiumjs.org/smallterrain'
-            });
-            // switch icon
-            button.removeClass('icon-3d').addClass('icon-2d');
-            // change tooltip message
-            button.attr('data-original-title', button.attr('data-original-title').replace('3D', '2D'));
-            // adapt legend position and colors
-            $('#map-legend').removeClass('inverse').addClass('right');
+        // mode is either specified, or taken from localStorage or defaults to 2D
+        mode = mode || preferences.mapMode || '2D';
+        
+        // ensure mode is either 2D or 3D, defaults to 2D
+        if(mode !== '2D' && mode !== '3D'){
+            mode = '2D'
         }
-        else{
-            this.map.destroy();
-            $('#map-js').html('');
-            this.map = L.mapbox.map('map-js', 'examples.map-9ijuk24y').setView([42.12, 12.45], 9);
-            // switch icon
-            button.removeClass('icon-2d').addClass('icon-3d');
-            // change tooltip message
-            button.attr('data-original-title', button.attr('data-original-title').replace('2D', '3D'));
-            // adapt legend position and colors
-            $('#map-legend').addClass('inverse').removeClass('right');
+        
+        if(mode === '2D'){
+            unloadMethod = 'destroy';
+            replacedString = '2D';
+            replacerString = '3D';
+            removedClass = 'right';
+            addedClass = 'inverse';
+        }
+        else if(mode === '3D'){
+            unloadMethod = 'remove';
+            replacedString = '3D';
+            replacerString = '2D';
+            removedClass = 'inverse';
+            addedClass = 'right';
+        }
+        
+        // unload map if already initialized
+        if(typeof(this.map) !== 'undefined'){
+            this.map[unloadMethod]();
+            $('#map-js').html('');    
         }
         
         setMapDimensions();
+        
+        // init map
+        this.map = this['_initMap'+mode]();
+        
+        // switch icon
+        button.removeClass('icon-'+replacedString.toLowerCase())
+              .addClass   ('icon-'+replacerString.toLowerCase());
+        
+        // change tooltip message
+        button.attr(
+            'data-original-title',
+            buttonTitle.replace(replacedString, replacerString)
+        );
+        
+        // adapt legend position and colors
+        $('#map-legend').removeClass(removedClass)
+                        .addClass   (addedClass);
+        
+        // store mapMode
+        preferences.mapMode = mode;
+    },
+    
+    /*
+     * init 2D map
+     * internal use only
+     */
+    _initMap2D: function(){
+        var map = L.map('map-js').setView([42.12, 12.45], 9);
+        // TODO: configurable tiles
+        L.tileLayer('http://a.tiles.mapbox.com/v3/examples.map-9ijuk24y/{z}/{x}/{y}.png').addTo(map);
+        return map;
+    },
+    
+    /*
+     * init 3D map
+     * internal use only
+     */
+    _initMap3D: function(){
+        var map = new Cesium.CesiumWidget('map-js');
+        map.centralBody.terrainProvider = new Cesium.CesiumTerrainProvider({
+            url : 'http://cesiumjs.org/smallterrain'
+        });
+        return map;
+    },
+    
+    /*
+     * toggle 3D or 2D map
+     */
+    toggleMapMode: function(e){
+        e.preventDefault();
+        // automatically determine which mod to use depending on the icon's button
+        var mode = this.ui.toggleMapMode.hasClass('icon-3d') ? '3D' : '2D';
+        this.initMap(mode);
     }
 });
 
@@ -271,6 +335,12 @@ Nodeshot.addRegions({
     body: '#body'
 });
 
+// localStorage check
+Nodeshot.addInitializer(function(){
+    Nodeshot.preferences = window.localStorage || {};
+});
+
+// init pages
 Nodeshot.addInitializer(function(){
     Nodeshot.page = new Page();
     
