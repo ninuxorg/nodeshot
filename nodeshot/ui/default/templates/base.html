@@ -83,8 +83,17 @@
                        data-target="#ns-top-nav-links">&nbsp;</a>
                 </li>
                 {% else %}
-                <li><a href="#"><span class="icon-user-add"></span><span class="text">{% trans 'Sign up' %}</span></a></li>
-                <li><a href="#"><span class="icon-user"></span><span class="text">{% trans 'Sign in' %}</span></a></li>
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#signup-modal">
+                        <span class="icon-user-add"></span><span class="text">{% trans 'Sign up' %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#signin-modal">
+                        <span class="icon-user"></span>
+                        <span class="text">{% trans 'Sign in' %}</span>
+                    </a>
+                </li>
                 {% endif %}
             </ul>
             <div id="notifications">
@@ -184,6 +193,143 @@
     
     <div id="body">
     {% block body %}{% endblock %}
+    </div>
+    
+    <!-- Sign up -->
+    <div class="modal fade narrow autocenter enlarge-on-mobile" id="signup-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="signup-modal-label"
+         aria-hidden="true"
+         data-autocenter-coefficient="2.6">
+        <div class="modal-dialog modal-content modal-body inverse user-dialog">
+            
+            <p class="text">By signing up to this service you agree to our <a href="#">privacy policy</a></p>
+            
+            <p class="social-buttons">
+                <a href="#" class="btn btn-social btn-facebook">
+                    <span class="icon icon-facebook"></span>
+                    <span class="text">Sign up with Facebook</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+                
+                <a href="#" class="btn btn-social btn-google">
+                    <span class="icon icon-google"></span>
+                    <span class="text">Sign up with Google</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+                
+                <a href="#" class="btn btn-social btn-github">
+                    <span class="icon icon-github"></span>
+                    <span class="text">Sign up with Github</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+            </p>
+            
+            <p class="separator">
+                <span class="line"></span>
+                <span class="text">or</span>
+            </p>
+            
+            <form action="" method="post">
+                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus" data-trigger="focus">
+                    <input class="form-control" type="text" name="username" placeholder="Username">
+                    <span class="input-group-addon icon-user"></span>
+                </p>
+                
+                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
+                    <input class="form-control " type="email" name="email" placeholder="Email">
+                    <span class="input-group-addon icon-mail"></span>
+                </p>
+                
+                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
+                    <input class="form-control" type="password" name="password" placeholder="Password" id="js-signup-password">
+                    <span class="input-group-addon icon-lock"></span>
+                </p>
+                
+                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
+                    <input class="form-control" type="password" name="password2" placeholder="Confirm password">
+                    <span class="input-group-addon icon-lock"></span>
+                </p>
+                
+                <p class="input-group text" id="js-password-strength-message">
+                    <span class="pwstrength_viewport_progress"></span>
+                    <span class="pwstrength_viewport_verdict"></span>
+                </p>
+                
+                <button class="btn btn-default">Sign up</button>
+            </form>
+            
+            <p class="text">Already have an account? <a href="#">Sign in</a></p>
+            
+            <a class="icon-close" data-dismiss="modal" href="#"></a>
+        </div>
+    </div>
+    
+    <!-- Sign in -->
+    <div class="modal fade narrow autocenter enlarge-on-mobile" id="signin-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="signin-modal-label"
+         aria-hidden="true">
+        <div class="modal-dialog modal-content modal-body inverse user-dialog">
+            
+            <p class="social-buttons">
+                <a href="#" class="btn btn-social btn-facebook">
+                    <span class="icon icon-facebook"></span>
+                    <span class="text">Sign in with Facebook</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+                
+                <a href="#" class="btn btn-social btn-google">
+                    <span class="icon icon-google"></span>
+                    <span class="text">Sign in with Google</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+                
+                <a href="#" class="btn btn-social btn-github">
+                    <span class="icon icon-github"></span>
+                    <span class="text">Sign in with Github</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+            </p>
+            
+            <p class="separator">
+                <span class="line"></span>
+                <span class="text">or</span>
+            </p>
+            
+            <form action="" method="post">
+                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
+                    <input class="form-control" type="text" name="username" placeholder="Username or Email">
+                    <span class="input-group-addon icon-user"></span>
+                </p>
+                
+                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
+                    <input class="form-control" type="password" name="password" placeholder="Password">
+                    <span class="input-group-addon icon-lock"></span>
+                </p>
+                
+                <p class="text text-left">
+                    <span class="custom-checkbox hastip"
+                          data-placement="top"
+                          title="For your protection, keep this checked only on devices you use regularly">
+                        <input type="checkbox" id="remember-signup" name="remember" />
+                        <label for="remember-signup"></label>
+                    </span>
+                    
+                    <label for="remember-signup">Stay signed in</label>
+                </p>
+                
+                <p><button class="btn btn-default">Sign in</button></p>
+            </form>
+            
+            <p class="text"><a href="#">Forgot your password?</a></p>
+            
+            <p class="text">Don't have an account yet? <a href="#">Sign up</a></p>
+            
+            <a class="icon-close" data-dismiss="modal" href="#"></a>
+        </div>
     </div>
     
     <script id="page-template" type="text/template">
