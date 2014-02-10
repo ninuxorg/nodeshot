@@ -11,7 +11,47 @@ var Page = Backbone.Model.extend({
 var AccountMenuView = Backbone.Marionette.ItemView.extend({
     el: '#main-actions',
     //className: 'center-stage multicolumn-md',
-    template: '#account-menu-template'
+    template: '#account-menu-template',
+	
+	events: {
+		'click #js-logout': 'logout'
+	},
+	
+	initialize: function(){
+		this.truncateUsername();
+		
+		var self = this;
+		this.model.on('change', function(){
+			self.render();
+		});
+	},
+	
+	/*
+	 * truncate long usernames
+	 */
+	truncateUsername: function(){
+		var username = this.model.get('username');
+		
+		if (typeof(username) !== 'undefined' && username.length > 15) {
+			// add an ellipsis if username is too long
+			var truncated = username.substr(0, 13) + "&hellip;";
+			console.log(truncated);
+			// update model
+			this.model.set('username', truncated);
+		}
+	},
+	
+	/*
+	 * logout
+	 */
+	logout: function(e){
+		e.preventDefault();
+		Nodeshot.currentUser.set('username', undefined);
+		$.post('api/v1/account/logout/').error(function(){
+			// TODO: improve!
+			alert('problem while logging out');
+		});
+	}
 });
 
 var PageView = Backbone.Marionette.ItemView.extend({
@@ -56,8 +96,6 @@ var MapView = Backbone.Marionette.ItemView.extend({
         $("#map-container .scroller").scroller({
             trackMargin: 6
         });
-        
-        
         
         // correction for map tools
         $('#map-toolbar a.icon-tools').click(function(e){
@@ -409,4 +447,17 @@ var NodeshotRouter = new Marionette.AppRouter({
 
 $(document).ready(function($){
     Nodeshot.start();
+	
+	$('#js-login').submit(function(e){
+		e.preventDefault();
+		var data = $(this).serialize();
+		$.post('/api/v1/account/login/', data).error(function(){
+			// TODO improve
+			alert('incorrect login');
+		}).done(function(response){
+			$('#signin-modal').modal('hide');
+			Nodeshot.currentUser.set('username', response.username);
+		});
+		
+	});
 });

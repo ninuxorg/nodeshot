@@ -9,13 +9,6 @@ $('#ns-top-nav-links > ul > li > a').click(function(e){
 	$(this).parents('li').eq(0).addClass('active');
 });
 
-// truncate long usernames
-var $username = $('#username-js');
-if($username.text().length > 15){
-	var truncated = $username.text().substr(0, 13) + "&hellip;";
-	$username.html(truncated);
-}
-
 // set max height of collapsible menu (mobile)
 var setCollapsibleMainMenuMaxHeight = function(){
 	$('#nav-bar .navbar-collapse').css('max-height', $(window).height()-50);

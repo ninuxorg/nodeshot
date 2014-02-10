@@ -257,7 +257,7 @@
                 <span class="text">or</span>
             </p>
             
-            <form action="" method="post">
+            <form action="" method="post" id="js-login">
                 <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
                     <input class="form-control" type="text" name="username" placeholder="Username or Email">
                     <span class="input-group-addon icon-user"></span>
@@ -302,26 +302,26 @@
             </a>
         </li>
         <% if(typeof(username) !== 'undefined'){ %>
-        <li class="dropdown logged-in">
+        <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <span class="icon-user"></span>
-                <span class="text" id="username-js"><%= username %></span>
+                <span class="text" id="js-username"><%= username %></span>
                 <span class="caret"></span>
             </a>
             
             <ul class="dropdown-menu">
-                <li><a href="#"><span class="icon-user"></span>{% trans 'My profile' %}</a></li>
-                <li><a href="#"><span class="icon-wrench"></span>{% trans 'Settings' %}</a></li>
-                <li><a href="#"><span class="icon-off"></span>{% trans 'Logout' %}</a></li>
+                <li><a href="#" id="js-profile"><span class="icon-user"></span>{% trans 'My profile' %}</a></li>
+                <li><a href="#" id="js-settings"><span class="icon-wrench"></span>{% trans 'Settings' %}</a></li>
+                <li><a href="#" id="js-logout"><span class="icon-off"></span>{% trans 'Logout' %}</a></li>
             </ul>
         </li>
         <% } else { %>
-        <li class="logged-out">
+        <li>
             <a href="#" data-toggle="modal" data-target="#signup-modal">
                 <span class="icon-user-add"></span><span class="text">{% trans 'Sign up' %}</span>
             </a>
         </li>
-        <li class="logged-out">
+        <li>
             <a href="#" data-toggle="modal" data-target="#signin-modal">
                 <span class="icon-user"></span>
                 <span class="text">{% trans 'Sign in' %}</span>
