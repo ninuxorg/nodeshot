@@ -16,14 +16,8 @@ from nodeshot.core.nodes.models import Node, Status, Image
 from nodeshot.core.layers.models import Layer
 from nodeshot.community.participation.models import Vote, Comment, Rating
 
-from .base import SERVICES, MODELS, iso8601_REGEXP
+from .base import STATUS, SERVICES, MODELS, iso8601_REGEXP
 from .serializers import *
-
-STATUS = {
-            'Potenziale' : 'open',
-            'Pianificato' : 'open',
-            'Attivo' : 'closed',
-        }
 
 class ServiceList(generics.ListAPIView):
     """
@@ -81,14 +75,13 @@ class ServiceDefinition(APIView):
     
 service_definition = ServiceDefinition.as_view()
 
-def get_service_name(service_code):
-    return SERVICES[service_code]['name']
-
 def create_output_data(data):
+    #convert received geometry to Point
     geom = fromstr(data['geometry']).centroid
     del data['geometry']
     data['lng'] = geom[0]
     data['lat'] = geom[1]
+    #get status from model and converts it into the mapped status type (open/closed)
     status_id = data['status']
     status = get_object_or_404(Status, pk=status_id)
     data['status'] = STATUS[status.name]
@@ -96,7 +89,8 @@ def create_output_data(data):
 
 class ServiceRequests(generics.ListCreateAPIView):
     """
-    Retrieve list of service requests.
+    ### GET
+    ###Retrieve list of service requests.
     
     Required parameters:
     
@@ -111,11 +105,13 @@ class ServiceRequests(generics.ListCreateAPIView):
      * `end_date=<date>`: date in w3 format, eg 2010-01-01T00:00:00Z
      
     ### POST
-    
-    Create a new service request. Requires authentication.
+    ### Create a new service request. Requires authentication.
+    See service definition for required parameters
     """
     authentication_classes = (authentication.SessionAuthentication,)
     serializer_class= NodeRequestListSerializer
+    
+    
     
     def get_serializer(self, instance=None, data=None,
                        files=None, many=False, partial=False):
@@ -246,8 +242,7 @@ class ServiceRequests(generics.ListCreateAPIView):
             for item in data:
                 item = create_output_data(item)
         else:
-            pass                       
-        
+            pass
         
         return Response(data)
     
