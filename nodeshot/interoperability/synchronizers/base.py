@@ -281,7 +281,7 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         
         # ensure all additional data items are strings
         for key, value in item['data'].items():
-            result["data"][key] = str(value)
+            result["data"][key] = unicode(value)
         
         return result
     
