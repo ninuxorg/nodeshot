@@ -103,6 +103,7 @@ class ServiceRequests(generics.ListCreateAPIView):
      * `status=<string>`: possible values are: 'open' or 'closed'
      * `start_date=<date>`: date in w3 format, eg 2010-01-01T00:00:00Z
      * `end_date=<date>`: date in w3 format, eg 2010-01-01T00:00:00Z
+     * `layer=<layer>`: layer to which node belongs
      
     ### POST
     ### Create a new service request. Requires authentication.
