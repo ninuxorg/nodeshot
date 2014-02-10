@@ -1,5 +1,3 @@
-var Nodeshot = new Backbone.Marionette.Application();
-
 var Page = Backbone.Model.extend({
     urlRoot : '/api/v1/pages/',
     idAttribute: 'slug',
@@ -8,6 +6,12 @@ var Page = Backbone.Model.extend({
         var origUrl = Backbone.Model.prototype.url.call(this);
         return origUrl + (origUrl.charAt(origUrl.length - 1) == '/' ? '' : '/');
     }
+});
+
+var AccountMenuView = Backbone.Marionette.ItemView.extend({
+    el: '#main-actions',
+    //className: 'center-stage multicolumn-md',
+    template: '#account-menu-template'
 });
 
 var PageView = Backbone.Marionette.ItemView.extend({
@@ -338,6 +342,14 @@ Nodeshot.addRegions({
 // localStorage check
 Nodeshot.addInitializer(function(){
     Nodeshot.preferences = window.localStorage || {};
+});
+
+// init layout
+Nodeshot.addInitializer(function(){
+    
+	Nodeshot.accountMenu = new AccountMenuView({ model: Nodeshot.currentUser });
+	Nodeshot.accountMenu.render();
+	
 });
 
 // init pages

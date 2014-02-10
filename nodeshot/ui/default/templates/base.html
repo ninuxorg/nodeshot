@@ -52,50 +52,8 @@
                 </ul>
             </div>
             
-            <ul id="main-actions">
-                <li>
-                    <a href="#" class="icon-search">&nbsp;</a>
-                </li>
-                {% if request.user.is_authenticated %}
-                <li>
-                    <a href="#" class="notifications">
-                        <span class="icon-globe">&nbsp;</span>
-                        &nbsp;
-                        <span class="bg">0</span>
-                    </a>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <span class="icon-user"></span>
-                        <span class="text" id="username-js">{{ request.user.username }}</span>
-                        <span class="caret"></span>
-                    </a>
-                    
-                    <ul class="dropdown-menu">
-                        <li><a href="#"><span class="icon-user"></span>{% trans 'My profile' %}</a></li>
-                        <li><a href="#"><span class="icon-wrench"></span>{% trans 'Settings' %}</a></li>
-                        <li><a href="#"><span class="icon-off"></span>{% trans 'Logout' %}</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" id="mobile-nav" class="icon-menu"
-                       data-toggle="collapse"
-                       data-target="#ns-top-nav-links">&nbsp;</a>
-                </li>
-                {% else %}
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#signup-modal">
-                        <span class="icon-user-add"></span><span class="text">{% trans 'Sign up' %}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#signin-modal">
-                        <span class="icon-user"></span>
-                        <span class="text">{% trans 'Sign in' %}</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
+            <ul id="main-actions"></ul>
+            
             <div id="notifications">
                 <span class="arrow"></span>
                 <div class="header">
@@ -332,6 +290,51 @@
         </div>
     </div>
     
+    <script id="account-menu-template" type="text/template">
+        <li>
+            <a href="#" class="icon-search">&nbsp;</a>
+        </li>
+        <li>
+            <a href="#" class="notifications">
+                <span class="icon-globe">&nbsp;</span>
+                &nbsp;
+                <span class="bg" id="js-notifications-count">0</span>
+            </a>
+        </li>
+        <% if(typeof(username) !== 'undefined'){ %>
+        <li class="dropdown logged-in">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <span class="icon-user"></span>
+                <span class="text" id="username-js"><%= username %></span>
+                <span class="caret"></span>
+            </a>
+            
+            <ul class="dropdown-menu">
+                <li><a href="#"><span class="icon-user"></span>{% trans 'My profile' %}</a></li>
+                <li><a href="#"><span class="icon-wrench"></span>{% trans 'Settings' %}</a></li>
+                <li><a href="#"><span class="icon-off"></span>{% trans 'Logout' %}</a></li>
+            </ul>
+        </li>
+        <% } else { %>
+        <li class="logged-out">
+            <a href="#" data-toggle="modal" data-target="#signup-modal">
+                <span class="icon-user-add"></span><span class="text">{% trans 'Sign up' %}</span>
+            </a>
+        </li>
+        <li class="logged-out">
+            <a href="#" data-toggle="modal" data-target="#signin-modal">
+                <span class="icon-user"></span>
+                <span class="text">{% trans 'Sign in' %}</span>
+            </a>
+        </li>
+        <% } %>
+        <li>
+            <a href="#" id="mobile-nav" class="icon-menu"
+               data-toggle="collapse"
+               data-target="#ns-top-nav-links">&nbsp;</a>
+        </li>
+    </script>
+    
     <script id="page-template" type="text/template">
         <h1><%= title %></h1>
         <%= content %>
@@ -358,6 +361,15 @@
     <script src="{{ STATIC_URL }}ui/lib/js/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/backbone.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/backbone.marionette.min.js"></script>
+    
+    <script>
+        var Nodeshot = new Backbone.Marionette.Application();
+        {% if request.user.is_authenticated %}
+            Nodeshot.currentUser = new Backbone.Model({ username: '{{ request.user.username }}'});
+        {% else %}
+            Nodeshot.currentUser = new Backbone.Model();
+        {% endif %}
+    </script>
     
     <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>
