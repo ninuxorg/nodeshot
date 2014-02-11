@@ -244,7 +244,7 @@ class AccountLogin(generics.GenericAPIView):
             return Response({
                 'detail': _(u'Logged in successfully'),
                 # TODO: maybe more user info in the request would have sense
-                'username': request.DATA['username']
+                'username': serializer.instance.username
             })
         
         return Response(serializer.errors, status=400)
