@@ -14,7 +14,8 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
     template: '#account-menu-template',
 	
 	events: {
-		'click #js-logout': 'logout'
+		'click #js-logout': 'logout',
+		'click .notifications': 'openNotificationsPanel'
 	},
 	
 	initialize: function(){
@@ -54,6 +55,33 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
 			// TODO: improve!
 			alert('problem while logging out');
 		});
+	},
+	
+	/*
+	 * open notifications panel
+	 */
+	openNotificationsPanel: function(e){
+		e.preventDefault();
+	
+		var notifications = $('#notifications');
+		
+		// show panel if hidden
+		if (notifications.is(':hidden')) {
+			setNotificationsLeft();
+			
+			notifications.fadeIn(255, function(){
+				// prepare scroller
+				$('#notifications .scroller').scroller('reset');
+				
+				// clicking anywhere else closes the panel
+				$('html').one('click',function() {
+					notifications.fadeOut(150);
+				});
+			});
+		}
+		else{
+			notifications.fadeOut(150);
+		}
 	}
 });
 

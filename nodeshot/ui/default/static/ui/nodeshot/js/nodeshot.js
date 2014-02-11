@@ -190,27 +190,6 @@ $(document).ready(function($){
     });
 });
 
-$('#main-actions .notifications').click(function(e){
-	e.preventDefault();
-	
-	var notifications = $('#notifications');
-	
-	if (notifications.is(':hidden')) {
-		setNotificationsLeft();
-		
-		notifications.fadeIn(255, function(){
-			$('#notifications .scroller').scroller('reset');
-			
-			$('html').one('click',function() {
-				notifications.fadeOut(150);
-			});
-		});
-	}
-	else{
-		notifications.fadeOut(150);
-	}
-});
-
 $('#notifications').click(function(e){
 	e.stopPropagation();
 });
