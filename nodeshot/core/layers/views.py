@@ -156,8 +156,15 @@ nodes_geojson_list = LayerNodesGeoJSONList.as_view()
 class LayerGeoJSONList(generics.ListAPIView):
     """
     Retrieve list of layers in GeoJSON format.
-    """
+    Parameters:
     
+     * `limit=<n>`: specify number of items per page (defaults to 40)
+     * `limit=0`: turns off pagination
+     * `page=<n>`: show page n
+    """
+    pagination_serializer_class = PaginatedGeojsonLayerListSerializer
+    paginate_by_param = 'limit'
+    paginate_by = 40
     serializer_class = GeoLayerListSerializer
     queryset = Layer.objects.published().exclude(area__isnull=True)
 
