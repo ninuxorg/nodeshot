@@ -83,6 +83,8 @@ class ProfilesTest(TestCase):
         
         user = User.objects.get(username='new_user_test')
         self.assertEqual(user.is_active, not PROFILE_EMAIL_CONFIRMATION)
+        # ensure password is hashed
+        self.assertTrue(user.has_usable_password())
         
         if PROFILE_EMAIL_CONFIRMATION:
             email_address = EmailAddress.objects.get(email='new_user@testing.com')

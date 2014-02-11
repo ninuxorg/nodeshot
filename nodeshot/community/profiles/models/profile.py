@@ -59,6 +59,14 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         app_label = 'profiles'
+    
+    def save(self, *args, **kwargs):
+        """ ensure instance has usable password when created """
+        if not self.pk and self.has_usable_password() is False:
+            self.set_password(self.password)
+        
+        super(Profile, self).save(*args, **kwargs)
+    
 
     def get_full_name(self):
         """
