@@ -578,6 +578,7 @@ if 'test' in sys.argv:
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
+    'nodeshot.community.profiles.backends.EmailBackend',
     'social_auth.backends.facebook.FacebookBackend',
     'social_auth.backends.google.GoogleBackend',
 )

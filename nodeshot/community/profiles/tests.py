@@ -310,9 +310,9 @@ class ProfilesTest(TestCase):
         
         self.client.logout()
         
-        # POST 400 bad credentials
+        # POST 400 invalid credentials
         response = self.client.post(url, { "username": "wrong", "password": "wrong" })
-        self.assertContains(response, 'not correct', status_code=400)
+        self.assertContains(response, 'Ivalid login credentials', status_code=400)
         
         # POST 400 missing credentials
         response = self.client.post(url)
@@ -325,6 +325,12 @@ class ProfilesTest(TestCase):
         # GET 403: already loggedin
         response = self.client.get(url)
         self.assertEqual(403, response.status_code)
+        
+        self.client.logout()
+        
+        # POST 200 login successfull with email
+        response = self.client.post(url, { "username": "registered@registered.org", "password": "tester" })
+        self.assertContains(response, 'successful')
     
     def test_account_logout(self):
         url = reverse('api_account_logout')
