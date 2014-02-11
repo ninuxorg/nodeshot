@@ -533,7 +533,13 @@ NODESHOT = {
     ],
     'OPEN311': {
         'METADATA': 'true',
-        'TYPE': 'realtime'
+        'TYPE': 'realtime',
+        #Change the following, according to the statuses you have configured in your model
+        #'STATUS' : {
+        #    'Potential' : 'open',
+        #    'Planned' : 'open',
+        #    'Active' : 'closed',
+        #}
     }
 }
 
