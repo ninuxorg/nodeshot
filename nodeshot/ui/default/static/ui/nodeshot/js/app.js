@@ -21,7 +21,10 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
 		this.truncateUsername();
 		
 		var self = this;
-		this.model.on('change', function(){
+		
+		// listen to models change and update accordingly
+		// used for login/logout rendering
+		this.listenTo(this.model, "change", function(){
 			self.render();
 		});
 	},
