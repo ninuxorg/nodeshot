@@ -424,6 +424,10 @@ var NodeshotController = {
         Nodeshot.page.fetch();
         
         var link = $('#nav-bar a[href="#/pages/'+slug+'"]');
+		
+		// ensure no duplicate active links
+		$('#nav-bar li').removeClass('active');
+		
         if(link.length && link.parents('.dropdown').length){
             link.parents('.dropdown').addClass('active');
         }
@@ -451,7 +455,7 @@ var NodeshotRouter = new Marionette.AppRouter({
 $(document).ready(function($){
     Nodeshot.start();
 	
-	$('#js-login').submit(function(e){
+	$('#js-signin-form').submit(function(e){
 		e.preventDefault();
 		var data = $(this).serialize();
 		$.post('/api/v1/account/login/', data).error(function(){
@@ -460,6 +464,18 @@ $(document).ready(function($){
 		}).done(function(response){
 			$('#signin-modal').modal('hide');
 			Nodeshot.currentUser.set('username', response.username);
+		});
+	});
+	
+	$('#js-signup-form').submit(function(e){
+		e.preventDefault();
+		var data = $(this).serialize();
+		$.post('/api/v1/profiles/', data).error(function(http){
+			// TODO improve
+			alert(JSON.stringify(http.responseJSON));
+		}).done(function(response){
+			$('#signup-modal').modal('hide');
+			alert('sent confirmation mail');
 		});
 	});
 	
