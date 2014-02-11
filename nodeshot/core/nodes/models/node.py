@@ -141,14 +141,19 @@ class Node(BaseAccessLevel):
     
     @property
     def point(self):
-        """ returns location of node. If node geometry is not a point a centroid point will be returned """
+        """ returns location of node. If node geometry is not a point a center  point will be returned """
         if not self.geometry:
             raise ValueError('geometry attribute must be set before trying to get point property')
         if self.geometry.geom_type == 'Point':
             return self.geometry
         else:
-            # centroid is the aproximative center of a geometry
-            return self.geometry.centroid
+            try:
+                # point_on_surface guarantees that the point is within the geometry
+                return  self.geometry.point_on_surface
+            except GEOSException:
+                # fall back on centroid which may not be within the geometry
+                # for example, a horseshoe shaped polygon
+                return self.geometry.centroid
     
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod
