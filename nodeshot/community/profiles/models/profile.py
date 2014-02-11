@@ -24,13 +24,13 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     Contains personal info of a user
     """
     # 254 maximum character for username makes it possible
-    username = models.CharField(_('username'), max_length=254, unique=True,
+    username = models.CharField(_('username'), max_length=254, unique=True, db_index=True,
         help_text=_('Required. 30 characters or fewer. Letters, numbers and '
                     '@/./+/-/_ characters'),
         validators=[
             validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
         ])
-    email = models.EmailField(_('primary email address'), blank=True, unique=True)
+    email = models.EmailField(_('primary email address'), blank=True, unique=True, db_index=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     
@@ -66,7 +66,6 @@ class Profile(AbstractBaseUser, PermissionsMixin):
             self.set_password(self.password)
         
         super(Profile, self).save(*args, **kwargs)
-    
 
     def get_full_name(self):
         """
