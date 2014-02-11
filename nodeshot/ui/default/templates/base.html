@@ -162,7 +162,7 @@
          data-autocenter-coefficient="2.6">
         <div class="modal-dialog modal-content modal-body inverse user-dialog">
             
-            <p class="text">By signing up to this service you agree to our <a href="#">privacy policy</a></p>
+            <p class="text">By signing up to this service you agree to our <a href="#/pages/privacy-policy" class="js-dismiss">privacy policy</a></p>
             
             <p class="social-buttons">
                 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
@@ -177,7 +177,7 @@
                     <span class="hover">&nbsp;</span>
                 </a>
                 
-                <a href="#" class="btn btn-social btn-github">
+                <a href="javascript:alert('not implemented yet')" class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
                     <span class="text">Sign up with Github</span>
                     <span class="hover">&nbsp;</span>
@@ -218,7 +218,7 @@
                 <button class="btn btn-default">Sign up</button>
             </form>
             
-            <p class="text">Already have an account? <a href="#">Sign in</a></p>
+            <p class="text">Already have an account? <a href="#" id="js-signin-link">Sign in</a></p>
             
             <a class="icon-close" data-dismiss="modal" href="#"></a>
         </div>
@@ -245,7 +245,7 @@
                     <span class="hover">&nbsp;</span>
                 </a>
                 
-                <a href="#" class="btn btn-social btn-github">
+                <a href="javascript:alert('not implemented yet')" class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
                     <span class="text">Sign in with Github</span>
                     <span class="hover">&nbsp;</span>
@@ -282,9 +282,9 @@
                 <p><button class="btn btn-default">Sign in</button></p>
             </form>
             
-            <p class="text"><a href="#">Forgot your password?</a></p>
+            <p class="text"><a href="javascript:alert('not implemented yet')">Forgot your password?</a></p>
             
-            <p class="text">Don't have an account yet? <a href="#">Sign up</a></p>
+            <p class="text">Don't have an account yet? <a href="#" id="js-signup-link">Sign up</a></p>
             
             <a class="icon-close" data-dismiss="modal" href="#"></a>
         </div>

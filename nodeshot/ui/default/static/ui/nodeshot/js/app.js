@@ -459,4 +459,20 @@ $(document).ready(function($){
 			Nodeshot.currentUser.set('username', response.username);
 		});
 	});
+	
+	$('#js-signup-link').click(function(e){
+		e.preventDefault();
+		$('#signin-modal').modal('hide');
+		$('#signup-modal').modal('show');
+	});
+	
+	$('#js-signin-link').click(function(e){
+		e.preventDefault();
+		$('#signup-modal').modal('hide');
+		$('#signin-modal').modal('show');
+	});
+	
+	$('.js-dismiss').click(function(e){
+		$(this).parents('.modal').modal('hide');
+	});
 });
