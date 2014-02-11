@@ -165,13 +165,13 @@
             <p class="text">By signing up to this service you agree to our <a href="#">privacy policy</a></p>
             
             <p class="social-buttons">
-                <a href="#" class="btn btn-social btn-facebook">
+                <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
                     <span class="icon icon-facebook"></span>
                     <span class="text">Sign up with Facebook</span>
                     <span class="hover">&nbsp;</span>
                 </a>
                 
-                <a href="#" class="btn btn-social btn-google">
+                <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
                     <span class="text">Sign up with Google</span>
                     <span class="hover">&nbsp;</span>
@@ -233,13 +233,13 @@
         <div class="modal-dialog modal-content modal-body inverse user-dialog">
             
             <p class="social-buttons">
-                <a href="#" class="btn btn-social btn-facebook">
+                <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
                     <span class="icon icon-facebook"></span>
                     <span class="text">Sign in with Facebook</span>
                     <span class="hover">&nbsp;</span>
                 </a>
                 
-                <a href="#" class="btn btn-social btn-google">
+                <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
                     <span class="text">Sign in with Google</span>
                     <span class="hover">&nbsp;</span>

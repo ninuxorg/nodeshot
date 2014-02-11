@@ -458,6 +458,5 @@ $(document).ready(function($){
 			$('#signin-modal').modal('hide');
 			Nodeshot.currentUser.set('username', response.username);
 		});
-		
 	});
 });
