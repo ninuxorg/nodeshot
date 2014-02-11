@@ -148,3 +148,62 @@ class HyperlinkedField(Field):
             pass
 
         raise Exception('Could not resolve URL for field using view name "%s"' % view_name)
+
+
+class GeoJSONDefaultObjectSerializer(serializers.Field):
+    """
+    If no object serializer is specified, then this serializer will be applied
+    as the default.
+    """
+
+    def __init__(self, source=None, context=None):
+        # Note: Swallow context kwarg - only required for eg. ModelSerializer.
+        super(GeoJSONDefaultObjectSerializer, self).__init__(source=source)
+
+
+class GeoJSONPaginationSerializerOptions(serializers.SerializerOptions):
+    """
+    An object that stores the options that may be provided to a
+    pagination serializer by using the inner `Meta` class.
+
+    Accessible on the instance as `serializer.opts`.
+    """
+    def __init__(self, meta):
+        super(GeoJSONPaginationSerializerOptions, self).__init__(meta)
+        self.object_serializer_class = getattr(meta, 'object_serializer_class',
+                                               GeoJSONDefaultObjectSerializer)
+
+
+class GeoJSONBasePaginationSerializer(serializers.Serializer):
+    """
+    A custom class for geojson serializers. 
+    """
+    _options_class = GeoJSONPaginationSerializerOptions
+    results_field = 'features'
+
+    def __init__(self, *args, **kwargs):
+        """
+        Override init to add in the object serializer field on-the-fly.
+        """
+        super(GeoJSONBasePaginationSerializer, self).__init__(*args, **kwargs)
+        results_field = self.results_field
+        object_serializer = self.opts.object_serializer_class
+        #object_serializer = NodeGeoSerializer
+        if 'context' in kwargs:
+            context_kwarg = {'context': kwargs['context']}
+        else:
+            context_kwarg = {}
+            
+        self.fields[results_field] = object_serializer(source='object_list', **context_kwarg)
+
+
+class GeoJSONPaginationSerializer(GeoJSONBasePaginationSerializer):
+    """
+    A geoJSON implementation of a pagination serializer.
+    """
+    type = serializers.SerializerMethodField('get_type')
+    
+    def get_type(self,obj):
+        """ returns FeatureCollection type for geojson """
+        
+        return "FeatureCollection"
