@@ -81,7 +81,7 @@ class BaseGeoAdmin(BaseAdmin, GeoModelAdmin):
             'default_lat': lat,
             'default_lon': lng,
             'default_zoom': _get_geodjango_map_zoom(),
-            #'hide_textarea': False,  # TODO: this might be configured in the future
+            'hide_textarea': not settings.DEBUG,  # TODO: this might be configured in the future
         }
     else:
         default_lon, default_lat = _get_geodjango_map_coords()

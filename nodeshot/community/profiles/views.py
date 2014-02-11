@@ -241,7 +241,11 @@ class AccountLogin(generics.GenericAPIView):
             else:
                 request.session.set_expiry(0)
                 
-            return Response({ 'detail': _(u'Logged in successfully') })
+            return Response({
+                'detail': _(u'Logged in successfully'),
+                # TODO: maybe more user info in the request would have sense
+                'username': request.DATA['username']
+            })
         
         return Response(serializer.errors, status=400)
     

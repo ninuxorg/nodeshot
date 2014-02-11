@@ -95,6 +95,12 @@ class LayerExternal(models.Model):
         if not self.interoperability or self.interoperability == 'None' or not self.layer:
             return False
         
+        # ensure data is up to date
+        if (self._synchronizer is not None and
+            self._synchronizer_class.__name__ not in self.interoperability):
+            self._synchronizer = None
+            self._synchronizer_class = None
+        
         # init synchronizer if not already done
         if not self._synchronizer:
             synchronizer_class = self.synchronizer_class
@@ -107,6 +113,12 @@ class LayerExternal(models.Model):
         """ returns synchronizer class """
         if not self.interoperability or self.interoperability == 'None' or not self.layer:
             return False
+        
+        # ensure data is up to date
+        if (self._synchronizer_class is not None and
+            self._synchronizer_class.__name__ not in self.interoperability):
+            self._synchronizer = None
+            self._synchronizer_class = None
         
         if not self._synchronizer_class:
             synchronizer_module = import_module(self.interoperability)

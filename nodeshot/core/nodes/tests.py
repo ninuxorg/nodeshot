@@ -305,6 +305,8 @@ class APITest(BaseTestCase):
         response = self.client.post(url, json.dumps(node), content_type='application/json')
         self.assertEqual(201, response.status_code)
         
+        self.assertEqual(response.data['user'], 'registered')
+        
         if HSTORE_ENABLED:
             node = Node.objects.get(slug='test_distance')
             self.assertEqual(node.data, { 'is_test': 'true' })

@@ -127,19 +127,29 @@ class OpenLabor(BaseSynchronizer):
         # calculated automatically 1 month after now
         job_expiration = int(now_after(days=30).strftime('%s'))
         
+        if node.user is not None:
+            user_email = node.user.email
+            user_first_name = node.user.first_name
+            user_last_name = node.user.last_name
+        else:
+            user_email = None
+            user_first_name = None
+            user_last_name = None
+        
         return {
             "service_code": self.config['service_code_post'],
             #"lat": node.point[1],
             #"long": node.point[0],
-            #"latitude": node.point[1],
-            #"longitude": node.point[0],
+            "latitude": node.point[1],
+            "longitude": node.point[0],
             "j_latitude": node.point[1],
             "j_longitude": node.point[0],
             "address": node.address,
+            "j_address": node.address,
             "address_string": node.address,
-            "email": node.user.email,
-            "first_name": node.user.first_name,
-            "last_name": node.user.last_name,
+            "email": user_email,
+            "first_name": user_first_name,
+            "last_name": user_last_name,
             "description": node.description,
             "api_key": "temporarily_not_used",
             "locale": "it_IT",
@@ -152,9 +162,9 @@ class OpenLabor(BaseSynchronizer):
             "notes": node.description,
             "zipCode": node.data.get('zip_code', None),
             "cityCompany": node.data.get('city', None),
-            "sourceJob": node.user.email,
-            "sourceJobName": node.user.first_name,
-            "sourceJobSurname": node.user.last_name
+            "sourceJob": user_email,
+            "sourceJobName": user_first_name,
+            "sourceJobSurname": user_last_name
         }
     
     def get_nodes(self, class_name, params):
@@ -226,17 +236,20 @@ class OpenLabor(BaseSynchronizer):
         if response.status_code != 200:
             message = 'ERROR while creating "%s". Response: %s' % (node.name, response.content)
             logger.error('== %s ==' % message)
+            print message
             return False
         
         try:
             data = response.json()
         except json.JSONDecodeError as e:
             logger.error('== ERROR: JSONDecodeError %s ==' % e)
+            print 'JSONDecodeError: %s\n\nresponse: %s' % (e, response.content)
             return False
         
         external = NodeExternal.objects.create(node=node, external_id=int(data))
         message = 'New record "%s" saved in CitySDK through the HTTP API"' % node.name
         self.verbose(message)
+        print message
         logger.info('== %s ==' % message)
         
         # clear cache

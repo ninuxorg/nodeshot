@@ -64,10 +64,15 @@ class NodeList(NodeListBase):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Node.objects.published()
     serializer_class = NodeListSerializer
-    serializer_custom_class = NodeCreatorSerializer
+    #serializer_custom_class = NodeCreatorSerializer
     pagination_serializer_class = PaginatedNodeListSerializer
     paginate_by_param = 'limit'
     paginate_by = 40
+    
+    def pre_save(self, obj):
+        """ automatically determine user on creation """
+        if not obj.id:
+            obj.user_id = self.request.user.id
     
     def get_queryset(self):
         """

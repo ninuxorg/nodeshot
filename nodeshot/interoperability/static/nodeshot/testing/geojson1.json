@@ -105,8 +105,9 @@
             "properties": {
                 "name": "simplegeojson",
                 "elev": 10, 
-                "address": "simplegeojson", 
-                "description": "simplegeojson"
+                "address": "simplegeojson aèìou °",
+                "description": "simplegeojson",
+                "some_other_field": "other field aèìou °"
             }
         },
         
