@@ -375,7 +375,10 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * internal use only
      */
     _initMap2D: function(){
-        var map = L.map('map-js').setView([42.12, 12.45], 9);
+        var latitude = 42.12,
+			longitude = 12.45,
+			zoomLevel = 9,
+			map = L.map('map-js').setView([latitude, longitude], zoomLevel);
         // TODO: configurable tiles
         L.tileLayer('http://a.tiles.mapbox.com/v3/examples.map-9ijuk24y/{z}/{x}/{y}.png').addTo(map);
         return map;
@@ -386,10 +389,21 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * internal use only
      */
     _initMap3D: function(){
-        var map = new Cesium.CesiumWidget('map-js');
+        var map = new Cesium.CesiumWidget('map-js'),
+			latitude = 42.12,
+			longitude = 12.45,
+			zoomLevel = 9,
+			flight = Cesium.CameraFlightPath.createAnimationCartographic(map.scene, {
+				destination : Cesium.Cartographic.fromDegrees(longitude, latitude, 16500 * zoomLevel),
+				duration: 0
+			});
+		
         map.centralBody.terrainProvider = new Cesium.CesiumTerrainProvider({
             url : 'http://cesiumjs.org/smallterrain'
         });
+		
+        map.scene.getAnimations().add(flight);
+		
         return map;
     },
     
