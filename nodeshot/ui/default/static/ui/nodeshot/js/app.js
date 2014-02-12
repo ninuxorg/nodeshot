@@ -114,6 +114,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 	initialize: function(){
 		// bind to namespaced events
         $(window).on("beforeunload.map", _.bind(this.beforeunload, this));
+		$(window).on("resize.map", _.bind(this.resize, this));
 	},
     
     onDomRefresh: function(){
@@ -167,10 +168,15 @@ var MapView = Backbone.Marionette.ItemView.extend({
 		
 		// unbind the namespaced events
         $(window).off("beforeunload.map");
+		$(window).off("resize.map");
     },
     
     /* --- Nodeshot methods --- */
     
+	resize: function(){
+		setMapDimensions();
+	},
+	
 	beforeunload: function(){
 		// store current coordinates before leaving the page
 		this.storeCoordinates();

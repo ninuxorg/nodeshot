@@ -155,7 +155,6 @@ $('#general-search-input').keyup(function(e){
 // map
 $(window).resize(function(e){
 	setCollapsibleMainMenuMaxHeight();
-	setMapDimensions();
 	setNotificationsLeft();
 }).load(function(e){
 	setCollapsibleMainMenuMaxHeight();
