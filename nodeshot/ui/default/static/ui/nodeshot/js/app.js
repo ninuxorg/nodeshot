@@ -194,7 +194,13 @@ var MapView = Backbone.Marionette.ItemView.extend({
 			zoom = this.map.getZoom()
 		}
 		else{
+			var cartesian = Cesium.Ellipsoid.WGS84.cartesianToCartographic(
+								this.map.scene.getCamera().position
+							)
 			
+			lat = Math.degrees(cartesian.latitude),
+			lng = Math.degrees(cartesian.longitude),
+			zoom = 9
 		}
 		
 		return {
@@ -410,8 +416,12 @@ var MapView = Backbone.Marionette.ItemView.extend({
         
         // unload map if already initialized
         if(typeof(this.map) !== 'undefined'){
-            this.map[unloadMethod]();
-            $('#map-js').html('');    
+			// store current coordinates
+			this.storeCoordinates();
+			// unload map
+			this.map[unloadMethod]();
+			// clear any HTML in map container
+			$('#map-js').html('');
         }
         
         setMapDimensions();
@@ -454,12 +464,13 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * internal use only
      */
     _initMap3D: function(){
-        var map = new Cesium.CesiumWidget('map-js'),
-			latitude = 42.12,
-			longitude = 12.45,
-			zoomLevel = 9,
+        var coords = this.rememberCoordinates(),
+			map = new Cesium.CesiumWidget('map-js'),
+			zoomLevels = [
+				148500
+			],
 			flight = Cesium.CameraFlightPath.createAnimationCartographic(map.scene, {
-				destination : Cesium.Cartographic.fromDegrees(longitude, latitude, 16500 * zoomLevel),
+				destination : Cesium.Cartographic.fromDegrees(coords.lng, coords.lat, 16500 * coords.zoom),
 				duration: 0
 			});
 		
