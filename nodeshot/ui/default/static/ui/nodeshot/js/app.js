@@ -98,7 +98,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
     ui: {
         'toolbarButtons': '#map-toolbar a',
         'legendTogglers': '#btn-legend, #map-legend a.icon-close',
-        'toggleMapMode': '#btn-map-mode'
+        'switchMapMode': '#btn-map-mode'
     },
     
     events: {
@@ -108,8 +108,13 @@ var MapView = Backbone.Marionette.ItemView.extend({
         'click #map-legend li a': 'toggleLegendControl',
         'click #fn-map-tools .tool': 'toggleTool',
         'click #toggle-toolbar': 'toggleToolbar',
-        'click @ui.toggleMapMode': 'toggleMapMode'
+        'click @ui.switchMapMode': 'switchMapMode'
     },
+	
+	initialize: function(){
+		// bind to namespaced events
+        $(window).on("beforeunload.map", _.bind(this.beforeunload, this));
+	},
     
     onDomRefresh: function(){
         $('#breadcrumb').removeClass('visible-xs').hide();
@@ -154,11 +159,67 @@ var MapView = Backbone.Marionette.ItemView.extend({
     },
     
     onClose: function(e){
+		// show breadcrumb on mobile
         $('#breadcrumb').addClass('visible-xs').show();
+		
+		// store current coordinates when changing view
+		this.storeCoordinates();
+		
+		// unbind the namespaced events
+        $(window).off("beforeunload.map");
     },
     
     /* --- Nodeshot methods --- */
     
+	beforeunload: function(){
+		// store current coordinates before leaving the page
+		this.storeCoordinates();
+	},
+	
+	/*
+     * get current map coordinates (lat, lng, zoom)
+     */
+	getCoordinates: function(){
+		var lat, lng, zoom;
+		
+		if (Nodeshot.preferences.mapMode == '2D') {
+			lat = this.map.getCenter().lat;
+			lng = this.map.getCenter().lng;
+			zoom = this.map.getZoom()
+		}
+		else{
+			
+		}
+		
+		return {
+			lat: lat,
+			lng: lng,
+			zoom: zoom
+		}
+	},
+	
+	/*
+     * store current map coordinates in localStorage
+     */
+	storeCoordinates: function(){
+		var coords = this.getCoordinates()
+		
+		Nodeshot.preferences.mapLat = coords.lat;
+		Nodeshot.preferences.mapLng = coords.lng;
+		Nodeshot.preferences.mapZoom = coords.zoom;
+	},
+	
+	/*
+     * get latest stored coordinates or default ones
+     */
+	rememberCoordinates: function(){
+		return {
+			lat: Nodeshot.preferences.mapLat || 42.12,
+			lng: Nodeshot.preferences.mapLng || 12.45,
+			zoom: Nodeshot.preferences.mapZoom || 9
+		}
+	},
+	
     /*
      * add node procedure
      */
@@ -309,7 +370,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * mode can be undefined, 2D or 3D
      */
     initMap: function(mode){
-        var button = this.ui.toggleMapMode,
+        var button = this.ui.switchMapMode,
             unloadMethod,
             replacedString,
             replacerString,
@@ -375,10 +436,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * internal use only
      */
     _initMap2D: function(){
-        var latitude = 42.12,
-			longitude = 12.45,
-			zoomLevel = 9,
-			map = L.map('map-js').setView([latitude, longitude], zoomLevel);
+		var coords = this.rememberCoordinates(),
+			map = L.map('map-js').setView([coords.lat, coords.lng], coords.zoom);
         // TODO: configurable tiles
         L.tileLayer('http://a.tiles.mapbox.com/v3/examples.map-9ijuk24y/{z}/{x}/{y}.png').addTo(map);
         return map;
@@ -410,10 +469,10 @@ var MapView = Backbone.Marionette.ItemView.extend({
     /*
      * toggle 3D or 2D map
      */
-    toggleMapMode: function(e){
+    switchMapMode: function(e){
         e.preventDefault();
         // automatically determine which mod to use depending on the icon's button
-        var mode = this.ui.toggleMapMode.hasClass('icon-3d') ? '3D' : '2D';
+        var mode = this.ui.switchMapMode.hasClass('icon-3d') ? '3D' : '2D';
         this.initMap(mode);
     }
 });
