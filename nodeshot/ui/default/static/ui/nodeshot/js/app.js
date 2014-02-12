@@ -98,7 +98,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
     ui: {
         'toolbarButtons': '#map-toolbar a',
         'legendTogglers': '#btn-legend, #map-legend a.icon-close',
-        'switchMapMode': '#btn-map-mode'
+        'switchMapMode': '#btn-map-mode',
+		'legend': '#map-legend',
+		'legendButton': '#btn-legend',
+		'addNodeStep1': '#add-node-step1',
+		'addNodeStep2': '#add-node-step2'
     },
     
     events: {
@@ -236,33 +240,88 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * add node procedure
      */
     addNode: function(e){
-        $('#map-legend .icon-close').trigger('click');
-    
-        var dialog = $('#step1'),
+		var self = this,
+			reopenLegend = false,
+			dialog = this.ui.addNodeStep1,
             dialog_dimensions = dialog.getHiddenDimensions();
+		
+		// hide legend
+		if (this.ui.legend.is(':visible')) {
+			$('#map-legend .icon-close').trigger('click');
+			reopenLegend = true;
+		}
         
+		// show step1
         dialog.css({
             width: dialog_dimensions.width,
             right: 0
         });
-        
-        // vertically align to center
         dialog.fadeIn(255);
         
-        $('#step1 button').click(function(e){
-            $('#step1').hide();
-            var dialog = $('#step2'),
+		// cancel
+		$('#add-node-step1 button').one('click', function(e){
+            self.cancelAddNode(reopenLegend);
+        });
+		
+		// on map click (only once)
+		this.map.once('click', function(e){
+			// drop marker on cliked point
+			var marker = L.marker([e.latlng.lat, e.latlng.lng], {
+				draggable: true
+			}).addTo(self.map);
+			
+			// hide step1
+			dialog.hide();
+			
+			// show step2
+            dialog = self.ui.addNodeStep2,
             dialog_dimensions = dialog.getHiddenDimensions();
-        
             dialog.css({
                 width: dialog_dimensions.width,
                 right: 0
             });
-            
-            // vertically align to center
             dialog.fadeIn(255);
-        });
+			
+			// bind cancel button once
+			$('#add-node-step2 .btn-default').one('click', function(e){
+				self.cancelAddNode(reopenLegend, marker);
+			});
+			
+			// add new node there
+			$('#add-node-step2 .btn-success').one('click', function(e){
+				alert('not implemented yet');
+			});
+		});
     },
+	
+	/*
+     * cancel addNode operation
+     * resets normal map functions
+     */
+	cancelAddNode: function(reopenLegend, marker){
+		// unbind click event
+		this.map.off('click');
+		
+		// reopen legend if necessary
+		if (reopenLegend && this.ui.legend.is(':hidden')) {
+			this.ui.legendButton.trigger('click');
+		}
+		
+		// hide step1 if necessary
+		if (this.ui.addNodeStep1.is(':visible')) {
+			this.ui.addNodeStep1.fadeOut(255);
+		}
+		
+		// hide step2 if necessary
+		if (this.ui.addNodeStep2.is(':visible')) {
+			this.ui.addNodeStep2.fadeOut(255);
+		}
+		
+		// remove marker if necessary
+		if (marker) {
+			this.map.removeLayer(marker);
+		}
+	},
     
     /*
      * show / hide toolbar panels
@@ -313,8 +372,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
     toggleLegend: function(e){
         e.preventDefault();
         
-        var legend = $('#map-legend'),
-            button = $('#btn-legend');
+        var legend = this.ui.legend,
+            button = this.ui.legendButton;
         
         if(legend.is(':visible')){
             legend.fadeOut(255);
