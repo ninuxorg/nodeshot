@@ -4,6 +4,7 @@ from rest_framework_gis import serializers as geoserializers
 
 from .models import Layer
 
+from nodeshot.core.base.serializers import GeoJSONPaginationSerializer
 from nodeshot.core.nodes.models import Node,StatusIcon
 from nodeshot.core.nodes.serializers import NodeListSerializer
 
@@ -15,6 +16,7 @@ __all__ = [
     'GeoLayerListSerializer',
     'CustomNodeListSerializer',
     'PaginatedLayerListSerializer',
+    'PaginatedGeojsonLayerListSerializer',
     'LayerStatusIconSerializer',
     'StatusIconSerializer',
 ]
@@ -41,6 +43,9 @@ class PaginatedLayerListSerializer(pagination.PaginationSerializer):
     class Meta:
         object_serializer_class = LayerListSerializer
 
+class PaginatedGeojsonLayerListSerializer(GeoJSONPaginationSerializer):
+    class Meta:
+        object_serializer_class = LayerListSerializer
 
 class GeoLayerListSerializer(geoserializers.GeoFeatureModelSerializer, LayerListSerializer):
     class Meta:

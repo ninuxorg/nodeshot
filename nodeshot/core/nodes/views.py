@@ -132,8 +132,11 @@ class NodeGeoJSONList(NodeList):
      * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (defaults to 40)
      * `limit=0`: turns off pagination
+     * `page=<n>`: show page n
     """
-    
+    pagination_serializer_class = PaginatedGeojsonNodeListSerializer
+    paginate_by_param = 'limit'
+    paginate_by = 40
     serializer_class = NodeGeoSerializer
     post = Hider()
 
