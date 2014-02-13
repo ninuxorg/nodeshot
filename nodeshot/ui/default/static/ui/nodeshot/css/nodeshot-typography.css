@@ -30,7 +30,8 @@ article{
     text-align: justify;
 }
 
-article.center-stage > *:first-child{ margin-top: 0 }
+article.center-stage > *:first-child,
+.content > *:first-child{ margin-top: 0 }
 
 body article h1{ letter-spacing: -1.25px }
 body article h2{ letter-spacing: -1px }

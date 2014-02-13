@@ -20,13 +20,23 @@ var setMapDimensions = function(){
 	$('#map-container, #map-toolbar').height(height);
 	
     var map_toolbar = $('#map-toolbar'),
+		add_node_container = $('#add-node-container');
         width = $(window).width();
     
-    // take in consideration map toolbar if visible
-    if(map_toolbar.is(':visible')){
-        width = width - $('#map-toolbar').width();
+    // take in consideration #add-node-container if visible
+    if(add_node_container.is(':visible')){
+		width = width - add_node_container.width();
     }
+	// take in consideration map toolbar if visible
+	else if(map_toolbar.is(':visible')){
+		width = width - map_toolbar.width();
+	}
 	$('#map').width(width);
+	
+	var map = Nodeshot.body.currentView.map;
+	if (map) {
+		Nodeshot.body.currentView.map.invalidateSize();
+	}
 }
 
 var setNotificationsLeft = function(){

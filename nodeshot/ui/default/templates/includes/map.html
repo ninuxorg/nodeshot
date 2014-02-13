@@ -1,3 +1,4 @@
+{% load i18n %}
 <aside id="map-toolbar">
     <a href="#" class="icon-pin-add" data-toggle="tooltip" title="Add new node" data-placement="left" data-delay="600"></a>
     <a href="#" class="icon-search" data-panel="fn-search-address" data-toggle="tooltip" title="Search address" data-placement="left" data-delay="600"></a>
@@ -177,14 +178,69 @@
     
     <div id="add-node-step1" tabindex="-1" role="dialog" aria-labelledby="add-node-step1-label" aria-hidden="true"
         class="modal-dialog modal-content modal-body modal-x-slim autocenter bottom">
-        <span class="message">Click on the map to indicate the location</span>
-        <button type="button" class="btn btn-default">cancel</button>
+        <span class="message">{% trans 'Click on the map to indicate the location' %}</span>
+        <button type="button" class="btn btn-default">{% trans 'cancel' %}</button>
     </div>
     
     <div id="add-node-step2" tabindex="-1" role="dialog" aria-labelledby="add-node-step2-label" aria-hidden="true"
         class="modal-dialog modal-content modal-body modal-x-slim autocenter bottom">
-        <span class="message">Drag to adjust</span>
-        <button type="button" class="btn btn-success">confirm</button>
-        <button type="button" class="btn btn-default">cancel</button>
+        <span class="message">{% trans 'Drag to adjust' %}</span>
+        <button type="button" class="btn btn-success">{% trans 'confirm' %}</button>
+        <button type="button" class="btn btn-default">{% trans 'cancel' %}</button>
     </div>
 </div>
+
+<article id="add-node-container" class="map-overlay animate-width content">
+    <h1>{% trans 'Add new node' %}</h1>
+    <form action="" id="add-node-form">
+        
+        <p>
+            <label for="id_name">{% trans 'Name' %}</label>
+            <input name="name" type="text" class="form-control input-sm" placeholder="{% trans 'Enter name (required)' %}" id="id_name">
+        </p>
+        
+        <label>Layer</label>
+        <div class="btn-group dropdown">
+            <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+                {% trans 'Layer' %}
+                <span class="caret">
+                    <span class="icon-down"></span>
+                </span>
+            </button>
+            <ul class="dropdown-menu">
+                {% for layer in layers %}
+                <li><a href="#" data-value="{{ layer.slug }}">{{ layer.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <p>
+            <label for="id_address">{% trans 'Address' %}</label>
+            <input name="address" type="text" class="form-control input-sm" placeholder="{% trans 'Enter address (optional)' %}" id="id_address">
+        </p>
+        
+        <p>
+            <label for="id_elevation">{% trans 'Elevation' %}</label>
+            <input name="elevation" type="text" class="form-control input-sm" placeholder="{% trans 'Enter elevation (optional)' %}" id="id_elevation">
+        </p>
+        
+        <p>
+            <label for="id_description">{% trans 'Description' %}</label>
+            <textarea name="description" class="form-control input-sm" rows="6" id="id_description" placeholder="{% trans 'Enter description (optional)' %}"></textarea>
+        </p>
+        
+        <p>
+            <label for="id_data">{% trans 'Extra data' %}</label>
+            <textarea name="description" class="form-control input-sm" rows="6" id="id_data" placeholder="{% trans 'Enter extra data (optional)' %}"></textarea>
+        </p>
+        
+        <p>
+            <button type="submit" class="btn btn-success">{% trans 'Add node' %}</button>
+            &nbsp;
+            <button type="button" class="btn btn-default">{% trans 'Cancel' %}</button>
+        </p>
+        
+        <input type="hidden" id="id_slug" name="id_slug">
+        <input type="hidden" id="id_geometry" name="geometry">
+    </form>
+</article>

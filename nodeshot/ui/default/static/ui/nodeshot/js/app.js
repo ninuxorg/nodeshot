@@ -275,6 +275,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
 				draggable: true
 			}).addTo(self.map);
 			
+			window.marker = marker;
+			self.map.panTo(e.latlng);
+			
 			// hide step1
 			dialog.hide();
 			
@@ -288,13 +291,27 @@ var MapView = Backbone.Marionette.ItemView.extend({
             dialog.fadeIn(255);
 			
 			// bind cancel button once
-			$('#add-node-step2 .btn-default').one('click', function(e){
+			$('#add-node-step2 .btn-default, #add-node-form .btn-default').one('click', function(e){
 				self.cancelAddNode(reopenLegend, marker);
 			});
 			
 			// add new node there
 			$('#add-node-step2 .btn-success').one('click', function(e){
-				alert('not implemented yet');
+				dialog.fadeOut(255);
+				$('#add-node-container').show().animate({
+					width: '+70%'
+				},
+				{
+					duration: 400,
+					progress: function(){
+						setMapDimensions();
+						self.map.panTo(marker._latlng);
+					},
+					complete: function(){
+						setMapDimensions();
+						self.map.panTo(marker._latlng);
+					}
+				});
 			});
 		});
     },
@@ -306,6 +323,26 @@ var MapView = Backbone.Marionette.ItemView.extend({
 	cancelAddNode: function(reopenLegend, marker){
 		// unbind click event
 		this.map.off('click');
+		
+		var self = this;
+		
+		if ($('#add-node-container').is(':visible')) {
+			$('#add-node-container').animate({
+				width: '0'
+			},
+			{
+				duration: 400,
+				progress: function(){
+					setMapDimensions();
+					self.map.panTo(marker._latlng);
+				},
+				complete: function(){
+					setMapDimensions();
+					self.map.panTo(marker._latlng);
+					$(this).hide();
+				}
+			});
+		}
 		
 		// reopen legend if necessary
 		if (reopenLegend && this.ui.legend.is(':hidden')) {
@@ -330,6 +367,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
 		if (marker) {
 			this.map.removeLayer(marker);
 		}
+		
+		setMapDimensions();
 	},
     
     /*
@@ -521,7 +560,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
      */
     _initMap2D: function(){
 		var coords = this.rememberCoordinates(),
-			map = L.map('map-js').setView([coords.lat, coords.lng], coords.zoom);
+			map = L.map('map-js').setView([coords.lat, coords.lng], coords.zoom, {
+				trackResize: true
+			});
         // TODO: configurable tiles
         L.tileLayer('http://a.tiles.mapbox.com/v3/examples.map-9ijuk24y/{z}/{x}/{y}.png').addTo(map);
         return map;

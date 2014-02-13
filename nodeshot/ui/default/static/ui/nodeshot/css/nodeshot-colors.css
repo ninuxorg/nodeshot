@@ -223,7 +223,8 @@ body article a:focus,
 }
 
 #map-toolbar,
-#toggle-toolbar{
+#toggle-toolbar,
+.map-overlay{
     background: #eaeaea;
     border-left: 1px solid rgba(53, 53, 53, 0.3);
     -webkit-box-shadow: -2px 0px 5px 0px rgba(50, 50, 50, 0.1);
