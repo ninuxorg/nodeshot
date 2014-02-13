@@ -96,6 +96,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
     template: '#map-template',
     
     ui: {
+		'toolbar': '#map-toolbar',
         'toolbarButtons': '#map-toolbar a',
         'legendTogglers': '#btn-legend, #map-legend a.icon-close',
         'switchMapMode': '#btn-map-mode',
@@ -250,6 +251,10 @@ var MapView = Backbone.Marionette.ItemView.extend({
 			$('#map-legend .icon-close').trigger('click');
 			reopenLegend = true;
 		}
+		
+		// hide toolbar and enlarge map
+		this.ui.toolbar.hide();
+		setMapDimensions();
         
 		// show step1
         dialog.css({
@@ -306,6 +311,10 @@ var MapView = Backbone.Marionette.ItemView.extend({
 		if (reopenLegend && this.ui.legend.is(':hidden')) {
 			this.ui.legendButton.trigger('click');
 		}
+		
+		// show toolbar and adapt map width
+		this.ui.toolbar.show();
+		setMapDimensions();
 		
 		// hide step1 if necessary
 		if (this.ui.addNodeStep1.is(':visible')) {
