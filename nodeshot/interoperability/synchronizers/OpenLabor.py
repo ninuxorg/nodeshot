@@ -224,14 +224,9 @@ class OpenLabor(BaseSynchronizer):
     def add(self, node):
         """ Add a new record into OpenLabor db """
         openlabor_record = self.to_external(node)
-        
-        # openlabor sync
-        response = requests.post(
-                        self.post_url,
-                        data=json.dumps(openlabor_record),
-                        headers={ 'Content-type': 'application/json' },
-                        verify=self.config.get('verify_SSL', True)
-                    )
+
+        ## openlabor sync
+        response=requests.post(self.post_url,openlabor_record)
         
         if response.status_code != 200:
             message = 'ERROR while creating "%s". Response: %s' % (node.name, response.content)
@@ -246,7 +241,7 @@ class OpenLabor(BaseSynchronizer):
             print 'JSONDecodeError: %s\n\nresponse: %s' % (e, response.content)
             return False
         
-        external = NodeExternal.objects.create(node=node, external_id=int(data))
+        external = NodeExternal.objects.create(node=node, external_id=int(data['AddedJobId']))
         message = 'New record "%s" saved in CitySDK through the HTTP API"' % node.name
         self.verbose(message)
         print message

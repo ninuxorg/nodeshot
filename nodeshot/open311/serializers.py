@@ -51,7 +51,7 @@ class ServiceListSerializer(serializers.Serializer):
     service_description = serializers.SerializerMethodField('get_service_description')
     
     def __init__(self, *args, **kwargs):
-        self.service_type = kwargs.pop('service_type')
+        self.service_type = kwargs.pop('service_type','node')
         super(ServiceListSerializer, self).__init__(*args, **kwargs)
     
     def get_definition(self, obj):

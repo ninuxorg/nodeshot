@@ -856,4 +856,3 @@ class InteroperabilityTest(TestCase):
         
         node.save()
         self.assertIsNotNone(node.external.external_id)
-    

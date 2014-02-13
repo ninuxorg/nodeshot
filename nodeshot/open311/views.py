@@ -128,7 +128,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         }
         context = self.get_serializer_context()
         service_code = context['request'].QUERY_PARAMS.get('service_code', 'node')
-        
+       
         if service_code not in serializers.keys():
             serializer_class = self.get_serializer_class()
         else:
@@ -145,7 +145,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         }
     
     def get(self, request, *args, **kwargs):
-        
+        """ Retrieve list of service requests """
         if 'service_code' not in request.GET.keys():
             return Response({ 'detail': _('A service code must be inserted') }, status=404)
         service_code = request.GET['service_code']
@@ -248,6 +248,8 @@ class ServiceRequests(generics.ListCreateAPIView):
         return Response(data)
     
     def post(self, request, *args, **kwargs):
+        """ Post a service request ( requires authentication) """
+
         service_code = request.POST['service_code']
         
         if service_code not in SERVICES.keys():
@@ -319,7 +321,9 @@ service_requests = ServiceRequests.as_view()
 
 
 class ServiceRequest(generics.RetrieveAPIView):
-    
+    """ Retrieve the details of a service request """
+
+    serializer_class= NodeRequestDetailSerializer
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
         service_code = kwargs['service_code']
