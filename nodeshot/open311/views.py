@@ -128,7 +128,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         }
         context = self.get_serializer_context()
         service_code = context['request'].QUERY_PARAMS.get('service_code', 'node')
-        
+       
         if service_code not in serializers.keys():
             serializer_class = self.get_serializer_class()
         else:
@@ -319,7 +319,7 @@ service_requests = ServiceRequests.as_view()
 
 
 class ServiceRequest(generics.RetrieveAPIView):
-    
+    serializer_class= NodeRequestDetailSerializer
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
         service_code = kwargs['service_code']
