@@ -4,8 +4,7 @@
         "pk": 1,
         "fields": {
             "name": "olsr",
-            "version": "0.6.2",
-            "url": "http://olsr.org/"
+            "version": "0.6.2"
         }
     }
 ]

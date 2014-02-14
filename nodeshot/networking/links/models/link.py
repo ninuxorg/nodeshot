@@ -19,9 +19,8 @@ from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
 class Link(BaseAccessLevel):
     """
     Link Model
-    Intended for both wireless and wired links
+    Designed for both wireless and wired links
     """
-    status = models.SmallIntegerField(_('status'), choices=choicify(LINK_STATUS), default=LINK_STATUS.get('planned'))
     type = models.SmallIntegerField(_('type'), max_length=10, null=True, blank=True,
                                     choices=choicify(LINK_TYPES), default=LINK_TYPES.get('radio'))
     
@@ -33,7 +32,8 @@ class Link(BaseAccessLevel):
                   related_name='link_interface_to', blank=True, null=True,
                   help_text=_('mandatory except for "planned" links (in planned links you might not have any device installed yet)'))
     
-    # in "planned" links these two are necessary
+    # in "planned" links these two fields are necessary
+    # while in all the other status they serve as a shortcut
     node_a = models.ForeignKey(Node, verbose_name=_('from node'),
                   related_name='link_node_from', blank=True, null=True,
                   help_text=_('leave blank (except for planned nodes) as it will be filled in automatically'))
@@ -41,29 +41,39 @@ class Link(BaseAccessLevel):
                   related_name='link_node_to', blank=True, null=True,
                   help_text=_('leave blank (except for planned nodes) as it will be filled in automatically'))
     
+    # geospatial info
     line = models.LineStringField(blank=True, null=True,
                            help_text=_('leave blank and the line will be drawn automatically'))
     
+    # monitoring info
+    status = models.SmallIntegerField(_('status'), choices=choicify(LINK_STATUS), default=LINK_STATUS.get('planned'))
+    first_seen = models.DateTimeField(_('first time seen on'), blank=True, null=True, default=None)
+    last_seen = models.DateTimeField(_('last time seen on'), blank=True, null=True, default=None)
+    
+    # technical info
     metric_type = models.CharField(_('metric type'), max_length=6,
                                    choices=choicify(METRIC_TYPES), blank=True, null=True)
     metric_value = models.FloatField(_('metric value'), blank=True, null=True)
-    tx_rate = models.IntegerField(_('TX rate average'), null=True, default=None, blank=True)
-    rx_rate = models.IntegerField(_('RX rate average'), null=True, default=None, blank=True)
+    max_rate = models.IntegerField(_('Maximum BPS'), null=True, default=None, blank=True)
+    min_rate = models.IntegerField(_('Minimum BPS'), null=True, default=None, blank=True)
+    
+    # wireless specific info
     dbm = models.IntegerField(_('dBm average'), null=True, default=None, blank=True)
     noise = models.IntegerField(_('noise average'), null=True, default=None, blank=True)
     
+    # additional data
     data = DictionaryField(_('extra data'), null=True, blank=True,
                             help_text=_('store extra attributes in JSON string'))
     shortcuts = ReferencesField(null=True, blank=True)
     
-    # manager
+    # django manager
     objects = LinkManager()
     
     class Meta:
         app_label = 'links'
     
     def __unicode__(self):
-        return _(u'Link between %s and %s') % (self.node_a_name, self.node_b_name)
+        return _(u'%s <> %s') % (self.node_a_name, self.node_b_name)
     
     def clean(self, *args, **kwargs):
         """

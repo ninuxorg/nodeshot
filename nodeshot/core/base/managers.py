@@ -1,9 +1,5 @@
 import sys
 
-if not 'synchronize' in sys.argv and not 'celery' in sys.argv:
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-
 from django.db.models import Manager, Q
 from django.contrib.gis.db.models import GeoManager
 from django.db.models.query import QuerySet
@@ -34,6 +30,7 @@ class BaseUtilityMixin(object):
             return queryset[0:n]
     
     def last(self, n=None):
+        """ return last object of a collection or last n specified objects """
         return self.slice('-id', n)
     
     def first(self, n=None):
@@ -71,12 +68,8 @@ class ACLMixin(BaseUtilityMixin):
         returns all the items that are accessible to the specified user
         if user is not authenticated will return public items
         
-        :param user: an user instance or integer representing user id
+        :param user: an user instance
         """
-        # if user param is an integer
-        if isinstance(user, int):
-            user = User.objects.get(pk=user)
-        
         if user.is_superuser:
             try:
                 queryset = self.get_query_set()
@@ -92,7 +85,7 @@ class ACLMixin(BaseUtilityMixin):
 
 
 class ExtendedManagerMixin(BaseUtilityMixin):
-    """ add this mixin to chainable custom methods support to your manager """
+    """ add this mixin to add  support for chainable custom methods to your manager """
     
     def __getattr__(self, attr, *args):
         try:
@@ -143,6 +136,11 @@ if HSTORE_ENABLED:
         pass
     
     
+    class HStoreGeoPublishedQuerySet(HStoreGeoQuerySet, PublishedMixin):
+        """ HStoreGeoQuerySet and PublishedMixin """
+        pass
+    
+    
     class HStoreGeoAccessLevelQuerySet(HStoreGeoQuerySet, ACLMixin):
         """ HStoreGeoQuerySet and AccessLevel """
         pass
@@ -155,6 +153,11 @@ if HSTORE_ENABLED:
 
 
 ### ------ MANAGERS ------ ###
+
+
+class NodeshotDefaultManager(Manager, ExtendedManagerMixin):
+    """ Simple Manager that implements the BaseUtilityMixin methods """
+    pass
 
 
 class PublishedManager(Manager, ExtendedManagerMixin, PublishedMixin):
@@ -207,6 +210,11 @@ if HSTORE_ENABLED:
     from django_hstore.managers import HStoreManager, HStoreGeoManager
     
     
+    class HStoreNodeshotManager(HStoreManager, ExtendedManagerMixin):
+        """ HStoreManager + ExtendedManagerMixin """
+        pass
+    
+    
     class HStoreAccessLevelManager(HStoreManager, ExtendedManagerMixin, ACLMixin):
         """
         HStoreManager and AccessLeveManager in one
@@ -214,6 +222,15 @@ if HSTORE_ENABLED:
         
         def get_query_set(self): 
             return HStoreAccessLevelQuerySet(self.model, using=self._db)
+    
+    
+    class HStoreGeoPublishedManager(HStoreGeoManager, ExtendedManagerMixin, PublishedMixin):
+        """
+        HStoreGeoManager and PublishedMixin in one
+        """
+        
+        def get_query_set(self): 
+            return HStoreGeoPublishedQuerySet(self.model, using=self._db)
     
     
     class HStoreGeoAccessLevelManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin):

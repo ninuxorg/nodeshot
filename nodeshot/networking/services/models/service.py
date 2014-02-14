@@ -2,9 +2,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.core.base.models import BaseAccessLevel
-from nodeshot.core.base.choices import SERVICE_STATUS
+from nodeshot.core.base.managers import AccessLevelManager
 
 from . import Category
+from .choices import SERVICE_STATUS
 
 
 class Service(BaseAccessLevel):
@@ -20,9 +21,10 @@ class Service(BaseAccessLevel):
     status = models.SmallIntegerField(_('status'), choices=SERVICE_STATUS)
     is_published = models.BooleanField(_('published'), default=True)
     
+    objects = AccessLevelManager()
+    
     class Meta:
         app_label = 'services'
-        permissions = (('can_view_services', 'Can view services'),)
         verbose_name = _('service')
         verbose_name_plural = _('services')
     

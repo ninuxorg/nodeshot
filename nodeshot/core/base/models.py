@@ -9,7 +9,47 @@ from .choices import ACCESS_LEVELS
 from .utils import choicify, now
 
 
-class BaseDate(models.Model):
+class BaseShortcut(models.Model):
+    """
+    Abstract Model providing shortcuts to main manager methods
+    Handy for shell prototyping
+    """
+    
+    class Meta:
+        abstract = True
+        
+    @classmethod
+    def all(cls):
+        return cls.objects.all()
+    
+    @classmethod
+    def filter(cls, *args, **kwargs):
+        return cls.objects.filter(*args, **kwargs)
+    
+    @classmethod
+    def exclude(cls, *args, **kwargs):
+        return cls.objects.exclude(*args, **kwargs)
+    
+    @classmethod
+    def count(cls, *args, **kwargs):
+        return cls.objects.count(*args, **kwargs)
+    
+    # --- custom methods, copying Rails :) --- #
+    
+    @classmethod
+    def last(cls, n=None):
+        return cls.objects.last(n)
+    
+    @classmethod
+    def first(cls, n=None):
+        return cls.objects.first(n)
+    
+    @classmethod
+    def find(cls, pk):
+        return cls.objects.find(pk)
+
+
+class BaseDate(BaseShortcut):
     """
     Base Abstract Model that provides:
         * an added field that automatically sets the insert date

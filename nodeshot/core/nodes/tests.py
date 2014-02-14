@@ -11,10 +11,10 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.conf import settings
+from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from nodeshot.core.layers.models import Layer
@@ -111,7 +111,8 @@ class ModelsTest(TestCase):
         # superuser can see all nodes
         self.assertEqual(Node.objects.all().count(), Node.objects.accessible_to(user).count())
         # same but passing only user_id
-        self.assertEqual(Node.objects.all().count(), Node.objects.accessible_to(user=1).count())
+        user_1 = User.objects.get(pk=1)
+        self.assertEqual(Node.objects.all().count(), Node.objects.accessible_to(user_1).count())
         # simulate non authenticated user
         self.assertEqual(8, Node.objects.accessible_to(AnonymousUser()).count())
         # public nodes
@@ -127,14 +128,14 @@ class ModelsTest(TestCase):
         self.assertEqual(9, Node.objects.access_level_up_to('community').published().count())
         # user 1 is admin and can see all the nodes, published() is the same as writing filter(is_published=True)
         count = Node.objects.all().filter(is_published=True).count()
-        self.assertEqual(count, Node.objects.published().accessible_to(user=1).count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).published().count())
+        self.assertEqual(count, Node.objects.published().accessible_to(user_1).count())
+        self.assertEqual(count, Node.objects.accessible_to(user_1).published().count())
         # chain with geographic query
         count = Node.objects.all().filter(is_published=True).filter(layer_id=1).count()
-        self.assertEqual(count, Node.objects.filter(geometry__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).filter(geometry__distance_lte=(pnt, 70000)).published().count())
-        self.assertEqual(count, Node.objects.accessible_to(user=1).published().filter(geometry__distance_lte=(pnt, 70000)).count())
-        self.assertEqual(count, Node.objects.filter(geometry__distance_lte=(pnt, 70000)).accessible_to(user=1).published().count())
+        self.assertEqual(count, Node.objects.filter(geometry__distance_lte=(pnt, 70000)).accessible_to(user_1).published().count())
+        self.assertEqual(count, Node.objects.accessible_to(user_1).filter(geometry__distance_lte=(pnt, 70000)).published().count())
+        self.assertEqual(count, Node.objects.accessible_to(user_1).published().filter(geometry__distance_lte=(pnt, 70000)).count())
+        self.assertEqual(count, Node.objects.filter(geometry__distance_lte=(pnt, 70000)).accessible_to(user_1).published().count())
         
         # slice, first, last, find
         self.assertEqual(Node.objects.last().__class__.__name__, 'Node')
@@ -178,7 +179,8 @@ class ModelsTest(TestCase):
     def test_image_manager(self):
         """ test manager methods of Image model """
         # admin can see all the images
-        self.assertEqual(Image.objects.all().count(), Image.objects.accessible_to(user=1).count())
+        user_1 = User.objects.get(pk=1)
+        self.assertEqual(Image.objects.all().count(), Image.objects.accessible_to(user_1).count())
     
     def test_image_auto_order(self):
         """ test image automatic ordering works correctly """
@@ -213,6 +215,7 @@ class ModelsTest(TestCase):
         icon.save()
         
         icon.marker = 'icon'
+        # TODO: what about the following line?
         #icon.icon = 'file.jpg'
         
         try:
@@ -271,9 +274,6 @@ class APITest(BaseTestCase):
         'test_images.json'
     ]
     
-    #def setup(self):
-    #    self.client.login(username='admin', password='tester')
-    
     def test_node_list(self):
         """ test node list """
         url = reverse('api_node_list')
@@ -304,6 +304,8 @@ class APITest(BaseTestCase):
         self.client.login(username='registered', password='tester')
         response = self.client.post(url, json.dumps(node), content_type='application/json')
         self.assertEqual(201, response.status_code)
+        
+        self.assertEqual(response.data['user'], 'registered')
         
         if HSTORE_ENABLED:
             node = Node.objects.get(slug='test_distance')
@@ -410,7 +412,7 @@ class APITest(BaseTestCase):
         self.client.login(username='admin', password='tester')
         response = self.client.get(url)
         images = json.loads(response.content)
-        node_image_count = Image.objects.accessible_to(1).filter(node__slug='fusolab').count()
+        node_image_count = Image.objects.accessible_to(User.objects.get(pk=1)).filter(node__slug='fusolab').count()
         self.assertEqual(node_image_count, len(images))
         
         # GET: 404

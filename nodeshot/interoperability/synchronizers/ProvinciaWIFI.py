@@ -5,14 +5,14 @@ from django.conf import settings
 
 from nodeshot.core.nodes.models import Node, Status
 
-from .base import XMLConverter
+from .base import XmlSynchronizer
 
 if settings.NODESHOT['SETTINGS'].get('HSTORE', False) is False:
     raise ImproperlyConfigured('HSTORE needs to be enabled for ProvinciaWIFI Converter to work properly')
 
 
 
-class ProvinciaWIFI(XMLConverter):
+class ProvinciaWIFI(XmlSynchronizer):
     """ ProvinciaWIFI interoperability class """
     
     def save(self):

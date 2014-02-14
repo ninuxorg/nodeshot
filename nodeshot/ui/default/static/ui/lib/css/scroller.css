@@ -1,0 +1,78 @@
+/*
+ * Scroller Plugin [Formstone Library]
+ * @author Ben Plum
+ * @version 0.6.4
+ *
+ * Copyright © 2013 Ben Plum <mr@benplum.com>
+ * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
+ */
+
+.scroller { overflow: hidden; overflow-x: hidden; overflow-y: hidden; position: relative; }
+.scroller-content {
+	height: 100%;
+	overflow: auto;
+	overflow-x: hidden;
+	overflow-y: auto;
+	position: relative;
+	z-index: 1;
+}
+.scroller-bar {
+	background: inherit;
+	display: none;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 15px;
+	z-index: 2;
+}
+.scroller-track {
+	background: inherit;
+	height: 100%;
+	overflow: hidden;
+	position: relative;
+	width: 9px;
+	background-color: #989898;
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+}
+
+.scroller-handle {
+	background: #989898;
+	border-radius: 5px;
+	cursor: pointer;
+	height: 20px;
+	overflow: hidden;
+	position: absolute;
+	right: 0px;
+	top: 0;
+	width: 9px;
+	z-index: 2; 
+	-webkit-transition: right 0.1s linear, width 0.1s linear;
+	-moz-transition: right 0.1s linear, width 0.1s linear;
+	-ms-transition: right 0.1s linear, width 0.1s linear;
+	-o-transition: right 0.1s linear, width 0.1s linear;
+	transition: right 0.1s linear, width 0.1s linear;
+}
+
+/* Webkit Fix */
+.scroller-content::-webkit-scrollbar,
+.scroller-content::-webkit-scrollbar-button,
+.scroller-content::-webkit-scrollbar-track,
+.scroller-content::-webkit-scrollbar-track-piece,
+.scroller-content::-webkit-scrollbar-thumb,
+.scroller-content::-webkit-scrollbar-corner,
+.scroller-content::-webkit-resizer { background: transparent; opacity: 0; }
+
+/* Active Scrollbar */
+.scroller-active .scroller-content { padding: 20px; }
+.scroller-active .scroller-bar { display: block; }
+
+/* Setup Scrollbar - Should match 'active' styles for proper sizing */
+.scroller-active .scroller-content { padding: 20px; }
+.scroller-active .scroller-bar { display: block; }
+
+/* Horizontal */
+.scroller-horizontal .scroller-content { overflow: auto; overflow-x: auto; overflow-y: hidden; padding: 0 0 10px 0; }
+.scroller-horizontal .scroller-bar { border-left: none; border-top: 1px solid #EEEEEE; bottom: 0; height: 20px; top: auto; width: 100%; }
+.scroller-horizontal .scroller-handle { bottom: 5px; height: 10px; right: auto; top: auto; width: 20px; }

@@ -5,6 +5,7 @@ from rest_framework import serializers, pagination
 from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers
 
+from nodeshot.core.base.serializers import GeoJSONPaginationSerializer
 from .base import ExtensibleNodeSerializer
 from .models import *
 
@@ -21,6 +22,7 @@ __all__ = [
     'NodeDetailSerializer',
     'NodeGeoSerializer',
     'PaginatedNodeListSerializer',
+    'PaginatedGeojsonNodeListSerializer',
     'ImageListSerializer',
     'ImageAddSerializer',
     'ImageEditSerializer',
@@ -76,12 +78,18 @@ class NodeListSerializer(NodeDetailSerializer):
         
         read_only_fields = ['added', 'updated']
         geo_field = 'geometry'
+        id_field = 'slug'
 
 
 class PaginatedNodeListSerializer(pagination.PaginationSerializer):
     class Meta:
         object_serializer_class = NodeListSerializer
 
+
+class PaginatedGeojsonNodeListSerializer(GeoJSONPaginationSerializer):
+    class Meta:
+        object_serializer_class = NodeListSerializer
+        
 
 class NodeCreatorSerializer(NodeListSerializer):
     layer = serializers.WritableField(source='layer')

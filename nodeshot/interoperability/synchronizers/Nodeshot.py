@@ -4,7 +4,7 @@ import simplejson as json
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 
-from .base import BaseConverter
+from .base import BaseSynchronizer
 
 
 class NodeshotMixin(object):
@@ -41,6 +41,6 @@ class NodeshotMixin(object):
         return response.data['nodes']
 
 
-class Nodeshot(NodeshotMixin, BaseConverter):
+class Nodeshot(NodeshotMixin, BaseSynchronizer):
     """ Nodeshot interop test """
     pass

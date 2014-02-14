@@ -32,7 +32,7 @@ class ImageInline(BaseStackedInline):
         classes = ('grp-collapse grp-open', )
 
 
-NODE_FILTERS = ['is_published', 'status', 'access_level', 'added']
+NODE_FILTERS = ['is_published', 'status', 'access_level', 'added', 'updated']
 NODE_LIST_DISPLAY = ['name', 'user', 'status', 'access_level', 'is_published', 'added', 'updated']
 NODE_FIELDS_LOOKEDUP = [
     'user__id', 'user__username',
@@ -58,28 +58,18 @@ class NodeAdmin(GeoAdmin):
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ImageInline]
     
+    # django-grappelli usability improvements
+    raw_id_fields = ('layer', 'user')
+    autocomplete_lookup_fields = {
+        'fk': ('layer', 'user'),
+    }
+    
     def queryset(self, request):
         return super(NodeAdmin, self).queryset(request).select_related('user', 'layer', 'status')
     
-    # Enable TinyMCE HTML Editor according to settings, defaults to True
-    if settings.NODESHOT['SETTINGS'].get('NODE_DESCRIPTION_HTML', True) is True: 
-        if 'grappelli' not in settings.INSTALLED_APPS:
-            raise ImproperlyConfigured(_("settings.NODESHOT['SETTINGS']['NODE_DESCRIPTION_HTML'] is set to True but grappelli is not in settings.INSTALLED_APPS"))
-        
-        class Media:
-            js = [
-                '%sgrappelli/tinymce/jscripts/tiny_mce/tiny_mce.js' % settings.STATIC_URL,
-                '%sgrappelli/tinymce_setup/tinymce_setup_ns.js' % settings.STATIC_URL,
-            ]
-        
+    if settings.NODESHOT['SETTINGS'].get('NODE_DESCRIPTION_HTML', True) is True:  
         # enable editor for "node description" only
-        def formfield_for_dbfield(self, db_field, **kwargs):
-            field = super(NodeAdmin, self).formfield_for_dbfield(db_field, **kwargs)
-            
-            if db_field.name == 'description':
-                field.widget.attrs['class'] = 'html-editor %s' % field.widget.attrs.get('class', '')
-            
-            return field
+        html_editor_fields = ['description']
 
 
 class StatusIconInline(admin.StackedInline):
@@ -111,19 +101,3 @@ class StatusAdmin(admin.ModelAdmin):
 
 admin.site.register(Node, NodeAdmin)
 admin.site.register(Status, StatusAdmin)
-
-
-# disable celery admin if not needed
-if getattr(settings, 'CELERYBEAT_SCHEDULER', None) != 'djcelery.schedulers.DatabaseScheduler':
-    from djcelery.models import (
-        TaskState, WorkerState, PeriodicTask, IntervalSchedule, CrontabSchedule
-    )
-
-    try:
-        admin.site.unregister(TaskState)
-        admin.site.unregister(WorkerState)
-        admin.site.unregister(IntervalSchedule)
-        admin.site.unregister(CrontabSchedule)
-        admin.site.unregister(PeriodicTask) 
-    except admin.sites.NotRegistered:
-        raise ImproperlyConfigured('django-celery (djcelery) is either not installed or does not come before nodeshot in settings.INSTALLED_APPS')

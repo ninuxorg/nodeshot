@@ -25,7 +25,7 @@ class Device(BaseAccessLevel):
     name = models.CharField(_('name'), max_length=50)
     node = models.ForeignKey('nodes.Node', verbose_name=_('node'))
     type = models.CharField(_('type'), max_length=50, choices=DEVICE_TYPES_CHOICES)
-    status = models.SmallIntegerField(_('status'), max_length=2, choices=DEVICE_STATUS_CHOICES, default=DEVICE_STATUS.get('unplugged'))
+    status = models.SmallIntegerField(_('status'), max_length=2, choices=DEVICE_STATUS_CHOICES, default=DEVICE_STATUS.get('unknown'))
     
     # geographic data
     location = models.PointField(_('location'), blank=True, null=True,
@@ -36,8 +36,12 @@ class Device(BaseAccessLevel):
     
     # device specific
     routing_protocols = models.ManyToManyField('net.RoutingProtocol', blank=True)
-    firmware = models.CharField(_('firmware'), max_length=40, blank=True, null=True)
+    
     os = models.CharField(_('operating system'), max_length=128, blank=True, null=True)
+    os_version = models.CharField(_('operating system version'), max_length=128, blank=True, null=True)
+    
+    first_seen = models.DateTimeField(_('first time seen on'), blank=True, null=True, default=None)
+    last_seen = models.DateTimeField(_('last time seen on'), blank=True, null=True, default=None)
     
     # text
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
@@ -50,6 +54,9 @@ class Device(BaseAccessLevel):
         shortcuts = ReferencesField(null=True, blank=True)
     
     objects = DeviceManager()
+    
+    # list indicating if any other module has extended this model
+    extended_by = []
     
     class Meta:
         app_label = 'net'
@@ -123,3 +130,8 @@ class Device(BaseAccessLevel):
             return self.shortcuts['layer']
         else:
             return self.node.layer
+    
+    if 'grappelli' in settings.INSTALLED_APPS:
+        @staticmethod
+        def autocomplete_search_fields():
+            return ('name__icontains',)

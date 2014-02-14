@@ -145,4 +145,3 @@ def create_layer_rating_settings(sender, **kwargs):
         # if CELERY_ALWAYS_EAGER is False celery worker must be running otherwise task won't be executed
         create_related_object.delay(LayerParticipationSettings, { 'layer': layer })
 
-

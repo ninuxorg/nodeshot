@@ -25,8 +25,6 @@ from .permissions import *
 
 class ProfileList(generics.ListCreateAPIView):
     """
-    ### GET
-    
     Return profile of current authenticated user or return 401.
     
     ### POST
@@ -82,7 +80,6 @@ profile_list = ProfileList.as_view()
 
 class ProfileDetail(generics.RetrieveUpdateAPIView):
     """
-    ### GET
     Retrieve specified profile.
     
     ### PUT & PATCH
@@ -118,9 +115,7 @@ if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
 
     class UserNodes(ListSerializerMixin, NodeList):
         """
-        ### GET
-        
-        Retrieve list of nodes of the specified layer
+        Retrieve list of nodes of the specified user
         
         Parameters:
         
@@ -138,7 +133,7 @@ if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
             return super(UserNodes, self).get_queryset().filter(user_id=self.user.id)
         
         def get(self, request, *args, **kwargs):
-            """ custom structure """
+            """ Retrieve list of nodes of the specified user """
             # ListSerializerMixin.list returns a serializer object
             nodes = self.list(request, *args, **kwargs)
             
@@ -175,8 +170,6 @@ class SocialLinkMixin(object):
 
 class UserSocialLinksList(CustomDataMixin, SocialLinkMixin, generics.ListCreateAPIView):
     """
-    ### GET
-    
     Get social links of a user
     
     ### POST
@@ -200,8 +193,6 @@ user_social_links_list = UserSocialLinksList.as_view()
 
 class UserSocialLinksDetail(SocialLinkMixin, generics.RetrieveUpdateDestroyAPIView):
     """
-    ### GET
-    
     Get specified social link
     
     ### PUT & PATCH
@@ -226,9 +217,7 @@ user_social_links_detail = UserSocialLinksDetail.as_view()
 
 class AccountLogin(generics.GenericAPIView):
     """
-    ### POST
-    
-    Login
+    Log in
     
     **Parameters**:
     
@@ -252,7 +241,11 @@ class AccountLogin(generics.GenericAPIView):
             else:
                 request.session.set_expiry(0)
                 
-            return Response({ 'detail': _(u'Logged in successfully') })
+            return Response({
+                'detail': _(u'Logged in successfully'),
+                # TODO: maybe more user info in the request would have sense
+                'username': request.DATA['username']
+            })
         
         return Response(serializer.errors, status=400)
     
@@ -264,9 +257,7 @@ account_login = AccountLogin.as_view()
 
 class AccountLogout(APIView):
     """
-    ### POST
-    
-    Logout
+    Log out
     """
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticated, )
@@ -281,16 +272,14 @@ account_logout = AccountLogout.as_view()
 
 class AccountDetail(generics.GenericAPIView):
     """
-    ### GET
-    
-    Retrieve profile of current user or return 401.
+    Retrieve profile of current user or return 401 if not authenticated.
     """
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticated, )
     serializer_class = AccountSerializer
     
     def get(self, request, format=None):
-        """ Return current account """
+        """ Retrieve profile of current user or return 401 if not authenticated. """
         serializer = self.serializer_class(request.user, context=self.get_serializer_context())
         return Response(serializer.data)
 
@@ -302,7 +291,6 @@ account_detail = AccountDetail.as_view()
 
 class AccountPassword(generics.GenericAPIView):
     """
-    ### POST
     Change password of the current user.
     
     **Accepted parameters:**
@@ -333,9 +321,7 @@ from .forms import ResetPasswordForm, ResetPasswordKeyForm
 
 class PasswordResetRequestKey(generics.GenericAPIView):
     """
-    ### POST
-    
-    Sends a link to the user email address with a link to reset his password.
+    Sends an email to the user email address with a link to reset his password.
     
     **TODO:** the key should be sent via push notification too.
     
@@ -367,8 +353,6 @@ account_password_reset = PasswordResetRequestKey.as_view()
 
 class PasswordResetFromKey(generics.GenericAPIView):
     """
-    ### POST
-    
     Reset password from key.
     
     **The key must be part of the URL**!
@@ -418,9 +402,7 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
     
     class AccountEmailList(CustomDataMixin, generics.ListCreateAPIView):
         """
-        ### GET
-        
-        Get email addresses of current user.
+        Get email addresses of current authenticated user.
         
         ### POST
         
@@ -456,8 +438,6 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
     
     class AccountEmailDetail(generics.RetrieveUpdateDestroyAPIView):
         """
-        ### GET
-        
         Get specified email object.
         
         ### PUT & PATCH
@@ -502,8 +482,6 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
     
     class ResendEmailConfirmation(APIView):
         """
-        ### POST
-        
         Resend email confirmation
         """
         

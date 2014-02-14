@@ -141,6 +141,8 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 3,
                 'required': True,
                 'variable' : True
+
+
             },
             
             # long
@@ -150,7 +152,8 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Longitude of node'),
                 'order': 4,
-                'required': True
+                'required': True,
+                'variable' : True
             },
             
             # address
@@ -162,6 +165,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 5,
                 'required': False,
                 'variable' : True
+
             },
             
             # elev (elevation)
@@ -173,6 +177,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 6,
                 'required': False,
                 'variable' : True
+
             },
             
             # description
@@ -184,6 +189,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 7,
                 'required': False,
                 'variable' : True
+
             },
             
             # images
@@ -191,11 +197,12 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'code': 'images',
                 'description': _('images'),
                 'datatype': 'string',
-                'datatype_description': _('Images related to node. A client may POST multiple files as multipart/form-data. Requests return the URL for this images via the image_url field\
-                                          '),
+                'datatype_description': _('Images related to node. A client may POST multiple files as multipart/form-data. Requests return the URL for this images via the image_url field\                                          '),
                 'order': 8,
                 'required': False,
                 'variable' : True
+
+
             }
         ]
     
@@ -224,6 +231,7 @@ class ServiceVoteSerializer(serializers.Serializer):
                 'order': 1,
                 'required': True,
                 'variable' : True
+
             },
             
             # vote
@@ -276,6 +284,7 @@ class ServiceCommentSerializer(serializers.Serializer):
                 'order': 2,
                 'required': True,
                 'variable' : True
+
             },
 
         ]
@@ -305,6 +314,8 @@ class ServiceRatingSerializer(serializers.Serializer):
                 'order': 1,
                 'required': True,
                 'variable' : True
+                'required': True
+
             },
             
             # rating

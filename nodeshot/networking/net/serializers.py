@@ -68,10 +68,14 @@ class DeviceListSerializer(gis_serializers.GeoModelSerializer):
         fields = [
             'id', 'node', 'name', 'type', 'status',
             'location', 'elev',
-            'firmware', 'os', 'description',
+            'os', 'os_version', 'description',
+            'first_seen', 'last_seen',
             'added', 'updated', 'details'
         ]
-        read_only_fields = ['added', 'updated']
+        read_only_fields = [
+            'first_seen', 'last_seen',
+            'added', 'updated'
+        ]
 
 
 class DeviceDetailSerializer(DeviceListSerializer):
@@ -132,8 +136,9 @@ class DeviceDetailSerializer(DeviceListSerializer):
         primary_fields = [
             'id', 'access_level', 'node', 'name', 'type', 'status',
             'location', 'elev',
-            'firmware', 'os', 'description',
+            'os', 'os_version', 'description',
             'routing_protocols', 'routing_protocols_named',
+            'first_seen', 'last_seen',
             'added', 'updated'
         ]
         
@@ -149,7 +154,10 @@ class DeviceDetailSerializer(DeviceListSerializer):
         ]
         
         fields = primary_fields + secondary_fields
-        read_only_fields = ('added', 'updated')
+        read_only_fields = [
+            'added', 'updated',
+            'first_seen', 'last_seen',
+        ]
 
 
 class NodeDeviceListSerializer(DeviceDetailSerializer):

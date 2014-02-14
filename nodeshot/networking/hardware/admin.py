@@ -65,12 +65,22 @@ from nodeshot.networking.net.admin import DeviceAdmin
 class DeviceToModelRelInline(admin.StackedInline):
     model = DeviceToModelRel
     inline_classes = ('grp-collapse grp-open',)
+    
+    raw_id_fields = ('model',)
+    autocomplete_lookup_fields = {
+        'fk': ['model'],
+    }
 
 
 class AntennaInline(BaseStackedInline):
     model = Antenna
     extra = 0
     inline_classes = ('grp-collapse grp-open',)
+    
+    raw_id_fields = ('model',)
+    autocomplete_lookup_fields = {
+        'fk': ['model'],
+    }
 
 
 DeviceAdmin.inlines.insert(0, DeviceToModelRelInline)

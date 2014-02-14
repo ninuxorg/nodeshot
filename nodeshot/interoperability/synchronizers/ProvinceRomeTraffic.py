@@ -9,13 +9,13 @@ from django.conf import settings
 
 from nodeshot.core.nodes.models import Node, Status
 
-from .base import BaseConverter
+from .base import BaseSynchronizer
 
 if settings.NODESHOT['SETTINGS'].get('HSTORE', False) is False:
     raise ImproperlyConfigured('HSTORE needs to be enabled for this converter to work properly')
 
 
-class ProvinceRomeTraffic(BaseConverter):
+class ProvinceRomeTraffic(BaseSynchronizer):
     """ Province of Rome Traffic interoperability class """
     
     REQUIRED_CONFIG_KEYS = [
@@ -83,7 +83,7 @@ class ProvinceRomeTraffic(BaseConverter):
                 except KeyError:
                     pass
             self.message += """
-            Updated %d measurements out of %d.
+            Updated measurements of %d street segments out of %d
             """ % (saved_measurements, len(items))
         
     def process_streets(self):
@@ -115,7 +115,7 @@ class ProvinceRomeTraffic(BaseConverter):
         for item in items:
             # retrieve info in auxiliary variables
             # readability counts!
-            id = item['id']
+            pk = item['id']
             name = item['properties'].get('LOCATION', '')[0:70]
             address = name
             slug = slugify(name)
@@ -126,7 +126,9 @@ class ProvinceRomeTraffic(BaseConverter):
             
             while True:
                 # items might have the same name... so we add a number..
-                if slug in external_nodes_slug:
+                # check in DB too
+                # TODO: this must be DRYED!!
+                if slug in external_nodes_slug or Node.objects.filter(slug__exact=slug).exclude(pk=pk).count() > 0:
                     needed_different_name = True
                     number = number + 1
                     name = "%s - %d" % (original_name, number)
@@ -145,11 +147,11 @@ class ProvinceRomeTraffic(BaseConverter):
             
             try:
                 # edit existing node
-                node = Node.objects.get(pk=id)
+                node = Node.objects.get(pk=pk)
             except Node.DoesNotExist:
                 # add a new node
                 node = Node()
-                node.id = id
+                node.id = pk
                 node.layer = self.layer
                 node.status = self.status
                 node.data = {}

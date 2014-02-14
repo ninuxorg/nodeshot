@@ -1,4 +1,3 @@
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 
@@ -40,17 +39,6 @@ TIME_ZONES = (
 ACCESS_LEVELS = settings.NODESHOT['CHOICES']['ACCESS_LEVELS'].copy()
 ACCESS_LEVELS['public'] = 0
 #ACCESS_LEVELS['private'] = 99
-
-LOGIN_TYPES = (
-    (1, _('read-only')),
-    (2, _('write')),
-)
-
-SERVICE_STATUS = (
-    (1, 'up'),
-    (2, 'down'),
-    (3, 'not reachable')
-)
 
 PLANNED_STATUS = (
     (0, 'pending'),

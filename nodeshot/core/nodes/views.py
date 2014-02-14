@@ -48,11 +48,7 @@ def get_queryset_or_404(queryset, kwargs):
 
 class NodeList(NodeListBase):
     """
-    ### GET
-    
-    Retrieve a list of nodes
-    
-    **Pagination**:
+    Retrieve list of all published nodes.
     
     Parameters:
     
@@ -62,37 +58,21 @@ class NodeList(NodeListBase):
     
     ### POST
     
-    Create a new node.
-    
-    **Permissions:** restricted to authenticated users only.
-    
-    Example of **JSON** representation that should be sent:
-    
-        {
-            "name": "Fusolab Rome", 
-            "slug": "fusolab", 
-            "geometry": [41.872041927700003, 12.582239191899999], 
-            "elev": 80.0, 
-            "address": "", 
-            "description": "Fusolab test", 
-            "layer": 1
-        }
-    
-    **Required Fields**:
-    
-     * name
-     * slug
-     * geometry
-     * layer (if layer app installed)
+    Create a new node. Requires authentication.
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Node.objects.published()
     serializer_class = NodeListSerializer
-    serializer_custom_class = NodeCreatorSerializer
+    #serializer_custom_class = NodeCreatorSerializer
     pagination_serializer_class = PaginatedNodeListSerializer
     paginate_by_param = 'limit'
     paginate_by = 40
+    
+    def pre_save(self, obj):
+        """ automatically determine user on creation """
+        if not obj.id:
+            obj.user_id = self.request.user.id
     
     def get_queryset(self):
         """
@@ -123,9 +103,7 @@ node_list = NodeList.as_view()
     
 class NodeDetail(NodeDetailBase):
     """
-    ### GET
-    
-    Retrieve details of specified node
+    Retrieve details of specified node. Node must be published and accessible.
     
     ### DELETE
     
@@ -133,30 +111,7 @@ class NodeDetail(NodeDetailBase):
     
     ### PUT & PATCH
     
-    Edit node.
-    
-    **Permissions:** only owner of a node can edit.
-    
-    Example of **JSON** representation that should be sent:
-    
-        {
-            "name": "Fusolab Rome", 
-            "slug": "fusolab", 
-            "user": "romano", 
-            "geometry": [41.872041927700003, 12.582239191899999], 
-            "elev": 80.0, 
-            "address": "", 
-            "description": "Fusolab test", 
-            "access_level": "public",
-            "layer": 1
-        }
-    
-    **Required Fields**:
-    
-     * name
-     * slug
-     * coords
-     * layer (if layer app installed)
+    Edit node. Must be authenticated as owner or admin.
     """
     lookup_field = 'slug'
     model = Node
@@ -170,17 +125,18 @@ node_details = NodeDetail.as_view()
 
 class NodeGeoJSONList(NodeList):
     """
-    ### GET
-    
-    Retrieve nodes in GeoJSON format.
+    Retrieve list of all published nodes in GeoJSON format.
     
     Parameters:
     
      * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (defaults to 40)
      * `limit=0`: turns off pagination
+     * `page=<n>`: show page n
     """
-    
+    pagination_serializer_class = PaginatedGeojsonNodeListSerializer
+    paginate_by_param = 'limit'
+    paginate_by = 40
     serializer_class = NodeGeoSerializer
     post = Hider()
 
@@ -192,9 +148,7 @@ geojson_list = NodeGeoJSONList.as_view()
 
 class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
     """
-    ### GET
-    
-    Retrieve a list of image of the specified node.
+    Retrieve a list of images of the specified node.
     Node must exist and be published.
     
     ### POST
@@ -235,7 +189,10 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
         super(NodeImageList, self).initial(request, *args, **kwargs)
         
         # ensure node exists
-        self.node = get_queryset_or_404(Node.objects.published().accessible_to(request.user), { 'slug': self.kwargs.get('slug', None) })
+        self.node = get_queryset_or_404(
+            Node.objects.published().accessible_to(request.user),
+            { 'slug': self.kwargs.get('slug', None) }
+        )
         
         # check permissions on node (for image creation)
         self.check_object_permissions(request, self.node)
@@ -248,9 +205,7 @@ node_images = NodeImageList.as_view()
 
 class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     """
-    ### GET
-    
-    Retrieve details of specified image
+    Retrieve details of specified image.
     
     ### DELETE
     
@@ -294,9 +249,7 @@ node_image_detail = ImageDetail.as_view()
 
 class StatusList(generics.ListAPIView):
     """
-    ### GET
-    
-    Retrieve all the status and their relative icons.
+    Retrieve a list of all the available statuses and their relative icons/colors.
     """
     model = Status
     serializer_class = StatusListSerializer

@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}
+
+<!-- LOADING -->
+{% load url from future %}
+{% load admin_static i18n admin_modify grp_tags %}
+
+<!-- JAVASCRIPTS -->
+{% block javascripts %}
+    {{ block.super }}
+    <script type="text/javascript" charset="utf-8">
+        (function($) {
+            $(document).ready(function() {
+                // nodeshot specific
+                if(window.location.pathname.indexOf('add') > -1){
+                    $('.grp-row.grp-cells-1.device').hide();
+                }
+                $('.grp-row.grp-cells-1.order').hide();
+            });
+        })(grp.jQuery);
+    </script>
+{% endblock %}

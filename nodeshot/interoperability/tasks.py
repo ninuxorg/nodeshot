@@ -2,15 +2,13 @@ from celery import task
 from importlib import import_module
 from django.core import management
 
-from nodeshot.core.nodes.models import Node
-
 
 @task()
-def synchronize_external_layers():
+def synchronize_external_layers(*args, **kwargs):
     """
     runs "python manage.py synchronize"
     """
-    management.call_command('synchronize')
+    management.call_command('synchronize', *args, **kwargs)
 
 
 # ------ Asynchronous tasks ------ #
@@ -28,6 +26,11 @@ def push_changes_to_external_layers(node, external_layer, operation):
     :param operation: the operation to perform (add, change, delete)
     :type operation: string
     """
+    # putting the model inside prevents circular imports
+    # subsequent imports go and look into sys.modules before reimporting the module again
+    # so performance is not affected
+    from nodeshot.core.nodes.models import Node
+    
     # get node because for some reason the node instance object is not passed entirely,
     # pheraphs because objects are serialized by celery or transport/queuing mechanism
     if not isinstance(node, basestring):

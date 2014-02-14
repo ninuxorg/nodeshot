@@ -6,7 +6,15 @@ from .models import Link
 
 
 class LinkAdmin(BaseGeoAdmin):
-    list_display  = ('__unicode__', 'type', 'status', 'interface_a', 'interface_b', 'added', 'updated')
+    list_display  = (
+        '__unicode__',
+        'type',
+        'status',
+        'interface_a_mac',
+        'interface_b_mac',
+        'added',
+        'updated'
+    )
     list_filter   = ('status', 'type')
     date_hierarchy = 'added'
     ordering = ('-id',)
@@ -17,7 +25,9 @@ class LinkAdmin(BaseGeoAdmin):
     }
     
     readonly_fields = [
-        'metric_value', 'tx_rate', 'rx_rate', 'dbm', 'noise'
+        'first_seen', 'last_seen',
+        'metric_value', 'min_rate', 'max_rate',
+        'dbm', 'noise'
     ] + BaseGeoAdmin.readonly_fields[:]
     exclude = ('shortcuts',)
 

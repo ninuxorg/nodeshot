@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.5.2
+Django==1.5.5
 
 # python libraries
 PIL
@@ -31,7 +31,7 @@ django-olwidget
 djangorestframework==2.3.7
 django-rest-swagger
 markdown
--e git+https://github.com/nemesisdesign/django-rest-framework-gis.git#egg=django_restframework_gis
+-e git+https://github.com/djangonauts/django-rest-framework-gis.git#egg=django_restframework_gis
 
 # networking
 netaddr
@@ -47,16 +47,14 @@ django-social-auth
 django-reversion==1.7.1
 
 # asynchronous tasks
-kombu
-Celery
-django-celery
+celery==3.1
 django-celery-email
 
 # websockets
 tornado==3.1
 
 # Postgres HSTORE support
--e git+https://github.com/nemesisdesign/django-hstore.git#egg=django_hstore
+-e git+https://github.com/djangonauts/django-hstore.git#egg=django_hstore
 
 # better shell
 bpython
@@ -71,5 +69,5 @@ django-debug-toolbar
 # migrations
 south
 
-# SSH and shell commands
-spur
+# retrieve info from network devices
+-e git+git://github.com/nemesisdesign/netengine#egg=netengine

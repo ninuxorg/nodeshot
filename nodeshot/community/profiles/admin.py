@@ -50,7 +50,17 @@ if 'social_auth' in settings.INSTALLED_APPS:
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'date_joined', 'last_login', 'is_staff', 'is_superuser')
+    list_display = (
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'is_active',
+        'date_joined',
+        'last_login',
+        'is_staff',
+        'is_superuser'
+    )
     inlines = USER_ADMIN_INLINES
     ordering = ['-is_staff', '-date_joined']
     search_fields = ('email', 'username', 'first_name', 'last_name')
@@ -64,7 +74,8 @@ class UserAdmin(BaseUserAdmin):
         [None, {'fields': ('username', 'password')}],
         [_('Personal info'), {'fields': [
             'first_name', 'last_name', 'email',
-            'birth_date', 'address', 'city', 'country'
+            'birth_date', 'address', 'city', 'country',
+            'gender', 'about'
         ]}],
         [_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}],

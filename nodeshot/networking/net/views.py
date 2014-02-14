@@ -21,8 +21,6 @@ from .models import *
 
 class DeviceList(ACLMixin, generics.ListAPIView):
     """
-    ### GET
-    
     Retrieve device list according to user access level
     
     Parameters:
@@ -65,8 +63,6 @@ device_list = DeviceList.as_view()
 
 class DeviceDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     """
-    ### GET
-    
     Retrieve details of specified device.
     
     ### DELETE
@@ -87,8 +83,6 @@ device_details = DeviceDetails.as_view()
 
 class NodeDeviceList(CustomDataMixin, generics.ListCreateAPIView):
     """
-    ### GET
-    
     Retrieve devices of specified node according to user access level.
     
     Parameters:
@@ -146,8 +140,6 @@ node_device_list = NodeDeviceList.as_view()
 
 class BaseInterfaceList(CustomDataMixin, generics.ListCreateAPIView):
     """
-    ### GET
-    
     Retrieve interface list for specified device.
     
     ### POST
@@ -188,8 +180,6 @@ class BaseInterfaceList(CustomDataMixin, generics.ListCreateAPIView):
 
 class BaseInterfaceDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     """
-    ### GET
-    
     Retrieve details of specified interface.
     
     ### DELETE
@@ -284,9 +274,7 @@ vlan_details = VlanDetails.as_view()
 
 class InterfaceIpList(CustomDataMixin, generics.ListCreateAPIView):
     """
-    ### GET
-    
-    Retrieve interface list for specified device.
+    Retrieve IP list of specified interface.
     
     ### POST
     
@@ -331,8 +319,6 @@ interface_ip_list = InterfaceIpList.as_view()
 
 class IpDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     """
-    ### GET
-    
     Retrieve details of specified ip address.
     
     ### DELETE

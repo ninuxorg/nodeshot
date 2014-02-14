@@ -12,6 +12,12 @@ from nodeshot.core.nodes.models import Node
 from ..managers import LayerManager
 
 
+HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
+
+if HSTORE_ENABLED:
+    from django_hstore.fields import DictionaryField
+
+
 class Layer(BaseDate):
     """ Layer Model """
     name = models.CharField(_('name'), max_length=50, unique=True)
@@ -26,7 +32,7 @@ class Layer(BaseDate):
     is_external = models.BooleanField(_('is it external?'))
     
     # geographic related fields
-    center = models.PointField(_('center coordinates'),null=True, blank=True)
+    center = models.PointField(_('center coordinates'), null=True, blank=True)
     area = models.PolygonField(_('area'), null=True, blank=True)
     zoom = models.SmallIntegerField(_('default zoom level'), choices=MAP_ZOOM, default=settings.NODESHOT['DEFAULTS']['LAYER_ZOOM'])
     
@@ -47,6 +53,10 @@ class Layer(BaseDate):
                                            help_text=_('minimum distance between nodes in meters, 0 means feature disabled'))
     new_nodes_allowed = models.BooleanField(_('new nodes allowed'), default=True, help_text=_('indicates whether users can add new nodes to this layer'))
     
+    if HSTORE_ENABLED:
+        data = DictionaryField(_('extra data'), null=True, blank=True,
+                            help_text=_('store extra attributes in JSON string'))
+        
     # default manager
     objects = LayerManager()
     

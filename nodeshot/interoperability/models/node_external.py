@@ -71,4 +71,5 @@ def delete_external_nodes(sender, **kwargs):
         return False
     
     if hasattr(node, 'external') and node.external.external_id:
+        # TODO: uniform here
         push_changes_to_external_layers.delay(node=node.external.external_id, external_layer=node.layer.external, operation='delete')

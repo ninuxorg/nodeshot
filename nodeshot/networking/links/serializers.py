@@ -61,7 +61,8 @@ class LinkDetailSerializer(DynamicRelationshipsMixin, LinkListSerializer):
             'interface_a_mac', 'interface_b_mac',
             'access_level', 'status', 'type', 'line', 
             'quality', 'metric_type', 'metric_value',
-            'tx_rate', 'rx_rate', 'dbm', 'noise',
+            'max_rate', 'min_rate', 'dbm', 'noise',
+            'first_seen', 'last_seen',
             'added', 'updated', 'relationships'
         ]
 

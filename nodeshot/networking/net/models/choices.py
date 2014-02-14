@@ -25,10 +25,10 @@ DEVICE_TYPES = {
 DEVICE_TYPES_CHOICES = choicify(DEVICE_TYPES)
 
 DEVICE_STATUS = {
-    'archived': -2,
-    'unplugged': -1,
-    'not_reachable': 0,
-    'reachable': 1,
+    'not_reachable': 0,     # device is not reachable
+    'reachable': 1,         # device is reachable
+    'unknown': 2,           # device has not been seen by the system yet
+    'inactive': 3,          # manually deactivated by user or admin
 }
 DEVICE_STATUS_CHOICES = choicify(DEVICE_STATUS)
 
@@ -124,6 +124,7 @@ ETHERNET_STANDARDS = (
     ('legacy', 'Legacy Ethernet'),
     ('fast', '10/100 Fast Ethernet'),
     ('gigabit', '10/100/1000 Gigabit Ethernet'),
+    ('basefx', '100/1000 BaseFX (Fiber)'),
 )
 
 DUPLEX_CHOICES = (

@@ -11,8 +11,18 @@ from .models import *
 class DeviceInline(BaseStackedInline):
     model = Device
     
+    if not settings.DEBUG:
+        readonly_fields =  [
+            'status', 'first_seen', 'last_seen'
+        ] + BaseStackedInline.readonly_fields
+    
     if 'grappelli' in settings.INSTALLED_APPS:
         classes = ('grp-collapse grp-open', )
+        
+        raw_id_fields = ('routing_protocols',)
+        autocomplete_lookup_fields = {
+            'm2m': ['routing_protocols']
+        }
 
 
 class EthernetInline(BaseStackedInline):
@@ -44,20 +54,23 @@ class VapInline(BaseStackedInline):
 
 
 class DeviceAdmin(BaseGeoAdmin):
-    list_filter   = ('added', 'updated', 'node')
-    list_display  = ('name', 'node', 'type', 'access_level', 'added', 'updated')
+    list_filter   = ('added', 'updated',)
+    list_display  = ('name', 'status', 'node', 'type', 'access_level', 'added', 'updated')
     search_fields = ('name', 'type')
     inlines = [EthernetInline, WirelessInline, BridgeInline, TunnelInline, VlanInline]
     
-    raw_id_fields = ('node',)
+    raw_id_fields = ('node', 'routing_protocols')
     autocomplete_lookup_fields = {
         'fk': ['node'],
+        'm2m': ['routing_protocols']
     }
     
     exclude = ('shortcuts',)
     
     if not settings.DEBUG:
-        readonly_fields = BaseAdmin.readonly_fields + ['status']
+        readonly_fields =  [
+            'status', 'first_seen', 'last_seen'
+        ] + BaseAdmin.readonly_fields
 
 
 class InterfaceAdmin(BaseAdmin):
@@ -77,7 +90,7 @@ class WirelessAdmin(InterfaceAdmin):
 
 
 class RoutingProtocolAdmin(BaseAdmin):
-    list_display   = ('name', 'version', 'url')
+    list_display   = ('name', 'version')
 
 
 class IpAdmin(BaseAdmin):

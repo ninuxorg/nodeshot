@@ -1,6 +1,9 @@
 # Django settings for nodeshot project.
 
 import os
+import sys
+
+sys.path.append('/var/www/nodeshot/')
 
 DEBUG = True
 SERVE_STATIC = DEBUG
@@ -14,29 +17,30 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django_hstore.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'nodeshot',                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'USER': 'nodeshot',                      # Not used with sqlite3.
+        'PASSWORD': 'your_password',                  # Not used with sqlite3.
+        'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    },
-    # uncomment if you need to use nodeshot.extra.oldimporter
-    #'old_nodeshot': {
-    #   'ENGINE': 'django.db.backends.mysql',
-    #   'NAME': 'nodeshot',
-    #   'USER': 'nodeshot-readonly',
-    #   'PASSWORD': '*********',
-    #   'HOST': 'remote-ip',
-    #   'PORT': 'remote-port',
-    #}
+    }
 }
 
 # uncomment if you need to use nodeshot.extra.oldimporter
-#DATABASE_ROUTERS = [
-#    'nodeshot.extra.oldimporter.db.DefaultRouter',
-#    'nodeshot.extra.oldimporter.db.OldNodeshotRouter'
-#]
+#if 'test' not in sys.argv:
+#    DATABASES['old_nodeshot'] = {
+#       'ENGINE': 'django.db.backends.mysql',  # might be also postgresql or sqlite
+#       'NAME': 'nodeshot',
+#       'USER': 'nodeshot-readonly',
+#       'PASSWORD': '*********',
+#       'HOST': 'remote-ip',
+#       'PORT': 'remote-port',
+#    }
+#    DATABASE_ROUTERS = [
+#        'nodeshot.extra.oldimporter.db.DefaultRouter',
+#        'nodeshot.extra.oldimporter.db.OldNodeshotRouter'
+#    ]
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -47,8 +51,6 @@ TIME_ZONE = 'Europe/Rome'
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-gb'
-
-#SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -61,9 +63,16 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-SITE_DOMAIN = 'localhost'
-PROTOCOL = 'http'
-BASE_URL = 'http://%s' % SITE_DOMAIN
+SITE_ID = 1
+PROTOCOL = 'http' if DEBUG else 'https'
+DOMAIN = 'localhost'
+PORT = '8000' if DEBUG else None
+SITE_URL = '%s://%s' % (PROTOCOL, DOMAIN)
+ALLOWED_HOSTS = [DOMAIN]  # check https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts for more info
+
+if PORT and PORT not in ['80', '433']:
+    SITE_URL = '%s:%s' % (SITE_URL, PORT)
+
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
@@ -73,7 +82,7 @@ MEDIA_ROOT = '%s/media/' % SITE_ROOT
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = '%s/media/' % BASE_URL
+MEDIA_URL = '%s/media/' % SITE_URL
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -83,7 +92,7 @@ STATIC_ROOT = '%s/static/' % SITE_ROOT
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '%s/static/' % BASE_URL
+STATIC_URL = '%s/static/' % SITE_URL
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -91,6 +100,12 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+if PROTOCOL == 'https':
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    os.environ['HTTPS'] = 'on'
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -102,7 +117,7 @@ STATICFILES_FINDERS = (
 
 # CHANGE THIS KEY AND UNCOMMENT
 # Make this unique, and don't share it with anybody.
-#SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
+#SECRET_KEY = 'da)t*+$)ugeyip6-#tuyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -144,7 +159,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.messages.context_processors.messages"
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -152,6 +167,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    
+    # PostgreSQL HStore extension support
+    'django_hstore',
     
     # admin site
     'grappelli.dashboard',
@@ -161,12 +179,6 @@ INSTALLED_APPS = (
     
     # --- background jobs --- #
     'djcelery_email',  # Celery Django Email Backend
-    'djcelery',  # Celery database scheduling for Django
-    # this app makes it possible to use django as a queue system for celery
-    # so you don't need to install RabbitQM or Redis
-    # pretty cool for development, but might not suffice for production if your system is heavily used
-    # our suggestion is to switch only if you start experiencing issues
-    'kombu.transport.django',
     
     # nodeshot
     'nodeshot.core.api',
@@ -183,16 +195,17 @@ INSTALLED_APPS = (
     'nodeshot.networking.links',
     'nodeshot.networking.services',
     'nodeshot.networking.hardware',
-    'nodeshot.networking.puller',
+    'nodeshot.networking.connectors',
     #'nodeshot.networking.monitor',
     'nodeshot.interface',
+    'nodeshot.open311',
     
     # import data from old nodeshot version 0.9
     # needs python MySQL database driver
     # run "pip install MySQL-python"
     # you might need to run also a similar command according to your own OS distribution:
     # sudo apt-get install libmysqlclient-dev
-    #'nodeshot.extra.oldimporter',  
+    #'nodeshot.extra.oldimporter',
     
     # 3d parthy django apps
     'rest_framework',
@@ -212,9 +225,9 @@ INSTALLED_APPS = (
     
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-)
+]
 
-if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
+if 'nodeshot.community.profiles' in INSTALLED_APPS:
     AUTH_USER_MODEL = 'profiles.Profile'
 
 # ------ DJANGO LOGGING ------ #
@@ -244,14 +257,14 @@ LOGGING = {
         #    'formatter': 'verbose',
         #    'filename': 'ninux.log'
         #},
-        'logfile': {
-            'level':'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename': SITE_ROOT + "/debug.log",
-            'maxBytes': 50000,
-            'backupCount': 2,
-            'formatter': 'custom',
-        },
+        #'logfile': {
+        #    'level':'DEBUG',
+        #    'class':'logging.handlers.RotatingFileHandler',
+        #    'filename': SITE_ROOT + "/debug.log",
+        #    'maxBytes': 50000,
+        #    'backupCount': 2,
+        #    'formatter': 'custom',
+        #},
     },
     'loggers': {
         #'django': {
@@ -264,18 +277,18 @@ LOGGING = {
         #    'level': 'DEBUG',
         #    'propagate': True,
         #},
-        'nodeshot.community.mailing': {
-            'handlers': ['logfile'],
-            'level': 'DEBUG',
-        },
-        'nodeshot.core.layers': {
-            'handlers': ['logfile'],
-            'level': 'DEBUG',
-        },
-        'nodeshot.community.profiles': {
-            'handlers': ['logfile'],
-            'level': 'DEBUG',
-        },
+        #'nodeshot.community.mailing': {
+        #    'handlers': ['logfile'],
+        #    'level': 'DEBUG',
+        #},
+        #'nodeshot.core.layers': {
+        #    'handlers': ['logfile'],
+        #    'level': 'DEBUG',
+        #},
+        #'nodeshot.community.profiles': {
+        #    'handlers': ['logfile'],
+        #    'level': 'DEBUG',
+        #},
     },
     'formatters': {
         'verbose': {
@@ -294,9 +307,7 @@ LOGGING = {
 
 CACHES = {
     'default': {
-        #'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        'LOCATION': '%s/cache' % os.path.dirname(os.path.realpath(__file__)),
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'TIMEOUT': 172800 if not DEBUG else 300,
         'OPTIONS': {
             'MAX_ENTRIES': 1000
@@ -315,18 +326,32 @@ CACHES = {
 EMAIL_HOST = 'localhost'
 #EMAIL_HOST_USER = 'your@email.org'
 #EMAIL_HOST_PASSWORD = '***********'
-EMAIL_PORT = 1025  # 1025 if you are in development mode, while 25 is usually the production port
+EMAIL_PORT = 1025 if DEBUG else 25  # 1025 if you are in development mode, while 25 is usually the production port
 DEFAULT_FROM_EMAIL = 'your@email.org'
 
 # ------ CELERY ------ #
 
-if not DEBUG:
+if DEBUG:
+    # this app makes it possible to use django as a queue system for celery
+    # so you don't need to install RabbitQM or Redis
+    # pretty cool for development, but might not suffice for production if your system is heavily used
+    # our suggestion is to switch only if you start experiencing issues
+    INSTALLED_APPS.append('kombu.transport.django')
+    BROKER_URL = 'django://'  
+    # synchronous behaviour for development
+    # more info here: http://docs.celeryproject.org/en/latest/configuration.html#celery-always-eager
+    CELERY_ALWAYS_EAGER = True
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+else:
+    # in production the default background queue manager is Redis
+    BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+    BROKER_TRANSPORT_OPTIONS = {
+        "visibility_timeout": 3600,  # 1 hour
+        "fanout_prefix": True
+    }
+    # in production emails are sent in the background
     EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
-
-BROKER_URL = 'django://'  # defaults to use kombu.transport.django
-
-import djcelery
-djcelery.setup_loader()
 
 #from datetime import timedelta
 #
@@ -334,6 +359,18 @@ djcelery.setup_loader()
 #    'synchronize': {
 #        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
 #        'schedule': timedelta(hours=12),
+#    },
+#    # example of how to synchronize one of the layers with a different periodicity
+#    'synchronize': {
+#        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
+#        'schedule': timedelta(minutes=30),
+#        'args': ('layer_slug',)
+#    },
+#    # example of how to synchronize all layers except two layers
+#    'synchronize': {
+#        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
+#        'schedule': timedelta(hours=12),
+#        'kwargs': { 'exclude': 'layer1-slug,layer2-slug' }
 #    },
 #    'purge_notifications': {
 #        'task': 'nodeshot.community.notifications.tasks.purge_notifications',
@@ -425,10 +462,14 @@ NODESHOT = {
             'nodeshot.community.mailing',
             'nodeshot.networking.net',
             'nodeshot.networking.links',
+            'nodeshot.networking.services',
+            'nodeshot.open311'
         ]
     },
     'INTEROPERABILITY': [
-        ('nodeshot.interoperability.synchronizers.NodeshotOld', 'Nodeshot 0.9'),
+        ('nodeshot.interoperability.synchronizers.Nodeshot', 'Nodeshot'),
+        ('nodeshot.interoperability.synchronizers.GeoJson', 'GeoJSON'),
+        ('nodeshot.interoperability.synchronizers.GeoRss', 'GeoRSS'),
         ('nodeshot.interoperability.synchronizers.OpenWISP', 'OpenWISP'),
         ('nodeshot.interoperability.synchronizers.OpenWISPCitySDK', 'OpenWISPCitySDK'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
@@ -463,7 +504,7 @@ NODESHOT = {
     'WEBSOCKETS': {
         'PUBLIC_PIPE': '%s/nodeshot.websockets.public' % os.path.dirname(SITE_ROOT),
         'PRIVATE_PIPE': '%s/nodeshot.websockets.private' % os.path.dirname(SITE_ROOT),
-        'DOMAIN': SITE_DOMAIN,
+        'DOMAIN': DOMAIN,
         'LISTENING_ADDRESS': '0.0.0.0',  # set to 127.0.0.1 to accept only local calls (used for proxying to port 80 with nginx or apache mod_proxy)
         'LISTENING_PORT': 9090,
         'REGISTRARS': (
@@ -485,12 +526,29 @@ NODESHOT = {
             'default': 'potential'
         }
     },
-    'PULLERS': [
-        ('nodeshot.networking.puller.scripts.UbiquityM5', 'UbiquityM5 Series'),
+    'NETENGINE_BACKENDS': [
+        ('netengine.backends.ssh.AirOS', 'AirOS (SSH)'),
+        ('netengine.backends.ssh.OpenWRT', 'OpenWRT (SSH)'),
+        ('netengine.backends.snmp.AirOS', 'AirOS (SNMP)'),
     ],
+    'OPEN311': {
+        'METADATA': 'true',
+        'TYPE': 'realtime',
+        #Change the following, according to the statuses you have configured in your model
+        #'STATUS' : {
+        #    'Potential' : 'open',
+        #    'Planned' : 'open',
+        #    'Active' : 'closed',
+        #}
+    }
 }
 
 NODESHOT['DEFAULTS']['CRONJOB'] = NODESHOT['CHOICES']['AVAILABLE_CRONJOBS'][0][0]
+
+if 'test' in sys.argv:
+    NODESHOT['NETENGINE_BACKENDS'].append(
+        ('netengine.backends.Dummy', 'Dummy')
+    )
 
 # ------ GRAPPELLI ------ #
 

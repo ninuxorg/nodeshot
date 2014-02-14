@@ -15,9 +15,7 @@ from .models import *
 
 class PageList(ACLMixin, generics.ListAPIView):
     """
-    ### GET
-    
-    Retrieve the list of pages.
+    Retrieve the list of all the available pages.
     """
     authentication_classes = (authentication.SessionAuthentication,)
     queryset = Page.objects.published()
@@ -32,8 +30,6 @@ page_list = PageList.as_view()
 
 class PageDetail(ACLMixin, generics.RetrieveAPIView):
     """
-    ### GET
-    
     Retrieve specified page.
     """
     authentication_classes = (authentication.SessionAuthentication,)
@@ -52,9 +48,7 @@ page_detail = PageDetail.as_view()
 
 class MenuList(ACLMixin, generics.ListAPIView):
     """
-    ### GET
-    
-    Retrieve the list of pages.
+    Retrieve menu item list.
     """
     authentication_classes = (authentication.SessionAuthentication,)
     queryset = MenuItem.objects.published()

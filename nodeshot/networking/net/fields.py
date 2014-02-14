@@ -64,4 +64,6 @@ class IPNetworkField(WritableField):
             return value
     
         def to_native(self, value):
-            return unicode(value)
+            if value:
+                return unicode(value)
+            return value
