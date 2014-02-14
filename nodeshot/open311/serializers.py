@@ -313,7 +313,7 @@ class ServiceRatingSerializer(serializers.Serializer):
                 'datatype_description': _('Specify which node you want to rate'),
                 'order': 1,
                 'required': True,
-                'variable' : True
+                'variable' : True,
                 'required': True
 
             },
