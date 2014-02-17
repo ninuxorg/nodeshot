@@ -117,7 +117,8 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Specify in which layer you want to insert the node'),
                 'order': 1,
-                'required': True
+                'required': True,
+                'variable' : True
             },
             
             # name
@@ -127,7 +128,8 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Name of the node you want to insert'),
                 'order': 2,
-                'required': True
+                'required': True,
+                'variable' : True
             },
             
             # lat
@@ -137,7 +139,10 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Latitude of node'),
                 'order': 3,
-                'required': True
+                'required': True,
+                'variable' : True
+
+
             },
             
             # long
@@ -147,7 +152,8 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Longitude of node'),
                 'order': 4,
-                'required': True
+                'required': True,
+                'variable' : True
             },
             
             # address
@@ -157,7 +163,9 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Address of node'),
                 'order': 5,
-                'required': False
+                'required': False,
+                'variable' : True
+
             },
             
             # elev (elevation)
@@ -167,7 +175,9 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Elevation of node'),
                 'order': 6,
-                'required': False
+                'required': False,
+                'variable' : True
+
             },
             
             # description
@@ -177,7 +187,9 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Description of node'),
                 'order': 7,
-                'required': False
+                'required': False,
+                'variable' : True
+
             },
             
             # images
@@ -185,10 +197,12 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'code': 'images',
                 'description': _('images'),
                 'datatype': 'string',
-                'datatype_description': _('Images related to node. A client may POST multiple files as multipart/form-data. Requests return the URL for this images via the image_url field\
-                                          '),
+                'datatype_description': _('Images related to node. A client may POST multiple files as multipart/form-data. Requests return the URL for this images via the image_url field\                                          '),
                 'order': 8,
-                'required': False
+                'required': False,
+                'variable' : True
+
+
             }
         ]
     
@@ -215,7 +229,9 @@ class ServiceVoteSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Specify for which node you want to insert the vote'),
                 'order': 1,
-                'required': True
+                'required': True,
+                'variable' : True
+
             },
             
             # vote
@@ -226,6 +242,7 @@ class ServiceVoteSerializer(serializers.Serializer):
                 'datatype_description': _('Vote 1 or -1 (Like/Dislike)'),
                 'order': 2,
                 'required': True,
+                'variable' : True,
                 'values' : [1,-1]
             },
 
@@ -254,7 +271,8 @@ class ServiceCommentSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Specify for which node you want to insert the comment'),
                 'order': 1,
-                'required': True
+                'required': True,
+                'variable' : True
             },
             
             # vote
@@ -265,6 +283,8 @@ class ServiceCommentSerializer(serializers.Serializer):
                 'datatype_description': _('text of the comment'),
                 'order': 2,
                 'required': True,
+                'variable' : True
+
             },
 
         ]
@@ -292,7 +312,10 @@ class ServiceRatingSerializer(serializers.Serializer):
                 'datatype': 'string',
                 'datatype_description': _('Specify which node you want to rate'),
                 'order': 1,
+                'required': True,
+                'variable' : True,
                 'required': True
+
             },
             
             # rating
@@ -303,6 +326,7 @@ class ServiceRatingSerializer(serializers.Serializer):
                 'datatype_description': _('rate node from 1 to 10'),
                 'order': 2,
                 'required': True,
+                'variable' : True,
                 'values' : RATING_CHOICES
             },
 
