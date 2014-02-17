@@ -168,6 +168,18 @@ class ModelsTest(TestCase):
             Node.objects.filter(is_published=True, access_level__lte=0).order_by('-id')[0]
         )
     
+    def test_autogenerate_slug(self):
+        n = Node()
+        n.name = 'Auto generate this'
+        n.layer_id = 1
+        n.geometry = 'POINT(12.509303756712 41.881163629853)'
+        n.full_clean()
+        
+        n.save()
+        
+        n = Node.objects.get(pk=n.id)
+        self.assertEqual(n.slug, 'auto-generate-this')
+    
     def test_node_point(self):
         node = Node.objects.first()
         self.assertEqual(node.point, node.geometry)

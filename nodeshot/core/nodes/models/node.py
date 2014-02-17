@@ -3,6 +3,7 @@ from django.contrib.gis.geos.collections import GeometryCollection
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.template.defaultfilters import slugify
 
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.utils import choicify
@@ -10,6 +11,7 @@ from nodeshot.core.base.utils import choicify
 from ..signals import node_status_changed
 from .status import Status
 
+# TODO: HSTORE MUST BE REQUIRED
 HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
 
 if HSTORE_ENABLED:
@@ -26,10 +28,11 @@ class Node(BaseAccessLevel):
     Can belong to 'Users'
     """
     name = models.CharField(_('name'), max_length=75, unique=True)
-    slug = models.SlugField(max_length=75, db_index=True, unique=True)
+    slug = models.SlugField(max_length=75, db_index=True, unique=True, blank=True)
     status = models.ForeignKey(Status, blank=True, null=True)
     is_published = models.BooleanField(default=settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True))
     
+    # TODO: find a way to move this in layers
     if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
         # layer might need to be able to be blank, would require custom validation
         layer = models.ForeignKey('layers.Layer')
@@ -64,7 +67,6 @@ class Node(BaseAccessLevel):
     class Meta:
         db_table = 'nodes_node'
         app_label= 'nodes'
-        permissions = (('can_view_nodes', 'Can view nodes'),)
     
     def __unicode__(self):
         return '%s' % self.name
@@ -87,6 +89,10 @@ class Node(BaseAccessLevel):
             * intercepts changes to status and fires node_status_changed signal
             * set default status
         """
+        # auto generate slug
+        if not self.slug:
+            self.slug = slugify(self.name)
+        
         # geometry collection check
         if isinstance(self.geometry, GeometryCollection) and 0 < len(self.geometry) < 2:
             self.geometry = self.geometry[0]
