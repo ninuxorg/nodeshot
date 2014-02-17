@@ -93,7 +93,8 @@
     color: #4d4d4d;
 }
 
-#general-search a:hover{
+#general-search a:hover,
+.btn-group.bootstrap-select ul.dropdown-menu .selected a{
     background-color: #0a246a;
     color: #fff !important;
 }
@@ -878,7 +879,8 @@ article.center-stage{
 
 .doublemargin > p,
 .doublemargin > div,
-.doublemargin .btn-group.dropdown{
+.doublemargin .btn-group.dropdown,
+.doublemargin .btn-group.bootstrap-select{
     margin-bottom: 20px
 }
 
@@ -889,10 +891,15 @@ article.center-stage{
 	right: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 9;
+	z-index: 999;
 	overflow: auto;
 }
 
 .animate-width{
 	width: 0%;
+}
+
+.error-msg{
+	display: none;
+	margin-left: 10px;
 }

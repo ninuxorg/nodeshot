@@ -392,16 +392,17 @@ body article a:focus,
 }
 
 .form-control{
-    color: #9e9e9e;
+    color: #404040;
 }
 
-input.error, .error input{
+input.error, .error input, button.error{
     border: 1px solid #d96352;
     color: #ff0000 !important;
 }
 .error .input-group-addon{
     border: 1px solid #d96352;
 }
+.error-msg{ color: #ff0000 }
 
 #map-legend{
     -webkit-box-shadow: 0px 3px 25px 0px rgba(50, 50, 50, 0.4);
@@ -728,16 +729,28 @@ input[type="range"]::-webkit-slider-thumb:active {
     font-weight: bold;
 }
 
-.btn-group.dropdown{
+.btn-group.dropdown,
+.bootstrap-select{
     height: 28px;
     margin-bottom: 10px;
 }
 
 .btn-group.dropdown,
-.btn.dropdown-toggle{
-    display: block;
+.btn.dropdown-toggle,
+.bootstrap-select{
+    display: block !important;
     width: 100%;
     padding: 0;
+}
+
+.bootstrap-select{
+	width: 100% !important;
+}
+
+.bootstrap-select.btn-group .btn .caret{
+	top: 0;
+	right: 0;
+	margin: 0;
 }
 
 .btn.dropdown-toggle{
@@ -763,6 +776,11 @@ input[type="range"]::-webkit-slider-thumb:active {
     border-radius: 0px 3px 3px 0px;
 }
 
+.btn.dropdown-toggle .caret:before{
+	content: '▾';
+}
+
+/* TODO: probably unused */
 .btn.dropdown-toggle .icon-down{
     font-size: 17px;
     position: relative;
@@ -770,19 +788,19 @@ input[type="range"]::-webkit-slider-thumb:active {
     right: -2px;
 }
 
-.btn-group.dropdown ul.dropdown-menu{
+.btn-group.bootstrap-select .bootstrap-select-searchbox input{
+	height: 28px !important
+}
+
+.btn-group.bootstrap-select ul.dropdown-menu{
     width: 100%;
     margin-top: -1px;
 }
 
-.btn-group.dropdown ul.dropdown-menu a{
+.btn-group.bootstrap-select ul.dropdown-menu a{
     text-decoration: none;
     padding: 8px 9px;
     font-size: 13px;
-}
-.btn-group.dropdown ul.dropdown-menu a:hover{
-    background: #7b7e85;
-    color: #fff;
 }
 
 label{ font-weight: normal !important }

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
     <link href="{{ STATIC_URL }}ui/lib/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}ui/lib/css/bootstrap.switch.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap-select.min.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}ui/lib/css/scroller.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-layout.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-colors.css" rel="stylesheet">
@@ -235,26 +236,26 @@
             <p class="social-buttons">
                 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
                     <span class="icon icon-facebook"></span>
-                    <span class="text">Sign in with Facebook</span>
+                    <span class="text">{% trans 'Sign in with Facebook' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
                 
                 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
-                    <span class="text">Sign in with Google</span>
+                    <span class="text">{% trans 'Sign in with Google' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
                 
                 <a href="javascript:alert('not implemented yet')" class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
-                    <span class="text">Sign in with Github</span>
+                    <span class="text">{% trans 'Sign in with Github' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
             </p>
             
             <p class="separator">
                 <span class="line"></span>
-                <span class="text">or</span>
+                <span class="text">{% trans 'or' %}</span>
             </p>
             
             <form action="" method="post" id="js-signin-form">
@@ -355,6 +356,7 @@
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.switch.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap-select.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/pwstrength.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/scroller.min.js"></script>
     
