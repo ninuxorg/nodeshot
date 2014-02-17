@@ -298,8 +298,7 @@ class APITest(BaseTestCase):
         
         node = {
             "layer": 1,
-            "name": "test_distance", 
-            "slug": "test_distance", 
+            "name": "test distance", 
             "address": "via dei test",
             "description": "",
             "geometry": json.loads(GEOSGeometry("POINT (12.99 41.8720419277)").json),
@@ -320,7 +319,7 @@ class APITest(BaseTestCase):
         self.assertEqual(response.data['user'], 'registered')
         
         if HSTORE_ENABLED:
-            node = Node.objects.get(slug='test_distance')
+            node = Node.objects.get(slug='test-distance')
             self.assertEqual(node.data, { 'is_test': 'true' })
             self.assertEqual(Node.objects.filter(data__contains={ "is_test": "true" }).count(), 1)
     
