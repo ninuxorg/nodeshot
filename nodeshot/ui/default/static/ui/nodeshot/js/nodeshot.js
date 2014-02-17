@@ -34,8 +34,8 @@ var setMapDimensions = function(){
 	$('#map').width(width);
 	
 	var map = Nodeshot.body.currentView.map;
-	if (map) {
-		Nodeshot.body.currentView.map.invalidateSize();
+	if (map && map.invalidateSize) {
+		map.invalidateSize();
 	}
 }
 
