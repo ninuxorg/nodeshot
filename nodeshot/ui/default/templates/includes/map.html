@@ -6,7 +6,7 @@
     <a href="#" id="btn-map-mode" class="icon-3d smaller" title="Toggle 3D view" data-placement="left" data-delay="600"></a>
     <a href="#" class="icon-tools" data-panel="fn-map-tools" title="Map tools" data-placement="left" data-delay="600"></a>
     <a href="#" class="icon-config" data-panel="fn-map-preferences" title="Map preferences" data-placement="left" data-delay="600"></a>
-    <a id="btn-legend" href="#" class="icon-list disabled" title="Toggle legend" data-placement="left" data-delay="600"></a>
+    <a id="btn-legend" href="#" class="icon-list" title="Toggle legend" data-placement="left" data-delay="600"></a>
 </aside>
 
 <a id="toggle-toolbar" href="#" class="glyphicon glyphicon-chevron-up"></a>
@@ -190,9 +190,11 @@
     </div>
 </div>
 
-<article id="add-node-container" class="map-overlay animate-width content" style="display:block;width:70%">
+<article id="add-node-container" class="map-overlay animate-width content" style="">
     <h1>{% trans 'Add new node' %}</h1>
     <form action="{% url 'api_node_list' %}" id="add-node-form">
+        
+        <ul class="error-list"></ul>
         
         <p>
             <label for="id_name">{% trans 'Name' %}</label>
@@ -204,25 +206,12 @@
             <label>Layer</label>
             <span class="error-msg"></span>
             
-            <select id="id_select" class="selectpicker" data-live-search="true">
+            <select name="layer" id="id_layer" class="selectpicker" data-live-search="true">
+                <option>{% trans 'Select Layer' %}</option>
                 {% for layer in layers %}
-                <option value="{{ layer.slug }}">{{ layer.name }}</option>
+                <option value="{{ layer.id }}">{{ layer.name }}</option>
                 {% endfor %}
             </select>
-            
-            <!--<div class="btn-group dropdown">
-                <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" id="id_layer">
-                    {% trans 'Layer' %}
-                    <span class="caret">
-                        <span class="icon-down"></span>
-                    </span>
-                </button>
-                <ul class="dropdown-menu">
-                    {% for layer in layers %}
-                    <li><a href="#" data-value="{{ layer.slug }}">{{ layer.name }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>-->
         </div>
         
         <p>

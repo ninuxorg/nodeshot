@@ -395,14 +395,15 @@ body article a:focus,
     color: #404040;
 }
 
-input.error, .error input, button.error{
-    border: 1px solid #d96352;
+input.error, .error input, .error button{
+    border: 1px solid #d96352 !important;
     color: #ff0000 !important;
 }
 .error .input-group-addon{
     border: 1px solid #d96352;
 }
-.error-msg{ color: #ff0000 }
+.error-msg,
+.error-list li{ color: #ff0000 }
 
 #map-legend{
     -webkit-box-shadow: 0px 3px 25px 0px rgba(50, 50, 50, 0.4);

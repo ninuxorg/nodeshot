@@ -103,7 +103,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
 		'legend': '#map-legend',
 		'legendButton': '#btn-legend',
 		'addNodeStep1': '#add-node-step1',
-		'addNodeStep2': '#add-node-step2'
+		'addNodeStep2': '#add-node-step2',
+		'addNodeContainer': '#add-node-container',
+		'addNodeForm': '#add-node-form'
     },
     
     events: {
@@ -113,7 +115,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
         'click #map-legend li a': 'toggleLegendControl',
         'click #fn-map-tools .tool': 'toggleTool',
         'click #toggle-toolbar': 'toggleToolbar',
-        'click @ui.switchMapMode': 'switchMapMode'
+        'click @ui.switchMapMode': 'switchMapMode',
+		'click #add-node-form .btn-default': 'closeAddNode',
+        'submit #add-node-form': 'submitAddNode'
     },
 	
 	initialize: function(){
@@ -162,6 +166,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 other_buttons.tooltip('enable');
             }
         });
+		
+		$('.selectpicker').selectpicker({
+			style: 'btn-special'
+		});
+
     },
     
     onClose: function(e){
@@ -248,8 +257,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
 		
 		// hide legend
 		if (this.ui.legend.is(':visible')) {
-			$('#map-legend .icon-close').trigger('click');
-			reopenLegend = true;
+			$('#map-legend').hide();
+			//$('#map-legend .icon-close').trigger('click');
+			//reopenLegend = true;
 		}
 		
 		// hide toolbar and enlarge map
@@ -265,7 +275,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         
 		// cancel
 		$('#add-node-step1 button').one('click', function(e){
-            self.cancelAddNode(reopenLegend);
+            self.closeAddNode();
         });
 		
 		// on map click (only once)
@@ -274,8 +284,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
 			var marker = L.marker([e.latlng.lat, e.latlng.lng], {
 				draggable: true
 			}).addTo(self.map);
+			self.newNodeMarker = marker;
 			
-			window.marker = marker;
 			self.map.panTo(e.latlng);
 			
 			// hide step1
@@ -291,14 +301,14 @@ var MapView = Backbone.Marionette.ItemView.extend({
             dialog.fadeIn(255);
 			
 			// bind cancel button once
-			$('#add-node-step2 .btn-default, #add-node-form .btn-default').one('click', function(e){
-				self.cancelAddNode(reopenLegend, marker);
+			$('#add-node-step2 .btn-default').one('click', function(e){
+				self.closeAddNode();
 			});
 			
 			// add new node there
 			$('#add-node-step2 .btn-success').one('click', function(e){
 				dialog.fadeOut(255);
-				$('#add-node-container').show().animate({
+				self.ui.addNodeContainer.show().animate({
 					width: '+70%'
 				},
 				{
@@ -317,36 +327,97 @@ var MapView = Backbone.Marionette.ItemView.extend({
     },
 	
 	/*
+     * submit new node
+     */
+	submitAddNode: function(e){
+		e.preventDefault();
+		
+		var self = this,
+			form = this.ui.addNodeForm;
+			geojson = JSON.stringify(this.newNodeMarker.toGeoJSON().geometry),
+			url = form.attr('action'),
+			errorList = form.find('.error-list');
+		
+		form.find('.error-msg').text('').hide();
+		form.find('.error').removeClass('error');
+		errorList.hide();
+		
+		$('#id_geometry').val(geojson);
+		
+		var data = form.serialize();
+		
+		// TODO: refactor this to use backbone and automatic validation
+		$.post(url, data).done(function(){
+			alert('new node added');
+			self.closeAddNode();
+		}).error(function(http){
+			var json = http.responseJSON;
+			
+			for (key in json) {
+				var input = $('#id_'+key);
+				if (input.length) {
+					input.addClass('error');
+					
+					if (input.selectpicker) {
+						input.selectpicker('setStyle');
+					}
+					
+					var errorContainer = input.parent().find('.error-msg');
+					
+					if (!errorContainer.length) {
+						errorContainer = input.parent().parent().find('.error-msg');
+					}
+					
+					errorContainer.text(json[key]).fadeIn(255);
+				}
+				else{
+					errorList.show();
+					errorList.append('<li>' + json[key] + '</li>');
+				}
+			}
+		});
+	},
+	
+	/*
      * cancel addNode operation
      * resets normal map functions
      */
-	cancelAddNode: function(reopenLegend, marker){
+	closeAddNode: function(){
+		var marker = this.newNodeMarker;
 		// unbind click event
 		this.map.off('click');
 		
-		var self = this;
+		var self = this,
+			container = this.ui.addNodeContainer;
 		
-		if ($('#add-node-container').is(':visible')) {
-			$('#add-node-container').animate({
+		if (container.is(':visible')) {
+			container.animate({
 				width: '0'
 			},
 			{
 				duration: 400,
 				progress: function(){
 					setMapDimensions();
-					self.map.panTo(marker._latlng);
+					if (marker) {
+						self.map.panTo(marker._latlng);
+					}
 				},
 				complete: function(){
+					if (marker) {
+						self.map.panTo(marker._latlng);
+					}
+					container.hide();
 					setMapDimensions();
-					self.map.panTo(marker._latlng);
-					$(this).hide();
 				}
 			});
 		}
 		
 		// reopen legend if necessary
-		if (reopenLegend && this.ui.legend.is(':hidden')) {
-			this.ui.legendButton.trigger('click');
+		if (
+			(Nodeshot.preferences.legendOpen === true || Nodeshot.preferences.legendOpen === "true") &&
+			this.ui.legend.is(':hidden')
+		) {
+			this.ui.legend.show();
 		}
 		
 		// show toolbar and adapt map width
@@ -427,11 +498,13 @@ var MapView = Backbone.Marionette.ItemView.extend({
             legend.fadeOut(255);
             button.removeClass('disabled');
             button.tooltip('enable');
+			Nodeshot.preferences.legendOpen = false;
         }
         else{
             legend.fadeIn(255);
             button.addClass('disabled');
             button.tooltip('disable').tooltip('hide');
+			Nodeshot.preferences.legendOpen = true;
         }
     },
     
@@ -495,6 +568,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             replacerString,
             removedClass,
             addedClass,
+			legend = this.ui.legend,
             buttonTitle = button.attr('data-original-title'),
             preferences = Nodeshot.preferences;
         
@@ -545,10 +619,16 @@ var MapView = Backbone.Marionette.ItemView.extend({
             'data-original-title',
             buttonTitle.replace(replacedString, replacerString)
         );
-        
+		
+		if (preferences.legendOpen === false || preferences.legendOpen === 'false') {
+			legend.hide();
+		}
+		else{
+			this.ui.legendButton.addClass('disabled');
+		}
+		
         // adapt legend position and colors
-        $('#map-legend').removeClass(removedClass)
-                        .addClass   (addedClass);
+        legend.removeClass(removedClass).addClass(addedClass);
         
         // store mapMode
         preferences.mapMode = mode;

@@ -25,11 +25,11 @@ var setMapDimensions = function(){
     
     // take in consideration #add-node-container if visible
     if(add_node_container.is(':visible')){
-		width = width - add_node_container.width();
+		width = width - add_node_container.outerWidth();
     }
 	// take in consideration map toolbar if visible
 	else if(map_toolbar.is(':visible')){
-		width = width - map_toolbar.width();
+		width = width - map_toolbar.outerWidth();
 	}
 	$('#map').width(width);
 	
