@@ -802,12 +802,21 @@ article.center-stage{
     position: absolute;
     top: 0;
     z-index: 1000; /* cover map */
-    overflow: hidden;
     right: 0px;
     padding: 8px;
     min-width: 150px;
     max-width: 420px;
     min-height: 54px;
+}
+
+.side-panel:before{
+	content: '';
+	position: absolute;
+	top: 0;
+	right: -1px;
+	width: 2px;
+	height: 53px;
+	background-color: #e4e4e4;
 }
 
 .side-panel .tool{
