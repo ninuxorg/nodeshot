@@ -39,7 +39,6 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
 		if (typeof(username) !== 'undefined' && username.length > 15) {
 			// add an ellipsis if username is too long
 			var truncated = username.substr(0, 13) + "&hellip;";
-			console.log(truncated);
 			// update model
 			this.model.set('username', truncated);
 		}
@@ -711,10 +710,10 @@ Nodeshot.addInitializer(function(){
     
     Nodeshot.page.on('error', function(model, http){
         if(http.status === 404){
-            alert('the requested page was not found');
+            createModal({ message: 'the requested page was not found' });
         }
         else{
-            alert('there was an error while retrieving the page');
+            createModal({ message: 'there was an error while retrieving the page' });
         }
     });
     
@@ -727,6 +726,8 @@ var NodeshotController = {
     },
     
     page: function(slug){
+		toggleLoading('show');
+		
         Nodeshot.page.set('slug', slug);
         Nodeshot.page.fetch();
         
@@ -803,7 +804,7 @@ $(document).ready(function($){
 	});
 });
 
-createModal = function(opts){
+var createModal = function(opts){
 	var template_html = $('#modal-template').html(),
 		options = $.extend({
 			message: '',
@@ -824,3 +825,43 @@ createModal = function(opts){
 		$('#tmp-modal').remove();
 	})
 };
+
+var toggleLoading = function(operation){
+	var loading = $('#loading');
+	
+	if (!loading.length) {
+		$('body').append(_.template($('#loading-template').html(), {}));
+		loading = $('#loading');
+		
+		var dimensions = loading.getHiddenDimensions();
+		loading.outerWidth(dimensions.width);
+		loading.css({ left: 0, margin: '0 auto' });
+		
+		// close loading
+		$('#loading .icon-close').click(function(e){
+			toggleLoading();
+			if (Nodeshot.currentXHR) {
+				Nodeshot.currentXHR.abort();
+			}
+		});
+	}
+	
+	if (operation == 'show') {
+		loading.fadeIn(255);
+	}
+	else if (operation == 'hide') {
+		loading.fadeOut(255);
+	}
+	else{
+		loading.fadeToggle(255);
+	}
+};
+
+$(document).ajaxSend(function(event, xhr, settings) {
+	toggleLoading('show');
+	Nodeshot.currentXHR = xhr;
+});
+
+$(document).ajaxStop(function() {
+	toggleLoading('hide');
+});

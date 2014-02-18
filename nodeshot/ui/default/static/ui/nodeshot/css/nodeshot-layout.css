@@ -489,9 +489,11 @@ article.center-stage{
 }
 
 .loading{
+	top: 145px;
     padding: 7px 14px;
     cursor: default;
     display: none;
+	z-index: 9999;
 }
 .loading .icon-loading{
     font-size: 17px;
@@ -505,8 +507,6 @@ article.center-stage{
 }
 
 .loading .icon-close{ position: static }
-
-#map .loading{ top: 25px; right: 25px }
 
 #map-container{
     position: relative;

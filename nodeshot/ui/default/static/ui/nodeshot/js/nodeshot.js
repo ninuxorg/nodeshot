@@ -47,15 +47,6 @@ var setNotificationsLeft = function(){
 	$('#notifications').css('left', left - notifications_width/2 + button_width/2);
 }
 
-var toggleLoading = function(){
-	$('#loading').fadeToggle(255);
-}
-
-// close loading
-$('#loading .icon-close').click(function(e){
-	toggleLoading();
-});
-
 // automatically center modal depending on its width
 $('body').delegate('.modal.autocenter', 'show.bs.modal', function(e) {
     var dialog = $(this).find('.modal-dialog'),
