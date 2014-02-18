@@ -339,7 +339,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 		
 		form.find('.error-msg').text('').hide();
 		form.find('.error').removeClass('error');
-		errorList.hide();
+		errorList.html('').hide();
 		
 		$('#id_geometry').val(geojson);
 		
