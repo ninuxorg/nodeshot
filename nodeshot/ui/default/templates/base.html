@@ -291,6 +291,21 @@
         </div>
     </div>
     
+    <script id="modal-template" type="text/template">
+        <div class="modal fade autocenter" id="tmp-modal" tabindex="-1">
+            <div class="modal-dialog modal-content modal-body modal-slim">
+                <span class="message"><%= message %></span>
+                <% if(successMessage) { %>
+                    <button type="button" class="btn btn-success"><%= successMessage %></button>
+                <% } %>
+                
+                <% if(defaultMessage) { %>
+                    <button type="button" class="btn btn-default"><%= defaultMessage %></button>
+                <% } %>
+            </div>
+        </div>
+    </script>
+    
     <script id="account-menu-template" type="text/template">
         <li>
             <a href="#" class="icon-search">&nbsp;</a>

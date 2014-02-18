@@ -57,7 +57,7 @@ $('#loading .icon-close').click(function(e){
 });
 
 // automatically center modal depending on its width
-$('.modal.autocenter').on('show.bs.modal', function(e) {
+$('body').delegate('.modal.autocenter', 'show.bs.modal', function(e) {
     var dialog = $(this).find('.modal-dialog'),
         dialog_dimensions = dialog.getHiddenDimensions(),
         coefficient = $(this).attr('data-autocenter-coefficient');

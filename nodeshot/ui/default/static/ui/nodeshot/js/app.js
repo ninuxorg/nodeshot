@@ -53,7 +53,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
 		Nodeshot.currentUser.set('username', undefined);
 		$.post('api/v1/account/logout/').error(function(){
 			// TODO: improve!
-			alert('problem while logging out');
+			createModal({ message: 'problem while logging out' });
 		});
 	},
 	
@@ -348,7 +348,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 		
 		// TODO: refactor this to use backbone and automatic validation
 		$.post(url, data).done(function(){
-			alert('new node added');
+			createModal({ message: 'new node added' });
 			self.closeAddNode();
 		}).error(function(http){
 			var json = http.responseJSON;
@@ -767,7 +767,7 @@ $(document).ready(function($){
 		var data = $(this).serialize();
 		$.post('/api/v1/account/login/', data).error(function(){
 			// TODO improve
-			alert('incorrect login');
+			createModal({ message: 'incorrect login' })
 		}).done(function(response){
 			$('#signin-modal').modal('hide');
 			Nodeshot.currentUser.set('username', response.username);
@@ -779,10 +779,10 @@ $(document).ready(function($){
 		var data = $(this).serialize();
 		$.post('/api/v1/profiles/', data).error(function(http){
 			// TODO improve
-			alert(JSON.stringify(http.responseJSON));
+			createModal({ message: JSON.stringify(http.responseJSON) });
 		}).done(function(response){
 			$('#signup-modal').modal('hide');
-			alert('sent confirmation mail');
+			createModal({ message: 'sent confirmation mail' });
 		});
 	});
 	
@@ -802,3 +802,25 @@ $(document).ready(function($){
 		$(this).parents('.modal').modal('hide');
 	});
 });
+
+createModal = function(opts){
+	var template_html = $('#modal-template').html(),
+		options = $.extend({
+			message: '',
+			successMessage: 'ok',
+			successAction: function(){ $('#tmp-modal').modal('hide') },
+			defaultMessage: null,
+			defaultAction: function(){ $('#tmp-modal').modal('hide') }
+	}, opts);
+	
+	$('body').append(_.template(template_html, options));
+	
+	$('#tmp-modal').modal('show');
+	
+	$('#tmp-modal .btn-success').one('click', options.successAction);
+	$('#tmp-modal .btn-default').one('click', options.defaultAction);
+	
+	$('#tmp-modal').one('hidden.bs.modal', function(e) {
+		$('#tmp-modal').remove();
+	})
+};
