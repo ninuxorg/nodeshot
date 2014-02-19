@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 GEODJANGO_IMPROVED_WIDGETS = 'olwidget' in settings.INSTALLED_APPS
 
@@ -86,6 +87,39 @@ class BaseGeoAdmin(BaseAdmin, GeoModelAdmin):
     else:
         default_lon, default_lat = _get_geodjango_map_coords()
         default_zoom = _get_geodjango_map_zoom()
+
+
+class PublishActionsAdminMixin(object):
+    """
+    Admin mixin that adds 2 actions in the admin list:
+        * publish objects
+        * unpublish objects
+    """
+    actions = ['publish_action', 'unpublish_action']
+
+    def publish_action(self, request, queryset):
+        rows_updated = queryset.update(is_published=True)
+        
+        if rows_updated == 1:
+            message_bit = _("1 item was")
+        else:
+            message_bit = _("%s items were") % rows_updated
+            
+        self.message_user(request, _("%s successfully published.") % message_bit)
+        
+    publish_action.short_description = _("Publish selected items")
+    
+    def unpublish_action(self, request, queryset):
+        rows_updated = queryset.update(is_published=False)
+        
+        if rows_updated == 1:
+            message_bit = _("1 item was")
+        else:
+            message_bit = _("%s items were") % rows_updated
+        
+        self.message_user(request, _("%s successfully unpublished.") % message_bit)
+    
+    unpublish_action.short_description = _("Unpublish selected items")
 
 
 class BaseStackedInline(admin.StackedInline):

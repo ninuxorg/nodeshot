@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from nodeshot.core.nodes.models import *
-from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline
+from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline, PublishActionsAdminMixin
 from nodeshot.core.base.widgets import AdvancedFileInput
 
 REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_NODES', True)
@@ -47,7 +47,7 @@ if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
     NODE_FIELDS_LOOKEDUP += ['layer__id', 'layer__name']
 
 
-class NodeAdmin(GeoAdmin):
+class NodeAdmin(PublishActionsAdminMixin, GeoAdmin):
     list_display = NODE_LIST_DISPLAY
     list_filter = NODE_FILTERS
     list_select_related = True

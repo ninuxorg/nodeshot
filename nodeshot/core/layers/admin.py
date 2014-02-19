@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from nodeshot.core.base.admin import BaseGeoAdmin
+from nodeshot.core.base.admin import BaseGeoAdmin, PublishActionsAdminMixin
 from models import Layer
 
 REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_LAYERS', True)
@@ -19,7 +19,7 @@ else:
         change_list_template = 'smuggler/change_list.html'
 
 
-class LayerAdmin(GeoAdmin):
+class LayerAdmin(PublishActionsAdminMixin, GeoAdmin):
     list_display = (
         'name', 'is_published', 'view_nodes',
         'organization', 'email', 'is_external',
