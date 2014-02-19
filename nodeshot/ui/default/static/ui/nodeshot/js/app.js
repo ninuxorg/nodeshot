@@ -254,11 +254,14 @@ var MapView = Backbone.Marionette.ItemView.extend({
 			dialog = this.ui.addNodeStep1,
             dialog_dimensions = dialog.getHiddenDimensions();
 		
+		if (!Nodeshot.currentUser.get('username')) {
+			$('#signin-modal').modal('show');
+			return;
+		}
+		
 		// hide legend
 		if (this.ui.legend.is(':visible')) {
 			$('#map-legend').hide();
-			//$('#map-legend .icon-close').trigger('click');
-			//reopenLegend = true;
 		}
 		
 		// hide toolbar and enlarge map
