@@ -286,6 +286,13 @@ var MapView = Backbone.Marionette.ItemView.extend({
 			}).addTo(self.map);
 			self.newNodeMarker = marker;
 			
+			self.getAddress(e.latlng)
+			
+			self.newNodeMarker.on('dragend', function(event) {
+					    var marker = event.target;  
+					    var result = marker.getLatLng(); 
+					    self.getAddress(result)
+					    });
 			self.map.panTo(e.latlng);
 			
 			// hide step1
@@ -680,7 +687,29 @@ var MapView = Backbone.Marionette.ItemView.extend({
         // automatically determine which mod to use depending on the icon's button
         var mode = this.ui.switchMapMode.hasClass('icon-3d') ? '3D' : '2D';
         this.initMap(mode);
-    }
+    },
+    
+    /*
+     * Get Address using OSM Nominatim service
+     */
+    getAddress: function(latlng) {
+	
+    //var latlngToString = latlng.toString();
+    var arrayLatLng = latlng.toString().split(",");
+    var lat = arrayLatLng[0].slice(7);
+    var lng = arrayLatLng[1].slice(0, -1);
+    var url = 'http://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=0';
+    $.ajax({
+        async: true, 
+        url: url,
+        dataType: 'json',
+        success: function (response) {
+            var address = response.display_name;
+	    console.log(address)
+            $("#id_address").val(address)
+        }
+    });    
+}
 });
 
 Nodeshot.addRegions({
