@@ -129,7 +129,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         $('#breadcrumb').removeClass('visible-xs').hide();
         
         // init tooltip
-        $('#map-toolbar a, .hastip').tooltip();
+        $('#map-toolbar a').tooltip();
         
         this.initMap();
         
@@ -763,63 +763,107 @@ var NodeshotRouter = new Marionette.AppRouter({
 $(document).ready(function($){
     Nodeshot.start();
 	
+	// login / sign in
 	$('#js-signin-form').submit(function(e){
 		e.preventDefault();
 		var data = $(this).serialize();
+		
+		// Login
 		$.post('/api/v1/account/login/', data).error(function(){
 			// TODO improve
-			createModal({ message: 'incorrect login' })
+			var zIndex = $('#signin-modal').css('z-index'); // original z-index
+			$('#signin-modal').css('z-index', 99); // temporarily change
+			createModal({
+				message: 'Invalid username or password',
+				successAction: function(){ $('#signin-modal').css('z-index', zIndex) } // restore z-index
+			});
 		}).done(function(response){
+			// update UI
 			$('#signin-modal').modal('hide');
 			Nodeshot.currentUser.set('username', response.username);
 		});
 	});
 	
+	// sign up 
 	$('#js-signup-form').submit(function(e){
 		e.preventDefault();
-		var data = $(this).serialize();
+		var form = $(this),
+			data = form.serialize();
+		
+		// remove eventual errors
+		form.find('.error').removeClass('error');
+		
 		$.post('/api/v1/profiles/', data).error(function(http){
 			// TODO improve
-			createModal({ message: JSON.stringify(http.responseJSON) });
+			// signup validation
+			var json = http.responseJSON;
+			
+			for (key in json) {
+				var input = $('#js-signup-'+key);
+				if (input.length) {
+					var container = input.parent();
+					container.attr('data-original-title', json[key]);
+					container.addClass('error');
+				}
+			}
+			
+			form.find('.error').tooltip('show');
+			form.find('.hastip:not(.error)').tooltip('hide');
+			
 		}).done(function(response){
 			$('#signup-modal').modal('hide');
 			createModal({ message: 'sent confirmation mail' });
 		});
 	});
 	
+	// signup link in sign in overlay
 	$('#js-signup-link').click(function(e){
 		e.preventDefault();
 		$('#signin-modal').modal('hide');
 		$('#signup-modal').modal('show');
 	});
 	
+	
+	// signin link in signup overlay
 	$('#js-signin-link').click(function(e){
 		e.preventDefault();
 		$('#signup-modal').modal('hide');
 		$('#signin-modal').modal('show');
 	});
 	
+	// dismiss modal links
 	$('.js-dismiss').click(function(e){
 		$(this).parents('.modal').modal('hide');
 	});
+	
+	// enable tooltips
+	$('.hastip').tooltip();
 });
 
 var createModal = function(opts){
 	var template_html = $('#modal-template').html(),
+		close = function(){ $('#tmp-modal').modal('hide') },
 		options = $.extend({
 			message: '',
 			successMessage: 'ok',
-			successAction: function(){ $('#tmp-modal').modal('hide') },
+			successAction: function(){},
 			defaultMessage: null,
-			defaultAction: function(){ $('#tmp-modal').modal('hide') }
-	}, opts);
+			defaultAction: function(){}
+		}, opts);
 	
 	$('body').append(_.template(template_html, options));
 	
 	$('#tmp-modal').modal('show');
 	
-	$('#tmp-modal .btn-success').one('click', options.successAction);
-	$('#tmp-modal .btn-default').one('click', options.defaultAction);
+	$('#tmp-modal .btn-success').one('click', function(e){
+		close();
+		options.successAction()
+	});
+	
+	$('#tmp-modal .btn-default').one('click', function(e){
+		close();
+		options.defaultAction()
+	});
 	
 	$('#tmp-modal').one('hidden.bs.modal', function(e) {
 		$('#tmp-modal').remove();

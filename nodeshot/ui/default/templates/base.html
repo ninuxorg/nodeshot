@@ -163,51 +163,51 @@
          data-autocenter-coefficient="2.6">
         <div class="modal-dialog modal-content modal-body inverse user-dialog">
             
-            <p class="text">By signing up to this service you agree to our <a href="#/pages/privacy-policy" class="js-dismiss">privacy policy</a></p>
+            <p class="text">{% trans 'By signing up to this service you agree to our <a href="#/pages/privacy-policy" class="js-dismiss">privacy policy</a>' %}</p>
             
             <p class="social-buttons">
                 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
                     <span class="icon icon-facebook"></span>
-                    <span class="text">Sign up with Facebook</span>
+                    <span class="text">{% trans 'Sign up with Facebook' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
                 
                 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
-                    <span class="text">Sign up with Google</span>
+                    <span class="text">{% trans 'Sign up with Google' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
                 
                 <a href="javascript:alert('not implemented yet')" class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
-                    <span class="text">Sign up with Github</span>
+                    <span class="text">{% trans 'Sign up with Github' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
             </p>
             
             <p class="separator">
                 <span class="line"></span>
-                <span class="text">or</span>
+                <span class="text">{% trans 'or' %}</span>
             </p>
             
             <form action="" method="post" id="js-signup-form">
-                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus" data-trigger="focus">
-                    <input class="form-control" type="text" name="username" placeholder="Username">
+                <p class="input-group hastip" data-placement="right" data-trigger="manual">
+                    <input required class="form-control" type="text" name="username" id="js-signup-username" placeholder="Username">
                     <span class="input-group-addon icon-user"></span>
                 </p>
                 
-                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
-                    <input class="form-control " type="email" name="email" placeholder="Email">
+                <p class="input-group hastip" data-placement="right" data-trigger="manual">
+                    <input required class="form-control " type="email" name="email" id="js-signup-email" placeholder="Email">
                     <span class="input-group-addon icon-mail"></span>
                 </p>
                 
-                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
-                    <input class="form-control" type="password" name="password" placeholder="Password" id="js-signup-password">
+                <p class="input-group hastip" data-placement="right" data-trigger="manual">
+                    <input required class="form-control" type="password" name="password" id="js-signup-password" placeholder="Password">
                     <span class="input-group-addon icon-lock"></span>
                 </p>
                 
-                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
-                    <input class="form-control" type="password" name="password_confirmation" placeholder="Confirm password">
+                <p class="input-group hastip" data-placement="right" data-trigger="manual">
+                    <input required class="form-control" type="password" name="password_confirmation" id="js-signup-password_confirmation" placeholder="Confirm password">
                     <span class="input-group-addon icon-lock"></span>
                 </p>
                 
@@ -216,10 +216,10 @@
                     <span class="pwstrength_viewport_verdict"></span>
                 </p>
                 
-                <button class="btn btn-default">Sign up</button>
+                <button class="btn btn-default">{% trans 'Sign up' %}</button>
             </form>
             
-            <p class="text">Already have an account? <a href="#" id="js-signin-link">Sign in</a></p>
+            <p class="text">{% trans 'Already have an account?' %} <a href="#" id="js-signin-link">{% trans 'Sign in' %}</a></p>
             
             <a class="icon-close" data-dismiss="modal" href="#"></a>
         </div>
@@ -259,12 +259,12 @@
             </p>
             
             <form action="" method="post" id="js-signin-form">
-                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
+                <p class="input-group">
                     <input class="form-control" type="text" name="username" placeholder="Username or Email">
                     <span class="input-group-addon icon-user"></span>
                 </p>
                 
-                <p class="input-group hastip" title="example tooltip" data-placement="top" data-trigger="focus">
+                <p class="input-group">
                     <input class="form-control" type="password" name="password" placeholder="Password">
                     <span class="input-group-addon icon-lock"></span>
                 </p>
@@ -277,15 +277,15 @@
                         <label for="remember-signup"></label>
                     </span>
                     
-                    <label for="remember-signup">Stay signed in</label>
+                    <label for="remember-signup">{% trans 'Stay signed in' %}</label>
                 </p>
                 
-                <p><button class="btn btn-default">Sign in</button></p>
+                <p><button class="btn btn-default">{% trans 'Sign in' %}</button></p>
             </form>
             
-            <p class="text"><a href="javascript:alert('not implemented yet')">Forgot your password?</a></p>
+            <p class="text"><a href="javascript:alert('not implemented yet')">{% trans 'Forgot your password?' %}</a></p>
             
-            <p class="text">Don't have an account yet? <a href="#" id="js-signup-link">Sign up</a></p>
+            <p class="text">{% trans "Don't have an account yet?" %} <a href="#" id="js-signup-link">{% trans 'Sign up' %}</a></p>
             
             <a class="icon-close" data-dismiss="modal" href="#"></a>
         </div>
