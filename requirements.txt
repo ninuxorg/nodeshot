@@ -8,3 +8,5 @@ south
 Celery
 django-celery
 django-celery-email
+
+django-rosetta

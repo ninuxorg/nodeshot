@@ -122,6 +122,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.staticfiles',
+    'rosetta',
     'nodeshot',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
@@ -222,3 +223,7 @@ TOPOLOGY_URL_TIMEOUT=30
 ETX_THRESHOLD=23.0
 OLSR_URLS=["http://127.0.0.1:2006/all"]
 BATMAN_URLS=[]
+
+#rosetta config
+ROSETTA_EXCLUDED_APPLICATIONS = ('rosetta',)
+ROSETTA_MESSAGES_PER_PAGE = 20
