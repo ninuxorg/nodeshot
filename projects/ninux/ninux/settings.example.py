@@ -196,8 +196,7 @@ INSTALLED_APPS = [
     'nodeshot.networking.services',
     'nodeshot.networking.hardware',
     'nodeshot.networking.connectors',
-    #'nodeshot.networking.monitor',
-    'nodeshot.interface',
+    'nodeshot.ui.default',
     'nodeshot.open311',
     
     # import data from old nodeshot version 0.9
