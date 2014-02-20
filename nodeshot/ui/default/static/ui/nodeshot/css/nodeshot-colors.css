@@ -826,3 +826,16 @@ label.inline{ margin: 0 }
 #js-password-strength-message .progress{
     border: 1px solid #ccc;
 }
+
+.nodes{
+	background-color:red;
+    width: 30px;
+    height: 30px;
+	margin-left: 5px;
+	margin-top: 5px;
+	padding: 2px;
+	text-align: center;
+	vertical-align: middle;
+	font: 14px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	border-radius: 20px;
+} 

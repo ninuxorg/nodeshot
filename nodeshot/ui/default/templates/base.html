@@ -374,10 +374,12 @@
     <script src="{{ STATIC_URL }}ui/lib/js/bootstrap-select.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/pwstrength.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/scroller.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/leaflet.markercluster.js"></script>
     
     <script src="{{ STATIC_URL }}ui/lib/js/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/backbone.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/backbone.marionette.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/utils.js"></script>
     
     <script>
         var Nodeshot = new Backbone.Marionette.Application();
@@ -397,17 +399,21 @@
             });
         {% endfor %}
         
+        Nodeshot.statuses = {}
+        {% for status in statuses %}
+            Nodeshot.statuses['{{ status.slug }}'] = {
+                name: '{{ status.name }}',
+                slug: '{{ status.slug }}',
+                background_color: '{{ status.background_color }}',
+                foreground_color: '{{ status.foreground_color }}',
+                node_count: {{ status.node_count }}
+            };
+        {% endfor %}
+        
         for (i=0; i<Nodeshot.layers.length; i++) {
             var layer = Nodeshot.layers[i];
-            // load geojson data
-            $.ajax({
-                async: false, 
-                url: layer.nodes_geojson_url,
-                dataType: 'json',
-                success: function(response){
-                    layer.nodes_geojson = response;
-                }
-            });
+            // get JSON data
+            layer.nodes_geojson = $.getData(layer.nodes_geojson_url);
         }
     </script>
     

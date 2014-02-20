@@ -562,7 +562,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 				trackResize: true
 			});
         // TODO: configurable tiles
-        L.tileLayer('http://a.tiles.mapbox.com/v3/examples.map-9ijuk24y/{z}/{x}/{y}.png').addTo(map);
+        this.mapBoxLayer = new L.tileLayer('http://a.tiles.mapbox.com/v3/examples.map-9ijuk24y/{z}/{x}/{y}.png').addTo(map);
         
         return map;
     },
@@ -593,26 +593,56 @@ var MapView = Backbone.Marionette.ItemView.extend({
     
     loadMapData: function(){
         var options = {
-            stroke: true,
+            stroke: false,
             fill: true,
             weight: 1,
-            color: '#ff0000',
-            fillColor: '#000000',
-            className: 'marker-'+Nodeshot.layers[2].slug,
-            lineCap: 'circle'
+            //color: '#ff0000',
+            //fillColor: '#000000',
+            //className: 'marker-'+Nodeshot.layers[2].slug,
+            lineCap: 'circle',
+			radius: 6,
+			opacity: 1,
+			fillOpacity: 0.7
         }
+		
+		//Layer insert on map
+		var overlaymaps = {};
+		
+		var baseMaps = {
+			"MapBox": this.mapBoxLayer
+		};
         
-        L.geoJson(Nodeshot.layers[2].nodes_geojson, {
-            style: function (feature) {
-                return options;
-            },
-            onEachFeature: function (feature, layer) {
-                layer.bindPopup('ciao');
-            },
-            pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, options);
-            }
-        }).addTo(this.map);
+		for (i=0; i<Nodeshot.layers.length; i++) {
+            var layer = Nodeshot.layers[i];
+			
+			var leafletLayer = L.geoJson(layer.nodes_geojson, {
+				style: function (feature) {
+					var status = Nodeshot.statuses[feature.properties.status];
+					options.fillColor = status.background_color;
+					return options
+				},
+				onEachFeature: function (feature, layer) {
+					layer.bindPopup(feature.properties.name);
+				},
+				pointToLayer: function (feature, latlng) {
+					return L.circleMarker(latlng, options);
+				}
+			})
+			
+			//Creates a Leaflet cluster group styled with layer's colour
+			var newCluster = createCluster('nodes');
+			
+			// Loads nodes in the cluster
+			newCluster.addLayer(leafletLayer);
+			
+			// Adds cluster to map
+			this.map.addLayer(newCluster);
+			
+			// Creates map controls for the layer
+			overlaymaps[layer.name] = newCluster;
+        }
+		
+		var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
     },
     
     /*
