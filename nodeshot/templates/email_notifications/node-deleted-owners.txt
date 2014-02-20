@@ -1,4 +1,0 @@
-{% load i18n %}{% blocktrans with node=node.name %}The node {{ node }} has been deleted successfully.{% endblocktrans %}
-
-{% trans 'Thank you for having used our map-server.' %}
-{{ site.name }} - http://{{ site.domain }}{% url nodeshot_index %}

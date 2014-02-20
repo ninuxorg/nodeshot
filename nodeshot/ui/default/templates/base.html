@@ -1,0 +1,427 @@
+<!DOCTYPE html>{% load i18n %}
+<html>
+<head>
+    <title>Nodeshot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap.switch.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap-select.min.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/lib/css/scroller.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-layout.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-colors.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-typography.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-typography.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/fontello/css/nodeshot.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}ui/fontello/css/animation.css" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    
+    <!-- leaflet -->
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+    
+    <!-- cesium -->
+    <link href="{{ STATIC_URL }}ui/cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="{{ STATIC_URL }}ui/cesium/Cesium.js"></script>
+</head>
+<body style="overflow:hidden">
+    <div id="preloader">
+        <p class="inner">
+            <span class="icon-loading animate-spin"></span> {% trans 'Loading' %} &hellip;
+        </p>
+    </div>
+    <header>
+        <nav id="top-bar">
+            <h1><a href="#">Nodeshot</a></h1>
+            
+            <div id="general-search">
+                <input type="text" id="general-search-input" placeholder="Search for data">
+                <span class="icon-search">&nbsp;</span>
+                <span class="icon-spinner animate-spin"></span>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="icon-pin">Zioproto Gallia</a></li>
+                    <li><a href="#" class="icon-pin">Hotspot Gallicano</a></li>
+                    <li><a href="#" class="icon-pin">Pisa::Galluppi</a></li>
+                    <li><a href="#" class="icon-user">galluswifi</a></li>
+                    <li><a href="#" class="icon-user">Alberto gallo</a></li>
+                </ul>
+            </div>
+            
+            <ul id="main-actions"></ul>
+            
+            <div id="notifications">
+                <span class="arrow"></span>
+                <div class="header">
+                    <div class="left">
+                        {% trans 'Notifications' %}
+                    </div>
+                    <div class="right">
+                        <a href="#">{% trans 'See all' %}</a> <span>-</span>
+                        <a href="#">{% trans 'Settings' %}</a>
+                    </div>
+                </div>
+                <div class="scroller">
+                    <ul>
+                        <li class="unread">
+                            <span class="icon-pin"></span>
+                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
+                            <p class="time">12 hours ago</p>
+                        </li>
+                        <li class="unread">
+                            <span class="icon-pin"></span>
+                            <p class="message">The status of your node <strong>Pomezia</strong> has changed from <strong>"proposed"</strong> to <strong>"approved"</strong></p>
+                            <p class="time">yesterday</p>
+                        </li>
+                        <li class="unread">
+                            <span class="icon-user"></span>
+                            <p class="message"><strong>Some event</strong> has just happened</p>
+                            <p class="time">Jan 24th 2014</p>
+                        </li>
+                        <li class="read">
+                            <span class="icon-mail"></span>
+                            <p class="message">Some <strong> other event</strong> has just happened</p>
+                            <p class="time">Jan 24th 2014</p>
+                        </li>
+                        <li class="read">
+                            <span class="icon-pin"></span>
+                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
+                            <p class="time">12 hours ago</p>
+                        </li>
+                        <li class="read">
+                            <span class="icon-pin"></span>
+                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
+                            <p class="time">12 hours ago</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <nav id="nav-bar" class="navbar navbar-inverse" role="navigation">
+            <div class="collapse navbar-collapse" id="ns-top-nav-links">
+                <ul class="nav navbar-nav">
+                    <li><a href="#/pages/home"><span class="icon-squares"></span>Dashboard</a></li>
+                    <li><a href="#/map"><span class="icon-globe"></span>Map</a></li>
+                    <li><a href="#"><span class="icon-nodes"></span>Nodes</a></li>
+                    <li><a href="#"><span class="icon-layer"></span>Layers</a></li>
+                    <li><a href="#"><span class="icon-chart-bar"></span>Statistics</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-info-circle"></span>About
+                            <span class="caret"></span>
+                        </a>
+            
+                        <ul class="dropdown-menu">
+                            <li><a href="#/pages/terms-of-service">Terms of services</a></li>
+                            <li><a href="#/pages/privacy-policy">Privacy Policy</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-plus-squared"></span>More
+                            <span class="caret"></span>
+                        </a>
+            
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    {% block breadcrumb %}
+    <ol class="breadcrumb center-stage visible-xs invert" id="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li class="active">Something</li>
+    </ol>
+    {% endblock %}
+    
+    <div id="body">
+    {% block body %}{% endblock %}
+    </div>
+    
+    <!-- Sign up -->
+    <div class="modal fade narrow autocenter enlarge-on-mobile" id="signup-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="signup-modal-label"
+         aria-hidden="true"
+         data-autocenter-coefficient="2.6">
+        <div class="modal-dialog modal-content modal-body inverse user-dialog">
+            
+            <p class="text">{% trans 'By signing up to this service you agree to our <a href="#/pages/privacy-policy" class="js-dismiss">privacy policy</a>' %}</p>
+            
+            <p class="social-buttons">
+                <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
+                    <span class="icon icon-facebook"></span>
+                    <span class="text">{% trans 'Sign up with Facebook' %}</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+                
+                <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
+                    <span class="icon icon-google"></span>
+                    <span class="text">{% trans 'Sign up with Google' %}</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+                
+                <a href="{% url "socialauth_begin" "github" %}" class="btn btn-social btn-github">
+                    <span class="icon icon-github"></span>
+                    <span class="text">{% trans 'Sign up with Github' %}</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+            </p>
+            
+            <p class="separator">
+                <span class="line"></span>
+                <span class="text">{% trans 'or' %}</span>
+            </p>
+            
+            <form action="" method="post" id="js-signup-form">
+                <p class="input-group hastip" data-placement="right" data-trigger="manual">
+                    <input required class="form-control" type="text" name="username" id="js-signup-username" placeholder="Username">
+                    <span class="input-group-addon icon-user"></span>
+                </p>
+                
+                <p class="input-group hastip" data-placement="right" data-trigger="manual">
+                    <input required class="form-control " type="email" name="email" id="js-signup-email" placeholder="Email">
+                    <span class="input-group-addon icon-mail"></span>
+                </p>
+                
+                <p class="input-group hastip" data-placement="right" data-trigger="manual">
+                    <input required class="form-control" type="password" name="password" id="js-signup-password" placeholder="Password">
+                    <span class="input-group-addon icon-lock"></span>
+                </p>
+                
+                <p class="input-group hastip" data-placement="right" data-trigger="manual">
+                    <input required class="form-control" type="password" name="password_confirmation" id="js-signup-password_confirmation" placeholder="Confirm password">
+                    <span class="input-group-addon icon-lock"></span>
+                </p>
+                
+                <p class="input-group text" id="js-password-strength-message">
+                    <span class="pwstrength_viewport_progress"></span>
+                    <span class="pwstrength_viewport_verdict"></span>
+                </p>
+                
+                <button class="btn btn-default">{% trans 'Sign up' %}</button>
+            </form>
+            
+            <p class="text">{% trans 'Already have an account?' %} <a href="#" id="js-signin-link">{% trans 'Sign in' %}</a></p>
+            
+            <a class="icon-close" data-dismiss="modal" href="#"></a>
+        </div>
+    </div>
+    
+    <!-- Sign in -->
+    <div class="modal fade narrow autocenter enlarge-on-mobile" id="signin-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="signin-modal-label"
+         aria-hidden="true">
+        <div class="modal-dialog modal-content modal-body inverse user-dialog">
+            
+            <p class="social-buttons">
+                <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
+                    <span class="icon icon-facebook"></span>
+                    <span class="text">{% trans 'Sign in with Facebook' %}</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+                
+                <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
+                    <span class="icon icon-google"></span>
+                    <span class="text">{% trans 'Sign in with Google' %}</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+                
+                <a href="{% url "socialauth_begin" "github" %}"  class="btn btn-social btn-github">
+                    <span class="icon icon-github"></span>
+                    <span class="text">{% trans 'Sign in with Github' %}</span>
+                    <span class="hover">&nbsp;</span>
+                </a>
+            </p>
+            
+            <p class="separator">
+                <span class="line"></span>
+                <span class="text">{% trans 'or' %}</span>
+            </p>
+            
+            <form action="" method="post" id="js-signin-form">
+                <p class="input-group">
+                    <input class="form-control" type="text" name="username" placeholder="Username or Email">
+                    <span class="input-group-addon icon-user"></span>
+                </p>
+                
+                <p class="input-group">
+                    <input class="form-control" type="password" name="password" placeholder="Password">
+                    <span class="input-group-addon icon-lock"></span>
+                </p>
+                
+                <p class="text text-left">
+                    <span class="custom-checkbox hastip"
+                          data-placement="top"
+                          title="For your protection, keep this checked only on devices you use regularly">
+                        <input type="checkbox" id="remember-signup" name="remember" />
+                        <label for="remember-signup"></label>
+                    </span>
+                    
+                    <label for="remember-signup">{% trans 'Stay signed in' %}</label>
+                </p>
+                
+                <p><button class="btn btn-default">{% trans 'Sign in' %}</button></p>
+            </form>
+            
+            <p class="text"><a href="javascript:alert('not implemented yet')">{% trans 'Forgot your password?' %}</a></p>
+            
+            <p class="text">{% trans "Don't have an account yet?" %} <a href="#" id="js-signup-link">{% trans 'Sign up' %}</a></p>
+            
+            <a class="icon-close" data-dismiss="modal" href="#"></a>
+        </div>
+    </div>
+    
+    <script id="modal-template" type="text/template">
+        <div class="modal fade autocenter" id="tmp-modal" tabindex="-1">
+            <div class="modal-dialog modal-content modal-body modal-slim">
+                <span class="message"><%= message %></span>
+                <% if(successMessage) { %>
+                    <button type="button" class="btn btn-success"><%= successMessage %></button>
+                <% } %>
+                
+                <% if(defaultMessage) { %>
+                    <button type="button" class="btn btn-default"><%= defaultMessage %></button>
+                <% } %>
+            </div>
+        </div>
+    </script>
+    
+    <script id="account-menu-template" type="text/template">
+        <li>
+            <a href="#" class="icon-search">&nbsp;</a>
+        </li>
+        <li>
+            <a href="#" class="notifications">
+                <span class="icon-globe">&nbsp;</span>
+                &nbsp;
+                <span class="bg" id="js-notifications-count">0</span>
+            </a>
+        </li>
+        <% if(typeof(username) !== 'undefined'){ %>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <span class="icon-user"></span>
+                <span class="text" id="js-username"><%= username %></span>
+                <span class="caret"></span>
+            </a>
+            
+            <ul class="dropdown-menu">
+                <li><a href="#" id="js-profile"><span class="icon-user"></span>{% trans 'My profile' %}</a></li>
+                <li><a href="#" id="js-settings"><span class="icon-wrench"></span>{% trans 'Settings' %}</a></li>
+                <li><a href="#" id="js-logout"><span class="icon-off"></span>{% trans 'Logout' %}</a></li>
+            </ul>
+        </li>
+        <% } else { %>
+        <li>
+            <a href="#" data-toggle="modal" data-target="#signup-modal">
+                <span class="icon-user-add"></span><span class="text">{% trans 'Sign up' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-toggle="modal" data-target="#signin-modal">
+                <span class="icon-user"></span>
+                <span class="text">{% trans 'Sign in' %}</span>
+            </a>
+        </li>
+        <% } %>
+        <li>
+            <a href="#" id="mobile-nav" class="icon-menu"
+               data-toggle="collapse"
+               data-target="#ns-top-nav-links">&nbsp;</a>
+        </li>
+    </script>
+    
+    <script id="page-template" type="text/template">
+        <h1><%= title %></h1>
+        <%= content %>
+    </script>
+    
+    <script id="map-template" type="text/template">
+        {% include 'includes/map.html' %}
+    </script>
+    
+    <script id="loading-template" type="text/template">
+        <div id="loading" class="overlay loading">
+            <span class="icon-loading animate-spin"></span>
+            <span class="text">{% trans 'Loading' %} &hellip;</span>
+            <a class="icon-close hastip" title="{% trans 'cancel&nbsp;operation' %}"></a>
+        </div>
+    </script>
+    
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.switch.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap-select.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/pwstrength.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/scroller.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/leaflet.markercluster.js"></script>
+    
+    <script src="{{ STATIC_URL }}ui/lib/js/underscore.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/backbone.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/backbone.marionette.min.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/utils.js"></script>
+    
+    <script>
+        var Nodeshot = new Backbone.Marionette.Application();
+        {% if request.user.is_authenticated %}
+            Nodeshot.currentUser = new Backbone.Model({ username: '{{ request.user.username }}'});
+        {% else %}
+            Nodeshot.currentUser = new Backbone.Model();
+        {% endif %}
+        
+        Nodeshot.layers = []
+        {% for layer in layers %}
+            Nodeshot.layers.push({
+                name: '{{ layer.name }}',
+                slug: '{{ layer.slug }}',
+                nodes_url: '{% url 'api_layer_nodes_list' layer.slug %}',
+                nodes_geojson_url: '{% url 'api_layer_nodes_geojson' layer.slug %}'
+            });
+        {% endfor %}
+        
+        Nodeshot.statuses = {}
+        {% for status in statuses %}
+            Nodeshot.statuses['{{ status.slug }}'] = {
+                name: '{{ status.name }}',
+                slug: '{{ status.slug }}',
+                background_color: '{{ status.background_color }}',
+                foreground_color: '{{ status.foreground_color }}',
+                node_count: {{ status.node_count }}
+            };
+        {% endfor %}
+        
+        for (i=0; i<Nodeshot.layers.length; i++) {
+            var layer = Nodeshot.layers[i];
+            // get JSON data
+            layer.nodes_geojson = $.getData(layer.nodes_geojson_url);
+        }
+    </script>
+    
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/models.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/account-menu.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>
+</body>
+</html>

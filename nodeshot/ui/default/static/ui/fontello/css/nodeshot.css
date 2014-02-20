@@ -1,0 +1,97 @@
+@font-face {
+  font-family: 'nodeshot';
+  src: url('../fonts/nodeshot.eot?24942220');
+  src: url('../fonts/nodeshot.eot?24942220#iefix') format('embedded-opentype'),
+       url('../fonts/nodeshot.woff?24942220') format('woff'),
+       url('../fonts/nodeshot.ttf?24942220') format('truetype'),
+       url('../fonts/nodeshot.svg?24942220#nodeshot') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'nodeshot';
+    src: url('../fonts/nodeshot.svg?24942220#nodeshot') format('svg');
+  }
+}
+ 
+[class^="icon-"]:before, [class*=" icon-"]:before {
+    font-family: "nodeshot";
+    font-style: normal;
+    font-weight: normal;
+    speak: none;
+    
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    margin-right: .4em;
+    text-align: center;
+    /* opacity: .8; */
+    
+    /* For safety - reset parent styles, that can break glyph codes*/
+    font-variant: normal;
+    text-transform: none;
+    
+    /* fix buttons height, for twitter bootstrap */
+    line-height: 1em;
+    
+    /* Animation center compensation - margins should be symmetric */
+    /* remove if not needed */
+    margin-left: .2em;
+    
+    /* you can be more comfortable with increased icons size */
+    /* font-size: 120%; */
+    
+    /* Uncomment for 3D effect */
+    /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.icon-nodes:before { content: '\e806'; } /* '' */
+.icon-comments:before { content: '\e82d'; } /* '' */
+.icon-search:before { content: '\e808'; } /* '' */
+.icon-user:before { content: '\e809'; } /* '' */
+.icon-user-add:before { content: '\e80a'; } /* '' */
+.icon-layer-2:before { content: '\e80b'; } /* '' */
+.icon-pin:before { content: '\e80c'; } /* '' */
+.icon-pin-add:before { content: '\e80d'; } /* '' */
+.icon-2d:before { content: '\e80e'; } /* '' */
+.icon-3d:before { content: '\e80f'; } /* '' */
+.icon-loading:before { content: '\e810'; } /* '' */
+.icon-plus-squared:before { content: '\e811'; } /* '' */
+.icon-layer:before { content: '\e812'; } /* '' */
+.icon-config:before { content: '\e813'; } /* '' */
+.icon-globe:before { content: '\e814'; } /* '' */
+.icon-off:before { content: '\e815'; } /* '' */
+.icon-menu:before { content: '\e816'; } /* '' */
+.icon-chart-pie:before { content: '\e817'; } /* '' */
+.icon-list:before { content: '\e818'; } /* '' */
+.icon-tools:before { content: '\e819'; } /* '' */
+.icon-chart-bar:before { content: '\e81a'; } /* '' */
+.icon-squares:before { content: '\e81b'; } /* '' */
+.icon-info-circle:before { content: '\e81c'; } /* '' */
+.icon-close:before { content: '\e807'; } /* '' */
+.icon-spinner:before { content: '\e81e'; } /* '' */
+.icon-wrench:before { content: '\e81f'; } /* '' */
+.icon-elevation-profile:before { content: '\e820'; } /* '' */
+.icon-ruler:before { content: '\e821'; } /* '' */
+.icon-select-area:before { content: '\e822'; } /* '' */
+.icon-star:before { content: '\e828'; } /* '' */
+.icon-star-empty:before { content: '\e829'; } /* '' */
+.icon-star-half-alt:before { content: '\e82a'; } /* '' */
+.icon-thumbs-up:before { content: '\e82b'; } /* '' */
+.icon-thumbs-down:before { content: '\e82c'; } /* '' */
+.icon-github:before { content: '\e802'; } /* '' */
+.icon-google:before { content: '\e801'; } /* '' */
+.icon-down:before { content: '\e823'; } /* '' */
+.icon-link:before { content: '\e824'; } /* '' */
+.icon-facebook:before { content: '\e800'; } /* '' */
+.icon-mail:before { content: '\e803'; } /* '' */
+.icon-ok:before { content: '\e826'; } /* '' */
+.icon-cancel:before { content: '\e827'; } /* '' */
+.icon-lock:before { content: '\e804'; } /* '' */
+.icon-lock-open:before { content: '\e805'; } /* '' */
+.icon-edit:before { content: '\e825'; } /* '' */
+.icon-placeholder:before { content: '\e81d'; } /* '' */

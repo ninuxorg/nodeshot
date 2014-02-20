@@ -1,0 +1,231 @@
+[
+    {
+        "pk": 1, 
+        "model": "nodes.node", 
+        "fields": {
+            "status": 3, 
+            "updated": "2013-06-20T13:36:47.171Z", 
+            "added": "2013-06-14T13:30:29.323Z", 
+            "name": "Fusolab Rome", 
+            "notes": "", 
+            "description": "Fusolab", 
+            "layer": 1, 
+            "access_level": 0, 
+            "geometry": "POINT (12.5822391919000012 41.8720419276999820)", 
+            "user": [
+                "romano"
+            ], 
+            "elev": 80.1,
+            "address": "Viale della Bella Villa",
+            "slug": "fusolab", 
+            "is_published": true
+        }
+    },
+        {
+            "pk": 2, 
+            "model": "nodes.node", 
+            "fields": {
+                "status": 3, 
+                "updated": "2013-06-20T13:21:08.889Z", 
+                "added": "2013-06-14T13:30:29.323Z", 
+                "name": "EigenLab", 
+                "notes": "", 
+                "description": "EigenLab", 
+                "layer": 2, 
+                "access_level": 0, 
+                "geometry": "POINT (10.4289188797003565 43.7100020000987328)", 
+                "user": [
+                    "pisano"
+                ], 
+                "elev": 80.0, 
+                "address": "",
+              
+                "slug": "eigenlab", 
+                "is_published": true
+            }
+        },
+        {
+            "pk": 3, 
+            "model": "nodes.node", 
+            "fields": {
+                "status": 3, 
+                "updated": "2013-06-20T11:42:22.169Z", 
+                "added": "2013-06-14T13:30:29.323Z", 
+                "name": "Tulug", 
+                "notes": "", 
+                "description": "House", 
+                "layer": 3, 
+                "access_level": 0, 
+                "geometry": "POINT (12.1073379926315674 42.4160316978522047)", 
+                "user": [
+                  "viterbese"
+                ], 
+                "elev": 25.0, 
+                "address": "", 
+                 
+                "slug": "tulug", 
+            "is_published": true
+        }
+    },
+    {
+        "pk": 4, 
+        "model": "nodes.node", 
+        "fields": {
+          "status": 1, 
+          "updated": "2013-06-20T11:37:11.841Z", 
+          "added": "2013-06-14T13:30:29.323Z", 
+          "name": "Potenziale Romano", 
+          "notes": "", 
+          "description": "Test record Rome", 
+          "layer": 1, 
+          "access_level": 0, 
+          "geometry": "POINT (12.5255051068249479 41.9143381543942581)", 
+          "user": [
+            "romano"
+          ], 
+          "elev": 80.0, 
+          "address": "", 
+           
+          "slug": "potenziale-romano", 
+          "is_published": true
+        }
+    },
+    {
+        "pk": 5, 
+        "model": "nodes.node", 
+        "fields": {
+          "status": 1, 
+          "updated": "2013-06-20T13:21:36.284Z", 
+          "added": "2013-06-14T13:30:29.323Z", 
+          "name": "Potenziale Pisano", 
+          "notes": "", 
+          "description": "Test record Pisa", 
+          "layer": 2, 
+          "access_level": 0, 
+          "geometry": "POINT (10.5168095046877568 43.6464368965596421)", 
+          "user": [
+            "pisano"
+          ], 
+          "elev": 80.0, 
+          "address": "", 
+           
+          "slug": "potenziale-pisano", 
+          "is_published": true
+        }
+    },
+    {
+        "pk": 6, 
+        "model": "nodes.node", 
+        "fields": {
+          "status": 1, 
+          "updated": "2013-06-20T11:42:43.583Z", 
+          "added": "2013-06-14T13:30:29.323Z", 
+          "name": "Potenziale Viterbo", 
+          "notes": "", 
+          "description": "Test record Viterbo", 
+          "layer": 3, 
+          "access_level": 0, 
+          "geometry": "POINT (12.1132603101296237 42.4212908498151577)", 
+          "user": [
+            "viterbese"
+          ], 
+          "elev": 25.0, 
+          "address": "", 
+           
+          "slug": "potenziale-viterbo", 
+          "is_published": true
+        }
+    },
+    {
+        "pk": 7, 
+        "model": "nodes.node", 
+        "fields": {
+          "status": 3, 
+          "updated": "2013-06-20T11:07:29.753Z", 
+          "added": "2013-06-14T13:30:29.323Z", 
+          "name": "Pomezia", 
+          "notes": "", 
+          "description": "Pomezia", 
+          "layer": 1, 
+          "access_level": 0, 
+          "geometry": "POINT (12.5012150219913654 41.6677070012515074)", 
+          "user": [
+            "romano"
+          ], 
+          "elev": 160.0, 
+          "address": "", 
+           
+          "slug": "pomezia", 
+          "is_published": true
+        }
+    },
+    {
+        "pk": 8, 
+        "model": "nodes.node", 
+        "fields": {
+          "status": 3, 
+          "updated": "2013-06-20T11:36:45.726Z", 
+          "added": "2013-06-14T13:30:29.323Z", 
+          "name": "RDP", 
+          "notes": "", 
+          "description": "Piazza dell'erba", 
+          "layer": 1, 
+          "access_level": 0, 
+          "geometry": "POINT (12.4902286938660296 41.8972185849048984)", 
+          "user": [
+            "romano"
+          ], 
+          "elev": 650.0, 
+          "address": "", 
+           
+          "slug": "rdp", 
+          "is_published": true
+        }
+    },
+    {
+        "pk": 9, 
+        "model": "nodes.node", 
+        "fields": {
+          "status": 3, 
+          "updated": "2013-06-20T11:38:11.941Z", 
+          "added": "2013-06-14T13:30:29.323Z", 
+          "name": "Hidden Node Rome", 
+          "notes": "", 
+          "description": "test", 
+          "layer": 1, 
+          "access_level": 2, 
+          "geometry": "POINT (12.5310841015748746 41.9405835009790309)", 
+          "user": [
+            "viterbese"
+          ], 
+          "elev": 250.0, 
+          "address": "", 
+           
+          "slug": "hidden-rome", 
+          "is_published": true
+        }
+    },
+    {
+        "pk": 10, 
+        "model": "nodes.node", 
+        "fields": {
+          "status": 3, 
+          "updated": "2013-06-20T11:40:47.648Z", 
+          "added": "2013-06-14T13:30:29.323Z", 
+          "name": "registered node", 
+          "notes": "", 
+          "description": "test", 
+          "layer": 1, 
+          "access_level": 1, 
+          "geometry": "POINT (12.5253334454477372 41.8890404543067518)", 
+          "user": [
+            "viterbese"
+          ], 
+          "elev": 150.0, 
+          "address": "", 
+           
+          "slug": "registered-rome", 
+          "is_published": true
+        }
+    }
+]

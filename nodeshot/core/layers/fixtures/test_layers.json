@@ -1,0 +1,68 @@
+[
+    {
+        "model": "layers.Layer",
+        "pk": 1,
+        "fields": {
+            "name": "Rome",
+            "slug": "rome",
+            "is_external": false,
+            "is_published": true,
+            "description": "Rome test layer",
+            "center": "POINT (38.1154075129 12.5107643008)",
+            "zoom": 12,
+            "organization": "Ninux.org",
+            "website": "http://ninux.org",
+            "email": "nodi-roma@ml.ninux.org",
+            "mantainers": [8]
+        }
+    },
+    {
+        "model": "layers.Layer",
+        "pk": 2,
+        "fields": {
+            "name": "Pisa",
+            "slug": "pisa",
+            "is_external": false,
+            "is_published": true,
+            "description": "Pisa test layer",
+            "center": "POINT (43.7219513025 10.4080197215)",
+            "zoom": 12,
+            "organization": "EigenLab",
+            "website": "http://eigenlab.org",
+            "email": "info@eigenlab.org",
+            "mantainers": [7]
+        }
+    },
+    {
+        "model": "layers.Layer",
+        "pk": 3,
+        "fields": {
+            "name": "Viterbo",
+            "slug": "viterbo",
+            "is_external": false,
+            "is_published": true,
+            "description": "Viterbo test layer",
+            "center": "POINT (42.4193749624 12.1111955426)",
+            "zoom": 12,
+            "organization": "TuLug",
+            "website": "http://www.tulug.it",
+            "email": "info@tulug.it"
+        }
+    },
+    {
+        "model": "layers.Layer",
+        "pk": 4,
+        "fields": {
+            "name": "Vienna",
+            "slug": "vienna",
+            "is_external": true,
+            "is_published": true,
+            "description": "Vienna external test layer",
+            "center": "POINT (42.4193749624 12.1111955426)",
+            "zoom": 12,
+            "organization": "FunkFeuer",
+            "website": "http://www.funkfeuer.at/",
+            "email": "info@funkfeuer.at"
+        }
+    }
+]

@@ -1,0 +1,60 @@
+[
+    {
+        "model": "net.Interface",
+        "pk": 1,
+        "fields": {
+            "device": 1,
+            "type": 1,
+            "name": "eth0",
+            "mac": "00:27:22:38:13:E4",
+            "mtu": 1500
+        }
+    },
+    {
+        "model": "net.Ethernet",
+        "pk": 1,
+        "fields": {
+            "interface_ptr": 1,
+            "standard": "fast",
+            "duplex": "full"
+        }
+    },
+    {
+        "model": "net.Interface",
+        "pk": 2,
+        "fields": {
+            "device": 1,
+            "type": 2,
+            "name": "ath0",
+            "mac": "00:27:22:00:50:71",
+            "mtu": 1500
+        }
+    },
+    {
+        "model": "net.Wireless",
+        "pk": 1,
+        "fields": {
+            "interface_ptr": 2,
+            "standard": "802.11n"
+        }
+    },
+    {
+        "model": "net.Interface",
+        "pk": 3,
+        "fields": {
+            "device": 3,
+            "type": 2,
+            "name": "ath0",
+            "mac": "00:27:22:00:50:72",
+            "mtu": 1500
+        }
+    },
+    {
+        "model": "net.Wireless",
+        "pk": 2,
+        "fields": {
+            "interface_ptr": 3,
+            "standard": "802.11n"
+        }
+    }
+]

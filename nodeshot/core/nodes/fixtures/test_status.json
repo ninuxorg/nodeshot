@@ -1,0 +1,35 @@
+[
+    {
+        "pk": 1, 
+        "model": "nodes.status", 
+        "fields": {
+            "is_default": true, 
+            "slug": "potenziale", 
+            "description": "Un nodo potenziale \u00e8 un punto in cui il proprietario ha espresso la sua volont\u00e0 di voler entrare in rete, ma non ha ancora installato nessuna antenna wifi.", 
+            "order": 0, 
+            "name": "Potenziale"
+        }
+    },
+    {
+        "pk": 2, 
+        "model": "nodes.status", 
+        "fields": {
+            "is_default": false, 
+            "slug": "pianificato", 
+            "description": "Un nodo pianificato \u00e8 un nodo potenziale che \u00e8 stato pianificato per divenire attivo entro poco tempo.", 
+            "order": 1, 
+            "name": "Pianificato"
+        }
+    },
+    {
+        "pk": 3, 
+        "model": "nodes.status", 
+        "fields": {
+            "is_default": false, 
+            "slug": "attivo", 
+            "description": "Un nodo attivo \u00e8 un nodo su cui sono installate una o pi\u00f9 antenne wifi", 
+            "order": 2, 
+            "name": "Attivo"
+        }
+    }
+]

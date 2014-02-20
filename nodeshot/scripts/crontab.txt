@@ -1,9 +1,0 @@
-# Example of crontab
-
-# m h  dom mon dow   command
-MAILTO=""
-*/5 * * * * /bin/bash /home/ninux/nodeshot/nodeshot/scripts/update_links.sh
-@hourly /bin/bash /home/ninux/nodeshot/nodeshot/scripts/update_snmp.sh
-# */5 * * * * /bin/bash /home/ninux/nodeshot/nodeshot/scripts/ninuxstats/update_all_rrd.sh
-@daily /home/ninux/nodeshot/nodeshot/scripts/backup_db.sh
-@daily /home/ninux/nodeshot/nodeshot/scripts/spicciatina.sh

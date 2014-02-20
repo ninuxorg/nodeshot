@@ -1,7 +1,0 @@
-{% load i18n %}{% trans 'Hi' %} {% if admin.first_name != '' %}{{ admin.first_name }}{% else %}{{ admin.username }}{% endif %},
-    
-{% blocktrans with node=node.name %}The node {{ node }} has been deleted.{% endblocktrans %}
-
-{% blocktrans with site=site.name %}You are receiving this email because you are an administrator of {{ site.name }} and you chose to receive notifications regarding the management of the nodes.
-If you don't want to receive notifications anymore edit your user profile on:{% endblocktrans %}
-http://{{ site.domain }}{% url admin:auth_user_change admin.id %}

@@ -1,0 +1,86 @@
+[
+    {
+        "model": "hardware.DeviceModel",
+        "pk": 1,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Nanostation M5",
+            "image": "devices/images/nanostationM5.jpg",
+            "datasheet": "devices/datasheets/nanostationM.pdf",
+            "cpu": "Atheros MIPS 24KC, 400 MHz",
+            "ram": "33554432"
+        }
+    },
+    {
+        "model": "hardware.DeviceModel",
+        "pk": 2,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Nanostation M2",
+            "image": "devices/images/nanostationM2.jpg",
+            "datasheet": "devices/datasheets/nanostationM.pdf",
+            "cpu": "Atheros MIPS 24KC, 400 MHz",
+            "ram": "33554432"
+        }
+    },
+    {
+        "model": "hardware.DeviceModel",
+        "pk": 3,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Nanostation Loco M5",
+            "image": "devices/images/nanostation-loco-M5.jpg",
+            "datasheet": "devices/datasheets/nanostationM.pdf",
+            "cpu": "Atheros MIPS 24KC, 400 MHz",
+            "ram": "33554432"
+        }
+    },
+    {
+        "model": "hardware.DeviceModel",
+        "pk": 4,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Nanostation Loco M2",
+            "image": "devices/images/nanostation-loco-M5.jpg",
+            "datasheet": "devices/datasheets/nanostationM.pdf",
+            "cpu": "Atheros MIPS 24KC, 400 MHz",
+            "ram": "33554432"
+        }
+    },
+    {
+        "model": "hardware.DeviceModel",
+        "pk": 5,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Nanobridge M5",
+            "image": "devices/images/nanobridgeM5.jpg",
+            "datasheet": "devices/datasheets/nanobridgeM.pdf",
+            "cpu": "Atheros MIPS 24KC, 400 MHz",
+            "ram": "33554432"
+        }
+    },
+    {
+        "model": "hardware.DeviceModel",
+        "pk": 6,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Nanobridge M2",
+            "image": "devices/images/nanobridgeM2.jpg",
+            "datasheet": "devices/datasheets/nanobridgeM.pdf",
+            "cpu": "Atheros MIPS 24KC, 400 MHz",
+            "ram": "33554432"
+        }
+    },
+    {
+        "model": "hardware.DeviceModel",
+        "pk": 7,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Rocket M5",
+            "image": "devices/images/rocketM5.jpg",
+            "datasheet": "devices/datasheets/rocketM.pdf",
+            "cpu": "Atheros MIPS 24KC, 400 MHz",
+            "ram": "67108864"
+        }
+    }
+]

@@ -1,12 +1,73 @@
-Django==1.4.1
-distribute==0.6.10
-wsgiref==0.1.2
-MySQL-Python
-django-debug-toolbar
-south
+# Nodeshot dependencies
+# install python-virtualenv
+# create a virtual environment (be sure to include the system default psycpog2 db drivers)
+# run pip install -r requirements
 
-Celery
-django-celery
+psycopg2
+Django==1.5.5
+
+# python libraries
+PIL
+simplejson
+#importlib
+pytz
+mimeparse
+python-dateutil
+six
+wsgiref
+requests
+
+# better admin
+django-grappelli==2.4.6
+django-filebrowser==3.5.2
+
+# utils
+django-extensions
+
+# geodjango improved widgets
+django-olwidget
+
+# RESTful API and API documentation
+djangorestframework==2.3.7
+django-rest-swagger
+markdown
+-e git+https://github.com/djangonauts/django-rest-framework-gis.git#egg=django_restframework_gis
+
+# networking
+netaddr
+django-netfields==0.2.1
+
+# email confirmation with configurable user model
+-e git+https://github.com/nemesisdesign/django-email-confirmation.git#egg=email_confirmation
+
+# authentication with social networks
+django-social-auth
+
+# versionable content
+django-reversion==1.7.1
+
+# asynchronous tasks
+celery==3.1
 django-celery-email
 
-django-rosetta
+# websockets
+tornado==3.1
+
+# Postgres HSTORE support
+-e git+https://github.com/djangonauts/django-hstore.git#egg=django_hstore
+
+# better shell
+bpython
+
+# fixture management
+# django-smuggler==0.4.1
+-e git+https://github.com/semente/django-smuggler#egg=django-smuggler
+
+# debugging
+django-debug-toolbar
+
+# migrations
+south
+
+# retrieve info from network devices
+-e git+git://github.com/nemesisdesign/netengine#egg=netengine

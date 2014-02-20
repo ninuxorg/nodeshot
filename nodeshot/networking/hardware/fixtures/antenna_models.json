@@ -1,0 +1,46 @@
+[
+    {
+        "model": "hardware.AntennaModel",
+        "pk": 1,
+        "fields": {
+            "manufacturer": 1,
+            "name": "Rocket Dish 30dBi",
+            "gain": 30,
+            "freq_range_lower": 5100,
+            "freq_range_higher": 5850,
+            "beamwidth_h": 5,
+            "beamwidth_v": 5,
+            "image": "antennas/images/rocket-dish.jpg",
+            "datasheet": "antennas/datasheets/rocket-dish.pdf"
+        }
+    },
+    {
+        "model": "hardware.AntennaModel",
+        "pk": 2,
+        "fields": {
+            "manufacturer": 1,
+            "name": "AirMax Sector 5G-16-120",
+            "gain": 16,
+            "freq_range_lower": 5100,
+            "freq_range_higher": 5850,
+            "beamwidth_h": 137,
+            "beamwidth_v": 118,
+            "image": "antennas/images/airmax-sector-5g-120.jpg",
+            "datasheet": "antennas/datasheets/airmax-sector-5ghz.pdf"
+        }
+    },
+    {
+        "model": "hardware.AntennaModel",
+        "pk": 3,
+        "fields": {
+            "manufacturer": 1,
+            "device_model": 1,
+            "name": "Nanostation M5 Integrated",
+            "gain": 16,
+            "freq_range_lower": 5470,
+            "freq_range_higher": 5825,
+            "beamwidth_h": 43,
+            "beamwidth_v": 41
+        }
+    }
+]

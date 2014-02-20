@@ -1,0 +1,32 @@
+[
+    {
+        "model": "participation.Comment",
+        "pk": 1,
+        "fields": {
+            "text": "first comment",
+            "node": "1",
+            "user": "1",
+      
+        }
+    },
+    {
+        "model": "participation.Comment",
+        "pk": 2,
+        "fields": {
+            "text": "second comment",
+            "node": "1",
+            "user": "1",
+      
+        }
+    },
+    {
+        "model": "participation.Comment",
+        "pk": 3,
+        "fields": {
+            "text": "second comment",
+            "node": "2",
+            "user": "1",
+      
+        }
+    }
+]

@@ -1,0 +1,38 @@
+[
+    {
+        "model": "hardware.Manufacturer",
+        "pk": 1,
+        "fields": {
+            "name": "Ubiquiti Networks",
+            "url": "http://www.ubnt.com/",
+            "image": "manufacturers/ubiquiti.png"
+        }
+    },
+    {
+        "model": "hardware.Manufacturer",
+        "pk": 2,
+        "fields": {
+            "name": "Mikrotic",
+            "url": "http://www.mikrotik.com/",
+            "image": "manufacturers/mikrotic.png"
+        }
+    },
+    {
+        "model": "hardware.Manufacturer",
+        "pk": 3,
+        "fields": {
+            "name": "D-Link",
+            "url": "http://www.dlink.com/",
+            "image": "manufacturers/dlink.jpg"
+        }
+    },
+    {
+        "model": "hardware.Manufacturer",
+        "pk": 4,
+        "fields": {
+            "name": "TP-Link",
+            "url": "http://www.tp-link.com/",
+            "image": "manufacturers/tplink.png"
+        }
+    }
+]

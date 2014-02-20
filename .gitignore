@@ -1,15 +1,36 @@
 #ignore the follow paths
 *.pyc
+.komodotools/
 settings.py
-
-#ignore the staticollected files
-static/*
-
-#ignore sqlite db
-nodeshot.db
-
-#virtualenv ignore
-bin/*
-lib/*
-local
-include/*
+*.komodoproject
+*.DS_Store
+python/
+projects/ninux/ninux/media/nodes/
+projects/ninux/ninux/media/external/
+projects/ninux/ninux/media/status-icons/
+projects/ninux/ninux/static/filebrowser/
+projects/ninux/ninux/static/interface/
+projects/ninux/ninux/static/rest_framework_swagger/
+projects/ninux/ninux/static/olwidget/
+projects/ninux/ninux/static/participation
+projects/georate/georate/media/nodes/
+projects/georate/georate/media/external/
+projects/georate/georate/media/status-icons/
+debug.log
+*~
+._*
+startshell
+activate
+runserver
+TODO.txt
+nodeshot.websockets.private
+nodeshot.websockets.public
+celerybeat.pid
+celerybeat-schedule
+runtests
+coverage
+load_fixtures.sh
+startup.py
+__GRAFICA
+celery.log
+projects/ninux/server.py

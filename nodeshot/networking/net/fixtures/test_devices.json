@@ -1,0 +1,35 @@
+[
+    {
+        "model": "net.Device",
+        "pk": 1,
+        "fields": {
+            "node": 7,
+            "name": "AGPomeziaRDP",
+            "type": "radio",
+            "routing_protocols": [1],
+            "status": 1
+        }
+    },
+    {
+        "model": "net.Device",
+        "pk": 2,
+        "fields": {
+            "node": 7,
+            "name": "AGRPapaPomezia",
+            "type": "radio",
+            "routing_protocols": [1],
+            "status": 1
+        }
+    },
+    {
+        "model": "net.Device",
+        "pk": 3,
+        "fields": {
+            "node": 6,
+            "name": "TestDevice",
+            "type": "radio",
+            "routing_protocols": [1],
+            "status": 1
+        }
+    }
+]

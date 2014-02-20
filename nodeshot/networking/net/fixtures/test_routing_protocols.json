@@ -1,0 +1,10 @@
+[
+    {
+        "model": "net.RoutingProtocol",
+        "pk": 1,
+        "fields": {
+            "name": "olsr",
+            "version": "0.6.2"
+        }
+    }
+]

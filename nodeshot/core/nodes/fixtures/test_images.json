@@ -1,0 +1,52 @@
+[
+    {
+        "model": "nodes.Image",
+        "pk": 1,
+        "fields": {
+            "access_level": 0,
+            "node": 1,
+            "order": 0,
+            "file": "test1.jpeg"
+        }
+    },
+    {
+        "model": "nodes.Image",
+        "pk": 2,
+        "fields": {
+            "access_level": 0,
+            "node": 1,
+            "order": 1,
+            "file": "test2.jpeg"
+        }
+    },
+    {
+        "model": "nodes.Image",
+        "pk": 3,
+        "fields": {
+            "access_level": 1,
+            "node": 3,
+            "order": 0,
+            "file": "test3.jpeg"
+        }
+    },
+    {
+        "model": "nodes.Image",
+        "pk": 4,
+        "fields": {
+            "access_level": 0,
+            "node": 3,
+            "order": 1,
+            "file": "test4.jpeg"
+        }
+    },
+    {
+        "model": "nodes.Image",
+        "pk": 5,
+        "fields": {
+            "access_level": 2,
+            "node": 1,
+            "order": 2,
+            "file": "test5.jpeg"
+        }
+    }
+]

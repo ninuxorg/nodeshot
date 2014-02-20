@@ -1,9 +1,0 @@
-{% load i18n %}{% blocktrans with site=site.name %}Your node on {{ site }} has been confirmed successfully.{% endblocktrans %}
-
-{% trans 'The password to edit the node is' %}: {{ password }}
-
-{% trans 'Details of the node' %}:
-
-{% include 'email_notifications/node_details_fragment.txt' %}
-
-{% trans 'Thank you for your participation in our community.' %}

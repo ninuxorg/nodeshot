@@ -1,3 +1,0 @@
-{% extends 'overlay.html' %}{% load i18n %}
-{% block title %}{% blocktrans with node=node.name %}Authentication required to edit {{ node }}{% endblocktrans %} - {{ SITE.name }}{% endblock %}
-{% block content %}{% include 'ajax/auth_node.html' %}{% endblock %}

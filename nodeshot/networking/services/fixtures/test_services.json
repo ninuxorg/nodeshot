@@ -1,0 +1,24 @@
+[
+    {
+        "model": "services.Service",
+        "pk": 1,
+        "fields": {
+            "device": 1,
+            "category": 1,
+            "name": "Service 1",
+            "description": "Test Service 1",
+            "status": 1
+        }
+    },
+    {
+        "model": "services.Service",
+        "pk": 2,
+        "fields": {
+            "device": 1,
+            "category": 1,
+            "name": "Service 2",
+            "description": "Test Service 2",
+            "status": 1
+        }
+    }
+]

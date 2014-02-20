@@ -1,0 +1,25 @@
+{% extends "admin/change_form.html" %}
+
+<!-- LOADING -->
+{% load url from future %}
+{% load admin_static i18n admin_modify grp_tags %}
+
+<!-- JAVASCRIPTS -->
+{% block javascripts %}
+    {{ block.super }}
+    <script type="text/javascript" charset="utf-8">
+        (function($) {
+            $(document).ready(function() {
+                // nodeshot specific
+                var external = $('#id_is_external');
+                var external_info = $('#external-group')
+                if(!external.is(':checked')){
+                    external_info.hide();
+                }
+                external.change(function(e){
+                    external_info.fadeToggle(250);
+                });
+            });
+        })(grp.jQuery);
+    </script>
+{% endblock %}

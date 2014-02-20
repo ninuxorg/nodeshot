@@ -1,5 +1,0 @@
-{% extends 'overlay.html' %}{% load i18n %}
-{% block title %}{% blocktrans with node=node.name %}Edit Hna for node {{ node }}{% endblocktrans %} - {{ SITE.name }}{% endblock %}
-{% block content %}
-    {% include 'ajax/hna_form.html' %}
-{% endblock %}
