@@ -17,9 +17,15 @@
     <div id="map-legend" class="overlay inverse">
         <h5>Legend</h5>
         <ul>
-            <li><a href="#"><span class="circle" style="background-color:#4283c5"></span>something</a><span class="stats">(234)</span></li>
-            <li><a href="#"><span class="circle" style="background:#ff7802"></span>potential</a><span class="stats">(934)</span></li>
-            <li><a href="#"><span class="circle" style="background:#138900"></span>active</a><span class="stats">(239)</span></li>
+            {% for status in statuses %}
+                <li>
+                    <a href="#">
+                        <span class="circle" style="background-color:{{ status.background_color }}"></span>
+                        {{ status.name }}
+                    </a>
+                    <span class="stats">{{ status.node_count }}</span>
+                </li>
+            {% endfor %}
         </ul>
         <a class="icon-close" href="#"></a>
     </div>
