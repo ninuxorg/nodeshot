@@ -386,6 +386,29 @@
         {% else %}
             Nodeshot.currentUser = new Backbone.Model();
         {% endif %}
+        
+        Nodeshot.layers = []
+        {% for layer in layers %}
+            Nodeshot.layers.push({
+                name: '{{ layer.name }}',
+                slug: '{{ layer.slug }}',
+                nodes_url: '{% url 'api_layer_nodes_list' layer.slug %}',
+                nodes_geojson_url: '{% url 'api_layer_nodes_geojson' layer.slug %}'
+            });
+        {% endfor %}
+        
+        for (i=0; i<Nodeshot.layers.length; i++) {
+            var layer = Nodeshot.layers[i];
+            // load geojson data
+            $.ajax({
+                async: false, 
+                url: layer.nodes_geojson_url,
+                dataType: 'json',
+                success: function(response){
+                    layer.nodes_geojson = response;
+                }
+            });
+        }
     </script>
     
     <script src="{{ STATIC_URL }}ui/nodeshot/js/models.js"></script>

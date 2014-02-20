@@ -526,6 +526,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         
         // init map
         this.map = this['_initMap'+mode]();
+        this.loadMapData();
         
         // switch icon
         button.removeClass('icon-'+replacedString.toLowerCase())
@@ -588,6 +589,30 @@ var MapView = Backbone.Marionette.ItemView.extend({
         map.scene.getAnimations().add(flight);
 		
         return map;
+    },
+    
+    loadMapData: function(){
+        var options = {
+            stroke: true,
+            fill: true,
+            weight: 1,
+            color: '#ff0000',
+            fillColor: '#000000',
+            className: 'marker-'+Nodeshot.layers[2].slug,
+            lineCap: 'circle'
+        }
+        
+        L.geoJson(Nodeshot.layers[2].nodes_geojson, {
+            style: function (feature) {
+                return options;
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('ciao');
+            },
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, options);
+            }
+        }).addTo(this.map);
     },
     
     /*
