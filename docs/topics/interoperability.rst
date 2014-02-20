@@ -9,7 +9,7 @@ There are mainly four strategies through which we can achieve interoperability:
 
  * **periodic synchronization**: data is synchronized periodically with a background job 
  * **event driven synchronization**: add, change, delete
- * **a mix of the two**: periodic and event driven)
+ * **a mix of the two**: periodic and event driven
  * **RESTful translator**: nodeshot gets data on the fly and converts the format
 
 These strategies are implemented through some Python classes called **"Synchronizers"**.
