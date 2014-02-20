@@ -599,9 +599,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.user.update_user_details'
 )
 
-SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google')
+SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google', 'github')
+
 FACEBOOK_APP_ID              = ''
 FACEBOOK_API_SECRET          = ''
+
+GITHUB_APP_ID = ''
+GITHUB_API_SECRET = ''
 
 SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
 SOCIAL_AUTH_UUID_LENGTH = 3
