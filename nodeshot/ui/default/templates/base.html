@@ -178,7 +178,7 @@
                     <span class="hover">&nbsp;</span>
                 </a>
                 
-                <a href="javascript:alert('not implemented yet')" class="btn btn-social btn-github">
+                <a href="{% url "socialauth_begin" "github" %}" class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
                     <span class="text">{% trans 'Sign up with Github' %}</span>
                     <span class="hover">&nbsp;</span>
@@ -246,7 +246,7 @@
                     <span class="hover">&nbsp;</span>
                 </a>
                 
-                <a href="javascript:alert('not implemented yet')" class="btn btn-social btn-github">
+                <a href="{% url "socialauth_begin" "github" %}"  class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
                     <span class="text">{% trans 'Sign in with Github' %}</span>
                     <span class="hover">&nbsp;</span>
