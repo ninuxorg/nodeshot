@@ -18,7 +18,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
     events: {
         'click #map-toolbar .icon-pin-add': 'addNode',
         'click #map-toolbar .icon-search': 'removeAddressFoundMarker',
-	'click #fn-search-address .input-group-btn': 'searchAddress',
+		'submit #fn-search-address form': 'searchAddress',
         'click @ui.toolbarButtons': 'togglePanel',
         'click @ui.legendTogglers': 'toggleLegend',
         'click #map-legend li a': 'toggleLegendControl',
@@ -678,10 +678,12 @@ var MapView = Backbone.Marionette.ItemView.extend({
 		});
 	},
 
-    searchAddress: function() {
+    searchAddress: function(e) {
+		e.preventDefault();
+		
 		this.removeAddressFoundMarker()
 		var self = this
-		var searchString = $("#search_address").val()
+		var searchString = $("#fn-search-address input").val()
 		var url = "http://nominatim.openstreetmap.org/search?format=json&q=" + searchString
 		$.ajax({
 			async: true,
@@ -705,8 +707,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
 	},
 
     removeAddressFoundMarker: function() {
-	if ( typeof( this.addressFoundMarker ) != "undefined"){
-	    this.map.removeLayer(this.addressFoundMarker)
-	}
+		if ( typeof( this.addressFoundMarker ) != "undefined"){
+			this.map.removeLayer(this.addressFoundMarker)
+		}
     }
 });
