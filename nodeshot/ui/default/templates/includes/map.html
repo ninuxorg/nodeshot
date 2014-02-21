@@ -31,12 +31,14 @@
     </div>
     
     <div id="fn-search-address" class="side-panel">
-        <div class="input-group">
-            <input type="text" class="form-control input-sm" placeholder="Enter an address">
-            <span class="input-group-btn">
-                <button class="btn btn-default btn-sm" type="button">search</button>
-            </span>
-        </div><!-- /input-group -->
+        <form>
+            <div class="input-group">
+                <input id=search_address type="text" class="form-control input-sm" placeholder="{% trans 'Enter an address (required)' %}">
+                <span class="input-group-btn">
+                    <button class="btn btn-default btn-sm" type="submit">search</button>
+                </span>
+            </div><!-- /input-group -->
+        </form>
     </div>
     
     <div id="fn-map-filter" class="side-panel adjust-height">

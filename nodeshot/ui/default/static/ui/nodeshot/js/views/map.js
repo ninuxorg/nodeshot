@@ -17,6 +17,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
     
     events: {
         'click #map-toolbar .icon-pin-add': 'addNode',
+        'click #map-toolbar .icon-search': 'removeAddressFoundMarker',
+	'click #fn-search-address .input-group-btn': 'searchAddress',
         'click @ui.toolbarButtons': 'togglePanel',
         'click @ui.legendTogglers': 'toggleLegend',
         'click #map-legend li a': 'toggleLegendControl',
@@ -671,9 +673,40 @@ var MapView = Backbone.Marionette.ItemView.extend({
 			dataType: 'json',
 			success: function (response) {
 				var address = response.display_name;
-			console.log(address)
-				$("#id_address").val(address)
+				$("#id_address").val(address);
 			}
 		});
+	},
+
+    searchAddress: function() {
+		this.removeAddressFoundMarker()
+		var self = this
+		var searchString = $("#search_address").val()
+		var url = "http://nominatim.openstreetmap.org/search?format=json&q=" + searchString
+		$.ajax({
+			async: true,
+			url: url,
+			dataType: 'json',
+			success: function (response) {
+				if (_.isEmpty(response)) {
+				    createModal({message : 'Address not found'});
+				}
+				else {
+				    var firstPlaceFound = (response[0]); //first place returned from OSM is displayed on map
+				    var lat = parseFloat(firstPlaceFound.lat);
+				    var lng = parseFloat(firstPlaceFound.lon);
+				    var latlng = L.latLng(lat, lng);
+				    self.addressFoundMarker = L.marker(latlng)
+				    self.addressFoundMarker.addTo(self.map);
+				    self.map.setView(latlng,16);
+				}		
+			}
+		});		
+	},
+
+    removeAddressFoundMarker: function() {
+	if ( typeof( this.addressFoundMarker ) != "undefined"){
+	    this.map.removeLayer(this.addressFoundMarker)
 	}
+    }
 });
