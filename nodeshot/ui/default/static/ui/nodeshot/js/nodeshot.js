@@ -1,67 +1,66 @@
 /*
  * this is just a temporary file for very basic features
  * will be converted to a more structured set of files with backbone.js
-*/
-
+ */
 // menu
-$('#ns-top-nav-links > ul > li > a').click(function(e){
-	$('#ns-top-nav-links li.active').removeClass('active');
-	$(this).parents('li').eq(0).addClass('active');
+$('#ns-top-nav-links > ul > li > a').click(function (e) {
+    $('#ns-top-nav-links li.active').removeClass('active');
+    $(this).parents('li').eq(0).addClass('active');
 });
 
 // set max height of collapsible menu (mobile)
-var setCollapsibleMainMenuMaxHeight = function(){
-	$('#nav-bar .navbar-collapse').css('max-height', $(window).height()-50);
+var setCollapsibleMainMenuMaxHeight = function () {
+    $('#nav-bar .navbar-collapse').css('max-height', $(window).height() - 50);
 }
 
 // dynamic map dimensions
-var setMapDimensions = function(){
-	var height = $(window).height() - $('body > header').height();
-	$('#map-container, #map-toolbar').height(height);
-	
+var setMapDimensions = function () {
+    var height = $(window).height() - $('body > header').height();
+    $('#map-container, #map-toolbar').height(height);
+
     var map_toolbar = $('#map-toolbar'),
-		add_node_container = $('#add-node-container');
-        width = $(window).width();
-    
+        add_node_container = $('#add-node-container');
+    width = $(window).width();
+
     // take in consideration #add-node-container if visible
-    if(add_node_container.is(':visible')){
-		width = width - add_node_container.outerWidth();
+    if (add_node_container.is(':visible')) {
+        width = width - add_node_container.outerWidth();
     }
-	// take in consideration map toolbar if visible
-	else if(map_toolbar.is(':visible')){
-		width = width - map_toolbar.outerWidth();
-	}
-	$('#map').width(width);
-	
-	var map = Nodeshot.body.currentView.map;
-	if (map && map.invalidateSize) {
-		map.invalidateSize();
-	}
+    // take in consideration map toolbar if visible
+    else if (map_toolbar.is(':visible')) {
+        width = width - map_toolbar.outerWidth();
+    }
+    $('#map').width(width);
+
+    var map = Nodeshot.body.currentView.map;
+    if (map && map.invalidateSize) {
+        map.invalidateSize();
+    }
 }
 
-var setNotificationsLeft = function(){
-	var left = $('#top-bar .notifications').offset().left,
-		button_width = $('#top-bar .notifications').outerWidth();
-		notifications_width = $('#notifications').getHiddenDimensions().width;
-	
-	$('#notifications').css('left', left - notifications_width/2 + button_width/2);
+var setNotificationsLeft = function () {
+    var left = $('#top-bar .notifications').offset().left,
+        button_width = $('#top-bar .notifications').outerWidth();
+    notifications_width = $('#notifications').getHiddenDimensions().width;
+
+    $('#notifications').css('left', left - notifications_width / 2 + button_width / 2);
 }
 
 // automatically center modal depending on its width
-$('body').delegate('.modal.autocenter', 'show.bs.modal', function(e) {
+$('body').delegate('.modal.autocenter', 'show.bs.modal', function (e) {
     var dialog = $(this).find('.modal-dialog'),
         dialog_dimensions = dialog.getHiddenDimensions(),
         coefficient = $(this).attr('data-autocenter-coefficient');
-    
-    if(!coefficient){
+
+    if (!coefficient) {
         coefficient = 2.1
     }
-    
+
     dialog.css({
         width: dialog_dimensions.width,
         right: 0
     });
-    
+
     // vertically align to center
     new_height = ($(window).height() - dialog_dimensions.height) / coefficient;
     // ensure new position is greater than zero
@@ -71,26 +70,26 @@ $('body').delegate('.modal.autocenter', 'show.bs.modal', function(e) {
 })
 
 // get width of an hidden element
-$.fn.getHiddenDimensions = function(){
+$.fn.getHiddenDimensions = function () {
     var self = $(this);
-    
-	// return immediately if element is visible
-	if(self.is(':visible')){
+
+    // return immediately if element is visible
+    if (self.is(':visible')) {
         return {
-			width: self.outerWidth(),
-			height: self.outerHeight()
-		}
+            width: self.outerWidth(),
+            height: self.outerHeight()
+        }
     }
-    
-    var hidden = self,  // this element is hidden
-        parents = self.parents(':hidden');  // look for hidden parent elements
-        
+
+    var hidden = self, // this element is hidden
+        parents = self.parents(':hidden'); // look for hidden parent elements
+
     // if any hidden parent element
-    if(parents.length){
+    if (parents.length) {
         // add to hidden collection
         hidden = $().add(parents).add(hidden);
     }
-    
+
     /*
      trick all the hidden elements in a way that
      they wont be shown but we'll be able to calculate their width
@@ -100,30 +99,30 @@ $.fn.getHiddenDimensions = function(){
         visibility: 'hidden',
         display: 'block'
     });
-    
+
     // store width of current element
     var dimensions = {
         width: self.outerWidth(),
         height: self.outerHeight()
     }
-    
+
     // reset hacked css on hidden elements
     hidden.css({
         position: '',
         visibility: '',
         display: ''
     });
-    
+
     // return width
     return dimensions;
 }
 
-clearPreloader = function(){
-    $('#preloader').fadeOut(255, function(){
-		// clear overflow hidden except if map view
-		if(!$('#map').length) {
-			$('body').removeAttr('style');
-		}
+clearPreloader = function () {
+    $('#preloader').fadeOut(255, function () {
+        // clear overflow hidden except if map view
+        if (!$('#map').length) {
+            $('body').removeAttr('style');
+        }
     });
 }
 
@@ -131,38 +130,37 @@ clearPreloader = function(){
 var searchLoadingIndicator = $('#general-search .animate-spin'),
     searchIcon = $('#general-search .icon-search'),
     searchResults = $('#general-search ul'),
-    showSearchSpinner = function(){
+    showSearchSpinner = function () {
         searchIcon.hide();
         searchLoadingIndicator.fadeIn(255);
         searchResults.fadeIn(255);
     },
-    hideSearchSpinner = function(){
+    hideSearchSpinner = function () {
         searchLoadingIndicator.hide();
         searchIcon.fadeIn(255);
         searchResults.fadeOut(255);
     };
 
-$('#general-search-input').keyup(function(e){
-    if(this.value.length > 2 && searchLoadingIndicator.is(':hidden')){
+$('#general-search-input').keyup(function (e) {
+    if (this.value.length > 2 && searchLoadingIndicator.is(':hidden')) {
         showSearchSpinner();
-    }
-    else if(this.value.length < 3 && searchLoadingIndicator.is(':visible')){
+    } else if (this.value.length < 3 && searchLoadingIndicator.is(':visible')) {
         hideSearchSpinner();
     }
-}).blur(function(e){
+}).blur(function (e) {
     hideSearchSpinner();
 });
 
 // map
-$(window).resize(function(e){
-	setCollapsibleMainMenuMaxHeight();
-	setNotificationsLeft();
-}).load(function(e){
-	setCollapsibleMainMenuMaxHeight();
+$(window).resize(function (e) {
+    setCollapsibleMainMenuMaxHeight();
+    setNotificationsLeft();
+}).load(function (e) {
+    setCollapsibleMainMenuMaxHeight();
     clearPreloader();
 });
 
-$(document).ready(function($){   
+$(document).ready(function ($) {
     $('#js-signup-password').pwstrength({
         common: {
             minChar: 1
@@ -177,25 +175,25 @@ $(document).ready(function($){
             scores: [10, 17, 26, 40, 50]
         }
         //bootstrap2: true
-    }).focus(function(e){
+    }).focus(function (e) {
         $('#js-password-strength-message').fadeIn(255);
     });
-    
-    $('#mobile-nav').click(function(e){
+
+    $('#mobile-nav').click(function (e) {
         e.preventDefault();
     });
-    
-    $('#nav-bar').delegate('#ns-top-nav-links.in a:not(.dropdown-toggle)', 'click', function(e){
+
+    $('#nav-bar').delegate('#ns-top-nav-links.in a:not(.dropdown-toggle)', 'click', function (e) {
         $('#ns-top-nav-links').collapse('hide');
     });
 });
 
-$('#notifications').click(function(e){
-	e.stopPropagation();
+$('#notifications').click(function (e) {
+    e.stopPropagation();
 });
 
-$('#notifications .scroller').mouseenter(function(e){
-	$('.scroller-bar').fadeIn(255);
-}).mouseleave(function(e){
-	$('.scroller-bar').fadeOut(255);
+$('#notifications .scroller').mouseenter(function (e) {
+    $('.scroller-bar').fadeIn(255);
+}).mouseleave(function (e) {
+    $('.scroller-bar').fadeOut(255);
 });
