@@ -280,6 +280,10 @@ choose (enter the number of) one of the following layers:
     def retrieve_nodes(self):
         """ retrieve nodes from old mysql DB """
         self.verbose('retrieving nodes from old mysql DB...')
+        
+        # tmp
+        OldNode.objects.all()
+        
         self.old_nodes = list(OldNode.objects.all())
         self.message('retrieved %d nodes' % len(self.old_nodes))
     
