@@ -413,7 +413,7 @@
         for (i=0; i<Nodeshot.layers.length; i++) {
             var layer = Nodeshot.layers[i];
             // get JSON data
-            layer.nodes_geojson = $.getData(layer.nodes_geojson_url);
+            layer.nodes_geojson = $.getDataSync(layer.nodes_geojson_url);
         }
     </script>
     

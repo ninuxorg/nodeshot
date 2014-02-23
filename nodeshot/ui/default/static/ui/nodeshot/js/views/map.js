@@ -621,8 +621,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 }
             })
 
-            //Creates a Leaflet cluster group styled with layer's colour
-            var newCluster = createCluster('nodes');
+            // Creates a Leaflet cluster group styled with layer's colour
+            var newCluster = this.createCluster('nodes');
 
             // Loads nodes in the cluster
             newCluster.addLayer(leafletLayer);
@@ -701,5 +701,26 @@ var MapView = Backbone.Marionette.ItemView.extend({
         if (typeof (this.addressFoundMarker) != "undefined") {
             this.map.removeLayer(this.addressFoundMarker)
         }
+    },
+    
+    /*
+     * Creates cluster group
+     */
+    createCluster: function(clusterClass) {
+       var newCluster = new L.MarkerClusterGroup({
+           iconCreateFunction: function (cluster) {
+               return L.divIcon({
+                   html: cluster.getChildCount(),
+                   className: clusterClass,
+                   iconSize: L.point(30, 30)
+               });
+           },
+           spiderfyOnMaxZoom: true,
+           showCoverageOnHover: true,
+           zoomToBoundsOnClick: true,
+           removeOutsideVisibleBounds: true
+       });
+       
+       return newCluster;
     }
 });

@@ -66,7 +66,7 @@ Math.degrees = function (radians) {
  * Get Data with async false
  * Returns response from server without having to use a callback
  */
-$.getData = function (url) {
+$.getDataSync = function (url) {
     var data;
 
     $.ajax({
@@ -82,54 +82,4 @@ $.getData = function (url) {
     });
 
     return data;
-}
-
-/*
- * Load nodes in cluster group and defines click properties for the popup window
- */
-function loadNodes(newClusterNodes, color) {
-
-    var layer = L.geoJson(newClusterNodes, {
-
-        onEachFeature: function (feature, layer) {
-            layer.on('click', function (e) {
-                this.bindPopup(feature.properties.name);
-            });
-
-        },
-        pointToLayer: function (feature, latlng) {
-            var marker = new L.circleMarker(latlng, {
-                radius: 6,
-                fillColor: color,
-                color: color,
-                weight: 1,
-                opacity: 1,
-                fillOpacity: 0.8
-            });
-
-            return marker;
-        }
-
-    });
-
-    return layer;
-}
-
-/*
- * Creates cluster group
- */
-function createCluster(clusterClass) {
-    var newCluster = new L.MarkerClusterGroup({
-        iconCreateFunction: function (cluster) {
-            return L.divIcon({
-                html: cluster.getChildCount(),
-                className: clusterClass,
-                iconSize: L.point(30, 30)
-            });
-        },
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: true,
-        zoomToBoundsOnClick: true
-    });
-    return newCluster;
 }
