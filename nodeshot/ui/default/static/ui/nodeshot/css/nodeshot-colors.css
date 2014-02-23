@@ -827,15 +827,12 @@ label.inline{ margin: 0 }
     border: 1px solid #ccc;
 }
 
-.nodes{
-	background-color:red;
-    width: 30px;
-    height: 30px;
-	margin-left: 5px;
-	margin-top: 5px;
-	padding: 2px;
+.cluster{
+    width: 35px !important;
+    height: 35px !important;
+	background-color: blue;
+    color: #fff;
 	text-align: center;
-	vertical-align: middle;
-	font: 14px "Helvetica Neue", Arial, Helvetica, sans-serif;
-	border-radius: 20px;
+	font: bold 13px/34px Arial, Helvetica, sans-serif;
+	border-radius: 50%;
 } 

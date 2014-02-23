@@ -622,7 +622,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             })
 
             // Creates a Leaflet cluster group styled with layer's colour
-            var newCluster = this.createCluster('nodes');
+            var newCluster = this.createCluster('cluster');
 
             // Loads nodes in the cluster
             newCluster.addLayer(leafletLayer);
@@ -715,10 +715,12 @@ var MapView = Backbone.Marionette.ItemView.extend({
                    iconSize: L.point(30, 30)
                });
            },
-           spiderfyOnMaxZoom: true,
            showCoverageOnHover: true,
            zoomToBoundsOnClick: true,
-           removeOutsideVisibleBounds: true
+           removeOutsideVisibleBounds: true,
+           // TODO: make these configurable
+           disableClusteringAtZoom: 12,
+           maxClusterRadius: 90
        });
        
        return newCluster;
