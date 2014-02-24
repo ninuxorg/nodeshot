@@ -35,6 +35,7 @@ DATABASES = {
 #       'PASSWORD': '*********',
 #       'HOST': 'remote-ip',
 #       'PORT': 'remote-port',
+#       'HAS_HSTORE': False
 #    }
 #    DATABASE_ROUTERS = [
 #        'nodeshot.extra.oldimporter.db.DefaultRouter',

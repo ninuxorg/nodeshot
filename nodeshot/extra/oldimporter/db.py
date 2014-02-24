@@ -35,6 +35,8 @@ class DefaultRouter(object):
         if db != 'old_nodeshot':
             return True
         return False
+    
+    allow_syncdb = allow_migrate
 
 
 class OldNodeshotRouter(object):
@@ -69,3 +71,5 @@ class OldNodeshotRouter(object):
         elif model._meta.app_label == 'old_nodeshot':
             return False
         return None
+    
+    allow_syncdb = allow_migrate
