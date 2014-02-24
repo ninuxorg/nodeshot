@@ -275,7 +275,7 @@ choose (enter the number of) one of the following layers:
         self.verbose('status map correct')
     
     def get_status(self, value):
-        self.status_mapping.get(value, self.status_mapping['default'])
+        return self.status_mapping.get(value, self.status_mapping['default'])
 
     def retrieve_nodes(self):
         """ retrieve nodes from old mysql DB """
@@ -447,7 +447,7 @@ choose (enter the number of) one of the following layers:
                 node.full_clean()
                 node.save(auto_update=False)
                 saved_nodes.append(node)
-                self.verbose('Saved node %s in layer %s' % (node.name, node.layer))
+                self.verbose('Saved node %s in layer %s with status %s' % (node.name, node.layer, node.status.name))
             except Exception as e:
                 self.message('Could not save node %s, got exception: %s' % (node.name, e))
         
