@@ -585,12 +585,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
     loadMapData: function () {
         var options = {
-            stroke: false,
             fill: true,
-            weight: 1,
-            //color: '#ff0000',
-            //fillColor: '#000000',
-            //className: 'marker-'+Nodeshot.layers[2].slug,
             lineCap: 'circle',
             radius: 6,
             opacity: 1,
@@ -610,7 +605,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
             var leafletLayer = L.geoJson(layer.nodes_geojson, {
                 style: function (feature) {
                     var status = Nodeshot.statuses[feature.properties.status];
-                    options.fillColor = status.background_color;
+                    options.fillColor = status.fill_color;
+                    options.stroke = status.stroke_width > 0;
+                    options.weight = status.stroke_width;
+                    options.color = status.stroke_color;
+                    options.className = 'marker-'+status.slug;
                     return options
                 },
                 onEachFeature: function (feature, layer) {
