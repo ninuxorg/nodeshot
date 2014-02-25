@@ -834,14 +834,15 @@ class InteroperabilityTest(TestCase):
         external.config = json.dumps({
             "open311_url": url,
             "service_code_get": "001",
-            "service_code_post": "002"
+            "service_code_post": "002",
+            "api_key": "DEVO1395445966"
         })
         external.full_clean()
         external.save()
         
         node = Node()
         node.name = 'offerta di lavoro di test'
-        node.description = 'offerta di lavoro inserita automaticamente tramite unit test'
+        node.description = 'altra offerta di lavoro inserita automaticamente tramite unit test'
         node.geometry = 'POINT (12.5823391919000012 41.8721429276999820)'
         node.layer = layer
         node.user_id = 1
