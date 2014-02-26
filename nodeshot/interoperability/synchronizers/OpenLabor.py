@@ -43,7 +43,8 @@ class OpenLabor(BaseSynchronizer):
     REQUIRED_CONFIG_KEYS = [
         'open311_url',
         'service_code_get',
-        'service_code_post'
+        'service_code_post',
+        'api_key'
     ]
     
     def __init__(self, *args, **kwargs):
@@ -66,6 +67,8 @@ class OpenLabor(BaseSynchronizer):
         
         # url for POST
         self.post_url = '%srequests.json' % self.open311_url
+        # api_key
+        self.api_key = self.config.get('api_key', '')
     
     def to_nodeshot(self, node):
         """
@@ -151,7 +154,7 @@ class OpenLabor(BaseSynchronizer):
             "first_name": user_first_name,
             "last_name": user_last_name,
             "description": node.description,
-            "api_key": "temporarily_not_used",
+            "api_key": self.config.get('api_key', ''),
             "locale": "it_IT",
             "position": node.name,
             "professionalProfile": node.data.get('professional_profile'),
