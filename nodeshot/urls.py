@@ -55,11 +55,16 @@ if 'nodeshot.core.api' in settings.INSTALLED_APPS:
 # todo: review
 if 'nodeshot.interface' in settings.INSTALLED_APPS:
     urlpatterns += patterns('nodeshot.interface.views',
-        url(r'^$', 'map_view', name='home'),
+        url(r'^old_map$', 'map_view', name='home'),
     )
 
 
 if 'nodeshot.ui.default' in settings.INSTALLED_APPS:
     urlpatterns = urlpatterns + patterns('',
         url(r'^', include('nodeshot.ui.default.urls', namespace='ui', app_name='ui')),
+    )
+    
+if 'rosetta' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        url(r'^rosetta/', include('rosetta.urls')),
     )

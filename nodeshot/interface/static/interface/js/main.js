@@ -12,70 +12,71 @@ map.on('click', onMapClick);
 var popup = L.popup();
 
 //Layer insert on map
-var overlaymaps={};
+var overlaymaps = {};
 
 
 //Load data from server
-var layers= getData(window.__BASEURL__+'api/v1/layers/'); //layers
-var geojsonlayers=getData(window.__BASEURL__+'api/v1/layers.geojson'); //layers' area
+var layers = getData(window.__BASEURL__ + 'api/v1/layers/'); //layers
+var geojsonlayers = getData(window.__BASEURL__ + 'api/v1/layers.geojson'); //layers' area
 
 
 /* Definition of color for layer's visualization
- * Custom icon of status "Accettato" for layer is used for this purpose.
+ * Custom icon of status "Attivo" for layer is used for this purpose.
  * It would be better ( and faster) to have a default generic color property for layers
  * and use status icons when working on nodes
  * */
 
-for (var i in layers){
-                {
-                var message = '';            
-		var layerColors=getData(window.__BASEURL__+'api/v1/layers/'+ layers[i].slug + '/status_icons');
-                if (layerColors.status_icons.length == 0) {
-                                message += layers[i].slug+',';
+for (var i in layers) {
+    {
+        var message = '';
+        var layerColors = getData(window.__BASEURL__ + 'api/v1/layers/' + layers[i].slug + '/status_icons');
+        if (layerColors.status_icons.length == 0) {
+            message += layers[i].slug + ',';
+        }
+        for (var j in layerColors.status_icons) {
+            if (layerColors.status_icons[j].status == "Attivo") {
+                layers[i].color = layerColors.status_icons[j].background_color;
+                createlayersCSS(layers[i].slug, layers[i].color);
+                console.log('layercss creato per ' + layers[i].slug)
+                for (var k in geojsonlayers.features) {
+                    var geolayerSlug = geojsonlayers.features[k].properties.slug
+                    if (geolayerSlug == layers[i].slug) {
+                        geojsonlayers.features[k].properties.color = layers[i].color
+                    }
+
                 }
-		for(var j in layerColors.status_icons){
-                                if (layerColors.status_icons[j].status == "Accettato"){
-				layers[i].color=layerColors.status_icons[j].background_color;
-				createlayersCSS(layers[i].slug,layers[i].color);
-                                console.log ('layercss creato per ' + layers[i].slug)
-                                for (var k in geojsonlayers.features){
-                                                var geolayerSlug = geojsonlayers.features[k].properties.slug
-                                                if (geolayerSlug == layers[i].slug ) {
-                                                                geojsonlayers.features[k].properties.color=layers[i].color
-                                                }
-                                                
-                                }
-                                }
-                                
-                         }
-                }
-                if (message != '') {
-                                var messageToDisplay = "CSS info missing for this layers: \n" + message
-                                alert(messageToDisplay)
-                }
+            }
+
+        }
+    }
+    if (message != '') {
+        var messageToDisplay = "CSS info missing for this layers: \n" + message
+        alert(messageToDisplay)
+    }
 }
 
 //Populate map's layers
 
-var mapLayersNodes=loadLayers(layers);
-var mapLayersArea=loadLayersArea(geojsonlayers);
+var mapLayersNodes = loadLayers(layers);
+var mapLayersArea = loadLayersArea(geojsonlayers);
 //Map Controls
 var baseMaps = {
-		"OpenStreetMap": osmLayer,
-		"Google Sat": googleSat,
-		"Google Map": googleMap,
-		"Google Hybrid": googleHybrid
-		
-				};
-var mapControl=L.control.layers(baseMaps,overlaymaps).addTo(map);
+    "OpenStreetMap": osmLayer,
+        "Google Sat": googleSat,
+        "Google Map": googleMap,
+        "Google Hybrid": googleHybrid
+
+};
+var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
 
 //Populate a select field wit Layers
 getLayerListSlug(layers);
-
-function createlayersCSS(slug,color){
-var cssClass= '.' + slug
-$("<style type='text/css'> " + cssClass + "{\
-  background-color:"+ color +";\
+//console.log("markerMap:"+markerMap)
+//console.log(markerMap)
+function createlayersCSS(slug, color) {
+    var cssClass = '.' + slug
+    $("<style type='text/css'> " + cssClass + "{\
+  background-color:" + color + ";\
     width: 30px;\
     height: 30px;\
     margin-left: 5px;\
@@ -85,9 +86,5 @@ $("<style type='text/css'> " + cssClass + "{\
     vertical-align: middle;\
     font: 14px \"Helvetica Neue\", Arial, Helvetica, sans-serif;\
     border-radius: 20px;\
-  } </style>").appendTo("head");                
+  } </style>").appendTo("head");
 }
-
-
-
-
