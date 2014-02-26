@@ -554,7 +554,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 trackResize: true
             });
         // TODO: configurable tiles
-        this.mapBoxLayer = new L.tileLayer('http://a.tiles.mapbox.com/v3/examples.map-9ijuk24y/{z}/{x}/{y}.png').addTo(map);
+        // TODO: rename mapbox in osm
+        this.mapBoxLayer = new L.tileLayer('http://a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
 
         return map;
     },
@@ -633,7 +634,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             overlaymaps[layer.name] = newCluster;
         }
 
-        var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
+        //var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
     },
 
     /*
