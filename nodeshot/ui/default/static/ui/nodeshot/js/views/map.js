@@ -555,7 +555,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             });
         // TODO: configurable tiles
         // TODO: rename mapbox in osm
-        this.mapBoxLayer = new L.tileLayer('http://a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
+        this.mapBoxLayer = new L.tileLayer('//a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
 
         return map;
     },
