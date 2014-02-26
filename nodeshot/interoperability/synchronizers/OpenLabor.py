@@ -68,7 +68,7 @@ class OpenLabor(BaseSynchronizer):
         # url for POST
         self.post_url = '%srequests.json' % self.open311_url
         # api_key
-        self.api_key = self.config['api_key']
+        self.api_key = self.config.get('api_key', '')
     
     def to_nodeshot(self, node):
         """
@@ -154,7 +154,7 @@ class OpenLabor(BaseSynchronizer):
             "first_name": user_first_name,
             "last_name": user_last_name,
             "description": node.description,
-            "api_key": self.config['api_key'],
+            "api_key": self.config.get('api_key', ''),
             "locale": "it_IT",
             "position": node.name,
             "professionalProfile": node.data.get('professional_profile'),
