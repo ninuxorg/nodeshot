@@ -35,7 +35,7 @@ The roadmap is the following:
 Code
 ====
 
-The development version is hosted at https://github.com/nemesisdesign/nodeshot.
+The development version is hosted at https://github.com/ninuxorg/nodeshot.
 
 The old version in use at http://map.ninux.org/ is hosted at https://github.com/ninuxorg/nodeshot.
 

@@ -10,7 +10,7 @@ from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
 
 from nodeshot.core.base.utils import now_after
-from nodeshot.core.nodes.models import Node
+from nodeshot.core.nodes.models import Node, Status
 from nodeshot.core.nodes.serializers import NodeListSerializer
 from nodeshot.interoperability.models import NodeExternal
 
@@ -44,7 +44,8 @@ class OpenLabor(BaseSynchronizer):
         'open311_url',
         'service_code_get',
         'service_code_post',
-        'api_key'
+        'api_key',
+        'default_status'
     ]
     
     def __init__(self, *args, **kwargs):
@@ -68,7 +69,13 @@ class OpenLabor(BaseSynchronizer):
         # url for POST
         self.post_url = '%srequests.json' % self.open311_url
         # api_key
-        self.api_key = self.config['api_key']
+        self.api_key = self.config.get('api_key', '')
+        
+        # default status
+        try:
+            self.default_status = Status.objects.get(slug=self.config.get('default_status', ''))
+        except Status.DoesNotExist:
+            self.default_status = None
     
     def to_nodeshot(self, node):
         """
@@ -112,7 +119,7 @@ class OpenLabor(BaseSynchronizer):
             "slug": node.get('idJobOriginal', None), 
             "layer_id": self.layer.id,
             "user": None, 
-            "status": None,
+            "status": self.default_status,
             "geometry": Point(float(longitude), float(latitude)), 
             "elev": None, 
             "address": full_address, 
@@ -154,7 +161,7 @@ class OpenLabor(BaseSynchronizer):
             "first_name": user_first_name,
             "last_name": user_last_name,
             "description": node.description,
-            "api_key": self.config['api_key'],
+            "api_key": self.config.get('api_key', ''),
             "locale": "it_IT",
             "position": node.name,
             "professionalProfile": node.data.get('professional_profile'),
