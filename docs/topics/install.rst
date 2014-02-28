@@ -1,5 +1,5 @@
 *******
-Install 
+Install
 *******
 
 .. warning::
@@ -467,9 +467,9 @@ Change the ``DEBUG`` setting to ``False``, leaving it to ``True`` **might lead t
     DEBUG = False
     # save and exit
 
---------------------
+---------------------
 Restart all processes
---------------------
+---------------------
 
 Restart all the processes to reload the new configurations::
 
