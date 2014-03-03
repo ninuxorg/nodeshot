@@ -538,7 +538,6 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // init map
         this.map = this['_initMap' + mode]();
-        this.loadMapData();
 
         // switch icon
         button.removeClass('icon-' + replacedString.toLowerCase())
@@ -561,6 +560,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // store mapMode
         preferences.mapMode = mode;
+
+        // load data
+        this.loadMapData();
     },
 
     /*
@@ -680,6 +682,12 @@ var MapView = Backbone.Marionette.ItemView.extend({
                         html: count,
                         className: 'cluster cluster-size-' + size + ' marker-' + this.cssClass
                     });
+                },
+                polygonOptions: {
+                    fillColor: status.fill_color,
+                    stroke: status.stroke_width > 0,
+                    weight: status.stroke_width,
+                    color: status.stroke_color,
                 },
                 chunkedLoading: true,
                 showCoverageOnHover: true,
