@@ -428,13 +428,32 @@ var MapView = Backbone.Marionette.ItemView.extend({
     toggleLegendControl: function (e) {
         e.preventDefault();
 
-        var li = $(e.currentTarget).parent();
+        var a = $(e.currentTarget),
+            li = a.parent(),
+            status = a.attr('data-status');
 
         if (li.hasClass('disabled')) {
             li.removeClass('disabled');
+            this.toggleMarkers('show', status);
         } else {
             li.addClass('disabled');
+            this.toggleMarkers('hide', status);
         }
+    },
+
+    /*
+     * hide or show markers from map
+     */
+    toggleMarkers: function (action, status) {
+        // local vars / shortcuts
+        var functionName,
+            markers = Nodeshot.statuses[status].cluster;
+
+        // determine action (show or hide)
+        functionName = action === 'show' ? 'addLayer' : 'removeLayer';
+
+        // show or hide from map
+        this.map[functionName](markers);
     },
 
     /*
