@@ -74,11 +74,11 @@ Choose a layer:<br>
 </script>
 
 <script id="tmplNodelist" type="text/template">
-  <ul>Nodes found: <strong><%= nodes.length %></strong> 
+  <ul>Requests found: <strong><%= nodes.length %></strong> 
     <% for (var i = 0; i < nodes.length; i++) { %>
       <% var node = nodes[i]; %>
       <li>
-      <a href="#" class="list-link" data-id='<%= node.id %>' ><%= node.properties.name %></a>
+      <a href="#" class="list-link" data-id='<%= node.request_id %>' ><%= node.request_id %></a>
       </li>
     <% } %>
   </ul>
@@ -143,6 +143,12 @@ Choose a layer:<br>
 <script id="tmplLayerList" type="text/template">
 <option value="<%= layer.slug %>"> <%= layer.name %>
 </option>
+</script>
+
+<script id="tmplOpen311Popup" type="text/template">
+<strong>Request ID: </strong><%= request_id %><br>
+<strong>Status: </strong><%= status %><br>
+<a href="<%= url %>">View details</a>
 </script>
 
 <script id="tmplNodePopup" type="text/template">
@@ -222,7 +228,7 @@ Against: <strong><%= dislikes %></strong><br>
             <div class="row">
 	       <div class="span2">
 		   <div id="controls">
-			 Node list:<br>
+			 Service requests :<br>
 			 <select id="selectLayer" onchange=createNodeList() class="layerList" >
 			      <option value=" ">Choose layer</option>
 			 </select>
@@ -273,14 +279,14 @@ Against: <strong><%= dislikes %></strong><br>
 	 <script>window.__BASEURL__ = '{% url 'ui:index' %}'</script>
 	<script>window.participation = '{{ participation }}'</script>
 	<script src="{% static 'interface/js/vendor/underscore-min.js' %}"></script>
-        <script src="{% static 'interface/js/vendor/jquery-1.8.3.min.js' %}"></script>
+        <script src="{% static 'interface/js/vendor/jquery-1.9.1.min.js' %}"></script>
 	<script src="{% static 'interface/js/vendor/jquery.tools.min.js' %}"></script>
 	<script src="{% static 'interface/js/vendor/jquery.cookie.js' %}"></script>
         <script src="{% static 'interface/js/vendor/bootstrap.min.js' %}"></script>
         <script src="{% static 'interface/js/vendor/leaflet.js' %}"></script>
         <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
         <script src="{% static 'interface/js/vendor/Google.js' %}"></script>
-        <script src="{% static 'interface/js/vendor/leaflet.markercluster-src.js' %}"></script>
+        <script src="{% static 'interface/js/vendor/leaflet.markercluster.js' %}"></script>
 	 <script src="{% static 'interface/js/vendor/leaflet-pip.min.js' %}"></script>
 	<script src="{% static 'interface/js/vendor/imtech_pager.js' %}"></script>
 	<script type="text/javascript">  
@@ -289,6 +295,7 @@ Against: <strong><%= dislikes %></strong><br>
 </script>
 	<script src="{% static 'interface/js/vendor/jquery.raty.js' %}"></script>
         <!--<script type="text/javascript" src="leaflet/leaflet.ajax.js"></script>-->
+	<script src="{% static 'interface/js/utils.js' %}"></script>
         <script src="{% static 'interface/js/functions.js' %}"></script>
         <script src="{% static 'interface/js/main.js' %}"></script>
 	

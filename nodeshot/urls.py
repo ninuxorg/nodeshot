@@ -55,7 +55,8 @@ if 'nodeshot.core.api' in settings.INSTALLED_APPS:
 # todo: review
 if 'nodeshot.open311.interface' in settings.INSTALLED_APPS:
     urlpatterns += patterns('nodeshot.open311.interface.views',
-        url(r'^open311/', 'map_view', name='home'),
+        url(r'^open311/$', 'map_view', name='311_home'),
+        url(r'^open311/request/(?P<request_id>[-\w]+)/$', 'request_view', name='311_request'),
     )
 
 

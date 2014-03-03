@@ -27,7 +27,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         if (layer != " ") {
             $.ajax({
                 type: 'GET',
-                url: window.__BASEURL__ + 'api/v1/layers/' + layer + '/nodes.geojson',
+                url: window.__BASEURL__ + 'api/v1/open311/requests?service_code=node&layer=' + layer ,
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 success: function (result) {
@@ -43,7 +43,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         console.log(data)
         $("#valori").html('');
         $("#nodelist").html('');
-        var nodes = data.features;
+        var nodes = data;
         var tmplMarkup = $('#tmplNodelist').html();
         var compiledTmpl = _.template(tmplMarkup, {
             nodes: nodes
@@ -52,13 +52,9 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
 
         $('a.list-link').click(function (e) {
             var slug = $(this).data('id');
-            //alert(slug)
             var marker = markerMap[slug];
-            //console.log(marker)
-            //console.log(marker.toGeoJSON());
-            populateNodeDiv(slug,"true");
+            populateOpen311Div(slug,"true");
             marker.addTo(map)
-            //marker.bindPopup(slug)
             marker.bindPopup(nodeDiv)
             populateRating(slug,nodeDiv,nodeRatingAVG)
             marker.openPopup()
@@ -117,13 +113,26 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             //Creates a Leaflet cluster group styled with layer's colour
             var newCluster = createCluster(clusterClass);
             //Loads nodes in the cluster
-            newClusterNodes = getData(window.__BASEURL__ + 'api/v1/layers/' + layers[i].slug + '/nodes.geojson');
-            var newClusterLayer = loadNodes(newClusterNodes, color);
+            //newClusterNodes = getData(window.__BASEURL__ + 'api/v1/layers/' + layers[i].slug + '/nodes.geojson');
+            var newClusterNodes = getData(window.__BASEURL__ + 'api/v1/open311/requests?service_code=node&layer='+layers[i].slug );
+            var GeoJSON= new geojsonColl();
+                for (var n in newClusterNodes){
+                            
+                                    var feature = new featureConstructor;
+                                    feature.geometry.coordinates = [newClusterNodes[n].lng,
+                                                                   newClusterNodes[n].lat]
+                                    feature.properties = newClusterNodes[n]
+                                    GeoJSON.features.push(feature)
+                                        
+    
+                                }
+            
+            var newClusterLayer = loadNodes(GeoJSON, color);
             newCluster.addLayer(newClusterLayer);
             //Adds cluster to map
             map.addLayer(newCluster);
             //Creates map controls for the layer
-            var newClusterKey = "<span style='color:" + color + "';'>" + layers[i].name + "</span>";
+            var newClusterKey = "<span style='color:#0000ff'>" + layers[i].name + "</span>";
             overlaymaps[newClusterKey] = newCluster;
             allLayers[i] = newCluster;
         }
@@ -161,9 +170,10 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             onEachFeature: function (feature, layer) {
                 layer.on('click', function (e) {
                     console.log(feature)
-                    populateNodeDiv(feature.id, "true");
+                    populateOpen311Div(feature.properties.request_id, "true");
                     this.bindPopup(nodeDiv);
-                    populateRating(feature.id, nodeDiv, nodeRatingAVG)
+                    //populateRating(feature.id, nodeDiv, nodeRatingAVG)
+                    //this.bindPopup(feature.properties.request_id)
                 });
 
             },
@@ -178,7 +188,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
                     fillOpacity: 0.8
                 });
                 //console.log(feature.properties.name)
-                window.markerMap[feature.id] = marker;
+                window.markerMap[feature.properties.request_id] = marker;
                 //console.log(markerMap[feature.properties.slug])
                 //console.log(markerMap)
 
@@ -253,6 +263,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
                 $("#sendLayer").click(function () {
                     var layerValues = $("input[name=\'layer\']:checked").val().split(",");
                     openInsertDiv(marker, layerValues[0], layerValues[1]);
+                    $('.leaflet-popup-content-wrapper').hide()
                 });
                 break;
             case 1:
@@ -274,6 +285,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
 
                     var layerValues = $("input[name=\'layer\']:checked").val().split(",");
                     openInsertDiv(marker, layerValues[0], layerValues[1]);
+                    $('#tmplcheckArea').hide()
                 });
         }
 
@@ -366,7 +378,39 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
 
     /* DISPLAYING OF NODES' PROPERTIES 
      * ================================ */
+    function populateOpen311Div(nodeSlug, create) {
+        /*
+         * Populates a Div with node's participation data
+         * 
+         */
 
+        if (create === "true") {
+            nodeDiv = document.createElement('div');
+            nodeDiv.id = nodeSlug;
+        }
+        
+        var node = getData(window.__BASEURL__ + 'api/v1/open311/requests/' + nodeSlug);
+        console.log(node)
+        //var nodeName = node.name;
+        var status = node.status;
+        var nodeLayer = node.layer;
+        var requestID = nodeSlug;
+        var url = window.__BASEURL__ + 'open311/request/' + nodeSlug
+
+        
+        var tmplMarkup = $('#tmplOpen311Popup').html();
+        var compiledTmpl = _.template(tmplMarkup, {
+            request_id: requestID,
+            status: status,
+            url: url,
+        });
+        $(nodeDiv).append(compiledTmpl);
+
+        
+
+        return (nodeDiv, nodeRatingAVG)
+
+    }
 
     function populateNodeDiv(nodeSlug, create) {
         /*
@@ -572,30 +616,6 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         });
     };
 
-
-/* AUTHENTICATION
- * ============== */
-
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-
-
-function sameOrigin(url) {
-    // test that a given url is a same-origin URL
-    // url could be relative or scheme relative or absolute
-    var host = document.location.host; // host + port
-    var protocol = document.location.protocol;
-    var sr_origin = '//' + host;
-    var origin = protocol + sr_origin;
-    // Allow absolute or scheme relative URLs to same origin
-    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') || (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-    // or any other URL that isn't scheme relative or absolute i.e relative.
-    !(/^(\/\/|http:|https:).*/.test(url));
-}
-
-
 //login
 function login() {
     user = $("#user").val();
@@ -637,110 +657,4 @@ function showLogout(user) {
     var tmplMarkup = $('#tmplLogout').html();
     var compiledTmpl = _.template(tmplMarkup, user);
     $('#userForm').html(compiledTmpl);
-}
-
-
-/* UTILITIES
- * ==========*/
-
-function latLngtoWKT(lng, lat) {
-    return "POINT(" + lng + " " + lat + ")";
-}
-
-function escapeHtml(unsafe) {
-    return unsafe.replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-//Ajax check
-
-$(function () {
-
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                // Send the token to same-origin, relative URLs only.
-                // Send the token only if the method warrants CSRF protection
-                // Using the CSRFToken value acquired earlier
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        },
-        error: function (jqXHR, exception) {
-            if (jqXHR.status === 0) {
-                alert('Not connect.\n Verify Network.');
-            } else if (jqXHR.status == 404) {
-                alert('Requested page not found. [404]');
-            } else if (jqXHR.status == 500) {
-                alert('Internal Server Error [500].');
-            } else if (exception === 'parsererror') {
-                alert('Requested JSON parse failed.');
-            } else if (exception === 'timeout') {
-                alert('Time out error.');
-            } else if (exception === 'abort') {
-                alert('Ajax request aborted.');
-            } else {
-                alert('Uncaught Error.\n' + jqXHR.responseText);
-            }
-            $("#nodeInsertDiv").html('A problem occurred while inserting node');
-        }
-    });
-});
-
-
-function getData(url) {
-    /*
-     * Get Data in async way, so that it can return an object to a variable
-     */
-    var data;
-    $.ajax({
-        async: false, //thats the trick
-        url: url,
-        dataType: 'json',
-        success: function (response) {
-            data = response;
-        }
-
-    });
-    return data;
-}
-
-
-function getAddress() {
-    /*
-     * Get Address using OSM Nominatim service
-     */
-    var lng = $("#nodeToInsertLng").val();
-    var lat = $("#nodeToInsertLat").val();
-    var url = 'http://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1';
-    $.ajax({
-        async: true,
-        url: url,
-        dataType: 'json',
-        success: function (response) {
-            data = {}
-            data = response;
-            address = data.display_name
-            $("#nodeToInsertAddress").val(address);
-            $("#loadingAddress").hide();
-        }
-
-    });
-}
-
-$('#loading').hide(); //initially hide the loading icon
-
-$('#loading').ajaxStart(function () {
-    $(this).show();
-});
-$("#loading").ajaxStop(function () {
-    $(this).hide();
-});
-
-function convertToSlug(Text) {
-    return Text.toLowerCase()
-        .replace(/[^\w ]+/g, '')
-        .replace(/ +/g, '-');
 }
