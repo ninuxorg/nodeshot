@@ -53,9 +53,9 @@ if 'nodeshot.core.api' in settings.INSTALLED_APPS:
 
 
 # todo: review
-if 'nodeshot.interface' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('nodeshot.interface.views',
-        url(r'^old_map$', 'map_view', name='home'),
+if 'nodeshot.open311.interface' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('nodeshot.open311.interface.views',
+        url(r'^open311/', 'map_view', name='home'),
     )
 
 
