@@ -40,7 +40,6 @@
 <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-info">Facebook Sign in</a>
 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-inverse">Google</a>
-<a href="{% url "socialauth_begin" "openwisp" %}" class="btn">OpenWISP</a>
 </script>
 
 
@@ -109,10 +108,10 @@ Choose a layer:<br>
 </script>
 
 <script id="tmplInsertNode" type="text/template">
-<form class="subform"  >
+<!--<form class="subform"  >-->
 <p><strong>Insert node details</strong></p>
 
-<form class="subform"  >
+<!--<form class="subform"  >-->
 	<p>
 	<label for="layerToInsert" >Layer</label>
 	<input class="input" id="layerToInsert" >
@@ -136,7 +135,7 @@ Choose a layer:<br>
 	<input class="input" id="nodeToInsertLng">
 	</p>
 	  <button  onclick=postNode();>Insert node</button>
-</form>
+<!--</form>-->
 </script>
 
 
@@ -245,13 +244,13 @@ Against: <strong><%= dislikes %></strong><br>
 
                 <!--<p><a class="btn" href="#">View details &raquo;</a></p>-->
               
-                <div id="map" style="width: 700px; height: 600px">
+                <div id="map" style="width: 100%; height: 600px">
 		    <div id='loading'>Loading...</div>
 		   
 		</div>
 		 
                </div>
-                <div class="span3">
+               <div class="span3">
 		   
 		    
                     <div id='valori' >
@@ -280,9 +279,9 @@ Against: <strong><%= dislikes %></strong><br>
 	<script>window.participation = '{{ participation }}'</script>
 	<script src="{% static 'interface/js/vendor/underscore-min.js' %}"></script>
         <script src="{% static 'interface/js/vendor/jquery-1.9.1.min.js' %}"></script>
-	<script src="{% static 'interface/js/vendor/jquery.tools.min.js' %}"></script>
-	<script src="{% static 'interface/js/vendor/jquery.cookie.js' %}"></script>
-        <script src="{% static 'interface/js/vendor/bootstrap.min.js' %}"></script>
+<!--	<script src="{% static 'interface/js/vendor/jquery.tools.min.js' %}"></script>
+--><!--	<script src="{% static 'interface/js/vendor/jquery.cookie.js' %}"></script>
+-->        <script src="{% static 'interface/js/vendor/bootstrap.min.js' %}"></script>
         <script src="{% static 'interface/js/vendor/leaflet.js' %}"></script>
         <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
         <script src="{% static 'interface/js/vendor/Google.js' %}"></script>

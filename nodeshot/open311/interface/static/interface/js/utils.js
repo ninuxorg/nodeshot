@@ -13,41 +13,6 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 
-//Ajax check
-
-$(function () {
-
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                // Send the token to same-origin, relative URLs only.
-                // Send the token only if the method warrants CSRF protection
-                // Using the CSRFToken value acquired earlier
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        },
-        error: function (jqXHR, exception) {
-            if (jqXHR.status === 0) {
-                alert('Not connect.\n Verify Network.');
-            } else if (jqXHR.status == 404) {
-                alert('Requested page not found. [404]');
-            } else if (jqXHR.status == 500) {
-                alert('Internal Server Error [500].');
-            } else if (exception === 'parsererror') {
-                alert('Requested JSON parse failed.');
-            } else if (exception === 'timeout') {
-                alert('Time out error.');
-            } else if (exception === 'abort') {
-                alert('Ajax request aborted.');
-            } else {
-                alert('Uncaught Error.\n' + jqXHR.responseText);
-            }
-            $("#nodeInsertDiv").html('A problem occurred while inserting node');
-        }
-    });
-});
-
-
 function getData(url) {
     /*
      * Get Data in async way, so that it can return an object to a variable
@@ -116,13 +81,29 @@ function featureConstructor() {
     /* AUTHENTICATION
  * ============== */
 
-function csrfSafeMethod(method) {
+$.getCookie = function (name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = $.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$.csrfSafeMethod = function (method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 
-
-function sameOrigin(url) {
+$.sameOrigin = function (url) {
     // test that a given url is a same-origin URL
     // url could be relative or scheme relative or absolute
     var host = document.location.host; // host + port
@@ -130,7 +111,39 @@ function sameOrigin(url) {
     var sr_origin = '//' + host;
     var origin = protocol + sr_origin;
     // Allow absolute or scheme relative URLs to same origin
-    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') || (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
     // or any other URL that isn't scheme relative or absolute i.e relative.
     !(/^(\/\/|http:|https:).*/.test(url));
 }
+
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        if (!$.csrfSafeMethod(settings.type) && $.sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", $.getCookie('csrftoken'));
+        }
+    },
+    error: function (jqXHR, exception) {
+            if (jqXHR.status === 0) {
+                alert('Not connect.\n Verify Network.');
+            } else if (jqXHR.status == 404) {
+                alert('Requested page not found. [404]');
+            } else if (jqXHR.status == 500) {
+                alert('Internal Server Error [500].');
+            } else if (exception === 'parsererror') {
+                alert('Requested JSON parse failed.');
+            } else if (exception === 'timeout') {
+                alert('Time out error.');
+            } else if (exception === 'abort') {
+                alert('Ajax request aborted.');
+            } else {
+                alert('Uncaught Error.\n' + jqXHR.responseText);
+            }
+            $("#nodeInsertDiv").html('A problem occurred while inserting node');
+        }
+    
+});
+

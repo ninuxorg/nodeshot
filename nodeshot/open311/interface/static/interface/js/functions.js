@@ -1,4 +1,4 @@
-var csrftoken = $.cookie('csrftoken');
+var csrftoken = $.getCookie('csrftoken');
 var markerToRemove //If users insert a new marker previous one has to be deleted from map
 var nodeRatingAVG // Rating data has to be globally available for rating plugin to correctly work
 var markerMap = {} //Object holding all nodes'slug and a reference to their marker
@@ -240,54 +240,55 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         /*
          * Opens node's insertion form
          */
-
-        $("#insertMarker").html('');
-        //check if point is contained in more than one layer
-        var areaLayer = L.geoJson(geojsonlayers);
-        var results = leafletPip.pointInLayer(markerLocation, areaLayer, false);
-        // 0=point not in Layers, 1= point in 1 layer, default = point in multiple layers
-        switch (results.length) {
-            case 0:
-                var noAreaLayers = [];
-                for (var i in layers) {
-                    if (layers[i].area === null) {
-                        noAreaLayers.push(layers[i]);
-                    }
-
-                }
-                var tmplMarkup = $('#tmplcheckArea').html();
-                var compiledTmpl = _.template(tmplMarkup, {
-                    choices: noAreaLayers
-                });
-                $("#insertMarker").append(compiledTmpl);
-                $("#sendLayer").click(function () {
-                    var layerValues = $("input[name=\'layer\']:checked").val().split(",");
-                    openInsertDiv(marker, layerValues[0], layerValues[1]);
-                    $('.leaflet-popup-content-wrapper').hide()
-                });
-                break;
-            case 1:
-                openInsertDiv(marker, results[0].feature.properties.id, results[0].feature.properties.name);
-                map.closePopup();
-                break;
-            default:
-                var FoundedLayers = [];
-                for (var i in results) {
-                    console.log(results[i].feature.properties.name);
-                    FoundedLayers.push(results[i].feature.properties);
-                };
-                var tmplMarkup = $('#tmplcheckArea').html();
-                var compiledTmpl = _.template(tmplMarkup, {
-                    choices: FoundedLayers
-                });
-                $("#insertMarker").append(compiledTmpl);
-                $("#sendLayer").click(function () {
-
-                    var layerValues = $("input[name=\'layer\']:checked").val().split(",");
-                    openInsertDiv(marker, layerValues[0], layerValues[1]);
-                    $('#tmplcheckArea').hide()
-                });
-        }
+        openInsertDiv(marker);
+        map.closePopup();
+        //$("#insertMarker").html('');
+        ////check if point is contained in more than one layer
+        //var areaLayer = L.geoJson(geojsonlayers);
+        //var results = leafletPip.pointInLayer(markerLocation, areaLayer, false);
+        //// 0=point not in Layers, 1= point in 1 layer, default = point in multiple layers
+        //switch (results.length) {
+        //    case 0:
+        //        var noAreaLayers = [];
+        //        for (var i in layers) {
+        //            if (layers[i].area === null) {
+        //                noAreaLayers.push(layers[i]);
+        //            }
+        //
+        //        }
+        //        var tmplMarkup = $('#tmplcheckArea').html();
+        //        var compiledTmpl = _.template(tmplMarkup, {
+        //            choices: noAreaLayers
+        //        });
+        //        $("#insertMarker").append(compiledTmpl);
+        //        $("#sendLayer").click(function () {
+        //            var layerValues = $("input[name=\'layer\']:checked").val().split(",");
+        //            openInsertDiv(marker, layerValues[0], layerValues[1]);
+        //            $('.leaflet-popup-content-wrapper').hide()
+        //        });
+        //        break;
+        //    case 1:
+        //        openInsertDiv(marker, results[0].feature.properties.id, results[0].feature.properties.name);
+        //        map.closePopup();
+        //        break;
+        //    default:
+        //        var FoundedLayers = [];
+        //        for (var i in results) {
+        //            console.log(results[i].feature.properties.name);
+        //            FoundedLayers.push(results[i].feature.properties);
+        //        };
+        //        var tmplMarkup = $('#tmplcheckArea').html();
+        //        var compiledTmpl = _.template(tmplMarkup, {
+        //            choices: FoundedLayers
+        //        });
+        //        $("#insertMarker").append(compiledTmpl);
+        //        $("#sendLayer").click(function () {
+        //
+        //            var layerValues = $("input[name=\'layer\']:checked").val().split(",");
+        //            openInsertDiv(marker, layerValues[0], layerValues[1]);
+        //            $('#tmplcheckArea').hide()
+        //        });
+        //}
 
     }
 
@@ -328,22 +329,25 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         var lng = $("#nodeToInsertLng").val();
         var lat = $("#nodeToInsertLat").val();
         var latlngToInsert = lat + '\,' + lng;
-        nodeToInsert["layer"] = $("#layerIdToInsert").val();
+        nodeToInsert["service_code"] = "node"
+        nodeToInsert["layer"] = "rome";
         nodeToInsert["name"] = $("#nodeToInsertName").val();
         nodeToInsert["slug"] = convertToSlug($("#nodeToInsertName").val())
         nodeToInsert["address"] = $("#nodeToInsertAddress").val();
-        nodeToInsert["geometry"] = latLngtoWKT(lng, lat);
-
+        nodeToInsert["lat"] = lat
+        nodeToInsert["lng"] = lng
+        console.log(nodeToInsert)
         var latlng = new L.LatLng(lat, lng);
-        var ok = confirm("Add node?");
+        var ok = confirm("Add service request?");
         if (ok == true) {
             $.ajax({
                 type: "POST",
-                url: 'http://localhost:8000/api/v1/nodes/',
+                url: window.__BASEURL__ + 'api/v1/open311/requests/',
                 data: nodeToInsert,
                 dataType: 'json',
                 success: function (response) {
-                    //Reload map to include new node, this should be absolutely improved
+                    //Reload map to include new node, this should be definetely improved
+                    alert('success')
                     clearLayers();
                     map.removeControl(mapControl)
                     mapLayersArea = loadLayersArea(geojsonlayers);
@@ -357,6 +361,10 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
                     $("#nodeInsertDiv").html('Node inserted');
                     //populateRating(nodeToInsert["slug"],nodeDiv,nodeRatingAVG);
 
+                },
+                error: function(){
+                    alert('error');
+                    //return(false);
                 }
 
             });
