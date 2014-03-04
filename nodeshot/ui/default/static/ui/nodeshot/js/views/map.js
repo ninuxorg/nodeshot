@@ -428,13 +428,32 @@ var MapView = Backbone.Marionette.ItemView.extend({
     toggleLegendControl: function (e) {
         e.preventDefault();
 
-        var li = $(e.currentTarget).parent();
+        var a = $(e.currentTarget),
+            li = a.parent(),
+            status = a.attr('data-status');
 
         if (li.hasClass('disabled')) {
             li.removeClass('disabled');
+            this.toggleMarkers('show', status);
         } else {
             li.addClass('disabled');
+            this.toggleMarkers('hide', status);
         }
+    },
+
+    /*
+     * hide or show markers from map
+     */
+    toggleMarkers: function (action, status) {
+        // local vars / shortcuts
+        var functionName,
+            markers = Nodeshot.statuses[status].cluster;
+
+        // determine action (show or hide)
+        functionName = action === 'show' ? 'addLayer' : 'removeLayer';
+
+        // show or hide from map
+        this.map[functionName](markers);
     },
 
     /*
@@ -519,7 +538,6 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // init map
         this.map = this['_initMap' + mode]();
-        this.loadMapData();
 
         // switch icon
         button.removeClass('icon-' + replacedString.toLowerCase())
@@ -542,6 +560,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // store mapMode
         preferences.mapMode = mode;
+
+        // load data
+        this.loadMapData();
     },
 
     /*
@@ -594,13 +615,14 @@ var MapView = Backbone.Marionette.ItemView.extend({
         }
 
         //Layer insert on map
-        var overlaymaps = {};
+        //var overlaymaps = {};
 
-        var baseMaps = {
-            "MapBox": this.mapBoxLayer
-        };
+        //var baseMaps = {
+        //    "MapBox": this.mapBoxLayer
+        //};
 
-        for (i = 0; i < Nodeshot.layers.length; i++) {
+        // loop over each layer
+        for (var i = 0; i < Nodeshot.layers.length; i++) {
             var layer = Nodeshot.layers[i];
 
             var leafletLayer = L.geoJson(layer.nodes_geojson, {
@@ -610,28 +632,79 @@ var MapView = Backbone.Marionette.ItemView.extend({
                     options.stroke = status.stroke_width > 0;
                     options.weight = status.stroke_width;
                     options.color = status.stroke_color;
-                    options.className = 'marker-'+status.slug;
+                    options.className = 'marker-' + status.slug;
                     return options
                 },
                 onEachFeature: function (feature, layer) {
                     layer.bindPopup(feature.properties.name);
                 },
                 pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng, options);
+                    var marker = L.circleMarker(latlng, options);
+                    Nodeshot.statuses[feature.properties.status].nodes.push(marker);
+                    return marker
                 }
-            })
+            });
 
-            // Creates a Leaflet cluster group styled with layer's colour
-            var newCluster = this.createCluster('cluster');
-
-            // Loads nodes in the cluster
-            newCluster.addLayer(leafletLayer);
-
-            // Adds cluster to map
-            this.map.addLayer(newCluster);
+            //this.map.addLayer(leafletLayer);
 
             // Creates map controls for the layer
-            overlaymaps[layer.name] = newCluster;
+            //overlaymaps[layer.name] = newCluster;
+        }
+
+        // loop over each status
+        for (var key in Nodeshot.statuses) {
+
+            var status = Nodeshot.statuses[key],
+                // group marker in layerGroup
+                leafletLayer = L.layerGroup(status.nodes);
+
+            // TODO: this is ugly!
+            $('head').append("\
+				<style type='text/css'>\
+				.marker-" + key + " {\
+					background-color:" + status.fill_color + ";\
+					color:" + status.text_color + ";\
+					border: " + status.stroke_width + "px solid " + status.stroke_color + ";\
+				}\
+				</style>\
+			");
+
+            // group markers in clusters
+            var group = new L.MarkerClusterGroup({
+                iconCreateFunction: function (cluster) {
+
+                    var count = cluster.getChildCount(),
+                        // determine size with the last number of the exponential notation
+                        // 0 for < 10, 1 for < 100, 2 for < 1000 and so on
+                        size = count.toExponential().split('+')[1];
+
+                    return L.divIcon({
+                        html: count,
+                        className: 'cluster cluster-size-' + size + ' marker-' + this.cssClass
+                    });
+                },
+                polygonOptions: {
+                    fillColor: status.fill_color,
+                    stroke: status.stroke_width > 0,
+                    weight: status.stroke_width,
+                    color: status.stroke_color,
+                },
+                chunkedLoading: true,
+                showCoverageOnHover: true,
+                zoomToBoundsOnClick: true,
+                removeOutsideVisibleBounds: true,
+                // TODO: make these configurable
+                disableClusteringAtZoom: 12,
+                maxClusterRadius: 90,
+                // custom option 
+                cssClass: key
+            }).addLayers(status.nodes);
+
+            // store for future reference
+            status.cluster = group;
+
+            // Adds cluster to map
+            this.map.addLayer(group);
         }
 
         //var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
@@ -685,7 +758,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                         message: 'Address not found'
                     });
                 } else {
-                    var firstPlaceFound = (response[0]); //first place returned from OSM is displayed on map
+                    var firstPlaceFound = (response[0]); // first place returned from OSM is displayed on map
                     var lat = parseFloat(firstPlaceFound.lat);
                     var lng = parseFloat(firstPlaceFound.lon);
                     var latlng = L.latLng(lat, lng);
@@ -701,28 +774,5 @@ var MapView = Backbone.Marionette.ItemView.extend({
         if (typeof (this.addressFoundMarker) != "undefined") {
             this.map.removeLayer(this.addressFoundMarker)
         }
-    },
-    
-    /*
-     * Creates cluster group
-     */
-    createCluster: function(clusterClass) {
-       var newCluster = new L.MarkerClusterGroup({
-           iconCreateFunction: function (cluster) {
-               return L.divIcon({
-                   html: cluster.getChildCount(),
-                   className: clusterClass,
-                   iconSize: L.point(30, 30)
-               });
-           },
-           showCoverageOnHover: true,
-           zoomToBoundsOnClick: true,
-           removeOutsideVisibleBounds: true,
-           // TODO: make these configurable
-           disableClusteringAtZoom: 12,
-           maxClusterRadius: 90
-       });
-       
-       return newCluster;
     }
 });

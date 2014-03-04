@@ -828,11 +828,31 @@ label.inline{ margin: 0 }
 }
 
 .cluster{
-    width: 35px !important;
-    height: 35px !important;
+    width: 37px !important;
+    height: 37px !important;
 	background-color: blue;
     color: #fff;
 	text-align: center;
-	font: bold 13px/34px Arial, Helvetica, sans-serif;
+	font: bold 13px/37px Arial, Helvetica, sans-serif;
 	border-radius: 50%;
-} 
+	box-sizing: content-box;
+}
+
+.cluster-size-0{
+	width: 26px !important;
+	height: 26px !important;
+	line-height: 26px !important;
+}
+
+.cluster-size-1{
+	width: 33px !important;
+	height: 33px !important;
+	line-height: 33px !important;
+}
+
+.cluster-size-3{
+	width: 42px !important;
+	height: 42px !important;
+	line-height: 42px !important;
+}
+

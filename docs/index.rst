@@ -19,7 +19,7 @@ It is designed to be modular, flexible, configurable and extensible.
 Status of this project
 ======================
 
-The first version of nodeshot was release in **October 2011** and was designed specifically for the community `Ninux.org`_.
+The first version of nodeshot was released in **October 2011** and was designed specifically for the community `Ninux.org`_.
 
 .. _Ninux.org: http://ninux.org
 
@@ -28,7 +28,7 @@ The version described in this documentation refers to the development version, w
 
 The roadmap is the following:
 
- * a first early release is expected for **mid February 2014**
+ * a first early release is expected for **end of February 2014**
  * a second more complete release is expected for **May 2014**
 
 ====
@@ -36,8 +36,6 @@ Code
 ====
 
 The development version is hosted at https://github.com/ninuxorg/nodeshot.
-
-The old version in use at http://map.ninux.org/ is hosted at https://github.com/ninuxorg/nodeshot.
 
 Once the new version will be ready it will be merged back into the original repository (ninuxorg/nodeshot).
 
@@ -77,4 +75,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
