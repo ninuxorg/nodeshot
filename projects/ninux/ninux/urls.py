@@ -23,3 +23,7 @@ if settings.DEBUG and settings.SERVE_STATIC:
     urlpatterns += patterns('django.contrib.staticfiles.views',
         url(r'^static/(?P<path>.*)$', 'serve'),
     )
+    urlpatterns += patterns('django.contrib.staticfiles.views',
+        url(r'^media/(?P<path>.*)$', 'serve'),
+    )
+       
