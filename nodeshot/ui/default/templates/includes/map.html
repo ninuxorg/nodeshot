@@ -195,7 +195,7 @@
             <select name="layer" id="id_layer" class="selectpicker" data-live-search="true">
                 <option>{% trans 'Select Layer' %}</option>
                 {% for layer in layers %}
-                <option value="{{ layer.id }}">{{ layer.name }}</option>
+                <option value="{{ layer.slug }}">{{ layer.name }}</option>
                 {% endfor %}
             </select>
         </div>
