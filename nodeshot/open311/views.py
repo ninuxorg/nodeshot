@@ -19,6 +19,28 @@ from nodeshot.community.participation.models import Vote, Comment, Rating
 from .base import STATUS, SERVICES, MODELS, iso8601_REGEXP
 from .serializers import *
 
+class ServiceDiscovery(generics.ListAPIView):
+    """
+    Open 311 services' discovery.
+    """
+    authentication_classes = (authentication.SessionAuthentication,)
+    serializer_class = ServiceDiscoverySerializer
+    
+    def get(self, request, *args, **kwargs):
+        """ return discovery metadata for open311 services """
+        # init django rest framework specific stuff
+        serializer_class = self.get_serializer_class()
+        context = self.get_serializer_context()
+        
+        discovery = serializer_class(
+                    context=context,
+               ).data
+        
+        return Response(discovery)
+
+service_discovery= ServiceDiscovery.as_view()
+
+
 class ServiceList(generics.ListAPIView):
     """
     Retrieve list of Open 311 services.
@@ -27,7 +49,7 @@ class ServiceList(generics.ListAPIView):
     serializer_class = ServiceListSerializer
     
     def get(self, request, *args, **kwargs):
-        """ return several services for each layer """
+        """ return list of open 311 services  """
         # init django rest framework specific stuff
         serializer_class = self.get_serializer_class()
         context = self.get_serializer_context()

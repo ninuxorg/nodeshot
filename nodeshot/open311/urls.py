@@ -2,6 +2,9 @@ from django.conf.urls import patterns, url
 
 
 urlpatterns = patterns('nodeshot.open311.views',
+    url(r'^open311/$',
+        'service_discovery',
+        name='api_service_discovery'),
     url(r'^open311/services/$',
         'service_list',
         name='api_service_list'),

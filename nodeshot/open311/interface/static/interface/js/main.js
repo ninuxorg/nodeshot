@@ -17,6 +17,7 @@ var overlaymaps = {};
 
 //Load data from server
 var layers = getData(window.__BASEURL__ + 'api/v1/layers/'); //layers
+console.log(layers)
 var geojsonlayers = getData(window.__BASEURL__ + 'api/v1/layers.geojson'); //layers' area
 
 
@@ -53,7 +54,7 @@ for (var i in layers) {
     //    var messageToDisplay = "CSS info missing for this layers: \n" + message
     //    alert(messageToDisplay)
     //}
-    var color="#0000ff";
+    var color="#5000ff";
     createlayersCSS(layers[i].slug, color);
 }
 

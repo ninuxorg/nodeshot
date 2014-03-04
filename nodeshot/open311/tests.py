@@ -20,6 +20,15 @@ class Open311Request(BaseTestCase):
         'test_nodes.json',
         'test_images.json'
     ]
+
+    def test_service_discovery(self):
+        response = self.client.get(reverse('api_service_discovery'))
+        # ensure 4 keys in response
+        self.assertEqual(len(response.data), 4)
+        
+        #ensure 5 keys for each endpoint
+        for endpoint in response.data['endpoints']:
+            self.assertEqual(len(endpoint), 5)
     
     def test_service_list(self):
         response = self.client.get(reverse('api_service_list'))

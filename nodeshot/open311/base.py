@@ -7,9 +7,9 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
 from nodeshot.community.participation.models import Vote, Comment, Rating
 
-STATUS = settings.NODESHOT['OPEN311']['STATUS']
+DISCOVERY = settings.NODESHOT['OPEN311']['DISCOVERY']
 
-LAYER_CHOICES = [layer.slug for layer in Layer.objects.all()]
+STATUS = settings.NODESHOT['OPEN311']['STATUS']
 
 SERVICES = {
     'node': {

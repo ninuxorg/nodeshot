@@ -24,6 +24,24 @@ The modules ``nodeshot.layers`` , ``nodeshot.nodes`` , ``nodeshot.participation`
 Specific settings for Open 311 are configured in NODESHOT['OPEN311'] inside ``settings.py``::
 
     'OPEN311': {
+        #Metadata for service discovery
+        'DISCOVERY': {
+            'changeset':'2014-02-03 14:18',
+            'contact':'email or phone number for assistance',
+            'key_service':'URL for api_key requests',
+            'endpoints':[
+              {
+                'specification':'http://wiki.open311.org/GeoReport_v2',
+                'url':'Public URL of your endpoint',
+                'changeset':'2014-02-03 09:01',
+                'type':'production',
+                'formats':[
+                  'application/json'
+                ]
+              },
+              
+            ]
+          },
         #Do not change this unless you want to redefine Open311 service definitions
         'METADATA': 'true',
         'TYPE': 'realtime',
@@ -34,14 +52,17 @@ Specific settings for Open 311 are configured in NODESHOT['OPEN311'] inside ``se
             'Active' : 'closed',
         }
     }
+'DISCOVERY' is a dictionary containing service discovery metadata. Inside it, you can define different endpoints (e.g production, test, development, ecc..)
+See http://wiki.open311.org/Service_Discovery for more details.
 
 'METADATA' and 'TYPE' need to be changed only in order to completely redefine the implementation of Nodeshot Open 311 service definition.
 
 See http://wiki.open311.org/GeoReport_v2 for details but you probably don't want to do this!
 
-'STATUS' is a dictionary, having the values that have been inserted in 'Status' model as keys, and 'open' or 'closed' as possible values.
+'STATUS' is a dictionary, containing the values that have been inserted in 'Status' model as keys, and 'open' or 'closed' as possible values.
+It is important that the keys of this dictionary exactly match the values contained in the STATUS model, otherwise the server will throw an exception. 
 
-In its simpliest form, it could be something like this::
+In its simpliest form, the configuration would be this::
 
     'STATUS' : {
             'Open' : 'open',
