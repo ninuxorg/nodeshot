@@ -53,13 +53,19 @@ if 'nodeshot.core.api' in settings.INSTALLED_APPS:
 
 
 # todo: review
-if 'nodeshot.interface' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('nodeshot.interface.views',
-        url(r'^$', 'map_view', name='home'),
+if 'nodeshot.open311.interface' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('nodeshot.open311.interface.views',
+        url(r'^open311/$', 'map_view', name='311_home'),
+        url(r'^open311/request/(?P<request_id>[-\w]+)/$', 'request_view', name='311_request'),
     )
 
 
 if 'nodeshot.ui.default' in settings.INSTALLED_APPS:
     urlpatterns = urlpatterns + patterns('',
         url(r'^', include('nodeshot.ui.default.urls', namespace='ui', app_name='ui')),
+    )
+    
+if 'rosetta' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        url(r'^rosetta/', include('rosetta.urls')),
     )

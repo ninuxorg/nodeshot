@@ -554,7 +554,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 trackResize: true
             });
         // TODO: configurable tiles
-        this.mapBoxLayer = new L.tileLayer('http://a.tiles.mapbox.com/v3/examples.map-9ijuk24y/{z}/{x}/{y}.png').addTo(map);
+        // TODO: rename mapbox in osm
+        this.mapBoxLayer = new L.tileLayer('//a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
 
         return map;
     },
@@ -585,12 +586,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
     loadMapData: function () {
         var options = {
-            stroke: false,
             fill: true,
-            weight: 1,
-            //color: '#ff0000',
-            //fillColor: '#000000',
-            //className: 'marker-'+Nodeshot.layers[2].slug,
             lineCap: 'circle',
             radius: 6,
             opacity: 1,
@@ -610,7 +606,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
             var leafletLayer = L.geoJson(layer.nodes_geojson, {
                 style: function (feature) {
                     var status = Nodeshot.statuses[feature.properties.status];
-                    options.fillColor = status.background_color;
+                    options.fillColor = status.fill_color;
+                    options.stroke = status.stroke_width > 0;
+                    options.weight = status.stroke_width;
+                    options.color = status.stroke_color;
+                    options.className = 'marker-'+status.slug;
                     return options
                 },
                 onEachFeature: function (feature, layer) {
@@ -634,7 +634,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             overlaymaps[layer.name] = newCluster;
         }
 
-        var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
+        //var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
     },
 
     /*

@@ -1,0 +1,201 @@
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+#map { height: 180px; }
+
+.remove_marker {
+  background-color: #ff0000;
+    color: #000000
+
+}
+.confirm_marker {
+  background-color: #00ff00;
+  color: #000000
+}
+
+.layerList
+{
+width: 90%;
+}
+
+.userLogged
+{
+color: #ffffff;
+}
+
+#valori {
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 12px;
+/*  margin: 1px;
+  border-style:solid;
+  border-width:1px;
+  border-color: #0000ff*/
+}
+
+#nodelist {
+
+  background-color: #c0c0c0;
+  color: #000000;
+  font-size: 12px;
+  max-height: 300px;
+  padding: 2px;
+  border-radius: 4px;
+  overflow:auto;
+/*  margin: 1px;
+  border-style:solid;
+  border-width:1px;
+  border-color: #0000ff*/
+}
+
+#nodelist ul{
+  padding: 0px;
+  margin: 0px;
+  color: #000000;
+}
+
+#nodelist li{
+
+  color: #000000;
+  margin: 1px;
+  
+}
+
+#controls {
+  background-color: #cccccc;
+  color: #000000;
+  font-size: 12px;
+  margin: 1px;
+  padding: 2px;
+  border-style:solid;
+  border-width:2px;
+  border-color: #0000ff;
+  border-radius: 4px;
+}
+
+.subform {
+font-size: 1.2em;
+color: black;
+
+}
+
+.subform label {
+display: inline-block;
+width: 200px;
+vertical-align: top;
+margin-right: 10px;
+font-size: 13px;
+font-weight: bold;
+margin-bottom: 0px;
+
+}
+
+
+
+
+#nodeInsertDiv {
+   background-color: #cccccc;
+  color: #000000;
+  font-size: 12px;
+  margin: 1px;
+  padding: 2px;
+  border-style:solid;
+  border-width:2px;
+  border-color: #0000ff;
+  border-radius: 4px;
+}
+
+#nodeInsert {
+  background-color: #cccccc;
+  color: #000000;
+  font-size: 10px;
+  display:none;
+}
+
+/*#logoutButton {
+  display:none;
+}*/
+
+#comments {
+  background-color: #cccccc;
+  color: #000000;
+  font-size: 12px;
+  margin: 1px;
+  padding: 2px;
+  border-style:solid;
+  border-width:2px;
+  border-color: #0000ff;
+  border-radius: 4px;
+/*  max-height: 300px;
+  overflow:auto;*/
+}
+
+.comment_text{
+    font-size:11px;
+    color:#000000;
+    background-color: #FFFFFF;
+    word-wrap: break-word;
+    border-style:solid;
+    border-width:1px;
+    padding: 3px;
+    margin: 1px;
+
+     
+}
+
+.comment_user{
+    font-size:10px;
+    color:#0000FF;
+    background-color: #CCCCCC;
+    word-wrap: break-word;
+/*    padding: 1px;
+*/
+}
+
+.comment_date{
+    font-size:10px;
+    color:#000000;
+    background-color: #CCCCCC;
+    word-wrap: break-word;
+/*    padding: 1px;
+*/     
+}
+
+.user{
+    font-size:10px;
+    color:#FFFFFF;
+    background-color: #CCCCCC;
+    word-wrap: break-word;
+  
+}
+
+
+
+
+
+.vote
+{
+  font-size:10px;
+}
+
+#pagingControls ul{
+  display:inline;
+  padding-left:0.5em;
+  margin: 0px;}
+  
+#pagingControls li
+{display:inline;
+padding:0 0.5em;
+font-size: bold;
+background-color: white;
+}
+
+
+
+
+
+
+
+
+
+

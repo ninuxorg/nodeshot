@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.core.base.models import BaseOrdered
+from nodeshot.core.base.fields import RGBColorField
 
 
 class Status(BaseOrdered):
@@ -17,6 +18,13 @@ class Status(BaseOrdered):
                 help_text=_("""indicates whether this is the default status for new nodes;
                             to change the default status to a new one just check and save,
                             any other default will be automatically unchecked"""))
+    
+    # map look and feel
+    stroke_width = models.SmallIntegerField(help_text=_('stroke of circles shown on map, set to 0 to disable'),
+                                            blank=False, default=0)
+    fill_color = RGBColorField(_('fill colour'), blank=True)
+    stroke_color = RGBColorField(_('stroke colour'), blank=True, default='#000000')
+    text_color = RGBColorField(_('text colour'), blank=True, default='#FFFFFF')
     
     # needed to intercept changes to is_default
     _current_is_default = False

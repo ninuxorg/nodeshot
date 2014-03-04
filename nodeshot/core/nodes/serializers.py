@@ -155,18 +155,21 @@ class ImageEditSerializer(ImageListSerializer):
 # --------- Status --------- #
 
 
-class StatusIconSerializer(serializers.ModelSerializer):
-    """ status icons """
-    
-    class Meta:
-        model = StatusIcon
-
-
 class StatusListSerializer(serializers.ModelSerializer):
     """ status list """
     
-    icons = StatusIconSerializer(source='statusicon_set', many=True, read_only=True)
+    nodes_count = serializers.Field(source='nodes_count')
     
     class Meta:
         model = Status
-        fields = ['id', 'name', 'slug', 'description', 'icons']
+        fields = [
+            'name',
+            'slug',
+            'description',
+            'is_default',
+            'stroke_width',
+            'fill_color',
+            'stroke_color',
+            'text_color',
+            'nodes_count'
+        ]

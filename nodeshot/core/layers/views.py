@@ -169,31 +169,3 @@ class LayerGeoJSONList(generics.ListAPIView):
     queryset = Layer.objects.published().exclude(area__isnull=True)
 
 layers_geojson_list = LayerGeoJSONList.as_view()
-
-
-class LayerStatusIconList(generics.RetrieveAPIView):
-    """
-    ### GET
-    
-    Retrieve status icon of a layer.
-    """
-    
-    serializer_class = LayerStatusIconSerializer
-    queryset = Layer.objects.published()
-    lookup_field = 'slug'
-    #queryset = Layer.objects.published()
-
-layer_status_icon_list = LayerStatusIconList.as_view()
-
-
-class AllLayerStatusIconList(generics.ListAPIView):
-    """
-    ### GET
-    
-    Retrieve status icon of all layers.
-    """
-    
-    serializer_class = LayerStatusIconSerializer
-    queryset = Layer.objects.published()
-
-all_layer_status_icon_list = AllLayerStatusIconList.as_view()

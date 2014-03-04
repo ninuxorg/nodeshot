@@ -208,59 +208,6 @@ class ModelsTest(TestCase):
         image.save()
         self.assertEqual(image.order, 0)
     
-    def test_status_icon_validation(self):
-        """ test StatusIcon custom validation """
-        status = Status(name='test', slug='test', description='test')
-        status.save()
-        
-        icon = StatusIcon(status=status, marker='circle')
-        
-        try:
-            icon.full_clean()
-            self.fail('ValidationError not raised')
-        except ValidationError as e:
-            self.assertIn(_('circle colour info is missing'), e.messages)
-        
-        icon.background_color = '#000'
-        icon.foreground_color = '#FFF'
-        icon.full_clean()
-        icon.save()
-        
-        icon.marker = 'icon'
-        # TODO: what about the following line?
-        #icon.icon = 'file.jpg'
-        
-        try:
-            icon.full_clean()
-            self.fail('ValidationError not raised')
-        except ValidationError as e:
-            self.assertIn(_('icon image is missing'), e.messages)
-        
-        icon.save()
-        # get again from DB
-        icon = StatusIcon.objects.get(pk=icon.pk)
-        
-        # ensure colour info is reset after marker has switched to icon
-        self.assertEqual(icon.background_color, '')
-        self.assertEqual(icon.foreground_color, '')
-        
-        icon.marker = 'circle'
-        icon.save()
-        
-        self.assertEqual(icon.icon, None)
-        
-        icon2 = StatusIcon(
-            status=status, marker='circle',
-            background_color='#000',
-            foreground_color='#FFF'
-        )
-        
-        try:
-            icon2.full_clean()
-            self.fail('ValidationError not raised')
-        except ValidationError as e:
-            self.assertIn(_('Status "%s" already has a default icon' % status.name), e.messages)
-    
     def test_geometry_collection_with_single_item(self):
         node = Node.objects.get(pk=1)
         node.geometry = GEOSGeometry("GEOMETRYCOLLECTION(POINT(12.509303756712 41.881163629853))")

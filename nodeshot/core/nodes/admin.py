@@ -72,29 +72,10 @@ class NodeAdmin(PublishActionsAdminMixin, GeoAdmin):
         html_editor_fields = ['description']
 
 
-class StatusIconInline(admin.StackedInline):
-    model = StatusIcon
-    extra = 0
-    
-    formfield_overrides = {
-        models.ImageField: {'widget': AdvancedFileInput(image_width='auto')},
-    }
-    
-    if 'grappelli' in settings.INSTALLED_APPS:
-        classes = ('grp-collapse grp-open', )
-        inline_classes = ('grp-collapse grp-open',) 
-
-
-if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-    from nodeshot.core.layers.admin import LayerAdmin
-    LayerAdmin.inlines.append(StatusIconInline)
-
-
 class StatusAdmin(admin.ModelAdmin):
     list_display  = ('name', 'slug', 'description', 'order', 'is_default')
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ('order', )
-    inlines = [StatusIconInline]
     
     change_list_template = 'smuggler/change_list.html'
 

@@ -17,15 +17,15 @@
     <div id="map-legend" class="overlay inverse">
         <h5>Legend</h5>
         <ul>
-            {% for status in statuses %}
-                <li>
-                    <a href="#">
-                        <span class="circle" style="background-color:{{ status.background_color }}"></span>
-                        {{ status.name }}
-                    </a>
-                    <span class="stats">{{ status.node_count }}</span>
-                </li>
-            {% endfor %}
+            <% _.each(Nodeshot.statuses, function(status){ %>
+            <li>
+                <a href="#" data-status="<%= status.slug %>">
+                    <span class="circle" style="background-color:<%= status.fill_color %>"></span>
+                    <%= status.name %>
+                </a>
+                <span class="stats"><%= status.nodes_count %></span>
+            </li>
+            <% }) %>
         </ul>
         <a class="icon-close" href="#"></a>
     </div>

@@ -23,8 +23,8 @@
     <![endif]-->
     
     <!-- leaflet -->
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
-    <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+    <link rel="stylesheet" href="{{ STATIC_URL }}ui/lib/css/leaflet.css" />
+    <script src="{{ STATIC_URL }}ui/lib/js/leaflet.js"></script>
     
     <!-- cesium -->
     <link href="{{ STATIC_URL }}ui/cesium/Widgets/widgets.css" rel="stylesheet">
@@ -389,6 +389,17 @@
             Nodeshot.currentUser = new Backbone.Model();
         {% endif %}
         
+        (function(){
+            var data = $.getDataSync('{% url 'api_status_list' %}'),
+                statuses = {};
+            
+            for (var i=0; i<data.length; i++) {
+                statuses[data[i].slug] = data[i]
+            }
+            
+            Nodeshot.statuses = statuses;
+        })();
+        
         Nodeshot.layers = []
         {% for layer in layers %}
             Nodeshot.layers.push({
@@ -399,18 +410,7 @@
             });
         {% endfor %}
         
-        Nodeshot.statuses = {}
-        {% for status in statuses %}
-            Nodeshot.statuses['{{ status.slug }}'] = {
-                name: '{{ status.name }}',
-                slug: '{{ status.slug }}',
-                background_color: '{{ status.background_color }}',
-                foreground_color: '{{ status.foreground_color }}',
-                node_count: {{ status.node_count }}
-            };
-        {% endfor %}
-        
-        for (i=0; i<Nodeshot.layers.length; i++) {
+        for (var i=0; i<Nodeshot.layers.length; i++) {
             var layer = Nodeshot.layers[i];
             // get JSON data
             layer.nodes_geojson = $.getDataSync(layer.nodes_geojson_url);

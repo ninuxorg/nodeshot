@@ -18,7 +18,7 @@ setup(
     author='Federico Capoano',
     author_email='nemesis[at]ninux[dot]org',
     license='GPL3',
-    url='https://github.com/nemesisdesign/nodeshot',
+    url='https://github.com/ninuxorg/nodeshot',
     packages=find_packages(exclude=['docs', 'docs.*']),
     zip_safe=False,
     classifiers=[

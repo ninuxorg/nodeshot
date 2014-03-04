@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from rest_framework import permissions, authentication, generics
 from rest_framework.response import Response
@@ -251,7 +251,7 @@ class StatusList(generics.ListAPIView):
     """
     Retrieve a list of all the available statuses and their relative icons/colors.
     """
-    model = Status
+    queryset = Status.objects.annotate(nodes_count=Count('node'))
     serializer_class = StatusListSerializer
     
     @method_decorator(cache_page(86400))  # cache for 1 day
