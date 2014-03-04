@@ -38,6 +38,8 @@ class NodeDetailSerializer(ExtensibleNodeSerializer):
                                      label=_('extra data'),
                                      help_text=_('store extra attributes in JSON string'))
     
+    layer = serializers.SlugRelatedField(slug_field='slug')
+    
     class Meta:
         model = Node
         primary_fields = [
