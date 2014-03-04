@@ -2,7 +2,7 @@
 <aside id="map-toolbar">
     <a href="#" class="icon-pin-add" data-toggle="tooltip" title="Add new node" data-placement="left" data-delay="600"></a>
     <a href="#" class="icon-search" data-panel="fn-search-address" data-toggle="tooltip" title="Search address" data-placement="left" data-delay="600"></a>
-    <a href="#" class="icon-layer-2" data-panel="fn-map-filter" title="Filter layers" data-placement="left" data-delay="600"></a>
+    <a href="#" class="icon-layer-2" data-panel="fn-map-layers" title="{% trans 'Control map data' %}" data-placement="left" data-delay="600"></a>
     <a href="#" id="btn-map-mode" class="icon-3d smaller" title="Toggle 3D view" data-placement="left" data-delay="600"></a>
     <a href="#" class="icon-tools" data-panel="fn-map-tools" title="Map tools" data-placement="left" data-delay="600"></a>
     <a href="#" class="icon-config" data-panel="fn-map-preferences" title="Map preferences" data-placement="left" data-delay="600"></a>
@@ -35,35 +35,26 @@
             <div class="input-group">
                 <input required type="text" class="form-control input-sm" placeholder="{% trans 'Enter an address' %}">
                 <span class="input-group-btn">
-                    <button class="btn btn-default btn-sm" type="submit">search</button>
+                    <button class="btn btn-default btn-sm" type="submit">{% trans 'search' %}</button>
                 </span>
             </div><!-- /input-group -->
         </form>
     </div>
     
-    <div id="fn-map-filter" class="side-panel adjust-height">
+    <div id="fn-map-layers" class="side-panel adjust-height">
         <div class="panel-inner scroller">
-            <h2>map filter</h2>
-            <p>test 1</p>
-            <p>test 2</p>
-            <p>test 3</p>
-            <p>test 4</p>
-            <p>test 5</p>
-            <p>test 6</p>
-            <p>test 7</p>
-            <p>test 8</p>
-            <p>test 9</p>
-            <p>test 10</p>
-            <p>test 11</p>
-            <p>test 12</p>
-            <p>test 13</p>
-            <p>test 15</p>
-            <p>test 16</p>
-            <p>test 17</p>
-            <p>test 18</p>
-            <p>test 19</p>
-            <p>test 20</p>
-            <p>test 21</p>
+            <h2>{% trans 'Control map data' %}</h2>
+            <% _.each(Nodeshot.layers, function(layer){ %>
+                <p>
+                    <label for="map-control-layer-<%= layer.slug %>" class="inline">
+                        <%= layer.name %>
+                    </label>
+                    <input type="checkbox" checked
+                           class="switch toggle-layer-data"
+                           id="map-control-layer-<%= layer.slug %>"
+                           data-slug="<%= layer.slug %>">
+                </p>
+            <% }); %>
         </div>
     </div>
     

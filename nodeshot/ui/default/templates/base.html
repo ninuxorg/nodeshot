@@ -401,7 +401,7 @@
             Nodeshot.statuses = statuses;
         })();
         
-        Nodeshot.layers = []
+        Nodeshot.layers = [];
         {% for layer in layers %}
             Nodeshot.layers.push({
                 name: '{{ layer.name }}',
