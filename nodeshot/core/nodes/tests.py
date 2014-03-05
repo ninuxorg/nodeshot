@@ -244,7 +244,7 @@ class APITest(BaseTestCase):
         self.assertEqual(public_node_count, len(nodes))
         
         node = {
-            "layer": 1,
+            "layer": "rome",
             "name": "test distance", 
             "address": "via dei test",
             "description": "",
@@ -308,7 +308,7 @@ class APITest(BaseTestCase):
             "address": "", 
             "description": "Fusolab test 2", 
             "access_level": "public",
-            "layer": 1,
+            "layer": "rome",
             "geometry": json.loads(GEOSGeometry("POINT (12.582239191899999 41.872041927700003)").json)
         }
         response = self.client.put(url, json.dumps(data), content_type='application/json')
@@ -440,7 +440,7 @@ class APITest(BaseTestCase):
         url = reverse('api_node_list')
         
         json_data = {
-            "layer": 1,
+            "layer": "rome",
             "name": "test_distance", 
             "slug": "test_distance", 
             "address": "via dei test", 

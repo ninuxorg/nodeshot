@@ -26,13 +26,16 @@ var MapView = Backbone.Marionette.ItemView.extend({
         'click #toggle-toolbar': 'toggleToolbar',
         'click @ui.switchMapMode': 'switchMapMode',
         'click #add-node-form .btn-default': 'closeAddNode',
-        'submit #add-node-form': 'submitAddNode'
+        'submit #add-node-form': 'submitAddNode',
+        'switch-change #fn-map-layers .toggle-layer-data': 'toggleLayerData'
     },
 
     initialize: function () {
         // bind to namespaced events
         $(window).on("beforeunload.map", _.bind(this.beforeunload, this));
         $(window).on("resize.map", _.bind(this.resize, this));
+
+        this.resetDataContainers();
     },
 
     onDomRefresh: function () {
@@ -77,7 +80,6 @@ var MapView = Backbone.Marionette.ItemView.extend({
         $('.selectpicker').selectpicker({
             style: 'btn-special'
         });
-
     },
 
     onClose: function (e) {
@@ -93,6 +95,15 @@ var MapView = Backbone.Marionette.ItemView.extend({
     },
 
     /* --- Nodeshot methods --- */
+
+    // reset containers with pointers to markers and other map objects
+    resetDataContainers: function () {
+        Nodeshot.nodes = [];
+        Nodeshot.clusters = [];
+        _.each(Nodeshot.statuses, function (status) {
+            status.nodes = [];
+        });
+    },
 
     resize: function () {
         setMapDimensions();
@@ -563,6 +574,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // load data
         this.loadMapData();
+        this.clusterizeMarkers();
     },
 
     /*
@@ -640,7 +652,12 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 },
                 pointToLayer: function (feature, latlng) {
                     var marker = L.circleMarker(latlng, options);
+
+                    // TODO: remember with localStorage
+                    marker.visible = true;
+
                     Nodeshot.statuses[feature.properties.status].nodes.push(marker);
+                    Nodeshot.nodes.push(marker);
                     return marker
                 }
             });
@@ -651,6 +668,10 @@ var MapView = Backbone.Marionette.ItemView.extend({
             //overlaymaps[layer.name] = newCluster;
         }
 
+        //var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
+    },
+
+    clusterizeMarkers: function () {
         // loop over each status
         for (var key in Nodeshot.statuses) {
 
@@ -696,18 +717,23 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 // TODO: make these configurable
                 disableClusteringAtZoom: 12,
                 maxClusterRadius: 90,
+                singleMarkerMode: true,
                 // custom option 
                 cssClass: key
-            }).addLayers(status.nodes);
+            });
+
+            group.status = key;
 
             // store for future reference
             status.cluster = group;
+            Nodeshot.clusters.push(group);
+
+            // show visible markers
+            this.showVisibleMarkers(group, status.nodes);
 
             // Adds cluster to map
             this.map.addLayer(group);
         }
-
-        //var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
     },
 
     /*
@@ -718,6 +744,44 @@ var MapView = Backbone.Marionette.ItemView.extend({
         // automatically determine which mod to use depending on the icon's button
         var mode = this.ui.switchMapMode.hasClass('icon-3d') ? '3D' : '2D';
         this.initMap(mode);
+    },
+
+    showVisibleMarkers: function (cluster, markers) {
+        for (var i = 0, len = markers.length; i < len; i++) {
+            var marker = markers[i];
+            if (marker.visible) {
+                cluster.addLayer(marker);
+            }
+        }
+    },
+
+    showVisibleClusters: function () {
+        var self = this;
+        _.each(Nodeshot.clusters, function (cluster) {
+            cluster.clearLayers();
+            // show visible markers
+            self.showVisibleMarkers(cluster, Nodeshot.statuses[cluster.status].nodes);
+        });
+    },
+
+    /*
+     * show or hide markers of a layer
+     */
+    toggleLayerData: function (e, data) {
+        var input = $(e.currentTarget),
+            slug = input.attr('data-slug');
+
+        // loop over nodes
+        for (var i = 0, len = Nodeshot.nodes.length; i < len; i++) {
+            var node = Nodeshot.nodes[i];
+
+            if (node.feature.properties.layer === slug) {
+                // mark appropiately
+                node.visible = data.value;
+            }
+        }
+
+        this.showVisibleClusters();
     },
 
     /*
