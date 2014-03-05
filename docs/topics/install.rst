@@ -367,6 +367,8 @@ Paste this config::
     vacuum=True
     home=/var/www/nodeshot/projects/ninux/python
     enable-threads=True
+    env=HTTPS=on
+    buffer-size=8192
 
 ----------
 Supervisor
@@ -466,6 +468,11 @@ Change the ``DEBUG`` setting to ``False``, leaving it to ``True`` **might lead t
     # set DEBUG to False
     DEBUG = False
     # save and exit
+
+You might encounter an issue in the Redis log that says:
+"Can't save in background: fork: Cannot allocate memory", in that case run this command:
+
+    echo 1 > /proc/sys/vm/overcommit_memory 
 
 ---------------------
 Restart all processes

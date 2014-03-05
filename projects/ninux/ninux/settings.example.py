@@ -324,10 +324,11 @@ CACHES = {
 
 #EMAIL_USE_TLS = True
 EMAIL_HOST = 'localhost'
-#EMAIL_HOST_USER = 'your@email.org'
+EMAIL_HOST_USER = 'your@email.org'
 #EMAIL_HOST_PASSWORD = '***********'
 EMAIL_PORT = 1025 if DEBUG else 25  # 1025 if you are in development mode, while 25 is usually the production port
-DEFAULT_FROM_EMAIL = 'your@email.org'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = DEFAULT_FROM_EMAIL  # used for error reporting
 
 # ------ CELERY ------ #
 
