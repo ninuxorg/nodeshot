@@ -623,16 +623,16 @@ SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google', 'github')
 
 FACEBOOK_APP_ID              = ''
 FACEBOOK_API_SECRET          = ''
+FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
 
 GITHUB_APP_ID = ''
 GITHUB_API_SECRET = ''
+GITHUB_EXTENDED_PERMISSIONS = ['email']
 
 SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
 SOCIAL_AUTH_UUID_LENGTH = 3
 SOCIAL_AUTH_SESSION_EXPIRATION = False
 SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
-
-FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
 
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
