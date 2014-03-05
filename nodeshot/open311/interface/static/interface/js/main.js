@@ -17,7 +17,6 @@ var overlaymaps = {};
 
 //Load data from server
 var layers = getData(window.__BASEURL__ + 'api/v1/layers/'); //layers
-console.log(layers)
 var geojsonlayers = getData(window.__BASEURL__ + 'api/v1/layers.geojson'); //layers' area
 
 
@@ -91,3 +90,4 @@ function createlayersCSS(slug, color) {
     border-radius: 20px;\
   } </style>").appendTo("head");
 }
+

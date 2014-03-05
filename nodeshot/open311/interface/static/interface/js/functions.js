@@ -181,7 +181,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
                 var marker = new
                 L.circleMarker(latlng, {
                     radius: 6,
-                    fillColor: color,
+                    fillColor: window.statuses[feature.properties.status].fill_color,
                     color: color,
                     weight: 1,
                     opacity: 1,
@@ -240,7 +240,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         /*
          * Opens node's insertion form
          */
-        openInsertDiv(marker);
+        openForm(marker);
         map.closePopup();
         //$("#insertMarker").html('');
         ////check if point is contained in more than one layer
@@ -292,50 +292,108 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
 
     }
 
-    function openInsertDiv(latlng, layerID, layerName) {
-        /*
-         *Creates node's insertion form
-         */
-        var latlngToString = latlng.toString();
-        var arrayLatLng = latlngToString.split(",");
-        var lat = arrayLatLng[0].slice(7);
-        var lng = arrayLatLng[1].slice(0, -1);
-
-        var tmplMarkup = $('#tmplInsertNode').html();
-        var compiledTmpl = _.template(tmplMarkup);
-        var nodeInsertDiv = $("<div>", {
-            id: "nodeInsertDiv"
-        });
-
-        $(nodeInsertDiv).html(compiledTmpl);
-        $("#valori").html(nodeInsertDiv)
-        $("#nodeToInsertLng").val(lng);
-        $("#nodeToInsertLat").val(lat);
-        $("#layerToInsert").val(layerName);
-        $("#layerIdToInsert").val(layerID);
-        $('#layerToInsert').attr('readonly', true);
-        $('#nodeToInsertLng').attr('readonly', true);
-        $('#nodeToInsertLat').attr('readonly', true);
-
-        getAddress();
-
+    //function openInsertDiv(latlng, layerID, layerName) {
+    //    /*
+    //     *Creates node's insertion form
+    //     */
+    //    var latlngToString = latlng.toString();
+    //    var arrayLatLng = latlngToString.split(",");
+    //    var lat = arrayLatLng[0].slice(7);
+    //    var lng = arrayLatLng[1].slice(0, -1);
+    //
+    //    var tmplMarkup = $('#tmplInsertNode').html();
+    //    var compiledTmpl = _.template(tmplMarkup);
+    //    var nodeInsertDiv = $("<div>", {
+    //        id: "nodeInsertDiv"
+    //    });
+    //
+    //    $(nodeInsertDiv).html(compiledTmpl);
+    //    $("#valori").html(nodeInsertDiv)
+    //    $("#nodeToInsertLng").val(lng);
+    //    $("#nodeToInsertLat").val(lat);
+    //    $("#layerToInsert").val(layerName);
+    //    $("#layerIdToInsert").val(layerID);
+    //    $('#layerToInsert').attr('readonly', true);
+    //    $('#nodeToInsertLng').attr('readonly', true);
+    //    $('#nodeToInsertLat').attr('readonly', true);
+    //
+    //    getAddress();
+    //
+    //}
+    
+    function openForm(marker){
+            var latlngToString = marker.toString();
+            var arrayLatLng = latlngToString.split(",");
+            var lat = arrayLatLng[0].slice(7);
+            var lng = arrayLatLng[1].slice(0, -1);
+            console.log(layers)
+            $('#overlay').fadeIn('fast',function(){
+            $('#serviceRequestForm').show();
+	    $('#serviceRequestForm').html('<a class="boxclose"  id="boxclose"></a>');
+	    $('#boxclose').bind("click",function(){
+				       $('#serviceRequestForm').hide("fast",function(){
+				       $('#overlay').fadeOut('fast');
+				  });
+		});
+	    var tmplMarkup = $('#tmplInsertNode').html();
+            var compiledTmpl = _.template(tmplMarkup,{layers:layers});
+            var nodeInsertDiv = $("<div>", {
+                id: "serviceRequestForm"
+            });
+    
+            $('#serviceRequestForm').append(compiledTmpl);
+            //$("#valori").html(nodeInsertDiv)
+            $("#nodeToInsertLng").val(lng);
+            $("#nodeToInsertLat").val(lat);
+            //$("#layerToInsert").val(layerName);
+            //$("#layerIdToInsert").val(layerID);
+            $('#layerToInsert').attr('readonly', true);
+            $('#nodeToInsertLng').attr('readonly', true);
+            $('#nodeToInsertLat').attr('readonly', true);
+    
+            getAddress();
+            $("#requestForm").submit(function(event){
+ 
+            //disable the default form submission
+            event.preventDefault();
+            alert("sending")
+                //grab all form data  
+            var formData = new FormData($(this)[0]);
+ 
+  $.ajax({
+    url: window.__BASEURL__ + 'api/v1/open311/requests/',
+    type: 'POST',
+    data: formData,
+    async: false,
+    cache: false,
+    contentType: false,
+    processData: false,
+    success: function (returndata) {
+      alert(returndata);
     }
-
+  });
+ 
+  return false;
+});
+});
+}
+    
     function postNode() {
         /*
          * Inserts node in DB and displays it on map
          */
-        var nodeToInsert = {}
+        var nodeToInsert = new FormData($("#requestForm"));
         var lng = $("#nodeToInsertLng").val();
         var lat = $("#nodeToInsertLat").val();
         var latlngToInsert = lat + '\,' + lng;
-        nodeToInsert["service_code"] = "node"
-        nodeToInsert["layer"] = "rome";
-        nodeToInsert["name"] = $("#nodeToInsertName").val();
-        nodeToInsert["slug"] = convertToSlug($("#nodeToInsertName").val())
-        nodeToInsert["address"] = $("#nodeToInsertAddress").val();
-        nodeToInsert["lat"] = lat
-        nodeToInsert["lng"] = lng
+        //nodeToInsert["service_code"] = "node"
+        //nodeToInsert["layer"] = $("#layerToInsert").val();
+        //nodeToInsert["name"] = $("#nodeToInsertName").val();
+        //nodeToInsert["description"] = $("#nodeToInsertName").val();
+        //nodeToInsert["slug"] = convertToSlug($("#nodeToInsertName").val())
+        //nodeToInsert["address"] = $("#nodeToInsertAddress").val();
+        //nodeToInsert["lat"] = lat
+        //nodeToInsert["lng"] = lng
         console.log(nodeToInsert)
         var latlng = new L.LatLng(lat, lng);
         var ok = confirm("Add service request?");
@@ -345,6 +403,9 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
                 url: window.__BASEURL__ + 'api/v1/open311/requests/',
                 data: nodeToInsert,
                 dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
                 success: function (response) {
                     //Reload map to include new node, this should be definetely improved
                     alert('success')

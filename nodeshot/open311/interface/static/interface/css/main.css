@@ -1,6 +1,71 @@
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
+body {
+  background-color: #FFCC33;
+}
+.row{
+  margin-top: 25px;
+}
+.overlay{
+    background:transparent url(images/overlay.png) repeat top left;
+    position:fixed;
+    top:0px;
+    bottom:0px;
+    left:0px;
+    right:0px;
+    height: 100%;
+    width: 100%;
+    z-index:100;
+}
+
+#serviceRequestForm {
+    width: 400px;
+    height: 500px;
+    line-height: 20px;
+    position: fixed;
+    top: 30%; 
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -250px;
+    background-color: #f1c40f;
+    border-radius: 5px;
+    text-align: center;
+    padding-left: 20px;
+    padding-top:20px;
+    padding-right: 20px;
+    z-index: 101; /* 1px higher than the overlay layer */
+}
+
+
+/*    position:fixed;
+    width:600px;
+    top:    160px;
+    left:auto;
+    right:auto;
+    background-color:#fff;
+    color:#7F7F7F;
+    padding-left: 20px;
+    padding-top:20px;
+    padding-right: 20px;
+
+    
+    border:2px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,.5);
+    z-index:101;*/
+    
+    
+a.boxclose{
+    float:right;
+    width:26px;
+    height:26px;
+    background:transparent url(images/cancel.png) repeat top left;
+    margin-top:-30px;
+    margin-right:-30px;
+    cursor:pointer;
+}
+
 #map { height: 180px; }
 
 .remove_marker {
@@ -37,8 +102,8 @@ color: #ffffff;
 
   background-color: #c0c0c0;
   color: #000000;
-  font-size: 12px;
-  max-height: 300px;
+  font-size: 14px;
+  max-height: 500px;
   padding: 2px;
   border-radius: 4px;
   overflow:auto;
@@ -52,6 +117,8 @@ color: #ffffff;
   padding: 0px;
   margin: 0px;
   color: #000000;
+  background-color: #c0c0c0;
+  text-align: left;
 }
 
 #nodelist li{
@@ -62,15 +129,30 @@ color: #ffffff;
 }
 
 #controls {
-  background-color: #FFFFFF;
+  background-color: #c0c0c0;
   color: #000000;
   font-size: 16px;
-  margin: 1px;
-  padding: 2px;
+/*  margin: 1px;
+  padding: 2px;*/
+  text-align: center;
 /*  border-style:solid;
   border-width:2px;
   border-color: #0000ff;
   border-radius: 4px;*/
+}
+
+.intest {
+  background-color: #990000;
+  color: #FFFFFF;
+  font-size: 16px;
+ /* margin: 1px;*/
+  padding: 2px;
+  text-align: center;
+  font-weight: bold;
+/*  border-style:solid;
+  border-width:2px;
+  border-color: #0000ff;*/
+/*  border-radius: 4px;*/
 }
 
 .subform {

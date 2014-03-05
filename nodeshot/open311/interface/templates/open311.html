@@ -1,0 +1,254 @@
+{% load staticfiles %}
+
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" href="{% static 'interface/css/bootstrap.css' %}" />
+
+
+
+       <style>
+            body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
+        </style>
+
+	<link rel="stylesheet" href="{% static 'interface/css/bootstrap-responsive.css' %}" />
+	<link rel="stylesheet" href="{% static 'interface/css/main.css' %}" />
+        <!--<link rel="stylesheet" href="css/main.css">-->
+        <link rel="stylesheet" href="{% static 'interface/css/leaflet.css' %}" />
+
+
+        <script src="{% static 'interface/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js' %}"></script>
+    </head>
+
+
+       
+<!-- Templates -->
+
+<script id="tmplLogin" type="text/template">
+<input id="user" class="span2" type="text" placeholder="Email">
+<input id="password" class="span2" type="password" placeholder="Password">
+<button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
+<a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-info">Facebook Sign in</a>
+<a href="{% url "socialauth_begin" "google" %}" class="btn btn-inverse">Google</a>
+</script>
+
+
+	
+<script id="tmplLogout" type="text/template">
+<span class="userLogged">Hello <%= user %> </span>
+<button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>
+</script>
+
+<script id="tmplcheckArea" type="text/template">
+     
+Choose a layer:<br>
+ 
+    <% for (var i = 0; i < choices.length; i++) { %>
+     
+ <% var layer = choices[i]; %>
+
+<input type="radio" name="layer" id="<%=layer.id %>" style="vertical-align: middle; margin: 0px;" value="<%=layer.id %>,<%=layer.name %> "/>
+<%=layer.name %><br/>    
+
+  
+    <% } %>
+<button id="sendLayer">Go</button>
+
+</script>
+
+<script id="tmplConfirmPos" type="text/template">
+<strong>Is position correct ?</strong><br>
+<button id="confirm" class="confirm_marker" onclick=markerConfirm(markerLocation)>Confirm</button>&nbsp;
+<button class="remove_marker" onclick=markerDelete(marker)>Delete</b>
+</script>
+
+<script id="tmplNodelist" type="text/template">
+  Requests found <strong><%= nodes.length %></strong> 
+   <ul> <% for (var i = 0; i < nodes.length; i++) { %>
+      <% var node = nodes[i]; %>
+      <li>
+      <a href="#" class="list-link" data-id='<%= node.request_id %>' ><%= node.description %></a>
+      </li>
+    <% } %>
+  </ul>
+</script>
+
+<script id="tmplComments" type="text/template">
+     Comments on node: <strong><%= node %></strong><br>
+	<div id="comment" >
+    <% for (var i = 0; i < comments.length; i++) { %>
+      <% var comment = comments[i]; %>
+		<div  class="comment_div">
+		<span class="comment_user">
+		    <%= comment.username %>
+		</span>
+		<div class="comment_text">
+		<%- comment.text %>
+		</div>
+		<span class="comment_date"><%= comment.added %></span>	
+		</div>
+		
+    <% }
+    
+    %>
+  </div><div id="pagingControls"></div>
+<hr>Add your:<br>
+<textarea id="commentText"></textarea><br>
+<button onclick=postComment("<%= node %>");>Add comment</button>
+</script>
+
+<script id="tmplInsertNode" type="text/template">
+<!--<form class="subform"  >-->
+<p><strong>Insert request details</strong></p>
+
+<form id="requestForm"  >
+  <input type="hidden" name="service_code" value="node">
+    <input type="hidden" name="name" value="test">
+	<p>
+	<label for="layerToInsert" >Layer</label>
+
+	<select name="layer" >
+	  <% for (var i = 0; i < layers.length; i++) { %>
+      <% var layer = layers[i]; %>
+	 <option value="<%= layer.slug %>"> <%= layer.name %>
+	     <% }
+	      %>
+	</select>
+	</p>
+	<p>
+	<label for="nodeToInsertName" >Description</label>
+	<input class="input" name="description">
+	</p>
+	
+	<label for="nodeToInsertAddress" >Address <br>(from Open Street Map)</label>
+	<div id="loadingAddress" >Loading...</div>
+	<textarea class="input" name="address"></textarea>	
+	
+	<p>
+	<label for="nodeToInsertLat">Lat</label>   
+	<input class="input" name="lat">
+	</p>
+	  <p>
+	<label for="nodeToInsertLng">Lng</label>   
+	<input class="input" name="lng">
+	</p>
+	  <label for="imageToInsert">Image</label>   
+	 <input type="file" name="image" id="photoimg" />
+	</p>
+	  <!--<button  onclick=postNode();>Insert request</button>-->
+	  <input type=submit>
+</form>
+</script>
+
+
+<script id="tmplLayerList" type="text/template">
+<option value="<%= layer.slug %>"> <%= layer.name %>
+</option>
+</script>
+
+<script id="tmplOpen311Popup" type="text/template">
+<strong>Request ID: </strong><%= request_id %><br>
+<strong>Status: </strong><%= status %><br>
+<a href="<%= url %>">View details</a>
+</script>
+
+<script id="tmplOpen311Request" type="text/template">
+<span class="requestField">Description: </span>
+<span class="requestField"><%= request.description %></span><br>
+<span class="requestField">Status: </span>
+<span class="requestField"><%= request.status %></span><br>
+<span class="requestField">Address: </span>
+<span class="requestField"><%= request.address %></span><br>
+<span class="requestField">Requested on: </span>
+<span class="requestField"><%= request.requested_datetime %></span><br>
+<span class="requestField">Updated on: </span>
+<span class="requestField"><%= request.updated_datetime %></span><br>
+</script>
+
+<script id="tmplNodePopup" type="text/template">
+<strong><%= node %></strong><br>
+<%= address %><br>
+</script>
+
+<script id="tmplNodePopupRating" type="text/template">
+<strong>Rating:</strong><br>
+<div id="star"></div>
+</script>
+
+<script id="tmplNodePopupVoting" type="text/template">
+<strong>Votes:</strong><br>
+In favour: <strong><%= likes %></strong><br>
+Against: <strong><%= dislikes %></strong><br>
+<button class="vote" onclick=postVote('<%= nodeSlug %>',1)>In favour</button>
+<button class="vote" onclick=postVote('<%= nodeSlug %>',-1)>Against</button><br>
+</script>
+
+<script id="tmplNodePopupComments" type="text/template">
+<strong>Comments:</strong><br>
+<a onclick=showComments('<%= nodeSlug %>');>comments: <%= comments %></a><br>
+</script>
+
+<!-- End of Templates -->
+<body>
+  <div class="overlay" id="overlay" style="display:none;"></div>
+<div id="serviceRequestForm" style="display: none;">
+<a class="boxclose" id="boxclose"></a>
+</div>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="#"><img src="{% static 'interface/css/images/nodeshot-311-logo.png' %}" /></img></a>
+                    <div class="nav-collapse collapse">
+                        
+                        <form id="userForm" class="navbar-form pull-right">
+			 {% if not user.is_authenticated %}
+                         <input id="user" class="span2" type="text" placeholder="Email">
+                         <input id="password" class="span2" type="password" placeholder="Password">
+                         <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
+			 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-info">Facebook Sign in</a>
+			 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-inverse">Google</a>
+			  {% else %}
+			   <span class="userLogged">Hello  {{ user }}  </span>
+			    <button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>
+			 {% endif %}  
+                        </form>
+                    </div><!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+{% block container %}
+
+{% endblock container %}
+
+<script>window.__BASEURL__ = '{% url 'ui:index' %}'</script>
+<script src="{% static 'interface/js/vendor/underscore-min.js' %}"></script>
+<script src="{% static 'interface/js/vendor/jquery-1.9.1.min.js' %}"></script>
+<script src="{% static 'interface/js/vendor/bootstrap.min.js' %}"></script>
+<script src="{% static 'interface/js/utils.js' %}"></script>
+<script src="{% static 'interface/js/functions.js' %}"></script>
+{% block scripts%}
+
+{% endblock scripts%}	
+
+
+
+    </body>
+</html>

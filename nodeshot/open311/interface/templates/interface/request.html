@@ -1,2 +1,29 @@
-Request_id: {{ request_id }}
-participation: {{ participation }}
+{% extends "open311.html" %}
+{% load staticfiles %}
+
+{% block container %}
+ <div class="container">
+<div class="row">
+    <div class="span6">
+        <div id="request">
+            
+        </div>
+   </div>
+     <div class="span6">
+   </div>
+</div>
+ </div>
+{% endblock container %}
+ Request_id: {{ request_id }}<br>
+participation: {{ participation }}<br>
+Layer: {{ layer.name }}<br>
+Node:  {{node.slug}}<br>
+comments: {{comments}}<br>
+likes: {{likes}}<br>
+dislikes: {{dislikes}}<br>
+rating_avg: {{rating_avg}}<br>
+rating_count: {{rating_count}}<br>
+{% block scripts%}
+<script>window.request_id = '{{ request_id }}'</script>
+<script src="{% static 'interface/js/request.js' %}"></script>
+{% endblock scripts%}
