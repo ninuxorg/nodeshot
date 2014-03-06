@@ -619,7 +619,7 @@ if 'social_auth' in INSTALLED_APPS:
     # register a new app:
     GITHUB_APP_ID = ''
     GITHUB_API_SECRET = ''
-    GITHUB_EXTENDED_PERMISSIONS = ['email']
+    GITHUB_EXTENDED_PERMISSIONS = ['user:email']
     
     SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
     SOCIAL_AUTH_UUID_LENGTH = 3
