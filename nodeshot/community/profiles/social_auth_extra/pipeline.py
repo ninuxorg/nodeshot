@@ -44,13 +44,13 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
             try:
                 user.city, user.country = response.get('hometown').get('name').split(', ')
             except AttributeError:
-                raise ImproperlyConfigured('facebook must return hometown info in response, add this permission to your facebook app')
+                pass
             
             try:
                 user.birth_date = datetime.strptime(response.get('birthday'), '%m/%d/%Y').date()
             except AttributeError:
-                raise ImproperlyConfigured('facebook must return birthday info in response, add this permission to your facebook app')
-            
+                pass
+ 
             user.save()
         
         return {'social_user': social_user}
