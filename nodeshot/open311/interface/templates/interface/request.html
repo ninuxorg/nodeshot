@@ -4,12 +4,16 @@
 {% block container %}
  <div class="container">
 <div class="row">
-    <div class="span6">
+    <div  id="left" class="span6">
         <div id="request">
             
         </div>
+        
+        
    </div>
-     <div class="span6">
+     <div id="right" class="span6">
+       
+        
    </div>
 </div>
  </div>
@@ -25,5 +29,17 @@ rating_avg: {{rating_avg}}<br>
 rating_count: {{rating_count}}<br>
 {% block scripts%}
 <script>window.request_id = '{{ request_id }}'</script>
+<script>window.category = '{{ layer.name }}'</script>
+<script>window.nodeSlug = '{{ node.slug }}'</script>
+<script>window.nodeId = '{{ node.id }}'</script>
+<!--<script>window.comments = '{{ comments }}'</script>
+<script>window.likes = '{{ likes }}'</script>
+<script>window.dislikes = '{{ dislikes}}'</script>
+<script>window.rating_avg = '{{ rating_avg }}'</script>
+<script>window.rating_count = '{{ rating_count }}'</script>-->
+<script>
+window.nodeSettings = getData(window.__BASEURL__ + 'api/v1/nodes/' + window.nodeSlug + '/participation_settings/');
+window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + nodeSlug + '/participation/');
+</script>
 <script src="{% static 'interface/js/request.js' %}"></script>
 {% endblock scripts%}

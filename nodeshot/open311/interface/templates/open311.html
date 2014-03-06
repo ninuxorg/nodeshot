@@ -77,35 +77,13 @@ Choose a layer:<br>
    <ul> <% for (var i = 0; i < nodes.length; i++) { %>
       <% var node = nodes[i]; %>
       <li>
-      <a href="#" class="list-link" data-id='<%= node.request_id %>' ><%= node.description %></a>
+      <a href="#" class="list-link" data-id='<%= node.request_id %>' ><%= node.request_id %></a>
       </li>
     <% } %>
   </ul>
 </script>
 
-<script id="tmplComments" type="text/template">
-     Comments on node: <strong><%= node %></strong><br>
-	<div id="comment" >
-    <% for (var i = 0; i < comments.length; i++) { %>
-      <% var comment = comments[i]; %>
-		<div  class="comment_div">
-		<span class="comment_user">
-		    <%= comment.username %>
-		</span>
-		<div class="comment_text">
-		<%- comment.text %>
-		</div>
-		<span class="comment_date"><%= comment.added %></span>	
-		</div>
-		
-    <% }
-    
-    %>
-  </div><div id="pagingControls"></div>
-<hr>Add your:<br>
-<textarea id="commentText"></textarea><br>
-<button onclick=postComment("<%= node %>");>Add comment</button>
-</script>
+
 
 <script id="tmplInsertNode" type="text/template">
 <!--<form class="subform"  >-->
@@ -113,8 +91,7 @@ Choose a layer:<br>
 
 <form id="requestForm"  >
   <input type="hidden" name="service_code" value="node">
-    <input type="hidden" name="name" value="test">
-	<p>
+ 
 	<label for="layerToInsert" >Layer</label>
 
 	<select name="layer" >
@@ -126,21 +103,26 @@ Choose a layer:<br>
 	</select>
 	</p>
 	<p>
+	  
+	<label for="nodeToInsertName" >Name</label>
+	<input class="input" name="name">
+	</p>
+	
 	<label for="nodeToInsertName" >Description</label>
 	<input class="input" name="description">
 	</p>
 	
 	<label for="nodeToInsertAddress" >Address <br>(from Open Street Map)</label>
 	<div id="loadingAddress" >Loading...</div>
-	<textarea class="input" name="address"></textarea>	
+	<textarea id="requestAddress" class="input" name="address"></textarea>	
 	
 	<p>
 	<label for="nodeToInsertLat">Lat</label>   
-	<input class="input" name="lat">
+	<input id="requestLat" class="input" name="lat">
 	</p>
 	  <p>
 	<label for="nodeToInsertLng">Lng</label>   
-	<input class="input" name="lng">
+	<input id="requestLng" class="input" name="lng">
 	</p>
 	  <label for="imageToInsert">Image</label>   
 	 <input type="file" name="image" id="photoimg" />
@@ -164,15 +146,59 @@ Choose a layer:<br>
 
 <script id="tmplOpen311Request" type="text/template">
 <span class="requestField">Description: </span>
-<span class="requestField"><%= request.description %></span><br>
+<%= request.description %><br>
 <span class="requestField">Status: </span>
-<span class="requestField"><%= request.status %></span><br>
+<%= request.status %><br>
 <span class="requestField">Address: </span>
-<span class="requestField"><%= request.address %></span><br>
+<%= request.address %><br>
 <span class="requestField">Requested on: </span>
-<span class="requestField"><%= request.requested_datetime %></span><br>
+<%= request.requested_datetime %><br>
 <span class="requestField">Updated on: </span>
-<span class="requestField"><%= request.updated_datetime %></span><br>
+<%= request.updated_datetime %><br>
+<img class="thumbnail" src="<%= request.image_urls[0] %>">
+</script>
+
+<script id="tmplOpen311Votes" type="text/template">
+<div id="votes">
+<div class="intest">Votes</div>           
+<p><img src="{% static 'interface/img/likes.jpg' %}" /><%= likes %> </p>
+<p><img src="{% static 'interface/img/dislike.jpg' %}" /><%= dislikes %> </p>
+
+<div id="insert_vote" class="insert_vote">
+Your vote:  
+<button id="likeButton">I like it</button>
+<button id="unlikeButton">I don't</button>
+</div>
+<div id="vote_messages" class="messages"></div>
+</div>
+</script>
+
+<script id="tmplComments" type="text/template">
+<div id="comments">
+<div class="intest">Comments</div>
+<textarea id="commentText" class="your_comment"></textarea><br>
+<button id="post_comments" >Add comment</button>
+<div id="comment_messages" class="messages"></div>
+<hr>
+<p><strong><%= comments_count%> people already commented:</strong></p>    
+	<div id="comment" >
+    <% for (var i = 0; i < comments.length; i++) { %>
+      <% var comment = comments[i]; %>
+		<div  class="comment_div">
+		<span class="comment_user">
+		    <%= comment.username %>
+		</span>
+		<div class="comment_text">
+		<%- comment.text %>
+		</div>
+		<span class="comment_date"><%= comment.added %></span>	
+		</div>
+		
+    <% }
+    
+    %>
+  </div>
+</div> 	
 </script>
 
 <script id="tmplNodePopup" type="text/template">
@@ -215,7 +241,9 @@ Against: <strong><%= dislikes %></strong><br>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="#"><img src="{% static 'interface/css/images/nodeshot-311-logo.png' %}" /></img></a>
+                    <a class="brand" href="#">
+		      <img src="{% static 'interface/css/images/nodeshot-311-logo.png' %}" />
+		    </a>
                     <div class="nav-collapse collapse">
                         
                         <form id="userForm" class="navbar-form pull-right">

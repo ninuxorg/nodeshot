@@ -53,7 +53,7 @@ for (var i in layers) {
     //    var messageToDisplay = "CSS info missing for this layers: \n" + message
     //    alert(messageToDisplay)
     //}
-    var color="#5000ff";
+    var color="#0000ff";
     createlayersCSS(layers[i].slug, color);
 }
 

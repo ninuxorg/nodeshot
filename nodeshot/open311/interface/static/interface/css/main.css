@@ -2,7 +2,7 @@
    Author's custom styles
    ========================================================================== */
 body {
-  background-color: #FFCC33;
+  background-color: #FF9900;
 }
 .row{
   margin-top: 25px;
@@ -21,7 +21,7 @@ body {
 
 #serviceRequestForm {
     width: 400px;
-    height: 500px;
+    height: 600px;
     line-height: 20px;
     position: fixed;
     top: 30%; 
@@ -30,6 +30,8 @@ body {
     margin-left: -250px;
     background-color: #f1c40f;
     border-radius: 5px;
+    border-color: black;
+    border: thin solid;
     text-align: center;
     padding-left: 20px;
     padding-top:20px;
@@ -66,7 +68,13 @@ a.boxclose{
     cursor:pointer;
 }
 
-#map { height: 180px; }
+
+.thumbnail{
+  width:200px;
+  height: 150px;
+  
+}
+
 
 .remove_marker {
   background-color: #ff0000;
@@ -128,7 +136,7 @@ color: #ffffff;
   
 }
 
-#controls {
+.controls {
   background-color: #c0c0c0;
   color: #000000;
   font-size: 16px;
@@ -198,22 +206,89 @@ margin-bottom: 0px;
   display:none;
 }*/
 
+.messages {
+  font-size: 12px;
+  margin:1px;
+}
+#request{
+  background-color: #FFFFFF;
+  margin-bottom: 10px;
+  padding: 5px;
+    border-style:solid;
+  border-width:2px;
+  border-color: #0000ff;
+  border-radius: 4px;
+}
+
+#request .requestField{
+  font-weight: bold;
+}
+
+#votes {
+  width: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  background-color: #FFFFFF;
+  /*padding: 5px;*/
+}
+
+#votes img {
+  width: 40px;
+  height: 40px;
+  margin-right: 15px;
+  margin-left: 5px;
+  margin-top: 5px;
+  padding-bottom: 5px;
+}
+
+.insert_vote{
+  font-size: 16px;
+  padding:5px;
+  background-color: #cccccc;
+}
+
 #comments {
   background-color: #cccccc;
   color: #000000;
   font-size: 12px;
   margin: 1px;
-  padding: 2px;
-  border-style:solid;
-  border-width:2px;
-  border-color: #0000ff;
-  border-radius: 4px;
+  padding: 5px;
+  /*border-style:solid;*/
+  /*border-width:2px;*/
+  /*border-color: #0000ff;*/
+  /*border-radius: 4px;*/
 /*  max-height: 300px;
   overflow:auto;*/
 }
 
+#comment {
+  background-color: #c0c0c0;
+  color: #000000;
+  font-size: 12px;
+  margin: 1px;
+  padding: 2px;
+/*  border-style:solid;
+  border-width:2px;
+  border-color: #0000ff;
+  border-radius: 4px;*/
+  max-height: 200px;
+  overflow:auto;
+}
+
+.your_comment{
+    font-size:14px;
+    color:#000000;
+    background-color: #FFFFFF;
+    word-wrap: break-word;
+    border-style:solid;
+    border-width:1px;
+    padding: 3px;
+    width: 80%;
+    height: 100px;
+}
+
 .comment_text{
-    font-size:11px;
+    font-size:14px;
     color:#000000;
     background-color: #FFFFFF;
     word-wrap: break-word;
@@ -221,12 +296,11 @@ margin-bottom: 0px;
     border-width:1px;
     padding: 3px;
     margin: 1px;
-
-     
+    width: 80%;    
 }
 
 .comment_user{
-    font-size:10px;
+    font-size:12px;
     color:#0000FF;
     background-color: #CCCCCC;
     word-wrap: break-word;
@@ -235,7 +309,7 @@ margin-bottom: 0px;
 }
 
 .comment_date{
-    font-size:10px;
+    font-size:11px;
     color:#000000;
     background-color: #CCCCCC;
     word-wrap: break-word;

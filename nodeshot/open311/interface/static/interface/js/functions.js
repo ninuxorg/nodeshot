@@ -56,7 +56,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             populateOpen311Div(slug,"true");
             marker.addTo(map)
             marker.bindPopup(nodeDiv)
-            populateRating(slug,nodeDiv,nodeRatingAVG)
+            //populateRating(slug,nodeDiv,nodeRatingAVG)
             marker.openPopup()
         })
     }
@@ -242,95 +242,23 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
          */
         openForm(marker);
         map.closePopup();
-        //$("#insertMarker").html('');
-        ////check if point is contained in more than one layer
-        //var areaLayer = L.geoJson(geojsonlayers);
-        //var results = leafletPip.pointInLayer(markerLocation, areaLayer, false);
-        //// 0=point not in Layers, 1= point in 1 layer, default = point in multiple layers
-        //switch (results.length) {
-        //    case 0:
-        //        var noAreaLayers = [];
-        //        for (var i in layers) {
-        //            if (layers[i].area === null) {
-        //                noAreaLayers.push(layers[i]);
-        //            }
-        //
-        //        }
-        //        var tmplMarkup = $('#tmplcheckArea').html();
-        //        var compiledTmpl = _.template(tmplMarkup, {
-        //            choices: noAreaLayers
-        //        });
-        //        $("#insertMarker").append(compiledTmpl);
-        //        $("#sendLayer").click(function () {
-        //            var layerValues = $("input[name=\'layer\']:checked").val().split(",");
-        //            openInsertDiv(marker, layerValues[0], layerValues[1]);
-        //            $('.leaflet-popup-content-wrapper').hide()
-        //        });
-        //        break;
-        //    case 1:
-        //        openInsertDiv(marker, results[0].feature.properties.id, results[0].feature.properties.name);
-        //        map.closePopup();
-        //        break;
-        //    default:
-        //        var FoundedLayers = [];
-        //        for (var i in results) {
-        //            console.log(results[i].feature.properties.name);
-        //            FoundedLayers.push(results[i].feature.properties);
-        //        };
-        //        var tmplMarkup = $('#tmplcheckArea').html();
-        //        var compiledTmpl = _.template(tmplMarkup, {
-        //            choices: FoundedLayers
-        //        });
-        //        $("#insertMarker").append(compiledTmpl);
-        //        $("#sendLayer").click(function () {
-        //
-        //            var layerValues = $("input[name=\'layer\']:checked").val().split(",");
-        //            openInsertDiv(marker, layerValues[0], layerValues[1]);
-        //            $('#tmplcheckArea').hide()
-        //        });
-        //}
 
     }
 
-    //function openInsertDiv(latlng, layerID, layerName) {
-    //    /*
-    //     *Creates node's insertion form
-    //     */
-    //    var latlngToString = latlng.toString();
-    //    var arrayLatLng = latlngToString.split(",");
-    //    var lat = arrayLatLng[0].slice(7);
-    //    var lng = arrayLatLng[1].slice(0, -1);
-    //
-    //    var tmplMarkup = $('#tmplInsertNode').html();
-    //    var compiledTmpl = _.template(tmplMarkup);
-    //    var nodeInsertDiv = $("<div>", {
-    //        id: "nodeInsertDiv"
-    //    });
-    //
-    //    $(nodeInsertDiv).html(compiledTmpl);
-    //    $("#valori").html(nodeInsertDiv)
-    //    $("#nodeToInsertLng").val(lng);
-    //    $("#nodeToInsertLat").val(lat);
-    //    $("#layerToInsert").val(layerName);
-    //    $("#layerIdToInsert").val(layerID);
-    //    $('#layerToInsert').attr('readonly', true);
-    //    $('#nodeToInsertLng').attr('readonly', true);
-    //    $('#nodeToInsertLat').attr('readonly', true);
-    //
-    //    getAddress();
-    //
-    //}
     
     function openForm(marker){
             var latlngToString = marker.toString();
             var arrayLatLng = latlngToString.split(",");
             var lat = arrayLatLng[0].slice(7);
             var lng = arrayLatLng[1].slice(0, -1);
-            console.log(layers)
+            //console.log(nodeToInsert)
+            var latlng = new L.LatLng(lat, lng);
+            
+            //console.log(layers)
             $('#overlay').fadeIn('fast',function(){
             $('#serviceRequestForm').show();
 	    $('#serviceRequestForm').html('<a class="boxclose"  id="boxclose"></a>');
-	    $('#boxclose').bind("click",function(){
+	    $('#boxclose').on("click",function(){
 				       $('#serviceRequestForm').hide("fast",function(){
 				       $('#overlay').fadeOut('fast');
 				  });
@@ -343,94 +271,60 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
     
             $('#serviceRequestForm').append(compiledTmpl);
             //$("#valori").html(nodeInsertDiv)
-            $("#nodeToInsertLng").val(lng);
-            $("#nodeToInsertLat").val(lat);
+            $("#requestLng").val(lng);
+            $("#requestLat").val(lat);
             //$("#layerToInsert").val(layerName);
             //$("#layerIdToInsert").val(layerID);
             $('#layerToInsert').attr('readonly', true);
             $('#nodeToInsertLng').attr('readonly', true);
             $('#nodeToInsertLat').attr('readonly', true);
     
-            getAddress();
+            getAddress(lat,lng);
             $("#requestForm").submit(function(event){
  
             //disable the default form submission
             event.preventDefault();
-            alert("sending")
+            //alert("sending")
                 //grab all form data  
             var formData = new FormData($(this)[0]);
  
-  $.ajax({
-    url: window.__BASEURL__ + 'api/v1/open311/requests/',
-    type: 'POST',
-    data: formData,
-    async: false,
-    cache: false,
-    contentType: false,
-    processData: false,
-    success: function (returndata) {
-      alert(returndata);
-    }
-  });
+            $.ajax({
+              url: window.__BASEURL__ + 'api/v1/open311/requests/',
+              type: 'POST',
+              data: formData,
+              async: false,
+              cache: false,
+              contentType: false,
+              processData: false,
+              success: function (returndata) {
+                console.log(returndata);
+                clearLayers();
+                    map.removeControl(mapControl)
+                    mapLayersArea = loadLayersArea(geojsonlayers);
+                    mapLayersNodes = loadLayers(layers);
+                    mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
+                    newMarker = L.marker(latlng).addTo(map);
+                    popupMessage="Request has been inserted<br>"
+                    
+                    var url = window.__BASEURL__ + 'open311/request/'
+                    var requestUrl = url  + returndata
+                    popupMessage+="<br><a href='"+requestUrl+"'>"+returndata+"</a>"
+
+                    newMarker.bindPopup(popupMessage).openPopup();
+                    map.panTo(latlng)
+                    //newMarker.bindPopup(nodeDiv).openPopup();
+                    $('#serviceRequestForm').hide("fast",function(){
+				       $('#overlay').fadeOut('fast');})
+                    $("#nodeInsertDiv").html('Node inserted');
+              }
+            });
  
   return false;
 });
 });
 }
     
-    function postNode() {
-        /*
-         * Inserts node in DB and displays it on map
-         */
-        var nodeToInsert = new FormData($("#requestForm"));
-        var lng = $("#nodeToInsertLng").val();
-        var lat = $("#nodeToInsertLat").val();
-        var latlngToInsert = lat + '\,' + lng;
-        //nodeToInsert["service_code"] = "node"
-        //nodeToInsert["layer"] = $("#layerToInsert").val();
-        //nodeToInsert["name"] = $("#nodeToInsertName").val();
-        //nodeToInsert["description"] = $("#nodeToInsertName").val();
-        //nodeToInsert["slug"] = convertToSlug($("#nodeToInsertName").val())
-        //nodeToInsert["address"] = $("#nodeToInsertAddress").val();
-        //nodeToInsert["lat"] = lat
-        //nodeToInsert["lng"] = lng
-        console.log(nodeToInsert)
-        var latlng = new L.LatLng(lat, lng);
-        var ok = confirm("Add service request?");
-        if (ok == true) {
-            $.ajax({
-                type: "POST",
-                url: window.__BASEURL__ + 'api/v1/open311/requests/',
-                data: nodeToInsert,
-                dataType: 'json',
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    //Reload map to include new node, this should be definetely improved
-                    alert('success')
-                    clearLayers();
-                    map.removeControl(mapControl)
-                    mapLayersArea = loadLayersArea(geojsonlayers);
-                    mapLayersNodes = loadLayers(layers);
-                    mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
-                    newMarker = L.marker(latlng).addTo(map);
-                    //populateNodeDiv(nodeToInsert["slug"],"true");
-                    newMarker.bindPopup("Node added").openPopup();
-                    map.panTo(latlng)
-                    //newMarker.bindPopup(nodeDiv).openPopup();
-                    $("#nodeInsertDiv").html('Node inserted');
-                    //populateRating(nodeToInsert["slug"],nodeDiv,nodeRatingAVG);
 
-                },
-                error: function(){
-                    alert('error');
-                    //return(false);
-                }
-
-            });
-        }
-    }
 
     function clearLayers() {
         /*
@@ -563,35 +457,45 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         return (nodeDiv, nodeRatingAVG)
 
     }
-
-
-    function showComments(nodeSlug) {
-        /*
-         * Populates a Div with node's comments
-         */
-
-        $("#valori").html('');
-        var commentsDiv = $("<div>", {
-            id: "comments"
+    
+    function getParticipationData(){
+        window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + nodeSlug + '/participation/');
+    }
+    
+    function showVotes(likes,dislikes){
+        var tmplMarkup = $('#tmplOpen311Votes').html();
+        var compiledTmpl = _.template(tmplMarkup, {
+            likes: likes,
+            dislikes:dislikes
         });
+        $("#votes").html('')
+        $("#left").append(compiledTmpl);
+        $("#likeButton").on("click",function(){
+				       postVote(nodeId, 1);
+				  });
+        $("#unlikeButton").on("click",function(){
+				       postVote(nodeId, -1);
+				  });
+    }
+
+    function showComments(nodeSlug,comments_count) {
         url = window.__BASEURL__ + 'api/v1/nodes/' + nodeSlug + '/comments/?format=json';
         var comments = getData(url);
         var tmplMarkup = $('#tmplComments').html();
         var compiledTmpl = _.template(tmplMarkup, {
             comments: comments,
-            node: nodeSlug
-        }); //Template should also get node name 
-        $(commentsDiv).html(compiledTmpl);
-
-        $("#valori").append(commentsDiv);
-
-        pager = new Imtech.Pager(); //Paging of comments in div
-        pager.paragraphsPerPage = 5; // set amount elements per page
-        pager.pagingContainer = $('#comment'); // set of main container
-        pager.paragraphs = $('div.comment_div', pager.pagingContainer); // set of required containers
-        pager.showPage(1);
+            node: nodeId,
+            comments_count: comments_count
+        });
+        $("#right").html('');
+        $("#right").append(compiledTmpl);
+        $("#post_comments").on("click",function(){
+				       postComment(nodeId);
+				  });
 
     }
+    
+    
 
     /* INSERTION OF NODES' PARTICIPATION DATA 
      * ====================================== */
@@ -603,7 +507,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         populateRating(nodeSlug, nodeDiv, nodeRatingAVG);
     }
 
-    function postComment(nodeSlug) {
+    function postComment(nodeID) {
         /*
          * post a comment
          */
@@ -612,22 +516,28 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         if (ok == true) {
             $.ajax({
                 type: "POST",
-                url: window.__BASEURL__ + 'api/v1/nodes/' + nodeSlug + '/comments/',
+                url: window.__BASEURL__ + 'api/v1/open311/requests/',
                 data: {
+                    "service_code": "comment",
+                    "node": nodeID,
                     "text": comment
                 },
                 dataType: 'json',
                 success: function (response) {
-                    reloadNodeDiv(nodeSlug)
-                    showComments(nodeSlug);
-                    alert("Your comment has been added!");
+                    getParticipationData()
+                    
+                    showComments(nodeSlug,nodeParticipation.participation.comment_count);
+                    $("#comment_messages").html("Thanks for your comment");
+                    
                 }
 
             });
+        
         }
+        
     }
 
-    function postVote(nodeSlug, vote) {
+    function postVote(nodeID, vote) {
         /*
          * post a vote
          */
@@ -635,15 +545,23 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
         if (ok == true) {
             $.ajax({
                 type: "POST",
-                url: 'http://localhost:8000/api/v1/nodes/' + nodeSlug + '/votes/',
+                url: window.__BASEURL__ + 'api/v1/open311/requests/',
                 data: {
+                    "service_code": "vote",
+                    "node": nodeID,
                     "vote": vote
                 },
                 dataType: 'json',
                 success: function (response) {
-                    reloadNodeDiv(nodeSlug)
-                    alert("Your vote has been added!");
+                    getParticipationData()
+                    showVotes(nodeParticipation.participation.likes,nodeParticipation.participation.dislikes);
+                    $("#vote_messages").html("Thanks for your vote");
+                },
+                error: function (jqXHR,error, errorThrown) {
+                    console.log(jqXHR)
+                    $("#vote_messages").html(jqXHR.responseText);
                 }
+                
 
             });
         }
