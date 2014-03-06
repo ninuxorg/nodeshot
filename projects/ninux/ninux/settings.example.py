@@ -251,48 +251,35 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        #'file': {
-        #    'level': 'INFO',
-        #    'class': 'logging.FileHandler',
-        #    'formatter': 'verbose',
-        #    'filename': 'ninux.log'
-        #},
-        #'logfile': {
-        #    'level':'DEBUG',
-        #    'class':'logging.handlers.RotatingFileHandler',
-        #    'filename': SITE_ROOT + "/debug.log",
-        #    'maxBytes': 50000,
-        #    'backupCount': 2,
-        #    'formatter': 'custom',
-        #},
+        'logfile': {
+            'level': 'ERROR',
+            'class':'logging.handlers.RotatingFileHandler',
+            'formatter': 'verbose',
+            'filename': SITE_ROOT + "/../log/ninux.error.log",
+            'maxBytes': 10485760,  # 10 MB
+            'backupCount': 3,
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
-        #'django': {
-        #    'handlers':['logfile'],
-        #    'level':'DEBUG',
-        #    'propagate': True,
-        #},
-        #'django.request': {
-        #    'handlers': ['mail_admins', 'logfile'],
-        #    'level': 'DEBUG',
-        #    'propagate': True,
-        #},
-        #'nodeshot.community.mailing': {
-        #    'handlers': ['logfile'],
-        #    'level': 'DEBUG',
-        #},
-        #'nodeshot.core.layers': {
-        #    'handlers': ['logfile'],
-        #    'level': 'DEBUG',
-        #},
-        #'nodeshot.community.profiles': {
-        #    'handlers': ['logfile'],
-        #    'level': 'DEBUG',
-        #},
+        'django': {
+            'handlers':['logfile'],
+            'level':'ERROR',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['mail_admins', 'logfile'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        '': {
+            'handlers': ['logfile'],
+            'level': 'ERROR',
+        },
     },
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': '\n\n[%(levelname)s %(asctime)s] module: %(module)s, process: %(process)d, thread: %(thread)d\n%(message)s'
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
