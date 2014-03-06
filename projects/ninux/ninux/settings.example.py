@@ -589,38 +589,43 @@ if 'test' in sys.argv:
 
 # ------ SOCIAL AUTH SETTINGS ------ #
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'nodeshot.community.profiles.backends.EmailBackend',
-    'social_auth.backends.facebook.FacebookBackend',
-    'social_auth.backends.google.GoogleBackend',
-)
-
-SOCIAL_AUTH_PIPELINE = (
-    'social_auth.backends.pipeline.social.social_auth_user',
-    #'social_auth.backends.pipeline.associate.associate_by_email',
-    'social_auth.backends.pipeline.user.get_username',
-    'social_auth.backends.pipeline.user.create_user',
-    'social_auth.backends.pipeline.social.associate_user',
-    'nodeshot.community.profiles.social_auth_extra.pipeline.load_extra_data',
-    'social_auth.backends.pipeline.user.update_user_details'
-)
-
-SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google', 'github')
-
-FACEBOOK_APP_ID              = ''
-FACEBOOK_API_SECRET          = ''
-FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
-
-GITHUB_APP_ID = ''
-GITHUB_API_SECRET = ''
-GITHUB_EXTENDED_PERMISSIONS = ['email']
-
-SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
-SOCIAL_AUTH_UUID_LENGTH = 3
-SOCIAL_AUTH_SESSION_EXPIRATION = False
-SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
-
-LOGIN_URL = '/'
-LOGIN_REDIRECT_URL = '/'
-LOGIN_ERROR_URL    = '/'
+if 'social_auth' in INSTALLED_APPS:
+    MIDDLEWARE_CLASSES += ('social_auth.middleware.SocialAuthExceptionMiddleware',)
+    
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'nodeshot.community.profiles.backends.EmailBackend',
+        'social_auth.backends.facebook.FacebookBackend',
+        'social_auth.backends.google.GoogleBackend',
+    )
+    
+    SOCIAL_AUTH_PIPELINE = (
+        'social_auth.backends.pipeline.social.social_auth_user',
+        #'social_auth.backends.pipeline.associate.associate_by_email',
+        'social_auth.backends.pipeline.user.get_username',
+        'social_auth.backends.pipeline.user.create_user',
+        'social_auth.backends.pipeline.social.associate_user',
+        'nodeshot.community.profiles.social_auth_extra.pipeline.load_extra_data',
+        'social_auth.backends.pipeline.user.update_user_details'
+    )
+    
+    SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google', 'github')
+    
+    # register a new app: 
+    FACEBOOK_APP_ID = ''  # put your app id
+    FACEBOOK_API_SECRET = ''
+    FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+    
+    # register a new app:
+    GITHUB_APP_ID = ''
+    GITHUB_API_SECRET = ''
+    GITHUB_EXTENDED_PERMISSIONS = ['email']
+    
+    SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
+    SOCIAL_AUTH_UUID_LENGTH = 3
+    SOCIAL_AUTH_SESSION_EXPIRATION = False
+    SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
+    
+    LOGIN_URL = '/'
+    LOGIN_REDIRECT_URL = '/'
+    LOGIN_ERROR_URL    = '/'
