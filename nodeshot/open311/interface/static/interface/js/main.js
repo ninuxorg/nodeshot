@@ -1,5 +1,30 @@
+var csrftoken = $.getCookie('csrftoken');
+var markerToRemove //If users insert a new marker previous one has to be deleted from map
+var nodeRatingAVG // Rating data has to be globally available for rating plugin to correctly work
+var markerMap = {} //Object holding all nodes'slug and a reference to their marker
 //Map initialization
 var map = L.map('map').setView([41.87, 12.49], 8);
+//var legend = L.control({position: 'bottomleft'});
+//
+//legend.onAdd = function (map) {
+//
+//    var div = L.DomUtil.create('div','mapLegend'),
+//        open_color = statuses.open.fill_color;
+//        closed_color = statuses.closed.fill_color;
+//
+//
+//    // loop through our density intervals and generate a label with a colored square for each interval
+//    
+//        div.innerHTML = "<span style='color:"+open_color+"'>Open requests</span><br>"
+//        div.innerHTML += "<span style='color:"+closed_color+"'>Closed requests</span><br>"
+//
+//
+//    return div;
+//};
+
+
+
+//legend.addTo(map);
 var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 //Uncomment for Google maps. Must be checked if it works in IE
 var googleHybrid = new L.Google('HYBRID');
@@ -88,6 +113,11 @@ function createlayersCSS(slug, color) {
     vertical-align: middle;\
     font: 14px \"Helvetica Neue\", Arial, Helvetica, sans-serif;\
     border-radius: 20px;\
+    border: thin solid;\
+    border-color: black;\
+    border-size: 3px;\
+    line-height: 30px;\
+    font-weight: bold;\
   } </style>").appendTo("head");
 }
 

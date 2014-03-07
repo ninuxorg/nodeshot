@@ -35,9 +35,7 @@ function getAddress(lat,lng) {
     /*
      * Get Address using OSM Nominatim service
      */
-    //var lng = $("#nodeToInsertLng").val();
-    //var lat = $("#nodeToInsertLat").val();
-    var url = 'http://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1';
+    var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1';
     $.ajax({
         async: true,
         url: url,

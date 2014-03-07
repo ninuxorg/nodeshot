@@ -1,8 +1,3 @@
-var csrftoken = $.getCookie('csrftoken');
-var markerToRemove //If users insert a new marker previous one has to be deleted from map
-var nodeRatingAVG // Rating data has to be globally available for rating plugin to correctly work
-var markerMap = {} //Object holding all nodes'slug and a reference to their marker
-
 /* LAYERS LIST CREATION
  * ====================*/
 
@@ -180,7 +175,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             pointToLayer: function (feature, latlng) {
                 var marker = new
                 L.circleMarker(latlng, {
-                    radius: 6,
+                    radius: 8,
                     fillColor: window.statuses[feature.properties.status].fill_color,
                     color: color,
                     weight: 1,
@@ -468,8 +463,8 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             likes: likes,
             dislikes:dislikes
         });
-        $("#votes").html('')
-        $("#left").append(compiledTmpl);
+        $("#votesContainer").html('')
+        $("#votesContainer").append(compiledTmpl);
         $("#likeButton").on("click",function(){
 				       postVote(nodeId, 1);
 				  });
@@ -487,8 +482,8 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             node: nodeId,
             comments_count: comments_count
         });
-        $("#right").html('');
-        $("#right").append(compiledTmpl);
+        $("#commentsContainer").html('');
+        $("#commentsContainer").append(compiledTmpl);
         $("#post_comments").on("click",function(){
 				       postComment(nodeId);
 				  });

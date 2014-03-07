@@ -6,15 +6,14 @@ var tmplMarkup = $('#tmplOpen311Request').html();
             request: request
         });
         $("#request").append(compiledTmpl);
-//Votes
 
+//Votes
 if (nodeSettings.participation_settings.voting_allowed) {
     console.log("Votes OK")
     showVotes(nodeParticipation.participation.likes,nodeParticipation.participation.dislikes)
-    //showComments(nodeSlug,nodeParticipation.participation.comment_count); 
 }
 
-       
+//Comments       
 if (nodeSettings.participation_settings.comments_allowed) {
     console.log("Comments OK")
     showComments(nodeSlug,nodeParticipation.participation.comment_count); 
