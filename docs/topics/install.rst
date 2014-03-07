@@ -264,14 +264,20 @@ Paste this configuration and tweak it according to your needs::
 	
     server {
         listen   443; ## listen for ipv4; this line is default and implied
-        listen   [::]:443 default ipv6only=on; ## listen for ipv6
+        #listen   [::]:443 default ipv6only=on; ## listen for ipv6
         
         root /var/www/nodeshot/public_html;
         index index.html index.htm;
         
+        # error log
+        error_log /var/www/nodeshot/projects/ninux/log/nginx.error.log error;
+        
         # Make site accessible from hostanme
         # change this according to your domain/hostanme
         server_name nodeshot.yourdomain.com;
+        
+        # set client body size #
+        client_max_body_size 5M;
         
         ssl on;
         ssl_certificate ssl/server.crt;
@@ -367,6 +373,8 @@ Paste this config::
     vacuum=True
     home=/var/www/nodeshot/projects/ninux/python
     enable-threads=True
+    env=HTTPS=on
+    buffer-size=8192
 
 ----------
 Supervisor
@@ -392,7 +400,7 @@ Save this in ``/etc/supervisor/conf.d/uwsgi.conf``::
     autorestart=true
     stopsignal=INT
     redirect_stderr=true
-    stdout_logfile=/var/www/nodeshot/projects/ninux/uwsgi.log
+    stdout_logfile=/var/www/nodeshot/projects/ninux/log/uwsgi.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=5
 
@@ -409,7 +417,7 @@ And paste::
     autostart=true
     autorestart=true
     redirect_stderr=true
-    stdout_logfile=/var/www/nodeshot/projects/ninux/celery.log
+    stdout_logfile=/var/www/nodeshot/projects/ninux/log/celery.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=10
     startsecs=10
@@ -428,7 +436,7 @@ And paste::
     autostart=true
     autorestart=true
     redirect_stderr=true
-    stdout_logfile=/var/www/nodeshot/projects/ninux/celery-beat.log
+    stdout_logfile=/var/www/nodeshot/projects/ninux/log/celery-beat.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=10
     startsects=10
@@ -466,6 +474,11 @@ Change the ``DEBUG`` setting to ``False``, leaving it to ``True`` **might lead t
     # set DEBUG to False
     DEBUG = False
     # save and exit
+
+You might encounter an issue in the Redis log that says:
+"Can't save in background: fork: Cannot allocate memory", in that case run this command:
+
+    echo 1 > /proc/sys/vm/overcommit_memory 
 
 ---------------------
 Restart all processes

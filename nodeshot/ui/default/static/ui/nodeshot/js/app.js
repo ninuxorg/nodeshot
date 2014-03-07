@@ -72,7 +72,8 @@ var NodeshotRouter = new Marionette.AppRouter({
     appRoutes: {
         "": "index",
         "pages/:slug": "page",
-        "map": "getMap"
+        "map": "getMap",
+        "_=_": "index"
     }
 });
 

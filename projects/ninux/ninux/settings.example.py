@@ -251,48 +251,35 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        #'file': {
-        #    'level': 'INFO',
-        #    'class': 'logging.FileHandler',
-        #    'formatter': 'verbose',
-        #    'filename': 'ninux.log'
-        #},
-        #'logfile': {
-        #    'level':'DEBUG',
-        #    'class':'logging.handlers.RotatingFileHandler',
-        #    'filename': SITE_ROOT + "/debug.log",
-        #    'maxBytes': 50000,
-        #    'backupCount': 2,
-        #    'formatter': 'custom',
-        #},
+        'logfile': {
+            'level': 'ERROR',
+            'class':'logging.handlers.RotatingFileHandler',
+            'formatter': 'verbose',
+            'filename': SITE_ROOT + "/../log/ninux.error.log",
+            'maxBytes': 10485760,  # 10 MB
+            'backupCount': 3,
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
-        #'django': {
-        #    'handlers':['logfile'],
-        #    'level':'DEBUG',
-        #    'propagate': True,
-        #},
-        #'django.request': {
-        #    'handlers': ['mail_admins', 'logfile'],
-        #    'level': 'DEBUG',
-        #    'propagate': True,
-        #},
-        #'nodeshot.community.mailing': {
-        #    'handlers': ['logfile'],
-        #    'level': 'DEBUG',
-        #},
-        #'nodeshot.core.layers': {
-        #    'handlers': ['logfile'],
-        #    'level': 'DEBUG',
-        #},
-        #'nodeshot.community.profiles': {
-        #    'handlers': ['logfile'],
-        #    'level': 'DEBUG',
-        #},
+        'django': {
+            'handlers':['logfile'],
+            'level':'ERROR',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['mail_admins', 'logfile'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        '': {
+            'handlers': ['logfile'],
+            'level': 'ERROR',
+        },
     },
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': '\n\n[%(levelname)s %(asctime)s] module: %(module)s, process: %(process)d, thread: %(thread)d\n%(message)s'
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -324,10 +311,11 @@ CACHES = {
 
 #EMAIL_USE_TLS = True
 EMAIL_HOST = 'localhost'
-#EMAIL_HOST_USER = 'your@email.org'
+EMAIL_HOST_USER = 'your@email.org'
 #EMAIL_HOST_PASSWORD = '***********'
 EMAIL_PORT = 1025 if DEBUG else 25  # 1025 if you are in development mode, while 25 is usually the production port
-DEFAULT_FROM_EMAIL = 'your@email.org'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = DEFAULT_FROM_EMAIL  # used for error reporting
 
 # ------ CELERY ------ #
 
@@ -601,38 +589,43 @@ if 'test' in sys.argv:
 
 # ------ SOCIAL AUTH SETTINGS ------ #
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'nodeshot.community.profiles.backends.EmailBackend',
-    'social_auth.backends.facebook.FacebookBackend',
-    'social_auth.backends.google.GoogleBackend',
-)
-
-SOCIAL_AUTH_PIPELINE = (
-    'social_auth.backends.pipeline.social.social_auth_user',
-    #'social_auth.backends.pipeline.associate.associate_by_email',
-    'social_auth.backends.pipeline.user.get_username',
-    'social_auth.backends.pipeline.user.create_user',
-    'social_auth.backends.pipeline.social.associate_user',
-    'nodeshot.community.profiles.social_auth_extra.pipeline.load_extra_data',
-    'social_auth.backends.pipeline.user.update_user_details'
-)
-
-SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google', 'github')
-
-FACEBOOK_APP_ID              = ''
-FACEBOOK_API_SECRET          = ''
-
-GITHUB_APP_ID = ''
-GITHUB_API_SECRET = ''
-
-SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
-SOCIAL_AUTH_UUID_LENGTH = 3
-SOCIAL_AUTH_SESSION_EXPIRATION = False
-SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
-
-FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
-
-LOGIN_URL = '/'
-LOGIN_REDIRECT_URL = '/'
-LOGIN_ERROR_URL    = '/'
+if 'social_auth' in INSTALLED_APPS:
+    MIDDLEWARE_CLASSES += ('social_auth.middleware.SocialAuthExceptionMiddleware',)
+    
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'nodeshot.community.profiles.backends.EmailBackend',
+        'social_auth.backends.facebook.FacebookBackend',
+        'social_auth.backends.google.GoogleBackend',
+    )
+    
+    SOCIAL_AUTH_PIPELINE = (
+        'social_auth.backends.pipeline.social.social_auth_user',
+        #'social_auth.backends.pipeline.associate.associate_by_email',
+        'social_auth.backends.pipeline.user.get_username',
+        'social_auth.backends.pipeline.user.create_user',
+        'social_auth.backends.pipeline.social.associate_user',
+        'nodeshot.community.profiles.social_auth_extra.pipeline.load_extra_data',
+        'social_auth.backends.pipeline.user.update_user_details'
+    )
+    
+    SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google', 'github')
+    
+    # register a new app: 
+    FACEBOOK_APP_ID = ''  # put your app id
+    FACEBOOK_API_SECRET = ''
+    FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+    
+    # register a new app:
+    GITHUB_APP_ID = ''
+    GITHUB_API_SECRET = ''
+    GITHUB_EXTENDED_PERMISSIONS = ['user:email']
+    
+    SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
+    SOCIAL_AUTH_UUID_LENGTH = 3
+    SOCIAL_AUTH_SESSION_EXPIRATION = False
+    SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
+    
+    LOGIN_URL = '/'
+    LOGIN_REDIRECT_URL = '/'
+    LOGIN_ERROR_URL    = '/'
