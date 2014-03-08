@@ -122,12 +122,12 @@
     
                                 }
             
-            var newClusterLayer = loadNodes(GeoJSON, color);
+            var newClusterLayer = loadNodes(GeoJSON, colors[i]);
             newCluster.addLayer(newClusterLayer);
             //Adds cluster to map
             map.addLayer(newCluster);
             //Creates map controls for the layer
-            var newClusterKey = "<span style='color:#0000ff'>" + layers[i].name + "</span>";
+            var newClusterKey = "<span style='color:"+colors[i]+"'>" + layers[i].name + "</span>";
             overlaymaps[newClusterKey] = newCluster;
             allLayers[i] = newCluster;
         }
