@@ -106,7 +106,9 @@
             var color = layers[i].color;
             var clusterClass = layers[i].slug; //CSS class with same name of the layer
             //Creates a Leaflet cluster group styled with layer's colour
-            var newCluster = createCluster(clusterClass);
+            window.mapClusters[layers[i].slug] = createCluster(clusterClass);
+            window.markerStatusMap[layers[i].slug]={"open":[],"closed":[]}
+            //var newCluster = window.mapClusters[layers[i].slug];
             //Loads nodes in the cluster
             //newClusterNodes = getData(window.__BASEURL__ + 'api/v1/layers/' + layers[i].slug + '/nodes.geojson');
             var newClusterNodes = getData(window.__BASEURL__ + 'api/v1/open311/requests?service_code=node&layer='+layers[i].slug );
@@ -122,14 +124,14 @@
     
                                 }
             
-            var newClusterLayer = loadNodes(GeoJSON, colors[i]);
-            newCluster.addLayer(newClusterLayer);
+            var newClusterLayer = loadNodes(layers[i].slug,GeoJSON, colors[i]);
+            window.mapClusters[layers[i].slug].addLayer(newClusterLayer);
             //Adds cluster to map
-            map.addLayer(newCluster);
+            map.addLayer(window.mapClusters[layers[i].slug]);
             //Creates map controls for the layer
             var newClusterKey = "<span style='color:"+colors[i]+"'>" + layers[i].name + "</span>";
-            overlaymaps[newClusterKey] = newCluster;
-            allLayers[i] = newCluster;
+            overlaymaps[newClusterKey] = window.mapClusters[layers[i].slug];
+            allLayers[i] = window.mapClusters[layers[i].slug];
         }
         return allLayers;
 
@@ -156,7 +158,7 @@
     }
 
 
-    function loadNodes(newClusterNodes, color) {
+    function loadNodes(layer,newClusterNodes, color) {
         /*
          * Load nodes in cluster group and defines click properties for the popup window
          */
@@ -184,6 +186,10 @@
                 });
                 //console.log(feature.properties.name)
                 window.markerMap[feature.properties.request_id] = marker;
+                window.markerStatusMap[layer][feature.properties.status].push(marker)
+                //if (feature.properties.status == "open") {
+                //    window.markerStatusMap['open'].push(marker)
+                //}
                 //console.log(markerMap[feature.properties.slug])
                 //console.log(markerMap)
 
