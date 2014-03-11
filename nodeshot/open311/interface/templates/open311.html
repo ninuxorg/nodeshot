@@ -42,29 +42,12 @@
 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-inverse">Google</a>
 </script>
 
-
 	
 <script id="tmplLogout" type="text/template">
 <span class="userLogged">Hello <%= user %> </span>
 <button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>
 </script>
 
-<script id="tmplcheckArea" type="text/template">
-     
-Choose a layer:<br>
- 
-    <% for (var i = 0; i < choices.length; i++) { %>
-     
- <% var layer = choices[i]; %>
-
-<input type="radio" name="layer" id="<%=layer.id %>" style="vertical-align: middle; margin: 0px;" value="<%=layer.id %>,<%=layer.name %> "/>
-<%=layer.name %><br/>    
-
-  
-    <% } %>
-<button id="sendLayer">Go</button>
-
-</script>
 
 <script id="tmplConfirmPos" type="text/template">
 <strong>Is position correct ?</strong><br>
@@ -83,10 +66,7 @@ Choose a layer:<br>
   </ul>
 </script>
 
-
-
 <script id="tmplInsertNode" type="text/template">
-<!--<form class="subform"  >-->
 <p><strong>Insert request details</strong></p>
 
 <form id="requestForm"  >
@@ -127,7 +107,6 @@ Choose a layer:<br>
 	  <label for="imageToInsert">Image</label>   
 	 <input type="file" name="image" id="photoimg" />
 	</p>
-	  <!--<button  onclick=postNode();>Insert request</button>-->
 	  <input type=submit>
 </form>
 <div id="request_messages" class="error_messages"></div>
@@ -203,27 +182,14 @@ Your vote:
 </div> 	
 </script>
 
-<script id="tmplNodePopup" type="text/template">
-<strong><%= node %></strong><br>
-<%= address %><br>
-</script>
-
 <script id="tmplNodePopupRating" type="text/template">
-<strong>Rating:</strong><br>
+  <div id="rating">
+    <div class="intest">Rating</div>
+<div style="background-color:#C0C0C0"> <strong><%= votes %> rating(s) </strong></div>
 <div id="star"></div>
-</script>
-
-<script id="tmplNodePopupVoting" type="text/template">
-<strong>Votes:</strong><br>
-In favour: <strong><%= likes %></strong><br>
-Against: <strong><%= dislikes %></strong><br>
-<button class="vote" onclick=postVote('<%= nodeSlug %>',1)>In favour</button>
-<button class="vote" onclick=postVote('<%= nodeSlug %>',-1)>Against</button><br>
-</script>
-
-<script id="tmplNodePopupComments" type="text/template">
-<strong>Comments:</strong><br>
-<a onclick=showComments('<%= nodeSlug %>');>comments: <%= comments %></a><br>
+<div id="rating_messages" class="thanks_messages"></div>
+<div id="rating_error_messages" class="error_messages"></div>
+</div>
 </script>
 
 <!-- End of Templates -->

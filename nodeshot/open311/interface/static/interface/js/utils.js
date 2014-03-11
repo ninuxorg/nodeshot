@@ -141,7 +141,6 @@ $.ajaxSetup({
             } else {
                 alert('Uncaught Error.\n' + jqXHR.responseText);
             }
-            $("#nodeInsertDiv").html('A problem occurred while inserting node');
         }
     
 });
