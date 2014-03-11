@@ -11,6 +11,9 @@
         <div id="votesContainer">
             
         </div>
+         <div id="ratingContainer">
+            
+        </div>
         
         
    </div>
@@ -34,6 +37,9 @@ dislikes: {{dislikes}}<br>
 rating_avg: {{rating_avg}}<br>
 rating_count: {{rating_count}}<br>
 {% block scripts%}
+<script src="{% static 'interface/js/vendor/jquery.raty.js' %}"></script>
+<script>$.myproject = {} // namespace
+    $.myproject.STATIC_URL = '{{ STATIC_URL }}';</script>
 <script>window.request_id = '{{ request_id }}'</script>
 <script>window.category = '{{ layer.name }}'</script>
 <script>window.nodeSlug = '{{ node.slug }}'</script>
