@@ -45,7 +45,7 @@ rating_count: {{rating_count}}<br>
 <script>window.rating_count = '{{ rating_count }}'</script>-->
 <script>
 window.nodeSettings = getData(window.__BASEURL__ + 'api/v1/nodes/' + window.nodeSlug + '/participation_settings/');
-window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + nodeSlug + '/participation/');
+window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + window.nodeSlug + '/participation/');
 </script>
 <script src="{% static 'interface/js/request.js' %}"></script>
 {% endblock scripts%}

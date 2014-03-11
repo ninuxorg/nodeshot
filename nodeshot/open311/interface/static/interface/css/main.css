@@ -18,15 +18,6 @@ body {
     text-align: left;
 }
 
-.circle {
-    width: 10px;
-    height: 10px;
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
-    border-radius: 50%;
-    background: #4679BD;
-}
-
 .overlay{
     background:transparent url(images/overlay.png) repeat top left;
     position:fixed;
@@ -176,9 +167,16 @@ color: #ffffff;
   display:none;
 }*/
 
-.messages {
-  font-size: 12px;
+.error_messages {
+  font-size: 13px;
   margin:1px;
+  color:red;
+}
+
+.thanks_messages {
+  font-size: 13px;
+  margin:1px;
+  color:blue;
 }
 #request{
   background-color: #FFFFFF;

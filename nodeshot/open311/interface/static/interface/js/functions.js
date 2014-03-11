@@ -110,7 +110,6 @@
             window.markerStatusMap[layers[i].slug]={"open":[],"closed":[]}
             //var newCluster = window.mapClusters[layers[i].slug];
             //Loads nodes in the cluster
-            //newClusterNodes = getData(window.__BASEURL__ + 'api/v1/layers/' + layers[i].slug + '/nodes.geojson');
             var newClusterNodes = getData(window.__BASEURL__ + 'api/v1/open311/requests?service_code=node&layer='+layers[i].slug );
             var GeoJSON= new geojsonColl();
                 for (var n in newClusterNodes){
@@ -158,7 +157,7 @@
     }
 
 
-    function loadNodes(layer,newClusterNodes, color) {
+    function loadNodes(layer_slug,newClusterNodes, color) {
         /*
          * Load nodes in cluster group and defines click properties for the popup window
          */
@@ -186,12 +185,7 @@
                 });
                 //console.log(feature.properties.name)
                 window.markerMap[feature.properties.request_id] = marker;
-                window.markerStatusMap[layer][feature.properties.status].push(marker)
-                //if (feature.properties.status == "open") {
-                //    window.markerStatusMap['open'].push(marker)
-                //}
-                //console.log(markerMap[feature.properties.slug])
-                //console.log(markerMap)
+                window.markerStatusMap[layer_slug][feature.properties.status].push(marker)
 
                 return marker;
             }
@@ -271,23 +265,19 @@
             });
     
             $('#serviceRequestForm').append(compiledTmpl);
-            //$("#valori").html(nodeInsertDiv)
             $("#requestLng").val(lng);
             $("#requestLat").val(lat);
-            //$("#layerToInsert").val(layerName);
-            //$("#layerIdToInsert").val(layerID);
-            $('#layerToInsert').attr('readonly', true);
-            $('#nodeToInsertLng').attr('readonly', true);
-            $('#nodeToInsertLat').attr('readonly', true);
-    
+            $('#requestLng').attr('readonly', true);
+            $('#requestLat').attr('readonly', true);
             getAddress(lat,lng);
             $("#requestForm").submit(function(event){
  
             //disable the default form submission
             event.preventDefault();
-            //alert("sending")
-                //grab all form data  
+            //grab all form data  
             var formData = new FormData($(this)[0]);
+            var layer_inserted = $( this).serializeArray()[1]['value']
+            //console.log( layer_inserted  );
  
             $.ajax({
               url: window.__BASEURL__ + 'api/v1/open311/requests/',
@@ -298,13 +288,15 @@
               contentType: false,
               processData: false,
               success: function (returndata) {
-                console.log(returndata);
-                clearLayers();
-                    map.removeControl(mapControl)
-                    mapLayersArea = loadLayersArea(geojsonlayers);
-                    mapLayersNodes = loadLayers(layers);
-                    mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
+                //console.log(returndata);
+                //console.log( layer_inserted  );
+                //clearLayers();
+                    //map.removeControl(mapControl)
+                    //mapLayersArea = loadLayersArea(geojsonlayers);
+                    //mapLayersNodes = loadLayers(layers);
+                    //mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
                     newMarker = L.marker(latlng).addTo(map);
+                    window.mapClusters[layer_inserted].addLayer(newMarker)
                     popupMessage="Request has been inserted<br>"
                     
                     var url = window.__BASEURL__ + 'open311/request/'
@@ -316,8 +308,11 @@
                     //newMarker.bindPopup(nodeDiv).openPopup();
                     $('#serviceRequestForm').hide("fast",function(){
 				       $('#overlay').fadeOut('fast');})
-                    $("#nodeInsertDiv").html('Node inserted');
-              }
+              },
+              error: function (jqXHR,error, errorThrown) {
+                    console.log(jqXHR)
+                    $("#request_messages").html(jqXHR.responseText);
+                }
             });
  
   return false;
@@ -530,7 +525,12 @@
                     showComments(nodeSlug,nodeParticipation.participation.comment_count);
                     $("#comment_messages").html("Thanks for your comment");
                     
+                },
+                error: function (jqXHR,error, errorThrown) {
+                    console.log(jqXHR)
+                    $("#comment_error_messages").html(jqXHR.responseText);
                 }
+                
 
             });
         
@@ -560,7 +560,7 @@
                 },
                 error: function (jqXHR,error, errorThrown) {
                     console.log(jqXHR)
-                    $("#vote_messages").html(jqXHR.responseText);
+                    $("#vote_error_messages").html(jqXHR.responseText);
                 }
                 
 

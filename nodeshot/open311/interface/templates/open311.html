@@ -130,6 +130,7 @@ Choose a layer:<br>
 	  <!--<button  onclick=postNode();>Insert request</button>-->
 	  <input type=submit>
 </form>
+<div id="request_messages" class="error_messages"></div>
 </script>
 
 
@@ -168,7 +169,8 @@ Your vote:
 <button id="likeButton">I like it</button>
 <button id="unlikeButton">I don't</button>
 </div>
-<div id="vote_messages" class="messages"></div>
+<div id="vote_messages" class="thanks_messages"></div>
+<div id="vote_error_messages" class="error_messages"></div>
 </div>
 </script>
 
@@ -177,7 +179,8 @@ Your vote:
 <div id="comments">
 <textarea id="commentText" class="your_comment"></textarea><br>
 <button id="post_comments" >Add comment</button>
-<div id="comment_messages" class="messages"></div>
+<div id="comment_messages" class="thanks_messages"></div>
+<div id="comment_error_messages" class="error_messages"></div>
 <hr>
 <p><strong><%= comments_count%> people already commented:</strong></p>    
 	<div id="comment" >
