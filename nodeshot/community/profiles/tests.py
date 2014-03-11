@@ -63,6 +63,7 @@ class ProfilesTest(TestCase):
         self.assertNotContains(response, 'password_confirmation')
         
         # POST 400: missing required field
+        self.client.logout()
         new_user = {
             "username": "new_user_test",
             "email": "new_user@testing.com",
@@ -94,7 +95,8 @@ class ProfilesTest(TestCase):
             key = email_address.emailconfirmation_set.all()[0].key
             confirmation_url = reverse('emailconfirmation_confirm_email', args=[key])
             response = self.client.get(confirmation_url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
+            self.assertIn('_auth_user_id', self.client.session)
             
             user = User.objects.get(username='new_user_test')
             self.assertEqual(user.is_active, True)
@@ -454,7 +456,7 @@ class ProfilesTest(TestCase):
             # verify email
             confirmation_url = reverse('emailconfirmation_confirm_email', args=[email_confirmation.key])
             response = self.client.get(confirmation_url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             
             # ensure verified and primary
             email_address = EmailAddress.objects.get(user=user, email='testing@test.com')
@@ -484,7 +486,7 @@ class ProfilesTest(TestCase):
             email_confirmation = EmailConfirmation.objects.filter(email_address=email_address).order_by('-id')[0]
             confirmation_url = reverse('emailconfirmation_confirm_email', args=[email_confirmation.key])
             response = self.client.get(confirmation_url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             
             # ensure is verified but not primary
             email_address = EmailAddress.objects.get(user=user, email='mynewemailaddress@test.com')

@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext
@@ -83,6 +83,7 @@ def password_reset_from_key(request, uidb36, key, **kwargs):
 if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
 
     from emailconfirmation.models import EmailConfirmation, EmailAddress
+    from django.contrib.auth import login
     
     def confirm_email(request, confirmation_key):
         """ confirm email view """
@@ -97,6 +98,10 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
         # confirm email
         email_address = EmailConfirmation.objects.confirm_email(confirmation_key, make_primary=make_primary)
         
-        return render_to_response("emailconfirmation/confirm_email.html", {
-            "email_address": email_address,
-        }, context_instance=RequestContext(request))
+        # log in the user if not already authenticated
+        if not request.user.is_authenticated():
+            user = email_address.user
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)
+        
+        return redirect(settings.SITE_URL)
