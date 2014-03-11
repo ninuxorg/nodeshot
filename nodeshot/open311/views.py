@@ -132,6 +132,7 @@ class ServiceRequests(generics.ListCreateAPIView):
     See service definition for required parameters
     """
     authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class= NodeRequestListSerializer
     
     

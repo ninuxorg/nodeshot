@@ -86,9 +86,6 @@ class Open311Request(BaseTestCase):
         
     def test_service_request_node(self):
         #service_request for nodes
-        login = self.client.login(username='admin', password='tester')
-        
-        
         service_request={
                         'service_code':"node",
                         "name": "montesacro4",
@@ -99,6 +96,11 @@ class Open311Request(BaseTestCase):
                         "description": "test",
                         }
         url = "%s" % reverse('api_service_requests')
+        response = self.client.post(url,service_request)
+        #Not authenticated : 403
+        self.assertEqual(response.status_code, 403)
+        login = self.client.login(username='admin', password='tester')
+        #Authenticated users can insert service requests: 201
         response = self.client.post(url,service_request)        
         self.assertEqual(response.status_code, 201)
         
