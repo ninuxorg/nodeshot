@@ -163,7 +163,6 @@ Choose a layer:<br>
 <div class="intest">Votes</div>           
 <p><img src="{% static 'interface/img/likes.jpg' %}" /><%= likes %> </p>
 <p><img src="{% static 'interface/img/dislike.jpg' %}" /><%= dislikes %> </p>
-
 <div id="insert_vote" class="insert_vote">
 Your vote:  
 <button id="likeButton">I like it</button>
@@ -174,8 +173,8 @@ Your vote:
 </script>
 
 <script id="tmplComments" type="text/template">
-<div id="comments">
 <div class="intest">Comments</div>
+<div id="comments">
 <textarea id="commentText" class="your_comment"></textarea><br>
 <button id="post_comments" >Add comment</button>
 <div id="comment_messages" class="messages"></div>

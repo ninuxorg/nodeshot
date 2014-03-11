@@ -1,8 +1,3 @@
-var csrftoken = $.getCookie('csrftoken');
-var markerToRemove //If users insert a new marker previous one has to be deleted from map
-var nodeRatingAVG // Rating data has to be globally available for rating plugin to correctly work
-var markerMap = {} //Object holding all nodes'slug and a reference to their marker
-
 /* LAYERS LIST CREATION
  * ====================*/
 
@@ -111,7 +106,9 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             var color = layers[i].color;
             var clusterClass = layers[i].slug; //CSS class with same name of the layer
             //Creates a Leaflet cluster group styled with layer's colour
-            var newCluster = createCluster(clusterClass);
+            window.mapClusters[layers[i].slug] = createCluster(clusterClass);
+            window.markerStatusMap[layers[i].slug]={"open":[],"closed":[]}
+            //var newCluster = window.mapClusters[layers[i].slug];
             //Loads nodes in the cluster
             //newClusterNodes = getData(window.__BASEURL__ + 'api/v1/layers/' + layers[i].slug + '/nodes.geojson');
             var newClusterNodes = getData(window.__BASEURL__ + 'api/v1/open311/requests?service_code=node&layer='+layers[i].slug );
@@ -127,14 +124,14 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
     
                                 }
             
-            var newClusterLayer = loadNodes(GeoJSON, color);
-            newCluster.addLayer(newClusterLayer);
+            var newClusterLayer = loadNodes(layers[i].slug,GeoJSON, colors[i]);
+            window.mapClusters[layers[i].slug].addLayer(newClusterLayer);
             //Adds cluster to map
-            map.addLayer(newCluster);
+            map.addLayer(window.mapClusters[layers[i].slug]);
             //Creates map controls for the layer
-            var newClusterKey = "<span style='color:#0000ff'>" + layers[i].name + "</span>";
-            overlaymaps[newClusterKey] = newCluster;
-            allLayers[i] = newCluster;
+            var newClusterKey = "<span style='color:"+colors[i]+"'>" + layers[i].name + "</span>";
+            overlaymaps[newClusterKey] = window.mapClusters[layers[i].slug];
+            allLayers[i] = window.mapClusters[layers[i].slug];
         }
         return allLayers;
 
@@ -161,7 +158,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
     }
 
 
-    function loadNodes(newClusterNodes, color) {
+    function loadNodes(layer,newClusterNodes, color) {
         /*
          * Load nodes in cluster group and defines click properties for the popup window
          */
@@ -180,7 +177,7 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             pointToLayer: function (feature, latlng) {
                 var marker = new
                 L.circleMarker(latlng, {
-                    radius: 6,
+                    radius: 8,
                     fillColor: window.statuses[feature.properties.status].fill_color,
                     color: color,
                     weight: 1,
@@ -189,6 +186,10 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
                 });
                 //console.log(feature.properties.name)
                 window.markerMap[feature.properties.request_id] = marker;
+                window.markerStatusMap[layer][feature.properties.status].push(marker)
+                //if (feature.properties.status == "open") {
+                //    window.markerStatusMap['open'].push(marker)
+                //}
                 //console.log(markerMap[feature.properties.slug])
                 //console.log(markerMap)
 
@@ -468,8 +469,8 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             likes: likes,
             dislikes:dislikes
         });
-        $("#votes").html('')
-        $("#left").append(compiledTmpl);
+        $("#votesContainer").html('')
+        $("#votesContainer").append(compiledTmpl);
         $("#likeButton").on("click",function(){
 				       postVote(nodeId, 1);
 				  });
@@ -487,8 +488,8 @@ var markerMap = {} //Object holding all nodes'slug and a reference to their mark
             node: nodeId,
             comments_count: comments_count
         });
-        $("#right").html('');
-        $("#right").append(compiledTmpl);
+        $("#commentsContainer").html('');
+        $("#commentsContainer").append(compiledTmpl);
         $("#post_comments").on("click",function(){
 				       postComment(nodeId);
 				  });

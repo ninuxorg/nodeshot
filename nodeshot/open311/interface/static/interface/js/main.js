@@ -1,5 +1,90 @@
+var csrftoken = $.getCookie('csrftoken');
+var markerToRemove //If users insert a new marker previous one has to be deleted from map
+var nodeRatingAVG // Rating data has to be globally available for rating plugin to correctly work
+var markerMap = {} //Object holding all nodes'id and a reference to their marker
+var markerStatusMap = {}
+var mapClusters = {}
 //Map initialization
+var colors = [//if more than 4 layers need to be represented add more colors to the array
+    '#0000ff',
+    '#FF8000',
+    '#610B5E',
+    '#FFFF00',
+    
+]
 var map = L.map('map').setView([41.87, 12.49], 8);
+var legend = L.control({position: 'bottomleft'});
+
+function test()  {
+    
+    alert('test');
+    //return false;
+}
+
+//function removeStatusMarkers(status){
+//    //event.stopPropagation();
+//    for (var i in window.layers) {
+//        var layer_slug = window.layers[i].slug
+//        console.log(window.mapClusters[layer_slug])
+//        console.log(window.markerStatusMap[layer_slug][status])
+//        window.mapClusters[layer_slug].removeLayers(window.markerStatusMap[layer_slug][status])
+//
+//       //console.log(window.markerStatusMap[layer_slug][status])
+//    }
+//    L.DomEvent
+//        //.addListener(toggleOpen, 'click', L.DomEvent.stopPropagation)
+//        ////.addListener(toggleOpen, 'click', L.DomEvent.preventDefault)
+//        //.addListener(toggleClosed, 'click', L.DomEvent.stopPropagation)
+//        //.addListener(toggleClosed, 'click', L.DomEvent.preventDefault)
+//        //.addListener(toggleOpen, 'click', function () { addStatusMarkers('open'); })
+//        .removeListener(toggleOpen, 'click', function () { removeStatusMarkers('open'); })
+//        //$(toggleOpenDiv).off()
+//}
+//
+//function addStatusMarkers(status){
+//    //event.stopPropagation();
+//    for (var i in window.layers) {
+//        var layer_slug = window.layers[i].slug
+//        console.log(window.mapClusters[layer_slug])
+//        console.log(window.markerStatusMap[layer_slug][status])
+//        window.mapClusters[layer_slug].addLayers(window.markerStatusMap[layer_slug][status])
+//
+//       //console.log(window.markerStatusMap[layer_slug][status])
+//    }
+    //L.DomEvent
+    //    
+    //    .addListener(toggleOpen, 'click', function () { removeStatusMarkers('open'); })
+    //    .removeListener(toggleOpen, 'click', function () { addStatusMarkers('open'); })
+//}
+
+legend.onAdd = function (map) {
+    open_color = statuses.open.fill_color;
+    closed_color = statuses.closed.fill_color;
+    var div = L.DomUtil.create('div','mapLegend')
+    var toggleOpenDiv = L.DomUtil.create('toggleOpen','',div)
+    var toggleClosedDiv = L.DomUtil.create('toggleClosed','',div)
+    toggleOpenDiv.innerHTML = " <span style='color:"+open_color+"'>Open requests</span><br>"
+    toggleOpenDiv.innerHTML += "<span style='color:"+closed_color+"'>Closed requests</span><br>"
+
+    
+    //toggleOpenDiv.innerHTML = "<input type='checkbox' id='toggleOpen' checked> <span style='color:"+open_color+"'>Open requests</span><br>"
+    //toggleOpenDiv.innerHTML += "<input type='checkbox' id='toggleClosed'> <span style='color:"+closed_color+"'>Closed requests</span><br>"
+    ////$(toggleOpenDiv).on('click',function(){removeStatusMarkers('open');})
+    //
+    //L.DomEvent
+    //    .addListener(toggleOpenDiv, 'click', L.DomEvent.stopPropagation)
+    //    //.addListener(toggleOpen, 'click', L.DomEvent.preventDefault)
+    //    //.addListener(toggleClosed, 'click', L.DomEvent.stopPropagation)
+    //    //.addListener(toggleClosed, 'click', L.DomEvent.preventDefault)
+    //    .addListener(toggleOpenDiv, 'click', function () { removeStatusMarkers('open'); })
+    //    //.addListener(toggleOpenDiv, 'click', function () { test(); });
+    //
+    return div;
+};
+
+
+
+legend.addTo(map);
 var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 //Uncomment for Google maps. Must be checked if it works in IE
 var googleHybrid = new L.Google('HYBRID');
@@ -53,8 +138,8 @@ for (var i in layers) {
     //    var messageToDisplay = "CSS info missing for this layers: \n" + message
     //    alert(messageToDisplay)
     //}
-    var color="#0000ff";
-    createlayersCSS(layers[i].slug, color);
+   // layers[i].color=colors[i];
+    createlayersCSS(layers[i].slug, colors[i]);
 }
 
 //Populate map's layers
@@ -88,6 +173,11 @@ function createlayersCSS(slug, color) {
     vertical-align: middle;\
     font: 14px \"Helvetica Neue\", Arial, Helvetica, sans-serif;\
     border-radius: 20px;\
+    border: thin solid;\
+    border-color: black;\
+    border-size: 3px;\
+    line-height: 30px;\
+    font-weight: bold;\
   } </style>").appendTo("head");
 }
 
