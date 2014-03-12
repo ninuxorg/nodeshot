@@ -9,11 +9,7 @@ from nodeshot.core.base.serializers import GeoJSONPaginationSerializer
 from .base import ExtensibleNodeSerializer
 from .models import *
 
-
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
-
-if HSTORE_ENABLED:
-    from nodeshot.core.base.fields import HStoreDictionaryField
+from nodeshot.core.base.fields import HStoreDictionaryField
 
 
 __all__ = [
@@ -33,10 +29,9 @@ __all__ = [
 class NodeDetailSerializer(ExtensibleNodeSerializer):
     """ node detail """
     
-    if HSTORE_ENABLED:
-        data = HStoreDictionaryField(required=False,
-                                     label=_('extra data'),
-                                     help_text=_('store extra attributes in JSON string'))
+    data = HStoreDictionaryField(required=False,
+                                 label=_('extra data'),
+                                 help_text=_('store extra attributes in JSON string'))
     
     layer = serializers.SlugRelatedField(slug_field='slug')
     
@@ -44,11 +39,9 @@ class NodeDetailSerializer(ExtensibleNodeSerializer):
         model = Node
         primary_fields = [
             'name', 'slug', 'status', 'user',
-            'geometry', 'elev', 'address', 'description',
+            'geometry', 'elev', 'address',
+            'description', 'data'
         ]
-        
-        if HSTORE_ENABLED:
-            primary_fields += ['data']
             
         secondary_fields = [
             'access_level', 'layer', 'layer_name',
@@ -70,13 +63,9 @@ class NodeListSerializer(NodeDetailSerializer):
         model = Node
         fields = [
             'name', 'slug', 'layer', 'layer_name', 'user', 'status',
-            'geometry', 'elev', 'address', 'description'
+            'geometry', 'elev', 'address', 'description', 'data',
+            'updated', 'added', 'details'
         ]
-        
-        if HSTORE_ENABLED:
-            fields += ['data']
-        
-        fields += ['updated', 'added', 'details']
         
         read_only_fields = ['added', 'updated']
         geo_field = 'geometry'

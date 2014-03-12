@@ -22,8 +22,6 @@ from nodeshot.core.base.tests import user_fixtures, BaseTestCase
 
 from .models import *
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
-
 
 class ModelsTest(TestCase):
     
@@ -249,10 +247,8 @@ class APITest(BaseTestCase):
             "address": "via dei test",
             "description": "",
             "geometry": json.loads(GEOSGeometry("POINT (12.99 41.8720419277)").json),
+            "data": { "is_test": True }
         }
-        
-        if HSTORE_ENABLED:
-            node['data'] = { "is_test": True }
         
         # POST: 403 - unauthenticated
         response = self.client.post(url, json.dumps(node), content_type='application/json')
@@ -265,10 +261,9 @@ class APITest(BaseTestCase):
         
         self.assertEqual(response.data['user'], 'registered')
         
-        if HSTORE_ENABLED:
-            node = Node.objects.get(slug='test-distance')
-            self.assertEqual(node.data, { 'is_test': 'true' })
-            self.assertEqual(Node.objects.filter(data__contains={ "is_test": "true" }).count(), 1)
+        node = Node.objects.get(slug='test-distance')
+        self.assertEqual(node.data, { 'is_test': 'true' })
+        self.assertEqual(Node.objects.filter(data__contains={ "is_test": "true" }).count(), 1)
     
     def test_delete_node(self):
         node = Node.objects.first()
@@ -397,7 +392,8 @@ class APITest(BaseTestCase):
             self.assertEqual(response.status_code, 201)
             # ensure image name is in DB
             image = Image.objects.all().order_by('-id')[0]
-            self.assertIn('image_unit_test.gif', image.file.name)
+            self.assertIn('image_unit_test', image.file.name)
+            self.assertIn('.gif', image.file.name)
             # remove file
             os.remove(image.file.file.name)
         

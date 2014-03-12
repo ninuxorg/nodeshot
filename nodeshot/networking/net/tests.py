@@ -13,8 +13,6 @@ from nodeshot.core.nodes.models import Node
 
 from .models import *
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
-
 
 class NetTest(BaseTestCase):
     """
@@ -84,7 +82,6 @@ class NetTest(BaseTestCase):
         self.assertEqual(d.elev, d.node.elev)
     
     def test_shortcuts(self):
-        """ assuming HSTORE is enabled """
         d = Device.objects.create(name='test_device_location', node_id=1, type='radio')
         self.assertEqual(d.shortcuts['user'], d.node.user)
         self.assertEqual(d.owner, d.node.user)
@@ -200,10 +197,8 @@ class NetTest(BaseTestCase):
             "name": "device creation test",
             "type": "radio",
             "description": "device creation test",
+            "data": { "is_unittest": "true" }
         }
-        
-        if HSTORE_ENABLED:
-            device_data["data"] = { "is_unittest": "true" }
         
         # unauthenticated can't create
         response = self.client.post(url, device_data)
@@ -222,13 +217,11 @@ class NetTest(BaseTestCase):
         response = self.client.post(url, json.dumps(device_data), content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['description'], 'device creation test')
-        if HSTORE_ENABLED:
-            self.assertEqual(response.data['data']['is_unittest'], 'true')
+        self.assertEqual(response.data['data']['is_unittest'], 'true')
         # check DB
         device = Device.objects.order_by('-id').all()[0]
         self.assertEqual(device.description, 'device creation test')
-        if HSTORE_ENABLED:
-            self.assertEqual(device.data['is_unittest'], 'true')
+        self.assertEqual(device.data['is_unittest'], 'true')
         device.delete()
         
         # admin can create device too
@@ -238,13 +231,11 @@ class NetTest(BaseTestCase):
         response = self.client.post(url, device_data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['description'], 'device creation test')
-        if HSTORE_ENABLED:
-            self.assertEqual(response.data['data']['is_unittest'], 'true')
+        self.assertEqual(response.data['data']['is_unittest'], 'true')
         # check DB
         device = Device.objects.order_by('-id').all()[0]
         self.assertEqual(device.description, 'device creation test')
-        if HSTORE_ENABLED:
-            self.assertEqual(device.data['is_unittest'], 'true')
+        self.assertEqual(device.data['is_unittest'], 'true')
     
     def test_interface_shortcuts(self):
         ethernet = Ethernet.objects.create(
@@ -304,10 +295,9 @@ class NetTest(BaseTestCase):
             "tx_rate": 10000, 
             "rx_rate": 10000, 
             "standard": "fast", 
-            "duplex": "full"
+            "duplex": "full",
+            "data": { "status": "active" }
         }
-        if HSTORE_ENABLED:
-            data['data'] = { "status": "active" }
         json_data = json.dumps(data)
         eth_count = Ethernet.objects.filter(device_id=2).count()
         url = reverse('api_device_ethernet', args=[2])
@@ -506,10 +496,10 @@ class NetTest(BaseTestCase):
             "mac": "00:27:22:38:13:c4",
             "tx_rate": 10000, 
             "rx_rate": 10000, 
-            "standard": "802.11n"
+            "standard": "802.11n",
+            "data": { "status": "active" }
+            
         }
-        if HSTORE_ENABLED:
-            data['data'] = { "status": "active" }
         json_data = json.dumps(data)
         eth_count = Wireless.objects.filter(device_id=2).count()
         url = reverse('api_device_wireless', args=[2])

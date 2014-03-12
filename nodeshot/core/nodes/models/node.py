@@ -11,14 +11,8 @@ from nodeshot.core.base.utils import choicify
 from ..signals import node_status_changed
 from .status import Status
 
-# TODO: HSTORE MUST BE REQUIRED
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
-
-if HSTORE_ENABLED:
-    from django_hstore.fields import DictionaryField
-    from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as NodeManager
-else:
-    from nodeshot.core.base.managers import GeoAccessLevelPublishedManager as NodeManager
+from django_hstore.fields import DictionaryField
+from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as NodeManager
 
 
 class Node(BaseAccessLevel):
@@ -49,9 +43,8 @@ class Node(BaseAccessLevel):
     description = models.TextField(_('description'), max_length=255, blank=True, null=True)
     notes = models.TextField(_('notes'), blank=True, null=True, help_text=_('for internal use only'))
     
-    if HSTORE_ENABLED:
-        data = DictionaryField(_('extra data'), null=True, blank=True,
-                            help_text=_('store extra attributes in JSON string'))
+    data = DictionaryField(_('extra data'), null=True, blank=True,
+                        help_text=_('store extra attributes in JSON string'))
     
     # manager
     objects = NodeManager()

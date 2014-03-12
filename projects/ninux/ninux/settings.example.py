@@ -35,7 +35,6 @@ DATABASES = {
 #       'PASSWORD': '*********',
 #       'HOST': 'remote-ip',
 #       'PORT': 'remote-port',
-#       'HAS_HSTORE': False
 #    }
 #    DATABASE_ROUTERS = [
 #        'nodeshot.extra.oldimporter.db.DefaultRouter',
@@ -402,8 +401,6 @@ NODESHOT = {
         
         'ADMIN_MAP_COORDS': [41.8934, 12.4960],  # lat, lng
         'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin
-        
-        'HSTORE': True,  #  postgresql hstore types for extra data fields
         
         'REVERSION_LAYERS': True,  # activate django reversion for layers.Layer model
         'REVERSION_NODES': True,  # activate django reversion for nodes.Node model

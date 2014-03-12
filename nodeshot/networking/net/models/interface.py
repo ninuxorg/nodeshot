@@ -7,13 +7,8 @@ from django.conf import settings
 from nodeshot.core.base.models import BaseAccessLevel
 from choices import INTERFACE_TYPE_CHOICES
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
-
-if HSTORE_ENABLED:
-    from django_hstore.fields import DictionaryField, ReferencesField
-    from nodeshot.core.base.managers import HStoreAccessLevelManager as InterfaceManager
-else:
-    from nodeshot.core.base.managers import AccessLevelManager as InterfaceManager
+from django_hstore.fields import DictionaryField, ReferencesField
+from nodeshot.core.base.managers import HStoreAccessLevelManager as InterfaceManager
 
 
 class Interface(BaseAccessLevel):
@@ -28,10 +23,9 @@ class Interface(BaseAccessLevel):
     rx_rate = models.IntegerField(_('RX Rate'), null=True, default=None, blank=True)
     
     # extra data
-    if HSTORE_ENABLED:
-        data = DictionaryField(_('extra data'), null=True, blank=True,
-                            help_text=_('store extra attributes in JSON string'))
-        shortcuts = ReferencesField(null=True, blank=True)
+    data = DictionaryField(_('extra data'), null=True, blank=True,
+                        help_text=_('store extra attributes in JSON string'))
+    shortcuts = ReferencesField(null=True, blank=True)
     
     objects = InterfaceManager()
     
@@ -46,60 +40,51 @@ class Interface(BaseAccessLevel):
         Custom save method does the following:
             * save shortcuts if HSTORE is enabled
         """
-        if HSTORE_ENABLED:
-            changed = False
-            
-            if not self.shortcuts.has_key('node'):
-                self.shortcuts['node'] = self.device.node
-                changed = True
-            
-            if not self.shortcuts.has_key('user'):
-                self.shortcuts['user'] = self.device.node.user
-                changed = True
-            
-            if not self.shortcuts.has_key('layer') and 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-                self.shortcuts['layer'] = self.device.node.layer
-                changed = True
+        changed = False
+        
+        if not self.shortcuts.has_key('node'):
+            self.shortcuts['node'] = self.device.node
+            changed = True
+        
+        if not self.shortcuts.has_key('user'):
+            self.shortcuts['user'] = self.device.node.user
+            changed = True
+        
+        if not self.shortcuts.has_key('layer') and 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+            self.shortcuts['layer'] = self.device.node.layer
+            changed = True
         
         super(Interface, self).save(*args, **kwargs)
     
     @property
     def owner(self):
-        if HSTORE_ENABLED:
-            if not self.shortcuts.has_key('user'):
-                if self.device or self.device_id:
-                    self.save()
-                else:
-                    raise Exception('Instance does not have a device set yet')
-            return self.shortcuts['user']
-        else:
-            return self.device.node.user
+        if not self.shortcuts.has_key('user'):
+            if self.device or self.device_id:
+                self.save()
+            else:
+                raise Exception('Instance does not have a device set yet')
+        
+        return self.shortcuts['user']
     
     @property
     def node(self):
-        if HSTORE_ENABLED:
-            if not self.shortcuts.has_key('node'):
-                if self.device or self.device_id:
-                    self.save()
-                else:
-                    raise Exception('Instance does not have a device set yet')
-            return self.shortcuts['node']
-        else:
-            return self.device.node
+        if not self.shortcuts.has_key('node'):
+            if self.device or self.device_id:
+                self.save()
+            else:
+                raise Exception('Instance does not have a device set yet')
+        return self.shortcuts['node']
     
     @property
     def layer(self):
         if 'nodeshot.core.layers' not in settings.INSTALLED_APPS:
             return False
-        if HSTORE_ENABLED:
-            if not self.shortcuts.has_key('layer'):
-                if self.device or self.device_id:
-                    self.save()
-                else:
-                    raise Exception('Instance does not have a device set yet')
-            return self.shortcuts['layer']
-        else:
-            return self.device.node.layer
+        if not self.shortcuts.has_key('layer'):
+            if self.device or self.device_id:
+                self.save()
+            else:
+                raise Exception('Instance does not have a device set yet')
+        return self.shortcuts['layer']
     
     @property
     def ip_addresses(self):

@@ -7,10 +7,6 @@ from nodeshot.core.nodes.models import Node, Status
 
 from .base import XmlSynchronizer
 
-if settings.NODESHOT['SETTINGS'].get('HSTORE', False) is False:
-    raise ImproperlyConfigured('HSTORE needs to be enabled for ProvinciaWIFI Converter to work properly')
-
-
 
 class ProvinciaWIFI(XmlSynchronizer):
     """ ProvinciaWIFI interoperability class """

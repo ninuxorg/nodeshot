@@ -7,13 +7,8 @@ from nodeshot.core.base.models import BaseAccessLevel
 
 from choices import DEVICE_STATUS, DEVICE_STATUS_CHOICES, DEVICE_TYPES_CHOICES
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
-
-if HSTORE_ENABLED:
-    from django_hstore.fields import DictionaryField, ReferencesField
-    from nodeshot.core.base.managers import HStoreGeoAccessLevelManager as DeviceManager
-else:
-    from nodeshot.core.base.managers import GeoAccessLevelManager as DeviceManager
+from django_hstore.fields import DictionaryField, ReferencesField
+from nodeshot.core.base.managers import HStoreGeoAccessLevelManager as DeviceManager
 
 
 class Device(BaseAccessLevel):
@@ -48,10 +43,9 @@ class Device(BaseAccessLevel):
     notes = models.TextField(_('notes'), blank=True, null=True)
     
     # extra data
-    if HSTORE_ENABLED:
-        data = DictionaryField(_('extra data'), null=True, blank=True,
+    data = DictionaryField(_('extra data'), null=True, blank=True,
                             help_text=_('store extra attributes in JSON string'))
-        shortcuts = ReferencesField(null=True, blank=True)
+    shortcuts = ReferencesField(null=True, blank=True)
     
     objects = DeviceManager()
     
@@ -87,49 +81,42 @@ class Device(BaseAccessLevel):
             self.elev = self.node.elev
             changed = True
         
-        if HSTORE_ENABLED:
-            original_user = self.shortcuts.get('user')
+        original_user = self.shortcuts.get('user')
+        
+        self.shortcuts['user'] = self.node.user
+        
+        if original_user != self.shortcuts.get('user'):
+            changed = True
+        
+        if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+            original_layer = self.shortcuts.get('layer')
+            self.shortcuts['layer'] = self.node.layer
             
-            self.shortcuts['user'] = self.node.user
-            
-            if original_user != self.shortcuts.get('user'):
+            if original_layer != self.shortcuts.get('layer'):
                 changed = True
-            
-            if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-                original_layer = self.shortcuts.get('layer')
-                self.shortcuts['layer'] = self.node.layer
-                
-                if original_layer != self.shortcuts.get('layer'):
-                    changed = True
         
         if changed:
             self.save(custom_checks=False)
     
     @property
     def owner(self):
-        if HSTORE_ENABLED:
-            if not self.shortcuts.has_key('user'):
-                if self.node or self.node_id:
-                    self.save()
-                else:
-                    raise Exception('Instance does not have a node set yet')
-            return self.shortcuts['user']
-        else:
-            return self.node.user
+        if not self.shortcuts.has_key('user'):
+            if self.node or self.node_id:
+                self.save()
+            else:
+                raise Exception('Instance does not have a node set yet')
+        return self.shortcuts['user']
     
     @property
     def layer(self):
         if 'nodeshot.core.layers' not in settings.INSTALLED_APPS:
             return False
-        if HSTORE_ENABLED:
-            if not self.shortcuts.has_key('layer'):
-                if self.node or self.node_id:
-                    self.save()
-                else:
-                    raise Exception('Instance does not have a node set yet')
-            return self.shortcuts['layer']
-        else:
-            return self.node.layer
+        if not self.shortcuts.has_key('layer'):
+            if self.node or self.node_id:
+                self.save()
+            else:
+                raise Exception('Instance does not have a node set yet')
+        return self.shortcuts['layer']
     
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod

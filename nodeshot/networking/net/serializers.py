@@ -10,10 +10,7 @@ from .models import *
 from .models.choices import INTERFACE_TYPES
 from .fields import MacAddressField, IPAddressField, IPNetworkField
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
-
-if HSTORE_ENABLED:
-    from nodeshot.core.base.fields import HStoreDictionaryField
+from nodeshot.core.base.fields import HStoreDictionaryField
 
 
 __all__ = [
@@ -99,12 +96,11 @@ class DeviceDetailSerializer(DeviceListSerializer):
     vlan = serializers.SerializerMethodField('get_vlan_interfaces')
     vlan_url = serializers.HyperlinkedIdentityField(view_name='api_device_vlan')
     
-    if HSTORE_ENABLED:
-        data = HStoreDictionaryField(
-            required=False,
-            label=_('extra data'),
-            help_text=_('store extra attributes in JSON string')
-        )
+    data = HStoreDictionaryField(
+        required=False,
+        label=_('extra data'),
+        help_text=_('store extra attributes in JSON string')
+    )
     
     def get_ethernet_interfaces(self, obj):
         user = self.context['request'].user
@@ -138,12 +134,9 @@ class DeviceDetailSerializer(DeviceListSerializer):
             'location', 'elev',
             'os', 'os_version', 'description',
             'routing_protocols', 'routing_protocols_named',
-            'first_seen', 'last_seen',
+            'first_seen', 'last_seen', 'data',
             'added', 'updated'
         ]
-        
-        if HSTORE_ENABLED:
-            primary_fields.insert(primary_fields.index('added'), 'data')
         
         secondary_fields = [
             'ethernet', 'ethernet_url',
@@ -199,12 +192,11 @@ class InterfaceSerializer(serializers.ModelSerializer):
     ip = serializers.SerializerMethodField('get_ip_addresses')
     ip_url = serializers.HyperlinkedIdentityField(view_name='api_interface_ip')
     
-    if HSTORE_ENABLED:
-        data = HStoreDictionaryField(
-            required=False,
-            label=_('extra data'),
-            help_text=_('store extra attributes in JSON string')
-        )
+    data = HStoreDictionaryField(
+        required=False,
+        label=_('extra data'),
+        help_text=_('store extra attributes in JSON string')
+    )
     
     def get_ip_addresses(self, obj):
         user = self.context['request'].user
@@ -216,12 +208,9 @@ class InterfaceSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'access_level', 'type', 'name',
             'mac', 'mtu', 'tx_rate', 'rx_rate',
-            'added', 'updated', 'ip_url', 'ip',
+             'data', 'added', 'updated', 'ip_url', 'ip',
         ]
         read_only_fields = ['added', 'updated']
-        
-        if HSTORE_ENABLED:
-            fields.insert(fields.index('added'), 'data')
 
 
 class EthernetSerializer(InterfaceSerializer):

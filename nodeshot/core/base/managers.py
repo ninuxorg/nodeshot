@@ -6,9 +6,10 @@ from django.db.models.query import QuerySet
 from django.contrib.gis.db.models.query import GeoQuerySet
 from django.conf import settings
 
-from nodeshot.core.base.choices import ACCESS_LEVELS
+from django_hstore.query import HStoreQuerySet, HStoreGeoQuerySet
+from django_hstore.managers import HStoreManager, HStoreGeoManager
 
-HSTORE_ENABLED = settings.NODESHOT['SETTINGS'].get('HSTORE', True)
+from nodeshot.core.base.choices import ACCESS_LEVELS
 
 
 ### ------ MIXINS ------ ###
@@ -127,28 +128,24 @@ class GeoAccessLevelPublishedQuerySet(GeoQuerySet, ACLMixin, PublishedMixin):
     pass
 
 
-if HSTORE_ENABLED:
-    from django_hstore.query import HStoreQuerySet, HStoreGeoQuerySet
-    
-    
-    class HStoreAccessLevelQuerySet(HStoreQuerySet, ACLMixin):
-        """ HStoreQuerySet, ACLMixin queryset """
-        pass
-    
-    
-    class HStoreGeoPublishedQuerySet(HStoreGeoQuerySet, PublishedMixin):
-        """ HStoreGeoQuerySet and PublishedMixin """
-        pass
-    
-    
-    class HStoreGeoAccessLevelQuerySet(HStoreGeoQuerySet, ACLMixin):
-        """ HStoreGeoQuerySet and AccessLevel """
-        pass
-    
-    
-    class HStoreGeoAccessLevelPublishedQuerySet(HStoreGeoQuerySet, ACLMixin, PublishedMixin):
-        """ HStoreGeoQuerySet, AccessLevelQuerySet, PublishedQuerySet with GeoDjango queryset """
-        pass
+class HStoreAccessLevelQuerySet(HStoreQuerySet, ACLMixin):
+    """ HStoreQuerySet, ACLMixin queryset """
+    pass
+
+
+class HStoreGeoPublishedQuerySet(HStoreGeoQuerySet, PublishedMixin):
+    """ HStoreGeoQuerySet and PublishedMixin """
+    pass
+
+
+class HStoreGeoAccessLevelQuerySet(HStoreGeoQuerySet, ACLMixin):
+    """ HStoreGeoQuerySet and AccessLevel """
+    pass
+
+
+class HStoreGeoAccessLevelPublishedQuerySet(HStoreGeoQuerySet, ACLMixin, PublishedMixin):
+    """ HStoreGeoQuerySet, AccessLevelQuerySet, PublishedQuerySet with GeoDjango queryset """
+    pass
 
 
 
@@ -206,46 +203,42 @@ class GeoAccessLevelPublishedManager(GeoManager, ExtendedManagerMixin, ACLMixin,
         return GeoAccessLevelPublishedQuerySet(self.model, using=self._db)
 
 
-if HSTORE_ENABLED:
-    from django_hstore.managers import HStoreManager, HStoreGeoManager
+class HStoreNodeshotManager(HStoreManager, ExtendedManagerMixin):
+    """ HStoreManager + ExtendedManagerMixin """
+    pass
+
+
+class HStoreAccessLevelManager(HStoreManager, ExtendedManagerMixin, ACLMixin):
+    """
+    HStoreManager and AccessLeveManager in one
+    """
     
+    def get_query_set(self): 
+        return HStoreAccessLevelQuerySet(self.model, using=self._db)
+
+
+class HStoreGeoPublishedManager(HStoreGeoManager, ExtendedManagerMixin, PublishedMixin):
+    """
+    HStoreGeoManager and PublishedMixin in one
+    """
     
-    class HStoreNodeshotManager(HStoreManager, ExtendedManagerMixin):
-        """ HStoreManager + ExtendedManagerMixin """
-        pass
+    def get_query_set(self): 
+        return HStoreGeoPublishedQuerySet(self.model, using=self._db)
+
+
+class HStoreGeoAccessLevelManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin):
+    """
+    HStoreGeoManager and AccessLeveManager in one
+    """
     
+    def get_query_set(self): 
+        return HStoreGeoAccessLevelQuerySet(self.model, using=self._db)
+
+
+class HStoreGeoAccessLevelPublishedManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin, PublishedMixin):
+    """
+    HStoreManager, GeoManager, AccessLeveManager and Publishedmanager in one
+    """
     
-    class HStoreAccessLevelManager(HStoreManager, ExtendedManagerMixin, ACLMixin):
-        """
-        HStoreManager and AccessLeveManager in one
-        """
-        
-        def get_query_set(self): 
-            return HStoreAccessLevelQuerySet(self.model, using=self._db)
-    
-    
-    class HStoreGeoPublishedManager(HStoreGeoManager, ExtendedManagerMixin, PublishedMixin):
-        """
-        HStoreGeoManager and PublishedMixin in one
-        """
-        
-        def get_query_set(self): 
-            return HStoreGeoPublishedQuerySet(self.model, using=self._db)
-    
-    
-    class HStoreGeoAccessLevelManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin):
-        """
-        HStoreGeoManager and AccessLeveManager in one
-        """
-        
-        def get_query_set(self): 
-            return HStoreGeoAccessLevelQuerySet(self.model, using=self._db)
-    
-    
-    class HStoreGeoAccessLevelPublishedManager(HStoreGeoManager, ExtendedManagerMixin, ACLMixin, PublishedMixin):
-        """
-        HStoreManager, GeoManager, AccessLeveManager and Publishedmanager in one
-        """
-        
-        def get_query_set(self): 
-            return HStoreGeoAccessLevelPublishedQuerySet(self.model, using=self._db)
+    def get_query_set(self): 
+        return HStoreGeoAccessLevelPublishedQuerySet(self.model, using=self._db)
