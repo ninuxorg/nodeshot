@@ -797,7 +797,9 @@ class InteroperabilityTest(TestCase):
         external.config = json.dumps({
             "open311_url": '%snodeshot/testing/' % settings.STATIC_URL,
             "service_code_get": "001",
-            "service_code_post": "002"
+            "service_code_post": "002",
+            "default_status": "active",
+            "api_key": "DEVO1395445966"
         })
         external.full_clean()
         external.save()
@@ -835,6 +837,7 @@ class InteroperabilityTest(TestCase):
             "open311_url": url,
             "service_code_get": "001",
             "service_code_post": "002",
+            "default_status": "active",
             "api_key": "DEVO1395445966"
         })
         external.full_clean()

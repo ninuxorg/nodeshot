@@ -241,20 +241,17 @@ class OpenLabor(BaseSynchronizer):
         if response.status_code != 200:
             message = 'ERROR while creating "%s". Response: %s' % (node.name, response.content)
             logger.error('== %s ==' % message)
-            print message
             return False
         
         try:
             data = response.json()
         except json.JSONDecodeError as e:
             logger.error('== ERROR: JSONDecodeError %s ==' % e)
-            print 'JSONDecodeError: %s\n\nresponse: %s' % (e, response.content)
             return False
         
         external = NodeExternal.objects.create(node=node, external_id=int(data['AddedJobId']))
         message = 'New record "%s" saved in CitySDK through the HTTP API"' % node.name
         self.verbose(message)
-        print message
         logger.info('== %s ==' % message)
         
         # clear cache
