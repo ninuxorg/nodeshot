@@ -185,6 +185,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         // hide toolbar and enlarge map
         this.ui.toolbar.hide();
         setMapDimensions();
+        this.toggleMarkersOpacity('fade');
 
         // show step1
         dialog.css({
@@ -349,6 +350,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         // show toolbar and adapt map width
         this.ui.toolbar.show();
         setMapDimensions();
+        this.toggleMarkersOpacity();
 
         // hide step1 if necessary
         if (this.ui.addNodeStep1.is(':visible')) {
@@ -366,6 +368,27 @@ var MapView = Backbone.Marionette.ItemView.extend({
         }
 
         setMapDimensions();
+    },
+
+    /*
+     * partially fade out or reset markers from the map
+     * used when adding a node
+     */
+    toggleMarkersOpacity: function (action) {
+        var tmpOpacity = 0.3;
+
+        // loop over nodes
+        for (var i = 0, len = Nodeshot.nodes.length; i < len; i++) {
+            var node = Nodeshot.nodes[i];
+
+            if (action === 'fade') {
+                node.options.opacity = tmpOpacity;
+                node.options.fillOpacity = tmpOpacity;
+                node.setStyle(node.options);
+            } else {
+                node.setStyle(node.defaultOptions);
+            }
+        }
     },
 
     /*
