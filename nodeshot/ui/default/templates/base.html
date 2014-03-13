@@ -389,7 +389,8 @@
             Nodeshot.currentUser = new Backbone.Model();
         {% endif %}
         
-        (function(){
+        // TODO: very ugly.. needs more structure, simplification and readability
+        var loadNodeData = function(){
             var data = $.getDataSync('{% url 'api_status_list' %}'),
                 statuses = {};
             
@@ -399,23 +400,25 @@
             }
             
             Nodeshot.statuses = statuses;
-        })();
-        
-        Nodeshot.layers = [];
-        {% for layer in layers %}
-            Nodeshot.layers.push({
-                name: '{{ layer.name }}',
-                slug: '{{ layer.slug }}',
-                nodes_url: '{% url 'api_layer_nodes_list' layer.slug %}',
-                nodes_geojson_url: '{% url 'api_layer_nodes_geojson' layer.slug %}'
-            });
-        {% endfor %}
-        
-        for (var i=0; i<Nodeshot.layers.length; i++) {
-            var layer = Nodeshot.layers[i];
-            // get JSON data
-            layer.nodes_geojson = $.getDataSync(layer.nodes_geojson_url);
+            
+            Nodeshot.layers = [];
+            {% for layer in layers %}
+                Nodeshot.layers.push({
+                    name: '{{ layer.name }}',
+                    slug: '{{ layer.slug }}',
+                    nodes_url: '{% url 'api_layer_nodes_list' layer.slug %}',
+                    nodes_geojson_url: '{% url 'api_layer_nodes_geojson' layer.slug %}'
+                });
+            {% endfor %}
+            
+            for (var i=0; i<Nodeshot.layers.length; i++) {
+                var layer = Nodeshot.layers[i];
+                // get JSON data
+                layer.nodes_geojson = $.getDataSync(layer.nodes_geojson_url);
+            }
         }
+        
+        loadNodeData();
     </script>
     
     <script src="{{ STATIC_URL }}ui/nodeshot/js/models.js"></script>

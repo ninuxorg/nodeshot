@@ -275,10 +275,18 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // TODO: refactor this to use backbone and automatic validation
         $.post(url, data).done(function () {
+            // TODO: fire custom event here
             createModal({
                 message: 'new node added'
             });
-            self.closeAddNode();
+            self.closeAddNode(function () {
+                // show added node
+                // TODO: improve ugly code
+                loadNodeData();
+                self.resetDataContainers();
+                self.loadMapData();
+                self.clusterizeMarkers();
+            });
         }).error(function (http) {
             var json = http.responseJSON;
 
@@ -310,7 +318,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * cancel addNode operation
      * resets normal map functions
      */
-    closeAddNode: function () {
+    closeAddNode: function (callback) {
         var marker = this.newNodeMarker;
         // unbind click event
         this.map.off('click');
@@ -335,6 +343,10 @@ var MapView = Backbone.Marionette.ItemView.extend({
                     }
                     container.hide();
                     setMapDimensions();
+
+                    if (callback && typeof(callback) === 'function') {
+                        callback();
+                    }
                 }
             });
         }
