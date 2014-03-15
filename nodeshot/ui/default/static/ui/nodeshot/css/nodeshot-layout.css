@@ -589,11 +589,11 @@ article.center-stage{
     max-width: 237px !important;
     text-align: left;
     font-size: 12px;
-	white-space: nowrap;
 }
 
 #signup-modal .tooltip-inner{
 	max-width: 400px !important;
+    white-space: nowrap;
 }
 
 #map-legend{
