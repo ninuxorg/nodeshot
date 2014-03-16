@@ -102,6 +102,7 @@
                 </div>
             </div>
         </nav>
+        
         <nav id="nav-bar" class="navbar navbar-inverse" role="navigation">
             <div class="collapse navbar-collapse" id="ns-top-nav-links">
                 <ul class="nav navbar-nav">
@@ -142,6 +143,7 @@
             </div>
         </nav>
     </header>
+    
     {% block breadcrumb %}
     <ol class="breadcrumb center-stage visible-xs invert" id="breadcrumb">
         <li><a href="#">Home</a></li>
@@ -310,6 +312,7 @@
         <li>
             <a href="#" class="icon-search">&nbsp;</a>
         </li>
+        <% if(typeof(username) !== 'undefined'){ %>
         <li>
             <a href="#" class="notifications">
                 <span class="icon-globe">&nbsp;</span>
@@ -317,7 +320,6 @@
                 <span class="bg" id="js-notifications-count">0</span>
             </a>
         </li>
-        <% if(typeof(username) !== 'undefined'){ %>
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <span class="icon-user"></span>
