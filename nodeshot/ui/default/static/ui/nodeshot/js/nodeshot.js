@@ -38,12 +38,16 @@ var setMapDimensions = function () {
     }
 }
 
+// TODO: refactor bad code
 var setNotificationsLeft = function () {
-    var left = $('#top-bar .notifications').offset().left,
-        button_width = $('#top-bar .notifications').outerWidth();
-    notifications_width = $('#notifications').getHiddenDimensions().width;
+    var notifications = $('#top-bar .notifications');
 
-    $('#notifications').css('left', left - notifications_width / 2 + button_width / 2);
+    if (notifications.length) {
+        var left = notifications.offset().left,
+            button_width = notifications.outerWidth();
+        notifications_width = $('#notifications').getHiddenDimensions().width;
+        $('#notifications').css('left', left - notifications_width / 2 + button_width / 2);
+    }
 }
 
 // automatically center modal depending on its width
