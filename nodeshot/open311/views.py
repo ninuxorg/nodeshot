@@ -4,9 +4,10 @@ from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import slugify
 from django.db.models import Q
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.gis.geos import *
+from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings
 
 from rest_framework import generics, permissions, authentication, status
 from rest_framework.views import APIView
@@ -18,6 +19,7 @@ from nodeshot.community.participation.models import Vote, Comment, Rating
 
 from .base import STATUS, SERVICES, MODELS, iso8601_REGEXP
 from .serializers import *
+
 
 class ServiceDiscovery(generics.ListAPIView):
     """
@@ -97,17 +99,28 @@ class ServiceDefinition(APIView):
     
 service_definition = ServiceDefinition.as_view()
 
+
 def create_output_data(data):
-    #convert received geometry to Point
+    # convert received geometry to Point
     geom = fromstr(data['geometry']).centroid
     del data['geometry']
     data['lng'] = geom[0]
     data['lat'] = geom[1]
-    #get status from model and converts it into the mapped status type (open/closed)
+    
+    # get status from model and converts it into the mapped status type (open/closed)
     status_id = data['status']
     status = get_object_or_404(Status, pk=status_id)
-    data['status'] = STATUS[status.name]
+    
+    try:
+        data['status'] = STATUS[status.name]
+    except KeyError:
+        if settings.DEBUG:
+            raise ImproperlyConfigured("NODESHOT['OPEN311']['STATUS'] settings bad configuration")
+        else:
+            data['status'] = 'closed'
+    
     return data
+
 
 class ServiceRequests(generics.ListCreateAPIView):
     """
@@ -133,9 +146,7 @@ class ServiceRequests(generics.ListCreateAPIView):
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    serializer_class= NodeRequestListSerializer
-    
-    
+    serializer_class= NodeRequestListSerializer    
     
     def get_serializer(self, instance=None, data=None,
                        files=None, many=False, partial=False):
@@ -176,12 +187,11 @@ class ServiceRequests(generics.ListCreateAPIView):
         if service_code not in SERVICES.keys():
             return Response({ 'detail': _('Service not found') }, status=404)
         
-        #service_code = 'node'
         start_date = None
         end_date = None
         status = None
         layer = None
-                
+        
         STATUSES = {}
         for status_type in ('open','closed'):
             STATUSES[status_type] = [k for k, v in STATUS.items() if v == status_type]
@@ -211,11 +221,11 @@ class ServiceRequests(generics.ListCreateAPIView):
         else: 
             self.queryset = service_model.objects.all()
         
-        #Filter by layer
+            # Filter by layer
             if layer is not None:
                 self.queryset = self.queryset.filter(layer = node_layer)
-        #Check of date parameters
-        
+                
+            # Check of date parameters
             if start_date is not None and end_date is not None:
                 self.queryset = self.queryset.filter(added__gte = start_date).filter(added__lte = end_date)
             
@@ -225,14 +235,12 @@ class ServiceRequests(generics.ListCreateAPIView):
             if start_date is None and end_date is not None:
                 self.queryset = self.queryset.filter(added__lte = end_date)
             
-        #Check of status parameter
-        
+        # Check of status parameter
         if status is not None:
             q_list = [Q(status__name__exact = s) for s in STATUSES[status]]
             self.queryset = self.queryset.filter(reduce(operator.or_, q_list))            
-                    
-        ## init right serializer
-        #kwargs['serializer'] = serializers[service_code]
+            
+        # init right serializer
         kwargs['service_code'] = service_code
         return self.list(request, *args, **kwargs)
     
@@ -240,6 +248,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         self.object_list = self.filter_queryset(self.get_queryset())
         service_code = kwargs['service_code']
         context = self.get_serializer_context()
+        
         # Default is to allow empty querysets.  This can be altered by setting
         # `.allow_empty = False`, to raise 404 errors on empty querysets.
         if not self.allow_empty and not self.object_list:
@@ -295,18 +304,18 @@ class ServiceRequests(generics.ListCreateAPIView):
         request.UPDATED['user'] = user['user']
         if service_code == 'node':
             for checkPOSTdata in ('layer','name','lat','lng'):
-                #Check if mandatory parameters key exists
+                # Check if mandatory parameters key exists
                 if checkPOSTdata not in request.POST.keys():
                     return Response({ 'detail': _('Mandatory parameter not found') }, status=400)
                 else:
-                    #Check if mandatory parameters values have been inserted
+                    # Check if mandatory parameters values have been inserted
                     if not request.POST[checkPOSTdata] :
                         return Response({ 'detail': _('Mandatory parameter not found') }, status=400)
-            #Get layer id
+            # Get layer id
             layer=Layer.objects.get(slug=request.UPDATED['layer'])           
             request.UPDATED['layer'] = layer.id
             
-            #Transform coords in wkt geometry
+            # Transform coords in wkt geometry
             lat = float(request.UPDATED['lat'])
             lng = float(request.UPDATED['lng'])
             point = Point((lng,lat))
@@ -335,7 +344,6 @@ class ServiceRequests(generics.ListCreateAPIView):
     
     def post_save(self,obj, created, files, service_code):
         if service_code == 'node' and files:
-            #print obj.id
             for file,image_file in files.iteritems():
                 image=Image(node=obj, file=image_file)
                 image.save()
@@ -374,12 +382,6 @@ class ServiceRequest(generics.RetrieveAPIView):
         data['service_code'] = service_code
         data['service_name'] = SERVICES[service_code]['name']
         
-        
         return Response(data)
 
 service_request = ServiceRequest.as_view()
-
-
-
-    
-

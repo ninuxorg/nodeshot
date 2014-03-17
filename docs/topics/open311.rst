@@ -1,15 +1,15 @@
- 
 =========================
 Open 311 API
 =========================
 
-Nodeshot comes with a self-documented API, in order to insert nodes, comments, votes or ratings as service requests,
-according to the Open 311 standard (http://open311.org/).
+Nodeshot comes with a self-documented API, in order to insert nodes, comments,
+votes or ratings as service requests, according to the Open 311 standard (http://open311.org/).
 
 ---------------
 Settings
 ---------------
-The modules ``nodeshot.layers`` , ``nodeshot.nodes`` , ``nodeshot.participation`` and ``nodeshot.open311`` need to be in ``settings.INSTALLED_APPS``::
+The modules ``nodeshot.layers`` , ``nodeshot.nodes`` , ``nodeshot.participation``
+and ``nodeshot.open311`` need to be in ``settings.INSTALLED_APPS``::
 
     INSTALLED_APPS = [
         # dependencies
@@ -42,25 +42,32 @@ Specific settings for Open 311 are configured in NODESHOT['OPEN311'] inside ``se
               
             ]
           },
-        #Do not change this unless you want to redefine Open311 service definitions
+        # Do not change this unless you want to redefine Open311 service definitions
         'METADATA': 'true',
         'TYPE': 'realtime',
-        #Change the following, according to the statuses you have configured in your model
+        # Change the following, according to the statuses you have configured the admin
         'STATUS' : {
-            'Potential' : 'open',
-            'Planned' : 'open',
-            'Active' : 'closed',
+            'potential': 'open',
+            'planned': 'open',
+            'active': 'closed',
         }
     }
-'DISCOVERY' is a dictionary containing service discovery metadata. Inside it, you can define different endpoints (e.g production, test, development, ecc..)
+
+'DISCOVERY' is a dictionary containing service discovery metadata. Inside it, you
+can define different endpoints (e.g production, test, development, ecc..)
+
 See http://wiki.open311.org/Service_Discovery for more details.
 
-'METADATA' and 'TYPE' need to be changed only in order to completely redefine the implementation of Nodeshot Open 311 service definition.
+'METADATA' and 'TYPE' need to be changed only in order to completely redefine the
+implementation of Nodeshot Open 311 service definition.
 
 See http://wiki.open311.org/GeoReport_v2 for details but you probably don't want to do this!
 
-'STATUS' is a dictionary, containing the values that have been inserted in 'Status' model as keys, and 'open' or 'closed' as possible values.
-It is important that the keys of this dictionary exactly match the values contained in the STATUS model, otherwise the server will throw an exception. 
+'STATUS' is a dictionary, containing the values that have been inserted in 'Status'
+model as keys, and 'open' or 'closed' as possible values. It is important that the
+keys of this dictionary exactly match the values of the slug fields contained in
+the STATUS records, otherwise the application will either throw an exception
+(if in DEBUG mode) or defaults to "closed" (production).
 
 In its simpliest form, the configuration would be this::
 

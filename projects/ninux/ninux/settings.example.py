@@ -539,11 +539,11 @@ NODESHOT = {
         'METADATA': 'true',
         'TYPE': 'realtime',
         # Change the following, according to the statuses you have configured in your model
-        #'STATUS' : {
-        #    'Potential' : 'open',
-        #    'Planned' : 'open',
-        #    'Active' : 'closed',
-        #}
+        'STATUS' : {
+            'potential': 'open',
+            'planned': 'open',
+            'active': 'closed',
+        }
     }
 }
 

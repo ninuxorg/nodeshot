@@ -228,43 +228,43 @@ class Open311Request(BaseTestCase):
         response = self.client.get(reverse('api_service_requests'))
         self.assertEqual(response.status_code, 404)
         
-        parameters = {'service_code':'node'}
+        parameters = {'service_code': 'node'}
         response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 10)
         
         parameters['status'] = 'open'
-        response = self.client.get(reverse('api_service_requests'),parameters)
+        response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
         
         parameters['status'] = 'closed'       
-        response = self.client.get(reverse('api_service_requests'),parameters)
+        response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 7)
         
         parameters['status'] = 'wrong'       
-        response = self.client.get(reverse('api_service_requests'),parameters)
+        response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 404)
         
         #check date parameters
         parameters = {'service_code':'node','start_date':'wrong'}
         
-        response = self.client.get(reverse('api_service_requests'),parameters)
+        response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 404)
         
         parameters['start_date'] = '2013-01-01T17:57:02Z'
-        response = self.client.get(reverse('api_service_requests'),parameters)
+        response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 10)
         
         parameters['end_date'] = '2013-04-01T17:57:02Z'
-        response = self.client.get(reverse('api_service_requests'),parameters)
+        response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
         
         parameters['start_date'] = '2015-01-01T17:57:02Z'
-        response = self.client.get(reverse('api_service_requests'),parameters)
+        response = self.client.get(reverse('api_service_requests'), parameters)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
         
@@ -286,9 +286,3 @@ class Open311Request(BaseTestCase):
             url = "%s" % reverse('api_service_requests')
             response = self.client.post(url,service_request)        
             self.assertEqual(response.status_code, 201)
-        
-        
-    
-        
-        
-        

@@ -39,10 +39,10 @@ SERVICES = {
 }
 
 MODELS = {
-            'node': Node,
-            'vote': Vote,
-            'comment': Comment,
-            'rate': Rating,
-        }
+    'node': Node,
+    'vote': Vote,
+    'comment': Comment,
+    'rate': Rating,
+}
 
 iso8601_REGEXP = re.compile("^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])?T(2[0-3]|[0-1][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)??(Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$")
