@@ -246,6 +246,10 @@ class ParticipationModelsTest(TestCase):
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
+        # POST 400 - user rating again fails because 'value' and 'user' are unique_together
+        response = self.client.post(url, good_post_data)
+        self.assertEqual(response.status_code, 400)
+        
         # POST 201 - ensure additional post data "user" and "node" are ignored
         bad_post_data = { "node": 100, "value": "10", "user": 2 }
         response = self.client.post(url, bad_post_data)
@@ -255,7 +259,9 @@ class ParticipationModelsTest(TestCase):
         self.assertEqual(ratings_dict['node'], 1)
         self.assertEqual(ratings_dict['value'], 10)
         
-        # Rating not allowed on layer
+        # Rating not allowed on layer - tested as a different user or 400 would be returned because 'value' and 'user' are unique_together
+        self.client.logout()
+        login = self.client.login(username='pisano', password='tester')
         node.layer.participation_settings.rating_allowed = False
         node.layer.participation_settings.save()
         response = self.client.post(url, good_post_data)
@@ -265,7 +271,9 @@ class ParticipationModelsTest(TestCase):
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
         
-        # Rating not allowed on node
+        # Rating not allowed on node - tested as a different user or 400 would be returned because 'value' and 'user' are unique_together
+        self.client.logout()
+        login = self.client.login(username='viterbese', password='tester')
         node.participation_settings.rating_allowed = False
         node.participation_settings.save()
         response = self.client.post(url, good_post_data)
