@@ -5,15 +5,20 @@ Install
 .. warning::
     This file describes how to install nodeshot on **Ubuntu Server 12.04 LTS**.
     
-    Other Linux distribution will be good as well but you will have to use the package names according to your distribution package manager.
+    Other Linux distribution will be good as well but you will have to use the
+    package names according to your distribution package manager.
 
-Other linux distributions will work as well but you will need to find the right package names to install for the specific distribution you are using.
+Other linux distributions will work as well but you will need to find the right
+package names to install for the specific distribution you are using.
 
-If you are installing for a **development environment** you need to follow the instructions until the section :ref:`project-configuration`.
+If you are installing for a **development environment** you need to follow the
+instructions until the section :ref:`project-configuration`.
 
-If you already have the required dependencies installed you can skip to :ref:`install-python-packages` and follow until :ref:`project-configuration`.
+If you already have the required dependencies installed you can skip to
+:ref:`install-python-packages` and follow until :ref:`project-configuration`.
 
-If you are installing for a **production environment** you need to follow all the instructions including :ref:`production-instructions`.
+If you are installing for a **production environment** you need to follow all the
+instructions including :ref:`production-instructions`.
 
 **Required dependencies**:
 
@@ -91,7 +96,8 @@ And **Git**::
 Install python packages
 =======================
 
-First of all, create the directory structure, a typical web app is usually installed in ``/var/www/``::
+First of all, create the directory structure, a typical web app is usually
+installed in ``/var/www/``::
 
 	mkdir /var/www/ && cd /var/www/
 
@@ -173,7 +179,8 @@ The minimum setting keys that you need to change are the following:
 * ``PROTOCOL`` (http or https)
 * ``SECRET_KEY`` (see below)
 
-If you are installing for **development**, you should put **"localhost"** as ``DOMAIN`` and you might comment the ``ALLOWED_HOSTS`` directive.
+If you are installing for **development**, you should put **"localhost"** as
+``DOMAIN`` and you might comment the ``ALLOWED_HOSTS`` directive.
 
 Remember to uncomment the ``SECRET_KEY`` setting and slighlty change it.
 
@@ -220,7 +227,8 @@ You just need to **run the django development server** in order to see the web a
 Production instructions
 =======================
 
-In production you will need more reliable instruments, we recommend the following software stack:
+In production you will need more reliable instruments, we recommend the following
+software stack:
 
 * **Nginx**: main web server
 * **uWSGI**: application server (serves requests to django)
@@ -236,7 +244,8 @@ Nginx
 
 **Nginx** is the recommended webserver for nodeshot.
 
-Alternatively you could also use any other webserver like apache2 or lighthttpd but it won't be covered in this doc.
+Alternatively you could also use any other webserver like apache2 or lighthttpd
+but it won't be covered in this doc.
 
 You can install from the system packages with the following command::
 
@@ -380,7 +389,8 @@ Paste this config::
 Supervisor
 ----------
 
-We will use `Supervisor`_ as a process manager. Install it via your package system (or alternatively via pip)::
+We will use `Supervisor`_ as a process manager. Install it via your package
+system (or alternatively via pip)::
 
 	apt-get install supervisor
 
@@ -468,7 +478,8 @@ Install celery bindings in your virtual environment::
     source python/bin/activate
     pip install -U celery[redis]
 
-Change the ``DEBUG`` setting to ``False``, leaving it to ``True`` **might lead to poor performance or security issues**::
+Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
+**might lead to poor performance or security issues**::
     
     vim /var/www/nodeshot/projects/ninux/ninux/settings.py
     # set DEBUG to False

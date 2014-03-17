@@ -2,7 +2,8 @@
 Import data from older versions
 *******************************
 
-The new version provides an integrated tool that allows to import data from older nodeshot versions (0.9.x).
+The new version provides an integrated tool that allows to import data from older
+nodeshot versions (0.9.x).
 
 .. warning::
     this tool is a work in progress, please report any bug in our `Mailing List`_.
@@ -13,7 +14,8 @@ The new version provides an integrated tool that allows to import data from olde
 Internal dependencies
 =====================
 
-For the **oldimporter** module to work, the following apps must be listed in ``settings.INSTALLED_APPS``:
+For the **oldimporter** module to work, the following apps must be listed in
+``settings.INSTALLED_APPS``:
 
  * nodeshot.core.nodes
  * nodeshot.core.layers
@@ -26,7 +28,8 @@ For the **oldimporter** module to work, the following apps must be listed in ``s
 Preparation
 ===========
 
-Due to some major differences between the old and the new version some manual preparation needs to be done.
+Due to some major differences between the old and the new version some manual
+preparation needs to be done.
 
 ------------------------------------
 0. Ensure your database is reachable
@@ -63,8 +66,9 @@ So laod the default status objects::
 ----------------
 
 Then ensure you have some layers defined in your admin interface.
-Open the browser and go to **/admin/layers/layer** (or follow the links from the admin index),
-if you see any layer defined, you are ready to proceed, if not you should create one or more layers.
+Open the browser and go to **/admin/layers/layer** (or follow the links from the
+admin index), if you see any layer defined, you are ready to proceed, if not you
+should create one or more layers.
 
 If you **specify the area of each layer**, the importer will be able to insert the
 old nodes into the right layer. It's a good thing to do it!
@@ -138,7 +142,8 @@ And set the ``DEFAULT_LAYER`` (object id/primary key):
     
     # ...
 
-If you followed exactly the instructions in this document you can leave the default ``STATUS_MAPPING`` setting unchanged.
+If you followed exactly the instructions in this document you can leave the default
+``STATUS_MAPPING`` setting unchanged.
 
 ========================
 Install database drivers
@@ -147,7 +152,8 @@ Install database drivers
 Most production installations of old nodeshot versions used MySQL
 (development quick install were done with SQlite).
 
-Because these drivers are not installed by default with the default install procedure, you will have to install them now.
+Because these drivers are not installed by default with the default install
+procedure, you will have to install them now.
 
 For MySQL you can do::
 

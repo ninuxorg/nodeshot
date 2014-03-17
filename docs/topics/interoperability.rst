@@ -2,8 +2,9 @@
 Interoperability
 ****************
 
-Nodeshot has a built mechanism named "interoperability", which is basically an abstraction layer between
-nodeshot and other third party applications which have similarities in common (georeferenced data).
+Nodeshot has a built mechanism named "interoperability", which is basically an
+abstraction layer between nodeshot and other third party applications which have
+similarities in common (georeferenced data).
 
 There are mainly four strategies through which we can achieve interoperability:
 
@@ -41,7 +42,8 @@ the module ``nodeshot.interoperability`` needs to be in ``settings.INSTALLED_APP
         # ...
     ]
 
-the celery beat settings must be uncommented (you might want to tweak how often data is synchronized, default is 12 hours)::
+the celery beat settings must be uncommented (you might want to tweak how often
+data is synchronized, default is 12 hours)::
 
     from datetime import timedelta
 
@@ -73,13 +75,15 @@ Configure a layer
 
 Interoperability is configured at layer level in the admin interface.
 
-A layer must be flagged as **"external"** and can be configured by editing the field **config**, which is a JSON representation of the configuration keys.
+A layer must be flagged as **"external"** and can be configured by editing the
+field **config**, which is a JSON representation of the configuration keys.
 
 ===================
 Synchronize command
 ===================
 
-When developing you can use the django management command "synchronize", which can be used in several different ways, see the help output::
+When developing you can use the django management command "synchronize", which
+can be used in several different ways, see the help output::
 
     python manage.py synchronize --help
 
@@ -107,7 +111,8 @@ When developing you can use the django management command "synchronize", which c
 Writing new synchronizers
 =========================
 
-To write new synchronizers, you should extend the class ``GenericGisSynchronizer`` in ``/nodeshot/interoperability/synchronizers/base.py``:
+To write new synchronizers, you should extend the class ``GenericGisSynchronizer``
+in ``/nodeshot/interoperability/synchronizers/base.py``:
 
 .. code-block:: python
 
@@ -120,7 +125,8 @@ To write new synchronizers, you should extend the class ``GenericGisSynchronizer
 .. note::
     this section is a work in progress.
 
-Save the synchronizer in your python path, name it exactly as you named the class, in our example that would be ``MyVeryCoolApp.py``:
+Save the synchronizer in your python path, name it exactly as you named the class,
+in our example that would be ``MyVeryCoolApp.py``:
 
 Once the file is saved and you are sure it's on your pythonpath you should add a
 tuple in your settings.py in which the first element is the path to the file and
