@@ -112,7 +112,7 @@ def create_output_data(data):
     status = get_object_or_404(Status, pk=status_id)
     
     try:
-        data['status'] = STATUS[status.name]
+        data['status'] = STATUS[status.slug]
     except KeyError:
         if settings.DEBUG:
             raise ImproperlyConfigured("NODESHOT['OPEN311']['STATUS'] settings bad configuration")
@@ -237,7 +237,7 @@ class ServiceRequests(generics.ListCreateAPIView):
             
         # Check of status parameter
         if status is not None:
-            q_list = [Q(status__name__exact = s) for s in STATUSES[status]]
+            q_list = [Q(status__slug__exact = s) for s in STATUSES[status]]
             self.queryset = self.queryset.filter(reduce(operator.or_, q_list))            
             
         # init right serializer
