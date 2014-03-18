@@ -12,35 +12,22 @@ from django.conf import settings
 from rest_framework import generics, permissions, authentication, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from nodeshot.core.nodes.models import Node, Status, Image
 from nodeshot.core.layers.models import Layer
 from nodeshot.community.participation.models import Vote, Comment, Rating
 
-from .base import STATUS, SERVICES, MODELS, iso8601_REGEXP
+from .base import STATUS, SERVICES, DISCOVERY, MODELS, iso8601_REGEXP
 from .serializers import *
 
 
-class ServiceDiscovery(generics.ListAPIView):
+@api_view(['GET'])
+def service_discovery(request):
     """
     Open 311 services' discovery.
     """
-    authentication_classes = (authentication.SessionAuthentication,)
-    serializer_class = ServiceDiscoverySerializer
-    
-    def get(self, request, *args, **kwargs):
-        """ return discovery metadata for open311 services """
-        # init django rest framework specific stuff
-        serializer_class = self.get_serializer_class()
-        context = self.get_serializer_context()
-        
-        discovery = serializer_class(
-                    context=context,
-               ).data
-        
-        return Response(discovery)
-
-service_discovery= ServiceDiscovery.as_view()
+    return Response(DISCOVERY)
 
 
 class ServiceList(generics.ListAPIView):

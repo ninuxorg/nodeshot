@@ -14,7 +14,7 @@ from nodeshot.core.nodes.models import Node, Image
 from nodeshot.community.participation.models import Vote, Comment, Rating
 from nodeshot.core.nodes.serializers import NodeListSerializer
 
-from .base import SERVICES, DISCOVERY
+from .base import SERVICES
 
 __all__ = [
     'ServiceRatingSerializer',
@@ -31,39 +31,10 @@ __all__ = [
     'VoteRequestListSerializer',
     'CommentRequestListSerializer',
     'RatingRequestListSerializer',
-    'ServiceDiscoverySerializer',
 ]
 
 RATING_CHOICES = [ n for n in range(1, 11) ]
 VOTING_CHOICES = [ -1, 1 ]
-
-
-class ServiceDiscoverySerializer(serializers.Serializer):
-    """
-    Open 311 discovery
-    """
-    changeset = serializers.SerializerMethodField('get_changeset')
-    contact = serializers.SerializerMethodField('get_contact')
-    key_service = serializers.SerializerMethodField('get_key_service')
-    endpoints = serializers.SerializerMethodField('get_endpoints')
-    
-    def get_changeset(self,obj):
-        """ type setting - TODO explain """
-        return DISCOVERY['changeset']
-    def get_contact(self,obj):
-        """ type setting - TODO explain """
-        return DISCOVERY['contact']
-    def get_key_service(self,obj):
-        """ type setting - TODO explain """
-        return DISCOVERY['key_service']
-    def get_endpoints(self,obj):
-        """ type setting - TODO explain """
-        return DISCOVERY['endpoints']
-    
-    class Meta:
-        fields= (
-            'changeset','contact','key_service','endpoints'
-            )
     
 
 class ServiceListSerializer(serializers.Serializer):
