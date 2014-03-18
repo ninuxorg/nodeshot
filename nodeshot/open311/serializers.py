@@ -10,7 +10,8 @@ from rest_framework_gis import serializers as geoserializers
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node, Image
 from nodeshot.community.participation.models import Vote, Comment, Rating
-from nodeshot.core.nodes.serializers import NodeListSerializer
+#from nodeshot.core.nodes.serializers import NodeListSerializer
+from nodeshot.core.base.serializers import ExtensibleModelSerializer
 
 from .base import SERVICES
 
@@ -479,7 +480,7 @@ class PostModelSerializer(serializers.ModelSerializer):
         """
 
 
-class NodeRequestListSerializer(PostModelSerializer):
+class NodeRequestListSerializer(ExtensibleModelSerializer):
     """
     Open 311 node request 
     """
@@ -494,7 +495,22 @@ class NodeRequestListSerializer(PostModelSerializer):
     lng = serializers.CharField()
     image = serializers.ImageField()
     service_code = serializers.CharField()
-    #layer = serializers.CharField()
+    layer = serializers.CharField()
+    
+    def restore_object(self, attrs, instance=None):
+        print "Restore object "
+        model_attrs, post_attrs = {}, {}
+        
+        for attr, value in attrs.iteritems():
+            if attr in self.opts.non_native_fields:
+                post_attrs[attr] = value
+            else:
+                model_attrs[attr] = value
+        obj = super(ExtensibleModelSerializer,
+                    self).restore_object(model_attrs, instance)
+        # Method to process ignored postonly_fields
+        #self.non_native_fields(obj, post_attrs)
+        return obj    
     
     def get_image_urls(self,obj):
         image_url =[]
@@ -546,12 +562,12 @@ class NodeRequestListSerializer(PostModelSerializer):
     class Meta:
         model = Node
         fields= ('request_id', 'slug', 'name', 'service_code', 'layer', 'layer_name', 'status', 'geometry', 'name',
-                 'description', 'requested_datetime', 'updated_datetime', 'image_urls',
+                 'description', 'requested_datetime', 'updated_datetime', 'image_urls','image',
                  'details', 'address', 'lat', 'lng', )
         read_only_fields = ('geometry', 'id', 'status', 'is_published', 'access_level',
                             'data','notes','user','added','updated','slug')
-        postonly_fields = ( 'service_code', 'lat', 'lng',
-                           'elev', 'image', )
+        non_native_fields = ( 'service_code', 'lat', 'lng',
+                                'elev', 'image','layer' )
         
 
 class NodeRequestDetailSerializer(NodeRequestListSerializer):
@@ -584,7 +600,7 @@ class VoteRequestListSerializer(PostModelSerializer):
     class Meta:
         model = Vote
         fields= ('service_code', 'node', 'vote',)        
-        postonly_fields = ('node', 'service_code')
+        non_native_fields = ('node', 'service_code')
 
 
 class VoteRequestSerializer(serializers.ModelSerializer):
@@ -604,7 +620,7 @@ class CommentRequestListSerializer(PostModelSerializer):
     class Meta:
         model = Comment
         fields= ('service_code', 'node', 'text',)        
-        postonly_fields = ('node', 'service_code')       
+        non_native_fields = ('node', 'service_code')       
 
         
 class CommentRequestSerializer(serializers.ModelSerializer):
@@ -624,7 +640,7 @@ class RatingRequestListSerializer(PostModelSerializer):
     class Meta:
         model = Rating
         fields= ('service_code', 'node', 'value',)        
-        postonly_fields = ('node', 'service_code')
+        non_native_fields = ('node', 'service_code')
         
         
 class RatingRequestSerializer(serializers.ModelSerializer):
