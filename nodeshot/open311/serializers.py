@@ -4,8 +4,8 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
-from rest_framework.serializers import (ModelSerializerOptions,
-                                             ModelSerializer)
+#from rest_framework.serializers import (ModelSerializerOptions,
+#                                             ModelSerializer)
 from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers
 
@@ -401,7 +401,7 @@ class RatingRequestListSerializer(serializers.ModelSerializer):
         fields= ('added','updated')
 
 
-class PostModelSerializerOptions(ModelSerializerOptions):
+class PostModelSerializerOptions(serializers.ModelSerializerOptions):
     """
    Options for PostModelSerializer
    """
@@ -411,29 +411,56 @@ class PostModelSerializerOptions(ModelSerializerOptions):
         self.postonly_fields = getattr(meta, 'postonly_fields', ())
         
 
-class PostModelSerializer(ModelSerializer):
+class PostModelSerializer(serializers.ModelSerializer):
     _options_class = PostModelSerializerOptions
- 
+    
+    
+    
+    #def to_native(self, obj):
+    #    """
+    #    Serialize objects -> primitives.
+    #    """
+    #    ret = self._dict_class()
+    #    ret.fields = {}
+    #
+    #    for field_name, field in self.fields.items():
+    #        # Ignore all postonly_fields fron serialization
+    #        if field_name in self.opts.postonly_fields:
+    #            continue
+    #        field.initialize(parent=self, field_name=field_name)
+    #        key = self.get_field_key(field_name)
+    #        value = field.field_to_native(obj, field_name)
+    #        ret[key] = value
+    #        ret.fields[key] = field
+    #    return ret
+    
     def to_native(self, obj):
         """
         Serialize objects -> primitives.
         """
         ret = self._dict_class()
-        ret.fields = {}
- 
+        ret.fields = self._dict_class()
+    
         for field_name, field in self.fields.items():
-            # Ignore all postonly_fields fron serialization
             if field_name in self.opts.postonly_fields:
-                continue
+               #print field_name
+               continue
+            
             field.initialize(parent=self, field_name=field_name)
             key = self.get_field_key(field_name)
             value = field.field_to_native(obj, field_name)
-            ret[key] = value
-            ret.fields[key] = field
+            method = getattr(self, 'transform_%s' % field_name, None)
+            if callable(method):
+                value = method(obj, value)
+            if field_name not in self.opts.postonly_fields:
+                ret[key] = value
+            ret.fields[key] = self.augment_field(field, field_name, key, value)
         return ret
  
     def restore_object(self, attrs, instance=None):
+
         model_attrs, post_attrs = {}, {}
+        
         for attr, value in attrs.iteritems():
             if attr in self.opts.postonly_fields:
                 post_attrs[attr] = value
@@ -443,7 +470,19 @@ class PostModelSerializer(ModelSerializer):
                     self).restore_object(model_attrs, instance)
         # Method to process ignored postonly_fields
         self.process_postonly_fields(obj, post_attrs)
+        
         return obj
+    
+    #def restore_object(self, attrs, instance=None):
+    #    """
+    #    Deserialize a dictionary of attributes into an object instance.
+    #    You should override this method to control how deserialized objects
+    #    are instantiated.
+    #    """
+    #    if instance is not None:
+    #        instance.update(attrs)
+    #        return instance
+    #    return attrs
  
     def process_postonly_fields(self, obj, post_attrs):
         """
@@ -486,10 +525,15 @@ class NodeRequestListSerializer(PostModelSerializer):
             return ""
     
     def get_request_id(self, obj):
+        #print obj
+        if obj is None:
+            return ""
         request_id = 'node-%d' % obj.id
         return request_id
     
     def get_details(self, obj):
+        if obj is None:
+            return ""
         request = self.context['request']
         format = self.context['format']
         
@@ -500,7 +544,9 @@ class NodeRequestListSerializer(PostModelSerializer):
    
     class Meta:
         model = Node
-        fields= ('request_id', 'service_code','layer','status','geometry','name','description','requested_datetime','updated_datetime','image_urls','details','address','lat','lng','image',)
+        fields= ('request_id', 'service_code','layer','status','geometry','name',
+                 'description','requested_datetime','updated_datetime','image_urls',
+                 'details','address','lat','lng','image',)
         read_only_fields = ('geometry','id','status','is_published','access_level','data','notes','user','added','updated',)
         postonly_fields = ('layer','service_code','lat', 'lng','elev','image','name','category')
         
