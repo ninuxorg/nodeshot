@@ -31,7 +31,7 @@ django-olwidget
 djangorestframework==2.3.13
 django-rest-swagger
 markdown
--e git+https://github.com/djangonauts/django-rest-framework-gis.git#egg=django_restframework_gis
+djangorestframework-gis
 
 # networking
 netaddr
@@ -54,7 +54,7 @@ django-celery-email
 tornado==3.1
 
 # Postgres HSTORE support
--e git+https://github.com/djangonauts/django-hstore.git#egg=django_hstore
+django_hstore
 
 # better shell
 bpython
