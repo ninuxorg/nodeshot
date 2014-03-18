@@ -51,6 +51,7 @@ class ServiceList(generics.ListAPIView):
             # initialize serializers for layer
             services.append(
                 serializer_class(
+                    object(),
                     context=context,
                     service_type=service_type
                 ).data
@@ -80,7 +81,7 @@ class ServiceDefinition(APIView):
         }
         
         # init right serializer
-        data = serializers[service_type]().data
+        data = serializers[service_type](object()).data
         
         return Response(data)
     
@@ -359,7 +360,7 @@ class ServiceRequest(generics.RetrieveAPIView):
         
         service_model = MODELS[service_code]
         request_object = get_object_or_404(service_model, pk=request_id)
-        data = serializers[service_code](request_object,context=context).data
+        data = serializers[service_code](request_object, context=context).data
         
         if service_code == 'node':
             data = create_output_data(data)
