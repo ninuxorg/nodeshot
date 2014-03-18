@@ -484,6 +484,8 @@ class NodeRequestListSerializer(PostModelSerializer):
     Open 311 node request 
     """
     request_id = serializers.SerializerMethodField('get_request_id')
+    layer_name = serializers.SerializerMethodField('get_layer_name')
+    layer = serializers.SerializerMethodField('get_layer_slug')   
     details = serializers.SerializerMethodField('get_details')
     image_urls = serializers.SerializerMethodField('get_image_urls')
     requested_datetime = serializers.Field(source='added')
@@ -492,7 +494,7 @@ class NodeRequestListSerializer(PostModelSerializer):
     lng = serializers.CharField()
     image = serializers.ImageField()
     service_code = serializers.CharField()
-    layer = serializers.CharField()
+    #layer = serializers.CharField()
     
     def get_image_urls(self,obj):
         image_url =[]
@@ -508,6 +510,20 @@ class NodeRequestListSerializer(PostModelSerializer):
             return image_url
         else:
             return ""
+
+    def get_layer_name(self, obj):
+        #print obj
+        if obj is None:
+            return ""
+        layer_name =  obj.layer
+        return layer_name
+    
+    def get_layer_slug(self, obj):
+        #print obj
+        if obj is None:
+            return ""
+        layer_slug =  obj.layer.slug
+        return layer_slug
     
     def get_request_id(self, obj):
         #print obj
@@ -529,13 +545,13 @@ class NodeRequestListSerializer(PostModelSerializer):
    
     class Meta:
         model = Node
-        fields= ('request_id', 'service_code', 'layer','status', 'geometry', 'name',
-                 'description', 'requested_datetime', 'updated_datetime','image_urls',
-                 'details', 'address', 'lat', 'lng', 'image',)
+        fields= ('request_id', 'slug', 'name', 'service_code', 'layer', 'layer_name', 'status', 'geometry', 'name',
+                 'description', 'requested_datetime', 'updated_datetime', 'image_urls',
+                 'details', 'address', 'lat', 'lng', )
         read_only_fields = ('geometry', 'id', 'status', 'is_published', 'access_level',
-                            'data','notes','user','added','updated',)
-        postonly_fields = ('layer', 'service_code', 'lat', 'lng',
-                           'elev', 'image', 'name')
+                            'data','notes','user','added','updated','slug')
+        postonly_fields = ( 'service_code', 'lat', 'lng',
+                           'elev', 'image', )
         
 
 class NodeRequestDetailSerializer(NodeRequestListSerializer):
