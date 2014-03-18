@@ -27,7 +27,6 @@ class ExtensibleModelSerializer(serializers.ModelSerializer):
         You should override this method to control how deserialized objects
         are instantiated.
         """
-        
         for field in self.opts.non_native_fields:
             attrs.pop(field)
         
@@ -38,16 +37,27 @@ class ExtensibleModelSerializer(serializers.ModelSerializer):
         Serialize objects -> primitives.
         """
         ret = self._dict_class()
-        ret.fields = {}
+        ret.fields = self._dict_class()
 
         for field_name, field in self.fields.items():
-            if field_name in self.opts.non_native_fields:
-                continue
+            if field.read_only and obj is None:
+               continue
             field.initialize(parent=self, field_name=field_name)
             key = self.get_field_key(field_name)
-            value = field.field_to_native(obj, field_name)
-            ret[key] = value
-            ret.fields[key] = field
+            
+            # skips to next iteration but permits to show the field in API browser
+            try:
+                value = field.field_to_native(obj, field_name)
+            except AttributeError:
+                continue
+            
+            method = getattr(self, 'transform_%s' % field_name, None)
+            if callable(method):
+                value = method(obj, value)
+            if not getattr(field, 'write_only', False):
+                ret[key] = value
+            ret.fields[key] = self.augment_field(field, field_name, key, value)
+
         return ret
 
 
