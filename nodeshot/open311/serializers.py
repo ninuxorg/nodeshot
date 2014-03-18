@@ -4,8 +4,6 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
-#from rest_framework.serializers import (ModelSerializerOptions,
-#                                             ModelSerializer)
 from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers
 
@@ -57,7 +55,7 @@ class ServiceListSerializer(serializers.Serializer):
     def get_definition(self, obj):
         request = self.context['request']
         format = self.context['format']
-        return reverse('api_service_definition',
+        return reverse('api_service_definition_detail',
                        args=[self.service_type],
                        request=request,
                        format=format) 
@@ -141,8 +139,6 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 3,
                 'required': True,
                 'variable' : True
-
-
             },
             
             # long
@@ -165,7 +161,6 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 5,
                 'required': False,
                 'variable' : True
-
             },
             
             # elev (elevation)
@@ -177,7 +172,6 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 6,
                 'required': False,
                 'variable' : True
-
             },
             
             # description
@@ -189,7 +183,6 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 7,
                 'required': False,
                 'variable' : True
-
             },
             
             # images
@@ -201,8 +194,6 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'order': 8,
                 'required': False,
                 'variable' : True
-
-
             }
         ]
     
@@ -414,8 +405,6 @@ class PostModelSerializerOptions(serializers.ModelSerializerOptions):
 class PostModelSerializer(serializers.ModelSerializer):
     _options_class = PostModelSerializerOptions
     
-    
-    
     #def to_native(self, obj):
     #    """
     #    Serialize objects -> primitives.
@@ -504,12 +493,8 @@ class NodeRequestListSerializer(PostModelSerializer):
     image = serializers.ImageField()
     service_code = serializers.CharField()
     layer = serializers.CharField()
-    #category = serializers.ChoiceField(choices=LAYER_CHOICES)
     
     def get_image_urls(self,obj):
-        request = self.context['request']
-        format = self.context['format']
-        
         image_url =[]
         
         try:
@@ -537,18 +522,20 @@ class NodeRequestListSerializer(PostModelSerializer):
         request = self.context['request']
         format = self.context['format']
         
-        return reverse('api_service_request',
+        return reverse('api_service_request_detail',
                        args=['node',obj.id],
                        request=request,
                        format=format)
    
     class Meta:
         model = Node
-        fields= ('request_id', 'service_code','layer','status','geometry','name',
-                 'description','requested_datetime','updated_datetime','image_urls',
-                 'details','address','lat','lng','image',)
-        read_only_fields = ('geometry','id','status','is_published','access_level','data','notes','user','added','updated',)
-        postonly_fields = ('layer','service_code','lat', 'lng','elev','image','name','category')
+        fields= ('request_id', 'service_code', 'layer','status', 'geometry', 'name',
+                 'description', 'requested_datetime', 'updated_datetime','image_urls',
+                 'details', 'address', 'lat', 'lng', 'image',)
+        read_only_fields = ('geometry', 'id', 'status', 'is_published', 'access_level',
+                            'data','notes','user','added','updated',)
+        postonly_fields = ('layer', 'service_code', 'lat', 'lng',
+                           'elev', 'image', 'name')
         
 
 class NodeRequestDetailSerializer(NodeRequestListSerializer):
@@ -558,8 +545,10 @@ class NodeRequestDetailSerializer(NodeRequestListSerializer):
    
     class Meta:
         model = Node
-        fields= ('status','geometry','description','address','requested_datetime','updated_datetime', 'image_urls',)
-    
+        fields= ('status', 'geometry', 'description', 'address',
+                 'requested_datetime', 'updated_datetime', 'image_urls',)
+
+
 class NodeRequestSerializer(serializers.ModelSerializer):
     """
     Open 311 node request 
@@ -580,6 +569,7 @@ class VoteRequestListSerializer(PostModelSerializer):
         model = Vote
         fields= ('service_code', 'node', 'vote',)        
         postonly_fields = ('node', 'service_code')
+
 
 class VoteRequestSerializer(serializers.ModelSerializer):
     """
@@ -628,8 +618,3 @@ class RatingRequestSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Rating
-        
-        
-
-
-

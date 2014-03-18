@@ -12,7 +12,6 @@ class ExtensibleModelSerializerOptions(serializers.ModelSerializerOptions):
     def __init__(self, meta):
         super(ExtensibleModelSerializerOptions, self).__init__(meta)
         self.non_native_fields = getattr(meta, 'non_native_fields', ())
-        
 
 
 class ExtensibleModelSerializer(serializers.ModelSerializer):

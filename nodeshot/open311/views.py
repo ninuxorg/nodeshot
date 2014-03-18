@@ -30,7 +30,7 @@ def service_discovery(request):
     return Response(DISCOVERY)
 
 
-class ServiceList(generics.ListAPIView):
+class ServiceDefinitionList(generics.ListAPIView):
     """
     Retrieve list of Open 311 services.
     """
@@ -59,10 +59,10 @@ class ServiceList(generics.ListAPIView):
         
         return Response(services)
 
-service_list = ServiceList.as_view()
+service_definition_list = ServiceDefinitionList.as_view()
 
 
-class ServiceDefinition(APIView):
+class ServiceDefinitionDetail(APIView):
     """
     Retrieve details of specified service.
     """
@@ -85,7 +85,7 @@ class ServiceDefinition(APIView):
         
         return Response(data)
     
-service_definition = ServiceDefinition.as_view()
+service_definition_detail = ServiceDefinitionDetail.as_view()
 
 
 def create_output_data(data):
@@ -103,14 +103,15 @@ def create_output_data(data):
         data['status'] = STATUS[status.slug]
     except KeyError:
         if settings.DEBUG:
-            raise ImproperlyConfigured("NODESHOT['OPEN311']['STATUS'] settings bad configuration")
+            raise ImproperlyConfigured("NODESHOT['OPEN311']['STATUS'] settings bad configuration: key %s not found"
+                                       % status.slug)
         else:
             data['status'] = 'closed'
     
     return data
 
 
-class ServiceRequests(generics.ListCreateAPIView):
+class ServiceRequestList(generics.ListCreateAPIView):
     """
     ### GET
     ###Retrieve list of service requests.
@@ -134,7 +135,8 @@ class ServiceRequests(generics.ListCreateAPIView):
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    serializer_class= NodeRequestListSerializer    
+    serializer_class= NodeRequestListSerializer
+    model = Node
     
     def get_serializer(self, instance=None, data=None,
                        files=None, many=False, partial=False):
@@ -170,6 +172,7 @@ class ServiceRequests(generics.ListCreateAPIView):
         """ Retrieve list of service requests """
         if 'service_code' not in request.GET.keys():
             return Response({ 'detail': _('A service code must be inserted') }, status=404)
+        
         service_code = request.GET['service_code']
         
         if service_code not in SERVICES.keys():
@@ -230,6 +233,7 @@ class ServiceRequests(generics.ListCreateAPIView):
             
         # init right serializer
         kwargs['service_code'] = service_code
+        
         return self.list(request, *args, **kwargs)
     
     def list(self, request, *args, **kwargs):
@@ -252,11 +256,12 @@ class ServiceRequests(generics.ListCreateAPIView):
 
         # Switch between paginated or standard style responses
         page = self.paginate_queryset(self.object_list)
+        
         if page is not None:
             serializer = self.get_pagination_serializer(page)
         else:
-            serializer = self.get_serializer(self.object_list, many=True, )
-            
+            serializer = self.get_serializer(self.object_list, many=True)
+        
         data = serializer.data
             
         if service_code == 'node':
@@ -300,7 +305,7 @@ class ServiceRequests(generics.ListCreateAPIView):
                     if not request.POST[checkPOSTdata] :
                         return Response({ 'detail': _('Mandatory parameter not found') }, status=400)
             # Get layer id
-            layer=Layer.objects.get(slug=request.UPDATED['layer'])           
+            layer = Layer.objects.get(slug=request.UPDATED['layer'])           
             request.UPDATED['layer'] = layer.id
             
             # Transform coords in wkt geometry
@@ -336,13 +341,14 @@ class ServiceRequests(generics.ListCreateAPIView):
                 image=Image(node=obj, file=image_file)
                 image.save()
         
-service_requests = ServiceRequests.as_view()
+service_request_list = ServiceRequestList.as_view()
 
 
-class ServiceRequest(generics.RetrieveAPIView):
+class ServiceRequestDetail(generics.RetrieveAPIView):
     """ Retrieve the details of a service request """
 
     serializer_class= NodeRequestDetailSerializer
+    
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
         service_code = kwargs['service_code']
@@ -372,4 +378,4 @@ class ServiceRequest(generics.RetrieveAPIView):
         
         return Response(data)
 
-service_request = ServiceRequest.as_view()
+service_request_detail = ServiceRequestDetail.as_view()
