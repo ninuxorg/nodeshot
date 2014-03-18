@@ -5,15 +5,14 @@ from rest_framework.fields import Field
 from rest_framework.reverse import reverse
 
 
-class ExtensibleModelSerializerOptions(serializers.SerializerOptions):
+class ExtensibleModelSerializerOptions(serializers.ModelSerializerOptions):
     """
     Meta class options for ExtensibleModelSerializerOptions
     """
     def __init__(self, meta):
         super(ExtensibleModelSerializerOptions, self).__init__(meta)
-        self.model = getattr(meta, 'model', None)
-        self.read_only_fields = getattr(meta, 'read_only_fields', ())
         self.non_native_fields = getattr(meta, 'non_native_fields', ())
+        
 
 
 class ExtensibleModelSerializer(serializers.ModelSerializer):

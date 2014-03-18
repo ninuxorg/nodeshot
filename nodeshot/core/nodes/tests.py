@@ -237,9 +237,8 @@ class APITest(BaseTestCase):
         
         # GET: 200
         response = self.client.get(url, { "limit": 0 })
-        nodes = json.loads(response.content)
         public_node_count = Node.objects.published().access_level_up_to('public').count()
-        self.assertEqual(public_node_count, len(nodes))
+        self.assertEqual(public_node_count, len(response.data['results']))
         
         node = {
             "layer": "rome",
