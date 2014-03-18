@@ -487,7 +487,7 @@ Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
     # save and exit
 
 You might encounter an issue in the Redis log that says:
-"Can't save in background: fork: Cannot allocate memory", in that case run this command:
+"Can't save in background: fork: Cannot allocate memory", in that case run this command::
 
     echo 1 > /proc/sys/vm/overcommit_memory 
 
