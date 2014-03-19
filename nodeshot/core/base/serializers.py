@@ -48,8 +48,11 @@ class ExtensibleModelSerializer(serializers.ModelSerializer):
             # skips to next iteration but permits to show the field in API browser
             try:
                 value = field.field_to_native(obj, field_name)
-            except AttributeError:
-                continue
+            except AttributeError as e:
+                if field_name in self.opts.non_native_fields:
+                    continue
+                else:
+                    raise AttributeError(e.message)
             
             method = getattr(self, 'transform_%s' % field_name, None)
             if callable(method):
