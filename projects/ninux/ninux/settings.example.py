@@ -182,15 +182,15 @@ INSTALLED_APPS = [
     
     # nodeshot
     'nodeshot.core.api',
-    'nodeshot.community.participation',  # participation must go before layers
-    'nodeshot.community.mailing',        # this too
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
     'nodeshot.core.cms',
     'nodeshot.core.websockets',
     'nodeshot.interoperability',
+    'nodeshot.community.participation',
     'nodeshot.community.notifications',
     'nodeshot.community.profiles',
+    'nodeshot.community.mailing',
     'nodeshot.networking.net',
     'nodeshot.networking.links',
     'nodeshot.networking.services',
@@ -565,7 +565,6 @@ if 'grappelli' in INSTALLED_APPS:
 INTERNAL_IPS = ('127.0.0.1', '::1',)  # ip addresses where you want to show the debug toolbar here 
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
-    'HIDE_DJANGO_SQL': False
 }
 
 # ------ UNIT TESTING SPEED UP ------ #

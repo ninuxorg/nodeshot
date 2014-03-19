@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.5.5
+Django==1.6.2
 
 # python libraries
 PIL
@@ -18,8 +18,8 @@ wsgiref
 requests
 
 # better admin
-django-grappelli==2.4.6
-django-filebrowser==3.5.2
+django-grappelli==2.5.2
+django-filebrowser==3.5.4
 
 # utils
 django-extensions
@@ -35,7 +35,7 @@ djangorestframework-gis
 
 # networking
 netaddr
-django-netfields==0.2.1
+-e git+https://github.com/jimfunk/django-postgresql-netfields.git#egg=netfields
 
 # email confirmation with configurable user model
 -e git+https://github.com/nemesisdesign/django-email-confirmation.git#egg=email_confirmation
@@ -44,14 +44,14 @@ django-netfields==0.2.1
 django-social-auth
 
 # versionable content
-django-reversion==1.7.1
+django-reversion==1.8
 
 # asynchronous tasks
-celery==3.1
+celery==3.1.9
 django-celery-email
 
 # websockets
-tornado==3.1
+tornado==3.2
 
 # Postgres HSTORE support
 django_hstore

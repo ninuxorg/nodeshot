@@ -8,8 +8,8 @@ from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import strip_tags
+from django.conf import settings
 from django.contrib.auth import get_user_model
-User = get_user_model()
 
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.base.fields import MultiSelectField
@@ -53,7 +53,7 @@ class Outward(BaseDate):
     if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
         layers = models.ManyToManyField('layers.Layer', verbose_name=_('layers'), blank=True)
     
-    users = models.ManyToManyField(User, verbose_name=_('users'), blank=True)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('users'), blank=True)
     
     class Meta:
         verbose_name = _('Outward message')
@@ -80,6 +80,9 @@ class Outward(BaseDate):
             * are part of any of the specified groups (eg: registered, community, trusted)
             * selected users
         """
+        # user model
+        User = get_user_model()
+        
         # prepare email list
         emails = []
         

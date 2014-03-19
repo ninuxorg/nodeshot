@@ -3,8 +3,8 @@ OpenWISP OAuth support.
 """
 from urllib import urlencode
 from urllib2 import HTTPError
+import simplejson as json
 
-from django.utils import simplejson
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
@@ -62,7 +62,7 @@ class OpenWISPAuth(BaseOAuth2):
         })
 
         try:
-            data = simplejson.load(dsa_urlopen(url))
+            data = json.load(dsa_urlopen(url))
         except ValueError:
             data = None
         

@@ -144,12 +144,6 @@ class ModelsTest(TestCase):
         
         self.assertEqual(Node.objects.find(1), Node.objects.get(pk=1))
         
-        with self.assertRaises(ValueError):
-            Node.objects.last(-1)
-        
-        with self.assertRaises(ValueError):
-            Node.objects.first(-3)
-        
         self.assertEqual(list(Node.objects.slice('name', 5)), list(Node.objects.order_by('name')[0:5]))
         self.assertEqual(list(Node.objects.slice('-name', 5)), list(Node.objects.order_by('-name')[0:5]))
         

@@ -25,7 +25,7 @@ class Layer(BaseDate):
     
     # record management
     is_published = models.BooleanField(_('published'), default=True)
-    is_external = models.BooleanField(_('is it external?'))
+    is_external = models.BooleanField(_('is it external?'), default=False)
     
     # geographic related fields
     center = models.PointField(_('center coordinates'), null=True, blank=True)

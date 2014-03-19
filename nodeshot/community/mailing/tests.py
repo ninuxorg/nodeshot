@@ -48,6 +48,7 @@ class MailingTest(TestCase):
             subject = 'This is a test',
             message = self.message.subject,
         )
+        mail.outbox = []
     
     def test_inward_model(self):
         """ ensure inward model validation works as expected """

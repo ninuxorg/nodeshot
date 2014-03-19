@@ -34,6 +34,7 @@ class ProfilesTest(TestCase):
     def setUp(self):
         self.fusolab = Node.objects.get(slug='fusolab')
         self.client.login(username='registered', password='tester')
+        mail.outbox = []
     
     def test_new_users_have_default_group(self):
         """ users should have a default group when created """

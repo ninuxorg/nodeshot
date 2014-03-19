@@ -37,12 +37,12 @@ class BaseShortcut(models.Model):
     # --- custom methods, copying Rails :) --- #
     
     @classmethod
-    def last(cls, n=None):
-        return cls.objects.last(n)
+    def last(cls):
+        return cls.objects.last()
     
     @classmethod
-    def first(cls, n=None):
-        return cls.objects.first(n)
+    def first(cls):
+        return cls.objects.first()
     
     @classmethod
     def find(cls, pk):
