@@ -171,6 +171,10 @@ Ready? Go!::
 
     python manage.py import_old_nodeshot
 
+If you want to see what the importer is doing behind the scenes raise the verbosity level::
+
+    python manage.py import_old_nodeshot --verbosity=2
+
 Wait for the importer to import your data, when it finishes it will ask you if you
 are satisfied with the results or not, if you enter "No" the importer will delete all
 the imported records.
