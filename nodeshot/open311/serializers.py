@@ -325,86 +325,21 @@ class ServiceRatingSerializer(serializers.Serializer):
         ]
     
     class Meta:
-        fields = ('service_code', 'attributes') 
+        fields = ('service_code', 'attributes')         
 
 
-class NodeRequestSerializer(serializers.ModelSerializer):
-    """
-    Open 311 node request 
-    """
-    
-    class Meta:
-        model = Node
-        
-        
-class VoteRequestSerializer(serializers.ModelSerializer):
-    """
-    Open 311 vote request 
-    """
-    
-    class Meta:
-        model = Vote
-        
-        
-class CommentRequestSerializer(serializers.ModelSerializer):
-    """
-    Open 311 comment request 
-    """
-    
-    class Meta:
-        model = Comment
-        
-        
-class RatingRequestSerializer(serializers.ModelSerializer):
-    """
-    Open 311 rating request 
-    """
-    
-    class Meta:
-        model = Rating
-        
-        
-class VoteRequestListSerializer(serializers.ModelSerializer):
-    """
-    Open 311 vote request 
-    """
-    
-    class Meta:
-        model = Vote
-        fields= ('added','updated')
-        
-        
-class CommentRequestListSerializer(serializers.ModelSerializer):
-    """
-    Open 311 comment request 
-    """
-    
-    class Meta:
-        model = Comment
-        fields= ('added','updated')
-        
-class RatingRequestListSerializer(serializers.ModelSerializer):
-    """
-    Open 311 rating request 
-    """
-    
-    class Meta:
-        model = Rating
-        fields= ('added','updated')
-
-
-class PostModelSerializerOptions(serializers.ModelSerializerOptions):
-    """
-   Options for PostModelSerializer
-   """
- 
-    def __init__(self, meta):
-        super(PostModelSerializerOptions, self).__init__(meta)
-        self.postonly_fields = getattr(meta, 'postonly_fields', ())
-        
-
-class PostModelSerializer(serializers.ModelSerializer):
-    _options_class = PostModelSerializerOptions
+#class PostModelSerializerOptions(serializers.ModelSerializerOptions):
+#    """
+#   Options for PostModelSerializer
+#   """
+# 
+#    def __init__(self, meta):
+#        super(PostModelSerializerOptions, self).__init__(meta)
+#        self.postonly_fields = getattr(meta, 'postonly_fields', ())
+#        
+#
+#class PostModelSerializer(serializers.ModelSerializer):
+#    _options_class = PostModelSerializerOptions
     
     #def to_native(self, obj):
     #    """
@@ -424,44 +359,44 @@ class PostModelSerializer(serializers.ModelSerializer):
     #        ret.fields[key] = field
     #    return ret
     
-    def to_native(self, obj):
-        """
-        Serialize objects -> primitives.
-        """
-        ret = self._dict_class()
-        ret.fields = self._dict_class()
-    
-        for field_name, field in self.fields.items():
-            if field_name in self.opts.postonly_fields:
-               #print field_name
-               continue
-            
-            field.initialize(parent=self, field_name=field_name)
-            key = self.get_field_key(field_name)
-            value = field.field_to_native(obj, field_name)
-            method = getattr(self, 'transform_%s' % field_name, None)
-            if callable(method):
-                value = method(obj, value)
-            if field_name not in self.opts.postonly_fields:
-                ret[key] = value
-            ret.fields[key] = self.augment_field(field, field_name, key, value)
-        return ret
- 
-    def restore_object(self, attrs, instance=None):
-
-        model_attrs, post_attrs = {}, {}
-        
-        for attr, value in attrs.iteritems():
-            if attr in self.opts.postonly_fields:
-                post_attrs[attr] = value
-            else:
-                model_attrs[attr] = value
-        obj = super(PostModelSerializer,
-                    self).restore_object(model_attrs, instance)
-        # Method to process ignored postonly_fields
-        self.process_postonly_fields(obj, post_attrs)
-        
-        return obj
+    #def to_native(self, obj):
+    #    """
+    #    Serialize objects -> primitives.
+    #    """
+    #    ret = self._dict_class()
+    #    ret.fields = self._dict_class()
+    #
+    #    for field_name, field in self.fields.items():
+    #        if field_name in self.opts.postonly_fields:
+    #           #print field_name
+    #           continue
+    #        
+    #        field.initialize(parent=self, field_name=field_name)
+    #        key = self.get_field_key(field_name)
+    #        value = field.field_to_native(obj, field_name)
+    #        method = getattr(self, 'transform_%s' % field_name, None)
+    #        if callable(method):
+    #            value = method(obj, value)
+    #        if field_name not in self.opts.postonly_fields:
+    #            ret[key] = value
+    #        ret.fields[key] = self.augment_field(field, field_name, key, value)
+    #    return ret
+    #
+    #def restore_object(self, attrs, instance=None):
+    #
+    #    model_attrs, post_attrs = {}, {}
+    #    
+    #    for attr, value in attrs.iteritems():
+    #        if attr in self.opts.postonly_fields:
+    #            post_attrs[attr] = value
+    #        else:
+    #            model_attrs[attr] = value
+    #    obj = super(PostModelSerializer,
+    #                self).restore_object(model_attrs, instance)
+    #    # Method to process ignored postonly_fields
+    #    self.process_postonly_fields(obj, post_attrs)
+    #    
+    #    return obj
     
     #def restore_object(self, attrs, instance=None):
     #    """
@@ -474,10 +409,10 @@ class PostModelSerializer(serializers.ModelSerializer):
     #        return instance
     #    return attrs
  
-    def process_postonly_fields(self, obj, post_attrs):
-        """
-        Placeholder method for processing data sent in POST.
-        """
+    #def process_postonly_fields(self, obj, post_attrs):
+    #    """
+    #    Placeholder method for processing data sent in POST.
+    #    """
 
 
 class NodeRequestListSerializer(ExtensibleModelSerializer):
@@ -590,7 +525,7 @@ class NodeRequestSerializer(serializers.ModelSerializer):
         model = Node
         
 
-class VoteRequestListSerializer(PostModelSerializer):
+class VoteRequestListSerializer(ExtensibleModelSerializer):
     """
     Open 311 vote request 
     """
@@ -612,7 +547,7 @@ class VoteRequestSerializer(serializers.ModelSerializer):
         model = Vote
 
 
-class CommentRequestListSerializer(PostModelSerializer):
+class CommentRequestListSerializer(ExtensibleModelSerializer):
     """
     Open 311 comment request 
     """
@@ -632,7 +567,7 @@ class CommentRequestSerializer(serializers.ModelSerializer):
         model = Comment
 
 
-class RatingRequestListSerializer(PostModelSerializer):
+class RatingRequestListSerializer(ExtensibleModelSerializer):
     """
     Open 311 rating request 
     """

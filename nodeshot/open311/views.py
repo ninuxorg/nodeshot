@@ -207,7 +207,7 @@ class ServiceRequestList(generics.ListCreateAPIView):
             node_layer = get_object_or_404(Layer, slug=layer)
 
         service_model = MODELS[service_code]
-        if service_code in ('vote', 'comment', 'rating'):
+        if service_code in ('vote', 'comment', 'rate'):
             self.queryset = service_model.objects.none()
         else: 
             self.queryset = service_model.objects.all()
