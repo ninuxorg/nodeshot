@@ -70,7 +70,7 @@ PORT = '8000' if DEBUG else None
 SITE_URL = '%s://%s' % (PROTOCOL, DOMAIN)
 ALLOWED_HOSTS = [DOMAIN]  # check https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts for more info
 
-if PORT and PORT not in ['80', '433']:
+if PORT and PORT not in ['80', '443']:
     SITE_URL = '%s:%s' % (SITE_URL, PORT)
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -594,6 +594,7 @@ if 'social_auth' in INSTALLED_APPS:
         'nodeshot.community.profiles.backends.EmailBackend',
         'social_auth.backends.facebook.FacebookBackend',
         'social_auth.backends.google.GoogleBackend',
+        'social_auth.backends.contrib.github.GithubBackend',
     )
     
     SOCIAL_AUTH_PIPELINE = (
