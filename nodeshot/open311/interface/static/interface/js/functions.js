@@ -285,7 +285,7 @@ function openForm(marker) {
                     })
                 },
                 error: function (jqXHR, error, errorThrown) {
-                    console.log(jqXHR)
+                    //console.log(jqXHR)
                     $("#request_messages").html(jqXHR.responseText);
                 }
             });
@@ -329,7 +329,6 @@ function populateOpen311Div(nodeSlug, create) {
     var requestID = nodeSlug;
     var url = window.__BASEURL__ + 'open311/request/' + nodeSlug
 
-
     var tmplMarkup = $('#tmplOpen311Popup').html();
     var compiledTmpl = _.template(tmplMarkup, {
         request_id: requestID,
@@ -337,11 +336,55 @@ function populateOpen311Div(nodeSlug, create) {
         url: url,
     });
     $(nodeDiv).append(compiledTmpl);
+    $(nodeDiv).on('click',function(){showRequestDetail(requestID,node)});
+    
 
     return (nodeDiv, nodeRatingAVG)
 
 }
 
+function showRequestDetail(requestID,node) {
+    $("#MainPage").hide();
+    $("#RequestDetails").show();
+    console.log(node.slug)
+    window.nodeSlug = node.slug
+    window.nodeId = requestID.split("-")[1];
+    console.log(nodeId)
+    window.layerSettings = getData(window.__BASEURL__ + 'api/v1/layers/' + node.layer + '/participation_settings/');
+    window.nodeSettings = getData(window.__BASEURL__ + 'api/v1/nodes/' + node.slug + '/participation_settings/');
+    window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + node.slug + '/participation/');
+    getParticipationData()
+var request = getData(window.__BASEURL__ + 'api/v1/open311/requests/' + requestID); 
+var tmplMarkup = $('#tmplOpen311Request').html();
+        var compiledTmpl = _.template(tmplMarkup, {
+            request: request
+        });
+        $("#request").html(compiledTmpl);
+
+//Votes
+if (nodeSettings.participation_settings.voting_allowed) {
+    //console.log("Votes OK")
+    showVotes(nodeParticipation.participation.likes,nodeParticipation.participation.dislikes)
+}
+
+//Comments       
+if (nodeSettings.participation_settings.comments_allowed) {
+    //console.log("Comments OK")
+    showComments(nodeSlug,nodeParticipation.participation.comment_count); 
+}
+
+//Comments       
+if (nodeSettings.participation_settings.rating_allowed) {
+    //console.log("Rating OK")
+    showRating(nodeSlug,nodeParticipation.participation.rating_avg,nodeParticipation.participation.rating_count); 
+}
+
+}
+
+function showMainPage(requestID) {
+    $("#MainPage").show();
+    $("#RequestDetails").hide();
+}
 
 function getParticipationData() {
     window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + nodeSlug + '/participation/');
@@ -496,7 +539,7 @@ function populateRating(nodeID, nodeDiv, nodeRatingAVG) {
         path: $.myproject.STATIC_URL + 'interface/js/vendor/images',
         click: function (score) {
             var nodeID = window.nodeId;
-            console.log(nodeID)
+            //console.log(nodeID)
             postRating(nodeID, score);
         }
     });

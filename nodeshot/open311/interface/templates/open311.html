@@ -121,10 +121,16 @@
 <script id="tmplOpen311Popup" type="text/template">
 <strong>Request ID: </strong><%= request_id %><br>
 <strong>Status: </strong><%= status %><br>
-<a href="<%= url %>">View details</a>
+<!--<a href="<%= url %>">View details</a>-->
+<button id="">View details</button>
 </script>
 
 <script id="tmplOpen311Request" type="text/template">
+  <h3>Request details</h3> 
+<span class="requestField">Layer: </span>
+<%= request.layer_name %><br>  
+<span class="requestField">Name: </span>
+<%= request.name %><br>
 <span class="requestField">Description: </span>
 <%= request.description %><br>
 <span class="requestField">Status: </span>
