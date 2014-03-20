@@ -55,30 +55,30 @@ function addToList(data) {
 /* INSERTION OF NODES ON MAP ON PAGE LOAD
  * ====================================== */
 
-function loadLayersArea(layers) {
-    /*
-     * Puts layer areas on map
-     */
-    var allLayersArea = []
-    for (var i in layers.features) {
-
-        var newArea = L.geoJson(layers.features[i], {
-            style: {
-                weight: 1,
-                opacity: 1,
-                color: 'black',
-                clickable: false,
-                dashArray: '3',
-                fillOpacity: 0.2,
-                fillColor: layers.features[i].properties.color
-            }
-        }).addTo(map);
-        var newAreaKey = "<span style='font-weight:bold;color:" + layers.features[i].properties.color + "'>" + layers.features[i].properties.name + " Area</span>";
-        overlaymaps[newAreaKey] = newArea;
-        allLayersArea[i] = newArea;
-    }
-    return allLayersArea;
-}
+//function loadLayersArea(layers) {
+//    /*
+//     * Puts layer areas on map
+//     */
+//    var allLayersArea = []
+//    for (var i in layers.features) {
+//
+//        var newArea = L.geoJson(layers.features[i], {
+//            style: {
+//                weight: 1,
+//                opacity: 1,
+//                color: 'black',
+//                clickable: false,
+//                dashArray: '3',
+//                fillOpacity: 0.2,
+//                fillColor: layers.features[i].properties.color
+//            }
+//        }).addTo(map);
+//        var newAreaKey = "<span style='font-weight:bold;color:" + layers.features[i].properties.color + "'>" + layers.features[i].properties.name + " Area</span>";
+//        overlaymaps[newAreaKey] = newArea;
+//        allLayersArea[i] = newArea;
+//    }
+//    return allLayersArea;
+//}
 
 function loadLayers(layers) {
     /*
@@ -150,8 +150,9 @@ function loadNodes(layer_slug, newClusterNodes, color) {
     var layer = L.geoJson(newClusterNodes, {
 
         onEachFeature: function (feature, layer) {
-            layer.on('click', function (e) {
                 console.log(feature)
+
+            layer.on('click', function (e) {
                 populateOpen311Div(feature.properties.request_id, "true");
                 this.bindPopup(nodeDiv);
             });
@@ -161,7 +162,7 @@ function loadNodes(layer_slug, newClusterNodes, color) {
             var marker = new
             L.circleMarker(latlng, {
                 radius: 8,
-                fillColor: window.statuses[feature.properties.status].fill_color,
+                fillColor: window.status_colors[feature.properties.status],
                 color: color,
                 weight: 1,
                 opacity: 1,
@@ -269,16 +270,25 @@ function openForm(marker) {
                 contentType: false,
                 processData: false,
                 success: function (returndata) {
-
-                    newMarker = L.marker(latlng).addTo(map);
-                    window.mapClusters[layer_inserted].addLayer(newMarker)
+                    var circle = L.circleMarker(latlng, {
+                radius: 8,
+                fillColor: window.status_colors['open'],
+                //color: color,
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+                    newMarker = L.marker(latlng);
+                    window.mapClusters[layer_inserted].addLayer(newMarker);
+                    window.markerMap[returndata] = newMarker;
                     popupMessage = "Request has been inserted<br>"
+                    popupMessage += "<strong>Request ID: </strong>"+ returndata
+                    //popupMessage += "<button onclick=>View details</button>"
+                    //var url = window.__BASEURL__ + 'open311/request/'
+                    //var requestUrl = url + returndata
+                    //popupMessage += "<br><a href='" + requestUrl + "'>" + returndata + "</a>"
 
-                    var url = window.__BASEURL__ + 'open311/request/'
-                    var requestUrl = url + returndata
-                    popupMessage += "<br><a href='" + requestUrl + "'>" + returndata + "</a>"
-
-                    newMarker.bindPopup(popupMessage).openPopup();
+                    circle.bindPopup(popupMessage).openPopup();
                     map.panTo(latlng)
                     $('#serviceRequestForm').hide("fast", function () {
                         $('#overlay').fadeOut('fast');

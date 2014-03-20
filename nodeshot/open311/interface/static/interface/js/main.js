@@ -12,6 +12,10 @@ var colors = [//if more than 4 layers need to be represented add more colors to 
     '#FFFF00',
     
 ]
+var status_colors = {
+    'open': '#FF0000',
+    'closed': '#00FF00'
+}
 var map = L.map('map').setView([41.87, 12.49], 8);
 var legend = L.control({position: 'bottomleft'});
 
@@ -58,13 +62,20 @@ function test()  {
 //}
 
 legend.onAdd = function (map) {
-    open_color = statuses.open.fill_color;
-    closed_color = statuses.closed.fill_color;
+    //open_color = statuses.open.fill_color;
+    //closed_color = statuses.closed.fill_color;
     var div = L.DomUtil.create('div','mapLegend')
-    var toggleOpenDiv = L.DomUtil.create('toggleOpen','',div)
-    var toggleClosedDiv = L.DomUtil.create('toggleClosed','',div)
-    toggleOpenDiv.innerHTML = " <span style='color:"+open_color+"'>Open requests</span><br>"
-    toggleOpenDiv.innerHTML += "<span style='color:"+closed_color+"'>Closed requests</span><br>"
+    div.innerHTML="<strong>Legend</strong><br>"
+    _.each(status_colors,function(value, key, list){
+        console.log(key+value)
+        var subDiv = L.DomUtil.create(key,'',div)
+        subDiv.innerHTML = " <span style='color:"+value+"'>"+key+"</span><br>"
+        
+        })
+    //var toggleOpenDiv = L.DomUtil.create('toggleOpen','',div)
+    //var toggleClosedDiv = L.DomUtil.create('toggleClosed','',div)
+    //toggleOpenDiv.innerHTML = " <span style='color:"+open_color+"'>Open requests</span><br>"
+    //toggleOpenDiv.innerHTML += "<span style='color:"+closed_color+"'>Closed requests</span><br>"
 
     
     //toggleOpenDiv.innerHTML = "<input type='checkbox' id='toggleOpen' checked> <span style='color:"+open_color+"'>Open requests</span><br>"
@@ -112,40 +123,13 @@ var geojsonlayers = getData(window.__BASEURL__ + 'api/v1/layers.geojson'); //lay
  * */
 
 for (var i in layers) {
-    //{
-    //    var message = '';
-    //    var layerColors = getData(window.__BASEURL__ + 'api/v1/layers/' + layers[i].slug + '/status_icons');
-    //    if (layerColors.status_icons.length == 0) {
-    //        message += layers[i].slug + ',';
-    //    }
-    //    for (var j in layerColors.status_icons) {
-    //        if (layerColors.status_icons[j].status == "Attivo") {
-    //            layers[i].color = layerColors.status_icons[j].background_color;
-    //            createlayersCSS(layers[i].slug, layers[i].color);
-    //            console.log('layercss creato per ' + layers[i].slug)
-    //            for (var k in geojsonlayers.features) {
-    //                var geolayerSlug = geojsonlayers.features[k].properties.slug
-    //                if (geolayerSlug == layers[i].slug) {
-    //                    geojsonlayers.features[k].properties.color = layers[i].color
-    //                }
-    //
-    //            }
-    //        }
-    //
-    //    }
-    //}
-    //if (message != '') {
-    //    var messageToDisplay = "CSS info missing for this layers: \n" + message
-    //    alert(messageToDisplay)
-    //}
-   // layers[i].color=colors[i];
     createlayersCSS(layers[i].slug, colors[i]);
 }
 
 //Populate map's layers
 
 var mapLayersNodes = loadLayers(layers);
-var mapLayersArea = loadLayersArea(geojsonlayers);
+//var mapLayersArea = loadLayersArea(geojsonlayers);
 //Map Controls
 var baseMaps = {
     "OpenStreetMap": osmLayer,

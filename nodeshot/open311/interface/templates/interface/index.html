@@ -28,7 +28,7 @@
 	      <div id="mapContainer">
 		
               <div class="intest">Map</div>
-	      Click on map to insert a new service request 
+	      <strong>Click on map to insert a new service request </strong>
                 <div id="map" style="width: 100%; height: 600px">
 		    <div id='loading'>Loading...</div>
 		   
@@ -84,20 +84,6 @@
     $.myproject.STATIC_URL = '{{ STATIC_URL }}';
 </script>
 	
-
-	<script>
-	  (function(){
-            var data = getData('{% url 'api_status_list' %}'),
-                statuses = {};
-            
-            for (var i=0; i<data.length; i++) {
-                data[i].nodes = [];
-                statuses[data[i].slug] = data[i]
-            }
-            
-            window.statuses = statuses;
-        })();
-	</script>
         <script src="{% static 'interface/js/main.js' %}"></script>
 {% endblock scripts%}		
 	

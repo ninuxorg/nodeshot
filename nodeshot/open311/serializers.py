@@ -433,7 +433,6 @@ class NodeRequestListSerializer(ExtensibleModelSerializer):
     category = serializers.CharField()
     
     def restore_object(self, attrs, instance=None):
-        print "Restore object "
         model_attrs, post_attrs = {}, {}
         
         for attr, value in attrs.iteritems():
@@ -475,7 +474,6 @@ class NodeRequestListSerializer(ExtensibleModelSerializer):
         if obj is None:
             return ""
         layer_slug =  obj.layer.slug
-        print layer_slug
         return layer_slug
     
     def get_request_id(self, obj):
