@@ -24,7 +24,7 @@ class Rating(UpdateCountsMixin, BaseDate):
     
     class Meta:
         app_label = 'participation'
-        unique_together = (("value", "user"),)
+        unique_together = (("node", "user"),)
     
     def update_count(self):
         """ updates rating count and rating average """
