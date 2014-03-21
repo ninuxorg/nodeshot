@@ -1,4 +1,5 @@
 var MapView = Backbone.Marionette.ItemView.extend({
+    name: 'MapView',
     id: 'map-container',
     template: '#map-template',
 
@@ -99,6 +100,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
     // reset containers with pointers to markers and other map objects
     resetDataContainers: function () {
         Nodeshot.nodes = [];
+        Nodeshot.nodesNamed = [];
         Nodeshot.clusters = [];
         _.each(Nodeshot.statuses, function (status) {
             status.nodes = [];
@@ -344,7 +346,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                     container.hide();
                     setMapDimensions();
 
-                    if (callback && typeof(callback) === 'function') {
+                    if (callback && typeof (callback) === 'function') {
                         callback();
                     }
                 }
@@ -659,14 +661,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
             radius: 6,
             opacity: 1,
             fillOpacity: 0.7
-        }
-
-        //Layer insert on map
-        //var overlaymaps = {};
-
-        //var baseMaps = {
-        //    "MapBox": this.mapBoxLayer
-        //};
+        },
+            popUpTemplate = _.template($('#map-popup-template').html());
 
         // loop over each layer
         for (var i = 0; i < Nodeshot.layers.length; i++) {
@@ -683,7 +679,10 @@ var MapView = Backbone.Marionette.ItemView.extend({
                     return options
                 },
                 onEachFeature: function (feature, layer) {
-                    layer.bindPopup(feature.properties.name);
+                    // add slug in properties
+                    feature.properties.slug = feature.id;
+                    // bind leaflet popup
+                    layer.bindPopup(popUpTemplate(feature.properties));
                 },
                 pointToLayer: function (feature, latlng) {
                     var marker = L.circleMarker(latlng, options);
@@ -691,19 +690,17 @@ var MapView = Backbone.Marionette.ItemView.extend({
                     // TODO: remember with localStorage
                     marker.visible = true;
 
+                    marker.on('click', function (e) {
+                        Backbone.history.navigate('#/map/' + feature.id);
+                    });
+
                     Nodeshot.statuses[feature.properties.status].nodes.push(marker);
                     Nodeshot.nodes.push(marker);
+                    Nodeshot.nodesNamed[feature.id] = marker;
                     return marker
                 }
             });
-
-            //this.map.addLayer(leafletLayer);
-
-            // Creates map controls for the layer
-            //overlaymaps[layer.name] = newCluster;
         }
-
-        //var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(this.map);
     },
 
     clusterizeMarkers: function () {

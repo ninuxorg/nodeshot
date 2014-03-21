@@ -1,5 +1,6 @@
 var PageView = Backbone.Marionette.ItemView.extend({
+    name: 'PageView',
     tagName: 'article',
-    className: 'center-stage multicolumn-md',
+    className: 'center-stage',
     template: '#page-template'
 });

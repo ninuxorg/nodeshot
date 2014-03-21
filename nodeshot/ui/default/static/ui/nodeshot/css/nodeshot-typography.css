@@ -35,6 +35,12 @@ article.center-stage > *:first-child,
 
 body article h1{ letter-spacing: -1.25px }
 body article h2{ letter-spacing: -1px }
+h1,
+h2,
+h3,
+h5,
+h5,
+h6{ text-align: left }
 
 body article blockquote{
     padding-top: 15px;

@@ -362,6 +362,16 @@
         {% include 'includes/map.html' %}
     </script>
     
+    <script id="map-popup-template" type="text/template">
+        <h4><%= name %></h4>
+        <% if(description){ %><%= description %><% } %>
+        <p class="details"><a href="#/nodes/<%= slug %>" class="btn btn-primary">{% trans 'Details' %}</a></p>
+    </script>
+    
+    <script id="node-details-template" type="text/template">
+        {% include 'includes/node-details.html' %}
+    </script>
+    
     <script id="loading-template" type="text/template">
         <div id="loading" class="overlay loading">
             <span class="icon-loading animate-spin"></span>
@@ -398,7 +408,7 @@
             
             for (var i=0; i<data.length; i++) {
                 data[i].nodes = [];
-                statuses[data[i].slug] = data[i]
+                statuses[data[i].slug] = data[i];
             }
             
             Nodeshot.statuses = statuses;
@@ -427,6 +437,7 @@
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/account-menu.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/node_details.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>
 </body>
