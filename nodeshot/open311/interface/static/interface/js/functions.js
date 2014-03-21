@@ -150,8 +150,6 @@ function loadNodes(layer_slug, newClusterNodes, color) {
     var layer = L.geoJson(newClusterNodes, {
 
         onEachFeature: function (feature, layer) {
-                console.log(feature)
-
             layer.on('click', function (e) {
                 populateOpen311Div(feature.properties.request_id, "true");
                 this.bindPopup(nodeDiv);
@@ -164,7 +162,7 @@ function loadNodes(layer_slug, newClusterNodes, color) {
                 radius: 8,
                 fillColor: window.status_colors[feature.properties.status],
                 color: color,
-                weight: 1,
+                weight: 3,
                 opacity: 1,
                 fillOpacity: 0.8
             });
@@ -274,7 +272,7 @@ function openForm(marker) {
                 radius: 8,
                 fillColor: window.status_colors['open'],
                 //color: color,
-                weight: 1,
+                weight: 3,
                 opacity: 1,
                 fillOpacity: 0.8
             }).addTo(map);
@@ -283,11 +281,6 @@ function openForm(marker) {
                     window.markerMap[returndata] = newMarker;
                     popupMessage = "Request has been inserted<br>"
                     popupMessage += "<strong>Request ID: </strong>"+ returndata
-                    //popupMessage += "<button onclick=>View details</button>"
-                    //var url = window.__BASEURL__ + 'open311/request/'
-                    //var requestUrl = url + returndata
-                    //popupMessage += "<br><a href='" + requestUrl + "'>" + returndata + "</a>"
-
                     circle.bindPopup(popupMessage).openPopup();
                     map.panTo(latlng)
                     $('#serviceRequestForm').hide("fast", function () {
@@ -304,8 +297,6 @@ function openForm(marker) {
         });
     });
 }
-
-
 
 function clearLayers() {
     /*
@@ -356,10 +347,8 @@ function populateOpen311Div(nodeSlug, create) {
 function showRequestDetail(requestID,node) {
     $("#MainPage").hide();
     $("#RequestDetails").show();
-    console.log(node.slug)
     window.nodeSlug = node.slug
     window.nodeId = requestID.split("-")[1];
-    console.log(nodeId)
     window.layerSettings = getData(window.__BASEURL__ + 'api/v1/layers/' + node.layer + '/participation_settings/');
     window.nodeSettings = getData(window.__BASEURL__ + 'api/v1/nodes/' + node.slug + '/participation_settings/');
     window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + node.slug + '/participation/');
@@ -367,7 +356,9 @@ function showRequestDetail(requestID,node) {
 var request = getData(window.__BASEURL__ + 'api/v1/open311/requests/' + requestID); 
 var tmplMarkup = $('#tmplOpen311Request').html();
         var compiledTmpl = _.template(tmplMarkup, {
-            request: request
+            request: request,
+            requestID: requestID,
+            
         });
         $("#request").html(compiledTmpl);
 
@@ -514,7 +505,6 @@ function postRating(nodeID, rating) {
     /*
      * post a rating
      */
-    console.log(nodeID)
     var ok = confirm("Add rating " + rating + " for this node?");
     if (ok == true) {
         $.ajax({

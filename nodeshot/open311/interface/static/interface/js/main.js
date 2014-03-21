@@ -4,26 +4,37 @@ var nodeRatingAVG // Rating data has to be globally available for rating plugin 
 var markerMap = {} //Object holding all nodes'id and a reference to their marker
 var markerStatusMap = {}
 var mapClusters = {}
-//Map initialization
-var colors = [//if more than 4 layers need to be represented add more colors to the array
+
+
+/*
+Colors are dinamically added to layers whe these are loaded.
+If more than 8 layers need to be represented add more colors to the array.
+*/
+
+var colors = [
     '#0000ff',
-    '#FF8000',
+    '#DFA171',
+    '#CBC7B6',
+    '#FED508',
     '#610B5E',
+    '#292323',
+    '#FF8000',
     '#FFFF00',
     
 ]
+
+/*
+ Status colors are green(open) and red ( closed).
+ Don't use these colors to style layers.
+ */
 var status_colors = {
     'open': '#FF0000',
     'closed': '#00FF00'
 }
+
+//Map initialization
 var map = L.map('map').setView([41.87, 12.49], 8);
 var legend = L.control({position: 'bottomleft'});
-
-function test()  {
-    
-    alert('test');
-    //return false;
-}
 
 //function removeStatusMarkers(status){
 //    //event.stopPropagation();
@@ -62,16 +73,15 @@ function test()  {
 //}
 
 legend.onAdd = function (map) {
-    //open_color = statuses.open.fill_color;
-    //closed_color = statuses.closed.fill_color;
     var div = L.DomUtil.create('div','mapLegend')
-    div.innerHTML="<strong>Legend</strong><br>"
+    div.innerHTML="<div><strong>Legend</strong>"
     _.each(status_colors,function(value, key, list){
-        console.log(key+value)
-        var subDiv = L.DomUtil.create(key,'',div)
-        subDiv.innerHTML = " <span style='color:"+value+"'>"+key+"</span><br>"
-        
+        div.innerHTML += "<div style='clear:both;min-height:10px;width:100px;'>"
+        div.innerHTML += "<div class='circle' style='float:left;background-color:"+value+"'></div>"
+        div.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests"+"</div>"
+        div.innerHTML += "</div>"
         })
+    div.innerHTML += "</div>"
     //var toggleOpenDiv = L.DomUtil.create('toggleOpen','',div)
     //var toggleClosedDiv = L.DomUtil.create('toggleClosed','',div)
     //toggleOpenDiv.innerHTML = " <span style='color:"+open_color+"'>Open requests</span><br>"
@@ -96,6 +106,7 @@ legend.onAdd = function (map) {
 
 
 legend.addTo(map);
+var mapBoxLayer = new L.tileLayer('//a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
 var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 //Uncomment for Google maps. Must be checked if it works in IE
 var googleHybrid = new L.Google('HYBRID');
@@ -103,7 +114,7 @@ var googleMap = new L.Google('ROADMAP');
 var googleSat = new L.Google();
 
 //OSM layer added to map
-osmLayer.addTo(map);
+mapBoxLayer.addTo(map);
 map.on('click', onMapClick);
 var popup = L.popup();
 
@@ -116,12 +127,6 @@ var layers = getData(window.__BASEURL__ + 'api/v1/layers/'); //layers
 var geojsonlayers = getData(window.__BASEURL__ + 'api/v1/layers.geojson'); //layers' area
 
 
-/* Definition of color for layer's visualization
- * Custom icon of status "Attivo" for layer is used for this purpose.
- * It would be better ( and faster) to have a default generic color property for layers
- * and use status icons when working on nodes
- * */
-
 for (var i in layers) {
     createlayersCSS(layers[i].slug, colors[i]);
 }
@@ -132,18 +137,18 @@ var mapLayersNodes = loadLayers(layers);
 //var mapLayersArea = loadLayersArea(geojsonlayers);
 //Map Controls
 var baseMaps = {
+    "MapBox": mapBoxLayer,
     "OpenStreetMap": osmLayer,
-        "Google Sat": googleSat,
-        "Google Map": googleMap,
-        "Google Hybrid": googleHybrid
+    "Google Sat": googleSat,
+    "Google Map": googleMap,
+    "Google Hybrid": googleHybrid
 
 };
 var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
 
-//Populate a select field wit Layers
+//Populate a select field with Layers
 getLayerListSlug(layers);
-//console.log("markerMap:"+markerMap)
-//console.log(markerMap)
+
 function createlayersCSS(slug, color) {
     var cssClass = '.' + slug
     $("<style type='text/css'> " + cssClass + "{\

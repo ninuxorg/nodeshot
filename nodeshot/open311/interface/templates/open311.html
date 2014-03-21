@@ -55,17 +55,6 @@
 <button class="remove_marker" onclick=markerDelete(marker)>Delete</b>
 </script>
 
-<script id="tmplNodelist" type="text/template">
-  Requests found <strong><%= nodes.length %></strong> 
-   <ul> <% for (var i = 0; i < nodes.length; i++) { %>
-      <% var node = nodes[i]; %>
-      <li>
-      <a href="#" class="list-link" data-id='<%= node.request_id %>' ><%= node.name %></a>
-      </li>
-    <% } %>
-  </ul>
-</script>
-
 <script id="tmplInsertNode" type="text/template">
 <p><strong>Insert request details</strong></p>
 
@@ -82,31 +71,26 @@
 	      %>
 	</select>
 	</p>
-	<p>
-	  
+		  
 	<label for="nodeToInsertName" >Name</label>
 	<input class="input" name="name">
-	</p>
-	
+
 	<label for="nodeToInsertName" >Description</label>
-	<input class="input" name="description">
-	</p>
-	
+	<textarea class="input" name="description"></textarea>
+
 	<label for="nodeToInsertAddress" >Address <br>(from Open Street Map)</label>
 	<div id="loadingAddress" >Loading...</div>
 	<textarea id="requestAddress" class="input" name="address"></textarea>	
-	
-	<p>
+
 	<label for="nodeToInsertLat">Lat</label>   
 	<input id="requestLat" class="input" name="lat">
-	</p>
-	  <p>
+
 	<label for="nodeToInsertLng">Lng</label>   
 	<input id="requestLng" class="input" name="lng">
-	</p>
-	  <label for="imageToInsert">Image</label>   
-	 <input type="file" name="image" id="photoimg" />
-	</p>
+
+	    <label for="imageToInsert">Image</label>   
+	 <input type="file" name="image" id="photoimg" >
+<br>
 	  <input type=submit>
 </form>
 <div id="request_messages" class="error_messages"></div>
@@ -118,6 +102,19 @@
 </option>
 </script>
 
+<script id="tmplNodelist" type="text/template">
+  Requests found: <strong><%= nodes.length %></strong> 
+   <ul> <% for (var i = 0; i < nodes.length; i++) { %>
+      <% var node = nodes[i]; %>
+      <li>
+      <span class="requestID"><%= node.request_id %>: </span>
+      <a href="#" class="list-link" data-id='<%= node.request_id %>'>
+      <%= node.name %></a>
+      </li>
+    <% } %>
+  </ul>
+</script>
+
 <script id="tmplOpen311Popup" type="text/template">
 <strong>Request ID: </strong><%= request_id %><br>
 <strong>Status: </strong><%= status %><br>
@@ -126,7 +123,16 @@
 </script>
 
 <script id="tmplOpen311Request" type="text/template">
-  <h3>Request details</h3> 
+<div style="float:right; width:80px;">
+<img src="{% static 'interface/img/map.png' %}"  /><br>
+<a style="text-align: right;" href="#" onClick=showMainPage()>
+
+
+Back to map</a>
+</div>
+<h3>Service Request details</h3>
+<span class="requestField">Request_id: </span>
+<%= requestID %><br>  
 <span class="requestField">Layer: </span>
 <%= request.layer_name %><br>  
 <span class="requestField">Name: </span>
@@ -146,7 +152,7 @@
 
 <script id="tmplOpen311Votes" type="text/template">
 <div id="votes">
-<div class="intest">Votes</div>           
+<div class="intest">Vote</div>           
 <p><img src="{% static 'interface/img/likes.jpg' %}" /><%= likes %> </p>
 <p><img src="{% static 'interface/img/dislike.jpg' %}" /><%= dislikes %> </p>
 <div id="insert_vote" class="insert_vote">
@@ -160,14 +166,14 @@ Your vote:
 </script>
 
 <script id="tmplComments" type="text/template">
-<div class="intest">Comments</div>
+<div class="intest">Add comments</div>
 <div id="comments">
 <textarea id="commentText" class="your_comment"></textarea><br>
-<button id="post_comments" >Add comment</button>
+<button id="post_comments" >Post comment</button>
 <div id="comment_messages" class="thanks_messages"></div>
 <div id="comment_error_messages" class="error_messages"></div>
 <hr>
-<p><strong><%= comments_count%> people already commented:</strong></p>    
+<p><strong>Comments (<%= comments_count%>) :</strong></p>    
 	<div id="comment" >
     <% for (var i = 0; i < comments.length; i++) { %>
       <% var comment = comments[i]; %>
@@ -190,8 +196,9 @@ Your vote:
 
 <script id="tmplNodePopupRating" type="text/template">
   <div id="rating">
-    <div class="intest">Rating</div>
-<div style="background-color:#C0C0C0"> <strong><%= votes %> rating(s) </strong></div>
+    <div class="intest">Rate it</div>
+<div style="background-color:#C0C0C0">
+Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> votes </strong></div>
 <div id="star"></div>
 <div id="rating_messages" class="thanks_messages"></div>
 <div id="rating_error_messages" class="error_messages"></div>

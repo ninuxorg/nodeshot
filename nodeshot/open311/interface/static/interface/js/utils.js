@@ -44,7 +44,6 @@ function getAddress(lat,lng) {
             data = {}
             data = response;
             address = data.display_name;
-            console.log(address)
             $("#requestAddress").val(address);
             $("#loadingAddress").hide();
         }
