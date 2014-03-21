@@ -8,6 +8,11 @@ body {
 .row {
   margin-top: 25px;
 }
+
+#RequestDetails{
+  display: none;
+}
+
 .mapLegend {
   padding: 6px 8px;
     font: 14px/16px Arial, Helvetica, sans-serif;
