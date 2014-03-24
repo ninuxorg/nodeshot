@@ -1,4 +1,5 @@
 var AccountMenuView = Backbone.Marionette.ItemView.extend({
+    name: 'AccountMenuView',
     el: '#main-actions',
     //className: 'center-stage multicolumn-md',
     template: '#account-menu-template',

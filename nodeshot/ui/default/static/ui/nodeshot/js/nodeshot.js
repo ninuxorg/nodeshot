@@ -15,8 +15,13 @@ var setCollapsibleMainMenuMaxHeight = function () {
 
 // dynamic map dimensions
 var setMapDimensions = function () {
-    var height = $(window).height() - $('body > header').height();
-    $('#map-container, #map-toolbar').height(height);
+    if (!$('#map-overlay-container').length) {
+        var height = $(window).height() - $('body > header').height();
+        $('#map-container, #map-toolbar').height(height);
+    } else {
+        var height = $('#map-overlay-container').height() + parseInt($('#map-overlay-container').css('top'));
+        $('#map-container').height(height);
+    }
 
     var map_toolbar = $('#map-toolbar'),
         add_node_container = $('#add-node-container');

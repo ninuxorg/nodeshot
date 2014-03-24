@@ -420,7 +420,9 @@ input.error, .error input, .error button{
 
 #map-legend.inverse .icon-close:hover,
 .user-dialog .icon-close:hover,
-.inverse .icon-close:focus{
+.inverse .icon-close:focus,
+article .icon-close:hover,
+article .icon-close:focus{
     color: #000
 }
 
@@ -515,7 +517,8 @@ input.error, .error input, .error button{
     text-decoration: none
 }
 
-.user-dialog .icon-close{
+.user-dialog .icon-close,
+article .icon-close{
     color: #999999;
 }
 
@@ -856,3 +859,66 @@ label.inline{ margin: 0 }
 	line-height: 42px !important;
 }
 
+.icon-ok,
+.icon-thumbs-up{ color: #328327 }
+.icon-cancel,
+.icon-thumbs-down{ color: #c72c25 }
+
+a.icon-thumbs-up:hover{ color: #139502 }
+a.icon-thumbs-down:hover{ color: #e20a00 }
+
+.icon-ok,
+.icon-cancel,
+.icon-star,
+.icon-star-half,
+.icon-star-empty,
+.icon-thumbs-up,
+.icon-thumbs-down{
+    line-height: 0;
+    font-size: 18px;
+    position: relative;
+    bottom: -1px;
+}
+
+.status{
+    padding: 2px 9px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 5px;
+}
+
+.icon-star,
+.icon-star-half,
+.icon-star-empty{
+    color: #ffa803;
+}
+
+.icon-star:before,
+.icon-star-half:before,
+.icon-star-empty:before,
+.icon-thumbs-up:before,
+.icon-thumbs-down:before{
+    width: auto !important;
+    margin: 0 1px 0 0 !important;
+}
+
+a.rating,
+a.icon-thumbs-up,
+a.icon-thumbs-down{
+    text-decoration: none;
+}
+
+.icon-thumbs-up,
+.icon-thumbs-down{
+    margin-left: 7px;
+}
+
+.icon-thumbs-up:before,
+.icon-thumbs-down:before{
+    font-size: 30px;
+}
+
+.icon-thumbs-down:before{
+    position: relative;
+    bottom: -6px
+}

@@ -1,0 +1,171 @@
+{% load i18n %}
+<div id="map">
+    <div id="map-js"></div>
+</div>
+
+<div id="map-overlay-container">
+    <article id="node-details" class="center-stage responsive-padding">
+        
+        <h2>
+            <%= name %>
+            <span class="vote">
+                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-thumbs-up">10</a>
+                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-thumbs-down">5</a>
+            </span>
+        </h2>
+        
+        <p class="actions" style="clear:both">
+            <a href="javascript:createModal({message:'not implemented yet'})"><img src="images/nyancat.jpg" alt=""><%= user %></a>
+            <a href="javascript:createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
+            <a href="javascript:createModal({message:'not implemented yet'})" class="icon-link">{% trans 'permalink' %}</a>
+            <a href="javascript:createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
+        </p>
+        
+        <ul class="nav nav-tabs hidden-xs" id="node-menu">
+            <li class="active"><a href="javascript:createModal({message:'not implemented yet'})">{% trans 'General info' %}</a></li>
+            <li><a href="javascript:createModal({message:'not implemented yet'})">Images (4)</a></li>
+            <li><a href="javascript:createModal({message:'not implemented yet'})">Devices (3)</a></li>
+        </ul>
+        
+        <ul class="nav nav-pills visible-xs" id="node-menu-mobile">
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:createModal({message:'not implemented yet'})">
+                    {% trans 'General info' %} <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="javascript:createModal({message:'not implemented yet'})">Images (4)</a></li>
+                    <li><a href="javascript:createModal({message:'not implemented yet'})">Devices (3)</a></li>
+                </ul>
+            </li>
+        </ul>
+        
+        <div class="row">
+            <div class="col-sm-6 left">
+                <table class="table table-striped left-labels">
+                    <tr>
+                        <td class="left">
+                            {% trans 'Status' %}:
+                        </td>
+                        <td class="right">
+                            <span class="status" style="
+								background:<%= Nodeshot.statuses[status].fill_color %>;
+								color:<%= Nodeshot.statuses[status].text_color %>;
+							"><%= status %></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            {% trans 'Layer' %}:
+                        </td>
+                        <td class="right">
+                            <a href="javascript:createModal({message:'not implemented yet'})"><%= layer_name %></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            {% trans 'Address' %}:
+                        </td>
+                        <td class="right">
+                            <%= address %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            {% trans 'Elevation' %}:
+                        </td>
+                        <td class="right">
+                            <%= elev %> {% trans 'meters' %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            {% trans 'Added' %}:
+                        </td>
+                        <td class="right">
+                            <%= added %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            {% trans 'Updated' %}:
+                        </td>
+                        <td class="right">
+                            <%= updated %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            Hotspot:
+                        </td>
+                        <td class="right">
+                            <span class="icon-ok"></span>
+                            <span class="icon-cancel"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            {% trans 'Rating' %}:
+                        </td>
+                        <td class="right" id="rating-js">
+                            <a href="javascript:createModal({message:'not implemented yet'})" class="rating">
+                                <span class="icon-star"></span>
+                                <span class="icon-star"></span>
+                                <span class="icon-star-half"></span>
+                                <span class="icon-star-empty"></span>
+                                <span class="icon-star-empty"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                
+                <h3>{% trans 'Description' %}</h3>
+                <%= description %>
+            </div>
+            <div class="col-sm-6 right">
+                <div style="background:#333;min-height:400px;line-height:400px;color:#fff;text-align:center;font-size:18px">
+                    Image gallery coming soon
+                </div>
+            </div>
+        </div>
+        
+        <div id="comments">
+            <h3>2 Comments</h3>
+            
+            <form action="" class="new-comment">
+                <div class="input-group">
+                    <span class="input-group-addon"><img class="avatar" src="images/user-1.png" alt=""></span>
+                    <div class="form-control">
+                        <textarea name="text" class="initial" placeholder="Join the discussion..." rows="1"></textarea>
+                    </div>
+                </div>
+            </form>
+            
+            <div class="comment">
+                <img class="avatar" src="images/user-2.png" alt="">
+                <div class="meta-data">
+                    <a href="javascript:createModal({message:'not implemented yet'})">tiger</a>
+                    <span class="separator">•</span>
+                    <span class="date">2 hours ago</span>
+                </div>
+                <p class="text">
+                    Lorem ipsum dolor sit amet consectetuer ut et molestie ut sagittis. Eget nunc orci Aenean tortor hendrerit dolor semper justo nibh sapien. Leo eros quis et Vestibulum ut cursus sagittis velit sodales volutpat.
+                </p>
+            </div>
+            
+            <div class="comment">
+                <img class="avatar" src="images/user-1.png" alt="">
+                <div class="meta-data">
+                    <a href="javascript:createModal({message:'not implemented yet'})">nemesis</a>
+                    <span class="separator">•</span>
+                    <span class="date">13 hours ago</span>
+                </div>
+                <p class="text">
+                    Scrivo commenti a caso perchè non ho nulla da fare.<br><br>
+                    Lorem ipsum dolor sit amet consectetuer ut et molestie ut sagittis. Eget nunc orci Aenean tortor hendrerit dolor semper justo nibh sapien. Leo eros quis et Vestibulum ut cursus sagittis velit sodales volutpat.
+                </p>
+            </div>
+        </div>
+        
+        <a href="javascript:history.back(1)" class="icon-close"></a>
+    </div>
+</div>
