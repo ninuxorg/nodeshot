@@ -1,29 +1,31 @@
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
-body {
-  background-color: #FF9900;
+ body {
+    background-color: #FF9900;
 }
-
 .row {
-  margin-top: 25px;
+    margin-top: 25px;
 }
-
-#RequestDetails{
-  display: none;
+#RequestDetails {
+    display: none;
 }
-
 .mapLegend {
-  padding: 6px 8px;
+    padding: 6px 8px;
     font: 14px/16px Arial, Helvetica, sans-serif;
     background: white;
-    background: rgba(255,255,255,0.8);
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     text-align: left;
 }
-
-.overlay{
+.circle {
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    /* width and height can be anything, as long as they're equal */
+}
+.overlay {
     background:transparent url(images/overlay.png) repeat top left;
     position:fixed;
     top:0px;
@@ -32,15 +34,14 @@ body {
     right:0px;
     height: 100%;
     width: 100%;
-    z-index:1000;
+    z-index:10000;
 }
-
 #serviceRequestForm {
     width: 400px;
     height: 600px;
     line-height: 20px;
     position: fixed;
-    top: 30%; 
+    top: 30%;
     left: 50%;
     margin-top: -100px;
     margin-left: -250px;
@@ -52,10 +53,19 @@ body {
     padding-left: 20px;
     padding-top:20px;
     padding-right: 20px;
-    z-index: 1001; /* 1px higher than the overlay layer */
-}  
-    
-a.boxclose{
+    z-index: 10001;
+    /* 1px higher than the overlay layer */
+}
+
+#requestForm label {
+    font-weight: bold;
+}
+
+#requestForm input[type="file"] {
+    width: 200px;
+}
+
+a.boxclose {
     float:right;
     width:26px;
     height:26px;
@@ -65,164 +75,164 @@ a.boxclose{
     cursor:pointer;
 }
 
-
-.thumbnail{
-  width:200px;
-  height: 150px;
-  
+.thumbnail {
+    width:200px;
+    height: 150px;
 }
-
 
 .remove_marker {
-  background-color: #ff0000;
+    background-color: #ff0000;
     color: #000000
-
 }
+
 .confirm_marker {
-  background-color: #00ff00;
-  color: #000000
+    background-color: #00ff00;
+    color: #000000
+}
+.layerList {
+    width: 90%;
 }
 
-.layerList
-{
-width: 90%;
+.userLogged {
+    color: #ffffff;
 }
-
-.userLogged
-{
-color: #ffffff;
-}
-
-
 
 #nodelist {
-
-  background-color: #c0c0c0;
-  color: #000000;
-  font-size: 14px;
-  max-height: 500px;
-  padding: 2px;
-  border-radius: 4px;
-  overflow:auto;
-/*  margin: 1px;
+    background-color: #c0c0c0;
+    color: #000000;
+    font-size: 14px;
+    max-height: 500px;
+    padding: 2px;
+    border-radius: 4px;
+    overflow:auto;
+    /*  margin: 1px;
   border-style:solid;
   border-width:1px;
   border-color: #0000ff*/
 }
 
-#nodelist ul{
-  padding: 0px;
-  margin: 0px;
-  color: #000000;
-  background-color: #c0c0c0;
-  text-align: left;
+#nodelist ul {
+    padding: 0px;
+    margin: 0px;
+    color: #000000;
+    background-color: #c0c0c0;
+    text-align: left;
+    list-style-type: none;
 }
 
-#nodelist li{
-
-  color: #000000;
-  margin: 1px;  
+#nodelist li {
+    color: #000000;
+    /*  margin: 2px;*/
+    border-bottom: 2px solid #ccc;
+    /*  padding:1px;*/
 }
 
-
-#nodelistContainer  {
-  background-color: #c0c0c0;
-  color: #000000;
-  font-size: 16px;
-  text-align: center;
+#nodelist .requestID {
+    font-weight: bold;
 }
 
-#mapContainer  {
-  background-color: #c0c0c0;
-  color: #000000;
-  font-size: 16px;
-  
+#nodelistContainer {
+    background-color: #c0c0c0;
+    color: #000000;
+    font-size: 16px;
+    text-align: center;
+}
+
+#mapContainer {
+    background-color: #c0c0c0;
+    color: #000000;
+    font-size: 16px;
 }
 
 .intest {
-  background-color: #990000;
-  color: #FFFFFF;
-  font-size: 16px;
-  padding: 2px;
-  text-align: center;
-  font-weight: bold;
+    background-color: #0000FF;
+    color: #FFFFFF;
+    font-size: 16px;
+    padding: 2px;
+    text-align: center;
+    font-weight: bold;
 }
 
 .error_messages {
-  font-size: 13px;
-  margin:1px;
-  color:red;
+    font-size: 13px;
+    margin:1px;
+    color:red;
 }
 
 .thanks_messages {
-  font-size: 13px;
-  margin:1px;
-  color:blue;
-}
-#request{
-  background-color: #FFFFFF;
-  margin-bottom: 10px;
-  padding: 5px;
-  border-style:solid;
-  border-width:2px;
-  border-color: #0000ff;
-  border-radius: 4px;
+    font-size: 13px;
+    margin:1px;
+    color:blue;
 }
 
-#request .requestField{
-  font-weight: bold;
+#request {
+    background-color: #FFFFFF;
+    margin-bottom: 10px;
+    padding: 5px;
+    border-style:solid;
+    border-width:2px;
+    border-color: #0000ff;
+    border-radius: 4px;
+}
+
+#request h3 {
+    line-height: 10px;
+    color: 0000FF;
+}
+
+#request .requestField {
+    font-weight: bold;
 }
 
 #rating {
-  width: 50%;
-  /*font-size: 24px;
+    width: 50%;
+    /*font-size: 24px;
   font-weight: bold;*/
-  background-color: #FFFFFF;
-
+    background-color: #FFFFFF;
 }
 
 #votes {
-  width: 50%;
-  font-size: 24px;
-  font-weight: bold;
-  background-color: #FFFFFF;
-  margin-bottom: 10px;
+    width: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: #FFFFFF;
+    margin-bottom: 10px;
 }
 
 #votes img {
-  width: 35px;
-  height: 35px;
-  margin-right: 15px;
-  margin-left: 5px;
-  margin-top: 5px;
-  padding-bottom: 5px;
+    width: 35px;
+    height: 35px;
+    margin-right: 15px;
+    margin-left: 5px;
+    margin-top: 5px;
+    padding-bottom: 5px;
 }
 
-.insert_vote{
-  font-size: 16px;
-  padding:5px;
-  background-color: #cccccc;
+.insert_vote {
+    font-size: 16px;
+    padding:5px;
+    background-color: #cccccc;
 }
 
 #comments {
-  background-color: #cccccc;
-  color: #000000;
-  font-size: 12px;
-  margin: 1px;
-  padding: 5px;
+    background-color: #cccccc;
+    color: #000000;
+    font-size: 12px;
+    margin: 1px;
+    padding: 5px;
 }
 
 #comment {
-  background-color: #c0c0c0;
-  color: #000000;
-  font-size: 12px;
-  margin: 1px;
-  padding: 2px;
-  max-height: 200px;
-  overflow:auto;
+    background-color: #c0c0c0;
+    color: #000000;
+    font-size: 12px;
+    margin: 1px;
+    padding: 2px;
+    max-height: 200px;
+    overflow:auto;
 }
 
-.your_comment{
+.your_comment {
     font-size:14px;
     color:#000000;
     background-color: #FFFFFF;
@@ -234,7 +244,7 @@ color: #ffffff;
     height: 100px;
 }
 
-.comment_text{
+.comment_text {
     font-size:14px;
     color:#000000;
     background-color: #FFFFFF;
@@ -243,31 +253,30 @@ color: #ffffff;
     border-width:1px;
     padding: 3px;
     margin: 1px;
-    width: 80%;    
+    width: 80%;
 }
 
-.comment_user{
+.comment_user {
     font-size:12px;
     color:#0000FF;
     background-color: #CCCCCC;
     word-wrap: break-word;
-/*    padding: 1px;
+    /*    padding: 1px;
 */
 }
 
-.comment_date{
+.comment_date {
     font-size:11px;
     color:#000000;
     background-color: #CCCCCC;
     word-wrap: break-word;
-/*    padding: 1px;
-*/     
+    /*    padding: 1px;
+*/
 }
 
-.user{
+.user {
     font-size:10px;
     color:#FFFFFF;
     background-color: #CCCCCC;
     word-wrap: break-word;
-  
 }
