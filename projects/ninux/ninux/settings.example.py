@@ -588,6 +588,13 @@ if 'test' in sys.argv:
 if 'social_auth' in INSTALLED_APPS:
     MIDDLEWARE_CLASSES += ('social_auth.middleware.SocialAuthExceptionMiddleware',)
     
+    # In Django 1.6, the default session serliazer has been switched to one based on JSON,
+    # rather than pickles, to improve security. Django-openid-auth does not support this
+    # because it attemps to store content that is not JSON serializable in sessions.
+    # See https://docs.djangoproject.com/en/dev/releases/1.6/#default-session-serialization-switched-to-json
+    # for details on the Django 1.6 change.
+    SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+    
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
         'nodeshot.community.profiles.backends.EmailBackend',
