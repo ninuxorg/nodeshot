@@ -17,4 +17,5 @@ class LayerParticipationSettings(models.Model):
     class Meta:
         app_label = 'participation'
         db_table = 'participation_layer_settings'
+        verbose_name_plural = "participation_layer_settings"
     

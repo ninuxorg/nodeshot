@@ -17,4 +17,4 @@ class NodeParticipationSettings(models.Model):
     class Meta:
         app_label = 'participation'
         db_table = 'participation_node_settings'
-    
+        verbose_name_plural = "participation_node_settings"
