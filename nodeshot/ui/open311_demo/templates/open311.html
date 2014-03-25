@@ -10,7 +10,7 @@
         <title></title>
         <meta name="description" content="">
 	  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<link rel="stylesheet" href="{% static 'interface/css/bootstrap.css' %}" />
+	<link rel="stylesheet" href="{% static 'open311/css/bootstrap.css' %}" />
 
 
 
@@ -21,13 +21,13 @@
             }
         </style>
 
-	<link rel="stylesheet" href="{% static 'interface/css/bootstrap-responsive.css' %}" />
-	<link rel="stylesheet" href="{% static 'interface/css/main.css' %}" />
+	<link rel="stylesheet" href="{% static 'open311/css/bootstrap-responsive.css' %}" />
+	<link rel="stylesheet" href="{% static 'open311/css/main.css' %}" />
         <!--<link rel="stylesheet" href="css/main.css">-->
-        <link rel="stylesheet" href="{% static 'interface/css/leaflet.css' %}" />
+        <link rel="stylesheet" href="{% static 'open311/css/leaflet.css' %}" />
 
 
-        <script src="{% static 'interface/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js' %}"></script>
+        <script src="{% static 'open311/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js' %}"></script>
     </head>
 
 
@@ -124,7 +124,7 @@
 
 <script id="tmplOpen311Request" type="text/template">
 <div style="float:right; width:80px;">
-<img src="{% static 'interface/img/map.png' %}"  /><br>
+<img src="{% static 'open311/img/map.png' %}"  /><br>
 <a style="text-align: right;" href="#" onClick=showMainPage()>
 
 
@@ -153,8 +153,8 @@ Back to map</a>
 <script id="tmplOpen311Votes" type="text/template">
 <div id="votes">
 <div class="intest">Vote</div>           
-<p><img src="{% static 'interface/img/likes.jpg' %}" /><%= likes %> </p>
-<p><img src="{% static 'interface/img/dislike.jpg' %}" /><%= dislikes %> </p>
+<p><img src="{% static 'open311/img/likes.jpg' %}" /><%= likes %> </p>
+<p><img src="{% static 'open311/img/dislike.jpg' %}" /><%= dislikes %> </p>
 <div id="insert_vote" class="insert_vote">
 Your vote:  
 <button id="likeButton">I like it</button>
@@ -223,7 +223,7 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
                         <span class="icon-bar"></span>
                     </a>
                     <a class="brand" href="#">
-		      <img src="{% static 'interface/css/images/nodeshot-311-logo.png' %}" />
+		      <img src="{% static 'open311/css/images/nodeshot-311-logo.png' %}" />
 		    </a>
                     <div class="nav-collapse collapse">
                         
@@ -247,12 +247,12 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
 
 {% endblock container %}
 
-<script>window.__BASEURL__ = '{% url 'ui:index' %}'</script>
-<script src="{% static 'interface/js/vendor/underscore-min.js' %}"></script>
-<script src="{% static 'interface/js/vendor/jquery-1.9.1.min.js' %}"></script>
-<script src="{% static 'interface/js/vendor/bootstrap.min.js' %}"></script>
-<script src="{% static 'interface/js/utils.js' %}"></script>
-<script src="{% static 'interface/js/functions.js' %}"></script>
+<script>window.__BASEURL__ = '{% url 'api_root_endpoint' %}'</script>
+<script src="{% static 'open311/js/vendor/underscore-min.js' %}"></script>
+<script src="{% static 'open311/js/vendor/jquery-1.9.1.min.js' %}"></script>
+<script src="{% static 'open311/js/vendor/bootstrap.min.js' %}"></script>
+<script src="{% static 'open311/js/utils.js' %}"></script>
+<script src="{% static 'open311/js/functions.js' %}"></script>
 {% block scripts%}
 
 {% endblock scripts%}	

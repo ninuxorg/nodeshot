@@ -22,7 +22,7 @@ function createNodeList() {
     if (layer != " ") {
         $.ajax({
             type: 'GET',
-            url: window.__BASEURL__ + 'api/v1/open311/requests?service_code=node&layer=' + layer,
+            url: window.__BASEURL__ + 'open311/requests?service_code=node&layer=' + layer,
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',
             success: function (result) {
@@ -96,7 +96,7 @@ function loadLayers(layers) {
         }
         //var newCluster = window.mapClusters[layers[i].slug];
         //Loads nodes in the cluster
-        var newClusterNodes = getData(window.__BASEURL__ + 'api/v1/open311/requests?service_code=node&layer=' + layers[i].slug);
+        var newClusterNodes = getData(window.__BASEURL__ + 'open311/requests?service_code=node&layer=' + layers[i].slug);
         var GeoJSON = new geojsonColl();
         for (var n in newClusterNodes) {
 
@@ -260,7 +260,7 @@ function openForm(marker) {
             var layer_inserted = $(this).serializeArray()[1]['value']
 
             $.ajax({
-                url: window.__BASEURL__ + 'api/v1/open311/requests/',
+                url: window.__BASEURL__ + 'open311/requests/',
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -324,7 +324,7 @@ function populateOpen311Div(nodeSlug, create) {
         nodeDiv.id = nodeSlug;
     }
 
-    var node = getData(window.__BASEURL__ + 'api/v1/open311/requests/' + nodeSlug);
+    var node = getData(window.__BASEURL__ + 'open311/requests/' + nodeSlug);
     var status = node.status;
     var nodeLayer = node.layer;
     var requestID = nodeSlug;
@@ -349,11 +349,11 @@ function showRequestDetail(requestID,node) {
     $("#RequestDetails").show();
     window.nodeSlug = node.slug
     window.nodeId = requestID.split("-")[1];
-    window.layerSettings = getData(window.__BASEURL__ + 'api/v1/layers/' + node.layer + '/participation_settings/');
-    window.nodeSettings = getData(window.__BASEURL__ + 'api/v1/nodes/' + node.slug + '/participation_settings/');
-    window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + node.slug + '/participation/');
+    window.layerSettings = getData(window.__BASEURL__ + 'layers/' + node.layer + '/participation_settings/');
+    window.nodeSettings = getData(window.__BASEURL__ + 'nodes/' + node.slug + '/participation_settings/');
+    window.nodeParticipation = getData(window.__BASEURL__ + 'nodes/' + node.slug + '/participation/');
     getParticipationData()
-    var request = getData(window.__BASEURL__ + 'api/v1/open311/requests/' + requestID); 
+    var request = getData(window.__BASEURL__ + 'open311/requests/' + requestID); 
     var tmplMarkup = $('#tmplOpen311Request').html();
     var compiledTmpl = _.template(tmplMarkup, {
             request: request,
@@ -388,7 +388,7 @@ function showMainPage(requestID) {
 }
 
 function getParticipationData() {
-    window.nodeParticipation = getData(window.__BASEURL__ + 'api/v1/nodes/' + nodeSlug + '/participation/');
+    window.nodeParticipation = getData(window.__BASEURL__ + 'nodes/' + nodeSlug + '/participation/');
 }
 
 function showVotes(likes, dislikes) {
@@ -408,7 +408,7 @@ function showVotes(likes, dislikes) {
 }
 
 function showComments(nodeSlug, comments_count) {
-    url = window.__BASEURL__ + 'api/v1/nodes/' + nodeSlug + '/comments/?format=json';
+    url = window.__BASEURL__ + 'nodes/' + nodeSlug + '/comments/?format=json';
     var comments = getData(url);
     var tmplMarkup = $('#tmplComments').html();
     var compiledTmpl = _.template(tmplMarkup, {
@@ -447,7 +447,7 @@ function postComment(nodeID) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: window.__BASEURL__ + 'api/v1/open311/requests/',
+            url: window.__BASEURL__ + 'open311/requests/',
             data: {
                 "service_code": "comment",
                     "node": nodeID,
@@ -480,7 +480,7 @@ function postVote(nodeID, vote) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: window.__BASEURL__ + 'api/v1/open311/requests/',
+            url: window.__BASEURL__ + 'open311/requests/',
             data: {
                 "service_code": "vote",
                     "node": nodeID,
@@ -509,7 +509,7 @@ function postRating(nodeID, rating) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: window.__BASEURL__ + 'api/v1/open311/requests/',
+            url: window.__BASEURL__ + 'open311/requests/',
             data: {
                 "service_code": "rate",
                     "node": nodeID,
@@ -551,7 +551,7 @@ function login() {
     var password = $("#password").val();
     $.ajax({
         type: "POST",
-        url: window.__BASEURL__ + "api/v1/account/login/",
+        url: window.__BASEURL__ + "account/login/",
         data: {
             "username": user,
                 "password": password
@@ -567,7 +567,7 @@ function login() {
 function logout() {
     $.ajax({
         type: "POST",
-        url: window.__BASEURL__ + "api/v1/account/logout/",
+        url: window.__BASEURL__ + "account/logout/",
         dataType: 'json',
         success: function (response) {
             showLogin();

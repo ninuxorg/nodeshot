@@ -123,8 +123,8 @@ var overlaymaps = {};
 
 
 //Load data from server
-var layers = getData(window.__BASEURL__ + 'api/v1/layers/'); //layers
-var geojsonlayers = getData(window.__BASEURL__ + 'api/v1/layers.geojson'); //layers' area
+var layers = getData(window.__BASEURL__ + 'layers/'); //layers
+var geojsonlayers = getData(window.__BASEURL__ + 'layers.geojson'); //layers' area
 
 
 for (var i in layers) {

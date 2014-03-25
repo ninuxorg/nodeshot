@@ -198,6 +198,7 @@ INSTALLED_APPS = [
     'nodeshot.networking.connectors',
     'nodeshot.ui.default',
     'nodeshot.open311',
+    'nodeshot.ui.open311_demo',
     
     # import data from old nodeshot version 0.9
     # needs python MySQL database driver

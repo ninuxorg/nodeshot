@@ -44,14 +44,14 @@
 <!-- /container -->
 {% endblock container %}
 {% block scripts%}
-<script src="{% static 'interface/js/vendor/leaflet.js' %}"></script>
+<script src="{% static 'open311/js/vendor/leaflet.js' %}"></script>
 <script src="https://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
-<script src="{% static 'interface/js/vendor/Google.js' %}"></script>
-<script src="{% static 'interface/js/vendor/leaflet.markercluster.js' %}"></script>
-<script src="{% static 'interface/js/vendor/jquery.raty.js' %}"></script>
+<script src="{% static 'open311/js/vendor/Google.js' %}"></script>
+<script src="{% static 'open311/js/vendor/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'open311/js/vendor/jquery.raty.js' %}"></script>
 <script type="text/javascript">
     $.myproject = {} // namespace
     $.myproject.STATIC_URL = '{{ STATIC_URL }}';
 </script>
-<script src="{% static 'interface/js/main.js' %}"></script>
+<script src="{% static 'open311/js/main.js' %}"></script>
 {% endblock scripts%}
