@@ -62,7 +62,7 @@ class ProfileList(generics.ListCreateAPIView):
         serializer = self.serializer_reader_class
         
         if request.user.is_authenticated():
-            return Response({ 'detail': serializer(request.user, context=self.get_serializer_context()).data })
+            return Response(serializer(request.user, context=self.get_serializer_context()).data)
         else:
             return Response({ 'detail': _('Authentication credentials were not provided') }, status=401)
     
