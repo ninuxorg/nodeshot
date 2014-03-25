@@ -61,6 +61,7 @@
                             <a href="javascript:createModal({message:'not implemented yet'})"><%= layer_name %></a>
                         </td>
                     </tr>
+                    <% if(address){ %>
                     <tr>
                         <td class="left">
                             {% trans 'Address' %}:
@@ -69,6 +70,8 @@
                             <%= address %>
                         </td>
                     </tr>
+                    <% } %>
+                    <% if(elev){ %>
                     <tr>
                         <td class="left">
                             {% trans 'Elevation' %}:
@@ -77,12 +80,13 @@
                             <%= elev %> {% trans 'meters' %}
                         </td>
                     </tr>
+                    <% } %>
                     <tr>
                         <td class="left">
                             {% trans 'Added' %}:
                         </td>
                         <td class="right">
-                            <%= added %>
+                            <%= _.formatDate(added) %>
                         </td>
                     </tr>
                     <tr>
@@ -90,7 +94,7 @@
                             {% trans 'Updated' %}:
                         </td>
                         <td class="right">
-                            <%= updated %>
+                            <%= _.formatDate(updated) %>
                         </td>
                     </tr>
                     <tr>
@@ -117,9 +121,10 @@
                         </td>
                     </tr>
                 </table>
-                
+                <% if(description){ %>
                 <h3>{% trans 'Description' %}</h3>
                 <%= description %>
+                <% } %>
             </div>
             <div class="col-sm-6 right">
                 <div style="background:#333;min-height:400px;line-height:400px;color:#fff;text-align:center;font-size:18px">

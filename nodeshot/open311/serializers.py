@@ -11,7 +11,7 @@ from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node, Image
 from nodeshot.community.participation.models import Vote, Comment, Rating
 #from nodeshot.core.nodes.serializers import NodeListSerializer
-from nodeshot.core.base.serializers import ExtensibleModelSerializer
+from nodeshot.core.base.serializers import ExtraFieldSerializer
 
 from .base import SERVICES
 
@@ -415,7 +415,7 @@ class ServiceRatingSerializer(serializers.Serializer):
     #    """
 
 
-class NodeRequestListSerializer(ExtensibleModelSerializer):
+class NodeRequestListSerializer(ExtraFieldSerializer):
     """
     Open 311 node request 
     """
@@ -440,7 +440,7 @@ class NodeRequestListSerializer(ExtensibleModelSerializer):
                 post_attrs[attr] = value
             else:
                 model_attrs[attr] = value
-        obj = super(ExtensibleModelSerializer,
+        obj = super(ExtraFieldSerializer,
                     self).restore_object(model_attrs, instance)
         # Method to process ignored postonly_fields
         #self.non_native_fields(obj, post_attrs)
@@ -525,7 +525,7 @@ class NodeRequestSerializer(serializers.ModelSerializer):
         model = Node
         
 
-class VoteRequestListSerializer(ExtensibleModelSerializer):
+class VoteRequestListSerializer(ExtraFieldSerializer):
     """
     Open 311 vote request 
     """
@@ -547,7 +547,7 @@ class VoteRequestSerializer(serializers.ModelSerializer):
         model = Vote
 
 
-class CommentRequestListSerializer(ExtensibleModelSerializer):
+class CommentRequestListSerializer(ExtraFieldSerializer):
     """
     Open 311 comment request 
     """
@@ -567,7 +567,7 @@ class CommentRequestSerializer(serializers.ModelSerializer):
         model = Comment
 
 
-class RatingRequestListSerializer(ExtensibleModelSerializer):
+class RatingRequestListSerializer(ExtraFieldSerializer):
     """
     Open 311 rating request 
     """

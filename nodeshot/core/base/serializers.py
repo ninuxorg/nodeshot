@@ -5,21 +5,22 @@ from rest_framework.fields import Field
 from rest_framework.reverse import reverse
 
 
-class ExtensibleModelSerializerOptions(serializers.ModelSerializerOptions):
+class ExtraFieldSerializerOptions(serializers.ModelSerializerOptions):
     """
-    Meta class options for ExtensibleModelSerializerOptions
+    Meta class options for ExtraFieldSerializerOptions
     """
     def __init__(self, meta):
-        super(ExtensibleModelSerializerOptions, self).__init__(meta)
+        super(ExtraFieldSerializerOptions, self).__init__(meta)
         self.non_native_fields = getattr(meta, 'non_native_fields', ())
 
 
-class ExtensibleModelSerializer(serializers.ModelSerializer):
+# TODO: rename / remove
+class ExtraFieldSerializer(serializers.ModelSerializer):
     """
     ModelSerializer in which non native extra fields can be specified.
     """
     
-    _options_class = ExtensibleModelSerializerOptions
+    _options_class = ExtraFieldSerializerOptions
     
     def restore_object(self, attrs, instance=None):
         """
@@ -30,7 +31,7 @@ class ExtensibleModelSerializer(serializers.ModelSerializer):
         for field in self.opts.non_native_fields:
             attrs.pop(field)
         
-        return super(ExtensibleModelSerializer, self).restore_object(attrs, instance)
+        return super(ExtraFieldSerializer, self).restore_object(attrs, instance)
     
     def to_native(self, obj):
         """

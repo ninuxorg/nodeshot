@@ -266,3 +266,9 @@ $(document).ajaxSend(function (event, xhr, settings) {
 $(document).ajaxStop(function () {
     toggleLoading('hide');
 });
+
+// extend underscore with formatDate shortcut
+_.formatDate = function(dateString){
+	// TODO: format configurable
+	return $.format.date(dateString, "dd MMMM yyyy - HH:mm")
+};
