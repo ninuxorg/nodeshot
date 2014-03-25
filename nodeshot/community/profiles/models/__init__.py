@@ -17,15 +17,16 @@ from .password_reset import PasswordReset
 __all__ = ['Profile', 'SocialLink', 'PasswordReset']
 
 
-# ------ Add relationship to ExtensibleNodeSerializer ------ #
+# ------ Add user info to ExtensibleNodeSerializer ------ #
 
 from nodeshot.core.nodes.base import ExtensibleNodeSerializer
+from ..serializers import ProfileRelationSerializer
 
-ExtensibleNodeSerializer.add_relationship(**{
-    'name': 'user',
-    'view_name': 'api_profile_detail',
-    'lookup_field': 'user.username'
-})
+ExtensibleNodeSerializer.add_relationship(
+    name='user',
+    serializer=ProfileRelationSerializer,
+    queryset='obj.user'
+)
 
 
 # ------ SIGNALS ------ #

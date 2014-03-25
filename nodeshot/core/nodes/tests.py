@@ -278,9 +278,9 @@ class APITest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         node = response.data
-        images_url = reverse('api_node_images', args=['fusolab'])
         # images_url in node['images']
-        self.assertIn(images_url, node['relationships']['images'])
+        self.assertTrue(isinstance(node['relationships']['images'], list))
+        self.assertTrue(isinstance(node['relationships']['images'][0], dict))
         
         # PUT: 403 - must be logged in
         response = self.client.put(url)
@@ -343,6 +343,21 @@ class APITest(BaseTestCase):
         self.assertEqual(204, response.status_code)
         with self.assertRaises(Node.DoesNotExist):
             Node.objects.get(slug='fusolab')
+    
+    def test_node_images_relationship(self):
+        url = reverse('api_node_details', args=['fusolab'])
+        
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        images = response.data['relationships']['images']
+        public_image_count = Image.objects.access_level_up_to('public').filter(node__slug='fusolab').count()
+        self.assertEqual(public_image_count, len(images))
+        # admin can get more images
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(url)
+        images = response.data['relationships']['images']
+        node_image_count = Image.objects.accessible_to(User.objects.get(pk=1)).filter(node__slug='fusolab').count()
+        self.assertEqual(node_image_count, len(images))
     
     def test_node_images(self):
         """ test node images """

@@ -12,11 +12,4 @@ class ExtensibleNodeSerializer(DynamicRelationshipsMixin, geoserializers.GeoMode
     layer_name = serializers.Field(source='layer.name')
     access_level = serializers.Field(source='get_access_level_display')
     relationships = serializers.SerializerMethodField('get_relationships')
-    
-    # relationships work this way:
-    # to add a new relationship, add a new key
-    # the value must be a tuple in which the first element is the view name (as specified in urls.py)
-    # and the second must be the lookup field, usually slug or id/pk
-    _relationships = {
-        'images': ('api_node_images', 'slug'),
-    }
+

@@ -22,6 +22,7 @@ __all__ = [
     'ImageListSerializer',
     'ImageAddSerializer',
     'ImageEditSerializer',
+    'ImageRelationSerializer',
     'StatusListSerializer'
 ]
 
@@ -94,7 +95,7 @@ class ImageListSerializer(serializers.ModelSerializer):
     """ Serializer used to show list """
     
     file_url = serializers.SerializerMethodField('get_image_file')
-    uri = serializers.SerializerMethodField('get_uri')
+    details = serializers.SerializerMethodField('get_uri')
     
     def get_image_file(self, obj):
         """ returns url to image file or empty string otherwise """
@@ -118,7 +119,7 @@ class ImageListSerializer(serializers.ModelSerializer):
         model = Image
         fields = (
             'id', 'file', 'file_url', 'description', 'order',
-            'access_level', 'added', 'updated', 'uri'
+            'access_level', 'added', 'updated', 'details'
         )
         read_only_fields = ('added', 'updated')
 
@@ -130,7 +131,7 @@ class ImageAddSerializer(ImageListSerializer):
         model = Image
         fields = (
             'node', 'id', 'file', 'file_url', 'description', 'order',
-            'access_level', 'added', 'updated', 'uri'
+            'access_level', 'added', 'updated', 'details'
         )
 
 
@@ -139,8 +140,26 @@ class ImageEditSerializer(ImageListSerializer):
     
     class Meta:
         model = Image
-        fields = ('id', 'file_url', 'description', 'order', 'access_level', 'added', 'updated', 'uri')
+        fields = ('id', 'file_url', 'description', 'order', 'access_level', 'added', 'updated', 'details')
         read_only_fields = ('file', 'added', 'updated')
+
+
+class ImageRelationSerializer(ImageListSerializer):
+    """ Serializer to reference images """
+    
+    class Meta:
+        model = Image
+        fields = ('id', 'file', 'file_url', 'description', 'added', 'updated')
+
+
+from nodeshot.core.nodes.base import ExtensibleNodeSerializer
+
+ExtensibleNodeSerializer.add_relationship(
+    'images',
+    serializer=ImageRelationSerializer,
+    many=True,
+    queryset='obj.image_set.accessible_to(request.user).all()'
+)
 
 
 # --------- Status --------- #

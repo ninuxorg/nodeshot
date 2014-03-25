@@ -86,7 +86,9 @@ class DynamicRelationshipsMixin(object):
     _relationships = {}
     
     @classmethod
-    def add_relationship(_class, name, view_name, lookup_field):
+    def add_relationship(_class, name,
+                         view_name=None, lookup_field=None,
+                         serializer=None, many=False, queryset=None):
         """ adds a relationship to serializer
         :param name: relationship name (dictionary key)
         :type name: str
@@ -94,18 +96,46 @@ class DynamicRelationshipsMixin(object):
         :type view_name: str
         :param lookup_field: lookup field, usually slug or id/pk
         :type lookup_field: str
+        :param serializer: Serializer class to use for relationship
+        :type serializer: Serializer
+        :param many: indicates if it's a list or a single element, defaults to False
+        :type many: bool
+        :param queryset: queryset string representation to use for the serializer
+        :type many: string
         :returns: None
         """
-        _class._relationships[name] = (view_name, lookup_field)
+        if view_name is not None and lookup_field is not None:
+            _class._relationships[name] = {
+                'type': 'link',
+                'view_name': view_name,
+                'lookup_field': lookup_field
+            }
+        elif serializer is not None and queryset is not None:
+            _class._relationships[name] = {
+                'type': 'serializer',
+                'serializer': serializer,
+                'many': many,
+                'queryset': queryset
+            }
+        else:
+            raise ValueError('missing arguments, either pass view_name and lookup_field or serializer and queryset')
     
     def get_lookup_value(self, obj, string):
         if '.' in string:
+            if '()' in string:
+                string = string.replace('()', '')
+                is_method = True
+            else:
+                is_method = False
             levels = string.split('.')
             value = getattr(obj, levels.pop(0))
             if value is not None:
                 for level in levels:
                     value = getattr(value, level)
-                return value
+                if is_method:
+                    return value()
+                else:
+                    return value
             else:
                 return None
         else:
@@ -117,15 +147,29 @@ class DynamicRelationshipsMixin(object):
         relationships = {}
         
         # loop over private _relationship attribute
-        for key, value in self._relationships.iteritems():
-            # retrieve view_name and name of lookup field by splitting tuple
-            view_name, lookup_field = value
-            lookup_value = self.get_lookup_value(obj, lookup_field)
-            # populate new dictionary with links
-            relationships[key] = reverse(view_name,
-                                         args=[lookup_value],
-                                         request=request,
-                                         format=format)
+        for key, options in self._relationships.iteritems():
+            # if relationship is a link
+            if options['type'] == 'link':
+                # get lookup value
+                lookup_value = self.get_lookup_value(obj, options['lookup_field'])
+                # get URL
+                value = reverse(options['view_name'],
+                                args=[lookup_value],
+                                request=request,
+                                format=format)
+            # if relationship is a serializer
+            elif options['type'] == 'serializer':
+                # if queryset is not specified use current object
+                #instance = self.get_lookup_value(obj, options['queryset'])
+                queryset = eval(options['queryset'])
+                # get serializer representation
+                value = options['serializer'](instance=queryset,
+                                              context=self.context,
+                                              many=options['many']).data
+            else:
+                raise ValueError('type %s not recognized' % options['type'])
+            # populate new dictionary with value
+            relationships[key] = value
         return relationships
 
 

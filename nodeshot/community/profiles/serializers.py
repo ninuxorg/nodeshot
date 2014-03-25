@@ -23,6 +23,7 @@ __all__ = [
     'LoginSerializer',
     'ProfileSerializer',
     'ProfileCreateSerializer',
+    'ProfileRelationSerializer',
     'AccountSerializer',
     'ChangePasswordSerializer',
     'ResetPasswordSerializer',
@@ -156,6 +157,14 @@ class ProfileCreateSerializer(ExtraFieldSerializer):
             'birth_date', 'address', 'city', 'country'
         )
         non_native_fields = ('password_confirmation', )
+
+
+class ProfileRelationSerializer(ProfileSerializer):
+    """ Profile Serializer used for linking """
+    
+    class Meta:
+        model = User
+        fields = ('username', 'full_name', 'city', 'country', 'avatar', 'details')
 
 
 class AccountSerializer(serializers.ModelSerializer):
