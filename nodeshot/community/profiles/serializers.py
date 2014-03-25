@@ -7,7 +7,7 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from nodeshot.core.base.serializers import ExtensibleModelSerializer, HyperlinkedField
+from nodeshot.core.base.serializers import ExtraFieldSerializer, HyperlinkedField
 from .models import Profile as User
 from .models import PasswordReset, SocialLink
 
@@ -127,7 +127,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ('username', 'date_joined',)
 
 
-class ProfileCreateSerializer(ExtensibleModelSerializer):
+class ProfileCreateSerializer(ExtraFieldSerializer):
     """ Profile Serializer for User Creation """
     
     password_confirmation = serializers.CharField(label=_('password_confirmation'),
