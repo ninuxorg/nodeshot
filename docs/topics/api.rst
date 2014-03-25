@@ -1,3 +1,4 @@
+.. _api-label:
 ***************************
 Self documented RESTful API
 ***************************

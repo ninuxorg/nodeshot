@@ -62,10 +62,13 @@ Contents
    /topics/install
    /topics/admin
    /topics/api
+   /topics/open311
    /topics/interoperability
+   /topics/participation
    /topics/oldimporter
    /topics/connectors
-   /topics/open311
+
+
 
 
 ==================

@@ -1,9 +1,12 @@
+.. _open311-label:
 =========================
-Open 311 API
+Open311 API
 =========================
 
 Nodeshot comes with a self-documented API, in order to insert nodes, comments,
 votes or ratings as service requests, according to the Open 311 standard (http://open311.org/).
+
+It depends from **participation** module . Be sure to read its :ref:`documentation <participation-label>` before .
 
 ---------------
 Settings
@@ -72,17 +75,17 @@ the STATUS records, otherwise the application will either throw an exception
 In its simpliest form, the configuration would be this::
 
     'STATUS' : {
-            'Open' : 'open',
-            'Closed' : 'closed',
+            'open' : 'open',
+            'closed' : 'closed',
         }
 Or, if more statuses are possible in your configuration, like in the example below:
 
-.. image:: statuses.png
+.. figure:: statuses.png
 
 each status can be mapped to one of the two values 'open' or 'closed', depending on your needs::
 
     'STATUS' : {
-            'Potential' : 'open',
-            'Planned' : 'open',
-            'Active' : 'closed',
+            'potential' : 'open',
+            'planned' : 'open',
+            'active' : 'closed',
         }
