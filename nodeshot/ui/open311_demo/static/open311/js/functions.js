@@ -536,7 +536,7 @@ function populateRating(nodeID, nodeDiv, nodeRatingAVG) {
     $("#star").raty({
         score: nodeRatingAVG,
         number: 10,
-        path: $.myproject.STATIC_URL + 'interface/js/vendor/images',
+        path: $.myproject.STATIC_URL + 'open311/js/vendor/images',
         click: function (score) {
             var nodeID = window.nodeId;
             //console.log(nodeID)

@@ -98,7 +98,8 @@ def create_output_data(data):
     # get status from model and converts it into the mapped status type (open/closed)
     status_id = data['status']
     status = get_object_or_404(Status, pk=status_id)
-    
+    data['detailed_status'] = status.name
+    data['detailed_status_description'] = status.description
     try:
         data['status'] = STATUS[status.slug]
     except KeyError:
