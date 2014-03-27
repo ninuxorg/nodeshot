@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.forms import UserChangeForm as BaseChangeForm
 from django.contrib.auth.forms import UserCreationForm as BaseCreationForm
 from django.contrib.auth.forms import AdminPasswordChangeForm as BasePasswordChangeForm
+from django.forms import ValidationError
 
 from nodeshot.core.base.admin import BaseStackedInline
 from .models import SocialLink, Profile, PasswordReset
@@ -20,6 +21,17 @@ class UserChangeForm(BaseChangeForm):
 
 
 class UserCreationForm(BaseCreationForm):
+    
+    # this happens to be needed, at least in django 1.6.2
+    # http://stackoverflow.com/questions/16953302/django-custom-user-model-in-admin-relation-auth-user-does-not-exist
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        try:
+            Profile.objects.get(username=username)
+        except Profile.DoesNotExist:
+            return username
+        raise ValidationError(self.error_messages['duplicate_username'])
+    
     class Meta:
         model = Profile
 

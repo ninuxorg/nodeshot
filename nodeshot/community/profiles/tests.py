@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.http import int_to_base36
 from django.core import mail
 from django.conf import settings
+from django.forms import ValidationError
 
 PROFILE_EMAIL_CONFIRMATION = settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True)
 if PROFILE_EMAIL_CONFIRMATION:
@@ -42,11 +43,24 @@ class ProfilesTest(TestCase):
         self.assertEqual(self.fusolab.user.groups.count(), 1)
         
         # create new user and check if it has any group
-        new_user = User(username='new_user_test', email='new_user@testing.com', password='tester')
+        new_user = User(username='new_user_test', email='new_user@testing.com', password='tester', is_active=True)
         new_user.save()
         # retrieve again from DB just in case...
         new_user = User.objects.get(username='new_user_test')
         self.assertEqual(new_user.groups.filter(name='registered').count(), 1)
+    
+    def test_user_admin(self):
+        self.client.logout()
+        self.client.login(username='admin', password='tester')
+        
+        # create new user through admin
+        url = reverse('admin:profiles_profile_add')
+        with self.assertRaises(ValidationError):
+            response = self.client.post(url, {
+                'username': 'testing',
+                'password': 'password',
+                'password2': 'password'
+            })
     
     def test_profile_list_API(self):
         """ test new user creation through the API """
