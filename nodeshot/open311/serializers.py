@@ -47,7 +47,7 @@ class ServiceListSerializer(serializers.Serializer):
     type = serializers.SerializerMethodField('get_type')
     service_code = serializers.SerializerMethodField('get_service_code')
     service_name = serializers.SerializerMethodField('get_service_name')
-    service_description = serializers.SerializerMethodField('get_service_description')
+    description = serializers.SerializerMethodField('get_service_description')
     
     def __init__(self, *args, **kwargs):
         self.service_type = kwargs.pop('service_type','node')
@@ -88,7 +88,7 @@ class ServiceListSerializer(serializers.Serializer):
         fields= (
             'service_code',
             'service_name',
-            'service_description',
+            'description',
             'keywords',
             'group',
             'definition',
@@ -112,9 +112,9 @@ class ServiceNodeSerializer(serializers.Serializer):
             # layer
             {
                 'code': 'layer',
-                'description': _('layer'),
+                'description': _('layer_slug'),
                 'datatype': 'string',
-                'datatype_description': _('Specify in which layer you want to insert the node'),
+                'datatype_description': _('Specify the slug of the layer in which you want to insert the node'),
                 'order': 1,
                 'required': True,
                 'variable' : True
@@ -328,123 +328,36 @@ class ServiceRatingSerializer(serializers.Serializer):
         fields = ('service_code', 'attributes')         
 
 
-#class PostModelSerializerOptions(serializers.ModelSerializerOptions):
-#    """
-#   Options for PostModelSerializer
-#   """
-# 
-#    def __init__(self, meta):
-#        super(PostModelSerializerOptions, self).__init__(meta)
-#        self.postonly_fields = getattr(meta, 'postonly_fields', ())
-#        
-#
-#class PostModelSerializer(serializers.ModelSerializer):
-#    _options_class = PostModelSerializerOptions
-    
-    #def to_native(self, obj):
-    #    """
-    #    Serialize objects -> primitives.
-    #    """
-    #    ret = self._dict_class()
-    #    ret.fields = {}
-    #
-    #    for field_name, field in self.fields.items():
-    #        # Ignore all postonly_fields fron serialization
-    #        if field_name in self.opts.postonly_fields:
-    #            continue
-    #        field.initialize(parent=self, field_name=field_name)
-    #        key = self.get_field_key(field_name)
-    #        value = field.field_to_native(obj, field_name)
-    #        ret[key] = value
-    #        ret.fields[key] = field
-    #    return ret
-    
-    #def to_native(self, obj):
-    #    """
-    #    Serialize objects -> primitives.
-    #    """
-    #    ret = self._dict_class()
-    #    ret.fields = self._dict_class()
-    #
-    #    for field_name, field in self.fields.items():
-    #        if field_name in self.opts.postonly_fields:
-    #           #print field_name
-    #           continue
-    #        
-    #        field.initialize(parent=self, field_name=field_name)
-    #        key = self.get_field_key(field_name)
-    #        value = field.field_to_native(obj, field_name)
-    #        method = getattr(self, 'transform_%s' % field_name, None)
-    #        if callable(method):
-    #            value = method(obj, value)
-    #        if field_name not in self.opts.postonly_fields:
-    #            ret[key] = value
-    #        ret.fields[key] = self.augment_field(field, field_name, key, value)
-    #    return ret
-    #
-    #def restore_object(self, attrs, instance=None):
-    #
-    #    model_attrs, post_attrs = {}, {}
-    #    
-    #    for attr, value in attrs.iteritems():
-    #        if attr in self.opts.postonly_fields:
-    #            post_attrs[attr] = value
-    #        else:
-    #            model_attrs[attr] = value
-    #    obj = super(PostModelSerializer,
-    #                self).restore_object(model_attrs, instance)
-    #    # Method to process ignored postonly_fields
-    #    self.process_postonly_fields(obj, post_attrs)
-    #    
-    #    return obj
-    
-    #def restore_object(self, attrs, instance=None):
-    #    """
-    #    Deserialize a dictionary of attributes into an object instance.
-    #    You should override this method to control how deserialized objects
-    #    are instantiated.
-    #    """
-    #    if instance is not None:
-    #        instance.update(attrs)
-    #        return instance
-    #    return attrs
- 
-    #def process_postonly_fields(self, obj, post_attrs):
-    #    """
-    #    Placeholder method for processing data sent in POST.
-    #    """
-
-
 class NodeRequestListSerializer(ExtraFieldSerializer):
     """
     Open 311 node request 
     """
-    request_id = serializers.SerializerMethodField('get_request_id')
-    layer_name = serializers.SerializerMethodField('get_layer_name')
-    layer= serializers.SerializerMethodField('get_layer_slug')   
+    service_request_id = serializers.SerializerMethodField('get_service_request_id')
+    #layer_name = serializers.SerializerMethodField('get_layer_name')
+    layer_slug= serializers.SerializerMethodField('get_layer_slug')   
     details = serializers.SerializerMethodField('get_details')
     image_urls = serializers.SerializerMethodField('get_image_urls')
     requested_datetime = serializers.Field(source='added')
     updated_datetime = serializers.Field(source='updated')
     lat = serializers.CharField()
-    lng = serializers.CharField()
+    long = serializers.CharField()
     image = serializers.ImageField()
     service_code = serializers.CharField()
-    category = serializers.CharField()
+    layer = serializers.CharField()
     
-    def restore_object(self, attrs, instance=None):
-        model_attrs, post_attrs = {}, {}
-        
-        for attr, value in attrs.iteritems():
-            if attr in self.opts.non_native_fields:
-                post_attrs[attr] = value
-            else:
-                model_attrs[attr] = value
-        obj = super(ExtraFieldSerializer,
-                    self).restore_object(model_attrs, instance)
-        # Method to process ignored postonly_fields
-        #self.non_native_fields(obj, post_attrs)
-        return obj    
+    #def restore_object(self, attrs, instance=None):
+    #    model_attrs, post_attrs = {}, {}
+    #    
+    #    for attr, value in attrs.iteritems():
+    #        if attr in self.opts.non_native_fields:
+    #            post_attrs[attr] = value
+    #        else:
+    #            model_attrs[attr] = value
+    #    obj = super(ExtraFieldSerializer,
+    #                self).restore_object(model_attrs, instance)
+    #    # Method to process ignored postonly_fields
+    #    #self.non_native_fields(obj, post_attrs)
+    #    return obj    
     
     def get_image_urls(self,obj):
         image_url =[]
@@ -476,12 +389,12 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
         layer_slug =  obj.layer.slug
         return layer_slug
     
-    def get_request_id(self, obj):
-        #print obj
+    def get_service_request_id(self, obj):
+        print obj.id
         if obj is None:
             return ""
-        request_id = 'node-%d' % obj.id
-        return request_id
+        service_request_id = 'node-%d' % obj.id
+        return service_request_id
     
     def get_details(self, obj):
         if obj is None:
@@ -496,13 +409,13 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
    
     class Meta:
         model = Node
-        fields= ('request_id', 'slug', 'name', 'service_code', 'layer', 'layer_name', 'status', 'geometry', 'name',
+        fields= ('service_request_id', 'slug', 'name', 'service_code', 'layer', 'layer_slug', 'status', 'geometry', 'name',
                  'description', 'requested_datetime', 'updated_datetime', 'image_urls','image',
-                 'details', 'address', 'lat', 'lng', )
+                 'details', 'address', 'lat', 'long', )
         read_only_fields = ('geometry', 'id', 'status', 'is_published', 'access_level',
-                            'data','notes','user','added','updated','slug')
-        non_native_fields = ( 'service_code', 'lat', 'lng',
-                                'elev', 'image','category' )
+                            'data','notes','user','added','updated', 'slug', )
+        non_native_fields = ( 'service_code', 'lat', 'long',
+                                'elev', 'image', 'layer_slug', )
         
 
 class NodeRequestDetailSerializer(NodeRequestListSerializer):

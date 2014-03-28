@@ -92,7 +92,7 @@ def create_output_data(data):
     # convert received geometry to Point
     geom = fromstr(data['geometry']).centroid
     del data['geometry']
-    data['lng'] = geom[0]
+    data['long'] = geom[0]
     data['lat'] = geom[1]
     
     # get status from model and converts it into the mapped status type (open/closed)
@@ -293,11 +293,11 @@ class ServiceRequestList(generics.ListCreateAPIView):
         kwargs['serializer'] = serializers[service_code]
         
         user=self.get_custom_data()
-        
+        print request.POST
         request.UPDATED = request.POST.copy()
         request.UPDATED['user'] = user['user']
         if service_code == 'node':
-            for checkPOSTdata in ('layer','name','lat','lng'):
+            for checkPOSTdata in ('layer','name','lat','long'):
                 # Check if mandatory parameters key exists
                 if checkPOSTdata not in request.POST.keys():
                     return Response({ 'detail': _('Mandatory parameter not found') }, status=400)
@@ -311,8 +311,8 @@ class ServiceRequestList(generics.ListCreateAPIView):
             
             # Transform coords in wkt geometry
             lat = float(request.UPDATED['lat'])
-            lng = float(request.UPDATED['lng'])
-            point = Point((lng,lat))
+            long = float(request.UPDATED['long'])
+            point = Point((long,lat))
             request.UPDATED['geometry'] = point.wkt
             request.UPDATED['slug'] = slugify(request.UPDATED['name'])
 
