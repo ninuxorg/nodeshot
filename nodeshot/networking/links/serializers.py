@@ -48,10 +48,8 @@ class LinkDetailSerializer(DynamicRelationshipsMixin, LinkListSerializer):
     interface_b_mac = serializers.Field(source='interface_b_mac')
     relationships = serializers.SerializerMethodField('get_relationships')
     
-    _relationships = {
-        'node_a': ('api_node_details', 'node_a_slug'),
-        'node_b': ('api_node_details', 'node_b_slug'),
-    }
+    # this is needed to avoid adding stuff to DynamicRelationshipsMixin
+    _relationships = {}
 
     class Meta:
         model = Link
@@ -65,6 +63,18 @@ class LinkDetailSerializer(DynamicRelationshipsMixin, LinkListSerializer):
             'first_seen', 'last_seen',
             'added', 'updated', 'relationships'
         ]
+
+LinkDetailSerializer.add_relationship(
+    'node_a',
+    view_name='api_node_details',
+    lookup_field='node_a_slug'
+)
+
+LinkDetailSerializer.add_relationship(
+    'node_b',
+    view_name='api_node_details',
+    lookup_field='node_b_slug'
+)
 
 
 class LinkDetailGeoJSONSerializer(LinkDetailSerializer, gis_serializers.GeoFeatureModelSerializer):

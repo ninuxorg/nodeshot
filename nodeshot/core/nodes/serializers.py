@@ -152,8 +152,6 @@ class ImageRelationSerializer(ImageListSerializer):
         fields = ('id', 'file', 'file_url', 'description', 'added', 'updated')
 
 
-from nodeshot.core.nodes.base import ExtensibleNodeSerializer
-
 ExtensibleNodeSerializer.add_relationship(
     'images',
     serializer=ImageRelationSerializer,
