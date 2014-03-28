@@ -52,21 +52,17 @@ if 'nodeshot.core.api' in settings.INSTALLED_APPS:
     )
 
 
-# todo: review
-#if 'nodeshot.open311.interface' in settings.INSTALLED_APPS:
-#    urlpatterns += patterns('nodeshot.open311.interface.views',
-#        url(r'^open311/$', 'map_view', name='311_home'),
-#    )
-
 if 'nodeshot.ui.open311_demo' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
-        url(r'^open311/$', include('nodeshot.ui.open311_demo.urls', namespace='ui', app_name='ui')),
+        url(r'^open311/$', include('nodeshot.ui.open311_demo.urls', namespace='open311_demo', app_name='open311_demo')),
     )
+
 
 if 'nodeshot.ui.default' in settings.INSTALLED_APPS:
     urlpatterns = urlpatterns + patterns('',
-        url(r'^', include('nodeshot.ui.default.urls', namespace='ui', app_name='ui')),
+        url(r'', include('nodeshot.ui.default.urls', namespace='ui', app_name='ui')),
     )
+
     
 if 'rosetta' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
