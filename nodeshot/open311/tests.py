@@ -304,3 +304,8 @@ class Open311Request(BaseTestCase):
         RatingRequestListSerializer().data
         NodeRequestListSerializer().data
         NodeRequestDetailSerializer().data
+        
+    def test_open311_UI(self):
+        """ ensure open311 UI can be reached"""
+        response = self.client.get(reverse('open311_demo:open311'))
+        self.assertEqual(response.status_code, 200)
