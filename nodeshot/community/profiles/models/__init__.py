@@ -17,18 +17,6 @@ from .password_reset import PasswordReset
 __all__ = ['Profile', 'SocialLink', 'PasswordReset']
 
 
-# ------ Add user info to ExtensibleNodeSerializer ------ #
-
-from nodeshot.core.nodes.base import ExtensibleNodeSerializer
-from ..serializers import ProfileRelationSerializer
-
-ExtensibleNodeSerializer.add_relationship(
-    name='user',
-    serializer=ProfileRelationSerializer,
-    queryset='obj.user'
-)
-
-
 # ------ SIGNALS ------ #
 
 # perform certain actions when some other parts of the application changes

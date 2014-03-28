@@ -167,6 +167,17 @@ class ProfileRelationSerializer(ProfileSerializer):
         fields = ('username', 'full_name', 'city', 'country', 'avatar', 'details')
 
 
+# ------ Add user info to ExtensibleNodeSerializer ------ #
+
+from nodeshot.core.nodes.base import ExtensibleNodeSerializer
+
+ExtensibleNodeSerializer.add_relationship(
+    name='user',
+    serializer=ProfileRelationSerializer,
+    queryset='obj.user'
+)
+
+
 class AccountSerializer(serializers.ModelSerializer):
     """ Account serializer """
     
