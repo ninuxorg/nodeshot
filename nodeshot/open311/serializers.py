@@ -375,11 +375,9 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
             return ""
 
     def get_layer_name(self, obj):
-        #print obj
         if obj is None:
             return ""
         layer_name =  obj.layer
-        print layer_name
         return layer_name
     
     def get_layer_slug(self, obj):
@@ -390,7 +388,6 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
         return layer_slug
     
     def get_service_request_id(self, obj):
-        print obj.id
         if obj is None:
             return ""
         service_request_id = 'node-%d' % obj.id
@@ -425,7 +422,7 @@ class NodeRequestDetailSerializer(NodeRequestListSerializer):
    
     class Meta:
         model = Node
-        fields= ('layer','layer_name','slug','name','status', 'geometry', 'description', 'address',
+        fields= ('layer','layer_slug','slug','name','status', 'geometry', 'description', 'address',
                  'requested_datetime', 'updated_datetime', 'image_urls',)
 
 

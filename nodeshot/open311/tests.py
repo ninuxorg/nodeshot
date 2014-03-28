@@ -94,7 +94,7 @@ class Open311Request(BaseTestCase):
                         "slug": "montesacro4",
                         "layer": "rome",
                         "lat": "22.5253",
-                        "lng": "41.8890",
+                        "long": "41.8890",
                         "description": "test",
                         }
         url = "%s" % reverse('api_service_request_list')
@@ -117,7 +117,7 @@ class Open311Request(BaseTestCase):
                         "slug": "montesacro4",
                         "layer": "rome",
                         "lat": "22.5253",
-                        "lng": "41.8890",
+                        "long": "41.8890",
                         "description": "test",
                         }
         url = "%s" % reverse('api_service_request_list')
@@ -136,7 +136,7 @@ class Open311Request(BaseTestCase):
                         "slug": "montesacro4",
                         "layer": "rome",
                         "lat": "22.5253",
-                        "lng": "41.8890",
+                        "long": "41.8890",
                         "description": "test",
                         }
         url = "%s" % reverse('api_service_request_list')
@@ -278,7 +278,7 @@ class Open311Request(BaseTestCase):
                         "slug": "montesacro4",
                         "layer": "rome",
                         "lat": "22.5253",
-                        "lng": "41.8890",
+                        "long": "41.8890",
                         "description": "test",
                         "geometry": "POINT (22.5253334454477372 41.8890404543067518)"
                         }

@@ -293,7 +293,6 @@ class ServiceRequestList(generics.ListCreateAPIView):
         kwargs['serializer'] = serializers[service_code]
         
         user=self.get_custom_data()
-        print request.POST
         request.UPDATED = request.POST.copy()
         request.UPDATED['user'] = user['user']
         if service_code == 'node':
