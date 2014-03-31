@@ -28,7 +28,7 @@ class Open311Request(BaseTestCase):
         # ensure 4 keys in response
         self.assertEqual(len(response.data), 4)
         
-        #ensure 5 keys for each endpoint
+        # ensure 5 keys for each endpoint
         for endpoint in response.data['endpoints']:
             self.assertEqual(len(endpoint), 5)
     
@@ -87,7 +87,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         
     def test_service_request_node(self):
-        #service_request for nodes
+        # service_request for nodes
         service_request={
                         'service_code':"node",
                         "name": "montesacro4",
@@ -99,17 +99,17 @@ class Open311Request(BaseTestCase):
                         }
         url = "%s" % reverse('api_service_request_list')
         response = self.client.post(url,service_request)
-        #Not authenticated : 403
+        # Not authenticated : 403
         self.assertEqual(response.status_code, 403)
         login = self.client.login(username='admin', password='tester')
-        #Authenticated users can insert service requests: 201
+        # Authenticated users can insert service requests: 201
         response = self.client.post(url,service_request)        
         self.assertEqual(response.status_code, 201)
         
     def test_service_request_node_incomplete_key(self):
-        #POST requests
+        # POST requests
         
-        #incorrect service_request for nodes
+        # incorrect service_request for nodes
         login = self.client.login(username='admin', password='tester')
                
         service_request={
@@ -125,9 +125,9 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         
     def test_service_request_node_incomplete_value(self):
-        #POST requests
+        # POST requests
         
-        #incorrect service_request for nodes
+        # incorrect service_request for nodes
         login = self.client.login(username='admin', password='tester')
                
         service_request={
@@ -144,7 +144,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 400)
     
     def test_service_request_vote(self):
-        #service_request for votes
+        # service_request for votes
         login = self.client.login(username='admin', password='tester')   
         service_request={'service_code':"vote","node": 1,"vote":1}
         url = "%s" % reverse('api_service_request_list')
@@ -152,7 +152,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 201)
         
     def test_service_request_vote_incomplete(self):
-        #incomplete service_request for votes
+        # incomplete service_request for votes
         login = self.client.login(username='admin', password='tester')   
         service_request={'service_code':"vote","vote":1}
         url = "%s" % reverse('api_service_request_list')
@@ -161,7 +161,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         
     def test_service_request_vote_incorrect(self):
-        #incorrect service_request for votes
+        # incorrect service_request for votes
         login = self.client.login(username='admin', password='tester')   
         service_request={'service_code':"vote","node": 1,"vote":10}
         url = "%s" % reverse('api_service_request_list')
@@ -169,7 +169,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         
     def test_service_request_rating(self):
-        #service_request for rating
+        # service_request for rating
         login = self.client.login(username='admin', password='tester')   
         service_request={'service_code':"rate","node": 1,"value":1}
         url = "%s" % reverse('api_service_request_list')
@@ -178,7 +178,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 201)
         
     def test_service_request_rating_incomplete(self):
-        #incomplete service_request for rating
+        # incomplete service_request for rating
         login = self.client.login(username='admin', password='tester')   
         service_request={'service_code':"rate","value":1}
         url = "%s" % reverse('api_service_request_list')
@@ -187,7 +187,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         
     def test_service_request_rating_incorrect(self):
-        #incorrect service_request for rating
+        # incorrect service_request for rating
         login = self.client.login(username='admin', password='tester')   
         service_request={'service_code':"rate","node": 1,"value":20}
         url = "%s" % reverse('api_service_request_list')
@@ -196,7 +196,7 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         
     def test_service_request_comment(self):
-        #service_request for comments
+        # service_request for comments
         login = self.client.login(username='admin', password='tester')   
         service_request={'service_code':"comment","node": 1,"text":"OK"}
         url = "%s" % reverse('api_service_request_list')
@@ -205,9 +205,9 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 201)
         
     def test_service_request_comment_incomplete(self):
-        #incomplete service_request for comments
+        # incomplete service_request for comments
         login = self.client.login(username='admin', password='tester')   
-        #Vote
+        # Vote
         service_request={'service_code':"comment","text":"OK"}
         url = "%s" % reverse('api_service_request_list')
         response = self.client.post(url,service_request)
@@ -215,18 +215,18 @@ class Open311Request(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         
     def test_get_service_request(self):
-        #GET request detail 
+        # GET request detail 
         response = self.client.get(reverse('api_service_request_detail', args=['node','1']))
         self.assertEqual(response.status_code, 200)
-        #Wrong service code
+        # Wrong service code
         response = self.client.get(reverse('api_service_request_detail', args=['wrong','1']))
         self.assertEqual(response.status_code, 404)
-        #Not existing request
+        # Not existing request
         response = self.client.get(reverse('api_service_request_detail', args=['node','100']))
         self.assertEqual(response.status_code, 404)
         
     def test_get_service_requests(self):
-        #GET requests list
+        # GET requests list
         response = self.client.get(reverse('api_service_request_list'))
         self.assertEqual(response.status_code, 404)
         
@@ -249,7 +249,7 @@ class Open311Request(BaseTestCase):
         response = self.client.get(reverse('api_service_request_list'), parameters)
         self.assertEqual(response.status_code, 404)
         
-        #check date parameters
+        # check date parameters
         parameters = {'service_code':'node','start_date':'wrong'}
         
         response = self.client.get(reverse('api_service_request_list'), parameters)

@@ -86,7 +86,7 @@
 	<input id="requestLat" class="input" name="lat">
 
 	<label for="nodeToInsertLng">Lng</label>   
-	<input id="requestLng" class="input" name="lng">
+	<input id="requestLng" class="input" name="long">
 
 	    <label for="imageToInsert">Image</label>   
 	 <input type="file" name="image" id="photoimg" >
@@ -107,8 +107,8 @@
    <ul> <% for (var i = 0; i < nodes.length; i++) { %>
       <% var node = nodes[i]; %>
       <li>
-      <span class="requestID"><%= node.request_id %>: </span>
-      <a href="#" class="list-link" data-id='<%= node.request_id %>'>
+      <span class="requestID"><%= node.service_request_id %>: </span>
+      <a href="#" class="list-link" data-id='<%= node.service_request_id %>'>
       <%= node.name %></a>
       </li>
     <% } %>
@@ -116,7 +116,7 @@
 </script>
 
 <script id="tmplOpen311Popup" type="text/template">
-<strong>Request ID: </strong><%= request_id %><br>
+<strong>Request ID: </strong><%= service_request_id %><br>
 <strong>Status: </strong><%= status %><br>
 <!--<a href="<%= url %>">View details</a>-->
 <button >View details</button>
@@ -134,7 +134,7 @@ Back to map</a>
 <span class="requestField">Request_id: </span>
 <%= requestID %><br>  
 <span class="requestField">Layer: </span>
-<%= request.layer_name %><br>  
+<%= request.layer %><br>  
 <span class="requestField">Name: </span>
 <%= request.name %><br>
 <span class="requestField">Description: </span>
@@ -253,8 +253,18 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
 <script src="{% static 'open311/js/vendor/underscore-min.js' %}"></script>
 <script src="{% static 'open311/js/vendor/jquery-1.9.1.min.js' %}"></script>
 <script src="{% static 'open311/js/vendor/bootstrap.min.js' %}"></script>
+<script src="{% static 'open311/js/vendor/leaflet.js' %}"></script>
+<script src="https://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
+<script src="{% static 'open311/js/vendor/Google.js' %}"></script>
+<script src="{% static 'open311/js/vendor/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'open311/js/vendor/jquery.raty.js' %}"></script>
+<script type="text/javascript">
+    $.myproject = {} // namespace
+    $.myproject.STATIC_URL = '{{ STATIC_URL }}';
+</script>
 <script src="{% static 'open311/js/utils.js' %}"></script>
 <script src="{% static 'open311/js/functions.js' %}"></script>
+<script src="{% static 'open311/js/main.js' %}"></script>
 {% block scripts%}
 
 {% endblock scripts%}	

@@ -1,9 +1,9 @@
 var csrftoken = $.getCookie('csrftoken');
 var markerToRemove //If users insert a new marker previous one has to be deleted from map
-var nodeRatingAVG // Rating data has to be globally available for rating plugin to correctly work
-var markerMap = {} //Object holding all nodes'id and a reference to their marker
-var markerStatusMap = {}
-var mapClusters = {}
+var nodeRatingAVG // Node Rating data has to be globally available for jquery-raty rating plugin to correctly work
+var markerMap = {} //Object containing all requests'id and a reference to their marker
+var markerStatusMap = {"open": [], "closed": []} //Object containing arrays of open and closed requests and a reference to their marker
+var mapClusters = {} // Object containing layers as leaflet Clusters
 
 
 /*
@@ -73,15 +73,15 @@ var legend = L.control({position: 'bottomleft'});
 //}
 
 legend.onAdd = function (map) {
-    var div = L.DomUtil.create('div','mapLegend')
-    div.innerHTML="<div><strong>Legend</strong>"
+    var mapLegend = L.DomUtil.create('div','mapLegend')
+    mapLegend.innerHTML="<div><strong>Legend</strong>"
     _.each(status_colors,function(value, key, list){
-        div.innerHTML += "<div style='clear:both;min-height:10px;width:100px;'>"
-        div.innerHTML += "<div class='circle' style='float:left;background-color:"+value+"'></div>"
-        div.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests"+"</div>"
-        div.innerHTML += "</div>"
+        mapLegend.innerHTML += "<div style='clear:both;min-height:10px;width:100px;'>"
+        mapLegend.innerHTML += "<div class='circle' style='float:left;background-color:"+value+"'></div>"
+        mapLegend.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests<strong>("+ markerStatusMap[key].length + ")</strong></div>"
+        mapLegend.innerHTML += "</div>"
         })
-    div.innerHTML += "</div>"
+    mapLegend.innerHTML += "</div>"
     //var toggleOpenDiv = L.DomUtil.create('toggleOpen','',div)
     //var toggleClosedDiv = L.DomUtil.create('toggleClosed','',div)
     //toggleOpenDiv.innerHTML = " <span style='color:"+open_color+"'>Open requests</span><br>"
@@ -100,12 +100,12 @@ legend.onAdd = function (map) {
     //    .addListener(toggleOpenDiv, 'click', function () { removeStatusMarkers('open'); })
     //    //.addListener(toggleOpenDiv, 'click', function () { test(); });
     //
-    return div;
+    return mapLegend;
 };
 
 
 
-legend.addTo(map);
+
 var mapBoxLayer = new L.tileLayer('//a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
 var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 //Uncomment for Google maps. Must be checked if it works in IE
@@ -148,7 +148,7 @@ var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
 
 //Populate a select field with Layers
 getLayerListSlug(layers);
-
+legend.addTo(map);
 function createlayersCSS(slug, color) {
     var cssClass = '.' + slug
     $("<style type='text/css'> " + cssClass + "{\

@@ -90,10 +90,10 @@ function loadLayers(layers) {
         var clusterClass = layers[i].slug; //CSS class with same name of the layer
         //Creates a Leaflet cluster group styled with layer's colour
         window.mapClusters[layers[i].slug] = createCluster(clusterClass);
-        window.markerStatusMap[layers[i].slug] = {
-            "open": [],
-            "closed": []
-        }
+        //window.markerStatusMap[layers[i].slug] = {
+        //    "open": [],
+        //    "closed": []
+        //}
         //var newCluster = window.mapClusters[layers[i].slug];
         //Loads nodes in the cluster
         var newClusterNodes = getData(window.__BASEURL__ + 'open311/requests?service_code=node&layer=' + layers[i].slug);
@@ -101,7 +101,7 @@ function loadLayers(layers) {
         for (var n in newClusterNodes) {
 
             var feature = new featureConstructor;
-            feature.geometry.coordinates = [newClusterNodes[n].lng,
+            feature.geometry.coordinates = [newClusterNodes[n].long,
             newClusterNodes[n].lat]
             feature.properties = newClusterNodes[n]
             GeoJSON.features.push(feature)
@@ -151,7 +151,7 @@ function loadNodes(layer_slug, newClusterNodes, color) {
 
         onEachFeature: function (feature, layer) {
             layer.on('click', function (e) {
-                populateOpen311Div(feature.properties.request_id, "true");
+                populateOpen311Div(feature.properties.service_request_id, "true");
                 this.bindPopup(nodeDiv);
             });
 
@@ -166,8 +166,8 @@ function loadNodes(layer_slug, newClusterNodes, color) {
                 opacity: 1,
                 fillOpacity: 0.8
             });
-            window.markerMap[feature.properties.request_id] = marker;
-            window.markerStatusMap[layer_slug][feature.properties.status].push(marker)
+            window.markerMap[feature.properties.service_request_id] = marker;
+            window.markerStatusMap[feature.properties.status].push(marker)
 
             return marker;
         }
@@ -226,8 +226,8 @@ function openForm(marker) {
     var latlngToString = marker.toString();
     var arrayLatLng = latlngToString.split(",");
     var lat = arrayLatLng[0].slice(7);
-    var lng = arrayLatLng[1].slice(0, -1);
-    var latlng = new L.LatLng(lat, lng);
+    var long = arrayLatLng[1].slice(0, -1);
+    var latlng = new L.LatLng(lat, long);
 
     $('#overlay').fadeIn('fast', function () {
         $('#serviceRequestForm').show();
@@ -246,11 +246,11 @@ function openForm(marker) {
         });
 
         $('#serviceRequestForm').append(compiledTmpl);
-        $("#requestLng").val(lng);
+        $("#requestLng").val(long);
         $("#requestLat").val(lat);
         $('#requestLng').attr('readonly', true);
         $('#requestLat').attr('readonly', true);
-        getAddress(lat, lng);
+        getAddress(lat, long);
         $("#requestForm").submit(function (event) {
 
             //disable the default form submission
@@ -269,16 +269,19 @@ function openForm(marker) {
                 processData: false,
                 success: function (returndata) {
                     var circle = L.circleMarker(latlng, {
-                radius: 8,
-                fillColor: window.status_colors['open'],
-                //color: color,
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(map);
-                    newMarker = L.marker(latlng);
+                                radius: 8,
+                                fillColor: window.status_colors['open'],
+                                //color: color,
+                                weight: 3,
+                                opacity: 1,
+                                fillOpacity: 0.8
+                            }).addTo(map);
+                    var newMarker = L.marker(latlng);
                     window.mapClusters[layer_inserted].addLayer(newMarker);
                     window.markerMap[returndata] = newMarker;
+                    window.markerStatusMap['open'].push(newMarker)
+                    window.legend.removeFrom(map)
+                    window.legend.addTo(map)
                     popupMessage = "Request has been inserted<br>"
                     popupMessage += "<strong>Request ID: </strong>"+ returndata
                     circle.bindPopup(popupMessage).openPopup();
@@ -332,7 +335,7 @@ function populateOpen311Div(nodeSlug, create) {
 
     var tmplMarkup = $('#tmplOpen311Popup').html();
     var compiledTmpl = _.template(tmplMarkup, {
-        request_id: requestID,
+        service_request_id: requestID,
         status: status,
         url: url,
     });
@@ -349,7 +352,7 @@ function showRequestDetail(requestID,node) {
     $("#RequestDetails").show();
     window.nodeSlug = node.slug
     window.nodeId = requestID.split("-")[1];
-    window.layerSettings = getData(window.__BASEURL__ + 'layers/' + node.layer + '/participation_settings/');
+    window.layerSettings = getData(window.__BASEURL__ + 'layers/' + node.layer_slug + '/participation_settings/');
     window.nodeSettings = getData(window.__BASEURL__ + 'nodes/' + node.slug + '/participation_settings/');
     window.nodeParticipation = getData(window.__BASEURL__ + 'nodes/' + node.slug + '/participation/');
     getParticipationData()
