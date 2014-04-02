@@ -71,3 +71,6 @@ south
 
 # retrieve info from network devices
 -e git+git://github.com/nemesisdesign/netengine#egg=netengine
+
+# django-cors-headers
+django-cors-headers==0.12

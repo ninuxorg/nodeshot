@@ -132,6 +132,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -215,11 +216,14 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'smuggler',
     'reversion',
+
+    #django-cors-headers
+    'corsheaders',
     
     # profiles and social networks
     'emailconfirmation',
     'social_auth',
-    
+
     # other utilities
     'django_extensions',
     
@@ -634,3 +638,7 @@ if 'social_auth' in INSTALLED_APPS:
     LOGIN_URL = '/'
     LOGIN_REDIRECT_URL = '/'
     LOGIN_ERROR_URL    = '/'
+
+# ------ CORS-HEADERS SETTINGS ------ #
+
+CORS_ORIGIN_ALLOW_ALL = True
