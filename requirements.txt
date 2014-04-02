@@ -7,9 +7,8 @@ psycopg2
 Django==1.6.2
 
 # python libraries
-PIL
+Pillow
 simplejson
-#importlib
 pytz
 mimeparse
 python-dateutil
@@ -21,9 +20,6 @@ requests
 django-grappelli==2.5.2
 django-filebrowser==3.5.4
 
-# utils
-django-extensions
-
 # geodjango improved widgets
 django-olwidget
 
@@ -32,10 +28,6 @@ djangorestframework==2.3.13
 django-rest-swagger
 markdown
 djangorestframework-gis
-
-# networking
-netaddr
--e git+https://github.com/jimfunk/django-postgresql-netfields.git#egg=netfields
 
 # email confirmation with configurable user model
 -e git+https://github.com/nemesisdesign/django-email-confirmation.git#egg=email_confirmation
@@ -50,27 +42,15 @@ django-reversion==1.8
 celery==3.1.10
 django-celery-email
 
-# websockets
-tornado==3.2
-
 # Postgres HSTORE support
 django_hstore
-
-# better shell
-bpython
 
 # fixture management
 # django-smuggler==0.4.1
 -e git+https://github.com/semente/django-smuggler#egg=django-smuggler
 
-# debugging
-django-debug-toolbar
-
 # migrations
 south
-
-# retrieve info from network devices
--e git+git://github.com/nemesisdesign/netengine#egg=netengine
 
 # django-cors-headers
 django-cors-headers==0.12

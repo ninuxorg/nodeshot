@@ -1,0 +1,40 @@
+language: python
+
+services:
+  - postgresql
+
+python:
+  - "2.7"
+  - "2.6"
+
+env:
+  - DJANGO="django==1.6.2"
+
+branches:
+  only:
+    - master
+
+# command to install requirements
+install:
+  - pip install $DJANGO
+  - pip install -r requirements.txt --use-mirrors
+  - pip install -r networking_requirements.txt --use-mirrors
+  - pip install coverage coveralls --use-mirrors
+  - python setup.py install
+
+before_script:
+  - psql template1 -c 'CREATE EXTENSION hstore;'
+  - psql -U postgres -c 'CREATE DATABASE nodeshot_travis;'
+  - psql -U postgres -d nodeshot_travis -c "CREATE EXTENSION postgis;"
+  - psql -U postgres -d nodeshot_travis -c "CREATE EXTENSION postgis_topology;"
+  - cd tests
+  - python manage.py syncdb --noinput
+  - python manage.py migrate --noinput
+  - python manage.py runserver 0.0.0.0:8000 &
+
+# command to run tests, e.g. python setup.py test
+script:
+  - coverage run --source=nodeshot runtests.py
+
+after_success:
+  coveralls

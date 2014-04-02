@@ -3,8 +3,6 @@
 import os
 import sys
 
-sys.path.append('/var/www/nodeshot/')
-
 DEBUG = True
 SERVE_STATIC = DEBUG
 TEMPLATE_DEBUG = DEBUG
@@ -17,14 +15,16 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'nodeshot',                      # Or path to database file if using sqlite3.
-        'USER': 'nodeshot',                      # Not used with sqlite3.
-        'PASSWORD': 'your_password',                  # Not used with sqlite3.
-        'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'nodeshot_travis',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
+
+POSTGIS_VERSION = (2, 1)
 
 # uncomment if you need to use nodeshot.extra.oldimporter
 #if 'test' not in sys.argv:
@@ -67,6 +67,12 @@ SITE_ID = 1
 PROTOCOL = 'http' if DEBUG else 'https'
 DOMAIN = 'localhost'
 PORT = '8000' if DEBUG else None
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
 SITE_URL = '%s://%s' % (PROTOCOL, DOMAIN)
 ALLOWED_HOSTS = [DOMAIN]  # check https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts for more info
 
@@ -117,7 +123,7 @@ STATICFILES_FINDERS = (
 
 # CHANGE THIS KEY AND UNCOMMENT
 # Make this unique, and don't share it with anybody.
-#SECRET_KEY = 'da)t*+$)ugeyip6-#tuyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
+SECRET_KEY = 'ba)t*+$)ugeyip6-#tuyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -132,15 +138,14 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'ninux.urls' # replace myproject with the name of your project. Default project is "ninux".
+ROOT_URLCONF = 'travis.urls' # replace myproject with the name of your project. Default project is "ninux".
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'ninux.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 TEMPLATE_DIRS = (
@@ -186,7 +191,7 @@ INSTALLED_APPS = [
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
     'nodeshot.core.cms',
-    'nodeshot.core.websockets',
+    #'nodeshot.core.websockets',
     'nodeshot.interoperability',
     'nodeshot.community.participation',
     'nodeshot.community.notifications',
@@ -196,7 +201,7 @@ INSTALLED_APPS = [
     'nodeshot.networking.links',
     'nodeshot.networking.services',
     'nodeshot.networking.hardware',
-    'nodeshot.networking.connectors',
+    #'nodeshot.networking.connectors',
     'nodeshot.ui.default',
     'nodeshot.open311',
     'nodeshot.ui.open311_demo',
@@ -213,22 +218,12 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'olwidget',  # geodjango better widgets
     'south',
-    'debug_toolbar',
     'smuggler',
     'reversion',
-    
-    # django-cors-headers
-    'corsheaders',
 
     # profiles and social networks
     'emailconfirmation',
     'social_auth',
-
-    # other utilities
-    'django_extensions',
-
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
 ]
 
 if 'nodeshot.community.profiles' in INSTALLED_APPS:
@@ -259,7 +254,7 @@ LOGGING = {
             'level': 'ERROR',
             'class':'logging.handlers.RotatingFileHandler',
             'formatter': 'verbose',
-            'filename': SITE_ROOT + "/../log/ninux.error.log",
+            'filename': SITE_ROOT + "/error.log",
             'maxBytes': 10485760,  # 10 MB
             'backupCount': 3,
             'formatter': 'verbose'
@@ -396,7 +391,7 @@ NODESHOT = {
         'CONTACT_INWARD_MINLENGTH': 15,
         'CONTACT_INWARD_REQUIRE_AUTH': False,
         'CONTACT_OUTWARD_MAXLENGTH': 9999,
-        'CONTACT_OUTWARD_MINLENGTH': 50,
+        'CONTACT_OUTWARD_MINLENGTH': 10,
         'CONTACT_OUTWARD_STEP': 20,
         'CONTACT_OUTWARD_DELAY': 10,
         'CONTACT_OUTWARD_HTML': True,  # grappelli must be in INSTALLED_APPS, otherwise it won't work
@@ -464,6 +459,7 @@ NODESHOT = {
         ('nodeshot.interoperability.synchronizers.OpenWISPCitySDK', 'OpenWISPCitySDK'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
         ('nodeshot.interoperability.synchronizers.ProvinciaWIFICitySDK', 'ProvinciaWIFICitySDK'),
+        ('nodeshot.interoperability.synchronizers.OpenLabor', 'OpenLabor'),
     ],
     'NOTIFICATIONS': {
         'TEXTS': {
@@ -565,13 +561,6 @@ if 'grappelli' in INSTALLED_APPS:
     GRAPPELLI_ADMIN_TITLE = 'Nodeshot Admin'
     GRAPPELLI_INDEX_DASHBOARD = 'nodeshot.dashboard.NodeshotDashboard'
 
-# ------ DEBUG TOOLBAR ------ #
-
-INTERNAL_IPS = ('127.0.0.1', '::1',)  # ip addresses where you want to show the debug toolbar here
-DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False,
-}
-
 # ------ UNIT TESTING SPEED UP ------ #
 
 SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
@@ -639,6 +628,16 @@ if 'social_auth' in INSTALLED_APPS:
     LOGIN_REDIRECT_URL = '/'
     LOGIN_ERROR_URL    = '/'
 
-# ------ CORS-HEADERS SETTINGS ------ #
 
-CORS_ORIGIN_ALLOW_ALL = True
+import django
+
+if django.VERSION[:2] >= (1, 6):
+    TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+else:
+    try:
+        import discover_runner
+        TEST_RUNNER = "discover_runner.DiscoverRunner"
+    except ImportError:
+        print("To run tests with django <= 1.5 you should install "
+              "django-discover-runner.")
+        sys.exit(-1)
