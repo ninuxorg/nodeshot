@@ -349,8 +349,21 @@ function populateOpen311Div(nodeSlug, create) {
 }
 
 function showRequestDetail(requestID,node) {
-    $("#MainPage").hide();
-    $("#RequestDetails").show();
+    $('#overlay').fadeIn('fast', function () {
+        $('#RequestDetails').show();
+        $('#RequestDetails').html('<a class="boxclose"  id="RequestDetailsClose"></a>');
+        $('#RequestDetailsClose').on("click", function () {
+            $('#RequestDetails').hide("fast", function () {
+                $('#overlay').fadeOut('fast');
+            });
+        });
+        var tmplMarkup = $('#tmplOpen311RequestBox').html();
+        var compiledTmpl = _.template(tmplMarkup, {
+        });
+        $("#RequestDetails").append(compiledTmpl);
+    
+    //$("#MainPage").hide();
+    //$("#RequestDetails").show();
     window.nodeSlug = node.slug
     window.nodeId = requestID.split("-")[1];
     window.layerSettings = getData(window.__BASEURL__ + 'layers/' + node.layer_slug + '/participation_settings/');
@@ -368,22 +381,22 @@ function showRequestDetail(requestID,node) {
 
 //Votes
 if (nodeSettings.participation_settings.voting_allowed && layerSettings.participation_settings.voting_allowed) {
-    //console.log("Votes OK")
+    console.log("Votes OK")
     showVotes(nodeParticipation.participation.likes,nodeParticipation.participation.dislikes)
 }
 
 //Comments       
 if (nodeSettings.participation_settings.comments_allowed && layerSettings.participation_settings.comments_allowed) {
-    //console.log("Comments OK")
+    console.log("Comments OK")
     showComments(nodeSlug,nodeParticipation.participation.comment_count); 
 }
 
 //Comments       
 if (nodeSettings.participation_settings.rating_allowed && layerSettings.participation_settings.rating_allowed) {
-    //console.log("Rating OK")
+    console.log("Rating OK")
     showRating(nodeSlug,nodeParticipation.participation.rating_avg,nodeParticipation.participation.rating_count); 
 }
-
+})
 }
 
 function showMainPage(requestID) {

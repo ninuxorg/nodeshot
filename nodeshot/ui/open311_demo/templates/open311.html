@@ -122,34 +122,52 @@
 <button >View details</button>
 </script>
 
+<script id="tmplOpen311RequestBox" type="text/template">
+<div id="left" class="span6" style="width:420px">
+            <div id="request"></div>
+            
+        </div>
+        <div id="right" class="span6" style="width:400px">
+	  <div id="votesContainer"></div>
+            <div id="ratingContainer"></div>
+            <div id="commentsContainer"></div>
+        </div>
+</script>
+
 <script id="tmplOpen311Request" type="text/template">
-<div style="float:right; width:80px;">
-<img src="{% static 'open311/img/map.png' %}"  /><br>
-<a style="text-align: right;" href="#" onClick=showMainPage()>
 
-
-Back to map</a>
-</div>
-<h3>Service Request details</h3>
-<span class="requestField">Request_id: </span>
-<%= requestID %><br>  
-<span class="requestField">Layer: </span>
-<%= request.layer %><br>  
-<span class="requestField">Name: </span>
-<%= request.name %><br>
-<span class="requestField">Description: </span>
-<%= request.description %><br>
-<span class="requestField">Status: </span>
-<%= request.status %><br>
-<span class="requestField">Status detail: </span>
-<%= request.detailed_status %><br>
-<span class="requestField">Address: </span>
-<%= request.address %><br>
-<span class="requestField">Requested on: </span>
-<%= request.requested_datetime %><br>
-<span class="requestField">Updated on: </span>
-<%= request.updated_datetime %><br>
-<img class="thumbnail" src="<%= request.image_urls[0] %>">
+<table class="table table-condensed">
+  <tr>
+<td class="requestField">Request_id</td><td>
+<%= requestID %></td>
+</tr><tr>
+<td class="requestField">Layer</td><td>
+<%= request.layer %></td>
+</tr><tr>
+<td class="requestField">Name</td><td>
+<%= request.name %></td>
+</tr><tr>
+<td class="requestField">Description</td><td>
+<%= request.description %></td>
+</tr><tr>
+<td class="requestField">Status</td><td>
+<%= request.status %></td>
+</tr><tr>
+<td class="requestField">Status detail</td><td>
+<%= request.detailed_status %></td>
+</tr><tr>
+<td class="requestField">Address</td><td>
+<%= request.address %></td>
+</tr><tr>
+<td class="requestField">Requested on</td><td>
+<%= request.requested_datetime %></td>
+</tr><tr>
+<td class="requestField">Updated on</td><td>
+<%= request.updated_datetime %></td></tr>
+  <tr>
+<td class="requestField">Image</td><td>
+<img class="thumbnail" src="<%= request.image_urls[0] %>"</td></tr>
+</table>
 </script>
 
 <script id="tmplOpen311Votes" type="text/template">
@@ -158,7 +176,6 @@ Back to map</a>
 <p><img src="{% static 'open311/img/likes.jpg' %}" /><%= likes %> </p>
 <p><img src="{% static 'open311/img/dislike.jpg' %}" /><%= dislikes %> </p>
 <div id="insert_vote" class="insert_vote">
-Your vote:  
 <button id="likeButton">I like it</button>
 <button id="unlikeButton">I don't</button>
 </div>
@@ -210,9 +227,13 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
 <!-- End of Templates -->
 <body>
   <div class="overlay" id="overlay" style="display:none;"></div>
-<div id="serviceRequestForm" style="display: none;">
+
+<div id="RequestDetails" style="display: none;">
 <a class="boxclose" id="boxclose"></a>
 </div>
+<div id="serviceRequestForm" style="display: none;">
+</div>
+
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
