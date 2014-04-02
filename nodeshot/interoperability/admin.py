@@ -13,15 +13,15 @@ from models import LayerExternal, NodeExternal
 class LayerExternalInline(admin.StackedInline):
     model = LayerExternal
     fk_name = 'layer'
-    
+
     if 'grappelli' in settings.INSTALLED_APPS:
-        inline_classes = ('grp-collapse grp-open',) 
+        inline_classes = ('grp-collapse grp-open',)
 
 
 # add inline to LayerAdmin
 LayerAdmin.inlines.append(LayerExternalInline)
 # custom admin template
-LayerAdmin.change_form_template = '%s/templates/admin/layer_change_form.html' % os.path.dirname(os.path.realpath(__file__))
+LayerAdmin.change_form_template = 'admin/layer_change_form.html'
 
 
 class NodeExternalInline(admin.StackedInline):
