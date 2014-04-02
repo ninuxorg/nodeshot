@@ -1,0 +1,3 @@
+include AUTHORS LICENSE README.rst
+recursive-include nodeshot *
+recursive-exclude * *.pyc *.swp
