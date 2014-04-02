@@ -34,3 +34,11 @@ startup.py
 __GRAFICA
 celery.log
 projects/ninux/server.py
+static/
+cesium/
+cache/
+*.log
+!/tests/travis/settings.py
+local_settings.py
+/tests/travis/media/
+.coverage
