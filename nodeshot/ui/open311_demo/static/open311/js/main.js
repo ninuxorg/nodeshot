@@ -78,7 +78,7 @@ legend.onAdd = function (map) {
     _.each(status_colors,function(value, key, list){
         mapLegend.innerHTML += "<div style='clear:both;min-height:10px;width:100px;'>"
         mapLegend.innerHTML += "<div class='circle' style='float:left;background-color:"+value+"'></div>"
-        mapLegend.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests<strong>("+ markerStatusMap[key].length + ")</strong></div>"
+        mapLegend.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests <strong>("+ markerStatusMap[key].length + ")</strong></div>"
         mapLegend.innerHTML += "</div>"
         })
     mapLegend.innerHTML += "</div>"

@@ -22,7 +22,6 @@ function createNodeList() {
     if (layer != " ") {
         $.ajax({
             type: 'GET',
-            //url: 'http://localhost:8000/api/v1/open311/requests.json?service_code=node&layer=' + layer,
             url: window.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layer,
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',
@@ -369,7 +368,7 @@ function showRequestDetail(requestID,node) {
     window.layerSettings = getData(window.__BASEURL__ + 'layers/' + node.layer_slug + '/participation_settings/');
     window.nodeSettings = getData(window.__BASEURL__ + 'nodes/' + node.slug + '/participation_settings/');
     window.nodeParticipation = getData(window.__BASEURL__ + 'nodes/' + node.slug + '/participation/');
-    getParticipationData()
+    //getParticipationData()
     var request = getData(window.__BASEURL__ + 'open311/requests/' + requestID + '.json'); 
     var tmplMarkup = $('#tmplOpen311Request').html();
     var compiledTmpl = _.template(tmplMarkup, {

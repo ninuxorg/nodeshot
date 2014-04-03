@@ -1,15 +1,37 @@
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
- body {
+#loading {
+   background-color: #CCCCCC;
+   height: 50px;
+   width: 150px;
+   position: fixed;
+   z-index: 100000;
+   left: 50%;
+   top: 50%;
+   margin: -25px 0 0 -25px;
+   border-radius: 4px;
+   border: thin solid;
+   border-color: #000000;
+   padding:5px;
+}
+
+body {
     background-color: #FF9900;
 }
+
 .row {
     margin-top: 25px;
 }
+
+.small {
+   font-size: 14px;
+}
+
 #RequestDetails {
     display: none;
 }
+
 .mapLegend {
     padding: 6px 8px;
     font: 14px/16px Arial, Helvetica, sans-serif;
@@ -19,12 +41,14 @@
     border-radius: 5px;
     text-align: left;
 }
+
 .circle {
     border-radius: 50%;
     width: 12px;
     height: 12px;
     /* width and height can be anything, as long as they're equal */
 }
+
 .overlay {
     background:transparent url(images/overlay.png) repeat top left;
     position:fixed;
@@ -36,6 +60,7 @@
     width: 100%;
     z-index:10000;
 }
+
 #serviceRequestForm {
     width: 400px;
     height: 600px;
@@ -218,7 +243,7 @@ a.boxclose {
 #votes {
     /*width: 50%;*/
     font-size: 24px;
-    font-weight: bold;
+    /*font-weight: bold;*/
     background-color: #FFFFFF;
     margin-bottom: 10px;
 }

@@ -79,13 +79,13 @@
 	<textarea class="input" name="description"></textarea>
 
 	<label for="nodeToInsertAddress" >Address <br>(from Open Street Map)</label>
-	<div id="loadingAddress" >Loading...</div>
+	<div id="loadingAddress" class="loading" ></div>
 	<textarea id="requestAddress" class="input" name="address"></textarea>	
 
 	<label for="nodeToInsertLat">Lat</label>   
 	<input id="requestLat" class="input" name="lat">
 
-	<label for="nodeToInsertLng">Lng</label>   
+	<label for="nodeToInsertLng">Long</label>   
 	<input id="requestLng" class="input" name="long">
 
 	    <label for="imageToInsert">Image</label>   
@@ -104,15 +104,15 @@
 
 <script id="tmplNodelist" type="text/template">
   Requests found: <strong><%= nodes.length %></strong> 
-   <ul> <% for (var i = 0; i < nodes.length; i++) { %>
+   <table class="table table-condensed small"> <% for (var i = 0; i < nodes.length; i++) { %>
       <% var node = nodes[i]; %>
-      <li>
-      <span class="requestID"><%= node.service_request_id %>: </span>
-      <a href="#" class="list-link" data-id='<%= node.service_request_id %>'>
-      <%= node.name %></a>
-      </li>
+      <tr>
+      <td class="requestID"><%= node.service_request_id %>: </td>
+      <td> <a href="#" class="list-link" data-id='<%= node.service_request_id %>'>
+      <%= node.name %></a></td>
+      </tr>
     <% } %>
-  </ul>
+  </table>
 </script>
 
 <script id="tmplOpen311Popup" type="text/template">
@@ -226,12 +226,13 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
 
 <!-- End of Templates -->
 <body>
+  <div id='loading'><img src= {% static 'open311/img/ajax-loader.gif' %}>Loading data.. </div>
   <div class="overlay" id="overlay" style="display:none;"></div>
 
 <div id="RequestDetails" style="display: none;">
-<a class="boxclose" id="boxclose"></a>
 </div>
 <div id="serviceRequestForm" style="display: none;">
+
 </div>
 
         <!--[if lt IE 7]>

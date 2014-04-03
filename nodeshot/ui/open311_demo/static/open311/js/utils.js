@@ -51,13 +51,13 @@ function getAddress(lat,lng) {
     });
 }
 
-$('#loading').hide(); //initially hide the loading icon
+//$('#loading').hide(); //initially hide the loading icon
 
-$('#loading').ajaxStart(function () {
-    $(this).show();
+$(document).ajaxStart(function () {
+    $('#loading').show();
 });
-$("#loading").ajaxStop(function () {
-    $(this).hide();
+$(document).ajaxStop(function () {
+    $('#loading').hide();
 });
 
 function convertToSlug(Text) {
