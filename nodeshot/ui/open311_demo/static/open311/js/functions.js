@@ -261,7 +261,7 @@ function openForm(marker) {
             var layer_inserted = $(this).serializeArray()[1]['value']
 
             $.ajax({
-                url: window.__BASEURL__ + 'open311/requests/',
+                url: window.__BASEURL__ + 'open311/requests.json/',
                 type: 'POST',
                 data: formData,
                 async: false,
