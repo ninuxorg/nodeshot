@@ -62,9 +62,9 @@ body {
 }
 
 #serviceRequestForm {
-    width: 400px;
-    height: 600px;
-    line-height: 20px;
+    width: 450px;
+    height: 700px;
+    line-height: 1.2;
     position: fixed;
     top: 30%;
     left: 50%;
@@ -80,14 +80,6 @@ body {
     padding-right: 20px;
     z-index: 10001;
     /* 1px higher than the overlay layer */
-}
-
-#requestForm label {
-    font-weight: bold;
-}
-
-#requestForm input[type="file"] {
-    width: 200px;
 }
 
 a.boxclose {
@@ -115,9 +107,10 @@ a.boxclose {
     background-color: #00ff00;
     color: #000000
 }
-.layerList {
-    width: 90%;
-}
+
+/*.layerList {*/
+/*    width: 90%;*/
+/*}*/
 
 .userLogged {
     color: #ffffff;
@@ -135,22 +128,6 @@ a.boxclose {
   border-style:solid;
   border-width:1px;
   border-color: #0000ff*/
-}
-
-#nodelist ul {
-    padding: 0px;
-    margin: 0px;
-    color: #000000;
-    background-color: #c0c0c0;
-    text-align: left;
-    list-style-type: none;
-}
-
-#nodelist li {
-    color: #000000;
-    /*  margin: 2px;*/
-    border-bottom: 2px solid #ccc;
-    /*  padding:1px;*/
 }
 
 #nodelist .requestID {
@@ -220,11 +197,6 @@ a.boxclose {
     /*border-width:2px;*/
     /*border-color: #0000ff;*/
     /*border-radius: 4px;*/
-}
-
-#request h3 {
-    line-height: 10px;
-    color: 0000FF;
 }
 
 #request .requestField {

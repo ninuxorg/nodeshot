@@ -153,8 +153,8 @@ function createlayersCSS(slug, color) {
     var cssClass = '.' + slug
     $("<style type='text/css'> " + cssClass + "{\
   background-color:" + color + ";\
-    width: 30px;\
-    height: 30px;\
+    width: 50px;\
+    height: 50px;\
     margin-left: 5px;\
     margin-top: 5px;\
     padding: 2px;\
@@ -164,8 +164,8 @@ function createlayersCSS(slug, color) {
     border-radius: 20px;\
     border: thin solid;\
     border-color: black;\
-    border-size: 3px;\
-    line-height: 30px;\
+    border-size: 5px;\
+    line-height: 25px;\
     font-weight: bold;\
   } </style>").appendTo("head");
 }

@@ -4,7 +4,7 @@
 <div class="container">
 
     <div id="MainPage" class="row ">
-        <div class="span3 ">
+        <div class="col-md-3 ">
             <div id="nodelistContainer">
                 <p class="intest">Service requests list</p>
                 <select id="selectLayer" onchange=createNodeList() class="layerList">
@@ -13,7 +13,7 @@
                 <div id="nodelist"></div>
             </div>
         </div>
-        <div class="span9 ">
+        <div class="col-md-9">
             <div id="mapContainer">
                 <div class="intest">Map</div>
                 <p style="text-align: center;font-weight: bold;">Click on map to insert a new service request</p>
@@ -24,17 +24,8 @@
         </div>
     </div>
     <!--Layer showing node details-->
-    <div id="RequestDetails" class="row">
-        <div id="left" class="span6">
-            <div id="request"></div>
-            <div id="votesContainer"></div>
-            <div id="ratingContainer"></div>
-        </div>
-        <div id="right" class="span6">
-            <div id="commentsContainer"></div>
-        </div>
-    </div>
-</div>
+
+
 </div>
 <!-- /container -->
 {% endblock container %}

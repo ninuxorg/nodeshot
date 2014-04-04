@@ -56,43 +56,48 @@
 </script>
 
 <script id="tmplInsertNode" type="text/template">
-<p><strong>Insert request details</strong></p>
+<h3><strong>Insert request details</strong></h3>
 
-<form id="requestForm"  >
+<form id="requestForm" role="form" >
   <input type="hidden" name="service_code" value="node">
- 
+    <div class="form-group">
 	<label for="layerToInsert" >Layer</label>
 
-	<select name="layer" >
+	<select class="form-control" name="layer" >
 	  <% for (var i = 0; i < layers.length; i++) { %>
       <% var layer = layers[i]; %>
 	 <option value="<%= layer.slug %>"> <%= layer.name %>
 	     <% }
 	      %>
 	</select>
-	</p>
-		  
+	</div>
+	<div class="form-group">	  
 	<label for="nodeToInsertName" >Name</label>
-	<input class="input" name="name">
-
+	<input class="form-control" name="name">
+	</div>
+	<div class="form-group">
 	<label for="nodeToInsertName" >Description</label>
-	<textarea class="input" name="description"></textarea>
-
+	<textarea class="form-control" name="description"></textarea>
+	</div>
+	<div class="form-group">
 	<label for="nodeToInsertAddress" >Address <br>(from Open Street Map)</label>
 	<div id="loadingAddress" class="loading" ></div>
-	<textarea id="requestAddress" class="input" name="address"></textarea>	
-
+	<textarea id="requestAddress" class="form-control" name="address"></textarea>	
+	</div>
+	<div class="form-group">
 	<label for="nodeToInsertLat">Lat</label>   
-	<input id="requestLat" class="input" name="lat">
-
+	<input id="requestLat" class="form-control" name="lat">
+	</div>
+	<div class="form-group">
 	<label for="nodeToInsertLng">Long</label>   
-	<input id="requestLng" class="input" name="long">
-
+	<input id="requestLng" class="form-control" name="long">
+	</div>
+	<div class="form-group">
 	    <label for="imageToInsert">Image</label>   
 	 <input type="file" name="image" id="photoimg" >
-<br>
-	  <input type=submit>
-</form>
+	</div>
+	  <input type=submit value="Insert request">
+	</form>
 <div id="request_messages" class="error_messages"></div>
 </script>
 
@@ -123,11 +128,11 @@
 </script>
 
 <script id="tmplOpen311RequestBox" type="text/template">
-<div id="left" class="span6" style="width:420px">
+<div id="left" class="col-md-6" style="width:420px">
             <div id="request"></div>
             
         </div>
-        <div id="right" class="span6" style="width:400px">
+        <div id="right" class="col-md-6" style="width:400px">
 	  <div id="votesContainer"></div>
             <div id="ratingContainer"></div>
             <div id="commentsContainer"></div>
@@ -239,25 +244,25 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
         <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-inner">
+            
                 <div class="container">
                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="#">
+                    <a class="navbar-brand" href="#">
 		      <img src="{% static 'open311/css/images/nodeshot-311-logo.png' %}" />
 		    </a>
-                    <div class="nav-collapse collapse">
+                    <div class="navbar-collapse collapse">
                         
                         <form id="userForm" class="navbar-form pull-right">
 			 {% if not user.is_authenticated %}
                          <input id="user" class="span2" type="text" placeholder="Email">
                          <input id="password" class="span2" type="password" placeholder="Password">
                          <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
-			 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-info">Facebook Sign in</a>
-			 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-inverse">Google</a>
+			 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-default">Facebook Sign in</a>
+			 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-default">Google</a>
 			  {% else %}
 			   <span class="userLogged">Hello  {{ user }}  </span>
 			    <button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>
@@ -265,7 +270,7 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
                         </form>
                     </div><!--/.nav-collapse -->
                 </div>
-            </div>
+           
         </div>
 {% block container %}
 
