@@ -1,6 +1,21 @@
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
+body {
+    background: #D6D4C9;
+    background: -moz-linear-gradient(#fff, #999);
+    background: -webkit-linear-gradient(#fff, #999);
+    background: -o-linear-gradient(#fff, #999);
+}
+
+.row {
+    margin-top: 25px;
+}
+
+.strong {
+   font-weight: bold;
+}
+
 #loading {
    background-color: #CCCCCC;
    height: 50px;
@@ -14,22 +29,6 @@
    border: thin solid;
    border-color: #000000;
    padding:5px;
-}
-
-body {
-    background-color: #FF9900;
-}
-
-.row {
-    margin-top: 25px;
-}
-
-.small {
-   font-size: 14px;
-}
-
-#RequestDetails {
-    display: none;
 }
 
 .mapLegend {
@@ -70,7 +69,7 @@ body {
     left: 50%;
     margin-top: -100px;
     margin-left: -250px;
-    background-color: #f1c40f;
+    background: #D6D4C9;
     border-radius: 5px;
     border-color: black;
     border: thin solid;
@@ -108,14 +107,6 @@ a.boxclose {
     color: #000000
 }
 
-/*.layerList {*/
-/*    width: 90%;*/
-/*}*/
-
-.userLogged {
-    color: #ffffff;
-}
-
 #nodelist {
     background-color: #c0c0c0;
     color: #000000;
@@ -124,14 +115,6 @@ a.boxclose {
     padding: 2px;
     border-radius: 4px;
     overflow:auto;
-    /*  margin: 1px;
-  border-style:solid;
-  border-width:1px;
-  border-color: #0000ff*/
-}
-
-#nodelist .requestID {
-    font-weight: bold;
 }
 
 #nodelistContainer {
@@ -139,22 +122,20 @@ a.boxclose {
     color: #000000;
     font-size: 16px;
     text-align: center;
+        border-radius: 10px 10px 0px 0px;
+   border: thin solid;
+    border-color: grey;
 }
 
 #mapContainer {
     background-color: #c0c0c0;
     color: #000000;
     font-size: 16px;
+   border-radius: 10px 10px 0px 0px;
+   border: thin solid;
+    border-color: grey;
 }
 
-.intest {
-    background-color: #0000FF;
-    color: #FFFFFF;
-    font-size: 16px;
-    padding: 2px;
-    text-align: center;
-    font-weight: bold;
-}
 
 .error_messages {
     font-size: 13px;
@@ -177,7 +158,7 @@ a.boxclose {
     left: 50%;
     margin-top: -100px;
     margin-left: -480px;
-    background-color: #f1c40f;
+    background: #D6D4C9;
     border-radius: 5px;
     border-color: black;
     border: thin solid;
@@ -189,66 +170,43 @@ a.boxclose {
     /* 1px higher than the overlay layer */
 }
 
-#request {
-    background-color: #FFFFFF;
-    margin-bottom: 10px;
-    /*padding: 5px;*/
-    /*border-style:solid;*/
-    /*border-width:2px;*/
-    /*border-color: #0000ff;*/
-    /*border-radius: 4px;*/
-}
-
-#request .requestField {
+.intest {
+    background-color: #33AB67;
+    color: #FFFFFF;
+    font-size: 16px;
+    padding: 2px;
+    text-align: center;
     font-weight: bold;
-    background-color: #C0C0C0;
+    border-radius: 10px 10px 0px 0px;
+    /*border: thin solid;*/
+    /*border-color: black;*/
+    
 }
 
-#rating {
-    /*width: 50%;*/
-    /*font-size: 24px;
-  font-weight: bold;*/
-    background-color: #FFFFFF;
-    margin-bottom: 10px;
-}
+.requestSubBox {
 
-#votes {
-    /*width: 50%;*/
-    font-size: 24px;
-    /*font-weight: bold;*/
     background-color: #FFFFFF;
     margin-bottom: 10px;
+    border-radius: 10px 10px 0px 0px;
+    border: thin solid;
+    border-color: grey;
 }
 
 #votes img {
-    width: 35px;
-    height: 35px;
-    margin-right: 15px;
-    margin-left: 5px;
-    margin-top: 5px;
-    padding-bottom: 5px;
+    width: 24px;
+    cursor: pointer;
 }
 
-.insert_vote {
-    font-size: 16px;
-    padding:5px;
-    background-color: #cccccc;
+#post_comments {
+       margin:5px;
 }
 
-#comments {
-    background-color: #cccccc;
-    color: #000000;
-    font-size: 12px;
-    margin: 1px;
-    padding: 5px;
-}
-
-#comment {
+#comment_list {
     background-color: #c0c0c0;
     color: #000000;
     font-size: 12px;
     margin: 1px;
-    padding: 2px;
+    padding: 5px;
     max-height: 200px;
     overflow:auto;
 }
@@ -261,6 +219,7 @@ a.boxclose {
     border-style:solid;
     border-width:1px;
     padding: 3px;
+    margin:5px;
     width: 80%;
     height: 100px;
 }
@@ -272,27 +231,30 @@ a.boxclose {
     word-wrap: break-word;
     border-style:solid;
     border-width:1px;
+    border-radius: 3px;
+    border-color: grey;
     padding: 3px;
-    margin: 1px;
     width: 80%;
 }
 
 .comment_user {
     font-size:12px;
     color:#0000FF;
-    background-color: #CCCCCC;
     word-wrap: break-word;
-    /*    padding: 1px;
-*/
+    padding: 1px;
+
 }
 
 .comment_date {
     font-size:11px;
     color:#000000;
-    background-color: #CCCCCC;
     word-wrap: break-word;
-    /*    padding: 1px;
-*/
+    padding: 1px;
+
+}
+
+.userLogged {
+    color: #ffffff;
 }
 
 .user {

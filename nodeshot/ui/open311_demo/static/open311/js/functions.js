@@ -376,7 +376,8 @@ function showRequestDetail(requestID,node) {
             requestID: requestID,
             
         });
-        $("#request").html(compiledTmpl);
+    $("#requestContainer").html('');
+    $("#requestContainer").append(compiledTmpl);
 
 //Votes
 if (nodeSettings.participation_settings.voting_allowed && layerSettings.participation_settings.voting_allowed) {
@@ -552,6 +553,7 @@ function populateRating(nodeID, nodeDiv, nodeRatingAVG) {
     $("#star").raty({
         score: nodeRatingAVG,
         number: 10,
+        width: 250 ,
         path: $.myproject.STATIC_URL + 'open311/js/vendor/images',
         click: function (score) {
             var nodeID = window.nodeId;

@@ -7,7 +7,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
+        <title>Nodeshot Open311 Service requests</title>
         <meta name="description" content="">
 	  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" href="{% static 'open311/css/bootstrap.css' %}" />
@@ -38,8 +38,9 @@
 <input id="user" class="span2" type="text" placeholder="Email">
 <input id="password" class="span2" type="password" placeholder="Password">
 <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
-<a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-info">Facebook Sign in</a>
-<a href="{% url "socialauth_begin" "google" %}" class="btn btn-inverse">Google</a>
+<a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-success">Facebook</a>
+<a href="{% url "socialauth_begin" "google" %}" class="btn btn-success">Google</a>
+<a href="{% url "socialauth_begin" "github" %}" class="btn btn-success">Github</a>
 </script>
 
 	
@@ -112,9 +113,12 @@
    <table class="table table-condensed small"> <% for (var i = 0; i < nodes.length; i++) { %>
       <% var node = nodes[i]; %>
       <tr>
-      <td class="requestID"><%= node.service_request_id %>: </td>
-      <td> <a href="#" class="list-link" data-id='<%= node.service_request_id %>'>
-      <%= node.name %></a></td>
+      <td class="active" style="width:35%">
+	<a href="#" class="list-link" data-id='<%= node.service_request_id %>'>
+	<%= node.service_request_id %>
+      </a>
+      </td>
+      <td> <%= node.name %></td>
       </tr>
     <% } %>
   </table>
@@ -124,81 +128,107 @@
 <strong>Request ID: </strong><%= service_request_id %><br>
 <strong>Status: </strong><%= status %><br>
 <!--<a href="<%= url %>">View details</a>-->
-<button >View details</button>
+<button class="btn btn-success">View details</button>
 </script>
 
 <script id="tmplOpen311RequestBox" type="text/template">
-<div id="left" class="col-md-6" style="width:420px">
-            <div id="request"></div>
+<div class="row">
+<div id="left" class="col-md-6" >
+            <div id="requestContainer"></div>
             
         </div>
-        <div id="right" class="col-md-6" style="width:400px">
+        <div id="right" class="col-md-6" >
 	  <div id="votesContainer"></div>
             <div id="ratingContainer"></div>
             <div id="commentsContainer"></div>
         </div>
+</div>
 </script>
 
 <script id="tmplOpen311Request" type="text/template">
-
+<div id="request" class="requestSubBox" >
+<div class="intest">Request</div>
 <table class="table table-condensed">
   <tr>
-<td class="requestField">Request_id</td><td>
+<td class="active strong">Request_id</td><td>
 <%= requestID %></td>
 </tr><tr>
-<td class="requestField">Layer</td><td>
+<td class="active strong">Layer</td><td>
 <%= request.layer %></td>
 </tr><tr>
-<td class="requestField">Name</td><td>
+<td class="active strong">Name</td><td>
 <%= request.name %></td>
 </tr><tr>
-<td class="requestField">Description</td><td>
+<td class="active strong">Description</td><td>
 <%= request.description %></td>
 </tr><tr>
-<td class="requestField">Status</td><td>
+<td class="active strong">Status</td><td>
 <%= request.status %></td>
 </tr><tr>
-<td class="requestField">Status detail</td><td>
+<td class="active strong">Status detail</td><td>
 <%= request.detailed_status %></td>
 </tr><tr>
-<td class="requestField">Address</td><td>
+<td class="active strong">Address</td><td>
 <%= request.address %></td>
 </tr><tr>
-<td class="requestField">Requested on</td><td>
+<td class="active strong">Requested on</td><td>
 <%= request.requested_datetime %></td>
 </tr><tr>
-<td class="requestField">Updated on</td><td>
+<td class="active strong">Updated on</td><td>
 <%= request.updated_datetime %></td></tr>
   <tr>
-<td class="requestField">Image</td><td>
+<td class="active strong">Image</td><td>
 <img class="thumbnail" src="<%= request.image_urls[0] %>"</td></tr>
 </table>
+</div>
 </script>
 
 <script id="tmplOpen311Votes" type="text/template">
-<div id="votes">
-<div class="intest">Vote</div>           
-<p><img src="{% static 'open311/img/likes.jpg' %}" /><%= likes %> </p>
-<p><img src="{% static 'open311/img/dislike.jpg' %}" /><%= dislikes %> </p>
-<div id="insert_vote" class="insert_vote">
+<div id="votes" class="requestSubBox">
+<div class="intest">Vote</div>
+<table class="table table-condensed text-center strong">
+<tr>
+<td class="active " style="width:15%"><img id="likeButton" src="{% static 'open311/img/ok.png' %}" />
+</td>
+<td style="width:15%"><%= likes %></td>
+</tr>
+<tr><td class="active " style="width:15%"><img id="unlikeButton" src="{% static 'open311/img/ko.png' %}" />
+</td>
+<td style="width:15%"><%= dislikes %></td>
+<td></td></tr>
+</table>
+<!--<div id="insert_vote" class="insert_vote">
 <button id="likeButton">I like it</button>
 <button id="unlikeButton">I don't</button>
-</div>
+
+</div>-->
 <div id="vote_messages" class="thanks_messages"></div>
 <div id="vote_error_messages" class="error_messages"></div>
 </div>
 </script>
 
+<script id="tmplNodePopupRating" type="text/template">
+  <div id="rating" class="requestSubBox">
+    <div class="intest">Rate it</div>
+<div style="background-color:#f5f5f5;padding:5px">
+Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> votes </strong></div>
+<div id="star" style="padding:5px;"></div>
+<div id="rating_messages" class="thanks_messages"></div>
+<div id="rating_error_messages" class="error_messages"></div>
+</div>
+</script>
+
 <script id="tmplComments" type="text/template">
-<div class="intest">Add comments</div>
-<div id="comments">
+ 
+<div id="comments" class="requestSubBox" >
+ <div class="intest">Add comments</div>
 <textarea id="commentText" class="your_comment"></textarea><br>
-<button id="post_comments" >Post comment</button>
+<button id="post_comments" style="margin:5px;">Post comment</button>
 <div id="comment_messages" class="thanks_messages"></div>
 <div id="comment_error_messages" class="error_messages"></div>
-<hr>
-<p><strong>Comments (<%= comments_count%>) :</strong></p>    
-	<div id="comment" >
+<br>  
+	<div id="comment_list" >
+	  <p><strong>Comments (<%= comments_count%>) :</strong></p> 
     <% for (var i = 0; i < comments.length; i++) { %>
       <% var comment = comments[i]; %>
 		<div  class="comment_div">
@@ -218,16 +248,7 @@
 </div> 	
 </script>
 
-<script id="tmplNodePopupRating" type="text/template">
-  <div id="rating">
-    <div class="intest">Rate it</div>
-<div style="background-color:#C0C0C0">
-Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> votes </strong></div>
-<div id="star"></div>
-<div id="rating_messages" class="thanks_messages"></div>
-<div id="rating_error_messages" class="error_messages"></div>
-</div>
-</script>
+
 
 <!-- End of Templates -->
 <body>
@@ -261,8 +282,9 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
                          <input id="user" class="span2" type="text" placeholder="Email">
                          <input id="password" class="span2" type="password" placeholder="Password">
                          <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
-			 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-default">Facebook Sign in</a>
-			 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-default">Google</a>
+			 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-success">Facebook</a>
+			 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-success">Google</a>
+			 <a href="{% url "socialauth_begin" "github" %}" class="btn btn-success">Github</a>
 			  {% else %}
 			   <span class="userLogged">Hello  {{ user }}  </span>
 			    <button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>
