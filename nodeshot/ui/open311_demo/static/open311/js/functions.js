@@ -331,13 +331,11 @@ function populateOpen311Div(nodeSlug, create) {
     var status = node.status;
     var nodeLayer = node.layer;
     var requestID = nodeSlug;
-    var url = window.__BASEURL__ + 'open311/request/' + nodeSlug
 
     var tmplMarkup = $('#tmplOpen311Popup').html();
     var compiledTmpl = _.template(tmplMarkup, {
         service_request_id: requestID,
         status: status,
-        url: url,
     });
     $(nodeDiv).append(compiledTmpl);
     $(nodeDiv).on('click',function(){showRequestDetail(requestID,node)});
