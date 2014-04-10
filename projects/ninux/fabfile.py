@@ -1,19 +1,24 @@
 from fabric.api import *
-#from fabric.api import local
 
-env.hosts = 'root@nodeshot-deploy'
-env.password = 'stefano'
-root_dir = '/var/www/'
-deploy_dir = '%snodeshot/' % root_dir
-project_dir = '%sprojects/ninux/' % deploy_dir
+# Put host(s) configuratione here or use -h switch on command line
+# env.hosts = ''
+# env.password = ''
+
+
 git_repo = 'https://github.com/ninuxorg/nodeshot.git'
 
-#
-#def local():
-#    "Use the local virtual server"
-#    hosts = ['localhost']
+global root_dir
+global deploy_dir
+global project_dir
+
 
 def install():
+    global root_dir
+    global deploy_dir
+    global project_dir
+    root_dir = prompt('Set install directory: ', default='/var/www/')
+    deploy_dir = '%snodeshot/' % root_dir
+    project_dir = '%sprojects/ninux' % deploy_dir
     clone()
     create_virtual_env()
     install_requirements()
@@ -87,12 +92,13 @@ def nginx_config():
     with cd('/etc/nginx/sites-available'):
         run ('sed \'s/nodeshot.yourdomain.com/%s/g\' nodeshot.yourdomain.com > %s' % (server_name,server_name))
         run ('ln -s /etc/nginx/sites-available/%s /etc/nginx/sites-enabled/%s' % (server_name,server_name))
-        #run('serv')
         
 def uwsgi_config():
     run ('pip install uwsgi')
     # Next line to be purged and file should be in repository
     run ('cp /var/www/nodeshot_deploy/uwsgi.ini %s' % project_dir)
+    with cd (project_dir):
+        run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' uwsgi.ini ' % project_dir)
     
 def supervisor_config():   
     run('apt-get -y install supervisor')
@@ -100,6 +106,10 @@ def supervisor_config():
     run ('cp /var/www/nodeshot_deploy/uwsgi.conf /etc/supervisor/conf.d/uwsgi.conf')
     run ('cp /var/www/nodeshot_deploy/celery.conf /etc/supervisor/conf.d/celery.conf')
     run ('cp /var/www/nodeshot_deploy/celery-beat.conf /etc/supervisor/conf.d/celery-beat.conf')
+    with cd ('/etc/supervisor/conf.d/'):
+        run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' uwsgi.conf ' % project_dir)
+        run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' celery.conf ' % project_dir)
+        run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' celery-beat.conf ' % project_dir)
     run('supervisorctl update')
     
 def redis_install():
