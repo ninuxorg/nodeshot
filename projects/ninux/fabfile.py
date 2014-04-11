@@ -1,25 +1,39 @@
 from fabric.api import *
 
-# Put host(s) configuratione here or use -h switch on command line
+# Put host(s) configuration here or use -h switch on command line
 # env.hosts = ''
 # env.password = ''
 
 
 git_repo = 'https://github.com/ninuxorg/nodeshot.git'
 
-global root_dir
-global deploy_dir
-global project_dir
+#global root_dir
+#global deploy_dir
+#global project_dir
 
-
-def install():
+def initialize():
+    install_dirs = ('root_dir','deploy_dir','project_dir')
+    for install_dir in install_dirs:
+        if install_dir not in globals():
+            initialize_dirs()
+            
+def initialize_dirs():        
     global root_dir
     global deploy_dir
     global project_dir
-    root_dir = prompt('Set install directory: ', default='/var/www/')
+    root_dir = prompt('Set install directory ( including trailing slash ): ', default='/var/www/')
     deploy_dir = '%snodeshot/' % root_dir
     project_dir = '%sprojects/ninux' % deploy_dir
+
+def uninstall():
+    initialize()
+    with cd(project_dir):
+        run('cat dependencies.txt | xargs apt-get -y purge')
+    
+def install():
+    initialize()
     clone()
+    install_dependencies()
     create_virtual_env()
     install_requirements()
     create_db()
@@ -32,21 +46,30 @@ def install():
     
 
 def update():
+    initialize()
     pull()
     install_requirements()
-    sync_data()
-
+    sync_data()  
       
-def clone():    
+def clone():
+    initialize()
     with settings(warn_only='true'):
         run('mkdir -p  %s' % root_dir)
         with cd (root_dir):
             run('git clone %s nodeshot' % git_repo)
-        pull()
-        create_virtual_env()
-        install_requirements()
+        #pull()
+        #create_virtual_env()
+        #install_requirements()
+        
+def install_dependencies():
+    initialize()
+    # Next line to be purged and file should be in repository
+    run ('cp /var/www/nodeshot_deploy/dependencies.txt %s' % project_dir )
+    with cd(project_dir):
+        run('cat dependencies.txt | xargs apt-get -y install')
 
 def pull():
+    initialize()
     with cd (deploy_dir):
         run('pwd')
         run('git pull')
@@ -56,6 +79,7 @@ def create_virtual_env():
         run('virtualenv python')
 
 def install_requirements():
+    initialize()
     virtual_env = 'source python/bin/activate'
     pip_command = 'python/bin/pip install -r %srequirements.txt' % deploy_dir
     distribute_command = 'python/bin/pip install -U distribute'
@@ -72,12 +96,14 @@ def create_db():
     run ('su - postgres -c "psql -c \'GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to %s \'"' % db_user)
     
 def sync_data():
+    initialize()
     virtual_env = 'source python/bin/activate'
     sync_command = 'python manage.py syncdb && python manage.py migrate && python manage.py collectstatic'
     with cd (project_dir):
         run( virtual_env + ' &&  ' + sync_command)
     
 def nginx_config():
+    initialize()
     server_name = prompt('Server name: ')
     nginx_dir = '/etc/nginx/ssl'
     run ('apt-get -y install nginx-full nginx-common openssl zlib-bin')
@@ -91,18 +117,21 @@ def nginx_config():
 
     with cd('/etc/nginx/sites-available'):
         run ('sed \'s/nodeshot.yourdomain.com/%s/g\' nodeshot.yourdomain.com > %s' % (server_name,server_name))
+        run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' %s ' % (project_dir,server_name))
         run ('ln -s /etc/nginx/sites-available/%s /etc/nginx/sites-enabled/%s' % (server_name,server_name))
         
 def uwsgi_config():
+    initialize()
     run ('pip install uwsgi')
     # Next line to be purged and file should be in repository
     run ('cp /var/www/nodeshot_deploy/uwsgi.ini %s' % project_dir)
     with cd (project_dir):
         run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' uwsgi.ini ' % project_dir)
     
-def supervisor_config():   
+def supervisor_config():
+    initialize()
     run('apt-get -y install supervisor')
-    # Next line to be purged and file should be in repository
+    # Next lines to be purged and file should be in repository
     run ('cp /var/www/nodeshot_deploy/uwsgi.conf /etc/supervisor/conf.d/uwsgi.conf')
     run ('cp /var/www/nodeshot_deploy/celery.conf /etc/supervisor/conf.d/celery.conf')
     run ('cp /var/www/nodeshot_deploy/celery-beat.conf /etc/supervisor/conf.d/celery-beat.conf')
@@ -113,6 +142,7 @@ def supervisor_config():
     run('supervisorctl update')
     
 def redis_install():
+    initialize()
     virtual_env = 'source python/bin/activate'
     pip_command = 'python/bin/pip install -U celery[redis]'
     run('add-apt-repository ppa:chris-lea/redis-server')
@@ -120,6 +150,14 @@ def redis_install():
     run('apt-get -y install redis-server')
     with cd (project_dir):
         run( virtual_env + ' &&  ' + pip_command)
+        
+def start_server():
+    initialize()
+    with cd (project_dir):
+        run('touch log/ninux.error.log')
+        run('chmod 666 log/ninux.error.log')
+        run('service nginx restart && supervisorctl restart all')
+        
 
     
 

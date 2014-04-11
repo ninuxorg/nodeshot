@@ -19,3 +19,7 @@ proj
 libpq-dev
 libgdal1-dev
 postgresql-contrib
+python-setuptools
+python-virtualenv
+python-dev
+git-core
