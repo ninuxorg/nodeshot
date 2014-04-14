@@ -1,10 +1,15 @@
 from fabric.api import *
+from django.utils.crypto import get_random_string
+
+
 
 # Put host(s) configuration here or use -h switch on command line
 # env.hosts = ''
 # env.password = ''
 
-
+chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+secret_key = get_random_string(50, chars)
+print secret_key
 git_repo = 'https://github.com/ninuxorg/nodeshot.git'
 
 #global root_dir
@@ -16,6 +21,15 @@ def initialize():
     for install_dir in install_dirs:
         if install_dir not in globals():
             initialize_dirs()
+
+def initialize_db():
+    db_params = ('db_user','db_pass')
+    for db_param in db_params:
+        if db_param not in globals():
+            global db_user
+            global db_pass
+            db_user = prompt('Set database user: ', default='nodeshot')
+            db_pass = prompt('Set database user password: ', )
             
 def initialize_dirs():        
     global root_dir
@@ -56,7 +70,9 @@ def clone():
     with settings(warn_only='true'):
         run('mkdir -p  %s' % root_dir)
         with cd (root_dir):
-            run('git clone %s nodeshot' % git_repo)
+            run('git clone %s nodeshot' % git_repo  )
+        with cd (deploy_dir):
+            run ('git checkout deploy_test')
         #pull()
         #create_virtual_env()
         #install_requirements()
@@ -64,7 +80,7 @@ def clone():
 def install_dependencies():
     initialize()
     # Next line to be purged and file should be in repository
-    run ('cp /var/www/nodeshot_deploy/dependencies.txt %s' % project_dir )
+    #run ('cp /var/www/nodeshot_deploy/dependencies.txt %s' % project_dir )
     with cd(project_dir):
         run('cat dependencies.txt | xargs apt-get -y install')
 
@@ -87,12 +103,13 @@ def install_requirements():
         run( virtual_env + ' &&  ' + pip_command  + ' &&  ' + distribute_command)
  
 def create_db():
-    db_user = prompt('Set database user: ', default='nodeshot')
+    initialize_db()
     run ('su - postgres -c "createdb nodeshot"')
     run ('su - postgres -c "psql nodeshot -c \'CREATE EXTENSION hstore;\'"')
     run ('su - postgres -c "psql nodeshot -c \'CREATE EXTENSION postgis;\'"')
     run ('su - postgres -c "psql nodeshot -c \'CREATE EXTENSION postgis_topology;\'"')
-    run ('su - postgres -c "createuser %s -P -R -S -D"'  % db_user)
+    run ('su - postgres -c "createuser %s  -R -S -D "'  % db_user)
+    run ('sudo -u postgres psql -U postgres -d postgres -c \"alter user %s with password \'%s\';\"' % (db_user,db_pass))
     run ('su - postgres -c "psql -c \'GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to %s \'"' % db_user)
     
 def sync_data():
@@ -112,8 +129,8 @@ def nginx_config():
         run ('openssl req -new -x509 -nodes -out server.crt -keyout server.key')
     run('cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/')
     run ('mkdir -p /var/www/nodeshot/public_html')
-    # Next line to be purged and file should be in repository
-    run ('cp /var/www/nodeshot_deploy/nodeshot.yourdomain.com /etc/nginx/sites-available/nodeshot.yourdomain.com')
+    
+    run ('cp %s/nodeshot.yourdomain.com /etc/nginx/sites-available/nodeshot.yourdomain.com' % project_dir)
 
     with cd('/etc/nginx/sites-available'):
         run ('sed \'s/nodeshot.yourdomain.com/%s/g\' nodeshot.yourdomain.com > %s' % (server_name,server_name))
@@ -124,7 +141,7 @@ def uwsgi_config():
     initialize()
     run ('pip install uwsgi')
     # Next line to be purged and file should be in repository
-    run ('cp /var/www/nodeshot_deploy/uwsgi.ini %s' % project_dir)
+    #run ('cp /var/www/nodeshot_deploy/uwsgi.ini %s' % project_dir)
     with cd (project_dir):
         run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' uwsgi.ini ' % project_dir)
     
@@ -132,9 +149,9 @@ def supervisor_config():
     initialize()
     run('apt-get -y install supervisor')
     # Next lines to be purged and file should be in repository
-    run ('cp /var/www/nodeshot_deploy/uwsgi.conf /etc/supervisor/conf.d/uwsgi.conf')
-    run ('cp /var/www/nodeshot_deploy/celery.conf /etc/supervisor/conf.d/celery.conf')
-    run ('cp /var/www/nodeshot_deploy/celery-beat.conf /etc/supervisor/conf.d/celery-beat.conf')
+    #run ('cp /var/www/nodeshot_deploy/uwsgi.conf /etc/supervisor/conf.d/uwsgi.conf')
+    #run ('cp /var/www/nodeshot_deploy/celery.conf /etc/supervisor/conf.d/celery.conf')
+    #run ('cp /var/www/nodeshot_deploy/celery-beat.conf /etc/supervisor/conf.d/celery-beat.conf')
     with cd ('/etc/supervisor/conf.d/'):
         run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' uwsgi.conf ' % project_dir)
         run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' celery.conf ' % project_dir)
