@@ -5,4 +5,6 @@ cd postgis-2.0.3 &&
 make &&
 make install &&
 ldconfig &&
-make comments-install 
+make comments-install &&
+cd .. &&
+rm -rf postgis-2.0.3.tar.gz postgis-2.0.3

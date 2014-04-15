@@ -1,5 +1,7 @@
 from fabric.api import *
-from django.utils.crypto import get_random_string
+import random
+chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+secret_key = ''.join(random.SystemRandom().choice(chars) for _ in range(50))
 
 
 
@@ -7,14 +9,8 @@ from django.utils.crypto import get_random_string
 # env.hosts = ''
 # env.password = ''
 
-chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-secret_key = get_random_string(50, chars)
-print secret_key
 git_repo = 'https://github.com/ninuxorg/nodeshot.git'
 
-#global root_dir
-#global deploy_dir
-#global project_dir
 
 def initialize():
     install_dirs = ('root_dir','deploy_dir','project_dir')
@@ -46,6 +42,7 @@ def uninstall():
     
 def install():
     initialize()
+    initialize_db()
     clone()
     install_dependencies()
     create_virtual_env()
@@ -83,6 +80,8 @@ def install_dependencies():
     #run ('cp /var/www/nodeshot_deploy/dependencies.txt %s' % project_dir )
     with cd(project_dir):
         run('cat dependencies.txt | xargs apt-get -y install')
+    with cd('/tmp'):
+        run('cp %s/install* . && ./install_GEOS.sh && ./install_Postgis.sh' % project_dir )
 
 def pull():
     initialize()

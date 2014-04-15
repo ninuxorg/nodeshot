@@ -4,4 +4,5 @@ cd geos-3.3.8 &&
 ./configure &&
 make &&
 make install &&
-cd ..
+cd .. &&
+rm -rf geos-3.3.8.tar.bz2 geos-3.3.8.tar.bz2
