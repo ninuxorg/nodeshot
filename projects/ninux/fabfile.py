@@ -1,5 +1,7 @@
 from fabric.api import *
+from fabric.contrib.files import append
 import random
+import json
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 secret_key = ''.join(random.SystemRandom().choice(chars) for _ in range(50))
 
@@ -17,7 +19,15 @@ def initialize():
     for install_dir in install_dirs:
         if install_dir not in globals():
             initialize_dirs()
+    try:
+        server_name
+    except:
+        initialize_server()
 
+def initialize_server():
+    global server_name
+    server_name = prompt('Server name: ')
+       
 def initialize_db():
     db_params = ('db_user','db_pass')
     for db_param in db_params:
@@ -120,7 +130,6 @@ def sync_data():
     
 def nginx_config():
     initialize()
-    server_name = prompt('Server name: ')
     nginx_dir = '/etc/nginx/ssl'
     run ('apt-get -y install nginx-full nginx-common openssl zlib-bin')
     run ('mkdir -p %s' % nginx_dir)
@@ -166,6 +175,39 @@ def redis_install():
     run('apt-get -y install redis-server')
     with cd (project_dir):
         run( virtual_env + ' &&  ' + pip_command)
+
+def file_send(localpath,remotepath):
+    put(localpath,remotepath,use_sudo=True)
+
+def create_settings():
+    initialize()
+    filename = 'local_settings.py'
+    #local_settings_file = open("local_settings.py", "w")
+    local_settings = "DEBUG = False \n" 
+    local_settings += "APP_PATH = '%s' \n" % deploy_dir
+    local_settings += "SECRET_KEY = '%s' \n" % secret_key
+    local_settings += "DOMAIN = '%s' \n" % server_name
+    try :
+        db_user
+    except:
+        initialize_db()
+        
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'nodeshot',                      # Or path to database file if using sqlite3.
+        'USER': db_user,                      # Not used with sqlite3.
+        'PASSWORD': db_pass,                  # Not used with sqlite3.
+        'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        }
+    }
+
+    db_settings = json.dumps(DATABASES)
+    with cd ('%s/ninux' % project_dir):
+        append('local_settings.py', local_settings)
+        append('local_settings.py', 'DATABASES = %s' % db_settings)
+        
         
 def start_server():
     initialize()
