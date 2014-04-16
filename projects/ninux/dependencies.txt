@@ -23,3 +23,8 @@ python-setuptools
 python-virtualenv
 python-dev
 git-core
+supervisor
+nginx-full
+nginx-common
+openssl
+zlib-bin
