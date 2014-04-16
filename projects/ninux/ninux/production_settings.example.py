@@ -198,7 +198,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'olwidget',  # geodjango better widgets
     'south',
-    'debug_toolbar',
+    # 'debug_toolbar',
     'smuggler',
     'reversion',
     
@@ -210,7 +210,7 @@ INSTALLED_APPS = [
     'social_auth',
 
     # other utilities
-    'django_extensions',
+    # 'django_extensions',
 
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
