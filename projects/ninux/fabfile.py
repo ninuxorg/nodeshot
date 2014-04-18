@@ -6,8 +6,6 @@ import json
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 secret_key = ''.join(random.SystemRandom().choice(chars) for _ in range(50))
 
-
-
 # Put host(s) configuration here or use -h switch on command line
 # env.hosts = ''
 # env.password = ''
@@ -24,7 +22,7 @@ def initialize():
 def initialize_server():
     if 'server_name' not in globals():
         global server_name
-        server_name = prompt('Server name: ')
+        server_name = prompt('Server name: ', default = 'nodeshot-deploy')
        
 def initialize_db():
     db_params = ('db_user','db_pass')
@@ -33,7 +31,7 @@ def initialize_db():
             global db_user
             global db_pass
             db_user = prompt('Set database user: ', default='nodeshot')
-            db_pass = prompt('Set database user password: ', )
+            db_pass = prompt('Set database user password: ' )
             
 def initialize_dirs():        
     global root_dir
@@ -90,6 +88,7 @@ def install_dependencies():
     initialize()
     print(green("Installing required packages. This may take a while..."))
     with hide( 'stdout', 'stderr'):
+        run('apt-get update')
         with cd(project_dir):
             run('cat dependencies.txt | xargs apt-get -y install')
         with cd('/tmp'):
@@ -188,29 +187,31 @@ def create_settings():
     initialize_db()
     initialize_server()
     print(green("Creating Nodeshot config..."))
-    local_settings = "DEBUG = False \n" 
-    local_settings += "APP_PATH = '%s' \n" % deploy_dir
-    local_settings += "SECRET_KEY = '%s' \n" % secret_key
-    local_settings += "DOMAIN = '%s' \n" % server_name
-    local_settings += "ALLOWED_HOSTS = ['*']\n"
-        
+    settings= {}
+    settings['debug'] = "DEBUG = False " 
+    settings['app_path'] = "APP_PATH = '%s' " % deploy_dir
+    settings['secret'] = "SECRET_KEY = '%s' \n" % secret_key
+    settings['domain'] = "DOMAIN = '%s' \n" % server_name
+    settings['allowed_hosts'] = "ALLOWED_HOSTS = ['*']\n"
+    
     DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'nodeshot',                      # Or path to database file if using sqlite3.
-        'USER': db_user,                      # Not used with sqlite3.
-        'PASSWORD': db_pass,                  # Not used with sqlite3.
-        'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', 
+        'NAME': 'nodeshot',                      
+        'USER': db_user,                      
+        'PASSWORD': db_pass,                 
+        'HOST': '127.0.0.1',                      
+        'PORT': '',  
         }
     }
 
     db_settings = json.dumps(DATABASES)
-    with hide( 'stdout', 'stderr'):
-        with cd ('%s/ninux' % project_dir):
-            append('local_settings.py', local_settings)
-            append('local_settings.py', 'DATABASES = %s' % db_settings)
-            run('cp production_settings.example.py settings.py')
+    with cd ('%s/ninux' % project_dir):
+        run('rm -f local_settings.py')
+        for setting,value in settings.iteritems():             
+            append('local_settings.py', value)
+        append('local_settings.py', 'DATABASES = %s' % db_settings)
+        run('cp production_settings.example.py settings.py')
         
         
 def start_server():
