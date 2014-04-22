@@ -8,14 +8,16 @@
         
         <h2>
             <%= name %>
+			<% if(relationships){ %>
             <span class="vote">
-                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-thumbs-up">10</a>
-                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-thumbs-down">5</a>
+				<a href="javascript:createModal({message:'not implemented yet'})" class="icon-thumbs-up"><%= relationships.counts.likes %></a>
+				<a href="javascript:createModal({message:'not implemented yet'})" class="icon-thumbs-down"><%= relationships.counts.dislikes %></a>
             </span>
+			<% } %>
         </h2>
         
         <p class="actions" style="clear:both">
-            <a href="javascript:createModal({message:'not implemented yet'})"><img src="images/nyancat.jpg" alt=""><%= user %></a>
+            <a href="javascript:createModal({message:'not implemented yet'})"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
             <a href="javascript:createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
             <a href="javascript:createModal({message:'not implemented yet'})" class="icon-link">{% trans 'permalink' %}</a>
             <a href="javascript:createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>

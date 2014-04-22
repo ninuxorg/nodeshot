@@ -4,6 +4,10 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     id: 'map-container',
     className: 'short-map',
     template: '#node-details-template',
+    
+    modelEvents: {
+        'change': 'render',
+    },
 
     onDomRefresh: function () {
         var slug = this.model.get('slug'),
@@ -32,7 +36,6 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         });
         setMapDimensions();
         this.setMinHeight();
-        
     },
 
     setMinHeight: function () {
@@ -48,6 +51,9 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     initialize: function () {
         // bind to namespaced events
         $(window).on("resize.node-details", _.bind(this.resize, this));
+        
+        // fetch details from DB
+        this.model.fetch();
     },
 
     onClose: function () {
