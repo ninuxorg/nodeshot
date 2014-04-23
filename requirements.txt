@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.6.2
+Django==1.6.3
 
 # python libraries
 Pillow
@@ -17,8 +17,8 @@ wsgiref
 requests
 
 # better admin
-django-grappelli==2.5.2
-django-filebrowser==3.5.4
+django-grappelli==2.5.3
+django-filebrowser==3.5.6
 
 # geodjango improved widgets
 django-olwidget
@@ -39,7 +39,7 @@ django-social-auth
 django-reversion==1.8
 
 # asynchronous tasks
-celery==3.1.10
+celery==3.1.11
 django-celery-email
 
 # Postgres HSTORE support
