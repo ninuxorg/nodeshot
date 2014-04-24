@@ -6,7 +6,7 @@ server {
     index index.html index.htm;
 
     # error log
-    error_log /var/www/nodeshot/projects/ninux/log/nginx.error.log error;
+    error_log PROJECT_PATH/log/nginx.error.log error;
 
     # Make site accessible from hostanme
     # change this according to your domain/hostanme
@@ -32,11 +32,11 @@ server {
     }
 
     location /static/ {
-        alias /var/www/nodeshot/projects/ninux/ninux/static/;
+        alias PROJECT_PATH/PROJECT_NAME/static/;
     }
 
     location /media/ {
-        alias /var/www/nodeshot/projects/ninux/ninux/media/;
+        alias PROJECT_PATH/PROJECT_NAME/media/;
     }
 
     #error_page 404 /404.html;

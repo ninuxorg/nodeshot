@@ -39,10 +39,11 @@ def initialize_dirs():
     global root_dir
     global deploy_dir
     global project_dir
+    global project_name
     root_dir = prompt('Set install directory ( including trailing slash ): ', default='/var/www/')
     project_name = prompt('Set project name: ', default='myproject')
     deploy_dir = '%snodeshot/' % root_dir
-    project_dir = '%sprojects/ninux' % deploy_dir
+    project_dir = '%sprojects/%s' % (deploy_dir,project_name)
 
 def uninstall():
     initialize()
@@ -58,12 +59,13 @@ def install():
     install_dependencies()
     create_virtual_env()
     install_requirements()
+    create_project()
     create_db()
+    create_settings()
+    sync_data() # Fails if settings are not correctly set
     nginx_config()
     supervisor_config()
     redis_install()
-    create_settings()
-    sync_data() # Fails if settings are not correctly set
     start_server()
 
 def update():
@@ -91,10 +93,10 @@ def install_dependencies():
     initialize()
     print(green("Installing required packages. This may take a while..."))
     with hide( 'stdout', 'stderr'):
-        with cd('%sinstall' % deploy_dir):
+        with cd('%sINSTALL' % deploy_dir):
             run('cat dependencies.txt | xargs apt-get -y install')
         with cd('/tmp'):
-            run('cp %s/install* . && ./install_GEOS.sh && ./install_Postgis.sh' % project_dir )
+            run('cp %sINSTALL/install* . && ./install_GEOS.sh && ./install_Postgis.sh' % deploy_dir )
 
 def pull():
     initialize()
@@ -103,8 +105,10 @@ def pull():
         run('git pull')
 
 def create_virtual_env():
+    initialize()
     print(green("Creating virtual env..."))
     with hide( 'stdout', 'stderr'):
+        run ('mkdir -p %s' % project_dir)
         with cd (project_dir):
             run('virtualenv python')
 
@@ -117,6 +121,16 @@ def install_requirements():
         distribute_command = 'python/bin/pip install -U distribute'
         with cd (project_dir):
             run( virtual_env + ' &&  ' + pip_command  + ' &&  ' + distribute_command)
+
+def create_project():
+    initialize()
+    print(green("Creating project..."))
+    virtual_env = 'source python/bin/activate'
+    template_name = "%sINSTALL/project_template" % deploy_dir
+    create_project_command = "django-admin.py startproject %s --template=%s ." % (project_name,template_name)
+    with hide( 'stdout', 'stderr'):
+        with cd (project_dir):
+            run( virtual_env + ' &&  ' + create_project_command  )
  
 def create_db():
     initialize_db()
@@ -129,17 +143,48 @@ def create_db():
         run ('su - postgres -c "createuser %s  -R -S -D "'  % db_user)
         run ('sudo -u postgres psql -U postgres -d postgres -c \"alter user %s with password \'%s\';\"' % (db_user,db_pass))
         run ('su - postgres -c "psql -c \'GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to %s \'"' % db_user)
+
+def create_settings():
+    initialize()
+    initialize_db()
+    initialize_server()
+    print(green("Creating Nodeshot config..."))
+    settings= {}
+    settings['app_path'] = "APP_PATH = '%s' " % deploy_dir
+    settings['domain'] = "DOMAIN = '%s' " % server_name
+    
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', 
+        'NAME': 'nodeshot',                      
+        'USER': db_user,                      
+        'PASSWORD': db_pass,                 
+        'HOST': '127.0.0.1',                      
+        'PORT': '',  
+        }
+    }
+
+    db_settings = json.dumps(DATABASES)
+    with cd ('%s/%s' % (project_dir,project_name)):
+        run('rm -f local_settings.py')
+        for setting,value in settings.iteritems():             
+            append('local_settings.py', value)
+        append('local_settings.py', 'DATABASES = %s' % db_settings)
         
 def sync_data():
     initialize()
     print(green("Initializing Nodeshot..."))
     virtual_env = 'source python/bin/activate'
-    sync_command = 'python manage.py syncdb && python manage.py migrate && python manage.py collectstatic'
+    sync_command = 'python manage.py syncdb && python manage.py migrate && python manage.py collectstatic --noinput'
     with cd (project_dir):
+        run('mkdir log'  )
+        run('touch log/%s.error.log' % project_name )
+        run('chmod 666 log/%s.error.log' % project_name)
         run( virtual_env + ' &&  ' + sync_command)
     
 def nginx_config():
     initialize()
+    initialize_server()
     print(green("Configuring Nginx..."))
     nginx_dir = '/etc/nginx/ssl'
     run ('mkdir -p %s' % nginx_dir)
@@ -149,11 +194,12 @@ def nginx_config():
     run('cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/')
     #run ('mkdir -p /var/www/nodeshot/public_html')
     
-    run ('cp %s/nodeshot.yourdomain.com /etc/nginx/sites-available/nodeshot.yourdomain.com' % project_dir)
+    run ('cp %sINSTALL/nodeshot.yourdomain.com /etc/nginx/sites-available/nodeshot.yourdomain.com' % deploy_dir)
 
     with cd('/etc/nginx/sites-available'):
         run ('sed \'s/nodeshot.yourdomain.com/%s/g\' nodeshot.yourdomain.com > %s' % (server_name,server_name))
-        run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' %s ' % (project_dir,server_name))
+        run ('sed -i \'s#PROJECT_PATH#%s#g\' %s ' % (project_dir,server_name))
+        run ('sed -i \'s#PROJECT_NAME#%s#g\' %s ' % (project_name,server_name))
         run ('ln -s /etc/nginx/sites-available/%s /etc/nginx/sites-enabled/%s' % (server_name,server_name))
     
 def supervisor_config():
@@ -162,14 +208,18 @@ def supervisor_config():
     with hide( 'stdout', 'stderr'):
         run ('pip install uwsgi')
         with cd (project_dir):
-            run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' uwsgi.ini ' % project_dir)
-        run ('cp %s/uwsgi.conf /etc/supervisor/conf.d/uwsgi.conf' % project_dir)
-        run ('cp %s/celery.conf /etc/supervisor/conf.d/celery.conf' % project_dir)
-        run ('cp %s/celery-beat.conf /etc/supervisor/conf.d/celery-beat.conf' % project_dir)
+            run ('cp %sINSTALL/uwsgi.ini .' % deploy_dir)
+            run ('sed -i \'s#PROJECT_PATH#%s#g\' uwsgi.ini ' % project_dir)
+            run ('sed -i \'s#PROJECT_NAME#%s#g\' uwsgi.ini ' % project_name)
+        run ('cp %sINSTALL/uwsgi.conf /etc/supervisor/conf.d/uwsgi.conf' % deploy_dir)
+        run ('cp %sINSTALL/celery.conf /etc/supervisor/conf.d/celery.conf' % deploy_dir)
+        run ('cp %sINSTALL/celery-beat.conf /etc/supervisor/conf.d/celery-beat.conf' % deploy_dir)
         with cd ('/etc/supervisor/conf.d/'):
-            run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' uwsgi.conf ' % project_dir)
-            run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' celery.conf ' % project_dir)
-            run ('sed -i \'s#/var/www/nodeshot/projects/ninux#%s#g\' celery-beat.conf ' % project_dir)
+            run ('sed -i \'s#PROJECT_PATH#%s#g\' uwsgi.conf ' % project_dir)
+            run ('sed -i \'s#PROJECT_PATH#%s#g\' celery.conf ' % project_dir)
+            run ('sed -i \'s#PROJECT_NAME#%s#g\' celery.conf ' % project_name)
+            run ('sed -i \'s#PROJECT_PATH#%s#g\' celery-beat.conf ' % project_dir)
+            run ('sed -i \'s#PROJECT_NAME#%s#g\' celery-beat.conf ' % project_name)
         run('supervisorctl update')
     
 def redis_install():
@@ -183,43 +233,11 @@ def redis_install():
         run('apt-get -y install redis-server')
         with cd (project_dir):
             run( virtual_env + ' &&  ' + pip_command)
-
-def create_settings():
-    initialize()
-    initialize_db()
-    initialize_server()
-    print(green("Creating Nodeshot config..."))
-    local_settings = "DEBUG = False \n" 
-    local_settings += "APP_PATH = '%s' \n" % deploy_dir
-    local_settings += "SECRET_KEY = '%s' \n" % secret_key
-    local_settings += "DOMAIN = '%s' \n" % server_name
-    local_settings += "ALLOWED_HOSTS = ['*']\n"
-        
-    DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'nodeshot',                      # Or path to database file if using sqlite3.
-        'USER': db_user,                      # Not used with sqlite3.
-        'PASSWORD': db_pass,                  # Not used with sqlite3.
-        'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-        }
-    }
-
-    db_settings = json.dumps(DATABASES)
-    with hide( 'stdout', 'stderr'):
-        with cd ('%s/ninux' % project_dir):
-            append('local_settings.py', local_settings)
-            append('local_settings.py', 'DATABASES = %s' % db_settings)
-            run('cp production_settings.example.py settings.py')
-        
         
 def start_server():
     initialize()
     print(green("Starting Nodeshot server..."))
     with cd (project_dir):
-        run('touch log/ninux.error.log')
-        run('chmod 666 log/ninux.error.log')
         run('service nginx restart && supervisorctl restart all')
     print(green("Nodeshot server started"))   
 
