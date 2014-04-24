@@ -64,9 +64,11 @@ class TopologyParser(object):
             self.topology_url = topology_url
             print ("Retrieving topology from %s ..." % topology_url)
             try:
-                self.topologylines = urllib2.urlopen(self.topology_url, data=None, timeout=settings.TOPOLOGY_URL_TIMEOUT).readlines()
+                req = urllib2.Request(self.topology_url, data=None, headers={'User-agent' : 'Wget/1.12'})
+                self.topologylines = urllib2.urlopen(req, timeout=settings.TOPOLOGY_URL_TIMEOUT).readlines()
             except Exception, e:
                 print "Got exception: ", e
+                self.topologylines = []
             print ("Done...")
             self.linklist = list()
             self.aliasmanager = AliasManager()
