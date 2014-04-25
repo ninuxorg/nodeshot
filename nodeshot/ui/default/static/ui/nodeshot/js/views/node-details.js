@@ -10,7 +10,9 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     },
     
     events: {
-        'click .icon-link': 'permalink'
+        'click .icon-link': 'permalink',
+        'click .icon-thumbs-up': 'like',
+        'click .icon-thumbs-down': 'dislike'
     },
 
     onDomRefresh: function () {
@@ -89,5 +91,47 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         e.preventDefault();
         var text = $(e.target).attr('data-text');
         window.prompt(text, window.location.href)
-    }
+    },
+    
+    like: function(e){
+        e.preventDefault();
+        
+        var relationships = this.model.get('relationships'),
+            backup = relationships.counts.likes,
+            self = this;
+        // increment
+        relationships.counts.likes++;
+        this.model.set('relationships', relationships);
+        $(e.target).text(relationships.counts.likes);
+        
+        $.post(relationships.votes, { vote: 1 })
+        // restore backup in case of error
+        .error(function(http){
+            $(e.target).text(backup);
+            relationships.counts.likes = backup;
+            self.model.set('relationships', relationships);
+            createModal({ message: 'error' })
+        });
+    },
+    
+    dislike: function(e){
+        e.preventDefault();
+        
+        var relationships = this.model.get('relationships'),
+            backup = relationships.counts.dislikes,
+            self = this;
+        // increment
+        relationships.counts.dislikes++;
+        this.model.set('relationships', relationships);
+        $(e.target).text(relationships.counts.dislikes);
+        
+        $.post(relationships.votes, { vote: -1 })
+        // restore backup in case of error
+        .error(function(http){
+            $(e.target).text(backup);
+            relationships.counts.dislikes = backup;
+            self.model.set('relationships', relationships);
+            createModal({ message: 'error' })
+        });
+    },
 });

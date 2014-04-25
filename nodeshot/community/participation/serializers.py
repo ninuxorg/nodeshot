@@ -178,3 +178,9 @@ ExtensibleNodeSerializer.add_relationship(
     serializer=ParticipationSerializer,
     queryset='obj.noderatingcount'
 )
+
+ExtensibleNodeSerializer.add_relationship(
+    'votes',
+    view_name='api_node_votes',
+    lookup_field='slug'
+)

@@ -10,8 +10,8 @@
             <%= name %>
             <% if(relationships){ %>
             <span class="vote">
-                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-thumbs-up"><%= relationships.counts.likes %></a>
-                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-thumbs-down"><%= relationships.counts.dislikes %></a>
+                <a href="#like" class="icon-thumbs-up"><%= relationships.counts.likes %></a>
+                <a href="#dislike" class="icon-thumbs-down"><%= relationships.counts.dislikes %></a>
             </span>
             <% } %>
         </h2>

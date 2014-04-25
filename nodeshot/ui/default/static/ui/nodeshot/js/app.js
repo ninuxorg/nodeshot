@@ -124,7 +124,7 @@ $(document).ready(function ($) {
             var json = http.responseJSON,
                 errorMessage = 'Invalid username or password',
                 zIndex = $('#signin-modal').css('z-index'); // original z-index
-            $('#signin-modal').css('z-index', 99); // temporarily change
+            $('#signin-modal').css('z-index', 1002); // temporarily change
             
             // determine correct error message to show
             errorMessage = json.non_field_errors || json.detail ||  errorMessage;
