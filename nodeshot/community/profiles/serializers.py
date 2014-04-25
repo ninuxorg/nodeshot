@@ -59,7 +59,7 @@ class LoginSerializer(serializers.Serializer):
             if user.is_active:
                 self.instance = user
             else:
-                raise forms.ValidationError(_("This account is currently inactive."))
+                raise serializers.ValidationError(_("This account is currently inactive."))
         else:
             error = _("Ivalid login credentials.")
             raise serializers.ValidationError(error)

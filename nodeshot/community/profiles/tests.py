@@ -349,6 +349,25 @@ class ProfilesTest(TestCase):
         response = self.client.post(url, { "username": "registered@registered.org", "password": "tester" })
         self.assertContains(response, 'successful')
     
+    def test_account_login_inactive(self):
+        url = reverse('api_account_login')
+        self.client.logout()
+        
+        # disable user
+        user = User.objects.get(username='registered')
+        user.is_active = False
+        user.save()
+        # expect 400
+        response = self.client.post(url, { "username": "registered", "password": "tester" })
+        self.assertContains(response, 'inactive', status_code=400)
+        
+        # re-enable user
+        user.is_active = True
+        user.save()
+        # expect 200 login successfull
+        response = self.client.post(url, { "username": "registered", "password": "tester" })
+        self.assertContains(response, 'successful')
+    
     def test_account_logout(self):
         url = reverse('api_account_logout')
         account_url = reverse('api_account_detail')
