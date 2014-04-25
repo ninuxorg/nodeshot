@@ -141,6 +141,7 @@ class LayerParticipationSettingsDetail(generics.RetrieveAPIView):
     
 layer_participation_settings = LayerParticipationSettingsDetail.as_view() 
 
+
 class NodeCommentList(CustomDataMixin, generics.ListCreateAPIView):
     """
     Retrieve a **list** of comments for the specified node
@@ -178,7 +179,7 @@ class NodeCommentList(CustomDataMixin, generics.ListCreateAPIView):
 node_comments = NodeCommentList.as_view()    
 
 
-class NodeRatingList(CustomDataMixin,generics.CreateAPIView):
+class NodeRatingList(CustomDataMixin, generics.CreateAPIView):
     """
     Not allowed
     
@@ -215,7 +216,7 @@ class NodeRatingList(CustomDataMixin,generics.CreateAPIView):
 node_ratings = NodeRatingList.as_view() 
 
 
-class NodeVotesList(CustomDataMixin,generics.CreateAPIView):
+class NodeVotesList(CustomDataMixin, generics.CreateAPIView):
     """
     Add a vote for the specified node
     """

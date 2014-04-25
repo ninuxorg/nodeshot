@@ -41,9 +41,11 @@ class PaginatedLayerListSerializer(pagination.PaginationSerializer):
     class Meta:
         object_serializer_class = LayerListSerializer
 
+
 class PaginatedGeojsonLayerListSerializer(GeoJSONPaginationSerializer):
     class Meta:
         object_serializer_class = LayerListSerializer
+
 
 class GeoLayerListSerializer(geoserializers.GeoFeatureModelSerializer, LayerListSerializer):
     class Meta:
@@ -57,7 +59,6 @@ class LayerDetailSerializer(LayerListSerializer):
     """
     Layer details
     """
-    
     class Meta:
         model = Layer
         fields = ('name', 'center', 'area', 'zoom', 'is_external',
@@ -65,7 +66,6 @@ class LayerDetailSerializer(LayerListSerializer):
         
 
 class CustomNodeListSerializer(NodeListSerializer):
-    
     class Meta:
         model = Node
         fields = [
@@ -81,7 +81,6 @@ class LayerNodeListSerializer(LayerDetailSerializer):
     """
     Nodes of a Layer
     """
-    
     class Meta:
         model = Layer
 
