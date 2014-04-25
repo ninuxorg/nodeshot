@@ -4,6 +4,7 @@ User = get_user_model()
 from rest_framework import serializers, pagination
 
 from nodeshot.core.nodes.models import Node
+from nodeshot.community.profiles.serializers import ProfileRelationSerializer
 from .models import *
 
 
@@ -18,8 +19,8 @@ __all__ = [
     'RatingAddSerializer' ,
     'VoteListSerializer',
     'VoteAddSerializer',
-    'PaginationSerializer',
     'LinksSerializer',
+    'PaginationSerializer',
     'NodeParticipationSettingsSerializer',
     'NodeSettingsSerializer',
     'LayerParticipationSettingsSerializer',
@@ -29,20 +30,17 @@ __all__ = [
 
 
 class LinksSerializer(serializers.Serializer):
-    
     next = pagination.NextPageField(source='*')
     prev = pagination.PreviousPageField(source='*')
 
 
 class PaginationSerializer(pagination.BasePaginationSerializer):
-
     links = LinksSerializer(source='*')  # Takes the page object as the source
     total_results = serializers.Field(source='paginator.count')
     results_field = 'nodes'
 
 
 class CommentAddSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = Comment       
         fields= ('node', 'user', 'text', )
@@ -75,8 +73,16 @@ class NodeCommentSerializer(serializers.ModelSerializer):
         fields = ('name', 'description', 'comments')
 
 
-class RatingAddSerializer(serializers.ModelSerializer):
+class CommentRelationSerializer(serializers.ModelSerializer):
+    """ display user info """
+    user = ProfileRelationSerializer(source='user')
     
+    class Meta:
+        model = Comment
+        fields = ('user', 'text', 'added',)
+
+
+class RatingAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating       
         fields= ('node', 'user', 'value', )
@@ -94,7 +100,6 @@ class RatingListSerializer(serializers.ModelSerializer):
 
 
 class VoteAddSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = Vote       
         fields= ('node', 'user', 'vote', )
@@ -112,7 +117,6 @@ class VoteListSerializer(serializers.ModelSerializer):
 
  
 class ParticipationSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = NodeRatingCount
         fields = ('likes', 'dislikes', 'rating_count',
@@ -120,8 +124,7 @@ class ParticipationSerializer(serializers.ModelSerializer):
 
     
 class NodeParticipationSerializer(serializers.ModelSerializer):
-    """ Node participation details"""
-
+    """ Node participation details """
     participation = ParticipationSerializer(source='noderatingcount')
     
     class Meta:
@@ -130,15 +133,13 @@ class NodeParticipationSerializer(serializers.ModelSerializer):
 
 
 class NodeSettingsSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = NodeParticipationSettings
         fields = ('voting_allowed', 'rating_allowed', 'comments_allowed',)
 
     
 class NodeParticipationSettingsSerializer(serializers.ModelSerializer):
-    """ Node participation settings"""
-
+    """ Node participation settings """
     participation_settings = NodeSettingsSerializer(source='node_participation_settings')
     
     class Meta:
@@ -147,7 +148,6 @@ class NodeParticipationSettingsSerializer(serializers.ModelSerializer):
 
 
 class LayerSettingsSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = LayerParticipationSettings
         fields = ('voting_allowed', 'rating_allowed', 'comments_allowed',)
@@ -155,7 +155,6 @@ class LayerSettingsSerializer(serializers.ModelSerializer):
     
 class LayerParticipationSettingsSerializer(serializers.ModelSerializer):
     """ Layer participation settings"""
-
     participation_settings = LayerSettingsSerializer(source='layer_participation_settings')
     
     class Meta:
@@ -169,7 +168,7 @@ from nodeshot.core.nodes.serializers import ExtensibleNodeSerializer
 
 ExtensibleNodeSerializer.add_relationship(
     'comments',
-    serializer=CommentListSerializer,
+    serializer=CommentRelationSerializer,
     many=True,
     queryset='obj.comment_set.all()'
 )
@@ -177,6 +176,5 @@ ExtensibleNodeSerializer.add_relationship(
 ExtensibleNodeSerializer.add_relationship(
     'counts',
     serializer=ParticipationSerializer,
-    #many=True,
     queryset='obj.noderatingcount'
 )

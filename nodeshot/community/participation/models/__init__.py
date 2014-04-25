@@ -1,7 +1,10 @@
 from nodeshot.core.base.utils import check_dependencies
 
 check_dependencies(
-    dependencies='nodeshot.core.nodes',
+    dependencies=[
+        'nodeshot.core.nodes',
+        'nodeshot.community.profiles'
+    ],
     module='nodeshot.community.participation'
 )
 
