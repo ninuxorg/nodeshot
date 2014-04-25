@@ -262,12 +262,12 @@
             
             <form action="" method="post" id="js-signin-form">
                 <p class="input-group">
-                    <input class="form-control" type="text" name="username" placeholder="Username or Email">
+                    <input class="form-control" type="text" name="username" placeholder="Username or Email" required>
                     <span class="input-group-addon icon-user"></span>
                 </p>
                 
                 <p class="input-group">
-                    <input class="form-control" type="password" name="password" placeholder="Password">
+                    <input class="form-control" type="password" name="password" placeholder="Password" required>
                     <span class="input-group-addon icon-lock"></span>
                 </p>
                 
@@ -393,13 +393,14 @@
     <script src="{{ STATIC_URL }}ui/lib/js/backbone.marionette.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/jquery.dateFormat.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/utils.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/models.js"></script>
     
     <script>
         var Nodeshot = new Backbone.Marionette.Application();
         {% if request.user.is_authenticated %}
-            Nodeshot.currentUser = new Backbone.Model({ username: '{{ request.user.username }}'});
+            Nodeshot.currentUser = new User({ username: '{{ request.user.username }}'});
         {% else %}
-            Nodeshot.currentUser = new Backbone.Model();
+            Nodeshot.currentUser = new User();
         {% endif %}
         
         // TODO: very ugly.. needs more structure, simplification and readability
@@ -434,7 +435,6 @@
         loadNodeData();
     </script>
     
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/models.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/account-menu.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>

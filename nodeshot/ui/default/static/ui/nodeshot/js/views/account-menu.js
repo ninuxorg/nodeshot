@@ -8,17 +8,15 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
         'click #js-logout': 'logout',
         'click .notifications': 'openNotificationsPanel'
     },
+    
+    // listen to models change and update accordingly
+    // used for login/logout rendering
+    modelEvents: {
+        'change': 'render'
+    },
 
     initialize: function () {
         this.truncateUsername();
-
-        var self = this;
-
-        // listen to models change and update accordingly
-        // used for login/logout rendering
-        this.listenTo(this.model, "change", function () {
-            self.render();
-        });
     },
 
     /*
@@ -40,7 +38,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
      */
     logout: function (e) {
         e.preventDefault();
-        Nodeshot.currentUser.set('username', undefined);
+        Nodeshot.currentUser.clear();
         $.post('api/v1/account/logout/').error(function () {
             // TODO: improve!
             createModal({
