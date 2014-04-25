@@ -8,6 +8,10 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     modelEvents: {
         'change': 'render'
     },
+    
+    events: {
+        'click .icon-link': 'permalink'
+    },
 
     onDomRefresh: function () {
         var slug = this.model.get('slug'),
@@ -39,16 +43,6 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         this.setMinHeight();
     },
 
-    setMinHeight: function () {
-        var containerHeight = $('#map-container').outerHeight(),
-            topDistance = parseInt($('#map-overlay-container').css('top').replace('px', ''));
-        newMinHeight = containerHeight - topDistance;
-
-        if (newMinHeight > 150) {
-            $('#node-details').css('min-height', newMinHeight);
-        }
-    },
-
     initialize: function () {
         // bind to namespaced events
         $(window).on("resize.node-details", _.bind(this.resize, this));
@@ -59,13 +53,41 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         this.listenTo(Nodeshot.currentUser, 'change', function(){ this.render() });
     },
 
+    /*
+     * unbind resize event when view is closed
+     */
     onClose: function () {
         // unbind the namespaced events
         $(window).off("resize.node-details");
     },
 
+    /*
+     * resize window event
+     */
     resize: function () {
         setMapDimensions();
         this.setMinHeight();
+    },
+    
+    /*
+     * set min-heigh css property on map-container div
+     */
+    setMinHeight: function () {
+        var containerHeight = $('#map-container').outerHeight(),
+            topDistance = parseInt($('#map-overlay-container').css('top').replace('px', ''));
+        newMinHeight = containerHeight - topDistance;
+
+        if (newMinHeight > 150) {
+            $('#node-details').css('min-height', newMinHeight);
+        }
+    },
+    
+    /*
+     * prompt permalink
+     */
+    permalink: function(e){
+        e.preventDefault();
+        var text = $(e.target).attr('data-text');
+        window.prompt(text, window.location.href)
     }
 });
