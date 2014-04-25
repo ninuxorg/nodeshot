@@ -106,7 +106,7 @@ var NodeshotRouter = new Marionette.AppRouter({
         "pages/:slug": "getPage",
         "map": "getMap",
         "map/:slug": "getMapNode",
-        "nodes/:slug": "getNode",
+        "nodes/:slug": "getNode"
     }
 });
 
@@ -119,20 +119,26 @@ $(document).ready(function ($) {
         var data = $(this).serialize();
 
         // Login
-        $.post('/api/v1/account/login/', data).error(function () {
+        $.post('/api/v1/account/login/', data).error(function (http) {
             // TODO improve
-            var zIndex = $('#signin-modal').css('z-index'); // original z-index
+            var json = http.responseJSON,
+                errorMessage = 'Invalid username or password',
+                zIndex = $('#signin-modal').css('z-index'); // original z-index
             $('#signin-modal').css('z-index', 99); // temporarily change
+            
+            // determine correct error message to show
+            errorMessage = json.non_field_errors || json.detail ||  errorMessage;
+            
             createModal({
-                message: 'Invalid username or password',
+                message: errorMessage,
                 successAction: function () {
                     $('#signin-modal').css('z-index', zIndex)
                 } // restore z-index
             });
         }).done(function (response) {
-            // update UI
             $('#signin-modal').modal('hide');
-            Nodeshot.currentUser.set('username', response.username);
+            // load User model which will trigger UI refresh
+            Nodeshot.currentUser.set(response.user);
         });
     });
 
@@ -192,6 +198,11 @@ $(document).ready(function ($) {
 
     // enable tooltips
     $('.hastip').tooltip();
+    
+    // load full user profile
+    if(Nodeshot.currentUser.get('username') !== undefined){
+        Nodeshot.currentUser.fetch();
+    }
 });
 
 var createModal = function (opts) {

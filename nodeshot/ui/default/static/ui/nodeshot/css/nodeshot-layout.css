@@ -972,6 +972,7 @@ article.center-stage{
 
 #node-details .actions{
     margin: 30px 0;
+    clear: both;
 }
 
 #node-details .actions a{

@@ -6,18 +6,19 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     template: '#node-details-template',
     
     modelEvents: {
-        'change': 'render',
+        'change': 'render'
     },
 
     onDomRefresh: function () {
         var slug = this.model.get('slug'),
             marker = Nodeshot.nodesNamed[slug],
             // init map on node coordinates and with high zoom (17)
-            map = L.map('map-js').setView(marker._latlng, 17, {
-                trackResize: true
-            });
+            map = L.map('map-js', {
+                trackResize: true,
+                scrollWheelZoom: false
+            }).setView(marker._latlng, 17);
         
-        // FIXME
+        // TODO: FIXME & DRY
         marker = L.circleMarker(marker._latlng, marker.options);
         // add marker to map
         map.addLayer(marker);
@@ -54,6 +55,8 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         
         // fetch details from DB
         this.model.fetch();
+        
+        this.listenTo(Nodeshot.currentUser, 'change', function(){ this.render() });
     },
 
     onClose: function () {

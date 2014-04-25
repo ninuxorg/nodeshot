@@ -238,6 +238,8 @@ body article a:focus,
     background-color: transparent !important;
 }
 
+.btn{ text-decoration: none !important }
+
 .btn,
 .input-group-addon,
 .has-switch,
