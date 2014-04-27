@@ -88,7 +88,8 @@ class DynamicRelationshipsMixin(object):
     @classmethod
     def add_relationship(_class, name,
                          view_name=None, lookup_field=None,
-                         serializer=None, many=False, queryset=None):
+                         serializer=None, many=False, queryset=None,
+                         function=None):
         """ adds a relationship to serializer
         :param name: relationship name (dictionary key)
         :type name: str
@@ -101,7 +102,9 @@ class DynamicRelationshipsMixin(object):
         :param many: indicates if it's a list or a single element, defaults to False
         :type many: bool
         :param queryset: queryset string representation to use for the serializer
-        :type many: string
+        :type queryset: QuerySet
+        :param function: function that returns the value to display (dict, list or str)
+        :type function: function(obj, request)
         :returns: None
         """
         if view_name is not None and lookup_field is not None:
@@ -116,6 +119,11 @@ class DynamicRelationshipsMixin(object):
                 'serializer': serializer,
                 'many': many,
                 'queryset': queryset
+            }
+        elif function is not None:
+            _class._relationships[name] = {
+                'type': 'function',
+                'function': function
             }
         else:
             raise ValueError('missing arguments, either pass view_name and lookup_field or serializer and queryset')
@@ -166,6 +174,8 @@ class DynamicRelationshipsMixin(object):
                 value = options['serializer'](instance=queryset,
                                               context=self.context,
                                               many=options['many']).data
+            elif options['type'] == 'function':
+                value = options['function'](obj, request)
             else:
                 raise ValueError('type %s not recognized' % options['type'])
             # populate new dictionary with value
