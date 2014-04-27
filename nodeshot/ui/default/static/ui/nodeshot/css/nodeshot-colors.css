@@ -865,6 +865,7 @@ label.inline{ margin: 0 }
 .icon-thumbs-up{ color: #328327 }
 .icon-cancel,
 .icon-thumbs-down{ color: #c72c25 }
+.vote .fade{ opacity: 0.2 }
 
 a.icon-thumbs-up:hover{ color: #139502 }
 a.icon-thumbs-down:hover{ color: #e20a00 }

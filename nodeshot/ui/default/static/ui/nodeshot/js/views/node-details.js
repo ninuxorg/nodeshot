@@ -122,11 +122,13 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         relationships.counts.likes++;
         this.model.set('relationships', relationships);
         $(e.target).text(relationships.counts.likes);
+        $('.icon-thumbs-down').addClass('fade');
         
         $.post(relationships.votes_url, { vote: 1 })
         // restore backup in case of error
         .error(function(http){
             $(e.target).text(backup);
+            $('.icon-thumbs-down').removeClass('fade');
             relationships.counts.likes = backup;
             self.model.set('relationships', relationships);
             createModal({ message: 'error' })
@@ -146,11 +148,13 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         relationships.counts.dislikes++;
         this.model.set('relationships', relationships);
         $(e.target).text(relationships.counts.dislikes);
+        $('.icon-thumbs-up').addClass('fade');
         
         $.post(relationships.votes_url, { vote: -1 })
         // rollback in case of error
         .error(function(http){
             $(e.target).text(backup);
+            $('.icon-thumbs-down').removeClass('fade');
             relationships.counts.dislikes = backup;
             self.model.set('relationships', relationships);
             createModal({ message: 'error' })
