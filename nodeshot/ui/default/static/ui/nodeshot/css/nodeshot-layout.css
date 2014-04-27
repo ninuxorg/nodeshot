@@ -1128,6 +1128,17 @@ img.avatar{
     margin-bottom: 30px;
 }
 
+.new-comment .submit-row{
+    display: none;
+    margin-top: 10px;
+    text-align: right
+}
+
+.new-comment .btn{
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
 .comment{
     position: relative;
 }
@@ -1168,3 +1179,5 @@ img.avatar{
 .leaflet-popup-content p{ margin: 10px 0 }
 .leaflet-popup-content a.btn{ color: #fff }
 .leaflet-popup-content .details{ text-align: center }
+
+.displaynone{ display: none }

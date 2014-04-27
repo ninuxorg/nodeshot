@@ -5,14 +5,30 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     className: 'short-map',
     template: '#node-details-template',
     
-    modelEvents: {
-        'change': 'render'
+    ui: {
+        'commentTextarea': '.new-comment textarea',
+        'commentTextareaContainer': '.new-comment .form-control',
+        'submitRow': '.new-comment .submit-row'
     },
     
     events: {
+        // actions
         'click .icon-link': 'permalink',
+        
+        // vote
         'click .icon-thumbs-up': 'like',
-        'click .icon-thumbs-down': 'dislike'
+        'click .icon-thumbs-down': 'dislike',
+        
+        // comments
+        'keypress @ui.commentTextarea': 'keyPressCommentTextarea',
+        'keydown @ui.commentTextarea': 'keyDownCommentTextarea',
+        'keyup @ui.commentTextarea': 'keyUpCommentTextarea',
+        'focusout @ui.commentTextarea': 'focusOutCommentTextarea',
+        'submit form.new-comment': 'submitComment'
+    },
+    
+    modelEvents: {
+        'change': 'render'
     },
 
     onDomRefresh: function () {
@@ -93,6 +109,9 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         window.prompt(text, window.location.href)
     },
     
+    /*
+     * like
+     */
     like: function(e){
         e.preventDefault();
         
@@ -104,7 +123,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         this.model.set('relationships', relationships);
         $(e.target).text(relationships.counts.likes);
         
-        $.post(relationships.votes, { vote: 1 })
+        $.post(relationships.votes_url, { vote: 1 })
         // restore backup in case of error
         .error(function(http){
             $(e.target).text(backup);
@@ -114,6 +133,9 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         });
     },
     
+    /*
+     * dislike
+     */
     dislike: function(e){
         e.preventDefault();
         
@@ -125,8 +147,8 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         this.model.set('relationships', relationships);
         $(e.target).text(relationships.counts.dislikes);
         
-        $.post(relationships.votes, { vote: -1 })
-        // restore backup in case of error
+        $.post(relationships.votes_url, { vote: -1 })
+        // rollback in case of error
         .error(function(http){
             $(e.target).text(backup);
             relationships.counts.dislikes = backup;
@@ -134,4 +156,87 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             createModal({ message: 'error' })
         });
     },
+    
+    /* comment textarea animations */
+    
+    keyPressCommentTextarea: function(e){
+        // when start entering text
+        if(this.ui.commentTextarea.val().length <= 0){
+            // smaller text
+            this.ui.commentTextarea.removeClass('initial');
+            // show submit button
+            this.ui.submitRow.fadeIn(250);
+            // animate height
+            this.ui.commentTextareaContainer.animate({height: 100}, 250);
+        }
+    },
+    
+    keyDownCommentTextarea: function(e){
+        // if deleting the last bit of text
+        // that is: pressing backspace when only 1 character
+        if(e.keyCode === 8 && this.ui.commentTextarea.val().length === 1){
+            // initial textarea state
+            this.ui.commentTextarea.addClass('initial');
+        }
+    },
+    
+    keyUpCommentTextarea: function(e){
+        // if all text is deleted
+        if(this.ui.commentTextarea.val().length <= 0){
+            // initial textarea state
+            this.ui.commentTextarea.addClass('initial');
+        }
+    },
+    
+    focusOutCommentTextarea: function(e){
+        // if textarea empty
+        if(this.ui.commentTextarea.val().length <= 0){
+            // initial textarea state
+            this.ui.commentTextarea.addClass('initial');
+            // hide sucmit button
+            this.ui.submitRow.fadeOut(250);
+            // reset height
+            this.ui.commentTextareaContainer.animate({height: 50}, 250);
+        }
+    },
+    
+    /*
+     * add comment
+     */
+    submitComment: function(e){
+        e.preventDefault();
+        
+        var self = this,
+            relationships = this.model.get('relationships'),
+            commentText = this.ui.commentTextarea.val();
+        
+        // add comment to UI
+        relationships.comments.push(
+            {
+                "user": Nodeshot.currentUser.toJSON(),
+                "text": commentText,
+                "added": Date.now()
+            }
+        )
+        this.model.set('relationships', relationships);
+        this.model.trigger('change');
+        // scroll to last comment
+        if($('.comment').length){
+            $('html, body').animate({
+                scrollTop: $('.comment').last().offset().top
+            }, 100);
+        }
+        
+        // add comment to DB
+        $.post(relationships.comments_url, { text: commentText })
+        // rollback in case of error
+        .error(function(){
+            // remove last comment
+            relationships.comments.pop();
+            self.model.set('relationships', relationships);
+            self.model.trigger('change');
+            // display error
+            createModal({ message: 'error' });
+        });
+    }
 });

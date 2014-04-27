@@ -180,7 +180,13 @@ ExtensibleNodeSerializer.add_relationship(
 )
 
 ExtensibleNodeSerializer.add_relationship(
-    'votes',
+    'votes_url',
     view_name='api_node_votes',
+    lookup_field='slug'
+)
+
+ExtensibleNodeSerializer.add_relationship(
+    'comments_url',
+    view_name='api_node_comments',
     lookup_field='slug'
 )

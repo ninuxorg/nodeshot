@@ -27,8 +27,8 @@
         
         <ul class="nav nav-tabs hidden-xs" id="node-menu">
             <li class="active"><a href="javascript:createModal({message:'not implemented yet'})">{% trans 'General info' %}</a></li>
-            <li><a href="javascript:createModal({message:'not implemented yet'})">Images (4)</a></li>
-            <li><a href="javascript:createModal({message:'not implemented yet'})">Devices (3)</a></li>
+            <!--<li><a href="javascript:createModal({message:'not implemented yet'})">Images (4)</a></li>
+            <li><a href="javascript:createModal({message:'not implemented yet'})">Devices (3)</a></li>-->
         </ul>
         
         <ul class="nav nav-pills visible-xs" id="node-menu-mobile">
@@ -139,15 +139,24 @@
         
         <% if(relationships){ %>
         <div id="comments">
-            <h3><%= relationships.counts.comment_count %> {% trans 'Comments' %}</h3>
+            <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
             
             <% if(!Nodeshot.currentUser.isNew()){ %>
-            <form action="" class="new-comment">
+            <form action="" class="new-comment" method="post">
                 <div class="input-group">
-                    <span class="input-group-addon"><img class="avatar" src="<%= Nodeshot.currentUser.get('avatar') %>" alt=""></span>
+                    <span class="input-group-addon">
+                        <img class="avatar" src="<%= Nodeshot.currentUser.get('avatar') %>" alt="">
+                    </span>
                     <div class="form-control">
-                        <textarea name="text" class="initial" placeholder="{% trans 'Join the discussion...' %}" rows="1"></textarea>
+                        <textarea name="text"
+                                  class="initial"
+                                  placeholder="{% trans 'Join the discussion...' %}"
+                                  rows="1"
+                                  required></textarea>
                     </div>
+                </div>
+                <div class="submit-row">
+                    <button type="submit" class="btn btn-primary icon-comments">{% trans 'submit comment' %}</button>
                 </div>
             </form>
             <% } else { %>
@@ -158,17 +167,21 @@
             </div>
             <% } %>
             
-            <% if(relationships.counts.comment_count > 0){ %>
-                <% _.each(relationships.comments, function(comment){ %>
-                    <div class="comment">
-                        <img class="avatar" src="<%= comment.user.avatar %>" alt="">
+            <% if(relationships.comments.length > 0){ %>
+                <% _.each(relationships.comments, function(comment, i){ %>
+                    <div class="comment" id="c-<%= i %>">
+                        <a href="javascript:createModal({message:'not implemented yet'})">
+                            <img class="avatar" src="<%= comment.user.avatar %>" alt="">
+                        </a>
                         <div class="meta-data">
-                            <a href="javascript:createModal({message:'not implemented yet'})"><%= comment.user.full_name %></a>
+                            <a href="javascript:createModal({message:'not implemented yet'})">
+                                <%= comment.user.full_name %>
+                            </a>
                             <span class="separator">•</span>
                             <span class="date"><%= $.format.prettyDate(comment.added) %></span>
                         </div>
                         <p class="text">
-                            <%= comment.text %>
+                            <%= _.nl2br(comment.text) %>
                         </p>
                     </div>
                 <% }); %>

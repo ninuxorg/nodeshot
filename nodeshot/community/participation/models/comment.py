@@ -18,8 +18,7 @@ class Comment(UpdateCountsMixin, BaseDate):
     class Meta:
         app_label = 'participation'
         db_table = 'participation_comment'
-        #permissions = (('can_view_comment', 'Can view comments'),)
-        #ordering = ['order']
+        ordering = ['id']
     
     def __unicode__(self):
         return self.text
