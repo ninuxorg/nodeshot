@@ -461,3 +461,28 @@ class ParticipationModelsTest(TestCase):
         login=self.client.login(username='admin', password='tester')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
+    
+    def test_has_already_voted_on_node(self):
+        node = Node.objects.get(pk=1)
+        url = reverse('api_node_details', args=[node.slug])
+        
+        # logged out expects False
+        self.client.logout()
+        response = self.client.get(url)
+        self.assertEqual(response.data['relationships']['has_already_voted'], False)
+        
+        # logged in not voted yet expects False
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(url)
+        self.assertEqual(response.data['relationships']['has_already_voted'], False)
+        
+        # has already liked expects 1
+        v = Vote.objects.create(node_id=node.id, user_id=1, vote=1)
+        response = self.client.get(url)
+        self.assertEqual(response.data['relationships']['has_already_voted'], 1)
+        
+        # has already disliked expects -1
+        v.delete()
+        v = Vote.objects.create(node_id=node.id, user_id=1, vote=-1)
+        response = self.client.get(url)
+        self.assertEqual(response.data['relationships']['has_already_voted'], -1)

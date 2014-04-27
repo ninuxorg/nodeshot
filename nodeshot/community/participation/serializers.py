@@ -190,3 +190,24 @@ ExtensibleNodeSerializer.add_relationship(
     view_name='api_node_comments',
     lookup_field='slug'
 )
+
+def has_already_voted(obj, request):
+    """
+    Determines if current logged-in user has already voted on a node
+    returns 1 if user has already liked
+    returns -1 if user has already disliked
+    returns False if user hasn't voted or if not authenticated
+    """
+    if request.user.is_authenticated():
+        v = Vote.objects.filter(node_id=obj.id, user_id=request.user.id)
+        try:
+            return v[0].vote
+        except IndexError:
+            pass
+    # hasn't voted yet or not authenticated
+    return False
+
+ExtensibleNodeSerializer.add_relationship(
+    'has_already_voted',
+    function=has_already_voted
+)
