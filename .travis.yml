@@ -7,16 +7,12 @@ python:
   - "2.7"
   - "2.6"
 
-env:
-  - DJANGO="django==1.6.2"
-
 branches:
   only:
     - master
 
 # command to install requirements
 install:
-  - pip install $DJANGO
   - pip install -r requirements.txt --use-mirrors
   - pip install -r networking_requirements.txt --use-mirrors
   - pip install coverage coveralls --use-mirrors
