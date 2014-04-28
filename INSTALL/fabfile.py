@@ -1,10 +1,10 @@
 from fabric.api import *
 from fabric.contrib.files import append
 from fabric.colors import green
-import random
+#import random
 import json
-chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-secret_key = ''.join(random.SystemRandom().choice(chars) for _ in range(50))
+#chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+#secret_key = ''.join(random.SystemRandom().choice(chars) for _ in range(50))
 
 
 
@@ -25,6 +25,14 @@ def initialize_server():
     if 'server_name' not in globals():
         global server_name
         server_name = prompt('Server name: ')
+        
+def initialize_ssl():
+    print(green("****************************************"))
+    print(green("Please insert SSL certificate details..."))
+    print(green("****************************************"))
+    run ('mkdir -p /tmp/nodeshot_install')
+    with cd('/tmp/nodeshot_install'):
+        run ('openssl req -new -x509 -nodes -days 365 -out server.crt -keyout server.key')
        
 def initialize_db():
     db_params = ('db_user','db_pass')
@@ -54,6 +62,7 @@ def install():
     initialize()
     initialize_server()
     initialize_db()
+    initialize_ssl()
     install_git()
     clone()
     install_dependencies()
@@ -92,10 +101,11 @@ def install_git():
 def install_dependencies():
     initialize()
     print(green("Installing required packages. This may take a while..."))
+    run('apt-get update')
     with hide( 'stdout', 'stderr'):
         with cd('%sINSTALL' % deploy_dir):
             run('cat dependencies.txt | xargs apt-get -y install')
-        with cd('/tmp'):
+        with cd('/tmp/nodeshot_install'):
             run('cp %sINSTALL/install* . && ./install_GEOS.sh && ./install_Postgis.sh' % deploy_dir )
 
 def pull():
@@ -173,7 +183,10 @@ def create_settings():
         
 def sync_data():
     initialize()
+    print(green("***********************************************************"))
     print(green("Initializing Nodeshot..."))
+    print(green("Please provide details for Nodeshot superuser when required"))
+    print(green("***********************************************************"))
     virtual_env = 'source python/bin/activate'
     sync_command = 'python manage.py syncdb && python manage.py migrate && python manage.py collectstatic --noinput'
     with cd (project_dir):
@@ -190,7 +203,9 @@ def nginx_config():
     run ('mkdir -p %s' % nginx_dir)
     with cd (nginx_dir):
         print(green("Insert Certificate details..."))
-        run ('openssl req -new -x509 -nodes -out server.crt -keyout server.key')
+        run ('cp /tmp/nodeshot_install/server.crt .')
+        run ('cp /tmp/nodeshot_install/server.key .')
+
     run('cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/')
     #run ('mkdir -p /var/www/nodeshot/public_html')
     
