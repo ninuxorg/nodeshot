@@ -1,12 +1,8 @@
+import json
+
 from fabric.api import *
 from fabric.contrib.files import append
 from fabric.colors import green
-#import random
-import json
-#chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-#secret_key = ''.join(random.SystemRandom().choice(chars) for _ in range(50))
-
-
 
 # Put host(s) configuration here or use -h switch on command line
 # env.hosts = ''
@@ -190,7 +186,7 @@ def sync_data():
     virtual_env = 'source python/bin/activate'
     sync_command = 'python manage.py syncdb && python manage.py migrate && python manage.py collectstatic --noinput'
     with cd (project_dir):
-        run('mkdir log'  )
+        run('mkdir -p log'  )
         run('touch log/%s.error.log' % project_name )
         run('chmod 666 log/%s.error.log' % project_name)
         run( virtual_env + ' &&  ' + sync_command)
@@ -254,8 +250,10 @@ def start_server():
     print(green("Starting Nodeshot server..."))
     with cd (project_dir):
         run('service nginx restart && supervisorctl restart all')
-    print(green("Nodeshot server started"))   
-
+    print(green("Nodeshot server started"))
+    print(green("Cleaning installation directory..."))
+    run ('rm -rf /tmp/nodeshot_install')
+    print(green("Installation completed"))
     
 
 
