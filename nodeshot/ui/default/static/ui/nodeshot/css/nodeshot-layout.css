@@ -202,7 +202,7 @@
     position: absolute;
     top: -12px;
     left: 48.3%;
-    width: 0; 
+    width: 0;
 	height: 0;
 }
 
@@ -260,7 +260,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    
+
 }
 #notifications .scroller-track { right: 4px }
 #notifications .scroller-bar {
@@ -302,14 +302,14 @@ article.center-stage{
         margin: 19px 3.5% 0 0;
     }
     #general-search-input{ padding: 0px 15px; }
-    
+
     #main-actions li a{
         height: 70px;
         padding: 18px 25px;
     }
-    
+
     #main-actions a.dropdown-toggle{ min-width: 170px }
-    
+
     #top-bar .icon-globe{
         position: absolute;
         top: 19px;
@@ -317,11 +317,11 @@ article.center-stage{
         font-size: 30px;
         line-height: 0;
     }
-    
+
     #top-bar .dropdown-menu{
         width: 100%;
     }
-    
+
     article.narrow{
         width: 60%;
         margin-left: auto;
@@ -339,18 +339,18 @@ article.center-stage{
         padding: 0;
         margin: 15px 2%
     }
-    
+
     .responsive-padding{
         padding: 20px 3.2% !important;
     }
-    
+
     #general-search{
         width: 210px;
         margin-right: 1.8%;
     }
-    
+
     #main-actions a.dropdown-toggle{ min-width: 0 }
-    
+
     #node-details .actions a{
         margin-right: 18px;
     }
@@ -373,7 +373,7 @@ article.center-stage{
         padding: 0;
         margin: 10px 2.5%;
     }
-    
+
     .responsive-padding{
         padding: 20px 2.9% !important;
         margin: 0 !important;
@@ -381,18 +381,18 @@ article.center-stage{
         border-right: 0 none !important;
         border-left: 0 none !important;
     }
-    
+
     #top-bar{
         height: 50px;
         padding-right: 0;
     }
-    
+
     #top-bar h1 a{
         min-width: 130px;
         background-size: 123px !important;
         margin: 2px 0 0 0;
     }
-    
+
     @media screen and (min-width: 0px) and (max-width: 380px){
         #top-bar h1 a{
             min-width: 100px;
@@ -401,14 +401,14 @@ article.center-stage{
         .modal.enlarge-on-mobile{
             background-color: #fff !important;
         }
-        
+
         .modal.enlarge-on-mobile .modal-dialog{
             top: 0 !important;
             box-shadow: none;
             border: 0 none;
         }
     }
-    
+
     #general-search{
         display: none;
         position: absolute;
@@ -416,22 +416,22 @@ article.center-stage{
         margin: 10px 1.5% 0 0;
     }
     #general-search-input{ padding: 0px 15px }
-    
+
     #main-actions li a{
         height: 50px;
         width: 61px;
         padding: 8px 15px;
     }
-    
+
     #top-bar .text,
     #top-bar .caret{ display: none }
-    
+
     #top-bar .icon-globe{
         font-size: 27px;
         position: relative;
         top: -3px;
         height:30px;
-        
+
     }
     #top-bar .notifications{ width: 61px }
     #top-bar .notifications .bg{
@@ -440,39 +440,39 @@ article.center-stage{
         right: 9px;
         font-size: 13px;
     }
-    
+
     #main-actions .icon-search{ display: block; font-size: 25px }
     #main-actions .icon-menu{ display: block }
-    
+
     #top-bar .icon-search:before,
     #top-bar .icon-globe:before{ margin: 0 !important }
-    
+
     #nav-bar{
         height: 0 !important;
         min-height: 0 !important;
         padding: 0;
     }
-    
+
     #nav-bar ul{ margin: 0; padding-top: 5px !important }
-    
+
     #nav-bar > div{
         border: 0 none;
         background: #383838;
     }
-    
+
     #nav-bar ul.nav{ padding: 0 }
-    
+
     #nav-bar ul.navbar-nav > li{
         width: 100%;
         padding-left: 2.5%; padding-right: 2.5%;
     }
-    
+
     #nav-bar .dropdown.open{ z-index: 1 }
-    
+
     #map-toolbar{ display: none }
     #toggle-toolbar{ display: block !important }
     .user-dialog .icon-close{ font-size: 18px }
-    
+
     body > article > h1,
     body > article h2{ letter-spacing: -3px; word-spacing: -1px }
 }
@@ -482,7 +482,7 @@ article.center-stage{
     .modal.enlarge-on-mobile{
         background-color: rgba(255,255,255,0.90);
     }
-    
+
     .modal.enlarge-on-mobile .modal-dialog{
         box-shadow: none;
         border-color: rgba(0,0,0,0.1);
@@ -654,7 +654,7 @@ article.center-stage{
     margin: 0;
     padding: 0;
     line-height: 24px;
-	
+
 }
 
 .circle{
@@ -1002,7 +1002,7 @@ article.center-stage{
     #node-details .actions a{
         margin-right: 10px;
     }
-    
+
 }
 
 article .nav-tabs,
@@ -1041,7 +1041,8 @@ article .nav-pills > li.dropdown.open > a.dropdown-toggle{
 article .nav-tabs > .active > a,
 article .nav-tabs > .active > a:hover,
 article .nav-tabs > .active > a:focus{
-    background-color: #f2f2f2;
+    color: #555 !important;
+    background-color: #f2f2f2 !important;
     border: 1px solid #979490;
     border-bottom-color: transparent;
 }

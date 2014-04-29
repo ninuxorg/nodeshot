@@ -8,15 +8,22 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
         'click #js-logout': 'logout',
         'click .notifications': 'openNotificationsPanel'
     },
-    
+
     // listen to models change and update accordingly
     // used for login/logout rendering
     modelEvents: {
-        'change': 'render'
+        'change': 'onModelChange',
     },
 
-    initialize: function () {
+    onModelChange: function () {
+        this.render();
         this.truncateUsername();
+        this.staySignedInCheck();
+    },
+
+    initialize: function(){
+        this.truncateUsername();
+        this.staySignedInCheck();
     },
 
     /*
@@ -31,6 +38,16 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
             // update model
             this.model.set('username', truncated);
         }
+    },
+
+    /*
+     * remember user preference on "stay signed in" checkbox
+     */
+    staySignedInCheck: function () {
+        // check stay signed in checkbox
+        var remember = Nodeshot.preferences.staySignedIn,
+            checked =  (remember === "true" || remember === true) ? true : false;
+        $('#remember-signup').prop('checked', checked);
     },
 
     /*

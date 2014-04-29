@@ -21,11 +21,11 @@
         <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
-    
+
     <!-- leaflet -->
     <link rel="stylesheet" href="{{ STATIC_URL }}ui/leaflet/leaflet.css" />
     <script src="{{ STATIC_URL }}ui/leaflet/leaflet.js"></script>
-    
+
     <!-- cesium -->
     <link href="{{ STATIC_URL }}ui/cesium/Widgets/widgets.css" rel="stylesheet">
     <script src="{{ STATIC_URL }}ui/cesium/Cesium.js"></script>
@@ -39,7 +39,7 @@
     <header>
         <nav id="top-bar">
             <h1><a href="#">Nodeshot</a></h1>
-            
+
             <div id="general-search">
                 <input type="text" id="general-search-input" placeholder="Search for data">
                 <span class="icon-search">&nbsp;</span>
@@ -52,9 +52,9 @@
                     <li><a href="#" class="icon-user">Alberto gallo</a></li>
                 </ul>
             </div>
-            
+
             <ul id="main-actions"></ul>
-            
+
             <div id="notifications">
                 <span class="arrow"></span>
                 <div class="header">
@@ -102,7 +102,7 @@
                 </div>
             </div>
         </nav>
-        
+
         <nav id="nav-bar" class="navbar navbar-inverse" role="navigation">
             <div class="collapse navbar-collapse" id="ns-top-nav-links">
                 <ul class="nav navbar-nav">
@@ -116,7 +116,7 @@
                             <span class="icon-info-circle"></span>About
                             <span class="caret"></span>
                         </a>
-            
+
                         <ul class="dropdown-menu">
                             <li><a href="#/pages/terms-of-service">Terms of services</a></li>
                             <li><a href="#/pages/privacy-policy">Privacy Policy</a></li>
@@ -130,7 +130,7 @@
                             <span class="icon-plus-squared"></span>More
                             <span class="caret"></span>
                         </a>
-            
+
                         <ul class="dropdown-menu">
                             <li><a href="#">Action</a></li>
                             <li><a href="#">Another action</a></li>
@@ -143,7 +143,7 @@
             </div>
         </nav>
     </header>
-    
+
     {% block breadcrumb %}
     <ol class="breadcrumb center-stage visible-xs invert" id="breadcrumb">
         <li><a href="#">Home</a></li>
@@ -151,11 +151,11 @@
         <li class="active">Something</li>
     </ol>
     {% endblock %}
-    
+
     <div id="body">
     {% block body %}{% endblock %}
     </div>
-    
+
     <!-- Sign up -->
     <div class="modal fade narrow autocenter enlarge-on-mobile" id="signup-modal"
          tabindex="-1"
@@ -164,69 +164,69 @@
          aria-hidden="true"
          data-autocenter-coefficient="2.6">
         <div class="modal-dialog modal-content modal-body inverse user-dialog">
-            
+
             <p class="text">{% trans 'By signing up to this service you agree to our <a href="#/pages/privacy-policy" class="js-dismiss">privacy policy</a>' %}</p>
-            
+
             <p class="social-buttons">
                 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
                     <span class="icon icon-facebook"></span>
                     <span class="text">{% trans 'Sign up with Facebook' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
-                
+
                 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
                     <span class="text">{% trans 'Sign up with Google' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
-                
+
                 <a href="{% url "socialauth_begin" "github" %}" class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
                     <span class="text">{% trans 'Sign up with Github' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
             </p>
-            
+
             <p class="separator">
                 <span class="line"></span>
                 <span class="text">{% trans 'or' %}</span>
             </p>
-            
+
             <form action="" method="post" id="js-signup-form">
                 <p class="input-group hastip" data-placement="right" data-trigger="manual">
                     <input required class="form-control" type="text" name="username" id="js-signup-username" placeholder="Username">
                     <span class="input-group-addon icon-user"></span>
                 </p>
-                
+
                 <p class="input-group hastip" data-placement="right" data-trigger="manual">
                     <input required class="form-control " type="email" name="email" id="js-signup-email" placeholder="Email">
                     <span class="input-group-addon icon-mail"></span>
                 </p>
-                
+
                 <p class="input-group hastip" data-placement="right" data-trigger="manual">
                     <input required class="form-control" type="password" name="password" id="js-signup-password" placeholder="Password">
                     <span class="input-group-addon icon-lock"></span>
                 </p>
-                
+
                 <p class="input-group hastip" data-placement="right" data-trigger="manual">
                     <input required class="form-control" type="password" name="password_confirmation" id="js-signup-password_confirmation" placeholder="Confirm password">
                     <span class="input-group-addon icon-lock"></span>
                 </p>
-                
+
                 <p class="input-group text" id="js-password-strength-message">
                     <span class="pwstrength_viewport_progress"></span>
                     <span class="pwstrength_viewport_verdict"></span>
                 </p>
-                
+
                 <button class="btn btn-default">{% trans 'Sign up' %}</button>
             </form>
-            
+
             <p class="text">{% trans 'Already have an account?' %} <a href="#" id="js-signin-link">{% trans 'Sign in' %}</a></p>
-            
+
             <a class="icon-close" data-dismiss="modal" href="#"></a>
         </div>
     </div>
-    
+
     <!-- Sign in -->
     <div class="modal fade narrow autocenter enlarge-on-mobile" id="signin-modal"
          tabindex="-1"
@@ -234,43 +234,43 @@
          aria-labelledby="signin-modal-label"
          aria-hidden="true">
         <div class="modal-dialog modal-content modal-body inverse user-dialog">
-            
+
             <p class="social-buttons">
                 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
                     <span class="icon icon-facebook"></span>
                     <span class="text">{% trans 'Sign in with Facebook' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
-                
+
                 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
                     <span class="text">{% trans 'Sign in with Google' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
-                
+
                 <a href="{% url "socialauth_begin" "github" %}"  class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
                     <span class="text">{% trans 'Sign in with Github' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
             </p>
-            
+
             <p class="separator">
                 <span class="line"></span>
                 <span class="text">{% trans 'or' %}</span>
             </p>
-            
+
             <form action="" method="post" id="js-signin-form">
                 <p class="input-group">
                     <input class="form-control" type="text" name="username" placeholder="Username or Email" required>
                     <span class="input-group-addon icon-user"></span>
                 </p>
-                
+
                 <p class="input-group">
                     <input class="form-control" type="password" name="password" placeholder="Password" required>
                     <span class="input-group-addon icon-lock"></span>
                 </p>
-                
+
                 <p class="text text-left">
                     <span class="custom-checkbox hastip"
                           data-placement="top"
@@ -278,21 +278,21 @@
                         <input type="checkbox" id="remember-signup" name="remember" />
                         <label for="remember-signup"></label>
                     </span>
-                    
+
                     <label for="remember-signup">{% trans 'Stay signed in' %}</label>
                 </p>
-                
+
                 <p><button class="btn btn-default">{% trans 'Sign in' %}</button></p>
             </form>
-            
+
             <p class="text"><a href="javascript:alert('not implemented yet')">{% trans 'Forgot your password?' %}</a></p>
-            
+
             <p class="text">{% trans "Don't have an account yet?" %} <a href="#" id="js-signup-link">{% trans 'Sign up' %}</a></p>
-            
+
             <a class="icon-close" data-dismiss="modal" href="#"></a>
         </div>
     </div>
-    
+
     <script id="modal-template" type="text/template">
         <div class="modal fade autocenter" id="tmp-modal" tabindex="-1">
             <div class="modal-dialog modal-content modal-body modal-slim">
@@ -300,14 +300,14 @@
                 <% if(successMessage) { %>
                     <button type="button" class="btn btn-success"><%= successMessage %></button>
                 <% } %>
-                
+
                 <% if(defaultMessage) { %>
                     <button type="button" class="btn btn-default"><%= defaultMessage %></button>
                 <% } %>
             </div>
         </div>
     </script>
-    
+
     <script id="account-menu-template" type="text/template">
         <li>
             <a href="#" class="icon-search">&nbsp;</a>
@@ -326,7 +326,7 @@
                 <span class="text" id="js-username"><%= username %></span>
                 <span class="caret"></span>
             </a>
-            
+
             <ul class="dropdown-menu">
                 <li><a href="#" id="js-profile"><span class="icon-user"></span>{% trans 'My profile' %}</a></li>
                 <li><a href="#" id="js-settings"><span class="icon-wrench"></span>{% trans 'Settings' %}</a></li>
@@ -352,26 +352,26 @@
                data-target="#ns-top-nav-links">&nbsp;</a>
         </li>
     </script>
-    
+
     <script id="page-template" type="text/template">
         <h1><%= title %></h1>
         <%= content %>
     </script>
-    
+
     <script id="map-template" type="text/template">
         {% include 'includes/map.html' %}
     </script>
-    
+
     <script id="map-popup-template" type="text/template">
         <h4><%= name %></h4>
         <% if(description){ %><%= description %><% } %>
         <p class="details"><a href="#/nodes/<%= slug %>" class="btn btn-primary">{% trans 'Details' %}</a></p>
     </script>
-    
+
     <script id="node-details-template" type="text/template">
         {% include 'includes/node-details.html' %}
     </script>
-    
+
     <script id="loading-template" type="text/template">
         <div id="loading" class="overlay loading">
             <span class="icon-loading animate-spin"></span>
@@ -379,7 +379,7 @@
             <a class="icon-close hastip" title="{% trans 'cancel&nbsp;operation' %}"></a>
         </div>
     </script>
-    
+
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.switch.js"></script>
@@ -387,14 +387,15 @@
     <script src="{{ STATIC_URL }}ui/lib/js/pwstrength.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/scroller.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/leaflet.markercluster.js"></script>
-    
+
     <script src="{{ STATIC_URL }}ui/lib/js/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/backbone.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/backbone.marionette.min.js"></script>
     <script src="{{ STATIC_URL }}ui/lib/js/jquery.dateFormat.js"></script>
+    <script src="{{ STATIC_URL }}ui/lib/js/jquery.serializeJSON.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/utils.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/models.js"></script>
-    
+
     <script>
         var Nodeshot = new Backbone.Marionette.Application();
         {% if request.user.is_authenticated %}
@@ -402,19 +403,19 @@
         {% else %}
             Nodeshot.currentUser = new User();
         {% endif %}
-        
+
         // TODO: very ugly.. needs more structure, simplification and readability
         var loadNodeData = function(){
             var data = $.getDataSync('{% url 'api_status_list' %}'),
                 statuses = {};
-            
+
             for (var i=0; i<data.length; i++) {
                 data[i].nodes = [];
                 statuses[data[i].slug] = data[i];
             }
-            
+
             Nodeshot.statuses = statuses;
-            
+
             Nodeshot.layers = [];
             {% for layer in layers %}
                 Nodeshot.layers.push({
@@ -424,17 +425,17 @@
                     nodes_geojson_url: '{% url 'api_layer_nodes_geojson' layer.slug %}'
                 });
             {% endfor %}
-            
+
             for (var i=0; i<Nodeshot.layers.length; i++) {
                 var layer = Nodeshot.layers[i];
                 // get JSON data
                 layer.nodes_geojson = $.getDataSync(layer.nodes_geojson_url);
             }
         }
-        
+
         loadNodeData();
     </script>
-    
+
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/account-menu.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>

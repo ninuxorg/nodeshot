@@ -42,10 +42,10 @@
                 <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:createModal({message:'not implemented yet'})">
                     {% trans 'General info' %} <span class="caret"></span>
                 </a>
-                <ul class="dropdown-menu">
+                <!--<ul class="dropdown-menu">
                     <li><a href="javascript:createModal({message:'not implemented yet'})">Images (4)</a></li>
                     <li><a href="javascript:createModal({message:'not implemented yet'})">Devices (3)</a></li>
-                </ul>
+                </ul> -->
             </li>
         </ul>
 
@@ -58,9 +58,9 @@
                         </td>
                         <td class="right">
                             <span class="status" style="
-								background:<%= Nodeshot.statuses[status].fill_color %>;
-								color:<%= Nodeshot.statuses[status].text_color %>;
-							"><%= status %></span>
+                                background:<%= Nodeshot.statuses[status].fill_color %>;
+                                color:<%= Nodeshot.statuses[status].text_color %>;
+                            "><%= status %></span>
                         </td>
                     </tr>
                     <tr>

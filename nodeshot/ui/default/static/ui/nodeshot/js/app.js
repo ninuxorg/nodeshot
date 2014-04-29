@@ -116,7 +116,11 @@ $(document).ready(function ($) {
     // login / sign in
     $('#js-signin-form').submit(function (e) {
         e.preventDefault();
-        var data = $(this).serialize();
+        var data = $(this).serializeJSON();
+        // data.remember is true if "on", false otherwise
+        data.remember = data.hasOwnProperty('remember') ? true : false;
+        // remember choice
+        Nodeshot.preferences.staySignedIn = data.remember;
 
         // Login
         $.post('/api/v1/account/login/', data).error(function (http) {
@@ -125,10 +129,10 @@ $(document).ready(function ($) {
                 errorMessage = 'Invalid username or password',
                 zIndex = $('#signin-modal').css('z-index'); // original z-index
             $('#signin-modal').css('z-index', 1002); // temporarily change
-            
+
             // determine correct error message to show
             errorMessage = json.non_field_errors || json.detail ||  errorMessage;
-            
+
             createModal({
                 message: errorMessage,
                 successAction: function () {
@@ -142,7 +146,7 @@ $(document).ready(function ($) {
         });
     });
 
-    // sign up 
+    // sign up
     $('#js-signup-form').submit(function (e) {
         e.preventDefault();
         var form = $(this),
@@ -198,7 +202,7 @@ $(document).ready(function ($) {
 
     // enable tooltips
     $('.hastip').tooltip();
-    
+
     // load full user profile
     if(Nodeshot.currentUser.get('username') !== undefined){
         Nodeshot.currentUser.fetch();
