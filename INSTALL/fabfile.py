@@ -72,13 +72,15 @@ def install():
     supervisor_config()
     redis_install()
     start_server()
+    warning_message()
 
 def update():
     initialize()
     pull()
     install_requirements()
     sync_data()  
-      
+    start_server()
+    
 def clone():
     initialize()
     print(green("Cloning repository..."))
@@ -179,18 +181,22 @@ def create_settings():
         
 def sync_data():
     initialize()
-    print(green("***********************************************************"))
     print(green("Initializing Nodeshot..."))
-    print(green("Please provide details for Nodeshot superuser when required"))
-    print(green("***********************************************************"))
     virtual_env = 'source python/bin/activate'
-    sync_command = 'python manage.py syncdb && python manage.py migrate && python manage.py collectstatic --noinput'
+    sync_command = 'python manage.py syncdb --noinput && python manage.py migrate && python manage.py collectstatic --noinput'
     with cd (project_dir):
         run('mkdir -p log'  )
         run('touch log/%s.error.log' % project_name )
         run('chmod 666 log/%s.error.log' % project_name)
         run( virtual_env + ' &&  ' + sync_command)
-    
+
+def create_admin():
+    print(green("Creating Nodeshot admin account..."))
+    virtual_env = 'source python/bin/activate'
+    create_admin_command = 'python manage.py loaddata %sINSTALL/admin_fixture.json' % deploy_dir
+    with cd (project_dir):
+        run( virtual_env + ' &&  ' + create_admin_command)
+        
 def nginx_config():
     initialize()
     initialize_server()
@@ -254,6 +260,17 @@ def start_server():
     print(green("Cleaning installation directory..."))
     run ('rm -rf /tmp/nodeshot_install')
     print(green("Installation completed"))
+    
+def warning_message():
+    initialize_server()
+    print(green("Cleaning installation directory..."))
+    run ('rm -rf /tmp/nodeshot_install')
+    print(green("\nINSTALLATION COMPLETED !\n"))
+    print (green("############################################################"))
+    print (green("                      WARNING:                     "))
+    print (green(" Superuser is currently set as 'admin' with password 'admin'"))
+    print (green(" Logon on %s/admin and change it " % server_name))
+    print (green("############################################################"))    
     
 
 
