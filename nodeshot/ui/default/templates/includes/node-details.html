@@ -147,7 +147,7 @@
         <div id="comments">
             <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
 
-            <% if(!Nodeshot.currentUser.isNew()){ %>
+            <% if(Nodeshot.currentUser.isAuthenticated()){ %>
             <form action="" class="new-comment" method="post">
                 <div class="input-group">
                     <span class="input-group-addon">

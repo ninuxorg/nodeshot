@@ -204,7 +204,7 @@ $(document).ready(function ($) {
     $('.hastip').tooltip();
 
     // load full user profile
-    if(Nodeshot.currentUser.get('username') !== undefined){
+    if(Nodeshot.currentUser.isAuthenticated()){
         Nodeshot.currentUser.fetch();
     }
 });

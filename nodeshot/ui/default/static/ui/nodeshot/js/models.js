@@ -11,7 +11,7 @@ var Page = Backbone.Model.extend({
 var Node = Backbone.Model.extend({
     urlRoot: '/api/v1/nodes/',
     idAttribute: 'slug',
-    
+
     defaults: {
         "relationships": false
     },
@@ -25,9 +25,13 @@ var Node = Backbone.Model.extend({
 var User = Backbone.Model.extend({
     urlRoot: '/api/v1/profiles/',
     idAttribute: 'username',
-    
+
     defaults: {
         "avatar": "http://www.gravatar.com/avatar/default"
+    },
+
+    isAuthenticated: function(){
+        return this.get('username') !== undefined;
     },
 
     url: function () {

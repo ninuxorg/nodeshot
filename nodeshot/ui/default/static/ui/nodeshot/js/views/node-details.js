@@ -4,21 +4,21 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     id: 'map-container',
     className: 'short-map',
     template: '#node-details-template',
-    
+
     ui: {
         'commentTextarea': '.new-comment textarea',
         'commentTextareaContainer': '.new-comment .form-control',
         'submitRow': '.new-comment .submit-row'
     },
-    
+
     events: {
         // actions
         'click .icon-link': 'permalink',
-        
+
         // vote
         'click .icon-thumbs-up': 'like',
         'click .icon-thumbs-down': 'dislike',
-        
+
         // comments
         'keypress @ui.commentTextarea': 'keyPressCommentTextarea',
         'keydown @ui.commentTextarea': 'keyDownCommentTextarea',
@@ -26,7 +26,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         'focusout @ui.commentTextarea': 'focusOutCommentTextarea',
         'submit form.new-comment': 'submitComment'
     },
-    
+
     modelEvents: {
         'change': 'render'
     },
@@ -39,7 +39,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
                 trackResize: true,
                 scrollWheelZoom: false
             }).setView(marker._latlng, 17);
-        
+
         // TODO: FIXME & DRY
         marker = L.circleMarker(marker._latlng, marker.options);
         // add marker to map
@@ -64,10 +64,10 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     initialize: function () {
         // bind to namespaced events
         $(window).on("resize.node-details", _.bind(this.resize, this));
-        
+
         // fetch details from DB
         this.model.fetch();
-        
+
         this.listenTo(Nodeshot.currentUser, 'change', function(){ this.render() });
     },
 
@@ -86,7 +86,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         setMapDimensions();
         this.setMinHeight();
     },
-    
+
     /*
      * set min-heigh css property on map-container div
      */
@@ -99,7 +99,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             $('#node-details').css('min-height', newMinHeight);
         }
     },
-    
+
     /*
      * prompt permalink
      */
@@ -108,13 +108,17 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         var text = $(e.target).attr('data-text');
         window.prompt(text, window.location.href)
     },
-    
+
     /*
      * like
      */
     like: function(e){
         e.preventDefault();
-        
+        if(!Nodeshot.currentUser.isAuthenticated()){
+            $('#signin-modal').modal('show');
+            return;
+        }
+
         var relationships = this.model.get('relationships'),
             backup = relationships.counts.likes,
             self = this;
@@ -123,7 +127,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         this.model.set('relationships', relationships);
         $(e.target).text(relationships.counts.likes);
         $('.icon-thumbs-down').addClass('fade');
-        
+
         $.post(relationships.votes_url, { vote: 1 })
         // restore backup in case of error
         .error(function(http){
@@ -134,13 +138,17 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             createModal({ message: 'error' })
         });
     },
-    
+
     /*
      * dislike
      */
     dislike: function(e){
         e.preventDefault();
-        
+        if(!Nodeshot.currentUser.isAuthenticated()){
+            $('#signin-modal').modal('show');
+            return;
+        }
+
         var relationships = this.model.get('relationships'),
             backup = relationships.counts.dislikes,
             self = this;
@@ -149,7 +157,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         this.model.set('relationships', relationships);
         $(e.target).text(relationships.counts.dislikes);
         $('.icon-thumbs-up').addClass('fade');
-        
+
         $.post(relationships.votes_url, { vote: -1 })
         // rollback in case of error
         .error(function(http){
@@ -160,9 +168,9 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             createModal({ message: 'error' })
         });
     },
-    
+
     /* comment textarea animations */
-    
+
     keyPressCommentTextarea: function(e){
         // when start entering text
         if(this.ui.commentTextarea.val().length <= 0){
@@ -174,7 +182,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             this.ui.commentTextareaContainer.animate({height: 100}, 250);
         }
     },
-    
+
     keyDownCommentTextarea: function(e){
         // if deleting the last bit of text
         // that is: pressing backspace when only 1 character
@@ -183,7 +191,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             this.ui.commentTextarea.addClass('initial');
         }
     },
-    
+
     keyUpCommentTextarea: function(e){
         // if all text is deleted
         if(this.ui.commentTextarea.val().length <= 0){
@@ -191,7 +199,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             this.ui.commentTextarea.addClass('initial');
         }
     },
-    
+
     focusOutCommentTextarea: function(e){
         // if textarea empty
         if(this.ui.commentTextarea.val().length <= 0){
@@ -203,17 +211,17 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             this.ui.commentTextareaContainer.animate({height: 50}, 250);
         }
     },
-    
+
     /*
      * add comment
      */
     submitComment: function(e){
         e.preventDefault();
-        
+
         var self = this,
             relationships = this.model.get('relationships'),
             commentText = this.ui.commentTextarea.val();
-        
+
         // add comment to UI
         relationships.comments.push(
             {
@@ -230,7 +238,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
                 scrollTop: $('.comment').last().offset().top
             }, 100);
         }
-        
+
         // add comment to DB
         $.post(relationships.comments_url, { text: commentText })
         // rollback in case of error
