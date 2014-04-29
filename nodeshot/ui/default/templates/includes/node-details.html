@@ -116,20 +116,23 @@
                             <span class="icon-cancel"></span>
                         </td>
                     </tr>-->
+                    <% if(relationships){ %>
                     <tr>
                         <td class="left">
                             {% trans 'Rating' %}:
                         </td>
-                        <td class="right" id="rating-js">
+                        <td class="right" id="js-rating" data-thanks-message="{% trans 'Thanks for rating' %}">
                             <a href="javascript:createModal({message:'not implemented yet'})" class="rating">
-                                <span class="icon-star"></span>
-                                <span class="icon-star"></span>
-                                <span class="icon-star-half"></span>
-                                <span class="icon-star-empty"></span>
-                                <span class="icon-star-empty"></span>
+                                <% _.each(Nodeshot.body.currentView.ratingTo5Stars(), function(style, i){ %>
+                                    <span class="icon-star-<%= style %>"
+                                          data-original-class="icon-star-<%= style %>"
+                                          data-number="<%= i %>"></span>
+                                <% }) %>
                             </a>
+                            <span class="rating-count">(<a class="hastip" title="{% trans 'number of ratings' %}"><%= relationships.counts.rating_count %></a>)<span>
                         </td>
                     </tr>
+                    <% } %>
                 </table>
                 <% if(description){ %>
                 <h3>{% trans 'Description' %}</h3>

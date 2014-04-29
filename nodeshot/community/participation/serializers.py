@@ -42,15 +42,15 @@ class PaginationSerializer(pagination.BasePaginationSerializer):
 
 class CommentAddSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment       
+        model = Comment
         fields= ('node', 'user', 'text', )
-    
-    
+
+
 class CommentListSerializer(serializers.ModelSerializer):
     """ Comment serializer """
     node = serializers.Field(source='node.name')
     username = serializers.Field(source='user.username')
-    
+
     class Meta:
         model = Comment
         fields = ('node', 'username', 'text', 'added')
@@ -59,7 +59,7 @@ class CommentListSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     username = serializers.Field(source='user.username')
-    
+
     class Meta:
         model = Comment
         fields = ('username', 'text', 'added',)
@@ -67,7 +67,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class NodeCommentSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(source='comment_set')
-    
+
     class Meta:
         model = Node
         fields = ('name', 'description', 'comments')
@@ -76,7 +76,7 @@ class NodeCommentSerializer(serializers.ModelSerializer):
 class CommentRelationSerializer(serializers.ModelSerializer):
     """ display user info """
     user = ProfileRelationSerializer(source='user')
-    
+
     class Meta:
         model = Comment
         fields = ('user', 'text', 'added',)
@@ -84,15 +84,15 @@ class CommentRelationSerializer(serializers.ModelSerializer):
 
 class RatingAddSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Rating       
+        model = Rating
         fields= ('node', 'user', 'value', )
-    
-    
+
+
 class RatingListSerializer(serializers.ModelSerializer):
     """ Rating serializer """
     node = serializers.Field(source='node.name')
     username = serializers.Field(source='user.username')
-    
+
     class Meta:
         model = Rating
         fields = ('node', 'username', 'value',)
@@ -101,32 +101,32 @@ class RatingListSerializer(serializers.ModelSerializer):
 
 class VoteAddSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Vote       
+        model = Vote
         fields= ('node', 'user', 'vote', )
-    
-    
+
+
 class VoteListSerializer(serializers.ModelSerializer):
     """ Votes serializer """
     node = serializers.Field(source='node.name')
     username = serializers.Field(source='user.username')
-    
+
     class Meta:
         model = Vote
         fields = ('node', 'username', 'vote',)
-        read_only_fields = ('added',)   
+        read_only_fields = ('added',)
 
- 
+
 class ParticipationSerializer(serializers.ModelSerializer):
     class Meta:
         model = NodeRatingCount
         fields = ('likes', 'dislikes', 'rating_count',
                   'rating_avg', 'comment_count')
 
-    
+
 class NodeParticipationSerializer(serializers.ModelSerializer):
     """ Node participation details """
     participation = ParticipationSerializer(source='noderatingcount')
-    
+
     class Meta:
         model=Node
         fields= ('name', 'slug', 'address', 'participation')
@@ -137,11 +137,11 @@ class NodeSettingsSerializer(serializers.ModelSerializer):
         model = NodeParticipationSettings
         fields = ('voting_allowed', 'rating_allowed', 'comments_allowed',)
 
-    
+
 class NodeParticipationSettingsSerializer(serializers.ModelSerializer):
     """ Node participation settings """
     participation_settings = NodeSettingsSerializer(source='node_participation_settings')
-    
+
     class Meta:
         model = Node
         fields = ('name', 'slug', 'address', 'participation_settings')
@@ -152,11 +152,11 @@ class LayerSettingsSerializer(serializers.ModelSerializer):
         model = LayerParticipationSettings
         fields = ('voting_allowed', 'rating_allowed', 'comments_allowed',)
 
-    
+
 class LayerParticipationSettingsSerializer(serializers.ModelSerializer):
     """ Layer participation settings"""
     participation_settings = LayerSettingsSerializer(source='layer_participation_settings')
-    
+
     class Meta:
         model=Node
         fields= ('name', 'slug', 'participation_settings')
@@ -182,6 +182,12 @@ ExtensibleNodeSerializer.add_relationship(
 ExtensibleNodeSerializer.add_relationship(
     'votes_url',
     view_name='api_node_votes',
+    lookup_field='slug'
+)
+
+ExtensibleNodeSerializer.add_relationship(
+    'ratings_url',
+    view_name='api_node_ratings',
     lookup_field='slug'
 )
 

@@ -8,7 +8,8 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     ui: {
         'commentTextarea': '.new-comment textarea',
         'commentTextareaContainer': '.new-comment .form-control',
-        'submitRow': '.new-comment .submit-row'
+        'submitRow': '.new-comment .submit-row',
+        'stars': '#js-rating a span'
     },
 
     events: {
@@ -24,7 +25,12 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         'keydown @ui.commentTextarea': 'keyDownCommentTextarea',
         'keyup @ui.commentTextarea': 'keyUpCommentTextarea',
         'focusout @ui.commentTextarea': 'focusOutCommentTextarea',
-        'submit form.new-comment': 'submitComment'
+        'submit form.new-comment': 'submitComment',
+
+        // rate
+        'mouseover @ui.stars': 'mouseOverStar',
+        'mouseout @ui.stars': 'mouseOutStar',
+        'click @ui.stars': 'rate'
     },
 
     modelEvents: {
@@ -59,6 +65,9 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         });
         setMapDimensions();
         this.setMinHeight();
+
+        // enable tooltips
+        $('.hastip').tooltip();
     },
 
     initialize: function () {
@@ -68,7 +77,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         // fetch details from DB
         this.model.fetch();
 
-        this.listenTo(Nodeshot.currentUser, 'change', function(){ this.render() });
+        this.listenTo(Nodeshot.currentUser, 'change', this.render);
     },
 
     /*
@@ -249,6 +258,84 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             self.model.trigger('change');
             // display error
             createModal({ message: 'error' });
+        });
+    },
+
+    /*
+     * convert rating_avg to an array of 5 elements
+     * in which each element is a string that indicates
+     * whether the start should be displayed as "full", "half" or "empty"
+     */
+    ratingTo5Stars: function(){
+        // cache relationships
+        var relationships = this.model.get('relationships'),
+            // convert to 5 star based
+            value = relationships.counts.rating_avg / 2,
+            // init empty array that will store results
+            stars = [];
+
+        // populate array
+        for(var i=1; i<=5; i++){
+            if(value >= 1){
+                stars.push('full');
+            }
+            else if(value >= 0.5){
+                stars.push('half')
+            }
+            else{
+                stars.push('empty')
+            }
+            value--;
+        }
+
+        return stars
+    },
+
+    /*
+     * highlight stars on mouse over
+     */
+    mouseOverStar: function(e){
+        var target = $(e.target),
+            currentNumber = target.attr('data-number');
+
+        _.each(this.ui.stars, function(el, i){
+            //console.log(currentNumber, i, currentNumber >= );
+            if(currentNumber >= i){
+                $(el).attr('class', 'icon-star-full');
+            }
+        });
+    },
+
+    /*
+     * restore stars original status on mouseout
+     */
+    mouseOutStar: function(e){
+        _.each(this.ui.stars, function(el, i){
+            $(el).attr('class', $(el).attr('data-original-class'));
+        });
+    },
+
+    /*
+     * submit rating, only if logged in
+     */
+    rate: function(e){
+        e.preventDefault();
+        if(!Nodeshot.currentUser.isAuthenticated()){
+            $('#signin-modal').modal('show');
+            return;
+        }
+
+        var relationships = this.model.get('relationships'),
+            value = (parseInt($(e.target).attr('data-number')) + 1) * 2,  // (0-index value + 1) * 2
+            self = this;
+
+        $.post(relationships.ratings_url, { "value": value })
+        .done(function(){
+            createModal({ message: $('#js-rating').attr('data-thanks-message') });
+            self.model.fetch();
+        })
+        .error(function(xhr){
+            createModal({ message: xhr.responseJSON["__all__"] });
         });
     }
 });

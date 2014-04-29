@@ -1173,6 +1173,14 @@ img.avatar{
     white-space: nowrap;
 }
 
+.rating span{
+    margin-right: -4px;
+    padding-right: 3px;
+}
+
+.rating-count{ margin-left: 5px }
+.rating-count a{ text-decoration: none; cursor: default; }
+
 .leaflet-popup-content{
 	min-width: 120px;
 	max-width: 300px;

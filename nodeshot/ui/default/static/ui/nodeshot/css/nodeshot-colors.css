@@ -106,7 +106,7 @@ body > header{
 #general-search-input::-moz-placeholder {
     /* FF 19+ */
     color: #979696;
-}    
+}
 #general-search-input:-ms-input-placeholder {
     /* IE 10+ */
     color: #979696;
@@ -378,12 +378,12 @@ body article a:focus,
     background: -ms-linear-gradient(top,  #989aa1 0%,#777a81 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #989aa1 0%,#777a81 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#989aa1', endColorstr='#777a81',GradientType=0 ); /* IE6-9 */
-    
+
     border-top: 1px solid #94969d;
     border-right: 1px solid #6d7078;
     border-bottom: 1px solid #52555f;
     border-left: 1px solid #6a6d76 !important;
-    
+
     padding: 5px 9px !important;
 }
 
@@ -872,7 +872,7 @@ a.icon-thumbs-down:hover{ color: #e20a00 }
 
 .icon-ok,
 .icon-cancel,
-.icon-star,
+.icon-star-full,
 .icon-star-half,
 .icon-star-empty,
 .icon-thumbs-up,
@@ -890,13 +890,13 @@ a.icon-thumbs-down:hover{ color: #e20a00 }
     border-radius: 5px;
 }
 
-.icon-star,
+.icon-star-full,
 .icon-star-half,
 .icon-star-empty{
     color: #ffa803;
 }
 
-.icon-star:before,
+.icon-star-full:before,
 .icon-star-half:before,
 .icon-star-empty:before,
 .icon-thumbs-up:before,
