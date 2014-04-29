@@ -5,7 +5,7 @@
 
 <div id="map-overlay-container">
     <article id="node-details" class="center-stage responsive-padding">
-        
+
         <h2>
             <%= name %>
             <% if(relationships){ %>
@@ -19,22 +19,24 @@
             </span>
             <% } %>
         </h2>
-        
+
         <p class="actions">
-            <a href="javascript:createModal({message:'not implemented yet'})"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
-            <a href="javascript:createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
+            <% if(user) { %>
+                <a href="javascript:createModal({message:'not implemented yet'})"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
+                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
+            <% } %>
             <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
             <% if(Nodeshot.accountMenu.model.get('username') !== undefined){ %>
                 <a href="javascript:createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
             <% } %>
         </p>
-        
+
         <ul class="nav nav-tabs hidden-xs" id="node-menu">
             <li class="active"><a href="javascript:createModal({message:'not implemented yet'})">{% trans 'General info' %}</a></li>
             <!--<li><a href="javascript:createModal({message:'not implemented yet'})">Images (4)</a></li>
             <li><a href="javascript:createModal({message:'not implemented yet'})">Devices (3)</a></li>-->
         </ul>
-        
+
         <ul class="nav nav-pills visible-xs" id="node-menu-mobile">
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:createModal({message:'not implemented yet'})">
@@ -46,7 +48,7 @@
                 </ul>
             </li>
         </ul>
-        
+
         <div class="row">
             <div class="col-sm-6 left">
                 <table class="table table-striped left-labels">
@@ -140,11 +142,11 @@
                 </div>
             </div>
         </div>
-        
+
         <% if(relationships){ %>
         <div id="comments">
             <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
-            
+
             <% if(!Nodeshot.currentUser.isNew()){ %>
             <form action="" class="new-comment" method="post">
                 <div class="input-group">
@@ -170,7 +172,7 @@
                 </a>
             </div>
             <% } %>
-            
+
             <% if(relationships.comments.length > 0){ %>
                 <% _.each(relationships.comments, function(comment, i){ %>
                     <div class="comment" id="c-<%= i %>">
@@ -192,7 +194,7 @@
             <% } %>
         </div>
         <% } %>
-        
+
         <a href="#/map" class="icon-close"></a>
     </div>
 </div>
