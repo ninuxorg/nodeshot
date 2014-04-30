@@ -26,6 +26,7 @@ before_script:
   - cd tests
   - python manage.py syncdb --noinput
   - python manage.py migrate --noinput
+  - python manage.py collectstatic --noinput
   - python manage.py runserver 0.0.0.0:8000 &
 
 # command to run tests, e.g. python setup.py test
