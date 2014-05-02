@@ -123,7 +123,6 @@ if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
          * `limit=<n>`: specify number of items per page (defaults to 40)
          * `limit=0`: turns off pagination
         """
-        
         def get_queryset(self):
             try:
                 self.user = Profile.objects.get(username=self.kwargs['username'])
@@ -154,7 +153,6 @@ class SocialLinkMixin(object):
     """
     Current user queryset
     """
-    
     queryset = SocialLink.objects.select_related('user').only(
         'id', 'user', 'user__username', 'url', 'description', 'added', 'updated'
     )
@@ -176,7 +174,6 @@ class UserSocialLinksList(CustomDataMixin, SocialLinkMixin, generics.ListCreateA
     
     Insert new social link. Profile owner only.
     """
-    
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticatedOrReadOnly, IsProfileOwner)
     serializer_class = SocialLinkSerializer
@@ -203,7 +200,6 @@ class UserSocialLinksDetail(SocialLinkMixin, generics.RetrieveUpdateDestroyAPIVi
     
     Delete social link. Profile owner only.
     """
-    
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticatedOrReadOnly, IsProfileOwner)
     serializer_class = SocialLinkSerializer
@@ -365,7 +361,6 @@ class PasswordResetFromKey(generics.GenericAPIView):
      * password1
      * password2
     """
-    
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = (IsNotAuthenticated, )
     serializer_class = ResetPasswordKeySerializer
@@ -411,7 +406,6 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
         
         Add new email address.
         """
-        
         authentication_classes = (TokenAuthentication, SessionAuthentication)
         permission_classes = (IsAuthenticated,)
         serializer_class = EmailSerializer
@@ -451,7 +445,6 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
         
         Delete email address
         """
-        
         authentication_classes = (TokenAuthentication, SessionAuthentication)
         permission_classes = (IsAuthenticated,)
         serializer_class = EmailEditSerializer
@@ -484,15 +477,14 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
     
     
     class ResendEmailConfirmation(APIView):
-        """
-        Resend email confirmation
-        """
-        
+        """ Resend email confirmation """
         authentication_classes = (TokenAuthentication, SessionAuthentication)
         permission_classes = (IsAuthenticated,)
         
         def post(self, request, *args, **kwargs):
-            
+            """
+            Resend email confirmation
+            """
             try:
                 email_address = EmailAddress.objects.get(user=request.user, pk=kwargs.get('pk', None))
             except EmailAddress.DoesNotExist:

@@ -29,10 +29,7 @@ __all__ = [
     'ResetPasswordSerializer',
     'ResetPasswordKeySerializer',
     'SocialLinkSerializer',
-    'SocialLinkAddSerializer',
-    'EmailSerializer',
-    'EmailAddSerializer',
-    'EmailEditSerializer'
+    'SocialLinkAddSerializer'
 ]
 
 
@@ -330,6 +327,12 @@ class ResetPasswordKeySerializer(serializers.Serializer):
 
 # email addresses
 if PROFILE_EMAIL_CONFIRMATION:
+    
+    __all__ += [
+        'EmailSerializer',
+        'EmailAddSerializer',
+        'EmailEditSerializer'
+    ]
     
     class EmailSerializer(serializers.ModelSerializer):
         details = serializers.HyperlinkedIdentityField(lookup_field='pk', view_name='api_account_email_detail')

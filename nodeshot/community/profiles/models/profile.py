@@ -5,7 +5,6 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserM
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from emailconfirmation.models import EmailAddress
 from nodeshot.core.base.utils import now
 from ..signals import password_changed
 
@@ -89,6 +88,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         Add email to DB and sends a confirmation mail if PROFILE_EMAL_CONFIRMATION is True
         """
         if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+            from emailconfirmation.models import EmailAddress
             self.is_active = False
             self.save()
             EmailAddress.objects.add_email(self, self.email)

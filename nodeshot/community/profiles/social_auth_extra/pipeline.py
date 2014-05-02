@@ -6,7 +6,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from social_auth.models import UserSocialAuth
 
-if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+PROFILE_EMAIL_CONFIRMATION = settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True)
+
+if PROFILE_EMAIL_CONFIRMATION:
     from emailconfirmation.models import EmailAddress
 
 
@@ -18,7 +20,7 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
     social_user = social_user or \
                   UserSocialAuth.get_social_auth(backend.name, uid)
     
-    if kwargs['is_new']:
+    if kwargs['is_new'] and PROFILE_EMAIL_CONFIRMATION:
         emailaddress = EmailAddress(**{
             'user': user,
             'email': user.email,
