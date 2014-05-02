@@ -34,7 +34,8 @@ startup.py
 __GRAFICA
 celery.log
 projects/ninux/server.py
-static/
+/static/
+/tests/static/
 cesium/
 cache/
 *.log
