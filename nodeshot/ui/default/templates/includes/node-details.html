@@ -22,7 +22,7 @@
 
         <p class="actions">
             <% if(user) { %>
-                <a href="javascript:createModal({message:'not implemented yet'})"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
+                <a href="#/users/<%= user %>"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
                 <a href="javascript:createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
             <% } %>
             <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
@@ -179,12 +179,12 @@
             <% if(relationships.comments.length > 0){ %>
                 <% _.each(relationships.comments, function(comment, i){ %>
                     <div class="comment" id="c-<%= i %>">
-                        <a href="javascript:createModal({message:'not implemented yet'})">
+                        <a href="#/users/<%= comment.user.username %>">
                             <img class="avatar" src="<%= comment.user.avatar %>" alt="">
                         </a>
                         <div class="meta-data">
-                            <a href="javascript:createModal({message:'not implemented yet'})">
-                                <%= comment.user.full_name %>
+                            <a href="#/users/<%= comment.user.username %>">
+                                <%= comment.user.username %>
                             </a>
                             <span class="separator">•</span>
                             <span class="date"><%= $.format.prettyDate(comment.added) %></span>

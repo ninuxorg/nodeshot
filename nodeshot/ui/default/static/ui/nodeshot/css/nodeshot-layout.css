@@ -1084,6 +1084,7 @@ img.avatar{
     height: 50px;
     border-radius: 5px;
 }
+img.avatar200{ border-radius: 15% }
 
 #comments h3{
     margin-bottom: 20px;
