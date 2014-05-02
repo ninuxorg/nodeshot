@@ -237,14 +237,17 @@ class AccountLogin(generics.GenericAPIView):
             login(request, serializer.instance)
         
             if request.DATA.get('remember'):
+                # TODO: remember configurable
                 request.session.set_expiry(60 * 60 * 24 * 7 * 3)
             else:
                 request.session.set_expiry(0)
                 
             return Response({
                 'detail': _(u'Logged in successfully'),
-                # TODO: maybe more user info in the request would have sense
-                'user': ProfileRelationSerializer(serializer.instance).data
+                'user': ProfileRelationSerializer(
+                    serializer.instance,
+                    context={ 'request': request }
+                ).data
             })
         
         return Response(serializer.errors, status=400)

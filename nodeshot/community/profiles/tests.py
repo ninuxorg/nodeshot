@@ -23,7 +23,6 @@ from .models import PasswordReset, SocialLink
 
 
 class ProfilesTest(TestCase):
-    
     fixtures = [
         'initial_data.json',
         'test_profiles.json',
@@ -163,6 +162,38 @@ class ProfilesTest(TestCase):
         self.client.logout()
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+    
+    def test_profile_detail_API_get_location(self):
+        url = reverse('api_profile_detail', args=['registered'])
+        user = User.objects.get(username='registered')
+        
+        # expects None
+        user.city = ''
+        user.country = ''
+        user.save()
+        response = self.client.get(url)
+        self.assertEqual(response.data['location'], None)
+        
+        # expects City, Country
+        user.city = 'Rome'
+        user.country = 'Italy'
+        user.save()
+        response = self.client.get(url)
+        self.assertEqual(response.data['location'], 'Rome, Italy')
+        
+        # expects City
+        user.city = 'Rome'
+        user.country = ''
+        user.save()
+        response = self.client.get(url)
+        self.assertEqual(response.data['location'], 'Rome')
+        
+        # expects Country
+        user.city = ''
+        user.country = 'Italy'
+        user.save()
+        response = self.client.get(url)
+        self.assertEqual(response.data['location'], 'Italy')
     
     def test_account_detail_API(self):
         url = reverse('api_account_detail')

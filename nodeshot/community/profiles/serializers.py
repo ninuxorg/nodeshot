@@ -37,7 +37,6 @@ __all__ = [
 
 
 class LoginSerializer(serializers.Serializer):
-    
     username = serializers.CharField(max_length=User._meta.get_field('username').max_length)
     password = serializers.CharField(max_length=PASSWORD_MAX_LENGTH)
     remember = serializers.BooleanField(default=True, help_text = _("If checked you will stay logged in for 3 weeks"))
@@ -67,7 +66,6 @@ class LoginSerializer(serializers.Serializer):
 
 
 class SocialLinkSerializer(serializers.ModelSerializer):
-    
     user = serializers.Field(source='user.username')
     details = serializers.SerializerMethodField('get_detail_url')
     
@@ -85,7 +83,6 @@ class SocialLinkSerializer(serializers.ModelSerializer):
 
 
 class SocialLinkAddSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = SocialLink
         read_only_fields = ('added', 'updated', )
@@ -93,10 +90,10 @@ class SocialLinkAddSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     """ Profile Serializer for visualization """
-    
     details = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_profile_detail')
     avatar = serializers.SerializerMethodField('get_avatar')
     full_name = serializers.SerializerMethodField('get_full_name')
+    location = serializers.SerializerMethodField('get_location')
     social_links_url = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_user_social_links_list')
     social_links = SocialLinkSerializer(source='sociallink_set', many=True, read_only=True)
     
@@ -111,13 +108,23 @@ class ProfileSerializer(serializers.ModelSerializer):
         """ user's full name """
         return obj.get_full_name()
     
+    def get_location(self, obj):
+        """ return user's location """
+        if not obj.city and not obj.country:
+            return None
+        elif obj.city and obj.country:
+            return '%s, %s' % (obj.city, obj.country)
+        elif obj.city or obj.country:
+            return obj.city or obj.country
+    
     class Meta:
         model = User
         fields = [
             'details',
             'username', 'full_name', 'first_name', 'last_name',
-            'about', 'gender', 'birth_date', 'address', 'city', 'country',
-            'date_joined', 'avatar',
+            'about', 'gender', 'birth_date', 'address', 'city',
+            'country', 'location',
+            'date_joined', 'last_login', 'avatar',
         ]
         
         if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
@@ -125,12 +132,15 @@ class ProfileSerializer(serializers.ModelSerializer):
             
         fields += ['social_links_url', 'social_links']
             
-        read_only_fields = ('username', 'date_joined',)
+        read_only_fields = (
+            'username',
+            'date_joined',
+            'last_login'
+        )
 
 
 class ProfileCreateSerializer(ExtraFieldSerializer):
     """ Profile Serializer for User Creation """
-    
     password_confirmation = serializers.CharField(label=_('password_confirmation'),
                                                   max_length=PASSWORD_MAX_LENGTH)
     email = serializers.CharField(source='email', required='email' in User.REQUIRED_FIELDS)
@@ -161,7 +171,6 @@ class ProfileCreateSerializer(ExtraFieldSerializer):
 
 class ProfileRelationSerializer(ProfileSerializer):
     """ Profile Serializer used for linking """
-    
     class Meta:
         model = User
         fields = ('username', 'full_name', 'city', 'country', 'avatar', 'details')
@@ -180,20 +189,29 @@ ExtensibleNodeSerializer.add_relationship(
 
 class AccountSerializer(serializers.ModelSerializer):
     """ Account serializer """
-    
-    profile = serializers.HyperlinkedIdentityField(lookup_field='username',
-                                                view_name='api_profile_detail')
-    social_links = serializers.HyperlinkedIdentityField(lookup_field='username',
-                                                view_name='api_user_social_links_list')
-    change_password = HyperlinkedField(view_name='api_account_password_change')
+    profile = serializers.HyperlinkedIdentityField(
+        lookup_field='username',
+        view_name='api_profile_detail'
+    )
+    social_links = serializers.HyperlinkedIdentityField(
+        lookup_field='username',
+        view_name='api_user_social_links_list'
+    )
+    change_password = HyperlinkedField(
+        view_name='api_account_password_change'
+    )
     logout = HyperlinkedField(view_name='api_account_logout')
     
     if PROFILE_EMAIL_CONFIRMATION:
         email_addresses = HyperlinkedField(view_name='api_account_email_list')
     
     if NOTIFICATIONS_INSTALLED:
-        web_notification_settings = HyperlinkedField(view_name='api_notification_web_settings')
-        email_notification_settings = HyperlinkedField(view_name='api_notification_email_settings')
+        web_notification_settings = HyperlinkedField(
+            view_name='api_notification_web_settings'
+        )
+        email_notification_settings = HyperlinkedField(
+            view_name='api_notification_email_settings'
+        )
     
     class Meta:
         model = User
@@ -255,7 +273,6 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class ResetPasswordSerializer(serializers.Serializer):
-    
     email = serializers.EmailField(required = True)
     
     def validate_email(self, attrs, source):
@@ -278,7 +295,6 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 
 class ResetPasswordKeySerializer(serializers.Serializer):
-    
     password1 = serializers.CharField(
         help_text = _('New Password'),
         max_length=PASSWORD_MAX_LENGTH
@@ -341,7 +357,6 @@ if PROFILE_EMAIL_CONFIRMATION:
     
     
     class EmailEditSerializer(EmailSerializer):
-        
         def validate_primary(self, attrs, source):
             """
             primary field validation
