@@ -351,7 +351,7 @@ article.center-stage{
 
     #main-actions a.dropdown-toggle{ min-width: 0 }
 
-    #node-details .actions a{
+    .actions a{
         margin-right: 18px;
     }
 }
@@ -475,6 +475,8 @@ article.center-stage{
 
     body > article > h1,
     body > article h2{ letter-spacing: -3px; word-spacing: -1px }
+    
+    .avatar200{ float: none !important }
 }
 
 /* Extra small adjustments */
@@ -970,17 +972,17 @@ article.center-stage{
     background-color: #aba49c;
 }
 
-#node-details .actions{
+.actions{
     margin: 30px 0;
     clear: both;
 }
 
-#node-details .actions a{
+.actions a{
     margin-right: 30px;
     white-space: nowrap;
 }
 
-#node-details .actions a:before{
+.actions a:before{
     color: #000;
     text-decoration: none;
     font-size: 18px;
@@ -989,20 +991,19 @@ article.center-stage{
     margin-right: 6px;
 }
 
-#node-details .actions img{
+.actions img{
     width: 19px;
     margin-right: 6px
 }
 
 @media screen and (max-width: 500px){
-    #node-details .actions a:before,
-    #node-details .actions img{
+    .actions a:before,
+    .actions img{
         margin: 0 4px 0 0 !important;
     }
-    #node-details .actions a{
+    .actions a{
         margin-right: 10px;
     }
-
 }
 
 article .nav-tabs,
@@ -1190,3 +1191,13 @@ img.avatar{
 .leaflet-popup-content .details{ text-align: center }
 
 .displaynone{ display: none }
+
+.avatar200{
+    float: left;
+    width: 200px;
+    height: 200px;
+    margin: 0 28px 10px 0;
+}
+
+.nomargin{ margin: 0 !important }
+.nopadding{ padding: 0 !important }

@@ -95,6 +95,19 @@ var NodeshotController = {
             this.getMap();
         }
         Nodeshot.nodesNamed[slug].openPopup();
+    },
+    
+    // user profile view
+    getUser: function (username) {
+        var user = new User({ username: username });
+        
+        user.fetch()
+        .done(function(){
+            Nodeshot.body.close();
+            Nodeshot.body.show(new UserDetailsView({
+                model: user
+            }));
+        });
     }
 }
 
@@ -106,7 +119,8 @@ var NodeshotRouter = new Marionette.AppRouter({
         "pages/:slug": "getPage",
         "map": "getMap",
         "map/:slug": "getMapNode",
-        "nodes/:slug": "getNode"
+        "nodes/:slug": "getNode",
+        "users/:username": "getUser"
     }
 });
 
@@ -282,8 +296,14 @@ $(document).ajaxStop(function () {
     toggleLoading('hide');
 });
 
+// extend underscore with formatDateTime shortcut
+_.formatDateTime = function(dateString){
+	// TODO: format configurable
+	return $.format.date(dateString, "dd MMMM yyyy - HH:mm")
+};
+
 // extend underscore with formatDate shortcut
 _.formatDate = function(dateString){
 	// TODO: format configurable
-	return $.format.date(dateString, "dd MMMM yyyy - HH:mm")
+	return $.format.date(dateString, "dd MMMM yyyy")
 };
