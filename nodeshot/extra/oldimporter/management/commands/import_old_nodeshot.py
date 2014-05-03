@@ -1,6 +1,7 @@
 import sys
 import string
 import random
+from optparse import make_option
 
 from netaddr import ip
 
@@ -104,6 +105,16 @@ class Command(BaseCommand):
     saved_links = []
     saved_contacts = []
     
+    option_list = BaseCommand.option_list + (
+        make_option(
+            '--noinput',
+            action='store_true',
+            dest='noinput',
+            default=False,
+            help='Do not prompt for user intervention and use default settings'
+        ),
+    )
+    
     def message(self, message):
         self.stdout.write('%s\n\r' % message) 
     
@@ -113,6 +124,7 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         """ execute synchronize command """
+        self.options = options
         delete = False
         
         try:
@@ -152,6 +164,10 @@ class Command(BaseCommand):
             self.delete_imported_data()
     
     def confirm_operation_completed(self):
+        # if noinput param do not ask for confirmatin
+        if self.options.get('noinput') is True:
+            return
+        
         self.message("Are you satisfied with the results? If not all imported data will be deleted\n\n[Y/n]")
         
         while True:
@@ -240,6 +256,10 @@ choose (enter the number of) one of the following layers:
         sys.stdout.write(question + prompt)
         
         while True:
+            if options.get('noinput') is True:
+                answer = 'default'
+                break
+            
             answer = raw_input().lower()
             if answer == '':
                 answer = "default"
