@@ -68,7 +68,6 @@ class OldNode(models.Model):
     class Meta:
         verbose_name = _('Node')
         verbose_name_plural = _('Nodes')
-        app_label = 'old_nodeshot'
         db_table = 'nodeshot_node'
 
 
@@ -90,7 +89,6 @@ class OldDevice(models.Model):
         unique_together = (('node', 'cname'),)
         verbose_name = _('OldDevice')
         verbose_name_plural = _('OldDevices')
-        app_label = 'old_nodeshot'
         db_table = 'nodeshot_device'
 
 
@@ -104,7 +102,6 @@ class OldHna(models.Model):
     class Meta:
         verbose_name = _('Hna')
         verbose_name_plural = _('Hna')
-        app_label = 'old_nodeshot'
         db_table = 'nodeshot_hna'
 
 
@@ -140,7 +137,6 @@ class OldInterface(models.Model):
         unique_together = (('device', 'cname'),)
         verbose_name = _('Interface')
         verbose_name_plural = _('Interfaces')
-        app_label = 'old_nodeshot'
         db_table = 'nodeshot_interface'
 
 
@@ -181,7 +177,6 @@ class OldLink(models.Model):
     class Meta:
         verbose_name = _('Link')
         verbose_name_plural = _('Links')
-        app_label = 'old_nodeshot'
         db_table = 'nodeshot_link'
 
 
@@ -199,7 +194,6 @@ class OldStatistic(models.Model):
     class Meta:
         verbose_name = _('Statistic')
         verbose_name_plural = _('Statistics')
-        app_label = 'old_nodeshot'
         db_table = 'nodeshot_statistic'
 
 
@@ -220,5 +214,4 @@ class OldContact(models.Model):
     class Meta:
         verbose_name = _('Contact Log')
         verbose_name_plural = _('Contact Logs')
-        app_label = 'old_nodeshot'
         db_table = 'nodeshot_contact'

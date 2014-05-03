@@ -9,34 +9,36 @@ class DefaultRouter(object):
         """
         Reads from nodeshot2 db
         """
-        if model._meta.app_label != 'old_nodeshot':
+        if model._meta.app_label != 'oldimporter':
             return 'default'
+        return None
 
     def db_for_write(self, model, **hints):
         """
         Writes to nodeshot2 db
         """
-        if model._meta.app_label != 'old_nodeshot':
+        if model._meta.app_label != 'oldimporter':
             return 'default'
+        return None
 
     def allow_relation(self, obj1, obj2, **hints):
         """
         Relations between objects are allowed between nodeshot2 objects only
         """
-        if obj1._meta.app_label != 'old_nodeshot' and \
-           obj2._meta.app_label != 'old_nodeshot':
+        if obj1._meta.app_label != 'oldimporter' and \
+           obj2._meta.app_label != 'oldimporter':
            return True
         return None
 
-    def allow_migrate(self, db, model):
+    def allow_syncdb(self, db, model):
         """
         Make sure the old_nodeshot app only appears in the 'old_nodeshot' database
         """
-        if db != 'old_nodeshot':
+        if db != 'old_nodeshot' and model._meta.app_label != 'oldimporter':
             return True
-        return False
+        return None
     
-    allow_syncdb = allow_migrate
+    allow_migrate = allow_syncdb
 
 
 class OldNodeshotRouter(object):
@@ -44,32 +46,33 @@ class OldNodeshotRouter(object):
         """
         Reads old nodeshot models from old_nodeshot db.
         """
-        if model._meta.app_label == 'old_nodeshot':
+        if model._meta.app_label == 'oldimporter':
             return 'old_nodeshot'
+        return None
 
     def db_for_write(self, model, **hints):
         """
         Writes not allowed
         """
+        if model._meta.app_label == 'oldimporter':
+            return 'old_nodeshot'
         return None
 
     def allow_relation(self, obj1, obj2, **hints):
         """
         Relations between objects are allowed between old_nodeshot objects only
         """
-        if obj1._meta.app_label == 'old_nodeshot' and \
-           obj2._meta.app_label == 'old_nodeshot':
+        if obj1._meta.app_label == 'oldimporter' and \
+           obj2._meta.app_label == 'oldimporter':
            return True
         return None
 
-    def allow_migrate(self, db, model):
+    def allow_syncdb(self, db, model):
         """
         Make sure the old_nodeshot app only appears in the 'old_nodeshot' database
         """
-        if db == 'old_nodeshot':
-            return model._meta.app_label == 'old_nodeshot'
-        elif model._meta.app_label == 'old_nodeshot':
+        if db != 'old_nodeshot' or model._meta.app_label != 'oldimporter':
             return False
-        return None
+        return True
     
-    allow_syncdb = allow_migrate
+    allow_migrate = allow_syncdb
