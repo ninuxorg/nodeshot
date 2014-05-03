@@ -21,9 +21,12 @@ class UnreadNotificationSerializer(serializers.ModelSerializer):
     """
     Unread notification serializer
     """
-    
     from_user_id = serializers.Field(source='from_user_id')
-    from_user_detail = serializers.HyperlinkedRelatedField(source='from_user', view_name='api_profile_detail', read_only=True)
+    from_user_detail = serializers.HyperlinkedRelatedField(
+        source='from_user',
+        view_name='api_profile_detail',
+        read_only=True
+    )
     action = serializers.SerializerMethodField('get_action')
     
     def get_action(self, obj):
@@ -33,7 +36,7 @@ class UnreadNotificationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Notification
-        fields = ('id', 'type', 'from_user_id',
+        fields = ('id', 'type', 'is_read', 'from_user_id',
                   'from_user_detail', 'text', 'action', 'added')
 
 
@@ -41,7 +44,6 @@ class NotificationSerializer(UnreadNotificationSerializer):
     """
     Notification serializer
     """
-    
     class Meta:
         model = Notification
         fields = ('id', 'type', 'from_user_id', 'from_user_detail',
