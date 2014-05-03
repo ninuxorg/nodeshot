@@ -11,8 +11,8 @@
     <img src="<%= avatar %>?s=200" alt="" class="avatar200">
 
     <div class="col-sm-4 right nopadding">
-        <p><%= full_name %></p>
-        <p><%= location %></p>
+        <% if(full_name){ %><p><%= full_name %></p><% } %>
+        <% if(location){ %><p><%= location %></p><% } %>
         <p>{% trans 'Joined on' %} <%= _.formatDate(date_joined) %></p>
         <p>{% trans 'Last seen on' %} <%= _.formatDate(last_login) %></p>
     </div>
