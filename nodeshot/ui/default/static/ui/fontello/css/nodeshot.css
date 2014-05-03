@@ -95,3 +95,7 @@
 .icon-lock-open:before { content: '\e805'; } /* '' */
 .icon-edit:before { content: '\e825'; } /* '' */
 .icon-placeholder:before { content: '\e81d'; } /* '' */
+
+/* notification icons */
+#notifications .icon-node:before { content: '\e80c' }
+#notifications .icon-custom:before { content: '\e81c' }

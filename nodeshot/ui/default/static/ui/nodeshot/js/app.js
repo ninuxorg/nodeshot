@@ -9,12 +9,16 @@ Nodeshot.addInitializer(function () {
 
 // init layout
 Nodeshot.addInitializer(function () {
-
+    
+    Nodeshot.notifications = new NotificationCollection();
+    Nodeshot.notificationView = new NotificationCollectionView({
+        collection: Nodeshot.notifications
+    }).render();
+    
     Nodeshot.accountMenu = new AccountMenuView({
         model: Nodeshot.currentUser
     });
     Nodeshot.accountMenu.render();
-
 });
 
 // init pages

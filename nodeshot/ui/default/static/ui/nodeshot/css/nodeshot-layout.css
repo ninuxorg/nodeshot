@@ -1202,3 +1202,10 @@ img.avatar200{ border-radius: 15% }
 
 .nomargin{ margin: 0 !important }
 .nopadding{ padding: 0 !important }
+
+#notifications .empty{
+    margin: 0;
+    padding: 139px 0 0 0;
+    font-size: 15px;
+    text-align: center;
+}

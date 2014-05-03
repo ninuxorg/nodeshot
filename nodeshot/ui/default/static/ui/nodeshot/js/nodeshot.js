@@ -43,18 +43,6 @@ var setMapDimensions = function () {
     }
 }
 
-// TODO: refactor bad code
-var setNotificationsLeft = function () {
-    var notifications = $('#top-bar .notifications');
-
-    if (notifications.length) {
-        var left = notifications.offset().left,
-            button_width = notifications.outerWidth();
-        notifications_width = $('#notifications').getHiddenDimensions().width;
-        $('#notifications').css('left', left - notifications_width / 2 + button_width / 2);
-    }
-}
-
 // automatically center modal depending on its width
 $('body').delegate('.modal.autocenter', 'show.bs.modal', function (e) {
     var dialog = $(this).find('.modal-dialog'),
@@ -163,7 +151,6 @@ $('#general-search-input').keyup(function (e) {
 // map
 $(window).resize(function (e) {
     setCollapsibleMainMenuMaxHeight();
-    setNotificationsLeft();
 }).load(function (e) {
     setCollapsibleMainMenuMaxHeight();
     clearPreloader();
@@ -195,14 +182,4 @@ $(document).ready(function ($) {
     $('#nav-bar').delegate('#ns-top-nav-links.in a:not(.dropdown-toggle)', 'click', function (e) {
         $('#ns-top-nav-links').collapse('hide');
     });
-});
-
-$('#notifications').click(function (e) {
-    e.stopPropagation();
-});
-
-$('#notifications .scroller').mouseenter(function (e) {
-    $('.scroller-bar').fadeIn(255);
-}).mouseleave(function (e) {
-    $('.scroller-bar').fadeOut(255);
 });

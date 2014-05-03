@@ -62,43 +62,12 @@
                         {% trans 'Notifications' %}
                     </div>
                     <div class="right">
-                        <a href="#">{% trans 'See all' %}</a> <span>-</span>
-                        <a href="#">{% trans 'Settings' %}</a>
+                        <a href="javascript:createModal({message:'not implemented yet'})">{% trans 'See all' %}</a> <span>-</span>
+                        <a href="javascript:createModal({message:'not implemented yet'})">{% trans 'Settings' %}</a>
                     </div>
                 </div>
                 <div class="scroller">
-                    <ul>
-                        <li class="unread">
-                            <span class="icon-pin"></span>
-                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
-                            <p class="time">12 hours ago</p>
-                        </li>
-                        <li class="unread">
-                            <span class="icon-pin"></span>
-                            <p class="message">The status of your node <strong>Pomezia</strong> has changed from <strong>"proposed"</strong> to <strong>"approved"</strong></p>
-                            <p class="time">yesterday</p>
-                        </li>
-                        <li class="unread">
-                            <span class="icon-user"></span>
-                            <p class="message"><strong>Some event</strong> has just happened</p>
-                            <p class="time">Jan 24th 2014</p>
-                        </li>
-                        <li class="read">
-                            <span class="icon-mail"></span>
-                            <p class="message">Some <strong> other event</strong> has just happened</p>
-                            <p class="time">Jan 24th 2014</p>
-                        </li>
-                        <li class="read">
-                            <span class="icon-pin"></span>
-                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
-                            <p class="time">12 hours ago</p>
-                        </li>
-                        <li class="read">
-                            <span class="icon-pin"></span>
-                            <p class="message"><strong>ZioProto</strong> commented on your node <strong>Pomezia</strong>: "daje!"</p>
-                            <p class="time">12 hours ago</p>
-                        </li>
-                    </ul>
+                    <ul id="js-notifications-container"></ul>
                 </div>
             </div>
         </nav>
@@ -328,15 +297,28 @@
             </a>
 
             <ul class="dropdown-menu">
-                <li><a href="#" id="js-profile"><span class="icon-user"></span>{% trans 'My profile' %}</a></li>
-                <li><a href="#" id="js-settings"><span class="icon-wrench"></span>{% trans 'Settings' %}</a></li>
-                <li><a href="#" id="js-logout"><span class="icon-off"></span>{% trans 'Logout' %}</a></li>
+                <li>
+                    <a href="#/users/<%= username %>" id="js-profile">
+                        <span class="icon-user"></span>{% trans 'My profile' %}
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:createModal({message:'not implemented yet'})" id="js-settings">
+                        <span class="icon-wrench"></span>{% trans 'Settings' %}
+                    </a>
+                </li>
+                <li>
+                    <a href="#logout" id="js-logout">
+                        <span class="icon-off"></span>{% trans 'Logout' %}
+                    </a>
+                </li>
             </ul>
         </li>
         <% } else { %>
         <li>
             <a href="#" data-toggle="modal" data-target="#signup-modal">
-                <span class="icon-user-add"></span><span class="text">{% trans 'Sign up' %}</span>
+                <span class="icon-user-add"></span>
+                <span class="text">{% trans 'Sign up' %}</span>
             </a>
         </li>
         <li>
@@ -356,6 +338,16 @@
     <script id="page-template" type="text/template">
         <h1><%= title %></h1>
         <%= content %>
+    </script>
+    
+    <script id="notification-item-template" type="text/template">
+        <span class="icon-<%= icon %>"></span>
+        <p class="message"><%= text %></p>
+        <p class="time"><%= $.format.prettyDate(added) %></p>
+    </script>
+    
+    <script id="notification-empty-template" type="text/template">
+        <p class="empty">{% trans 'Nothing interesting yet!' %}</p>
     </script>
 
     <script id="map-template" type="text/template">
@@ -442,6 +434,7 @@
 
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/account-menu.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/notifications.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/node-details.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/user-details.js"></script>
