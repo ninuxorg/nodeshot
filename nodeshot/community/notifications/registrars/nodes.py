@@ -58,7 +58,7 @@ def node_status_changed_handler(**kwargs):
         create_notifications.delay(**{
             "users": [obj.user],
             "notification_model": Notification,
-            "notification_type": "your_node_status_changed",
+            "notification_type": "node_own_status_changed",
             "related_object": obj
         })
 

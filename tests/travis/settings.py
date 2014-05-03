@@ -466,7 +466,7 @@ NODESHOT = {
             'custom': None,
             'node_created': _('A new node with name "%(name)s" has been created.'),
             'node_status_changed': _('Status of node "%(name)s" has changed from "%(old_status)s" to "%(new_status)s".'),
-            'your_node_status_changed': _('Status of your node "%(name)s" changed from "%(old_status)s" to "%(new_status)s".'),
+            'node_own_status_changed': _('Status of your node "%(name)s" changed from "%(old_status)s" to "%(new_status)s".'),
             'node_deleted': _('Node "%(name)s" with ID #%(id)s was deleted.'),
         },
         # boolean: users can only turn on or off
@@ -475,12 +475,12 @@ NODESHOT = {
             'node_created':             { 'type': 'distance', 'geo_field': 'geometry' },
             'node_status_changed':      { 'type': 'distance', 'geo_field': 'geometry' },
             'node_deleted':             { 'type': 'distance', 'geo_field': 'geometry' },
-            'your_node_status_changed': { 'type': 'boolean' },
+            'node_own_status_changed': { 'type': 'boolean' },
         },
         'ACTIONS': {
             'node_created': "reverse('api_node_details', args=[self.related_object.slug])",
             'node_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
-            'your_node_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
+            'node_own_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
         },
         'DELETE_OLD': 40,  # delete notifications older than specified days
         'REGISTRARS': (

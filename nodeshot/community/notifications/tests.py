@@ -107,7 +107,7 @@ class TestNotification(BaseTestCase):
         def test_check_settings(self):
             n = Notification(**{
                 "to_user_id": 4,
-                "type": "your_node_status_changed",
+                "type": "node_own_status_changed",
             })
             self.assertEqual(n.check_user_settings(medium='web'), settings.NODESHOT['DEFAULTS']['NOTIFICATION_BOOLEAN_FIELDS'])
             self.assertTrue(n.check_user_settings(medium='email'), settings.NODESHOT['DEFAULTS']['NOTIFICATION_BOOLEAN_FIELDS'])
@@ -537,9 +537,9 @@ class TestNotification(BaseTestCase):
             node.save()
             
             self.assertEqual(Notification.objects.filter(type='node_status_changed').count(), all_users.count()-1)
-            self.assertEqual(Notification.objects.filter(type='your_node_status_changed').count(), 1)
-            # ensure notification of type "your_node_status_changed" is directed towards owner
-            notification = Notification.objects.filter(type='your_node_status_changed').order_by('-id')[0]
+            self.assertEqual(Notification.objects.filter(type='node_own_status_changed').count(), 1)
+            # ensure notification of type "node_own_status_changed" is directed towards owner
+            notification = Notification.objects.filter(type='node_own_status_changed').order_by('-id')[0]
             self.assertEqual(notification.to_user_id, 1)
             self.assertEqual(len(mail.outbox), 8)  # all users have received emails
         
@@ -571,9 +571,9 @@ class TestNotification(BaseTestCase):
             node.save()
             
             self.assertEqual(Notification.objects.filter(type='node_status_changed').count(), 0)
-            self.assertEqual(Notification.objects.filter(type='your_node_status_changed').count(), 1)
-            # ensure notification of type "your_node_status_changed" is directed towards owner
-            notification = Notification.objects.filter(type='your_node_status_changed').order_by('-id')[0]
+            self.assertEqual(Notification.objects.filter(type='node_own_status_changed').count(), 1)
+            # ensure notification of type "node_own_status_changed" is directed towards owner
+            notification = Notification.objects.filter(type='node_own_status_changed').order_by('-id')[0]
             self.assertEqual(notification.to_user_id, 1)
             self.assertEqual(len(mail.outbox), 8)  # all users have received emails
         
@@ -585,12 +585,12 @@ class TestNotification(BaseTestCase):
                 user.email_notification_settings.node_deleted = -1
                 user.email_notification_settings.node_created = -1
                 user.email_notification_settings.node_status_changed = -1
-                user.email_notification_settings.your_node_status_changed = False
+                user.email_notification_settings.node_own_status_changed = False
                 user.email_notification_settings.save()
                 user.web_notification_settings.node_deleted = -1
                 user.web_notification_settings.node_created = -1
                 user.web_notification_settings.node_status_changed = -1
-                user.web_notification_settings.your_node_status_changed = False
+                user.web_notification_settings.node_own_status_changed = False
                 user.web_notification_settings.save()
             
             # create node of user who will receive the notification
@@ -807,27 +807,27 @@ class TestNotification(BaseTestCase):
             self.assertContains(response, 'uri')
             self.assertContains(response, 'node_created')
             self.assertContains(response, 'node_status_changed')
-            self.assertContains(response, 'your_node_status_changed')
+            self.assertContains(response, 'node_own_status_changed')
             self.assertContains(response, 'node_deleted')
             
             # PATCH 200
-            response = self.client.patch(url, { "your_node_status_changed": False })
+            response = self.client.patch(url, { "node_own_status_changed": False })
             self.assertEquals(200, response.status_code)
             # check DB
             user = User.objects.get(username='romano')
-            self.assertFalse(user.email_notification_settings.your_node_status_changed)
+            self.assertFalse(user.email_notification_settings.node_own_status_changed)
             
             # PUT 200
             response = self.client.put(url, json.dumps({
                 "node_created": 50, 
                 "node_status_changed": 50, 
-                "your_node_status_changed": True, 
+                "node_own_status_changed": True, 
                 "node_deleted": 50
             }), content_type='application/json')
             self.assertEquals(200, response.status_code)
             # check DB
             user = User.objects.get(username='romano')
-            self.assertTrue(user.email_notification_settings.your_node_status_changed)
+            self.assertTrue(user.email_notification_settings.node_own_status_changed)
             self.assertEqual(user.email_notification_settings.node_created, 50)
             self.assertEqual(user.email_notification_settings.node_status_changed, 50)
             self.assertEqual(user.email_notification_settings.node_deleted, 50)
@@ -849,27 +849,27 @@ class TestNotification(BaseTestCase):
             self.assertContains(response, 'uri')
             self.assertContains(response, 'node_created')
             self.assertContains(response, 'node_status_changed')
-            self.assertContains(response, 'your_node_status_changed')
+            self.assertContains(response, 'node_own_status_changed')
             self.assertContains(response, 'node_deleted')
             
             # PATCH 200
-            response = self.client.patch(url, { "your_node_status_changed": False })
+            response = self.client.patch(url, { "node_own_status_changed": False })
             self.assertEquals(200, response.status_code)
             # check DB
             user = User.objects.get(username='romano')
-            self.assertFalse(user.web_notification_settings.your_node_status_changed)
+            self.assertFalse(user.web_notification_settings.node_own_status_changed)
             
             # PUT 200
             response = self.client.put(url, json.dumps({
                 "node_created": 50, 
                 "node_status_changed": 50, 
-                "your_node_status_changed": True, 
+                "node_own_status_changed": True, 
                 "node_deleted": 50
             }), content_type='application/json')
             self.assertEquals(200, response.status_code)
             # check DB
             user = User.objects.get(username='romano')
-            self.assertTrue(user.web_notification_settings.your_node_status_changed)
+            self.assertTrue(user.web_notification_settings.node_own_status_changed)
             self.assertEqual(user.web_notification_settings.node_created, 50)
             self.assertEqual(user.web_notification_settings.node_status_changed, 50)
             self.assertEqual(user.web_notification_settings.node_deleted, 50)
