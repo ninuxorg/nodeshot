@@ -1,6 +1,7 @@
 import sys
 import string
 import random
+import traceback
 from optparse import make_option
 
 from netaddr import ip
@@ -155,10 +156,11 @@ class Command(BaseCommand):
             self.message('\n\nOperation cancelled...')
             delete = True
         except Exception as e:
+            tb = traceback.format_exc()
             delete = True
             # rollback database transaction
             transaction.rollback()
-            self.message('Got exception %s' % e)
+            self.message('Got exception:\n\n%s' % tb)
         
         if delete:
             self.delete_imported_data()
@@ -192,37 +194,43 @@ class Command(BaseCommand):
             try:
                 interface.delete()
             except Exception as e:
-                self.message('Got exception while deleting interface %s: %s' % (interface.mac, e))
+                tb = traceback.format_exc()
+                self.message('Got exception while deleting interface %s\n\n%s' % (interface.mac, tb))
         
         for device in self.saved_devices:
             try:
                 device.delete()
             except Exception as e:
-                self.message('Got exception while deleting device %s: %s' % (device.name, e))
+                tb = traceback.format_exc()
+                self.message('Got exception while deleting device %s\n\n%s' % (device.name, tb))
         
         for routing_protocol in self.routing_protocols_added:
             try:
                 routing_protocol.delete()
             except Exception as e:
-                self.message('Got exception while deleting routing_protocol %s: %s' % (routing_protocol.name, e))
+                tb = traceback.format_exc()
+                self.message('Got exception while deleting routing_protocol %s\n\n%s' % (routing_protocol.name, tb))
         
         for node in self.saved_nodes:
             try:
                 node.delete()
             except Exception as e:
-                self.message('Got exception while deleting node %s: %s' % (node.name, e))
+                tb = traceback.format_exc()
+                self.message('Got exception while deleting node %s\n\n%s' % (node.name, tb))
         
         for contact in self.saved_contacts:
             try:
                 contact.delete()
             except Exception as e:
-                self.message('Got exception while deleting contact log entry %s: %s' % (contact.id, e))
+                tb = traceback.format_exc()
+                self.message('Got exception while deleting contact log entry %s\n\n%s' % (contact.id, tb))
         
         for user in self.saved_users:
             try:
                 user.delete()
             except Exception as e:
-                self.message('Got exception while deleting user %s: %s' % (user.username, e))
+                tb = traceback.format_exc()
+                self.message('Got exception while deleting user %s\n\n%s' % (user.username, tb))
     
     def prompt_layer_selection(self, node, layers):
         """Ask user what to do when an old node is contained in more than one layer.
@@ -382,7 +390,8 @@ choose (enter the number of) one of the following layers:
                 saved_users.append(user)
                 self.verbose('Saved user %s (%s) with email <%s>' % (user.username, user.get_full_name(), user.email))
             except Exception as e:
-                self.message('Could not save user %s, got exception: %s' % (user.username, e))
+                tb = traceback.format_exc()
+                self.message('Could not save user %s, got exception:\n\n%s' % (user.username, tb))
             
             # mark email address as confirmed if feature is enabled
             if EMAIL_ADDRESS_APP_INSTALLED:
@@ -391,7 +400,8 @@ choose (enter the number of) one of the following layers:
                     email_address.full_clean()
                     email_address.save()
                 except Exception as e:
-                    self.message('Could not save email address for user %s, got exception: %s' % (user.username, e))
+                    tb = traceback.format_exc()
+                    self.message('Could not save email address for user %s, got exception:\n\n%s' % (user.username, tb))
             
         self.message('saved %d users into local DB' % len(saved_users))
         self.saved_users = saved_users
@@ -466,7 +476,8 @@ choose (enter the number of) one of the following layers:
                 saved_nodes.append(node)
                 self.verbose('Saved node %s in layer %s with status %s' % (node.name, node.layer, node.status.name))
             except Exception as e:
-                self.message('Could not save node %s, got exception: %s' % (node.name, e))
+                tb = traceback.format_exc()
+                self.message('Could not save node %s, got exception:\n\n%s' % (node.name, tb))
         
         self.message('saved %d nodes into local DB' % len(saved_nodes))
         self.saved_nodes = saved_nodes
@@ -500,7 +511,8 @@ choose (enter the number of) one of the following layers:
                 saved_devices.append(device)
                 self.verbose('Saved device %s' % device.name)
             except Exception as e:
-                self.message('Could not save device %s, got exception: %s' % (device.name, e))
+                tb = traceback.format_exc()
+                self.message('Could not save device %s, got exception:\n\n%s' % (device.name, tb))
             
             try:
                 routing_protocol = RoutingProtocol.objects.filter(name__icontains=old_device.routing_protocol)[0]
@@ -600,7 +612,8 @@ choose (enter the number of) one of the following layers:
                 saved_interfaces.append(interface)
                 self.verbose('Saved interface %s' % interface.name)
             except Exception as e:
-                self.message('Could not save interface %s, got exception: %s' % (interface.mac, e))
+                tb = traceback.format_exc()
+                self.message('Could not save interface %s, got exception:\n\n%s' % (interface.mac, tb))
                 continue
             
             if vap:
@@ -610,7 +623,8 @@ choose (enter the number of) one of the following layers:
                     saved_vaps.append(vap)
                     self.verbose('Saved vap %s' % vap.essid or vap.bssid)
                 except Exception as e:
-                    self.message('Could not save vap %s, got exception: %s' % (vap.essid or vap.bssid, e))
+                    tb = traceback.format_exc()
+                    self.message('Could not save vap %s, got exception:\n\n%s' % (vap.essid or vap.bssid, tb))
             
             if ipv4:
                 try:
@@ -619,7 +633,8 @@ choose (enter the number of) one of the following layers:
                     saved_ipv4.append(ipv4)
                     self.verbose('Saved ipv4 %s' % ipv4.address)
                 except Exception as e:
-                    self.message('Could not save ipv4 %s, got exception: %s' % (ipv4.address, e))
+                    tb = traceback.format_exc()
+                    self.message('Could not save ipv4 %s, got exception:\n\n%s' % (ipv4.address, tb))
             
             if ipv6:
                 try:
@@ -628,7 +643,8 @@ choose (enter the number of) one of the following layers:
                     saved_ipv6.append(ipv6)
                     self.verbose('Saved ipv6 %s' % ipv6.address)
                 except Exception as e:
-                    self.message('Could not save ipv6 %s, got exception: %s' % (ipv6.address, e))
+                    tb = traceback.format_exc()
+                    self.message('Could not save ipv6 %s, got exception:\n\n%s' % (ipv6.address, tb))
             
         self.message('saved %d interfaces into local DB' % len(saved_interfaces))
         self.message('saved %d vaps into local DB' % len(saved_vaps))
@@ -695,7 +711,8 @@ choose (enter the number of) one of the following layers:
                 saved_links.append(link)
                 self.verbose('Saved link %s' % link)
             except Exception as e:
-                self.message('Could not save link %s, got exception: %s' % (old_link.id, e))
+                tb = traceback.format_exc()
+                self.message('Could not save link %s, got exception:\n\n%s' % (old_link.id, tb))
             
         self.message('saved %d links into local DB' % len(saved_links))
         self.saved_links = saved_links
@@ -731,7 +748,8 @@ choose (enter the number of) one of the following layers:
                 saved_contacts.append(contact)
                 self.verbose('Saved contact log entry #%s' % contact.id)
             except Exception as e:
-                self.message('Could not save contact log entry %s, got exception: %s' % (old_contact.id, e))
+                tb = traceback.format_exc()
+                self.message('Could not save contact log entry %s, got exception:\n\n%s' % (old_contact.id, tb))
             
         self.message('saved %d entries of contact log into local DB' % len(saved_contacts))
         self.saved_contacts = saved_contacts
