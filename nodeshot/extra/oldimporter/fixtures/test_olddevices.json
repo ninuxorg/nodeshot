@@ -1,0 +1,101 @@
+[
+    {
+        "pk": 1, 
+        "model": "oldimporter.olddevice", 
+        "fields": {
+            "name": "device1",
+            "node": 1,
+            "cname": "oldnode1-device1",
+            "description": "device1-description",
+            "type": "test model",
+            "routing_protocol": "olsr",
+            "updated": "2013-08-20T13:36:47.171Z", 
+            "added": "2013-08-14T13:30:29.323Z"
+        }
+    },
+    {
+        "pk": 1, 
+        "model": "oldimporter.oldinterface", 
+        "fields": {
+            "device": 1,
+            "mac_address": "00:27:22:38:D1:38",
+            "ipv4_address": "10.40.0.1",
+            "ipv6_address": "2001:4c00:893b:fede:eddb:decd:e878:88b3",
+            "cname": "eth",
+            "type": "eth",
+            "status": "r",
+            "updated": "2013-08-20T13:36:47.171Z", 
+            "added": "2013-08-15T13:30:29.323Z"
+        }
+    },
+    {
+        "pk": 2, 
+        "model": "oldimporter.oldinterface", 
+        "fields": {
+            "device": 1,
+            "mac_address": "00:27:22:38:D1:39",
+            "ipv4_address": "172.16.40.27",
+            "ipv6_address": "2001:4c00:893b:fede:eddb:decd:e878:88b4",
+            "cname": "wifi",
+            "type": "wifi",
+            "status": "r",
+            "wireless_mode": "ap",
+            "wireless_channel": "5620",
+            "wireless_polarity": "c",
+            "essid": "essid test",
+            "bssid": "bssidtest",
+            "updated": "2013-08-19T13:36:47.171Z", 
+            "added": "2013-08-16T13:30:29.323Z"
+        }
+    },
+    
+    {
+        "pk": 2, 
+        "model": "oldimporter.olddevice", 
+        "fields": {
+            "name": "device2",
+            "node": 2,
+            "cname": "oldnode2-device2",
+            "description": "device2-description",
+            "type": "test model 2",
+            "routing_protocol": "olsr",
+            "updated": "2013-08-19T13:36:47.171Z", 
+            "added": "2013-08-13T13:30:29.323Z"
+        }
+    },
+    {
+        "pk": 3, 
+        "model": "oldimporter.oldinterface", 
+        "fields": {
+            "device": 2,
+            "mac_address": "00:27:22:38:D1:40",
+            "ipv4_address": "10.40.1.1",
+            "ipv6_address": "2001:4c00:893b:fede:eddb:decd:e878:88b5",
+            "cname": "eth",
+            "type": "eth",
+            "status": "r",
+            "updated": "2013-08-20T13:36:47.171Z", 
+            "added": "2013-08-14T13:30:29.323Z"
+        }
+    },
+    {
+        "pk": 4, 
+        "model": "oldimporter.oldinterface", 
+        "fields": {
+            "device": 2,
+            "mac_address": "00:27:22:38:D1:41",
+            "ipv4_address": "172.16.40.28",
+            "ipv6_address": "2001:4c00:893b:fede:eddb:decd:e878:88b6",
+            "cname": "wifi",
+            "type": "wifi",
+            "status": "r",
+            "wireless_mode": "sta",
+            "wireless_channel": "5620",
+            "wireless_polarity": "c",
+            "essid": "essid test",
+            "bssid": "bssidtest",
+            "updated": "2013-08-20T13:36:47.171Z", 
+            "added": "2013-08-14T13:30:29.323Z"
+        }
+    }
+]

@@ -15,7 +15,7 @@ check_dependencies(
         'nodeshot.community.mailing',
         'nodeshot.community.profiles',
     ],
-    module='nodeshot.community.participation'
+    module='nodeshot.extra.oldimporter'
 )
 
 from django.db import models

@@ -1,16 +1,195 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+from django.test import TestCase
+from django.core import mail, management
+from django.conf import settings
+from django.contrib.gis.geos import Point
+from django.test.utils import override_settings
 
-Replace this with more appropriate tests for your application.
-"""
+from nodeshot.core.nodes.models import Node
+from nodeshot.core.layers.models import Layer
+from nodeshot.networking.net.models import Device, Interface, Ip, Vap, Wireless
+from nodeshot.networking.links.models import Link
+from nodeshot.community.profiles.models import Profile as User
+from nodeshot.community.mailing.models import Inward
+from .models import *
 
-#from django.test import TestCase
-#
-#
-#class SimpleTest(TestCase):
-#    def test_basic_addition(self):
-#        """
-#        Tests that 1 + 1 always equals 2.
-#        """
-#        self.assertEqual(1 + 1, 2)
+
+class TestOldImporter(TestCase):
+    fixtures = [
+        'initial_data.json',
+        'test_profiles.json',
+        'test_layers.json',
+        'test_status.json',
+    ]
+    
+    mysql_fixtures = [
+        'test_oldnodes.json',
+        'test_olddevices.json',
+        'test_oldlinks.json',
+        'test_oldcontacts.json'
+    ]
+    
+    def setUp(self):
+        for fixture in self.mysql_fixtures:
+            management.call_command('loaddata', fixture, database='old_nodeshot')
+        
+        l = Layer()
+        l.id = 5
+        l.name = 'Default Layer'
+        l.slug = 'default-layer'
+        l.description = 'Default Layer'
+        l.organization = 'Test'
+        l.published = True
+        l.geometry = Point(40.0, 10.0)
+        l.full_clean()
+        l.save()
+    
+    @override_settings()
+    def test_command(self):
+        for user in User.objects.all():
+            user.delete()
+        
+        settings.NODESHOT['OLD_IMPORTER']['DEFAULT_LAYER'] = 5
+        management.call_command('import_old_nodeshot', noinput=True)
+        
+        nodes = Node.objects.all().order_by('id')
+        devices = Device.objects.all().order_by('id')
+        interfaces = Interface.objects.all().order_by('id')
+        ip_addresses = Ip.objects.all().order_by('id')
+        links = Link.objects.all().order_by('id')
+        users = User.objects.all()
+        inwards = Inward.objects.all()
+        
+        self.assertEqual(len(nodes), 4)
+        self.assertEqual(len(devices), 2)
+        self.assertEqual(len(interfaces), 4)
+        self.assertEqual(len(ip_addresses), 8)
+        self.assertEqual(Vap.objects.count(), 2)
+        self.assertEqual(len(links), 1)
+        self.assertEqual(len(users), 4)
+        self.assertEqual(len(inwards), 1)
+        
+        # node1
+        self.assertEqual(nodes[0].id, 1)
+        self.assertEqual(nodes[0].name, 'oldnode1 rome')
+        self.assertEqual(nodes[0].slug, 'oldnode1-rome')
+        self.assertEqual(nodes[0].user.get_full_name(), 'Oldnode1 Owner')
+        self.assertEqual(nodes[0].user.username, 'oldnode1-owner')
+        self.assertEqual(nodes[0].user.email, 'oldnode1@test.com')
+        self.assertEqual(nodes[0].description, 'oldnode1-description')
+        self.assertEqual(nodes[0].data['postal_code'], '00185')
+        self.assertEqual(nodes[0].status.slug, 'active')
+        self.assertEqual(nodes[0].updated.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-20T13:36:47')
+        self.assertEqual(nodes[0].added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-14T13:30:29')
+        self.assertEqual(nodes[0].geometry[0], 12.5390629470348003)
+        self.assertEqual(nodes[0].geometry[1], 41.9064152946931969)
+        self.assertEqual(nodes[0].elev, 24.5)
+        # ensure layer has been picked correctly
+        self.assertEqual(nodes[0].layer.slug, 'rome')
+        
+        # node2
+        self.assertEqual(nodes[1].id, 2)
+        self.assertEqual(nodes[1].name, 'oldnode2 rome')
+        self.assertEqual(nodes[1].slug, 'oldnode2-rome')
+        self.assertEqual(nodes[1].user.get_full_name(), 'Oldnode2 Owner')
+        self.assertEqual(nodes[1].user.username, 'oldnode2-owner')
+        self.assertEqual(nodes[1].user.email, 'oldnode2@test.com')
+        self.assertEqual(nodes[1].description, 'oldnode2-description')
+        self.assertEqual(nodes[1].data['postal_code'], '00175')
+        self.assertEqual(nodes[1].data['is_hotspot'], 'true')
+        self.assertEqual(nodes[1].status.slug, 'active')
+        self.assertEqual(nodes[1].updated.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-19T13:36:47')
+        self.assertEqual(nodes[1].added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-19T13:30:29')
+        self.assertEqual(nodes[1].geometry[0], 12.534556835889)
+        self.assertEqual(nodes[1].geometry[1], 41.90746129417)
+        self.assertEqual(nodes[1].elev, 15.5)
+        # ensure layer has been picked correctly
+        self.assertEqual(nodes[1].layer.slug, 'rome')
+        
+        # node3
+        self.assertEqual(nodes[2].id, 3)
+        self.assertEqual(nodes[2].name, 'oldnode3 pisa')
+        self.assertEqual(nodes[2].slug, 'oldnode3-pisa')
+        self.assertEqual(nodes[2].user.get_full_name(), 'Oldnode3 Pisano')
+        self.assertEqual(nodes[2].user.username, 'oldnode3-pisano')
+        self.assertEqual(nodes[2].user.email, 'oldnode3@test.com')
+        self.assertEqual(nodes[2].description, 'oldnode3 description')
+        self.assertEqual(nodes[2].data['postal_code'], '00100')
+        self.assertEqual(nodes[2].status.slug, 'potential')
+        self.assertEqual(nodes[2].updated.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-18T13:36:47')
+        self.assertEqual(nodes[2].added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-18T13:30:29')
+        self.assertEqual(nodes[2].geometry[0], 10.3973981737999992)
+        self.assertEqual(nodes[2].geometry[1], 43.7175764660999988)
+        self.assertEqual(nodes[2].elev, 10)
+        # ensure layer has been picked correctly
+        self.assertEqual(nodes[2].layer.slug, 'pisa')
+        
+        # ensure default layer
+        self.assertEqual(nodes[3].layer.slug, 'default-layer')
+        self.assertEqual(nodes[3].layer.id, 5)
+        
+        # device import check
+        self.assertEqual(devices[0].id, 1)
+        self.assertEqual(devices[0].name, 'device1')
+        self.assertEqual(devices[0].node_id, 1)
+        self.assertEqual(devices[0].description, 'device1-description')
+        self.assertEqual(devices[0].type, 'radio')
+        self.assertEqual(devices[0].data['cname'], 'oldnode1-device1')
+        self.assertEqual(devices[0].data['model'], 'test model')
+        self.assertEqual(devices[0].added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-08-14T13:30:29')
+        self.assertEqual(devices[0].routing_protocols.count(), 1)
+        self.assertEqual(devices[0].routing_protocols.first().name, 'olsr')
+        
+        # interface import check
+        self.assertEqual(interfaces[0].id, 1)
+        self.assertEqual(interfaces[0].device_id, 1)
+        self.assertEqual(interfaces[0].mac, '00:27:22:38:d1:38')
+        self.assertEqual(interfaces[0].name, 'eth')
+        self.assertEqual(interfaces[0].get_type_display(), 'ethernet')
+        self.assertEqual(interfaces[0].added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-08-15T13:30:29')
+        self.assertEqual(interfaces[0].ip_set.count(), 2)
+        ipv4 = interfaces[0].ip_set.filter(protocol='ipv4').first()
+        self.assertEqual(str(ipv4.address), '10.40.0.1')
+        ipv6 = interfaces[0].ip_set.filter(protocol='ipv6').first()
+        self.assertEqual(str(ipv6.address), '2001:4c00:893b:fede:eddb:decd:e878:88b3')
+        
+        # wireless interface check
+        wireless_interface = Wireless.objects.get(pk=interfaces[1].id)
+        self.assertEqual(wireless_interface.id, 2)
+        self.assertEqual(wireless_interface.device_id, 1)
+        self.assertEqual(wireless_interface.mac, '00:27:22:38:d1:39')
+        self.assertEqual(wireless_interface.name, 'wifi')
+        self.assertEqual(wireless_interface.get_type_display(), 'wireless')
+        self.assertEqual(wireless_interface.channel, '5620')
+        self.assertEqual(wireless_interface.mode, 'ap')
+        self.assertEqual(wireless_interface.added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-08-16T13:30:29')
+        ipv4 = wireless_interface.ip_set.filter(protocol='ipv4').first()
+        self.assertEqual(str(ipv4.address), '172.16.40.27')
+        ipv6 = wireless_interface.ip_set.filter(protocol='ipv6').first()
+        self.assertEqual(str(ipv6.address), '2001:4c00:893b:fede:eddb:decd:e878:88b4')
+        
+        # vap check
+        vap = wireless_interface.vap_set.first()
+        self.assertEqual(vap.essid, 'essid test')
+        self.assertEqual(vap.bssid, 'bssidtest')
+        
+        # link check
+        self.assertEqual(links[0].id, 1)
+        self.assertEqual(links[0].interface_a_id, 2)
+        self.assertEqual(links[0].interface_b_id, 4)
+        self.assertEqual(links[0].metric_type, 'etx')
+        self.assertEqual(links[0].metric_value, 1)
+        self.assertEqual(links[0].dbm, -76)
+        self.assertEqual(links[0].min_rate, 50)
+        self.assertEqual(links[0].max_rate, 50)
+        
+        # inward contact check
+        self.assertEqual(inwards[0].id, 1)
+        self.assertEqual(inwards[0].object_id, 1)
+        self.assertEqual(inwards[0].status, 1)
+        self.assertEqual(inwards[0].from_name, 'Tester')
+        self.assertEqual(inwards[0].from_email, 'tester@test.com')
+        self.assertEqual(inwards[0].message, 'This is a test old contact')
+        self.assertEqual(inwards[0].ip, '10.40.0.56')
+        self.assertEqual(inwards[0].user_agent, 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/33.0.1750.152 Chrome/33.0.1750.152 Safari/537.36')
+        self.assertEqual(inwards[0].accept_language, 'it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4')
+        self.assertEqual(inwards[0].added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-09-14T13:30:29')

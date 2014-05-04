@@ -1,0 +1,78 @@
+[
+    {
+        "pk": 1, 
+        "model": "oldimporter.oldnode", 
+        "fields": {
+            "name": "oldnode1 rome",
+            "slug": "oldnode1-rome",
+            "owner": "oldnode1 owner",
+            "description": "oldnode1-description",
+            "postal_code": "00185",
+            "email": "oldnode1@test.com",
+            "password": "",
+            "lat": 41.9064152946931969,
+            "lng": 12.5390629470348003,
+            "alt": 24.5,
+            "status": "a",
+            "updated": "2013-06-20T13:36:47.171Z", 
+            "added": "2013-06-14T13:30:29.323Z"
+        }
+    },
+    {
+        "pk": 2, 
+        "model": "oldimporter.oldnode", 
+        "fields": {
+            "name": "oldnode2 rome",
+            "slug": "oldnode2-rome",
+            "owner": "oldnode2 owner",
+            "description": "oldnode2-description",
+            "postal_code": "00175",
+            "email": "oldnode2@test.com",
+            "password": "",
+            "lat": 41.90746129417,
+            "lng": 12.534556835889,
+            "alt": 15.5,
+            "status": "ah",
+            "updated": "2013-06-19T13:36:47.171Z", 
+            "added": "2013-06-19T13:30:29.323Z"
+        }
+    },
+    {
+        "pk": 3, 
+        "model": "oldimporter.oldnode", 
+        "fields": {
+            "name": "oldnode3 pisa",
+            "slug": "oldnode3-pisa",
+            "owner": "oldnode3 pisano",
+            "description": "oldnode3 description",
+            "postal_code": "00100",
+            "email": "oldnode3@test.com",
+            "password": "",
+            "lat": 43.7175764660999988,
+            "lng": 10.3973981737999992,
+            "alt": 10,
+            "status": "p",
+            "updated": "2013-06-18T13:36:47.171Z", 
+            "added": "2013-06-18T13:30:29.323Z"
+        }
+    },
+    {
+        "pk": 4, 
+        "model": "oldimporter.oldnode", 
+        "fields": {
+            "name": "oldnode4 default",
+            "slug": "oldnode4-default",
+            "owner": "oldnode4 default",
+            "description": "oldnode4 description",
+            "postal_code": "00100",
+            "email": "oldnode4@test.com",
+            "password": "",
+            "lat": 40.0,
+            "lng": 10.0,
+            "alt": 2,
+            "status": "a",
+            "updated": "2013-05-18T13:36:47.171Z", 
+            "added": "2013-05-18T13:30:29.323Z"
+        }
+    }
+]

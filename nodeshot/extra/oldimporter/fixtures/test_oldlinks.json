@@ -1,0 +1,14 @@
+[
+    {
+        "pk": 1, 
+        "model": "oldimporter.oldlink", 
+        "fields": {
+            "from_interface": 2,
+            "to_interface": 4,
+            "etx": 1,
+            "dbm": -76,
+            "sync_tx": 50,
+            "sync_rx": 50
+        }
+    }
+]

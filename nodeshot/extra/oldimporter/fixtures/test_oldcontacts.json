@@ -1,0 +1,17 @@
+[
+    {
+        "pk": 1, 
+        "model": "oldimporter.oldcontact", 
+        "fields": {
+            "node": 1,
+            "from_name": "Tester",
+            "from_email": "tester@test.com",
+            "message": "This is a test old contact",
+            "ip": "10.40.0.56",
+            "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/33.0.1750.152 Chrome/33.0.1750.152 Safari/537.36",
+            "http_referer": "http://map.ninux.org/",
+            "accept_language": "it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4",
+            "date": "2013-09-14T13:30:29.323Z"
+        }
+    }
+]

@@ -489,7 +489,7 @@ choose (enter the number of) one of the following layers:
                 "added": old_device.added,
                 "updated": old_device.updated,
                 "data": {
-                    "modello": old_device.type,
+                    "model": old_device.type,
                     "cname": old_device.cname
                 }
             })
@@ -551,7 +551,7 @@ choose (enter the number of) one of the following layers:
                     vap = Vap(**{
                         "interface_id": old_interface.id,
                         "essid": old_interface.essid,
-                        "bssid": old_interface.essid
+                        "bssid": old_interface.bssid
                     })
                 if old_interface.essid:
                     interface_dict['data']['essid'] = old_interface.essid
@@ -713,7 +713,7 @@ choose (enter the number of) one of the following layers:
             
             contact = Inward(**{
                 "content_type": content_type,
-                "object_id": old_contact.node_id,                
+                "object_id": old_contact.node_id,
                 "status": 1,  # sent
                 "from_name": old_contact.from_name,
                 "from_email": old_contact.from_email,

@@ -507,7 +507,7 @@ NODESHOT = {
     'DISCONNECTABLE_SIGNALS': [],
     # settings for old nodeshot importer
     'OLD_IMPORTER':{
-        'DEFAULT_LAYER': 30,
+        'DEFAULT_LAYER': 1,  # id of default layer
         'STATUS_MAPPING': {
             'a': 'active',
             'h': 'active',
