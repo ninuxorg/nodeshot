@@ -580,9 +580,13 @@ class ProfilesTest(TestCase):
             self.assertEqual(response.status_code, 204)
             self.assertEqual(EmailAddress.objects.filter(user=user, email='testing@test.com').count(), 0)
     
-    def test_password_confirmation_field_in_html(self, ):
+    def test_password_confirmation_field_in_html(self):
         url = reverse('api_profile_list')
         response = self.client.get(url, HTTP_ACCEPT='text/html')
         
         self.assertContains(response, 'password:</label>')
         self.assertContains(response, 'password_confirmation:</label>')
+    
+    def test_delete_user(self):
+        User.objects.all().delete()
+        self.assertEqual(User.objects.count(), 0)
