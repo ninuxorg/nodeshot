@@ -20,18 +20,18 @@ class TestOldImporter(TestCase):
         'test_layers.json',
         'test_status.json',
     ]
-    
+
     mysql_fixtures = [
         'test_oldnodes.json',
         'test_olddevices.json',
         'test_oldlinks.json',
         'test_oldcontacts.json'
     ]
-    
+
     def setUp(self):
         for fixture in self.mysql_fixtures:
             management.call_command('loaddata', fixture, database='old_nodeshot')
-        
+
         l = Layer()
         l.id = 5
         l.name = 'Default Layer'
@@ -42,15 +42,15 @@ class TestOldImporter(TestCase):
         l.geometry = Point(40.0, 10.0)
         l.full_clean()
         l.save()
-    
+
     @override_settings()
     def test_command(self):
         for user in User.objects.all():
             user.delete()
-        
+
         settings.NODESHOT['OLD_IMPORTER']['DEFAULT_LAYER'] = 5
         management.call_command('import_old_nodeshot', noinput=True)
-        
+
         nodes = Node.objects.all().order_by('id')
         devices = Device.objects.all().order_by('id')
         interfaces = Interface.objects.all().order_by('id')
@@ -58,7 +58,7 @@ class TestOldImporter(TestCase):
         links = Link.objects.all().order_by('id')
         users = User.objects.all()
         inwards = Inward.objects.all()
-        
+
         self.assertEqual(len(nodes), 4)
         self.assertEqual(len(devices), 2)
         self.assertEqual(len(interfaces), 4)
@@ -67,7 +67,7 @@ class TestOldImporter(TestCase):
         self.assertEqual(len(links), 1)
         self.assertEqual(len(users), 4)
         self.assertEqual(len(inwards), 1)
-        
+
         # node1
         self.assertEqual(nodes[0].id, 1)
         self.assertEqual(nodes[0].name, 'oldnode1 rome')
@@ -85,7 +85,7 @@ class TestOldImporter(TestCase):
         self.assertEqual(nodes[0].elev, 24.5)
         # ensure layer has been picked correctly
         self.assertEqual(nodes[0].layer.slug, 'rome')
-        
+
         # node2
         self.assertEqual(nodes[1].id, 2)
         self.assertEqual(nodes[1].name, 'oldnode2 rome')
@@ -104,7 +104,7 @@ class TestOldImporter(TestCase):
         self.assertEqual(nodes[1].elev, 15.5)
         # ensure layer has been picked correctly
         self.assertEqual(nodes[1].layer.slug, 'rome')
-        
+
         # node3
         self.assertEqual(nodes[2].id, 3)
         self.assertEqual(nodes[2].name, 'oldnode3 pisa')
@@ -122,11 +122,11 @@ class TestOldImporter(TestCase):
         self.assertEqual(nodes[2].elev, 10)
         # ensure layer has been picked correctly
         self.assertEqual(nodes[2].layer.slug, 'pisa')
-        
+
         # ensure default layer
         self.assertEqual(nodes[3].layer.slug, 'default-layer')
         self.assertEqual(nodes[3].layer.id, 5)
-        
+
         # device import check
         self.assertEqual(devices[0].id, 1)
         self.assertEqual(devices[0].name, 'device1')
@@ -138,7 +138,7 @@ class TestOldImporter(TestCase):
         self.assertEqual(devices[0].added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-08-14T13:30:29')
         self.assertEqual(devices[0].routing_protocols.count(), 1)
         self.assertEqual(devices[0].routing_protocols.first().name, 'olsr')
-        
+
         # interface import check
         self.assertEqual(interfaces[0].id, 1)
         self.assertEqual(interfaces[0].device_id, 1)
@@ -151,7 +151,7 @@ class TestOldImporter(TestCase):
         self.assertEqual(str(ipv4.address), '10.40.0.1')
         ipv6 = interfaces[0].ip_set.filter(protocol='ipv6').first()
         self.assertEqual(str(ipv6.address), '2001:4c00:893b:fede:eddb:decd:e878:88b3')
-        
+
         # wireless interface check
         wireless_interface = Wireless.objects.get(pk=interfaces[1].id)
         self.assertEqual(wireless_interface.id, 2)
@@ -166,12 +166,12 @@ class TestOldImporter(TestCase):
         self.assertEqual(str(ipv4.address), '172.16.40.27')
         ipv6 = wireless_interface.ip_set.filter(protocol='ipv6').first()
         self.assertEqual(str(ipv6.address), '2001:4c00:893b:fede:eddb:decd:e878:88b4')
-        
+
         # vap check
         vap = wireless_interface.vap_set.first()
         self.assertEqual(vap.essid, 'essid test')
         self.assertEqual(vap.bssid, 'bssidtest')
-        
+
         # link check
         self.assertEqual(links[0].id, 1)
         self.assertEqual(links[0].interface_a_id, 2)
@@ -181,7 +181,7 @@ class TestOldImporter(TestCase):
         self.assertEqual(links[0].dbm, -76)
         self.assertEqual(links[0].min_rate, 50)
         self.assertEqual(links[0].max_rate, 50)
-        
+
         # inward contact check
         self.assertEqual(inwards[0].id, 1)
         self.assertEqual(inwards[0].object_id, 1)
@@ -193,3 +193,104 @@ class TestOldImporter(TestCase):
         self.assertEqual(inwards[0].user_agent, 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/33.0.1750.152 Chrome/33.0.1750.152 Safari/537.36')
         self.assertEqual(inwards[0].accept_language, 'it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4')
         self.assertEqual(inwards[0].added.strftime('%Y-%m-%dT%H:%M:%S'), '2013-09-14T13:30:29')
+
+        # --- update --- #
+
+        n = OldNode(**{
+            "name": "addednode1",
+            "slug": "addednode1",
+            "owner": "addednode1 owner",
+            "description": "addednode1-description",
+            "postal_code": "00185",
+            "email": "addednode@test.com",
+            "password": "",
+            "lat": 41.4064152946931969,
+            "lng": 12.7390629470348003,
+            "alt": 23.5,
+            "status": "a"
+        })
+        n.save()
+
+        d = OldDevice(**{
+            "name": "addeddevice1",
+            "node": n,
+            "cname": "addeddevice1",
+            "description": "addeddevice1-description",
+            "type": "test model",
+            "routing_protocol": "olsr"
+        })
+        d.save()
+
+        i = OldInterface(**{
+            "device": d,
+            "mac_address": "00:27:22:38:D1:48",
+            "ipv4_address": "10.40.0.6",
+            "ipv6_address": "2001:4c00:893b:fede:eddb:decd:e878:88c3",
+            "cname": "addedeth",
+            "type": "eth",
+            "status": "r"
+        })
+        i.save()
+
+        l = OldLink(**{
+            "from_interface": OldInterface.objects.first(),
+            "to_interface": i,
+            "etx": 1,
+            "dbm": -75,
+            "sync_tx": 60,
+            "sync_rx": 40
+        })
+        l.save()
+
+        c = OldContact(**{
+            "node_id": 1,
+            "from_name": "Added",
+            "from_email": "added@test.com",
+            "message": "This is an added test old contact",
+            "ip": "10.40.0.57",
+            "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/33.0.1750.152 Chrome/33.0.1750.152 Safari/537.36",
+            "http_referer": "http://map.ninux.org/",
+            "accept_language": "it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4"
+        })
+        c.save()
+
+        management.call_command('import_old_nodeshot', noinput=True)
+
+        nodes = Node.objects.all().order_by('id')
+        devices = Device.objects.all().order_by('id')
+        interfaces = Interface.objects.all().order_by('id')
+        ip_addresses = Ip.objects.all().order_by('id')
+        links = Link.objects.all().order_by('id')
+        users = User.objects.all().order_by('id')
+        inwards = Inward.objects.all().order_by('id')
+
+        self.assertEqual(len(nodes), 5)
+        self.assertEqual(len(devices), 3)
+        self.assertEqual(len(interfaces), 5)
+        self.assertEqual(len(ip_addresses), 10)
+        self.assertEqual(Vap.objects.count(), 2)
+        self.assertEqual(len(links), 2)
+        self.assertEqual(len(users), 5)
+        self.assertEqual(len(inwards), 2)
+
+        self.assertEqual(nodes[0].user.username, 'oldnode1-owner')
+        self.assertEqual(nodes[1].user.username, 'oldnode2-owner')
+        self.assertEqual(nodes[2].user.username, 'oldnode3-pisano')
+        self.assertEqual(nodes[3].user.username, 'oldnode4-default')
+        self.assertEqual(nodes[4].user.username, 'addednode1-owner')
+        self.assertEqual(nodes[4].user.email, 'addednode@test.com')
+        self.assertEqual(nodes[4].name, 'addednode1')
+        self.assertEqual(nodes[4].description, 'addednode1-description')
+
+        device = Device.objects.last()
+        self.assertEqual(device.name, 'addeddevice1')
+
+        interface = Interface.objects.last()
+        self.assertEqual(interface.name, 'addedeth')
+        self.assertEqual(interface.ip_set.count(), 2)
+
+        link = Link.objects.last()
+        self.assertEqual(link.interface_b_id, i.id)
+        self.assertEqual(link.dbm, -75)
+
+        self.assertEqual(inwards[1].from_name, 'Added')
