@@ -31,9 +31,9 @@ Preparation
 Due to some major differences between the old and the new version some manual
 preparation needs to be done.
 
-------------------------------------
-0. Ensure your database is reachable
-------------------------------------
+----------------------------------------
+0. Ensure your old database is reachable
+----------------------------------------
 
 In order for the **oldimporter** to work it musts be able to connect to the remote old database.
 
@@ -58,7 +58,7 @@ So laod the default status objects::
     cd /var/www/nodeshot/projects/ninux
     # activate virtual env
     source python/bin/activate
-    
+
     python manage.py loaddata default_status
 
 ----------------
@@ -116,10 +116,10 @@ Uncomment ``nodeshot.extra.oldimporter`` in ``settings.INSTALLED_APPS``:
         'nodeshot.networking.links',
         'nodeshot.community.mailing',
         'nodeshot.community.profiles',
-        
+
         # oldimporter module
         'nodeshot.extra.oldimporter',
-        
+
         # ...
     ]
 
@@ -139,7 +139,7 @@ And set the ``DEFAULT_LAYER`` (object id/primary key):
             'default': 'potential'
         }
     },
-    
+
     # ...
 
 If you followed exactly the instructions in this document you can leave the default
@@ -158,7 +158,7 @@ procedure, you will have to install them now.
 For MySQL you can do::
 
     sudo apt-get install libmysqlclient-dev
-    
+
     cd /var/www/nodeshot/projects/ninux
     source python/bin/activate
     pip install MySQL-python
@@ -167,6 +167,9 @@ For MySQL you can do::
 Import data
 ===========
 
+.. warning::
+    The first import should start with a clean database
+
 Ready? Go!::
 
     python manage.py import_old_nodeshot
@@ -174,6 +177,10 @@ Ready? Go!::
 If you want to see what the importer is doing behind the scenes raise the verbosity level::
 
     python manage.py import_old_nodeshot --verbosity=2
+
+If you want to save the output for later inspection try this::
+
+    python manage.py import_old_nodeshot --verbosity=2 | tee import_result.txt
 
 Wait for the importer to import your data, when it finishes it will ask you if you
 are satisfied with the results or not, if you enter "No" the importer will delete all
@@ -203,7 +210,7 @@ and convert the queryset in a python list that will be used in the next steps.
 -------------------------------
 2. Extract user data from nodes
 -------------------------------
-    
+
 Since in old nodeshot there are no users but each node contains data
 such as name, email, and stuff like that, the script will create user accounts:
 
@@ -215,7 +222,7 @@ such as name, email, and stuff like that, the script will create user accounts:
 ---------------
 3. Import nodes
 ---------------
-    
+
     * **USER**: assign owner (the link is the email)
     * **LAYER**: assign layer (layers must be created by hand first!):
         1. if node has coordinates comprised in a specified layer choose that
