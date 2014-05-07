@@ -107,6 +107,13 @@ def install_dependencies():
         with cd('/tmp/nodeshot_install'):
             run('cp %sINSTALL/install* . && ./install_GEOS.sh && ./install_Postgis.sh' % deploy_dir )
 
+def install_postfix():
+    initialize()
+    with hide( 'stdout', 'stderr'):
+        with cd('%sINSTALL' % deploy_dir):
+            run('export DEBIAN_FRONTEND=noninteractive && apt-get -y install postfix')
+            run ('cp main.cf /etc/postfix/main.cf')
+        
 def pull():
     initialize()
     with cd (deploy_dir):
