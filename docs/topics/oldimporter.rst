@@ -186,6 +186,53 @@ Wait for the importer to import your data, when it finishes it will ask you if y
 are satisfied with the results or not, if you enter "No" the importer will delete all
 the imported records.
 
+**If the importer runs into an uncaught exception it will automatically delete all the imported data**.
+
+If you get such an error notify us and we'll try to fix it.
+
+In case you don't want the importer data to be deleted you can use the ``--nodelete`` option.
+
+===============
+Command options
+===============
+
+ * ``--verbosity``: verbosity level, can be 0 (no output), 1 (default), 2 (verbose), 3 (very verbose)
+ * ``--noinput``: suppress all user prompts
+ * ``--nodelete``: do not delete imported data in case of errors
+
+=============
+Periodic sync
+=============
+
+You can run the importer periodically and it will try to import new data.
+
+This process can be handy while you test the new version but before you launch
+your service to your audience we advise to reset everything and run the importer
+again on a clean database.
+
+It is better to specify the ``--nodelete`` option in order to avoid automatic deletion of data in case of errros::
+
+    python manage.py import_old_nodeshot --nodelete
+
+To automate the periodic import uncomment the following key in your ``CELERYBEAT_SCHEDULE`` setting::
+
+    CELERYBEAT_SCHEDULE = {
+
+        # ...
+
+        'import_old_nodeshot': {
+           'task': 'nodeshot.extra.oldimporter.tasks.import_old_nodeshot',
+           'schedule': timedelta(hours=12),
+           # pass --noinput and --nodelete options
+           'kwargs': { 'noinput': True, 'nodelete': True }
+        },
+
+        # ...
+
+    }
+
+This assumes that celery and celerybeat are configured and running correctly.
+
 ======================
 Deactivate oldimporter
 ======================

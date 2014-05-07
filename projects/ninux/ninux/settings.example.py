@@ -216,7 +216,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'smuggler',
     'reversion',
-    
+
     # django-cors-headers
     'corsheaders',
 
@@ -367,7 +367,13 @@ else:
 #    'purge_notifications': {
 #        'task': 'nodeshot.community.notifications.tasks.purge_notifications',
 #        'schedule': timedelta(days=1),
-#    }
+#    },
+#    'import_old_nodeshot': {
+#       'task': 'nodeshot.extra.oldimporter.tasks.import_old_nodeshot',
+#       'schedule': timedelta(hours=12),
+#       # pass --noinput and --nodelete options
+#       'kwargs': { 'noinput': True, 'nodelete': True }
+#    },
 #}
 
 # ------ NODESHOT ------ #
