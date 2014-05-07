@@ -4,7 +4,7 @@ Install
 
 .. warning::
     This file describes how to install nodeshot on **Ubuntu Server 12.04 LTS**.
-    
+
     Other Linux distribution will be good as well but you will have to use the
     package names according to your distribution package manager.
 
@@ -59,7 +59,7 @@ First of all I suggest to become ``root`` to avoid typing sudo each time::
 Install **postgresql 9.1** or greater and spatial libraries::
 
 	apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 libxml2-dev libproj-dev libjson0-dev xsltproc docbook-xsl docbook-mathml gdal-bin binutils libxml2 libxml2-dev libxml2-dev checkinstall proj libpq-dev libgdal1-dev postgresql-contrib
-	
+
 Build **GEOS** library from source::
 
 	wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2
@@ -215,7 +215,7 @@ You just need to **run the django development server** in order to see the web a
     # listens only on 127.0.0.1
     python manage.py runserver
     # open browser at http://localhost:8000/admin/
-    
+
     # alternatively, if you need to reach the dev server for other computers
     # on the same LAN, tell it to listen on all the interfaces:
     python manage.py runserver 0.0.0.0:8000
@@ -255,7 +255,7 @@ Create a temporary self signed SSL certificate (or install your own one if you a
 
     mkdir /etc/nginx/ssl
     cd /etc/nginx/ssl
-    openssl req -new -x509 -nodes -out server.crt -keyout server.key 
+    openssl req -new -x509 -nodes -out server.crt -keyout server.key
 
 Copy ``uwsgi_params`` file::
 
@@ -270,57 +270,57 @@ Create site configuration (replace ``nodeshot.yourdomain.com`` with your domain)
     vim /etc/nginx/sites-available/nodeshot.yourdomain.com
 
 Paste this configuration and tweak it according to your needs::
-	
+
     server {
         listen   443; ## listen for ipv4; this line is default and implied
         #listen   [::]:443 default ipv6only=on; ## listen for ipv6
-        
+
         root /var/www/nodeshot/public_html;
         index index.html index.htm;
-        
+
         # error log
         error_log /var/www/nodeshot/projects/ninux/log/nginx.error.log error;
-        
+
         # Make site accessible from hostanme
         # change this according to your domain/hostanme
         server_name nodeshot.yourdomain.com;
-        
+
         # set client body size #
         client_max_body_size 5M;
-        
+
         ssl on;
         ssl_certificate ssl/server.crt;
         ssl_certificate_key ssl/server.key;
-        
+
         ssl_session_timeout 5m;
-        
+
         ssl_protocols SSLv3 TLSv1;
         ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
         ssl_prefer_server_ciphers on;
-        
+
         location / {
             uwsgi_pass 127.0.0.1:3031;
             include uwsgi_params;
             uwsgi_param HTTP_X_FORWARDED_PROTO https;
         }
-        
+
         location /static/ {
             alias /var/www/nodeshot/projects/ninux/ninux/static/;
         }
-        
+
         location /media/ {
             alias /var/www/nodeshot/projects/ninux/ninux/media/;
         }
-        
+
         #error_page 404 /404.html;
-        
+
         # redirect server error pages to the static page /50x.html
         #
         #error_page 500 502 503 504 /50x.html;
         #location = /50x.html {
         #	root /usr/share/nginx/www;
         #}
-        
+
         # deny access to .htaccess files, if Apache's document root
         # concurs with nginx's one
         #
@@ -328,15 +328,15 @@ Paste this configuration and tweak it according to your needs::
         #	deny all;
         #}
     }
-	
+
     server {
         listen   80; ## listen for ipv4; this line is default and implied
         listen   [::]:80 default ipv6only=on; ## listen for ipv6
-        
+
         # Make site accessible from hostanme on port 80
         # change this according to your domain/hostanme
         server_name nodeshot.yourdomain.com;
-        
+
         # redirect all requests to https
         return 301 https://$host$request_uri;
     }
@@ -367,7 +367,7 @@ Install the latest version via pip::
 Create a new ini configuration file::
 
     vim /var/www/nodeshot/projects/ninux/uwsgi.ini
-    
+
 Paste this config::
 
     [uwsgi]
@@ -467,11 +467,11 @@ Redis
 -----
 
 Install **Redis**, we will use it as a message broker for *Celery* and as a *Cache Storage*::
-	
+
     add-apt-repository ppa:chris-lea/redis-server
     apt-get update
     apt-get install redis-server
-	
+
 Install celery bindings in your virtual environment::
 
     cd /var/www/nodeshot/projects/ninux
@@ -480,7 +480,7 @@ Install celery bindings in your virtual environment::
 
 Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
 **might lead to poor performance or security issues**::
-    
+
     vim /var/www/nodeshot/projects/ninux/ninux/settings.py
     # set DEBUG to False
     DEBUG = False
@@ -489,7 +489,46 @@ Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
 You might encounter an issue in the Redis log that says:
 "Can't save in background: fork: Cannot allocate memory", in that case run this command::
 
-    echo 1 > /proc/sys/vm/overcommit_memory 
+    echo 1 > /proc/sys/vm/overcommit_memory
+
+Restart redis and ensure is running::
+
+    service redis-server restart
+    service redis-server status
+
+-------
+Postfix
+-------
+
+Postfix is needed to send emails.
+By default postfix is configured to accept local connections only.
+It is better to leave this default config unchanged to avoid spam, unless you know what you are doing.
+
+To have a working SMTP server in the least possible steps follow this procedure:
+
+**1. install postfix**::
+
+    apt-get install postfix
+
+**2. open configuration in editor**::
+
+    vim /etc/postfix/main.cf
+
+**3. disable TLS**::
+
+    smtpd_use_tls=no
+
+**4. set** ``myhostname``::
+
+    myhostname = nodeshot.yourdomain.com
+
+**5. add your hostname to** ``destination``::
+
+    mydestination = localhost.localdomain, localhost, nodeshot.yourdomain.com
+
+**6. save changes and restart postfix**::
+
+    service postfix restart
 
 ---------------------
 Restart all processes
