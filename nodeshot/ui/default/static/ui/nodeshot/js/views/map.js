@@ -414,37 +414,44 @@ var MapView = Backbone.Marionette.ItemView.extend({
         var button = $(e.currentTarget),
             panel_id = button.attr('data-panel'),
             panel = $('#' + panel_id),
-            other_panels = $('.side-panel:not(#' + panel_id + ')');
+            self = this;
 
         // if no panel return here
         if (!panel.length) {
             return;
         }
 
-        // hide all other open panels
-        other_panels.hide();
         // hide any open tooltip
         $('#map-toolbar .tooltip').hide();
-        this.ui.toolbarButtons.removeClass('active');
 
-        if (panel.is(':hidden')) {
-            var distance_from_top = button.offset().top - $('body > header').eq(0).outerHeight();
-            panel.css('top', distance_from_top);
+        var distance_from_top = button.offset().top - $('body > header').eq(0).outerHeight();
+        panel.css('top', distance_from_top);
 
-            // here we should use an event
-            if (panel.hasClass('adjust-height')) {
-                var preferences_height = this.$el.height() - distance_from_top - 18;
-                panel.height(preferences_height);
-            }
+        // here we should use an event
+        if (panel.hasClass('adjust-height')) {
+            var preferences_height = this.$el.height() - distance_from_top - 18;
+            panel.height(preferences_height);
+        }
 
-            panel.show();
+        panel.fadeIn(25, function(){
             panel.find('.scroller').scroller('reset');
             button.addClass('active');
             button.tooltip('disable');
-        } else {
-            panel.hide();
-            button.tooltip('enable');
-        }
+
+            // clicking anywhere else closes the panel
+            $('#map-toolbar, body > header, #map > div:not(.side-panel)').one('click', function(e){
+                if(panel.is(':visible')){
+                    panel.hide();
+                    self.ui.toolbarButtons.removeClass('active');
+                    button.tooltip('enable');
+                    // if clicking again on the same button avoid reopening the panel
+                    if($(e.target).attr('data-panel') == panel_id){
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
     },
 
     /*
