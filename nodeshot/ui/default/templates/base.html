@@ -27,8 +27,9 @@
     <script src="{{ STATIC_URL }}ui/leaflet/leaflet.js"></script>
 
     <!-- cesium -->
-    <link href="{{ STATIC_URL }}ui/cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="{{ STATIC_URL }}ui/cesium/Cesium.js"></script>
+    <!-- TODO: find a way to keep these files out of the repo! -->
+    <!-- <link href="{{ STATIC_URL }}ui/cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="{{ STATIC_URL }}ui/cesium/Cesium.js"></script> -->
 </head>
 <body style="overflow:hidden">
     <div id="preloader">
@@ -339,13 +340,13 @@
         <h1><%= title %></h1>
         <%= content %>
     </script>
-    
+
     <script id="notification-item-template" type="text/template">
         <span class="icon-<%= icon %>"></span>
         <p class="message"><%= text %></p>
         <p class="time"><%= $.format.prettyDate(added) %></p>
     </script>
-    
+
     <script id="notification-empty-template" type="text/template">
         <p class="empty">{% trans 'Nothing interesting yet!' %}</p>
     </script>
@@ -363,7 +364,7 @@
     <script id="node-details-template" type="text/template">
         {% include 'includes/node-details.html' %}
     </script>
-    
+
     <script id="user-details-template" type="text/template">
         {% include 'includes/user-details.html' %}
     </script>

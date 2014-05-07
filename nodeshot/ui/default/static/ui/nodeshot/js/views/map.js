@@ -750,7 +750,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 disableClusteringAtZoom: 12,
                 maxClusterRadius: 90,
                 singleMarkerMode: true,
-                // custom option 
+                // custom option
                 cssClass: key
             });
 
@@ -773,6 +773,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
      */
     switchMapMode: function (e) {
         e.preventDefault();
+        createModal({message:'not implemented yet'});
+        return
         // automatically determine which mod to use depending on the icon's button
         var mode = this.ui.switchMapMode.hasClass('icon-3d') ? '3D' : '2D';
         this.initMap(mode);
