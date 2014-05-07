@@ -549,7 +549,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
     toggleToolbar: function (e) {
         e.preventDefault();
         this.ui.toolbar.toggle();
+        // if toolbar has just been hidden
         if(this.ui.toolbar.is(':hidden')){
+            // close any open panel
             if($('.side-panel:visible').length){
                 $('body>header').trigger('click');
             }
