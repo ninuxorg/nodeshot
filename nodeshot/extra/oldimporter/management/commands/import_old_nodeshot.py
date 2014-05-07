@@ -23,6 +23,7 @@ if 'emailconfirmation' in settings.INSTALLED_APPS:
 else:
     EMAIL_ADDRESS_APP_INSTALLED = False
 
+# TODO: this check is useless because nodeshot.core.layer is required as a dependency!
 if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
     from nodeshot.core.layers.models import Layer
     LAYER_APP_INSTALLED = True
@@ -115,6 +116,13 @@ class Command(BaseCommand):
             default=False,
             help='Do not prompt for user intervention and use default settings'
         ),
+        make_option(
+            '--nodelete',
+            action='store_false',
+            dest='nodelete',
+            default=False,
+            help='Do not delete imported data if any uncaught exception occurs'
+        ),
     )
 
     def message(self, message):
@@ -189,6 +197,10 @@ class Command(BaseCommand):
             self.message('Operation completed!')
 
     def delete_imported_data(self):
+        if options.get('nodelete') is True:
+            self.message('--nodelete option specified, won\'t delete the imported data')
+            return
+
         self.message('Going to delete all the imported data...')
 
         for interface in self.saved_interfaces:
@@ -320,7 +332,7 @@ choose (enter the number of) one of the following layers:
         self.message('retrieved %d nodes' % len(self.old_nodes))
 
     def extract_users(self):
-        """ extrac user info """
+        """ extract user info """
         email_set = set()
         users_dict = {}
 
@@ -408,7 +420,7 @@ choose (enter the number of) one of the following layers:
                 self.message('Could not save user %s, got exception:\n\n%s' % (user.username, tb))
 
             # mark email address as confirmed if feature is enabled
-            if EMAIL_ADDRESS_APP_INSTALLED and EmailAddress.objects.filter(user=user, email=user.email).count() < 1:
+            if EMAIL_ADDRESS_APP_INSTALLED and EmailAddress.objects.filter(email=user.email).count() is 0:
                 try:
                     email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
                     email_address.full_clean()
