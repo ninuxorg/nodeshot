@@ -237,6 +237,7 @@ body article a:focus,
     cursor: default;
     background-color: transparent !important;
 }
+#btn-legend.disabled { cursor: auto }
 
 .btn{ text-decoration: none !important }
 
