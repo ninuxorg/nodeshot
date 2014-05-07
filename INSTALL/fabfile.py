@@ -90,8 +90,8 @@ def clone():
         run('mkdir -p  %s' % root_dir)
         with cd (root_dir):
             run('git clone %s nodeshot' % git_repo  )
-        with cd (deploy_dir):
-            run ('git checkout deploy_test') # to be removed when merged into master
+        #with cd (deploy_dir):
+        #    run ('git checkout deploy_test') # to be removed when merged into master
 
 def install_git():
     print(green("Installing Git..."))
@@ -110,10 +110,12 @@ def install_dependencies():
 
 def install_postfix():
     initialize()
+    initialize_server()
     with hide( 'stdout', 'stderr'):
         with cd('%sINSTALL' % deploy_dir):
             run('export DEBIAN_FRONTEND=noninteractive && apt-get -y install postfix')
             run ('cp main.cf /etc/postfix/main.cf')
+            run ('sed -i \'s#nodeshot.yourdomain.com#%s#g\' /etc/postfix/main.cf ' % server_name)
 
 def pull():
     initialize()
