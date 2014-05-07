@@ -62,6 +62,7 @@ def install():
     install_git()
     clone()
     install_dependencies()
+    install_postfix()
     create_virtual_env()
     install_requirements()
     create_project()
@@ -113,7 +114,7 @@ def install_postfix():
         with cd('%sINSTALL' % deploy_dir):
             run('export DEBIAN_FRONTEND=noninteractive && apt-get -y install postfix')
             run ('cp main.cf /etc/postfix/main.cf')
-        
+
 def pull():
     initialize()
     with cd (deploy_dir):
