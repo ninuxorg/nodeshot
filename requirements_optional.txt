@@ -4,4 +4,4 @@ django-extensions
 django-debug-toolbar
 
 # websockets
-tornado==3.2
+tornado
