@@ -109,6 +109,16 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
     resize: function () {
         setMapDimensions();
+
+        // when narrowing the window to medium-small size
+        if($(window).width() <= 767){
+            // if any side-panel remains open
+            var panels = $('.side-panel:visible');
+            if(panels.length){
+                // trigger click on header to close it
+                $('body>header').trigger('click');
+            }
+        }
     },
 
     beforeunload: function () {
@@ -538,7 +548,12 @@ var MapView = Backbone.Marionette.ItemView.extend({
      */
     toggleToolbar: function (e) {
         e.preventDefault();
-        $('#map-toolbar').toggle();
+        this.ui.toolbar.toggle();
+        if(this.ui.toolbar.is(':hidden')){
+            if($('.side-panel:visible').length){
+                $('body>header').trigger('click');
+            }
+        }
         setMapDimensions();
     },
 
