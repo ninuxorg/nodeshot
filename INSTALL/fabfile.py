@@ -68,6 +68,7 @@ def install():
     create_db()
     create_settings()
     sync_data() # Fails if settings are not correctly set
+    create_admin()
     nginx_config()
     supervisor_config()
     redis_install()
@@ -191,6 +192,7 @@ def sync_data():
         run( virtual_env + ' &&  ' + sync_command)
 
 def create_admin():
+    initialize()
     print(green("Creating Nodeshot admin account..."))
     virtual_env = 'source python/bin/activate'
     create_admin_command = 'python manage.py loaddata %sINSTALL/admin_fixture.json' % deploy_dir
