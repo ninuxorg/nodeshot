@@ -137,9 +137,11 @@ def install_requirements():
     with hide( 'stdout', 'stderr'):
         virtual_env = 'source python/bin/activate'
         pip_command = 'python/bin/pip install -r %srequirements.txt' % deploy_dir
+        pip_command_networking = 'python/bin/pip install -r %srequirements_networking.txt' % deploy_dir
         distribute_command = 'python/bin/pip install -U distribute'
         with cd (project_dir):
             run( virtual_env + ' &&  ' + pip_command  + ' &&  ' + distribute_command)
+            run( virtual_env + ' &&  ' + pip_command_networking)
 
 def create_project():
     initialize()

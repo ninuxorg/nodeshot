@@ -3,4 +3,4 @@ netaddr
 -e git+https://github.com/jimfunk/django-postgresql-netfields.git#egg=netfields
 
 # retrieve info from network devices
-#-e git+git://github.com/nemesisdesign/netengine#egg=netengine
+-e git+git://github.com/ninuxorg/netengine#egg=netengine
