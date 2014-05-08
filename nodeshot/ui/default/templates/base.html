@@ -396,7 +396,10 @@
     <script>
         var Nodeshot = new Backbone.Marionette.Application();
         {% if request.user.is_authenticated %}
-            Nodeshot.currentUser = new User({ username: '{{ request.user.username }}'});
+            Nodeshot.currentUser = new User({
+                username: '{{ request.user.username }}',
+                id: '{{ request.user.id }}'
+            });
         {% else %}
             Nodeshot.currentUser = new User();
         {% endif %}
@@ -441,5 +444,16 @@
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/user-details.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>
+    
+    {% if WEBSOCKETS %}
+    <script>
+        __websockets__ = {
+            'DOMAIN': '{{ WEBSOCKETS.DOMAIN }}',
+            'PATH': '{{ WEBSOCKETS.PATH }}',
+            'PORT': '{{ WEBSOCKETS.PORT }}'
+        }
+    </script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/websockets.js"></script>
+    {% endif %}
 </body>
 </html>

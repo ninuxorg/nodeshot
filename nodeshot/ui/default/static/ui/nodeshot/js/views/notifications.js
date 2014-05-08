@@ -22,6 +22,8 @@ var NotificationCollectionView = Backbone.Marionette.CollectionView.extend({
     initialize: function(){
         // listens when user status changes to fetch notifications
         this.listenTo(Nodeshot.currentUser, 'change', this.fetch);
+        // fetch when collection is synced
+        this.listenTo(this.collection, 'sync', this.render);
     },
     
     onRender: function(){
@@ -56,5 +58,5 @@ var NotificationCollectionView = Backbone.Marionette.CollectionView.extend({
         if(Nodeshot.currentUser.isAuthenticated()){
             this.collection.fetch();
         }
-    },
+    }
 });
