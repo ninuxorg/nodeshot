@@ -501,8 +501,9 @@ NODESHOT = {
         'PUBLIC_PIPE': '%s/nodeshot.websockets.public' % os.path.dirname(SITE_ROOT),
         'PRIVATE_PIPE': '%s/nodeshot.websockets.private' % os.path.dirname(SITE_ROOT),
         'DOMAIN': DOMAIN,
+        'PATH': '',
         'LISTENING_ADDRESS': '0.0.0.0',  # set to 127.0.0.1 to accept only local calls (used for proxying to port 80 with nginx or apache mod_proxy)
-        'LISTENING_PORT': 9090,
+        'LISTENING_PORT': 8080,
         'REGISTRARS': (
             'nodeshot.core.websockets.registrars.nodes',
         )

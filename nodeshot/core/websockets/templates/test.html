@@ -58,7 +58,7 @@
         
                 function connect() {
                     var socket;
-                    var host = "ws://{{ DOMAIN }}:{{ PORT }}/";
+                    var host = "ws://{{ DOMAIN }}{{ PATH }}:{{ PORT }}/";
                     var querystring = {% if user.is_authenticated %}'?user_id={{ user.id }}'{% else %}''{% endif %}
         
                     try {
