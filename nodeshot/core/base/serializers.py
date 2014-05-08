@@ -167,8 +167,6 @@ class DynamicRelationshipsMixin(object):
                                 format=format)
             # if relationship is a serializer
             elif options['type'] == 'serializer':
-                # if queryset is not specified use current object
-                #instance = self.get_lookup_value(obj, options['queryset'])
                 queryset = eval(options['queryset'])
                 # get serializer representation
                 value = options['serializer'](instance=queryset,
@@ -254,7 +252,6 @@ class GeoJSONBasePaginationSerializer(serializers.Serializer):
         super(GeoJSONBasePaginationSerializer, self).__init__(*args, **kwargs)
         results_field = self.results_field
         object_serializer = self.opts.object_serializer_class
-        #object_serializer = NodeGeoSerializer
         if 'context' in kwargs:
             context_kwarg = {'context': kwargs['context']}
         else:

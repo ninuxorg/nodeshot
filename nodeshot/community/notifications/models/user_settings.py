@@ -12,7 +12,7 @@ def add_notifications(myclass):
     """
     for key, value in settings.NODESHOT['NOTIFICATIONS']['TEXTS'].items():
         # custom notifications cannot be disabled
-        if key == 'custom':
+        if 'custom' in [key, value]:
             continue
         
         field_type = settings.NODESHOT['NOTIFICATIONS']['USER_SETTING'][key]['type']
@@ -20,15 +20,19 @@ def add_notifications(myclass):
         if field_type == 'boolean':
             field = models.BooleanField(_(key), default=settings.NODESHOT['DEFAULTS']['NOTIFICATION_BOOLEAN_FIELDS'])
         elif field_type == 'distance':
-            field = models.IntegerField(_(key), default=settings.NODESHOT['DEFAULTS']['NOTIFICATION_DISTANCE_FIELDS'],
-                    help_text=_("""-1 (less than 0): disabled; 0: enabled for all;
-                                1 (less than 0): enabled for those in the specified distance range (km)"""))
-            field.geo_field=settings.NODESHOT['NOTIFICATIONS']['USER_SETTING'][key]['geo_field']
+            field = models.IntegerField(
+                _(key),
+                default=settings.NODESHOT['DEFAULTS']['NOTIFICATION_DISTANCE_FIELDS'],
+                help_text=_('-1 (less than 0): disabled; 0: enabled for all;\
+                            1 (less than 0): enabled for those in the specified distance range (km)')
+            )
+            field.geo_field = settings.NODESHOT['NOTIFICATIONS']['USER_SETTING'][key]['geo_field']
         
         field.name = field.column = field.attname = key
         field.user_setting_type = field_type
         setattr(myclass, key, field)
         myclass.add_to_class(key, field)
+    
     return myclass
 
 
@@ -71,25 +75,3 @@ class UserEmailNotificationSettings(models.Model):
     
     def __unicode__(self):
         return _('email notification settings for %s') % self.user
-
-
-#@add_notifications
-#class UserMobileNotificationSettings(models.Model):
-#    """
-#    FUNCTIONALITY NOT IMPLEMENTED YET
-#    User Email Mobile Settings Model
-#    Takes care of tracking the user's mobile notification preferences
-#    """
-#    user = models.OneToOneField(settings.AUTH_USER_MODEL,
-#                                verbose_name=_('user'),
-#                                related_name='mobile_notification_settings')
-#    
-#    class Meta:
-#        app_label = 'notifications'
-#        db_table = 'notifications_user_mobile_settings'
-#    
-#    def __unicode__(self):
-#        return _('mobile notification settings for %s') % self.user
-#    
-#    def __init__(self, *args, **kwargs):
-#        raise NotImplementedError('Mobile Notifications not implemented yet')

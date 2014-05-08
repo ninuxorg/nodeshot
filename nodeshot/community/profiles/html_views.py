@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
-from django.db import models
-from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
+from django.http import Http404
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.http import base36_to_int
@@ -12,7 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from .forms import ResetPasswordForm, ResetPasswordKeyForm
+from .forms import ResetPasswordKeyForm
 
 
 def group_and_bridge(kwargs):

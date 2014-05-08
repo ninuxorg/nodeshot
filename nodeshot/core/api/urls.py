@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, include, url
-from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 
 

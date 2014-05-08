@@ -1,11 +1,10 @@
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
-from django.conf import settings
 
-from rest_framework import permissions, authentication, generics
+from rest_framework import authentication, generics
 
-from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
+from nodeshot.core.base.mixins import ACLMixin
 from nodeshot.core.nodes.models import Node
 
 from .serializers import *

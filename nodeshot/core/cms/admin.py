@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django import forms
 from django.conf import settings
 
 import reversion

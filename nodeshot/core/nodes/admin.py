@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.db import models
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 
 from nodeshot.core.nodes.models import *
 from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline, PublishActionsAdminMixin

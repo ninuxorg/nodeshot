@@ -1,4 +1,3 @@
-import os
 from django.conf import settings
 from celery import task
 
@@ -9,7 +8,7 @@ def send_message(message, pipe='public'):
     writes message to pipe
     """
     if pipe not in ['public', 'private']:
-        raise ArgumentError('pipe argument can be only "public" or "private"')
+        raise ValueError('pipe argument can be only "public" or "private"')
     else:
         pipe = pipe.upper()
     

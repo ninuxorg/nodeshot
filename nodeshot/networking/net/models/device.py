@@ -1,6 +1,5 @@
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.gis.geos import Point
 from django.conf import settings
 
 from nodeshot.core.base.models import BaseAccessLevel
@@ -44,7 +43,7 @@ class Device(BaseAccessLevel):
     
     # extra data
     data = DictionaryField(_('extra data'), null=True, blank=True,
-                            help_text=_('store extra attributes in JSON string'))
+                           help_text=_('store extra attributes in JSON string'))
     shortcuts = ReferencesField(null=True, blank=True)
     
     objects = DeviceManager()
@@ -100,7 +99,7 @@ class Device(BaseAccessLevel):
     
     @property
     def owner(self):
-        if not self.shortcuts.has_key('user'):
+        if 'user' not in self.shortcuts:
             if self.node or self.node_id:
                 self.save()
             else:
@@ -111,7 +110,7 @@ class Device(BaseAccessLevel):
     def layer(self):
         if 'nodeshot.core.layers' not in settings.INSTALLED_APPS:
             return False
-        if not self.shortcuts.has_key('layer'):
+        if 'layer' not in self.shortcuts:
             if self.node or self.node_id:
                 self.save()
             else:

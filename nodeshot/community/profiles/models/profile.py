@@ -23,12 +23,21 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     Contains personal info of a user
     """
     # 254 maximum character for username makes it possible
-    username = models.CharField(_('username'), max_length=254, unique=True, db_index=True,
-        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
-                    '@/./+/-/_ characters'),
+    username = models.CharField(
+        _('username'),
+        max_length=254,
+        unique=True,
+        db_index=True,
+        help_text=_('Required. 30 characters or fewer.\
+                    Letters, numbers and @/./+/-/_ characters'),
         validators=[
-            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
-        ])
+            validators.RegexValidator(
+                re.compile('^[\w.@+-]+$'),
+                _('Enter a valid username.'),
+                'invalid'
+            )
+        ]
+    )
     email = models.EmailField(_('primary email address'), blank=True, unique=True, db_index=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
@@ -42,11 +51,13 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     country = models.CharField(_('country'), max_length=30, blank=True)
     
     is_staff = models.BooleanField(_('staff status'), default=False,
-        help_text=_('Designates whether the user can log into this admin '
-                    'site.'))
-    is_active = models.BooleanField(_('active'), default=True,
-        help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
+                                   help_text=_('Designates whether the user can log into this admin site.'))
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_('Designates whether this user should be treated as active.\
+                    Unselect this instead of deleting accounts.')
+    )
     date_joined = models.DateTimeField(_('date joined'), default=now)
 
     objects = UserManager()
@@ -58,6 +69,9 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         app_label = 'profiles'
+    
+    def __unicode__(self):
+        return self.username
     
     def save(self, *args, **kwargs):
         """ ensure instance has usable password when created """

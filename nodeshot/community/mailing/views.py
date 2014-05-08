@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from nodeshot.core.nodes.models import Node
 
 from .serializers import *
-from .models import Inward, Outward
+from .models import Inward
 
 
 CONTACT_PERMISSIONS = (permissions.IsAuthenticated,) if settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH'] else []

@@ -1,4 +1,3 @@
-import os
 import time
 import simplejson as json
 from threading import Thread
@@ -7,7 +6,7 @@ import tornado.web
 import tornado.ioloop
 
 from .handlers import WebSocketHandler
-from . import DOMAIN, ADDRESS, PORT, PUBLIC_PIPE, PRIVATE_PIPE  # contained in __init__.py
+from . import ADDRESS, PORT, PUBLIC_PIPE, PRIVATE_PIPE  # contained in __init__.py
 
 
 application = tornado.web.Application([

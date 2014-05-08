@@ -3,6 +3,10 @@ reusable restframework mixins for API views
 """
 
 import reversion
+import warnings
+
+from django.http import Http404
+
 from rest_framework.response import Response
 
 

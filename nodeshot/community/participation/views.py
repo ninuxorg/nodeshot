@@ -5,7 +5,7 @@ User = get_user_model()
 
 from rest_framework import permissions, authentication, generics
 
-from .models import NodeRatingCount, Rating, Vote, Comment
+from .models import Rating, Vote, Comment
 from .serializers import *
 
 from nodeshot.core.base.mixins import CustomDataMixin

@@ -1,11 +1,7 @@
-import simplejson as json
-
-from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
 from rest_framework import generics, authentication
-from rest_framework.response import Response
 
 from nodeshot.core.base.mixins import ACLMixin
 

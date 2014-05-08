@@ -1,7 +1,6 @@
-import simplejson as json
 from netfields import InetAddressField, CidrAddressField
 
-from django.db import models, DatabaseError, IntegrityError
+from django.db import models, DatabaseError
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings

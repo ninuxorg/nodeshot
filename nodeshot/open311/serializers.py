@@ -1,16 +1,11 @@
-import simplejson as json
-
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from rest_framework_gis import serializers as geoserializers
 
-from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node, Image
 from nodeshot.community.participation.models import Vote, Comment, Rating
-#from nodeshot.core.nodes.serializers import NodeListSerializer
 from nodeshot.core.base.serializers import ExtraFieldSerializer
 
 from .base import SERVICES
@@ -191,7 +186,8 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'code': 'images',
                 'description': _('images'),
                 'datatype': 'string',
-                'datatype_description': _('Images related to node. A client may POST multiple files as multipart/form-data. Requests return the URL for this images via the image_url field\                                          '),
+                'datatype_description': _('Images related to node. A client may POST multiple files as multipart/form-data.\
+                                          Requests return the URL for this images via the image_url field'),
                 'order': 8,
                 'required': False,
                 'variable' : True
@@ -333,7 +329,6 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
     Open 311 node request 
     """
     service_request_id = serializers.SerializerMethodField('get_service_request_id')
-    #layer_name = serializers.SerializerMethodField('get_layer_name')
     layer_slug= serializers.SerializerMethodField('get_layer_slug')   
     details = serializers.SerializerMethodField('get_details')
     image_urls = serializers.SerializerMethodField('get_image_urls')
@@ -344,20 +339,6 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
     image = serializers.ImageField()
     service_code = serializers.CharField()
     layer = serializers.CharField()
-    
-    #def restore_object(self, attrs, instance=None):
-    #    model_attrs, post_attrs = {}, {}
-    #    
-    #    for attr, value in attrs.iteritems():
-    #        if attr in self.opts.non_native_fields:
-    #            post_attrs[attr] = value
-    #        else:
-    #            model_attrs[attr] = value
-    #    obj = super(ExtraFieldSerializer,
-    #                self).restore_object(model_attrs, instance)
-    #    # Method to process ignored postonly_fields
-    #    #self.non_native_fields(obj, post_attrs)
-    #    return obj    
     
     def get_image_urls(self,obj):
         image_url =[]
@@ -381,7 +362,6 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
         return layer_name
     
     def get_layer_slug(self, obj):
-        #print obj
         if obj is None:
             return ""
         layer_slug =  obj.layer.slug

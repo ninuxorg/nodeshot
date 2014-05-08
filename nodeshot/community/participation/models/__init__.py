@@ -29,7 +29,7 @@ __all__ = [
 ]
 
 
-### ------ Layers Operations ------ ###
+# ------ Layers Operations ------ #
 
 
 if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
@@ -59,7 +59,7 @@ if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
     Layer.participation_settings = _layer_participation_settings
 
 
-### ------ Add methods to Node Model ------ ###
+# ------ Add methods to Node Model ------ #
 
 
 from nodeshot.core.nodes.models import Node

@@ -1,12 +1,11 @@
-from django.conf import settings
 from rest_framework import serializers, pagination
 from rest_framework_gis import serializers as geoserializers
-
-from .models import Layer
 
 from nodeshot.core.base.serializers import GeoJSONPaginationSerializer
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.nodes.serializers import NodeListSerializer
+
+from .models import Layer
 
 
 __all__ = [

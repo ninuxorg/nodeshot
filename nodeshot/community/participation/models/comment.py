@@ -38,11 +38,11 @@ class Comment(UpdateCountsMixin, BaseDate):
             node = self.node
             
             # ensure comments for this node are allowed
-            if  node.participation_settings.comments_allowed == False:
+            if  node.participation_settings.comments_allowed is False:
                 raise ValidationError("Comments not allowed for this node")
             
             # ensure comments for this layer are allowed
             if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
                 layer = node.layer
-                if  layer.participation_settings.comments_allowed == False:
+                if  layer.participation_settings.comments_allowed is False:
                     raise ValidationError("Comments not allowed for this layer")

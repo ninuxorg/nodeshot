@@ -15,7 +15,11 @@ from .choices import INWARD_STATUS_CHOICES
 
 user_app_label = settings.AUTH_USER_MODEL.split('.')[0]
 user_model_name = settings.AUTH_USER_MODEL.split('.')[1]
-limit = models.Q(app_label='nodes', model='node') | models.Q(app_label=user_app_label, model=user_model_name.lower()) | models.Q(app_label='layers', model='layer')
+limit = (
+    models.Q(app_label='nodes', model='node') |
+    models.Q(app_label=user_app_label, model=user_model_name.lower()) |
+    models.Q(app_label='layers', model='layer')
+)
 USER_CAN_BE_BLANK = not settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH']
 
 
@@ -97,7 +101,8 @@ class Inward(BaseDate):
             # log the error
             import logging
             log = logging.getLogger(__name__)
-            log.error('nodeshot.community.mailing.models.inward.send(): %s' % e)
+            error_msg = 'nodeshot.community.mailing.models.inward.send(): %s' % e
+            log.error(error_msg)
             # set status of the instance as "error"
             self.status = -1
     

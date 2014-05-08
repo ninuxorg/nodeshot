@@ -13,6 +13,9 @@ class LayerParticipationSettings(models.Model):
     voting_allowed = models.BooleanField(_('voting allowed?'), default=True)
     rating_allowed = models.BooleanField(_('rating allowed?'), default=True)
     comments_allowed = models.BooleanField(_('comments allowed?'), default=True)
+    
+    def __unicode__(self):
+        return _('Participation settings for layer %s' % self.layer.name)
 
     class Meta:
         app_label = 'participation'

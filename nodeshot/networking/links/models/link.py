@@ -26,24 +26,23 @@ class Link(BaseAccessLevel):
     
     # in most cases these two fields are mandatory, except for "planned" links
     interface_a = models.ForeignKey(Interface, verbose_name=_('from interface'),
-                  related_name='link_interface_from', blank=True, null=True,
-                  help_text=_('mandatory except for "planned" links (in planned links you might not have any device installed yet)'))
+                                    related_name='link_interface_from', blank=True, null=True,
+                                    help_text=_('mandatory except for "planned" links (in planned links you might not have any device installed yet)'))
     interface_b = models.ForeignKey(Interface, verbose_name=_('to interface'),
-                  related_name='link_interface_to', blank=True, null=True,
-                  help_text=_('mandatory except for "planned" links (in planned links you might not have any device installed yet)'))
+                                    related_name='link_interface_to', blank=True, null=True,
+                                    help_text=_('mandatory except for "planned" links (in planned links you might not have any device installed yet)'))
     
     # in "planned" links these two fields are necessary
     # while in all the other status they serve as a shortcut
     node_a = models.ForeignKey(Node, verbose_name=_('from node'),
-                  related_name='link_node_from', blank=True, null=True,
-                  help_text=_('leave blank (except for planned nodes) as it will be filled in automatically'))
+                               related_name='link_node_from', blank=True, null=True,
+                               help_text=_('leave blank (except for planned nodes) as it will be filled in automatically'))
     node_b = models.ForeignKey(Node, verbose_name=_('to node'),
-                  related_name='link_node_to', blank=True, null=True,
-                  help_text=_('leave blank (except for planned nodes) as it will be filled in automatically'))
+                               related_name='link_node_to', blank=True, null=True,
+                               help_text=_('leave blank (except for planned nodes) as it will be filled in automatically'))
     
     # geospatial info
-    line = models.LineStringField(blank=True, null=True,
-                           help_text=_('leave blank and the line will be drawn automatically'))
+    line = models.LineStringField(blank=True, null=True, help_text=_('leave blank and the line will be drawn automatically'))
     
     # monitoring info
     status = models.SmallIntegerField(_('status'), choices=choicify(LINK_STATUS), default=LINK_STATUS.get('planned'))
@@ -63,7 +62,7 @@ class Link(BaseAccessLevel):
     
     # additional data
     data = DictionaryField(_('extra data'), null=True, blank=True,
-                            help_text=_('store extra attributes in JSON string'))
+                           help_text=_('store extra attributes in JSON string'))
     shortcuts = ReferencesField(null=True, blank=True)
     
     # django manager
@@ -85,23 +84,22 @@ class Link(BaseAccessLevel):
             5. interface a and b type must match
         """
         
-        if self.status != LINK_STATUS.get('planned') and (self.interface_a == None or self.interface_b == None):
+        if self.status != LINK_STATUS.get('planned') and (self.interface_a is None or self.interface_b is None):
             raise ValidationError(_('fields "from interface" and "to interface" are mandatory in this case'))
         
-        if self.status == LINK_STATUS.get('planned') and (self.node_a == None or self.node_b == None):
+        if self.status == LINK_STATUS.get('planned') and (self.node_a is None or self.node_b is None):
             raise ValidationError(_('fields "from node" and "to node" are mandatory for planned links'))
         
-        if self.type != LINK_TYPES.get('radio') and (self.dbm != None or self.noise != None):
+        if self.type != LINK_TYPES.get('radio') and (self.dbm is not None or self.noise is not None):
             raise ValidationError(_('Only links of type "radio" can contain "dbm" and "noise" information'))
         
         if (self.interface_a_id == self.interface_b_id) or (self.interface_a == self.interface_b):
             raise ValidationError(_('link cannot have same "from interface" and "to interface"'))
         
         if (self.interface_a and self.interface_b) and self.interface_a.type != self.interface_b.type:
-            raise ValidationError(_(
-                """link cannot be between of interfaces of different types: interface a is "%s" while b is "%s" """) %
-                (self.interface_a.get_type_display(), self.interface_b.get_type_display())
-            )
+            format_tuple = (self.interface_a.get_type_display(), self.interface_b.get_type_display())
+            raise ValidationError(_('link cannot be between of interfaces of different types:\
+                                    interface a is "%s" while b is "%s"') % format_tuple)
     
     def save(self, *args, **kwargs):
         """
@@ -126,9 +124,9 @@ class Link(BaseAccessLevel):
             self.interface_b = Interface.objects.get(pk=self.interface_b_id)
         
         # fill in node_a and node_b
-        if self.node_a is None and self.interface_a != None:
+        if self.node_a is None and self.interface_a is not None:
             self.node_a = self.interface_a.node
-        if self.node_b is None and self.interface_b != None:
+        if self.node_b is None and self.interface_b is not None:
             self.node_b = self.interface_b.node
         
         # draw linestring

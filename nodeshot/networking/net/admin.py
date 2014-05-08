@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.conf import settings
 
 from nodeshot.core.base.admin import BaseAdmin, BaseGeoAdmin, BaseStackedInline
-from nodeshot.core.nodes.models import Node
 
 from .models.choices import INTERFACE_TYPES
 from .models import *

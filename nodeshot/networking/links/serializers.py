@@ -1,8 +1,4 @@
-from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
-
 from rest_framework import pagination, serializers
-from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as gis_serializers
 
 from nodeshot.core.base.serializers import DynamicRelationshipsMixin
@@ -84,18 +80,6 @@ class LinkDetailGeoJSONSerializer(LinkDetailSerializer, gis_serializers.GeoFeatu
         fields = LinkDetailSerializer.Meta.fields[:]
 
 
-#class LinkAddSerializer(NodeLinkListSerializer):
-#    """ Serializer for Link Creation """
-#    node = serializers.WritableField(source='node_id')
-#    type = serializers.WritableField(source='type')
-#    details = serializers.HyperlinkedIdentityField(view_name='api_link_details') 
-
-
 class PaginatedLinkSerializer(pagination.PaginationSerializer):
     class Meta:
         object_serializer_class = LinkListSerializer
-
-
-#class PaginatedNodeLinkSerializer(pagination.PaginationSerializer):
-#    class Meta:
-#        object_serializer_class = NodeLinkListSerializer

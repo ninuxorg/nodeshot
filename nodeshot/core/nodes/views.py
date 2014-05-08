@@ -6,7 +6,6 @@ from django.conf import settings
 from django.db.models import Q, Count
 
 from rest_framework import permissions, authentication, generics
-from rest_framework.response import Response
 
 from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
 from nodeshot.core.base.utils import Hider
@@ -64,7 +63,6 @@ class NodeList(NodeListBase):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Node.objects.published()
     serializer_class = NodeListSerializer
-    #serializer_custom_class = NodeCreatorSerializer
     pagination_serializer_class = PaginatedNodeListSerializer
     paginate_by_param = 'limit'
     paginate_by = 40
@@ -143,7 +141,7 @@ class NodeGeoJSONList(NodeList):
 geojson_list = NodeGeoJSONList.as_view()
 
 
-### ------ Images ------ ###
+# -------- Images -------- #
 
 
 class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
@@ -233,18 +231,17 @@ class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
     
     def get_queryset(self):
-        
-        self.node = get_queryset_or_404(Node.objects.published().accessible_to(self.request.user), {
-            'slug': self.kwargs.get('slug', None)
-        })
+        self.node = get_queryset_or_404(
+            Node.objects.published().accessible_to(self.request.user),
+            { 'slug': self.kwargs.get('slug', None) }
+        )
         
         return super(ImageDetail, self).get_queryset().filter(node=self.node)
-    
 
 node_image_detail = ImageDetail.as_view()
 
 
-### ------ Status ------ ###
+# --------- Status ---------#
 
 
 class StatusList(generics.ListAPIView):

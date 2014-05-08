@@ -38,7 +38,6 @@ TIME_ZONES = (
 
 ACCESS_LEVELS = settings.NODESHOT['CHOICES']['ACCESS_LEVELS'].copy()
 ACCESS_LEVELS['public'] = 0
-#ACCESS_LEVELS['private'] = 99
 
 PLANNED_STATUS = (
     (0, 'pending'),

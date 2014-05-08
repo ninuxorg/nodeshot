@@ -1,6 +1,4 @@
 from django.conf.urls import patterns, url
-from django.conf import settings
-
 
 urlpatterns = patterns('nodeshot.community.notifications.views',
     url(r'^account/notifications/$', 'notification_list', name='api_notification_list'),

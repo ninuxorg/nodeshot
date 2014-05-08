@@ -30,9 +30,8 @@ if 'nodeshot.community.notifications' in settings.INSTALLED_APPS:
         created = kwargs['created']
         user = kwargs['instance']
         if created:
-            user_web_settings = UserWebNotificationSettings.objects.create(user=user)
-            user_email_settings = UserEmailNotificationSettings.objects.create(user=user)
-    
+            UserWebNotificationSettings.objects.create(user=user)
+            UserEmailNotificationSettings.objects.create(user=user)
     
     # ------ register notification signals ------ #
     

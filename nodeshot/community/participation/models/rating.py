@@ -26,6 +26,9 @@ class Rating(UpdateCountsMixin, BaseDate):
         app_label = 'participation'
         unique_together = (("node", "user"),)
     
+    def __unicode__(self):
+        return _('rating #%d for node %s') % (self.pk, self.node.name)
+    
     def update_count(self):
         """ updates rating count and rating average """
         node_rating_count = self.node.rating_count
@@ -43,13 +46,10 @@ class Rating(UpdateCountsMixin, BaseDate):
         """
         Check if rating can be inserted for parent node or parent layer
         """
-        
         if not self.pk:
-        
             node = self.node
-            
             layer= Layer.objects.get(pk=node.layer_id)
-            if  layer.participation_settings.rating_allowed != True:
+            if  layer.participation_settings.rating_allowed is not True:
                 raise ValidationError  ("Rating not allowed for this layer")
-            if  node.participation_settings.rating_allowed != True:
+            if  node.participation_settings.rating_allowed is not True:
                 raise ValidationError  ("Rating not allowed for this node")

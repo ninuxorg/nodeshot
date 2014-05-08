@@ -16,7 +16,6 @@ admin.site.register(Vote)
 if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
 
     from nodeshot.core.layers.admin import LayerAdmin
-    from nodeshot.core.layers.models import Layer
     
     class LayerSettingsInline(admin.TabularInline):
         model = LayerParticipationSettings
@@ -28,7 +27,6 @@ if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
 # ------ EXTEND NODE ADMIN ------ #
 
 from nodeshot.core.nodes.admin import NodeAdmin
-from nodeshot.core.nodes.models import Node
 
 
 class NodeSettingsInline(admin.TabularInline):

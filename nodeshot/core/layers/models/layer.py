@@ -7,8 +7,7 @@ from django.conf import settings
 from django_hstore.fields import DictionaryField
 
 from nodeshot.core.base.models import BaseDate
-from nodeshot.core.base.choices import MAP_ZOOM, ACCESS_LEVELS
-from nodeshot.core.base.utils import choicify
+from nodeshot.core.base.choices import MAP_ZOOM
 from nodeshot.core.nodes.models import Node
 
 from ..managers import LayerManager
@@ -49,8 +48,8 @@ class Layer(BaseDate):
                                            help_text=_('minimum distance between nodes in meters, 0 means feature disabled'))
     new_nodes_allowed = models.BooleanField(_('new nodes allowed'), default=True, help_text=_('indicates whether users can add new nodes to this layer'))
     
-    data = DictionaryField(_('extra data'), null=True, blank=True,
-                        help_text=_('store extra attributes in JSON string'))
+    data = DictionaryField(_('extra data'), null=True, blank=True,\
+                           help_text=_('store extra attributes in JSON string'))
         
     # default manager
     objects = LayerManager()

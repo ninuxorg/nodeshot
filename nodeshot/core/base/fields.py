@@ -39,6 +39,7 @@ class MultiSelectField(models.Field):
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
         choicedict = dict(field.choices)
+        return choicedict.get(value, value)
  
     def formfield(self, **kwargs):
         # don't call super, as that overrides default widget if it has choices
@@ -66,7 +67,9 @@ class MultiSelectField(models.Field):
     def contribute_to_class(self, cls, name):
         super(MultiSelectField, self).contribute_to_class(cls, name)
         if self.choices:
-            func = lambda self, fieldname = name, choicedict = dict(self.choices): ",".join([choicedict.get(value, value) for value in getattr(self, fieldname)])
+            func = lambda self, fieldname = name, choicedict = dict(self.choices): ",".join([
+                choicedict.get(value, value) for value in getattr(self, fieldname)
+            ])
             setattr(cls, 'get_%s_display' % self.name, func)
  
     def validate(self, value, model_instance):

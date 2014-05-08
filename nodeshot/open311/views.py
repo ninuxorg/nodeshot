@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view
 
 from nodeshot.core.nodes.models import Node, Status, Image
 from nodeshot.core.layers.models import Layer
-from nodeshot.community.participation.models import Vote, Comment, Rating
+from nodeshot.community.participation.models import Comment, Rating
 
 from .base import STATUS, SERVICES, DISCOVERY, MODELS, iso8601_REGEXP
 from .serializers import *
@@ -240,7 +240,6 @@ class ServiceRequestList(generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         self.object_list = self.filter_queryset(self.get_queryset())
         service_code = kwargs['service_code']
-        context = self.get_serializer_context()
         
         # Default is to allow empty querysets.  This can be altered by setting
         # `.allow_empty = False`, to raise 404 errors on empty querysets.

@@ -1,8 +1,6 @@
 import uuid
 import tornado.websocket
 
-from . import PUBLIC_PIPE  # contained in __init__.py
-
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     """

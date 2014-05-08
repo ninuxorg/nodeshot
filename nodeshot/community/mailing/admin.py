@@ -4,9 +4,8 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ImproperlyConfigured
 
-from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
+from nodeshot.core.base.admin import BaseAdmin
 from nodeshot.core.layers.models import Layer
 from .models import Inward, Outward
 
@@ -16,8 +15,6 @@ import os
 class InwardAdmin(BaseAdmin):
     list_display  = ('from_email', 'from_name', 'to',  'status', 'added', 'updated')
     search_fields = ('from_email', 'from_name')
-    #ordering = ('name',)
-    #search_fields = ('name', 'description')
     # define the autocomplete_lookup_fields
     if 'grappelli' in settings.INSTALLED_APPS:
         autocomplete_lookup_fields = {

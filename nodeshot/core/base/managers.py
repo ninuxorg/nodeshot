@@ -1,10 +1,7 @@
-import sys
-
-from django.db.models import Manager, Q
+from django.db.models import Manager
 from django.contrib.gis.db.models import GeoManager
 from django.db.models.query import QuerySet
 from django.contrib.gis.db.models.query import GeoQuerySet
-from django.conf import settings
 
 from django_hstore.query import HStoreQuerySet, HStoreGeoQuerySet
 from django_hstore.managers import HStoreManager, HStoreGeoManager
@@ -12,7 +9,7 @@ from django_hstore.managers import HStoreManager, HStoreGeoManager
 from nodeshot.core.base.choices import ACCESS_LEVELS
 
 
-### ------ MIXINS ------ ###
+# -------- MIXINS -------- #
 
 
 class BaseUtilityMixin(object):
@@ -87,7 +84,7 @@ class ExtendedManagerMixin(BaseUtilityMixin):
             return getattr(self.get_query_set(), attr, *args)
 
 
-### ------ QUERYSETS ------ ###
+# -------- QUERYSETS -------- #
 
 
 class PublishedQuerySet(QuerySet, PublishedMixin):
@@ -141,7 +138,7 @@ class HStoreGeoAccessLevelPublishedQuerySet(HStoreGeoQuerySet, ACLMixin, Publish
 
 
 
-### ------ MANAGERS ------ ###
+# -------- MANAGERS -------- #
 
 
 class NodeshotDefaultManager(Manager, ExtendedManagerMixin):

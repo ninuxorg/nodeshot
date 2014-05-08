@@ -2,17 +2,17 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos.collections import GeometryCollection
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
-from nodeshot.core.base.utils import choicify
+from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as NodeManager
+
+from django_hstore.fields import DictionaryField
 
 from ..signals import node_status_changed
 from .status import Status
 
-from django_hstore.fields import DictionaryField
-from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as NodeManager
+DEFAULT_NODE_PUBLISHED = settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True)
 
 
 class Node(BaseAccessLevel):
@@ -24,7 +24,7 @@ class Node(BaseAccessLevel):
     name = models.CharField(_('name'), max_length=75, unique=True)
     slug = models.SlugField(max_length=75, db_index=True, unique=True, blank=True)
     status = models.ForeignKey(Status, blank=True, null=True)
-    is_published = models.BooleanField(default=settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True))
+    is_published = models.BooleanField(default=DEFAULT_NODE_PUBLISHED)
     
     # TODO: find a way to move this in layers
     if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
@@ -35,16 +35,20 @@ class Node(BaseAccessLevel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     
     # geographic information
-    geometry = models.GeometryField(_('geometry'), help_text=_('geometry of the node (point, polygon, line)'))
+    geometry = models.GeometryField(
+        _('geometry'),
+        help_text=_('geometry of the node (point, polygon, line)')
+    )
     elev = models.FloatField(_('elevation'), blank=True, null=True)
     address = models.CharField(_('address'), max_length=150, blank=True, null=True)
     
     # descriptive information
     description = models.TextField(_('description'), max_length=255, blank=True, null=True)
-    notes = models.TextField(_('notes'), blank=True, null=True, help_text=_('for internal use only'))
+    notes = models.TextField(_('notes'), blank=True, null=True,\
+                             help_text=_('for internal use only'))
     
-    data = DictionaryField(_('extra data'), null=True, blank=True,
-                        help_text=_('store extra attributes in JSON string'))
+    data = DictionaryField(_('extra data'), null=True, blank=True,\
+                           help_text=_('store extra attributes in JSON string'))
     
     # manager
     objects = NodeManager()
@@ -100,11 +104,15 @@ class Node(BaseAccessLevel):
         super(Node, self).save(*args, **kwargs)
         
         # if status of a node changes
-        if (self.status and self._current_status and self.status.id != self._current_status) or (
-            self.status_id and self._current_status and self.status_id != self._current_status
-        ):
+        if (self.status and self._current_status and self.status.id != self._current_status) or\
+            (self.status_id and self._current_status and self.status_id != self._current_status):
             # send django signal
-            node_status_changed.send(sender=self.__class__, instance=self, old_status=Status.objects.get(pk=self._current_status), new_status=self.status)
+            node_status_changed.send(
+                sender=self.__class__,
+                instance=self,
+                old_status=Status.objects.get(pk=self._current_status),
+                new_status=self.status
+            )
         # update _current_status
         self._current_status = self.status_id
     

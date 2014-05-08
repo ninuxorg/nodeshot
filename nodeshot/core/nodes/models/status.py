@@ -9,19 +9,26 @@ class Status(BaseOrdered):
     """
     Status of a node, eg: active, potential, approved
     """
-    name = models.CharField(_('name'), max_length=255, help_text=_('label for this status, eg: active, approved, proposed'))
+    name = models.CharField(_('name'), max_length=255,\
+                            help_text=_('label for this status, eg: active, approved, proposed'))
     slug = models.SlugField(max_length=75, db_index=True, unique=True)
-    description = models.CharField(_('description'), max_length=255,
+    description = models.CharField(_('description'), max_length=255,\
                                    help_text=_('this description will be used in the legend'))
     
-    is_default = models.BooleanField(default=False, verbose_name=_('is default status?'),
-                help_text=_("""indicates whether this is the default status for new nodes;
-                            to change the default status to a new one just check and save,
-                            any other default will be automatically unchecked"""))
+    is_default = models.BooleanField(
+        default=False,
+        verbose_name=_('is default status?'),
+        help_text=_('indicates whether this is the default status for new nodes;\
+                    to change the default status to a new one just check and save,\
+                    any other default will be automatically unchecked')
+    )
     
     # map look and feel
-    stroke_width = models.SmallIntegerField(help_text=_('stroke of circles shown on map, set to 0 to disable'),
-                                            blank=False, default=0)
+    stroke_width = models.SmallIntegerField(
+        blank=False,
+        default=0,
+        help_text=_('stroke of circles shown on map, set to 0 to disable')
+    )
     fill_color = RGBColorField(_('fill colour'), blank=True)
     stroke_color = RGBColorField(_('stroke colour'), blank=True, default='#000000')
     text_color = RGBColorField(_('text colour'), blank=True, default='#FFFFFF')

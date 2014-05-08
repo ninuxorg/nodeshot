@@ -2,7 +2,6 @@
 OpenWISP OAuth support.
 """
 from urllib import urlencode
-from urllib2 import HTTPError
 import simplejson as json
 
 from django.conf import settings
@@ -10,7 +9,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 from social_auth.utils import dsa_urlopen
 from social_auth.backends import BaseOAuth2, OAuthBackend
-from social_auth.exceptions import AuthFailed
 
 
 # OpenWISP configuration

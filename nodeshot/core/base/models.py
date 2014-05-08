@@ -1,8 +1,5 @@
-from datetime import datetime
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.utils.timezone import utc
 from django.conf import settings
 
 from .choices import ACCESS_LEVELS
@@ -72,7 +69,7 @@ class BaseDate(BaseShortcut):
             self.updated = now()
         
         # remove eventual auto_update
-        if kwargs.has_key('auto_update'):
+        if 'auto_update' in kwargs:
             kwargs.pop('auto_update')
         
         super(BaseDate, self).save(*args, **kwargs)
@@ -80,30 +77,38 @@ class BaseDate(BaseShortcut):
 
 class BaseAccessLevel(BaseDate):
     """
-    Base Abstract Model that extends BaseDate and provides an additional field for access level management.
-    The field default and editable attributes value can be overriden by adding some directives in the settings file.
+    Base Abstract Model that extends BaseDate and provides
+    an additional field for access level management.
+    The field default and editable attributes value can be
+    overriden by adding some directives in the settings file.
     
     DEFAULT VALUE
-        To edit the default value for the access_level field of a certain model you will have to add the following setting in the settings.py file:
+        To edit the default value for the access_level field of a certain
+        model you will have to add the following setting in the settings.py file:
     
         NODESHOT['DEFAULTS']['ACL_{APP_NAME}_{MODEL_NAME}'] = 'public'
     
         where {APP_NAME} is the uppercase name of an app like "nodes" or "network"
         and {MODEL_NAME} is the uppercase name of a model like "Node" or "Device"
-        The values will have to be one of the possible values specified in "nodeshot.core.base.choices.ACCESS_LEVELS"
-        The possible values are public or the id of the group saved in the database (default ones are 1 for registered, 2 for community and 3 for trusted)
+        The values will have to be one of the possible values specified in
+        "nodeshot.core.base.choices.ACCESS_LEVELS"
+        The possible values are public or the id of the group saved in the database
+        (default ones are 1 for registered, 2 for community and 3 for trusted)
         
-        For the cases in which no setting is specified the fallback setting NODESHOT['DEFAULTS']['ACL_GLOBAL'] will be used.
+        For the cases in which no setting is specified the fallback setting
+        NODESHOT['DEFAULTS']['ACL_GLOBAL'] will be used.
     
     EDITABLE
-        If you want to disable the possibility to edit the access_level field for a given model you will have to add the following settings in the settings.py file:
+        If you want to disable the possibility to edit the access_level field
+        for a given model you will have to add the following settings in the settings.py file:
         
         NODESHOT['DEFAULTS']['ACL_{APP_NAME}_{MODEL_NAME}_EDITABLE'] = False
         
         where {APP_NAME} is the uppercase name of an app like "nodes" or "network"
         and {MODEL_NAME} is the uppercase name of a model like "Node" or "Device"
         
-        For the cases in which no setting is specified the fallback setting NODESHOT['DEFAULTS']['ACL_GLOBAL_EDITABLE'] will be used.
+        For the cases in which no setting is specified the fallback setting
+        NODESHOT['DEFAULTS']['ACL_GLOBAL_EDITABLE'] will be used.
     
     """
     access_level = models.SmallIntegerField(_('access level'), choices=choicify(ACCESS_LEVELS), default=ACCESS_LEVELS.get('public'))
@@ -159,7 +164,7 @@ class BaseOrdered(models.Model):
     
     def save(self, *args, **kwargs):
         """ if order left blank """
-        if self.order == '' or self.order == None:
+        if self.order == '' or self.order is None:
             try:
                 self.order = self.get_auto_order_queryset().order_by("-order")[0].order + 1
             except IndexError:

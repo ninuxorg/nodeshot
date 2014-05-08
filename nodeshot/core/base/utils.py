@@ -20,10 +20,10 @@ __all__ = [
 
 class Hider(object):
     def __get__(self,instance,owner):
-        raise AttributeError, "Hidden attrbute"
+        raise AttributeError("Hidden attrbute")
 
     def __set__(self, obj, val):
-        raise AttributeError, "Hidden attribute"
+        raise AttributeError("Hidden attribute")
 
 
 def check_dependencies(dependencies, module):
@@ -57,7 +57,7 @@ def choicify(dictionary):
     for field in ordered_fields:
         # build tuple (value, i18n_key)
         row = (dictionary[field], _(field.replace('_', ' ')))
-        #append tuple to choices
+        # append tuple to choices
         choices.append(row)
     # return django sorted choices
     return choices

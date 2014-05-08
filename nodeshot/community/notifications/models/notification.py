@@ -64,7 +64,6 @@ class Notification(BaseDate):
     def send_notifications(self):
         """ send notifications to recipient user according to her settings """
         self.send_email()
-        #self.send_mobile()
     
     def send_email(self):
         """ send email notification according to user settings """
@@ -130,9 +129,12 @@ class Notification(BaseDate):
         action_url = self.get_action()
         if action_url != '' and not action_url.startswith('http'):
             action_url = "%s://%s%s" % (getattr(settings, 'PROTOCOL', 'http'), site.domain, action_url)
-        hello_text = __("""Hi %s,""" % self.to_user.get_full_name())
-        action_text = __("""\n\nMore details here: %s""") % action_url if action_url != "" else ""
-        explain_text = __("""This is an automatic notification sent from from %s.\nIf you want to stop receiving this notification edit your email notification settings here: %s""") % (site.name, 'TODO')
+        hello_text = __("Hi %s," % self.to_user.get_full_name())
+        action_text = __("\n\nMore details here: %s") % action_url if action_url != "" else ""
+        explain_text = __(
+            "This is an automatic notification sent from from %s.\n"
+            "If you want to stop receiving this notification edit your"
+            "email notification settings here: %s") % (site.name, 'TODO')
         
         return "%s\n\n%s%s\n\n%s" % (hello_text, self.text, action_text, explain_text)
     
@@ -151,7 +153,7 @@ class Notification(BaseDate):
         if not action:
             return ''
         
-        if action.startswith('reverse'):
+        if action.startswith(reverse.__name__):
             try:
                 return eval(action)
             except NoReverseMatch:

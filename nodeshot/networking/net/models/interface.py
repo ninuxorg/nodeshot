@@ -24,7 +24,7 @@ class Interface(BaseAccessLevel):
     
     # extra data
     data = DictionaryField(_('extra data'), null=True, blank=True,
-                        help_text=_('store extra attributes in JSON string'))
+                           help_text=_('store extra attributes in JSON string'))
     shortcuts = ReferencesField(null=True, blank=True)
     
     objects = InterfaceManager()
@@ -40,25 +40,20 @@ class Interface(BaseAccessLevel):
         Custom save method does the following:
             * save shortcuts if HSTORE is enabled
         """
-        changed = False
-        
-        if not self.shortcuts.has_key('node'):
+        if 'node' not in self.shortcuts:
             self.shortcuts['node'] = self.device.node
-            changed = True
         
-        if not self.shortcuts.has_key('user'):
+        if 'user' not in self.shortcuts:
             self.shortcuts['user'] = self.device.node.user
-            changed = True
         
-        if not self.shortcuts.has_key('layer') and 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+        if 'layer' not in self.shortcuts and 'nodeshot.core.layers' in settings.INSTALLED_APPS:
             self.shortcuts['layer'] = self.device.node.layer
-            changed = True
         
         super(Interface, self).save(*args, **kwargs)
     
     @property
     def owner(self):
-        if not self.shortcuts.has_key('user'):
+        if 'user' not in self.shortcuts:
             if self.device or self.device_id:
                 self.save()
             else:
@@ -68,7 +63,7 @@ class Interface(BaseAccessLevel):
     
     @property
     def node(self):
-        if not self.shortcuts.has_key('node'):
+        if 'node' not in self.shortcuts:
             if self.device or self.device_id:
                 self.save()
             else:
@@ -79,7 +74,7 @@ class Interface(BaseAccessLevel):
     def layer(self):
         if 'nodeshot.core.layers' not in settings.INSTALLED_APPS:
             return False
-        if not self.shortcuts.has_key('layer'):
+        if 'layer' not in self.shortcuts:
             if self.device or self.device_id:
                 self.save()
             else:
@@ -89,10 +84,10 @@ class Interface(BaseAccessLevel):
     @property
     def ip_addresses(self):
         try:
-            addresses = self.data.get('ip_addresses', False)
+            addresses = self.data.get('ip_addresses', '')
         # self.data might be none, hence self.data['ip_addresses'] will raise an exception
         except AttributeError:
-            addresses = []
+            addresses = ''
         return addresses.replace(' ', '').split(',') if addresses else []
     
     @ip_addresses.setter

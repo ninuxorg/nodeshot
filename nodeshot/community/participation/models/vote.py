@@ -29,7 +29,7 @@ class Vote(UpdateCountsMixin, BaseDate):
         unique_together = (("node", "user"),)
     
     def __unicode__(self):
-        return self.node.name
+        return _('vote #%d for node %s') % (self.pk, self.node.name)
     
     def update_count(self):
         """ updates likes and dislikes count """

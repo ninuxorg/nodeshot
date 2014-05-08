@@ -316,8 +316,6 @@ class AccountPassword(generics.GenericAPIView):
 account_password_change = AccountPassword.as_view()
 
 
-from .forms import ResetPasswordForm, ResetPasswordKeyForm
-
 class PasswordResetRequestKey(generics.GenericAPIView):
     """
     Sends an email to the user email address with a link to reset his password.
@@ -459,8 +457,6 @@ if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
             """
             if obj.primary:
                 obj.set_as_primary()
-            else:
-                primary = EmailAddress.objects.filter(user=obj.user, primary=True)
             
             super(AccountEmailDetail, self).pre_save(obj)
         

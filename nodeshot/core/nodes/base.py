@@ -1,5 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers, pagination
+from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
 from nodeshot.core.base.serializers import DynamicRelationshipsMixin
 

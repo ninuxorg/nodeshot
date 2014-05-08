@@ -20,6 +20,3 @@ class SocialLink(BaseDate):
     
     def __unicode__(self):
         return self.url
-    
-    class Meta:
-        app_label= 'profiles'

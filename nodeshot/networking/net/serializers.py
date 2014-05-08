@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 
@@ -208,7 +207,7 @@ class InterfaceSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'access_level', 'type', 'name',
             'mac', 'mtu', 'tx_rate', 'rx_rate',
-             'data', 'added', 'updated', 'ip_url', 'ip',
+            'data', 'added', 'updated', 'ip_url', 'ip',
         ]
         read_only_fields = ['added', 'updated']
 
@@ -304,7 +303,7 @@ class BridgeSerializer(InterfaceSerializer):
         
         # redundant but necessary
         if(len(interfaces) < 2 and not self.partial) or \
-          (self.partial and attrs.has_key('interfaces') and len(interfaces) < 2):  # this line adds support for partial udpates with PATCH method
+          (self.partial and 'interfaces' in attrs and len(interfaces) < 2):  # this line adds support for partial udpates with PATCH method
             raise ValidationError(_(u'You must bridge at least 2 interfaces'))
         
         # when creating a new interface self.object is None
