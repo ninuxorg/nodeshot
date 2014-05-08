@@ -84,7 +84,9 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
 
                 // clicking anywhere else closes the panel
                 $('html').one('click', function () {
-                    notifications.fadeOut(150);
+                    notifications.fadeOut(150, function(){
+                        Nodeshot.notifications.read();
+                    });
                 });
             });
         } else {

@@ -292,6 +292,9 @@ var toggleLoading = function (operation) {
 };
 
 $(document).ajaxSend(function (event, xhr, settings) {
+    if(settings.url.indexOf('notifications') > -1){
+        return;
+    }
     toggleLoading('show');
     Nodeshot.currentXHR = xhr;
 });

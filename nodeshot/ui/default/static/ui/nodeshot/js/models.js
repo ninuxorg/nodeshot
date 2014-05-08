@@ -47,7 +47,9 @@ var Notification = Backbone.Model.extend({
         this.setIcon();
     },
     
-    // use type attribute to differentiate icons
+    /*
+     * use type attribute to differentiate icons
+     */
     setIcon: function(){
         var value = this.get('type').split('_')[0];
         this.set('icon', value);
@@ -68,6 +70,9 @@ var NotificationCollection = Backbone.Collection.extend({
         return response.results;
     },
     
+    /*
+     * get number of unread notifications
+     */
     getUnreadCount: function(){
         var count = 0;
         this.models.forEach(function(model){
@@ -76,5 +81,19 @@ var NotificationCollection = Backbone.Collection.extend({
             }
         });
         return count;
+    },
+    
+    /*
+     * mark notifications as read
+     */
+    read: function(){
+        // skip if all notifications are already read
+        if(this.getUnreadCount() > 0){
+            $.get(this.url.split('?')[0]);
+            this.models.forEach(function(model){
+                model.set('is_read', true);
+            });
+            this.trigger('reset');
+        }
     }
 });

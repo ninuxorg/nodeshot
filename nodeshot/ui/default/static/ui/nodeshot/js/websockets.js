@@ -18,7 +18,7 @@
                     data = JSON.parse(msg.data);
                     // if we got a notification update the UI
                     if(data.model == 'notification'){
-                        Nodeshot.notifications.fetch()
+                        Nodeshot.notifications.fetch({ reset: true })
                     }
                 }
                 catch(e){
