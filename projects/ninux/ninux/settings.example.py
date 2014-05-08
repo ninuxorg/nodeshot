@@ -506,6 +506,7 @@ NODESHOT = {
         'LISTENING_PORT': 8080,
         'REGISTRARS': (
             'nodeshot.core.websockets.registrars.nodes',
+            'nodeshot.core.websockets.registrars.notifications',
         )
     },
     # list that will contain functions to disable and re-enable some signals

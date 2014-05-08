@@ -299,7 +299,6 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             currentNumber = target.attr('data-number');
 
         _.each(this.ui.stars, function(el, i){
-            //console.log(currentNumber, i, currentNumber >= );
             if(currentNumber >= i){
                 $(el).attr('class', 'icon-star-full');
             }
