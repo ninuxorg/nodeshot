@@ -1,0 +1,11 @@
+ignore-paths:
+    - docs
+    - INSTALL
+    - /tests
+    - projects
+    - static/
+    - nodeshot/statistics
+    - batman
+    - olsr
+    - monitor
+    - planning
