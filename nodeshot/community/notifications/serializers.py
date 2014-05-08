@@ -26,16 +26,29 @@ class UnreadNotificationSerializer(serializers.ModelSerializer):
         read_only=True
     )
     action = serializers.SerializerMethodField('get_action')
+    related_object = serializers.SerializerMethodField('get_related_object')
     
     def get_action(self, obj):
         """ return notification.get_action() """
         action = obj.get_action()
         return action if action != '' else None
     
+    def get_related_object(self, obj):
+        related = obj.related_object
+        if related is not None:
+            if hasattr(related, 'slug'):
+                return related.slug
+            else:
+                return related.id
+        return None
+    
     class Meta:
         model = Notification
-        fields = ('id', 'type', 'is_read', 'from_user_id',
-                  'from_user_detail', 'text', 'action', 'added')
+        fields = (
+            'id', 'type', 'is_read', 'from_user_id',
+            'from_user_detail', 'related_object',
+            'text', 'action', 'added'
+        )
 
 
 class NotificationSerializer(UnreadNotificationSerializer):
@@ -44,8 +57,11 @@ class NotificationSerializer(UnreadNotificationSerializer):
     """
     class Meta:
         model = Notification
-        fields = ('id', 'type', 'from_user_id', 'from_user_detail',
-                  'text', 'action', 'is_read', 'added', 'updated')
+        fields = (
+            'id', 'type', 'is_read', 'from_user_id',
+            'from_user_detail', 'related_object',
+            'text', 'action', 'added'
+        )
 
 
 class PaginatedNotificationSerializer(PaginationSerializer):
