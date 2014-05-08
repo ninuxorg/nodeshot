@@ -39,7 +39,7 @@ projects/ninux/server.py
 cesium/
 cache/
 *.log
-!/tests/travis/settings.py
+!/tests/ci/settings.py
 local_settings.py
-/tests/travis/media/
+/tests/ci/media/
 .coverage
