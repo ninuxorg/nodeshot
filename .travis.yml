@@ -20,9 +20,9 @@ install:
 
 before_script:
   - psql template1 -c 'CREATE EXTENSION hstore;'
-  - psql -U postgres -c 'CREATE DATABASE nodeshot_travis;'
-  - psql -U postgres -d nodeshot_travis -c "CREATE EXTENSION postgis;"
-  - psql -U postgres -d nodeshot_travis -c "CREATE EXTENSION postgis_topology;"
+  - psql -U postgres -c 'CREATE DATABASE nodeshot_ci;'
+  - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis;"
+  - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis_topology;"
   - cd tests
   - python manage.py syncdb --noinput
   - python manage.py migrate --noinput
