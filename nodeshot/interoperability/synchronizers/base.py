@@ -255,12 +255,10 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         try:
             item['added'] = DateParser.parse(item['added'])
         except Exception as e:
-            added = None
             print "Exception while parsing 'added' date: %s" % e
         try:
             item['updated'] = DateParser.parse(item['updated'])
         except Exception as e:
-            updated = None
             print "Exception while parsing 'updated' date: %s" % e
         
         result = {
@@ -383,10 +381,8 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
                     # indicates that a DB query is necessary
                     changed = True
             
-            if added is True or (
-                node.geometry.equals(item['geometry']) is False and
-                node.geometry.equals_exact(item['geometry']) is False
-                ):
+            if added is True or (node.geometry.equals(item['geometry']) is False\
+                                 and node.geometry.equals_exact(item['geometry']) is False):
                 node.geometry = item['geometry']
                 changed = True
             
@@ -426,7 +422,7 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         # delete old nodes
         for local_node in layer_nodes_slug_list:
             # if local node not found in external nodes
-            if not local_node in processed_slug_list:
+            if local_node not in processed_slug_list:
                 # store node name to print it later
                 node_name = node.name
                 # retrieve from DB and delete

@@ -13,14 +13,16 @@ class Command(BaseCommand):
     help = 'Synchronize external layers with the local database'
     
     option_list = BaseCommand.option_list + (
-        make_option('--exclude',
+        make_option(
+            '--exclude',
             action='store',
             dest='exclude',
             default=[],
             help='Exclude specific layers from synchronization\n\
                  Supply a comma separated string of layer slugs\n\
                  e.g. --exclude=layer1-slug,layer2-slug,layer3-slug\n\
-                 (works only if no layer has been specified)'),
+                 (works only if no layer has been specified)'
+        )
     )
 
     def retrieve_layers(self, *args, **options):

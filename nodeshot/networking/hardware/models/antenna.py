@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.models import BaseDate
 from nodeshot.networking.net.models import Device, Interface
 
-from choices import POLARIZATIONS, POLARIZATION_CHOICES
+from choices import POLARIZATION_CHOICES
 from . import AntennaModel
 
 
@@ -19,9 +19,9 @@ class Antenna(BaseDate):
     inclination = models.FloatField(_('inclination'), blank=True, null=True)
     
     # TODO: this must become a postgis point
-    #elevation = models.FloatField(_('elevation'), blank=True, null=True)
-    #lat = models.FloatField(_('latitude'), blank=True, null=True, help_text=_('automatically inherits the value of the node, specify a different value if needed'))
-    #lng = models.FloatField(_('longitude'), blank=True, null=True, help_text=_('automatically inherits the value of the node, specify a different value if needed'))
+    # elevation = models.FloatField(_('elevation'), blank=True, null=True)
+    # lat = models.FloatField(_('latitude'), blank=True, null=True, help_text=_('automatically inherits the value of the node, specify a different value if needed'))
+    # lng = models.FloatField(_('longitude'), blank=True, null=True, help_text=_('automatically inherits the value of the node, specify a different value if needed'))
     
     class Meta:
         app_label = 'hardware'

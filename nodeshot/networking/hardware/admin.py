@@ -1,9 +1,9 @@
 from django.contrib import admin
-from django.conf import settings
 from django.db import models
 
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
 from nodeshot.core.base.widgets import AdvancedFileInput
+from nodeshot.networking.net.admin import DeviceAdmin
 
 from models import *
 
@@ -56,11 +56,8 @@ admin.site.register(Manufacturer, ManufacturerAdmin)
 admin.site.register(DeviceModel, DeviceModelAdmin)
 admin.site.register(AntennaModel, AntennaModelAdmin)
 
+
 # Extend Default Device Admin
-
-from nodeshot.networking.net.models import Device
-from nodeshot.networking.net.admin import DeviceAdmin
-
 
 class DeviceToModelRelInline(admin.StackedInline):
     model = DeviceToModelRel

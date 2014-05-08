@@ -34,7 +34,7 @@ class NodeExternal(models.Model):
             # convert ' to "
             self.extra_data = self.extra_data.replace("'", '"')
             try:
-                extra_data = json.loads(self.extra_data)
+                json.loads(self.extra_data)
             except json.decoder.JSONDecodeError:
                 raise ValidationError(_('The specified configuration is not valid JSON'))
 

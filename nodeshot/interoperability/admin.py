@@ -1,11 +1,8 @@
-import os
-
 from django.contrib import admin
 from django.conf import settings
 
-from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
-from nodeshot.core.layers.admin import Layer, LayerAdmin
-from nodeshot.core.nodes.admin import Node, NodeAdmin
+from nodeshot.core.layers.admin import  LayerAdmin
+from nodeshot.core.nodes.admin import NodeAdmin
 
 from models import LayerExternal, NodeExternal
 

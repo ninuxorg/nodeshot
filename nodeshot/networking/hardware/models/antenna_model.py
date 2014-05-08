@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.core.base.models import BaseDate
-from choices import POLARIZATIONS, POLARIZATION_CHOICES
+from choices import POLARIZATION_CHOICES
 
 from . import ImageMixin, DeviceModel, Manufacturer
 
@@ -23,6 +23,9 @@ class AntennaModel(BaseDate, ImageMixin):
     beamwidth_v = models.DecimalField(_('vpol Beamwidth'), max_digits=4, decimal_places=1, help_text=_('degrees'))
     image = models.ImageField(_('image'), upload_to='antennas/images/', blank=True)
     datasheet = models.FileField(_('datasheet'), upload_to='antennas/datasheets/', blank=True)
+    
+    def __unicode__(self):
+        return self.name
     
     class Meta:
         app_label= 'hardware'

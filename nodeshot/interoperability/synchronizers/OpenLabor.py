@@ -148,8 +148,6 @@ class OpenLabor(BaseSynchronizer):
         
         return {
             "service_code": self.config['service_code_post'],
-            #"lat": node.point[1],
-            #"long": node.point[0],
             "latitude": node.point[1],
             "longitude": node.point[0],
             "j_latitude": node.point[1],
@@ -235,7 +233,7 @@ class OpenLabor(BaseSynchronizer):
         """ Add a new record into OpenLabor db """
         openlabor_record = self.to_external(node)
 
-        ## openlabor sync
+        # openlabor sync
         response=requests.post(self.post_url,openlabor_record)
         
         if response.status_code != 200:
@@ -249,7 +247,7 @@ class OpenLabor(BaseSynchronizer):
             logger.error('== ERROR: JSONDecodeError %s ==' % e)
             return False
         
-        external = NodeExternal.objects.create(node=node, external_id=int(data['AddedJobId']))
+        NodeExternal.objects.create(node=node, external_id=int(data['AddedJobId']))
         message = 'New record "%s" saved in CitySDK through the HTTP API"' % node.name
         self.verbose(message)
         logger.info('== %s ==' % message)

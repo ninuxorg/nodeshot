@@ -17,6 +17,9 @@ class DeviceModel(BaseDate, ImageMixin):
     cpu = models.CharField(_('CPU'), max_length=255, blank=True)
     ram = models.IntegerField(_('RAM'), blank=True, help_text=_('bytes'))
     
+    def __unicode__(self):
+        return self.name
+    
     class Meta:
         app_label= 'hardware'
         db_table = 'hardware_device_model'

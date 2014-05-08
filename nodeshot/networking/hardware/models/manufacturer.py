@@ -21,6 +21,9 @@ class Manufacturer(BaseDate, ImageMixin):
         verbose_name_plural = _('Manufacturers')
         ordering = ['name']
     
+    def __unicode__(self):
+        return self.name
+    
     def url_tag(self):
         return '<a href="%s" target="_blank">%s</a>' % (self.url, self.url)
         

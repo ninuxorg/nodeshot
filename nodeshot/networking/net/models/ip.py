@@ -1,6 +1,6 @@
 from netfields import InetAddressField, CidrAddressField
 
-from django.db import models, DatabaseError
+from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings

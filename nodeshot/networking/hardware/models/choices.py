@@ -1,4 +1,3 @@
-from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.utils import choicify
 
 

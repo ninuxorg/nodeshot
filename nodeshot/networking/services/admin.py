@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.conf import settings
 
 from nodeshot.core.base.admin import BaseAdmin, BaseStackedInline
-from nodeshot.networking.net.models import Ip
 
 from .models import Category, Service, ServiceLogin, Url
 

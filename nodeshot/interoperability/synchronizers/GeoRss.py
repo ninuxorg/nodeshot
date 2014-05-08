@@ -1,4 +1,3 @@
-from dateutil import parser as DateParser
 from django.contrib.gis.geos import GEOSGeometry
 from .base import XMLParserMixin, GenericGisSynchronizer
 

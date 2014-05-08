@@ -1,10 +1,9 @@
 import requests
 import simplejson as json
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 
 from ..models import NodeExternal
-from .base import XmlSynchronizer
 
 from celery.utils.log import get_logger
 logger = get_logger(__name__)
@@ -39,10 +38,8 @@ class CitySDKMixin(object):
     def _init_config(self):
         """ Init required attributes if necessary (for internal use only) """
         if getattr(self, 'citysdk_categories_url', None) is None:
-            self.citysdk_resource_url = '%s%ss/' % (self.config['citysdk_url'],
-                                                    self.config['citysdk_type'])
-            self.citysdk_categories_url = '%scategories?list=%s&limit=0&format=json' % (self.config['citysdk_url'],
-                                                                                self.config['citysdk_type'])
+            self.citysdk_resource_url = '%s%ss/' % (self.config['citysdk_url'], self.config['citysdk_type'])
+            self.citysdk_categories_url = '%scategories?list=%s&limit=0&format=json' % (self.config['citysdk_url'], self.config['citysdk_type'])
             self.citysdk_category_id = self.config.get('citysdk_category_id')
  
     def clean(self):
@@ -89,7 +86,7 @@ class CitySDKMixin(object):
         
         if response.status_code != 200:
             message = 'API Authentication Error: "%s"' % json.loads(response.content)['ResponseStatus']['Message']
-            logger.error('== %s ==' % message)
+            logger.error(message)
             raise ImproperlyConfigured(message)
         
         self.cookies = response.cookies.get_dict()
@@ -120,7 +117,7 @@ class CitySDKMixin(object):
             
             message = 'category with ID "%s" already present in config' % citysdk_category_id
             self.verbose(message)
-            logger.info('== %s ==' % message)
+            logger.info(message)
             
             # exit here
             return False
@@ -156,7 +153,7 @@ class CitySDKMixin(object):
                 if response.status_code is not 200:
                     message = 'ERROR: %s' % response.content
                     self.verbose(message)
-                    logger.error('== %s ==' % message)
+                    logger.error(message)
                     raise ImproperlyConfigured(response.content)
                 
                 # get ID
@@ -164,7 +161,7 @@ class CitySDKMixin(object):
                 
                 message = 'category with ID "%s" has been created' % citysdk_category_id
                 self.verbose(message)
-                logger.info('== %s ==' % message)
+                logger.info(message)
             # category already exists, find ID
             else:
                 categories = json.loads(response.content)['categories']
@@ -176,7 +173,7 @@ class CitySDKMixin(object):
                 # raise exception if not found - should not happen but who knows
                 if citysdk_category_id is None:
                     message = 'Category was thought to be there but could not be found!'
-                    logger.info('== %s ==' % message)
+                    logger.info(message)
                     raise ImproperlyConfigured(message)
             
             # now store ID in the database both in case category has been created or not
@@ -186,7 +183,7 @@ class CitySDKMixin(object):
             # verbose output
             message = 'category with ID "%s" has been stored in config' % citysdk_category_id
             self.verbose(message)
-            logger.info('== %s ==' % message)
+            logger.info(message)
     
     def convert_format(self, node):
         """ Prepares the JSON that will be sent to the CitySDK API """
@@ -200,7 +197,7 @@ class CitySDKMixin(object):
         return {
             self.config['citysdk_type'] :{
                 "location":{
-                   "point":[
+                    "point":[
                         {
                             "Point":{
                                 "posList":"%s %s" % (float(node.point.coords[1]), float(node.point.coords[0])),
@@ -267,7 +264,7 @@ END:VCARD""" % (
         
         if response.status_code != 200:
             message = 'ERROR while creating "%s". Response: %s' % (node.name, response.content)
-            logger.error('== %s ==' % message)
+            logger.error(message)
             return False
         
         try:
@@ -279,7 +276,7 @@ END:VCARD""" % (
         external = NodeExternal.objects.create(node=node, external_id=data['id'])
         message = 'New record "%s" saved in CitySDK through the HTTP API"' % node.name
         self.verbose(message)
-        logger.info('== %s ==' % message)
+        logger.info(message)
         
         return True
     
@@ -300,13 +297,12 @@ END:VCARD""" % (
                         cookies=self.cookies)
             
             if response.status_code == 200:
-                data = json.loads(response.content)
                 message = 'Updated record "%s" through the CitySDK HTTP API' % node.name
                 self.verbose(message)
-                logger.info('== %s ==' % message)
+                logger.info(message)
             else:
                 message = 'ERROR while updating record "%s" through CitySDK API\n%s' % (node.name, response.content)
-                logger.error('== %s ==' % message)
+                logger.error(message)
                 raise ImproperlyConfigured(message)
             
             return True
@@ -326,11 +322,11 @@ END:VCARD""" % (
         if response.status_code != 200:
             message = 'Failed to delete a record through the CitySDK HTTP API'
             self.verbose(message)
-            logger.info('== %s ==' % message)
+            logger.info(message)
             return False
         
         message = 'Deleted a record through the CitySDK HTTP API'
         self.verbose(message)
-        logger.info('== %s ==' % message)
+        logger.info(message)
         
         return True

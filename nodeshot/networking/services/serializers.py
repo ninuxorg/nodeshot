@@ -1,5 +1,3 @@
-#from django.conf import settings
-
 from rest_framework import pagination, serializers
 
 from .models import *
@@ -26,8 +24,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Service
-        #fields = ['id', 'line', 'quality', 'details']
-        
+
 
 class ServiceDetailSerializer(ServiceListSerializer):
     """ Service Detail Serializer  """
@@ -36,7 +33,6 @@ class ServiceDetailSerializer(ServiceListSerializer):
     
     class Meta:
         model = Service
-        #fields = ['id', 'line', 'quality', 'details']
 
 
 class PaginatedServiceSerializer(pagination.PaginationSerializer):

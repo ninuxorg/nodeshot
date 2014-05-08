@@ -1,10 +1,8 @@
 import requests
 import simplejson as json
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-#from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 
-from nodeshot.interoperability.models import NodeExternal
 from nodeshot.interoperability.synchronizers.base import BaseSynchronizer
 
 from celery.utils.log import get_logger
@@ -52,27 +50,8 @@ class CitySdkMobilityMixin(object):
         session = self.get_session()
         self.release_session(session)
     
-    #def get_session(self):
-    #    """ returns session from cache or from server """
-    #    session = cache.get(self.session_cache_key, False)
-    #    
-    #    if session is False:
-    #        session = self.authenticate()
-    #    
-    #    return session
-    
-    #def cache_session(self, session):
-    #    """ caches session for 60 seconds """
-    #    cache.set(self.session_cache_key, session, 60)
-    
     def get_session(self):
         """ authenticate into the CitySDK Mobility API and return session token """
-        ## if citysdk-mobility-session is stored in cache no need to reauthenticate
-        ## if force_http_request is True do HTTP request anyway
-        #session = cache.get(self.session_cache_key, False)
-        #if force_http_request is False and session:
-        #    return session
-            
         self.verbose('Authenticating to CitySDK')
         logger.info('== Authenticating to CitySDK ==')
 
@@ -89,7 +68,7 @@ class CitySdkMobilityMixin(object):
             )
         except Exception as e:
             message = 'API Authentication Error: "%s"' % e
-            logger.error('== %s ==' % message)
+            logger.error(message)
             raise ImproperlyConfigured(message)
         
         if response.status_code != 200:
@@ -97,7 +76,7 @@ class CitySdkMobilityMixin(object):
                 message = 'API Authentication Error: "%s"' % json.loads(response.content)['message']
             except Exception:
                 message = 'API Authentication Error: "%s"' % response.content
-            logger.error('== %s ==' % message)
+            logger.error(message)
             raise ImproperlyConfigured(message)
         
         # store session token
@@ -142,7 +121,6 @@ class CitySdkMobilityMixin(object):
             "nodes": [
                 {
                     "name": node.name,
-                    #"modalities": ["rail"],
                     "geom" : json.loads(node.geometry.json),
                     "data" : data
                 }
@@ -165,11 +143,11 @@ class CitySdkMobilityMixin(object):
 
         # citysdk sync
         response = requests.put(
-                        citysdk_api_url,
-                        data=json.dumps(citysdk_record),
-                        verify=self.config.get('verify_SSL', True),
-                        headers={ 'Content-type': 'application/json', 'X-Auth': session }
-                    )
+            citysdk_api_url,
+            data=json.dumps(citysdk_record),
+            verify=self.config.get('verify_SSL', True),
+            headers={ 'Content-type': 'application/json', 'X-Auth': session }
+        )
         
         print response.content
         
@@ -177,23 +155,18 @@ class CitySdkMobilityMixin(object):
         
         if response.status_code != 200:
             message = 'ERROR while creating "%s". Response: %s' % (node.name, response.content)
-            logger.error('== %s ==' % message)
+            logger.error(message)
             return False
-        
-        #self.cache_session(session)
-        
+         
         try:
             data = json.loads(response.content)
         except json.JSONDecodeError as e:
             logger.error('== ERROR: JSONDecodeError %s ==' % e)
             return False
         
-        cdk_id = data['create']['results']['created'][0]['cdk_id']
-        
-        external = NodeExternal.objects.create(node=node, external_id=cdk_id)
         message = 'New record "%s" saved in CitySDK through the HTTP API"' % node.name
         self.verbose(message)
-        logger.info('== %s ==' % message)
+        logger.info(message)
         
         return True
     
@@ -206,11 +179,11 @@ class CitySdkMobilityMixin(object):
 
         # citysdk sync
         response = requests.put(
-                        citysdk_api_url,
-                        data=json.dumps(citysdk_record),
-                        verify=self.config.get('verify_SSL', True),
-                        headers={ 'Content-type': 'application/json', 'X-Auth': session }
-                    )
+            citysdk_api_url,
+            data=json.dumps(citysdk_record),
+            verify=self.config.get('verify_SSL', True),
+            headers={ 'Content-type': 'application/json', 'X-Auth': session }
+        )
         
         print response.content
         
@@ -218,20 +191,18 @@ class CitySdkMobilityMixin(object):
         
         if response.status_code != 200:
             message = 'ERROR while updating record "%s" through CitySDK API\n%s' % (node.name, response.content)
-            logger.error('== %s ==' % message)
+            logger.error(message)
             return False
         
-        #self.cache_session(session)
-        
         try:
-            data = json.loads(response.content)
+            json.loads(response.content)
         except json.JSONDecodeError as e:
-            logger.error('== ERROR: JSONDecodeError %s ==' % e)
+            logger.error(e)
             return False
         
         message = 'Updated record "%s" through the CitySDK HTTP API' % node.name
         self.verbose(message)
-        logger.info('== %s ==' % message)
+        logger.info(message)
         
         return True
     
@@ -246,26 +217,22 @@ class CitySdkMobilityMixin(object):
         )
         
         response = requests.delete(
-                    citysdk_api_url,
-                    verify=self.config.get('verify_SSL', True),
-                    headers={ 'Content-type': 'application/json', 'X-Auth': session }
-                )
-    
-        print response.content
+            citysdk_api_url,
+            verify=self.config.get('verify_SSL', True),
+            headers={ 'Content-type': 'application/json', 'X-Auth': session }
+        )
         
         self.release_session(session)
         
         if response.status_code != 200:
             message = 'Failed to delete a record through the CitySDK HTTP API'
             self.verbose(message)
-            logger.info('== %s ==' % message)
+            logger.info(message)
             return False
-        
-        #self.cache_session(session)
         
         message = 'Deleted a record through the CitySDK HTTP API'
         self.verbose(message)
-        logger.info('== %s ==' % message)
+        logger.info(message)
         
         return True
 

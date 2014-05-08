@@ -4,8 +4,7 @@ from datetime import date, datetime, timedelta
 
 from django.template.defaultfilters import slugify
 from django.contrib.gis.geos import GEOSGeometry
-from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from nodeshot.core.nodes.models import Node, Status
 
@@ -195,7 +194,7 @@ class ProvinceRomeTraffic(BaseSynchronizer):
         # delete old nodes
         for local_node in local_nodes_slug:
             # if local node not found in external nodes
-            if not local_node in external_nodes_slug:
+            if local_node not in external_nodes_slug:
                 node_name = node.name
                 # retrieve from DB and delete
                 node = Node.objects.get(slug=local_node)

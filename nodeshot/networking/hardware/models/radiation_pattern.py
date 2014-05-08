@@ -11,6 +11,9 @@ class RadiationPattern(BaseDate, ImageMixin):
     type = models.CharField(_('type'), max_length=30)
     image = models.ImageField(upload_to='antennas/radiation_patterns/', verbose_name=_('image'))
     
+    def __unicode__(self):
+        return _('radiation pattern for antenna model: %s' % self.antenna_model)
+    
     class Meta:
         app_label= 'hardware'
         db_table = 'hardware_radiation_pattern'

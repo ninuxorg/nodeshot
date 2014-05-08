@@ -1,7 +1,7 @@
 import requests
 import simplejson as json
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 
 from .base import BaseSynchronizer
