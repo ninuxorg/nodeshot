@@ -22,7 +22,7 @@ class Command(BaseCommand):
                  Supply a comma separated string of layer slugs\n\
                  e.g. --exclude=layer1-slug,layer2-slug,layer3-slug\n\
                  (works only if no layer has been specified)'
-        )
+        ),
     )
 
     def retrieve_layers(self, *args, **options):
