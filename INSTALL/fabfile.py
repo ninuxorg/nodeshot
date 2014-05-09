@@ -44,10 +44,12 @@ def initialize_dirs():
     global deploy_dir
     global project_dir
     global project_name
+    global virtual_env
     root_dir = prompt('Set install directory ( including trailing slash ): ', default='/var/www/')
     project_name = prompt('Set project name: ', default='myproject')
     deploy_dir = '%snodeshot/' % root_dir
     project_dir = '%sprojects/%s' % (deploy_dir,project_name)
+    virtual_env = 'source %s/python/bin/activate'  % project_dir
 
 def uninstall():
     initialize()
@@ -134,19 +136,20 @@ def create_virtual_env():
 def install_requirements():
     initialize()
     print(green("Installing requirements. This may take a while..."))
-    with hide( 'stdout', 'stderr'):
-        virtual_env = 'source python/bin/activate'
+    with hide( 'stdout', 'stderr'):        
         pip_command = 'python/bin/pip install -r %srequirements.txt' % deploy_dir
         pip_command_networking = 'python/bin/pip install -r %srequirements_networking.txt' % deploy_dir
+        pip_command_nodeshot = 'python/bin/pip install -U https://github.com/ninuxorg/nodeshot/tarball/master' % deploy_dir
         distribute_command = 'python/bin/pip install -U distribute'
         with cd (project_dir):
             run( virtual_env + ' &&  ' + pip_command  + ' &&  ' + distribute_command)
             run( virtual_env + ' &&  ' + pip_command_networking)
+            run( virtual_env + ' &&  ' + pip_command_nodeshot)
 
 def create_project():
     initialize()
     print(green("Creating project..."))
-    virtual_env = 'source python/bin/activate'
+    
     template_name = "%sINSTALL/project_template" % deploy_dir
     create_project_command = "django-admin.py startproject %s --template=%s ." % (project_name,template_name)
     with hide( 'stdout', 'stderr'):
@@ -171,7 +174,6 @@ def create_settings():
     initialize_server()
     print(green("Creating Nodeshot config..."))
     settings= {}
-    settings['app_path'] = "APP_PATH = '%s' " % deploy_dir
     settings['domain'] = "DOMAIN = '%s' " % server_name
     
     DATABASES = {
@@ -195,7 +197,7 @@ def create_settings():
 def sync_data():
     initialize()
     print(green("Initializing Nodeshot..."))
-    virtual_env = 'source python/bin/activate'
+    virtual_env = 'source %s/python/bin/activate'  % project_dir
     sync_command = 'python manage.py syncdb --noinput && python manage.py migrate && python manage.py collectstatic --noinput'
     with cd (project_dir):
         run('mkdir -p log'  )
@@ -206,7 +208,7 @@ def sync_data():
 def create_admin():
     initialize()
     print(green("Creating Nodeshot admin account..."))
-    virtual_env = 'source python/bin/activate'
+    
     create_admin_command = 'python manage.py loaddata %sINSTALL/admin_fixture.json' % deploy_dir
     with cd (project_dir):
         run( virtual_env + ' &&  ' + create_admin_command)
@@ -257,7 +259,7 @@ def redis_install():
     initialize()
     print(green("Installing redis..."))
     with hide( 'stdout', 'stderr'):
-        virtual_env = 'source python/bin/activate'
+        
         pip_command = 'python/bin/pip install -U celery[redis]'
         run('add-apt-repository -y ppa:chris-lea/redis-server')
         run('apt-get -y update')

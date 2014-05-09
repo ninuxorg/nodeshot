@@ -5,7 +5,6 @@ import sys
 
 from local_settings import *
 
-sys.path.append(APP_PATH)
 ALLOWED_HOSTS = ['*']
 SECRET_KEY = '{{ secret_key }}'
 DEBUG = False
