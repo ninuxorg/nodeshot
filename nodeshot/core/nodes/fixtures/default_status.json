@@ -7,7 +7,11 @@
             "slug": "potential", 
             "description": "Potential node", 
             "order": 0, 
-            "name": "Potential"
+            "name": "Potential",
+            "fill_color": "#ff8000", 
+            "stroke_color": "#ec7600", 
+            "stroke_width": 2, 
+            "text_color": "#ffffff"
         }
     },
     {
@@ -18,7 +22,11 @@
             "slug": "planned", 
             "description": "Planned node", 
             "order": 1, 
-            "name": "Planned"
+            "name": "Planned",
+            "fill_color": "#408080", 
+            "stroke_color": "#2f5e5e", 
+            "stroke_width": 2, 
+            "text_color": "#ffffff"
         }
     },
     {
@@ -29,7 +37,12 @@
             "slug": "active", 
             "description": "Active node", 
             "order": 2, 
-            "name": "Active"
+            "name": "Active",
+            "fill_color": "#008000", 
+            "stroke_color": "#005e00", 
+            "stroke_width": 2, 
+            "order": 2, 
+            "text_color": "#ffffff"
         }
     }
 ]
