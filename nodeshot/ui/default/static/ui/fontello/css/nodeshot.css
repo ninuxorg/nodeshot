@@ -98,5 +98,5 @@
 .icon-close:before { content: '\e81e'; } /* '' */
 
 /* notification icons */
-#notifications .icon-node:before { content: '\e80c' }
-#notifications .icon-custom:before { content: '\e81c' }
+#notifications .icon-node:before { content: '\e807' }
+#notifications .icon-custom:before { content: '\e81d' }

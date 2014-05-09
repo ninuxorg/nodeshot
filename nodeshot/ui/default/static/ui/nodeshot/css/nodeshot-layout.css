@@ -1091,12 +1091,12 @@ img.avatar200{ border-radius: 15% }
 }
 
 #comments .input-group-addon{
-    background: none;
+    background: none !important;
     border: 0 none !important;
     padding: 0 14px 0 0 !important;
     -webkit-box-shadow: none;
-	-moz-box-shadow: none;
-	box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
     vertical-align: top;
 }
 
