@@ -89,7 +89,6 @@ And **Git**::
 
     apt-get install git-core
 
-
 .. _install-python-packages:
 
 =======================
@@ -122,6 +121,10 @@ This can be done with two simple commands::
 Now install all the required python packages, it will take a bit::
 
     pip install -r /var/www/nodeshot/requirements.txt
+    # if you are using the networking modules
+    pip install -r /var/www/nodeshot/requirements_networking.txt
+    # additional useful packages
+    pip install -r /var/www/nodeshot/requirements_optional.txt
 
 And update the distribute python package::
 
@@ -155,7 +158,6 @@ create a user and grant all privileges to the newly created DB::
 exit (press CTRL+D) and go back to being root::
 
     exit
-
 
 .. _project-configuration:
 
@@ -220,7 +222,6 @@ You just need to **run the django development server** in order to see the web a
     # on the same LAN, tell it to listen on all the interfaces:
     python manage.py runserver 0.0.0.0:8000
 
-
 .. _production-instructions:
 
 =======================
@@ -234,6 +235,7 @@ software stack:
 * **uWSGI**: application server (serves requests to django)
 * **Supervisor**: daemon process manager (used to manage uwsgi, celery and celery-beat)
 * **Redis**: in memory key-value store (used as a message broker and cache storage)
+* **Postfixs**: SMTP server
 
 .. note::
     If you are installing for development you can skip to the next chapter.
