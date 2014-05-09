@@ -117,7 +117,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'details',
+            'details', 'id',
             'username', 'full_name', 'first_name', 'last_name',
             'about', 'gender', 'birth_date', 'address', 'city',
             'country', 'location',
@@ -157,6 +157,7 @@ class ProfileCreateSerializer(ExtraFieldSerializer):
     class Meta:
         model = User
         fields = (
+            'id',
             # required
             'username', 'email', 'password', 'password_confirmation',
             # optional
@@ -170,7 +171,7 @@ class ProfileRelationSerializer(ProfileSerializer):
     """ Profile Serializer used for linking """
     class Meta:
         model = User
-        fields = ('username', 'full_name', 'city', 'country', 'avatar', 'details')
+        fields = ('id', 'username', 'full_name', 'city', 'country', 'avatar', 'details')
 
 
 # ------ Add user info to ExtensibleNodeSerializer ------ #
