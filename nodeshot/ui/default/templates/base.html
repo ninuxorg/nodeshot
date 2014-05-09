@@ -78,7 +78,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="#/pages/home"><span class="icon-squares"></span>Dashboard</a></li>
                     <li><a href="#/map"><span class="icon-globe"></span>Map</a></li>
-                    <li><a href="javascript:createModal({message:'not implemented yet'})"><span class="icon-nodes"></span>Nodes</a></li>
+                    <li><a href="#/nodes"><span class="icon-nodes"></span>Nodes</a></li>
                     <li><a href="javascript:createModal({message:'not implemented yet'})"><span class="icon-layer"></span>Layers</a></li>
                     <li><a href="javascript:createModal({message:'not implemented yet'})"><span class="icon-chart-bar"></span>Statistics</a></li>
                     <li class="dropdown">
@@ -364,6 +364,33 @@
     <script id="node-details-template" type="text/template">
         {% include 'includes/node-details.html' %}
     </script>
+    
+    <script id="node-list-template" type="text/template">
+        {% include 'includes/node-list.html' %}
+    </script>
+    
+    <script id="node-list-row-template" type="text/template">
+        <td class="name-column">
+            <a href="#/nodes/<%= slug %>">
+                <%= name %>
+            </a>
+        </td>
+        <td class="status-column">
+            <span class="status <%= status %>">
+                <%= Nodeshot.statuses[status].name %>
+            </span>
+        </td>
+        <td>
+            <a href="javascript:createModal({ message: 'Not implemented yet' })">
+                <%= layer_name %>
+            </a>
+        </td>
+        <td>
+            <a href="#/users/<%= user %>"><%= user %></a>
+        </td>
+        <td><%= _.formatDateTime(added) %></td>
+        <td><%= _.formatDateTime(updated) %></td>
+    </script>
 
     <script id="user-details-template" type="text/template">
         {% include 'includes/user-details.html' %}
@@ -375,6 +402,17 @@
             <span class="text">{% trans 'Loading' %} &hellip;</span>
             <a class="icon-close hastip" title="{% trans 'cancel&nbsp;operation' %}"></a>
         </div>
+    </script>
+    
+    <script id="status-css-template" type="text/template">
+        <style>
+        <% _.each(Nodeshot.statuses, function(status, key){ %>
+            .status.<%= key %>{
+                background: <%= status.fill_color %>;
+                color:<%= status.text_color %>;
+            }
+        <% }) %>
+        </style>
     </script>
 
     <script src="https://code.jquery.com/jquery.js"></script>
@@ -441,6 +479,7 @@
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/notifications.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/node-details.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/node-list.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/user-details.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>

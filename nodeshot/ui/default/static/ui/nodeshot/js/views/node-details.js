@@ -30,7 +30,9 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         // rate
         'mouseover @ui.stars': 'mouseOverStar',
         'mouseout @ui.stars': 'mouseOutStar',
-        'click @ui.stars': 'rate'
+        'click @ui.stars': 'rate',
+        
+        'click .icon-close': 'goBack'
     },
 
     modelEvents: {
@@ -336,5 +338,16 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         .error(function(xhr){
             createModal({ message: xhr.responseJSON["__all__"] });
         });
+    },
+    
+    /*
+     * go back (to map or node list)
+     */
+    goBack: function(e){
+        e.preventDefault();
+        NodeshotRouter.navigate(
+            Nodeshot.onNodeClose,
+            { trigger: true }
+        )
     }
 });

@@ -37,6 +37,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         $(window).on("resize.map", _.bind(this.resize, this));
 
         this.resetDataContainers();
+        Nodeshot.onNodeClose = '#/map';
     },
 
     onDomRefresh: function () {

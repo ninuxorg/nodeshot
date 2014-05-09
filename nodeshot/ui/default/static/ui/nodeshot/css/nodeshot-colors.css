@@ -370,23 +370,23 @@ body article a:focus,
     background-color: #171516;
 }
 
-.input-group-addon{
+.input-group-addon, .btn.dropdown-toggle .caret{
     background: #989aa1; /* Old browsers */
     background: -moz-linear-gradient(top,  #989aa1 0%, #777a81 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#989aa1), color-stop(100%,#777a81)); /* Chrome,Safari4+ */
     background: -webkit-linear-gradient(top,  #989aa1 0%,#777a81 100%); /* Chrome10+,Safari5.1+ */
     background: -o-linear-gradient(top,  #989aa1 0%,#777a81 100%); /* Opera 11.10+ */
     background: -ms-linear-gradient(top,  #989aa1 0%,#777a81 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #989aa1 0%,#777a81 100%); /* W3C */
+    background: linear-gradient(to bottom,  #989aa1 0%,#777a81 100%) !important; /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#989aa1', endColorstr='#777a81',GradientType=0 ); /* IE6-9 */
 
-    border-top: 1px solid #94969d;
-    border-right: 1px solid #6d7078;
-    border-bottom: 1px solid #52555f;
+    border-top: 1px solid #94969d !important;
+    border-right: 1px solid #6d7078 !important;
+    border-bottom: 1px solid #52555f !important;
     border-left: 1px solid #6a6d76 !important;
-
-    padding: 5px 9px !important;
 }
+
+.input-group-addon{ padding: 5px 9px !important; }
 
 .input-group-addon:before{
     font-size: 15px !important;
@@ -402,7 +402,8 @@ input.error, .error input, .error button{
     border: 1px solid #d96352 !important;
     color: #ff0000 !important;
 }
-.error .input-group-addon{
+.error .input-group-
+{
     border: 1px solid #d96352;
 }
 .error-msg,
@@ -751,13 +752,13 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 
 .bootstrap-select{
-	width: 100% !important;
+    width: 100% !important;
 }
 
 .bootstrap-select.btn-group .btn .caret{
-	top: 0;
-	right: 0;
-	margin: 0;
+    top: 0;
+    right: 0;
+    margin: 0;
 }
 
 .btn.dropdown-toggle{
@@ -784,7 +785,7 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 
 .btn.dropdown-toggle .caret:before{
-	content: '▾';
+    content: '▾';
 }
 
 /* TODO: probably unused */
@@ -796,7 +797,7 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 
 .btn-group.bootstrap-select .bootstrap-select-searchbox input{
-	height: 28px !important
+    height: 28px !important
 }
 
 .btn-group.bootstrap-select ul.dropdown-menu{
@@ -886,9 +887,14 @@ a.icon-thumbs-down:hover{ color: #e20a00 }
 
 .status{
     padding: 2px 9px;
-    background-color: #000;
+    background-color: #595959;
     color: #fff;
     border-radius: 5px;
+}
+.status.pull-left{
+    margin-top: 5px;
+    margin-left: 2.4%;
+    padding-bottom: 3px;
 }
 
 .icon-star-full,

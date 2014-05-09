@@ -22,6 +22,17 @@ var Node = Backbone.Model.extend({
     }
 });
 
+var NodeCollection = Backbone.Collection.extend({
+    model: Node,
+    url: '/api/v1/nodes/',
+    
+    // needed to use pagination results as the collection
+    parse: function(response) {
+        this.count = response.count;
+        return response.results;
+    }
+});
+
 var User = Backbone.Model.extend({
     urlRoot: '/api/v1/profiles/',
     idAttribute: 'username',

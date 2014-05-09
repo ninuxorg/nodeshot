@@ -1,0 +1,130 @@
+{% load i18n %}
+<div class="row-ns">
+    <h2 class="pull-left title">
+        {% trans 'Nodes' %}
+    </h2>
+    <span class="status pull-left">
+        <%= total %> total
+    </span>
+    <% _.each(Nodeshot.statuses, function(s, key){ %>
+        <span class="status pull-left <%= key %>"
+              data-slug="<%= key %>">
+            <%= s.nodes_count %>
+            <%= s.name.toLowerCase() %>
+        </span>
+    <% }) %>
+    <div class="clearfix"></div>
+</div>
+
+<div class="row-ns">
+    <div class="input-group width30 marginright">
+        <input type="text" class="form-control" placeholder="{% trans 'Quick search' %}">
+        <span class="input-group-addon icon-search"></span>
+    </div>
+    
+    <div class="dropdown input-group width30">
+        <button class="btn dropdown-toggle" type="button" id="js-open-filter-panel">
+            {% trans 'Filter' %}
+            <span class="caret input-group-addon"></span>
+        </button>
+        <div class="dropdown-menu filter-panel" id="js-filter-panel">
+            <div class="group">
+                <label>{% trans 'Layer' %}</label>
+                <select id="layer-filter" class="selectpicker">
+                    <option>{% trans 'All' %}</option>
+                    {% for layer in layers %}
+                    <option value="{{ layer.slug }}">{{ layer.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="group">
+                <label>Status</label>
+                <select id="status-filter" class="selectpicker">
+                    <option>{% trans 'All' %}</option>
+                    <% _.each(Nodeshot.statuses, function(status, key){ %>
+                        <option value="<%=  key %>"><%= status.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+            
+            <div class="group">
+                <label>{% trans 'User' %}</label>
+                <div class="input-group nput-group-sm">
+                    <input type="text" class="form-control" placeholder="{% trans 'Any user' %}">
+                    <span class="input-group-addon icon-search"></span>
+                </div>
+            </div>
+            
+            <div class="group">
+                <label>{% trans 'Created on' %}</label>
+                <select class="selectpicker">
+                    <option>{% trans 'Any date' %}</option>
+                    <option>{% trans 'Today' %}</option>
+                    <option>{% trans 'Past 7 days' %}</option>
+                    <option>{% trans 'This month' %}</option>
+                    <option>{% trans 'This year' %}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <button class="btn btn-default icon-plus pull-right">Add node</button>
+    
+    <div class="clearfix"></div>
+</div>
+
+<div class="padding-bottom">
+    <table class="table table-striped columns">
+        <thead>
+            <tr>
+                <th>{% trans 'Name' %}</th>
+                <th class="status-column">{% trans 'Status' %}</th>
+                <th>{% trans 'Layer' %}</th>
+                <th>{% trans 'User' %}</th>
+                <th>{% trans 'Created' %}</th>
+                <th>{% trans 'Updated' %}</th>
+            </tr>
+        </thead>
+        <tbody id="js-rows">
+        </tbody>
+    </table>
+</div>
+
+<footer class="fixedbottom dark">
+    <div class="center-stage">
+        <div class="pull-left pagination-links">
+            <a href="#" class="btn btn-default">1</a>
+            <a href="#" class="btn btn-default">2</a>
+            <a href="#" class="btn btn-default">3</a>
+            <a href="#" class="btn btn-default">{% trans 'next' %}</a>
+        </div>
+        <div class="pull-left pagination-select">
+            <select class="selectpicker">
+                <option>25</option>
+                <option selected="selected">50</option>
+                <option>100</option>
+                <option>200</option>
+                <option>500</option>
+            </select>
+        </div>
+        
+        <div class="pull-right list-actions">
+            <select class="selectpicker">
+                <option>{% trans 'Choose action' %}</option>
+                <option>do something</option>
+            </select>
+        </div>
+        
+        <div class="pull-right select-all">
+            <span class="custom-checkbox">
+                <input type="checkbox" id="select-all-checkbox" />
+                <label for="select-all-checkbox"></label>
+            </span>
+            
+            <label for="select-all-checkbox">{% trans 'Select all' %}</label>
+        </div>
+        
+        <br class="clearfix">
+    </div>
+</footer>

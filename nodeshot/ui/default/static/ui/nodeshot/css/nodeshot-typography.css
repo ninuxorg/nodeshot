@@ -42,6 +42,12 @@ h5,
 h5,
 h6{ text-align: left }
 
+h1.title,
+h2.title{ margin-top: 0 }
+
+.row-ns h1.title,
+.row-ns h2.title{ margin-bottom: 0 }
+
 body article blockquote{
     padding-top: 15px;
     padding-bottom: 15px;

@@ -37,8 +37,8 @@
 }
 
 #general-search{
-	position: relative;
-	display: inline-block;
+    position: relative;
+    display: inline-block;
     line-height: 30px;
     border-radius: 4px;
     border: 0 none;
@@ -56,14 +56,14 @@
 }
 
 #general-search span{
-	position: absolute;
-	right: 8px;
-	bottom: 4px;
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
     width: 22px;
     height: 22px;
     overflow: hidden;
-	color: #8f8f8f;
-	font-size: 22px;
+    color: #8f8f8f;
+    font-size: 22px;
     line-height: 0px !important;
 }
 #general-search span:before{
@@ -1184,8 +1184,8 @@ img.avatar200{ border-radius: 15% }
 .rating-count a{ text-decoration: none; cursor: default; }
 
 .leaflet-popup-content{
-	min-width: 120px;
-	max-width: 300px;
+    min-width: 120px;
+    max-width: 300px;
 }
 .leaflet-popup-content p{ margin: 10px 0 }
 .leaflet-popup-content a.btn{ color: #fff }
@@ -1209,3 +1209,144 @@ img.avatar200{ border-radius: 15% }
     font-size: 15px;
     text-align: center;
 }
+
+/* --- Begin Node List --- */
+
+#node-list .name-column a{
+    color: #252525;
+    font-weight: normal;
+}
+
+#node-list .status-column{
+    text-align: center
+}
+
+.padding-bottom {
+    padding-bottom: 25px;
+}
+
+.table th{
+    color: #fff;
+    background: #363636; /* Old browsers */
+    background: -moz-linear-gradient(top, #595959 0%, #343434 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#595959), color-stop(100%,#343434)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #595959 0%,#343434 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #595959 0%,#343434 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #595959 0%,#343434 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #595959 0%,#343434 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#595959', endColorstr='#343434',GradientType=0 ); /* IE6-9 */
+}
+
+.table.columns{
+    border: 0 none;
+    border-bottom: 1px solid #e3e3e3;
+}
+
+.table.columns th,
+.table.columns td{
+    padding-left: 1.7%;
+    padding-right: 1.7%;
+    border-collapse: collapse;
+    border-left: 1px solid #e3e3e3;
+    border-right: 1px solid #e3e3e3;
+}
+.table.columns td{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.02) !important;
+}
+
+.table.columns th{
+    font-weight: normal;
+    border-left: 1px solid rgba(255, 255, 255, 0.13);
+    border-right: 1px solid rgba(255, 255, 255, 0.13);
+    border-bottom: 0 none;
+}
+.table.columns th:first-child{ border-left: 0 none }
+.table.columns th:last-child{ border-right: 0 none }
+
+.row-ns{
+    margin-bottom: 20px;
+    clear: both;
+}
+
+#node-list .title{ margin-right: 2.4% }
+#node-list .marginright{ margin-right: 2.4% }
+
+.input-group.width30{
+    width: 30%;
+    float: left;
+}
+
+.input-group.dropdown,
+.input-group.dropdown button{
+    height: 34px;
+}
+
+.input-group.dropdown span.caret{
+    height: 32px;
+    width: 34px;
+}
+
+.filter-panel{
+    width: 100%;
+    padding: 5% 7%;
+    margin-top: -1px
+}
+
+.filter-panel > div > label{
+    display: block;
+    margin-bottom: 5px;
+}
+
+.filter-panel .group{
+    margin-bottom: 10px;
+    float: left;
+    width: 100%;
+    clear: both;
+}
+
+.fixedbottom{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.dark{
+    color: #fff;
+    background: #4e4e4e; /* Old browsers */
+    background: -moz-linear-gradient(top, #4e4e4e 0%, #303030 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#4e4e4e), color-stop(100%,#303030)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #4e4e4e 0%,#303030 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #4e4e4e 0%,#303030 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #4e4e4e 0%,#303030 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #4e4e4e 0%,#303030 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e4e4e', endColorstr='#303030',GradientType=0 ); /* IE6-9 */
+}
+
+footer.fixedbottom{
+    padding: 8px 0
+}
+
+footer .btn{
+    padding-top: 3px;
+    padding-bottom: 4px;
+    margin-right: 4px;
+}
+
+footer .btn-group{ margin-bottom: 0 !important }
+
+#node-list footer .selectpicker .caret{ padding-top: 2px !important }
+
+.pagination-select{
+    width: 80px;
+    margin-left: 15px;
+}
+
+.select-all{
+    margin-right: 25px;
+    padding-top: 4px;
+}
+
+.list-actions{ width: 170px }
+.custom-checkbox{ margin-top: 1px }
+
+/* --- End Node List --- */

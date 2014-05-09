@@ -19,6 +19,8 @@ Nodeshot.addInitializer(function () {
         model: Nodeshot.currentUser
     });
     Nodeshot.accountMenu.render();
+    
+    Nodeshot.onNodeClose = '#/map';
 });
 
 // init pages
@@ -76,6 +78,19 @@ var NodeshotController = {
             link.trigger('click');
         }
     },
+    
+    // node list
+    getNodeList: function() {
+        new NodeCollection().fetch({
+            success: function(collection){
+                Nodeshot.body.close();
+                Nodeshot.body.show(new NodeListView({
+                    model: new Backbone.Model({ total: collection.count }),
+                    collection: collection
+                }));
+            }
+        });
+    },
 
     // node details
     getNode: function (slug) {
@@ -123,6 +138,7 @@ var NodeshotRouter = new Marionette.AppRouter({
         "pages/:slug": "getPage",
         "map": "getMap",
         "map/:slug": "getMapNode",
+        "nodes": "getNodeList",
         "nodes/:slug": "getNode",
         "users/:username": "getUser"
     }
@@ -225,6 +241,10 @@ $(document).ready(function ($) {
     if(Nodeshot.currentUser.isAuthenticated()){
         Nodeshot.currentUser.fetch();
     }
+    
+    // create status CSS classes
+    css = _.template($('#status-css-template').html(), {});
+    $('head').append(css);
 });
 
 var createModal = function (opts) {
@@ -305,12 +325,12 @@ $(document).ajaxStop(function () {
 
 // extend underscore with formatDateTime shortcut
 _.formatDateTime = function(dateString){
-	// TODO: format configurable
-	return $.format.date(dateString, "dd MMMM yyyy - HH:mm")
+    // TODO: format configurable
+    return $.format.date(dateString, "dd MMMM yyyy, HH:mm");
 };
 
 // extend underscore with formatDate shortcut
 _.formatDate = function(dateString){
-	// TODO: format configurable
-	return $.format.date(dateString, "dd MMMM yyyy")
+    // TODO: format configurable
+    return $.format.date(dateString, "dd MMMM yyyy");
 };

@@ -57,10 +57,9 @@
                             {% trans 'Status' %}:
                         </td>
                         <td class="right">
-                            <span class="status" style="
-                                background:<%= Nodeshot.statuses[status].fill_color %>;
-                                color:<%= Nodeshot.statuses[status].text_color %>;
-                            "><%= status %></span>
+                            <span class="status <%= status %>">
+                                <%= Nodeshot.statuses[status].slug.toLowerCase() %>
+                            </span>
                         </td>
                     </tr>
                     <tr>
@@ -198,6 +197,6 @@
         </div>
         <% } %>
 
-        <a href="#/map" class="icon-close"></a>
+        <a href="#/close" class="icon-close"></a>
     </div>
 </div>
