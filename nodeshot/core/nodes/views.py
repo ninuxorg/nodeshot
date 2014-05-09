@@ -52,7 +52,7 @@ class NodeList(NodeListBase):
     Parameters:
     
      * `search=<word>`: search <word> in name, slug, description and address of nodes
-     * `limit=<n>`: specify number of items per page (defaults to 40)
+     * `limit=<n>`: specify number of items per page (defaults to 50)
      * `limit=0`: turns off pagination
     
     ### POST
@@ -65,7 +65,7 @@ class NodeList(NodeListBase):
     serializer_class = NodeListSerializer
     pagination_serializer_class = PaginatedNodeListSerializer
     paginate_by_param = 'limit'
-    paginate_by = 40
+    paginate_by = 50
     
     def pre_save(self, obj):
         """ automatically determine user on creation """
@@ -128,13 +128,13 @@ class NodeGeoJSONList(NodeList):
     Parameters:
     
      * `search=<word>`: search <word> in name, slug, description and address of nodes
-     * `limit=<n>`: specify number of items per page (defaults to 40)
+     * `limit=<n>`: specify number of items per page (defaults to 50)
      * `limit=0`: turns off pagination
      * `page=<n>`: show page n
     """
     pagination_serializer_class = PaginatedGeojsonNodeListSerializer
     paginate_by_param = 'limit'
-    paginate_by = 40
+    paginate_by = 50
     serializer_class = NodeGeoSerializer
     post = Hider()
 
