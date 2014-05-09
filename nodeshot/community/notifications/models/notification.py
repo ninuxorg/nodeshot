@@ -126,37 +126,12 @@ class Notification(BaseDate):
     def email_message(self):
         """ compose complete email message text """
         site = Site.objects.get(pk=settings.SITE_ID)
-        action_url = self.get_action()
-        if action_url != '' and not action_url.startswith('http'):
-            action_url = "%s://%s%s" % (getattr(settings, 'PROTOCOL', 'http'), site.domain, action_url)
+        url = "%s://%s/" % (getattr(settings, 'PROTOCOL', 'http'), site.domain)
         hello_text = __("Hi %s," % self.to_user.get_full_name())
-        action_text = __("\n\nMore details here: %s") % action_url if action_url != "" else ""
+        action_text = __("\n\nMore details here: %s") % url
         explain_text = __(
             "This is an automatic notification sent from from %s.\n"
             "If you want to stop receiving this notification edit your"
             "email notification settings here: %s") % (site.name, 'TODO')
         
         return "%s\n\n%s%s\n\n%s" % (hello_text, self.text, action_text, explain_text)
-    
-    def get_action(self):
-        """
-        returns a link to the action that the user can perform
-            - if custom type return ""
-            - if action starts with "reverse" perform an evaluation of python code
-            - otherwise just return the string contained in related setting
-        """
-        if self.type == 'custom':
-            return ''
-        
-        action = settings.NODESHOT['NOTIFICATIONS']['ACTIONS'].get(self.type, None)
-        
-        if not action:
-            return ''
-        
-        if action.startswith(reverse.__name__):
-            try:
-                return eval(action)
-            except NoReverseMatch:
-                return ''
-        
-        return action

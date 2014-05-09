@@ -67,10 +67,8 @@ class TestNotification(BaseTestCase):
         email_text = n.email_message
         self.assertIn('Hi', email_text)
         self.assertIn('testing test', email_text)
-        self.assertNotIn('More details here', email_text)
+        self.assertIn('More details here', email_text)
         self.assertIn('This is an automatic notification sent from from', email_text)
-        
-        self.assertEqual(n.get_action(), '')
     
     def test_purge_notifications(self):
         default_setting = settings.NODESHOT['NOTIFICATIONS']['DELETE_OLD']

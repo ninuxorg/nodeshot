@@ -487,11 +487,6 @@ NODESHOT = {
             'node_deleted':             { 'type': 'distance', 'geo_field': 'geometry' },
             'node_own_status_changed': { 'type': 'boolean' },
         },
-        'ACTIONS': {
-            'node_created': "reverse('api_node_details', args=[self.related_object.slug])",
-            'node_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
-            'node_own_status_changed': "reverse('api_node_details', args=[self.related_object.slug])",
-        },
         'DELETE_OLD': 40,  # delete notifications older than specified days
         'REGISTRARS': (
             'nodeshot.community.notifications.registrars.nodes',

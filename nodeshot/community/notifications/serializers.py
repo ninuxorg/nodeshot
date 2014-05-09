@@ -25,13 +25,7 @@ class UnreadNotificationSerializer(serializers.ModelSerializer):
         view_name='api_profile_detail',
         read_only=True
     )
-    action = serializers.SerializerMethodField('get_action')
     related_object = serializers.SerializerMethodField('get_related_object')
-    
-    def get_action(self, obj):
-        """ return notification.get_action() """
-        action = obj.get_action()
-        return action if action != '' else None
     
     def get_related_object(self, obj):
         related = obj.related_object
@@ -47,7 +41,7 @@ class UnreadNotificationSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'type', 'is_read', 'from_user_id',
             'from_user_detail', 'related_object',
-            'text', 'action', 'added'
+            'text', 'added'
         )
 
 
@@ -60,7 +54,7 @@ class NotificationSerializer(UnreadNotificationSerializer):
         fields = (
             'id', 'type', 'is_read', 'from_user_id',
             'from_user_detail', 'related_object',
-            'text', 'action', 'added'
+            'text', 'added'
         )
 
 
