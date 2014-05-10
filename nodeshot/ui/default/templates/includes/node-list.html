@@ -17,12 +17,12 @@
 </div>
 
 <div class="row-ns">
-    <div class="input-group width30 marginright">
-        <input type="text" class="form-control" placeholder="{% trans 'Quick search' %}">
-        <span class="input-group-addon icon-search"></span>
-    </div>
+    <form action="" id="js-search" class="input-group width30 marginright">
+            <input type="text" class="form-control" placeholder="{% trans 'Quick search' %}" value="<%= collection.searchTerm %>">
+            <span class="input-group-addon icon-search"></span>
+    </form>
     
-    <div class="dropdown input-group width30">
+    <div class="dropdown input-group width30 marginright">
         <button class="btn dropdown-toggle" type="button" id="js-open-filter-panel">
             {% trans 'Filter' %}
             <span class="caret input-group-addon"></span>
@@ -39,7 +39,7 @@
             </div>
             
             <div class="group">
-                <label>Status</label>
+                <label>{% trans 'Status' %}</label>
                 <select id="status-filter" class="selectpicker">
                     <option>{% trans 'All' %}</option>
                     <% _.each(Nodeshot.statuses, function(status, key){ %>
@@ -69,7 +69,17 @@
         </div>
     </div>
     
-    <button class="btn btn-default icon-plus pull-right">Add node</button>
+    <% if(collection.searchTerm){ %>
+    <div class="pull-left filter-status slimtip boldtip">
+        <%= collection.count %> {% trans 'results' %}
+        <span id="js-reset-filter"
+              class="icon-close static hastip"
+              title="{% trans 'reset filter settings' %}">
+        </span>
+    </div>
+    <% } %>
+    
+    <button class="btn btn-light icon-plus pull-right" id="js-add-node">{% trans 'Add node' %}</button>
     
     <div class="clearfix"></div>
 </div>
@@ -94,29 +104,32 @@
 <footer class="fixedbottom dark">
     <div class="center-stage">
         <div class="pull-left pagination-links">
-            <a href="#" class="btn btn-default">1</a>
-            <a href="#" class="btn btn-default">2</a>
-            <a href="#" class="btn btn-default">3</a>
-            <a href="#" class="btn btn-default">{% trans 'next' %}</a>
+            <% if(collection.hasPreviousPage()){ %>
+                <a href="#" class="btn btn-default" id="js-previous-page">&laquo; {% trans 'previous' %}</a>
+            <% } %>
+            <% if(collection.hasNextPage()){ %>
+                <a href="#" class="btn btn-default" id="js-next-page">{% trans 'next' %} &raquo;</a>
+            <% } %>
+            <%= collection.state.currentPage %> {% trans 'of' %} <%= collection.getNumberOfPages() %>
         </div>
-        <div class="pull-left pagination-select">
+        <div class="pull-left pagination-select" id="js-page-size">
             <select class="selectpicker">
-                <option>25</option>
-                <option selected="selected">50</option>
-                <option>100</option>
-                <option>200</option>
-                <option>500</option>
+                <% [25, 50, 100, 200, 500, 1000].forEach(function(n){ %>
+                    <option value="<%= n %>" <% if(collection.state.pageSize === n){ %>selected<% } %>>
+                        <%= n %>
+                    </option>
+                <% }) %>
             </select>
         </div>
         
-        <div class="pull-right list-actions">
+        <div class="pull-right list-actions not-implemented">
             <select class="selectpicker">
                 <option>{% trans 'Choose action' %}</option>
                 <option>do something</option>
             </select>
         </div>
         
-        <div class="pull-right select-all">
+        <div class="pull-right select-all not-implemented">
             <span class="custom-checkbox">
                 <input type="checkbox" id="select-all-checkbox" />
                 <label for="select-all-checkbox"></label>

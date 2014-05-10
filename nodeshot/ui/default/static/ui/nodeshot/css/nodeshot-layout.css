@@ -1262,6 +1262,7 @@ img.avatar200{ border-radius: 15% }
 }
 .table.columns th:first-child{ border-left: 0 none }
 .table.columns th:last-child{ border-right: 0 none }
+.table.columns tbody tr:last-child td{ border-bottom: 1px solid #e3e3e3 !important }
 
 .row-ns{
     margin-bottom: 20px;
@@ -1336,6 +1337,10 @@ footer .btn-group{ margin-bottom: 0 !important }
 
 #node-list footer .selectpicker .caret{ padding-top: 2px !important }
 
+.pagination-links{
+    line-height: 28px
+}
+
 .pagination-select{
     width: 80px;
     margin-left: 15px;
@@ -1348,5 +1353,27 @@ footer .btn-group{ margin-bottom: 0 !important }
 
 .list-actions{ width: 170px }
 .custom-checkbox{ margin-top: 1px }
+
+.static{
+    position: static
+}
+
+.slimtip .tooltip-inner{
+    padding: 7px 10px 7px !important;
+    line-height: 11px;
+}
+.boldtip .tooltip-inner{ font-weight: bold }
+
+.filter-status{
+    height: 34px;
+    line-height: 34px;
+    color: #5d5d5d;
+}
+
+.icon-close.static:before {
+    font-size: 20px;
+    position: relative;
+    bottom: -2px !important;
+}
 
 /* --- End Node List --- */

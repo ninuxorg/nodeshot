@@ -279,6 +279,7 @@ body article a:focus,
 .btn-default:hover,
 .btn-default:focus,
 .btn-default:active,
+.btn-light,
 .input-group-addon,
 .btn.dropdown-toggle .caret{
     background: #696b6f; /* Old browsers */
@@ -370,7 +371,8 @@ body article a:focus,
     background-color: #171516;
 }
 
-.input-group-addon, .btn.dropdown-toggle .caret{
+.input-group-addon, .btn.dropdown-toggle .caret,
+.btn-light{
     background: #989aa1; /* Old browsers */
     background: -moz-linear-gradient(top,  #989aa1 0%, #777a81 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#989aa1), color-stop(100%,#777a81)); /* Chrome,Safari4+ */
@@ -392,6 +394,12 @@ body article a:focus,
     font-size: 15px !important;
     margin: 0 !important;
     padding: 0 !important;
+}
+
+.btn-light:hover,
+.btn-light:focus{
+    background: #777a81 !important;
+    color: #fff !important;
 }
 
 .form-control{

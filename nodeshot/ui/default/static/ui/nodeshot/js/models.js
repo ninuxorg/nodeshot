@@ -22,14 +22,57 @@ var Node = Backbone.Model.extend({
     }
 });
 
-var NodeCollection = Backbone.Collection.extend({
+var NodeCollection = Backbone.PageableCollection.extend({
     model: Node,
     url: '/api/v1/nodes/',
+    
+    // Any `state` or `queryParam` you override in a subclass will be merged with
+    // the defaults in `Backbone.PageableCollection` 's prototype.
+    state: {
+        pageSize: 50,
+        firstPage: 1,
+        currentPage: 1
+    },
+    
+    queryParams: {
+        currentPage: "page",
+        pageSize: "limit",
+        totalRecords: "count"
+    },
+    
+    hasNextPage: function(){
+        return this.next !== null;
+    },
+    
+    hasPreviousPage: function(){
+        return this.previous !== null;
+    },
+    
+    getNumberOfPages: function(){
+        var total = this.count,
+            size = this.state.pageSize;
+        
+        return Math.ceil(total / size)
+    },
+    
+    search: function(q){
+        this.searchTerm = q;
+        return this.getPage(1, {
+            data: { search: q },
+            processData: true
+        });
+    },
     
     // needed to use pagination results as the collection
     parse: function(response) {
         this.count = response.count;
+        this.next = response.next;
+        this.previous = response.previous;
         return response.results;
+    },
+    
+    initialize: function(){
+        this.searchTerm = '';
     }
 });
 
