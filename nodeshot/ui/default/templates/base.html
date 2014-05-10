@@ -395,6 +395,10 @@
         <td><%= _.formatDateTime(added) %></td>
         <td><%= _.formatDateTime(updated) %></td>
     </script>
+    
+    <script id="node-list-empty-template" type="text/template">
+        <td colspan="100%" class="empty">{% trans 'nothing found' %}</td>
+    </script>
 
     <script id="user-details-template" type="text/template">
         {% include 'includes/user-details.html' %}

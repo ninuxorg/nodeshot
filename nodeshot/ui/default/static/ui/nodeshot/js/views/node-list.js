@@ -3,6 +3,12 @@ var NodeRowView = Backbone.Marionette.ItemView.extend({
   template: "#node-list-row-template"
 });
 
+var NodeEmptyView = Backbone.Marionette.ItemView.extend({
+    tagName: "tr",
+    template: "#node-list-empty-template"
+});
+
+
 var NodeListView = Backbone.Marionette.CompositeView.extend({
     name: 'NodeListView',
     tagName: 'article',
@@ -11,6 +17,7 @@ var NodeListView = Backbone.Marionette.CompositeView.extend({
     template: '#node-list-template',
     itemView: NodeRowView,
     itemViewContainer: '#js-rows',
+    emptyView: NodeEmptyView,
     
     ui:{
         'searchInput': '#js-search input',

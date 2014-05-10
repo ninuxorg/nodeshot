@@ -1378,4 +1378,10 @@ footer .btn-group{ margin-bottom: 0 !important }
     bottom: -2px !important;
 }
 
+td.empty{
+    padding: 30px 0 !important;
+    text-align: center;
+    font-size: 15px;
+}
+
 /* --- End Node List --- */
