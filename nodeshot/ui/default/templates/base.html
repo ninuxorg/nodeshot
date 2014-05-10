@@ -41,18 +41,7 @@
         <nav id="top-bar">
             <h1><a href="#">Nodeshot</a></h1>
 
-            <div id="general-search">
-                <input type="text" id="general-search-input" placeholder="Search for data">
-                <span class="icon-search">&nbsp;</span>
-                <span class="icon-spinner animate-spin"></span>
-                <ul class="dropdown-menu">
-                    <li><a href="javascript:createModal({message:'not implemented yet'})" class="icon-pin">Zioproto Gallia</a></li>
-                    <li><a href="javascript:createModal({message:'not implemented yet'})" class="icon-pin">Hotspot Gallicano</a></li>
-                    <li><a href="javascript:createModal({message:'not implemented yet'})" class="icon-pin">Pisa::Galluppi</a></li>
-                    <li><a href="javascript:createModal({message:'not implemented yet'})" class="icon-user">galluswifi</a></li>
-                    <li><a href="javascript:createModal({message:'not implemented yet'})" class="icon-user">Alberto gallo</a></li>
-                </ul>
-            </div>
+            <div id="general-search"></div>
 
             <ul id="main-actions"></ul>
 
@@ -277,6 +266,21 @@
             </div>
         </div>
     </script>
+    
+    <script id="search-template" type="text/template">
+        <input type="text" id="general-search-input" placeholder="{% trans 'Search for data' %}">
+        <span class="icon-search">&nbsp;</span>
+        <span class="icon-spinner animate-spin"></span>
+        <ul class="dropdown-menu" id="js-search-results"></ul>
+    </script>
+    
+    <script id="search-result-template" type="text/template">
+        <a href="#/nodes/<%= slug %>" class="icon-pin"><%= name %></a>
+    </script>
+    
+    <script id="search-empty-template" type="text/template">
+        <a class="empty" href="#">{% trans 'nothing found' %}</a>
+    </script>
 
     <script id="account-menu-template" type="text/template">
         <li>
@@ -476,6 +480,7 @@
     </script>
 
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/search.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/account-menu.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/notifications.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>

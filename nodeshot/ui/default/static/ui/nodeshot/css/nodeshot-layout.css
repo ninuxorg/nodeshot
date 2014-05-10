@@ -96,6 +96,8 @@
 }
 
 #general-search a:hover,
+#general-search a:focus,
+#general-search a.focus,
 .btn-group.bootstrap-select ul.dropdown-menu .selected a{
     background-color: #0a246a;
     color: #fff !important;

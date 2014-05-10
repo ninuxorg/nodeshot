@@ -20,6 +20,8 @@ Nodeshot.addInitializer(function () {
     });
     Nodeshot.accountMenu.render();
     
+    Nodeshot.generalSearch = new SearchView();
+    
     Nodeshot.onNodeClose = '#/map';
 });
 

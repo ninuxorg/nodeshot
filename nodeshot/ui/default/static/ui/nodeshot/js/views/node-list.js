@@ -72,7 +72,7 @@ var NodeListView = Backbone.Marionette.CompositeView.extend({
         });
     },
     
-    /* --- user interactions --- */
+    /* --- user interaction --- */
     
     notImplemented: function(e){
         e.preventDefault();

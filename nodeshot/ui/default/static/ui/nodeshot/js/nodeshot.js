@@ -123,31 +123,6 @@ clearPreloader = function () {
     });
 }
 
-// search (ugly global var!)
-var searchLoadingIndicator = $('#general-search .animate-spin'),
-    searchIcon = $('#general-search .icon-search'),
-    searchResults = $('#general-search ul'),
-    showSearchSpinner = function () {
-        searchIcon.hide();
-        searchLoadingIndicator.fadeIn(255);
-        searchResults.fadeIn(255);
-    },
-    hideSearchSpinner = function () {
-        searchLoadingIndicator.hide();
-        searchIcon.fadeIn(255);
-        searchResults.fadeOut(255);
-    };
-
-$('#general-search-input').keyup(function (e) {
-    if (this.value.length > 2 && searchLoadingIndicator.is(':hidden')) {
-        showSearchSpinner();
-    } else if (this.value.length < 3 && searchLoadingIndicator.is(':visible')) {
-        hideSearchSpinner();
-    }
-}).blur(function (e) {
-    hideSearchSpinner();
-});
-
 // map
 $(window).resize(function (e) {
     setCollapsibleMainMenuMaxHeight();
