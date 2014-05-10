@@ -70,6 +70,13 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
 
         // enable tooltips
         $('.hastip').tooltip();
+        
+        // store coordinates in preferences
+        if(this.model && this.model.get('geometry')){
+            var coords = this.model.get('geometry')['coordinates'];
+            Nodeshot.preferences.mapLat = coords[1];
+            Nodeshot.preferences.mapLng = coords[0];
+        }
     },
 
     initialize: function () {
