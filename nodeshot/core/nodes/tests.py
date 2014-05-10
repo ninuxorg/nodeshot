@@ -258,6 +258,13 @@ class APITest(BaseTestCase):
         self.assertEqual(node.data, { 'is_test': 'true' })
         self.assertEqual(Node.objects.filter(data__contains={ "is_test": "true" }).count(), 1)
     
+    def test_node_list_search(self):
+        url = reverse('api_node_list')
+        
+        # GET: 200
+        response = self.client.get(url, { "search": "Fusolab" })
+        self.assertEqual(response.data['count'], 1)
+    
     def test_delete_node(self):
         node = Node.objects.first()
         node.delete()
