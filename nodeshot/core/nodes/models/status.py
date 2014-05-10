@@ -74,3 +74,7 @@ class Status(BaseOrdered):
         # update __current_status
         self._current_is_default = self.is_default
     
+    @property
+    def nodes_count(self):
+        """ return number of published nodes with that status """
+        return self.node_set.published().count()

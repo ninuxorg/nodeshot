@@ -248,7 +248,7 @@ class StatusList(generics.ListAPIView):
     """
     Retrieve a list of all the available statuses and their relative icons/colors.
     """
-    queryset = Status.objects.annotate(nodes_count=Count('node'))
+    queryset = Status.objects.all()
     serializer_class = StatusListSerializer
     
     @method_decorator(cache_page(86400))  # cache for 1 day
