@@ -216,3 +216,16 @@ class LayerTest(TestCase):
         response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(layer_count + 1, Layer.objects.all().count())
+    
+    def test_unpublish_layer_should_unpublish_nodes(self):
+        layer = Layer.objects.first()
+        layer.is_published = False
+        layer.save()
+        for node in layer.node_set.all():
+            self.assertFalse(node.is_published)
+        
+        layer = Layer.objects.first()
+        layer.is_published = True
+        layer.save()
+        for node in layer.node_set.all():
+            self.assertTrue(node.is_published)

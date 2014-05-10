@@ -11,6 +11,7 @@ from nodeshot.core.base.choices import MAP_ZOOM
 from nodeshot.core.nodes.models import Node
 
 from ..managers import LayerManager
+from ..signals import layer_is_published_changed
 
 
 class Layer(BaseDate):
@@ -54,12 +55,50 @@ class Layer(BaseDate):
     # default manager
     objects = LayerManager()
     
+    # this is needed to check if the is_published is changing
+    # explained here:
+    # http://stackoverflow.com/questions/1355150/django-when-saving-how-can-you-check-if-a-field-has-changed
+    _current_is_published = None
+    
     class Meta:
         db_table = 'layers_layer'
         app_label= 'layers'
     
     def __unicode__(self):
         return '%s' % self.name
+    
+    def __init__(self, *args, **kwargs):
+        """ Fill __current_is_published """
+        super(Layer, self).__init__(*args, **kwargs)
+        # set current is_published, but only if it is an existing layer
+        if self.pk:
+            self._current_is_published = self.is_published
+    
+    def save(self, *args, **kwargs):
+        """
+        intercepts changes to is_published and fires layer_is_published_changed signal
+        """
+        super(Layer, self).save(*args, **kwargs)
+        
+        # if is_published of an existing layer changes
+        if self.pk and self.is_published != self._current_is_published:
+            # send django signal
+            layer_is_published_changed.send(
+                sender=self.__class__,
+                instance=self,
+                old_is_published=self._current_is_published,
+                new_is_published=self.is_published
+            )
+            # unpublish nodes
+            self.update_nodes_published()
+        
+        # update _current_is_published
+        self._current_is_published = self.is_published
+    
+    def update_nodes_published(self):
+        """ publish or unpublish nodes of current layer """
+        if self.pk:
+            self.node_set.all().update(is_published=self.is_published)
     
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod

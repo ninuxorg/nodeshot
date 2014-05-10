@@ -48,6 +48,16 @@ class LayerAdmin(PublishActionsAdminMixin, GeoAdmin):
             _('view nodes')
         )
     view_nodes.allow_tags = True
+    
+    def publish_action(self, request, queryset):
+        super(LayerAdmin, self).publish_action(request, queryset)
+        # unpublish all nodes of selected layers
+        Layer.node_set.related.model.filter(layer__in=queryset).update(is_published=True)
+    
+    def unpublish_action(self, request, queryset):
+        super(LayerAdmin, self).unpublish_action(request, queryset)
+        # publish all nodes of selected layers
+        Layer.node_set.related.model.filter(layer__in=queryset).update(is_published=False)
 
 
 admin.site.register(Layer, LayerAdmin)
