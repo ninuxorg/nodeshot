@@ -442,6 +442,8 @@
 
     <script>
         var Nodeshot = new Backbone.Marionette.Application();
+        Nodeshot.TILESERVER_URL = '{{ TILESERVER_URL }}';
+        
         {% if request.user.is_authenticated %}
             Nodeshot.currentUser = new User({
                 username: '{{ request.user.username }}',

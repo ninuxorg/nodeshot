@@ -648,9 +648,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             map = L.map('map-js').setView([coords.lat, coords.lng], coords.zoom, {
                 trackResize: true
             });
-        // TODO: configurable tiles
-        // TODO: rename mapbox in osm
-        this.mapBoxLayer = new L.tileLayer('//a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
+        this.osmLayer = new L.tileLayer(Nodeshot.TILESERVER_URL).addTo(map);
 
         return map;
     },

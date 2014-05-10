@@ -415,6 +415,9 @@ NODESHOT = {
 
         'REVERSION_LAYERS': True,  # activate django reversion for layers.Layer model
         'REVERSION_NODES': True,  # activate django reversion for nodes.Node model
+        
+        # configure your tile server
+        'TILESERVER_URL': '//a.tiles.mapbox.com/v3/nodeshot-cineca.i6kgg4hb/{z}/{x}/{y}.png'
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (

@@ -57,8 +57,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             animate: false
         });
         // TODO: configurable tiles
-        // TODO: rename mapbox in osm
-        this.mapBoxLayer = new L.tileLayer('//a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
+        this.osmLayer = new L.tileLayer(Nodeshot.TILESERVER_URL).addTo(map);
         this.map = map;
 
         $('body').attr('style', '').css({
