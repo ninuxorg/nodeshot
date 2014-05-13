@@ -139,7 +139,7 @@ def install_requirements():
     with hide( 'stdout', 'stderr'):        
         pip_command = 'python/bin/pip install -r %srequirements.txt' % deploy_dir
         pip_command_networking = 'python/bin/pip install -r %srequirements_networking.txt' % deploy_dir
-        pip_command_nodeshot = 'python/bin/pip install -U https://github.com/ninuxorg/nodeshot/tarball/master' % deploy_dir
+        pip_command_nodeshot = 'python/bin/pip install -U https://github.com/ninuxorg/nodeshot/tarball/master'
         distribute_command = 'python/bin/pip install -U distribute'
         with cd (project_dir):
             run( virtual_env + ' &&  ' + pip_command  + ' &&  ' + distribute_command)
@@ -173,26 +173,13 @@ def create_settings():
     initialize_db()
     initialize_server()
     print(green("Creating Nodeshot config..."))
-    settings= {}
-    settings['domain'] = "DOMAIN = '%s' " % server_name
-    
-    DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', 
-        'NAME': 'nodeshot',                      
-        'USER': db_user,                      
-        'PASSWORD': db_pass,                 
-        'HOST': '127.0.0.1',                      
-        'PORT': '',  
-        }
-    }
 
-    db_settings = json.dumps(DATABASES)
     with cd ('%s/%s' % (project_dir,project_name)):
-        run('rm -f local_settings.py')
-        for setting,value in settings.iteritems():             
-            append('local_settings.py', value)
-        append('local_settings.py', 'DATABASES = %s' % db_settings)
+        run ('sed -i \'s#<app_path>#%s#g\' local_settings_template.py ' % deploy_dir)
+        run ('sed -i \'s#<user>#%s#g\' local_settings_template.py ' % db_user)
+        run ('sed -i \'s#<password>#%s#g\' local_settings_template.py ' % db_pass)
+        run ('sed -i \'s#<domain>#%s#g\' local_settings_template.py ' % server_name)
+        run ('mv local_settings_template.py local_settings.py')
         
 def sync_data():
     initialize()
