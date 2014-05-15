@@ -273,8 +273,8 @@ if __name__ == "__main__":
     # record hnas
     old_hnas = dict([ (h.id, False) for h in Hna.objects.all()])
 
-    for ips,hna in hnas:
-        found_device,i  = None, None
+    for ips, hna in hnas:
+        found_device, i  = None, None
         for ip in ips:
             if not found_device:
                 i = Interface.objects.filter(ipv4_address = ip)
