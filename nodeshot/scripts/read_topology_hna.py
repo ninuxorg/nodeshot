@@ -207,6 +207,8 @@ def isinsubnet(ip, subnet, mask_threshold):
 
 #OLSR
 if __name__ == "__main__":
+    HNA_NETMASK_THRESHOLD = 20 #don't consider HNAs with a netmask less than than this value
+    HNA_COUNT_THRESHOLD = 12 #don't draw links between nodes and remote HNAs if the number of HNAs is bigger than this value
     #Link.objects.all().delete()
     hnas = []
     values = []
@@ -290,15 +292,14 @@ if __name__ == "__main__":
         if not v:
             Hna.objects.get(id=h).delete()
             print "Deleted hna %d" % h
-
+    
     # take into account L2 only / bridged links
     # iterate over all devices, and see if the IP address of one of the interfaces belongs to an HNA
 
-    # don't do this in nodeshot2
     l2links = []
     for interface in Interface.objects.all().exclude(type='vpn').exclude(draw_link=False):
         for hna in Hna.objects.all().exclude(route="0.0.0.0/0"):
-            if isinsubnet(interface.ipv4_address, hna.route, 16):
+            if isinsubnet(interface.ipv4_address, hna.route, HNA_NETMASK_THRESHOLD):
                 try:
                     # get one interface associated to this HNA
                     hna_device_interface = hna.device.interface_set.all()[0]
@@ -315,6 +316,9 @@ if __name__ == "__main__":
                     continue
                 if nodeB.status in "pu" or nodeA.status in "pu":
                     print "Node %s or %s is not active" % (nodeA, nodeB)
+                    continue
+                if hna.device.hna_set.count() > HNA_COUNT_THRESHOLD:
+                    print "HNA %s is from a device with too many HNAs [%s]. Ignoring." % (hna.route, hna.device.node)
                     continue
 
                 # check if the link already exists
