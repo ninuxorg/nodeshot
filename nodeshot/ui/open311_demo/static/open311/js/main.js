@@ -1,9 +1,9 @@
-var csrftoken = $.getCookie('csrftoken');
-var markerToRemove //If users insert a new marker previous one has to be deleted from map
-var nodeRatingAVG // Node Rating data has to be globally available for jquery-raty rating plugin to correctly work
-var markerMap = {} //Object containing all requests'id and a reference to their marker
-var markerStatusMap = {"open": [], "closed": []} //Object containing arrays of open and closed requests and a reference to their marker
-var mapClusters = {} // Object containing layers as leaflet Clusters
+NS_311.csrftoken = $.getCookie('csrftoken');
+NS_311.markerToRemove //If users insert a new marker previous one has to be deleted from map
+NS_311.nodeRatingAVG // Node Rating data has to be globally available for jquery-raty rating plugin to correctly work
+NS_311.markerMap = {} //Object containing all requests'id and a reference to their marker
+NS_311.markerStatusMap = {"open": [], "closed": []} //Object containing arrays of open and closed requests and a reference to their marker
+NS_311.mapClusters = {} // Object containing layers as leaflet Clusters
 
 
 /*
@@ -11,7 +11,7 @@ Colors are dinamically added to layers whe these are loaded.
 If more than 8 layers need to be represented add more colors to the array.
 */
 
-var colors = [
+NS_311.colors = [
     '#0000ff',
     '#DFA171',
     '#CBC7B6',
@@ -27,7 +27,7 @@ var colors = [
  Status colors are green(open) and red ( closed).
  Don't use these colors to style layers.
  */
-var status_colors = {
+NS_311.status_colors = {
     'open': '#FF0000',
     'closed': '#00FF00'
 }
@@ -36,79 +36,24 @@ var status_colors = {
 var map = L.map('map').setView([41.87, 12.49], 8);
 var legend = L.control({position: 'bottomleft'});
 
-//function removeStatusMarkers(status){
-//    //event.stopPropagation();
-//    for (var i in window.layers) {
-//        var layer_slug = window.layers[i].slug
-//        console.log(window.mapClusters[layer_slug])
-//        console.log(window.markerStatusMap[layer_slug][status])
-//        window.mapClusters[layer_slug].removeLayers(window.markerStatusMap[layer_slug][status])
-//
-//       //console.log(window.markerStatusMap[layer_slug][status])
-//    }
-//    L.DomEvent
-//        //.addListener(toggleOpen, 'click', L.DomEvent.stopPropagation)
-//        ////.addListener(toggleOpen, 'click', L.DomEvent.preventDefault)
-//        //.addListener(toggleClosed, 'click', L.DomEvent.stopPropagation)
-//        //.addListener(toggleClosed, 'click', L.DomEvent.preventDefault)
-//        //.addListener(toggleOpen, 'click', function () { addStatusMarkers('open'); })
-//        .removeListener(toggleOpen, 'click', function () { removeStatusMarkers('open'); })
-//        //$(toggleOpenDiv).off()
-//}
-//
-//function addStatusMarkers(status){
-//    //event.stopPropagation();
-//    for (var i in window.layers) {
-//        var layer_slug = window.layers[i].slug
-//        console.log(window.mapClusters[layer_slug])
-//        console.log(window.markerStatusMap[layer_slug][status])
-//        window.mapClusters[layer_slug].addLayers(window.markerStatusMap[layer_slug][status])
-//
-//       //console.log(window.markerStatusMap[layer_slug][status])
-//    }
-    //L.DomEvent
-    //    
-    //    .addListener(toggleOpen, 'click', function () { removeStatusMarkers('open'); })
-    //    .removeListener(toggleOpen, 'click', function () { addStatusMarkers('open'); })
-//}
-
 legend.onAdd = function (map) {
     var mapLegend = L.DomUtil.create('div','mapLegend')
     mapLegend.innerHTML="<div><strong>Legend</strong>"
-    _.each(status_colors,function(value, key, list){
+    _.each(NS_311.status_colors,function(value, key, list){
         mapLegend.innerHTML += "<div style='clear:both;min-height:10px;width:100px;'>"
         mapLegend.innerHTML += "<div class='circle' style='float:left;background-color:"+value+"'></div>"
-        mapLegend.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests <strong>("+ markerStatusMap[key].length + ")</strong></div>"
+        mapLegend.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests <strong>("+ NS_311.markerStatusMap[key].length + ")</strong></div>"
         mapLegend.innerHTML += "</div>"
         })
     mapLegend.innerHTML += "</div>"
-    //var toggleOpenDiv = L.DomUtil.create('toggleOpen','',div)
-    //var toggleClosedDiv = L.DomUtil.create('toggleClosed','',div)
-    //toggleOpenDiv.innerHTML = " <span style='color:"+open_color+"'>Open requests</span><br>"
-    //toggleOpenDiv.innerHTML += "<span style='color:"+closed_color+"'>Closed requests</span><br>"
-
-    
-    //toggleOpenDiv.innerHTML = "<input type='checkbox' id='toggleOpen' checked> <span style='color:"+open_color+"'>Open requests</span><br>"
-    //toggleOpenDiv.innerHTML += "<input type='checkbox' id='toggleClosed'> <span style='color:"+closed_color+"'>Closed requests</span><br>"
-    ////$(toggleOpenDiv).on('click',function(){removeStatusMarkers('open');})
-    //
-    //L.DomEvent
-    //    .addListener(toggleOpenDiv, 'click', L.DomEvent.stopPropagation)
-    //    //.addListener(toggleOpen, 'click', L.DomEvent.preventDefault)
-    //    //.addListener(toggleClosed, 'click', L.DomEvent.stopPropagation)
-    //    //.addListener(toggleClosed, 'click', L.DomEvent.preventDefault)
-    //    .addListener(toggleOpenDiv, 'click', function () { removeStatusMarkers('open'); })
-    //    //.addListener(toggleOpenDiv, 'click', function () { test(); });
-    //
     return mapLegend;
 };
+legend.addTo(map);
 
 
 
-
-var mapBoxLayer = new L.tileLayer('//a.tiles.mapbox.com/v3/nemesisdesign.hcj0ha2h/{z}/{x}/{y}.png').addTo(map);
+var mapBoxLayer = new L.tileLayer(NS_311.TILESERVER_URL).addTo(map);
 var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
-//Uncomment for Google maps. Must be checked if it works in IE
 var googleHybrid = new L.Google('HYBRID');
 var googleMap = new L.Google('ROADMAP');
 var googleSat = new L.Google();
@@ -121,20 +66,18 @@ var popup = L.popup();
 //Layer insert on map
 var overlaymaps = {};
 
-
 //Load data from server
 var layers = getData(window.__BASEURL__ + 'layers/'); //layers
 var geojsonlayers = getData(window.__BASEURL__ + 'layers.geojson'); //layers' area
 
-
 for (var i in layers) {
-    createlayersCSS(layers[i].slug, colors[i]);
+    createlayersCSS(layers[i].slug, NS_311.colors[i]);
 }
 
 //Populate map's layers
 
 var mapLayersNodes = loadLayers(layers);
-//var mapLayersArea = loadLayersArea(geojsonlayers);
+
 //Map Controls
 var baseMaps = {
     "MapBox": mapBoxLayer,
@@ -148,11 +91,13 @@ var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
 
 //Populate a select field with Layers
 getLayerListSlug(layers);
-legend.addTo(map);
+
+
+
 function createlayersCSS(slug, color) {
     var cssClass = '.' + slug
     $("<style type='text/css'> " + cssClass + "{\
-  background-color:" + color + ";\
+    background-color:" + color + ";\
     width: 50px;\
     height: 50px;\
     margin-left: 5px;\

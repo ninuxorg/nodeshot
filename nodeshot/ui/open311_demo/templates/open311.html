@@ -21,9 +21,7 @@
             }
         </style>
 
-	<link rel="stylesheet" href="{% static 'open311/css/bootstrap-responsive.css' %}" />
 	<link rel="stylesheet" href="{% static 'open311/css/main.css' %}" />
-        <!--<link rel="stylesheet" href="css/main.css">-->
         <link rel="stylesheet" href="{% static 'open311/css/leaflet.css' %}" />
 
 
@@ -302,6 +300,10 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
 <script src="{% static 'open311/js/vendor/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'open311/js/vendor/jquery.raty.js' %}"></script>
 <script type="text/javascript">
+    var NS_311 = {}
+    NS_311.__BASEURL__ = '{% url 'api_root_endpoint' %}'
+    NS_311.TILESERVER_URL = '{{ TILESERVER_URL }}';
+    //console.log(NS_311.TILESERVER_URL)
     $.myproject = {} // namespace
     $.myproject.STATIC_URL = '{{ STATIC_URL }}';
 </script>

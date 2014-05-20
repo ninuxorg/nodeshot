@@ -22,7 +22,7 @@ function createNodeList() {
     if (layer != " ") {
         $.ajax({
             type: 'GET',
-            url: window.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layer,
+            url: NS_311.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layer,
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',
             success: function (result) {
@@ -44,41 +44,13 @@ function addToList(data) {
 
     $('a.list-link').click(function (e) {
         var slug = $(this).data('id');
-        var marker = markerMap[slug];
+        var marker = NS_311.markerMap[slug];
         populateOpen311Div(slug, "true");
         marker.addTo(map)
         marker.bindPopup(nodeDiv)
         marker.openPopup()
     })
 }
-
-/* INSERTION OF NODES ON MAP ON PAGE LOAD
- * ====================================== */
-
-//function loadLayersArea(layers) {
-//    /*
-//     * Puts layer areas on map
-//     */
-//    var allLayersArea = []
-//    for (var i in layers.features) {
-//
-//        var newArea = L.geoJson(layers.features[i], {
-//            style: {
-//                weight: 1,
-//                opacity: 1,
-//                color: 'black',
-//                clickable: false,
-//                dashArray: '3',
-//                fillOpacity: 0.2,
-//                fillColor: layers.features[i].properties.color
-//            }
-//        }).addTo(map);
-//        var newAreaKey = "<span style='font-weight:bold;color:" + layers.features[i].properties.color + "'>" + layers.features[i].properties.name + " Area</span>";
-//        overlaymaps[newAreaKey] = newArea;
-//        allLayersArea[i] = newArea;
-//    }
-//    return allLayersArea;
-//}
 
 function loadLayers(layers) {
     /*
@@ -89,14 +61,10 @@ function loadLayers(layers) {
         var color = layers[i].color;
         var clusterClass = layers[i].slug; //CSS class with same name of the layer
         //Creates a Leaflet cluster group styled with layer's colour
-        window.mapClusters[layers[i].slug] = createCluster(clusterClass);
-        //window.markerStatusMap[layers[i].slug] = {
-        //    "open": [],
-        //    "closed": []
-        //}
-        //var newCluster = window.mapClusters[layers[i].slug];
+        NS_311.mapClusters[layers[i].slug] = createCluster(clusterClass);
         //Loads nodes in the cluster
-        var newClusterNodes = getData(window.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layers[i].slug);
+        var newClusterNodes = getData(NS_311.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layers[i].slug);
+        //Creates GeoJSON from JSON
         var GeoJSON = new geojsonColl();
         for (var n in newClusterNodes) {
 
@@ -109,14 +77,14 @@ function loadLayers(layers) {
 
         }
 
-        var newClusterLayer = loadNodes(layers[i].slug, GeoJSON, colors[i]);
-        window.mapClusters[layers[i].slug].addLayer(newClusterLayer);
+        var newClusterLayer = loadNodes(layers[i].slug, GeoJSON, NS_311.colors[i]);
+        NS_311.mapClusters[layers[i].slug].addLayer(newClusterLayer);
         //Adds cluster to map
-        map.addLayer(window.mapClusters[layers[i].slug]);
+        map.addLayer(NS_311.mapClusters[layers[i].slug]);
         //Creates map controls for the layer
-        var newClusterKey = "<span style='color:" + colors[i] + "'>" + layers[i].name + "</span>";
-        overlaymaps[newClusterKey] = window.mapClusters[layers[i].slug];
-        allLayers[i] = window.mapClusters[layers[i].slug];
+        var newClusterKey = "<span style='color:" + NS_311.colors[i] + "'>" + layers[i].name + "</span>";
+        overlaymaps[newClusterKey] = NS_311.mapClusters[layers[i].slug];
+        allLayers[i] = NS_311.mapClusters[layers[i].slug];
     }
     return allLayers;
 
@@ -160,14 +128,14 @@ function loadNodes(layer_slug, newClusterNodes, color) {
             var marker = new
             L.circleMarker(latlng, {
                 radius: 8,
-                fillColor: window.status_colors[feature.properties.status],
+                fillColor: NS_311.status_colors[feature.properties.status],
                 color: color,
                 weight: 3,
                 opacity: 1,
                 fillOpacity: 0.8
             });
-            window.markerMap[feature.properties.service_request_id] = marker;
-            window.markerStatusMap[feature.properties.status].push(marker)
+            NS_311.markerMap[feature.properties.service_request_id] = marker;
+            NS_311.markerStatusMap[feature.properties.status].push(marker)
 
             return marker;
         }
@@ -185,13 +153,13 @@ function onMapClick(e) {
     /*
      *Creates marker object
      */
-    if (markerToRemove) {
-        map.removeLayer(markerToRemove);
+    if (NS_311.markerToRemove) {
+        map.removeLayer(NS_311.markerToRemove);
     }
 
     markerLocation = e.latlng
     marker = new L.Marker(markerLocation);
-    markerToRemove = marker
+    NS_311.markerToRemove = marker
     var popupelem = document.createElement('div');
     popupelem.id = "insertMarker";
     var tmplMarkup = $('#tmplConfirmPos').html();
@@ -260,7 +228,7 @@ function openForm(marker) {
             var layer_inserted = $(this).serializeArray()[1]['value']
 
             $.ajax({
-                url: window.__BASEURL__ + 'open311/requests.json/',
+                url: NS_311.__BASEURL__ + 'open311/requests.json/',
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -270,18 +238,18 @@ function openForm(marker) {
                 success: function (returndata) {
                     var circle = L.circleMarker(latlng, {
                                 radius: 8,
-                                fillColor: window.status_colors['open'],
+                                fillColor: NS_311.status_colors['open'],
                                 //color: color,
                                 weight: 3,
                                 opacity: 1,
                                 fillOpacity: 0.8
                             }).addTo(map);
                     var newMarker = L.marker(latlng);
-                    window.mapClusters[layer_inserted].addLayer(newMarker);
-                    window.markerMap[returndata] = newMarker;
-                    window.markerStatusMap['open'].push(newMarker)
-                    window.legend.removeFrom(map)
-                    window.legend.addTo(map)
+                    NS_311.mapClusters[layer_inserted].addLayer(newMarker);
+                    NS_311.markerMap[returndata] = newMarker;
+                    NS_311.markerStatusMap['open'].push(newMarker)
+                    legend.removeFrom(map)
+                    legend.addTo(map)
                     popupMessage = "Request has been inserted<br>"
                     popupMessage += "<strong>Request ID: </strong>"+ returndata
                     circle.bindPopup(popupMessage).openPopup();
@@ -291,7 +259,6 @@ function openForm(marker) {
                     })
                 },
                 error: function (jqXHR, error, errorThrown) {
-                    //console.log(jqXHR)
                     $("#request_messages").html(jqXHR.responseText);
                 }
             });
@@ -327,7 +294,7 @@ function populateOpen311Div(nodeSlug, create) {
         nodeDiv.id = nodeSlug;
     }
 
-    var node = getData(window.__BASEURL__ + 'open311/requests/' + nodeSlug + '.json');
+    var node = getData(NS_311.__BASEURL__ + 'open311/requests/' + nodeSlug + '.json');
     var status = node.status;
     var nodeLayer = node.layer;
     var requestID = nodeSlug;
@@ -341,7 +308,7 @@ function populateOpen311Div(nodeSlug, create) {
     $(nodeDiv).on('click',function(){showRequestDetail(requestID,node)});
     
 
-    return (nodeDiv, nodeRatingAVG)
+    return (nodeDiv, NS_311.nodeRatingAVG)
 
 }
 
@@ -361,13 +328,13 @@ function showRequestDetail(requestID,node) {
     
     //$("#MainPage").hide();
     //$("#RequestDetails").show();
-    window.nodeSlug = node.slug
-    window.nodeId = requestID.split("-")[1];
-    window.layerSettings = getData(window.__BASEURL__ + 'layers/' + node.layer_slug + '/participation_settings/');
-    window.nodeSettings = getData(window.__BASEURL__ + 'nodes/' + node.slug + '/participation_settings/');
-    window.nodeParticipation = getData(window.__BASEURL__ + 'nodes/' + node.slug + '/participation/');
+    NS_311.nodeSlug = node.slug
+    NS_311.nodeId = requestID.split("-")[1];
+    NS_311.layerSettings = getData(NS_311.__BASEURL__ + 'layers/' + node.layer_slug + '/participation_settings/');
+    NS_311.nodeSettings = getData(NS_311.__BASEURL__ + 'nodes/' + node.slug + '/participation_settings/');
+    NS_311.nodeParticipation = getData(NS_311.__BASEURL__ + 'nodes/' + node.slug + '/participation/');
     //getParticipationData()
-    var request = getData(window.__BASEURL__ + 'open311/requests/' + requestID + '.json'); 
+    var request = getData(NS_311.__BASEURL__ + 'open311/requests/' + requestID + '.json'); 
     var tmplMarkup = $('#tmplOpen311Request').html();
     var compiledTmpl = _.template(tmplMarkup, {
             request: request,
@@ -378,21 +345,21 @@ function showRequestDetail(requestID,node) {
     $("#requestContainer").append(compiledTmpl);
 
 //Votes
-if (nodeSettings.participation_settings.voting_allowed && layerSettings.participation_settings.voting_allowed) {
-    console.log("Votes OK")
-    showVotes(nodeParticipation.participation.likes,nodeParticipation.participation.dislikes)
+if (NS_311.nodeSettings.participation_settings.voting_allowed && NS_311.layerSettings.participation_settings.voting_allowed) {
+    //console.log("Votes OK")
+    showVotes(NS_311.nodeParticipation.participation.likes,NS_311.nodeParticipation.participation.dislikes)
 }
 
 //Comments       
-if (nodeSettings.participation_settings.comments_allowed && layerSettings.participation_settings.comments_allowed) {
-    console.log("Comments OK")
-    showComments(nodeSlug,nodeParticipation.participation.comment_count); 
+if (NS_311.nodeSettings.participation_settings.comments_allowed && NS_311.layerSettings.participation_settings.comments_allowed) {
+    //console.log("Comments OK")
+    showComments(NS_311.nodeSlug,NS_311.nodeParticipation.participation.comment_count); 
 }
 
-//Comments       
-if (nodeSettings.participation_settings.rating_allowed && layerSettings.participation_settings.rating_allowed) {
-    console.log("Rating OK")
-    showRating(nodeSlug,nodeParticipation.participation.rating_avg,nodeParticipation.participation.rating_count); 
+//rating       
+if (NS_311.nodeSettings.participation_settings.rating_allowed && NS_311.layerSettings.participation_settings.rating_allowed) {
+    //console.log("Rating OK")
+    showRating(NS_311.nodeSlug,NS_311.nodeParticipation.participation.rating_avg,NS_311.nodeParticipation.participation.rating_count); 
 }
 })
 }
@@ -403,7 +370,7 @@ function showMainPage(requestID) {
 }
 
 function getParticipationData() {
-    window.nodeParticipation = getData(window.__BASEURL__ + 'nodes/' + nodeSlug + '/participation/');
+    NS_311.nodeParticipation = getData(NS_311.__BASEURL__ + 'nodes/' + NS_311.nodeSlug + '/participation/');
 }
 
 function showVotes(likes, dislikes) {
@@ -415,26 +382,26 @@ function showVotes(likes, dislikes) {
     $("#votesContainer").html('')
     $("#votesContainer").append(compiledTmpl);
     $("#likeButton").on("click", function () {
-        postVote(nodeId, 1);
+        postVote(NS_311.nodeId, 1);
     });
     $("#unlikeButton").on("click", function () {
-        postVote(nodeId, -1);
+        postVote(NS_311.nodeId, -1);
     });
 }
 
 function showComments(nodeSlug, comments_count) {
-    url = window.__BASEURL__ + 'nodes/' + nodeSlug + '/comments/?format=json';
+    url = NS_311.__BASEURL__ + 'nodes/' + nodeSlug + '/comments/?format=json';
     var comments = getData(url);
     var tmplMarkup = $('#tmplComments').html();
     var compiledTmpl = _.template(tmplMarkup, {
         comments: comments,
-        node: nodeId,
+        node: NS_311.nodeId,
         comments_count: comments_count
     });
     $("#commentsContainer").html('');
     $("#commentsContainer").append(compiledTmpl);
     $("#post_comments").on("click", function () {
-        postComment(nodeId);
+        postComment(NS_311.nodeId);
     });
 
 }
@@ -462,7 +429,7 @@ function postComment(nodeID) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: window.__BASEURL__ + 'open311/requests.json/',
+            url: NS_311.__BASEURL__ + 'open311/requests.json/',
             data: {
                 "service_code": "comment",
                     "node": nodeID,
@@ -472,7 +439,7 @@ function postComment(nodeID) {
             success: function (response) {
                 getParticipationData()
 
-                showComments(nodeSlug, nodeParticipation.participation.comment_count);
+                showComments(NS_311.nodeSlug, NS_311.nodeParticipation.participation.comment_count);
                 $("#comment_messages").html("Thanks for your comment");
 
             },
@@ -495,7 +462,7 @@ function postVote(nodeID, vote) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: window.__BASEURL__ + 'open311/requests.json/',
+            url: NS_311.__BASEURL__ + 'open311/requests.json/',
             data: {
                 "service_code": "vote",
                     "node": nodeID,
@@ -504,7 +471,7 @@ function postVote(nodeID, vote) {
             dataType: 'json',
             success: function (response) {
                 getParticipationData()
-                showVotes(nodeParticipation.participation.likes, nodeParticipation.participation.dislikes);
+                showVotes(NS_311.nodeParticipation.participation.likes, NS_311.nodeParticipation.participation.dislikes);
                 $("#vote_messages").html("Thanks for your vote");
             },
             error: function (jqXHR, error, errorThrown) {
@@ -524,7 +491,7 @@ function postRating(nodeID, rating) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: window.__BASEURL__ + 'open311/requests.json/',
+            url: NS_311.__BASEURL__ + 'open311/requests.json/',
             data: {
                 "service_code": "rate",
                     "node": nodeID,
@@ -533,7 +500,7 @@ function postRating(nodeID, rating) {
             dataType: 'json',
             success: function (response) {
                 getParticipationData()
-                showRating(nodeSlug, nodeParticipation.participation.rating_avg, nodeParticipation.participation.rating_count);
+                showRating(NS_311.nodeSlug, NS_311.nodeParticipation.participation.rating_avg, NS_311.nodeParticipation.participation.rating_count);
                 $("#rating_messages").html("Thanks for your rating");
             },
             error: function (jqXHR, error, errorThrown) {
@@ -554,8 +521,7 @@ function populateRating(nodeID, nodeDiv, nodeRatingAVG) {
         width: 250 ,
         path: $.myproject.STATIC_URL + 'open311/js/vendor/images',
         click: function (score) {
-            var nodeID = window.nodeId;
-            //console.log(nodeID)
+            var nodeID = NS_311.nodeId;
             postRating(nodeID, score);
         }
     });
@@ -567,7 +533,7 @@ function login() {
     var password = $("#password").val();
     $.ajax({
         type: "POST",
-        url: window.__BASEURL__ + "account/login/",
+        url: NS_311.__BASEURL__ + "account/login/",
         data: {
             "username": user,
                 "password": password
@@ -583,7 +549,7 @@ function login() {
 function logout() {
     $.ajax({
         type: "POST",
-        url: window.__BASEURL__ + "account/logout/",
+        url: NS_311.__BASEURL__ + "account/logout/",
         dataType: 'json',
         success: function (response) {
             showLogin();
