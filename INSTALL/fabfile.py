@@ -82,7 +82,7 @@ def update():
     initialize()
     pull()
     install_requirements()
-    sync_data()  
+    sync_data(update=True)  
     start_server()
     
 def clone():
@@ -181,11 +181,13 @@ def create_settings():
         run ('sed -i \'s#<domain>#%s#g\' local_settings_template.py ' % server_name)
         run ('mv local_settings_template.py local_settings.py')
         
-def sync_data():
+def sync_data(update=None):
     initialize()
     print(green("Initializing Nodeshot..."))
     virtual_env = 'source %s/python/bin/activate'  % project_dir
     sync_command = 'python manage.py syncdb --noinput && python manage.py migrate && python manage.py collectstatic --noinput'
+    if update is not None:
+        sync_command = 'python manage.py syncdb --noinput %s && python manage.py migrate && python manage.py collectstatic --noinput' % '--no-initial-data'
     with cd (project_dir):
         run('mkdir -p log'  )
         run('touch log/%s.error.log' % project_name )
