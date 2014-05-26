@@ -1,33 +1,47 @@
 [
   {
-    "pk": 1, 
-    "model": "cms.page", 
+    "pk": 1,
+    "model": "cms.page",
     "fields": {
-      "meta_description": "", 
-      "updated": "2013-08-02T11:37:47.339Z", 
-      "added": "2013-08-02T11:35:50.419Z", 
-      "title": "Terms of service", 
-      "content": "<p>Put here your terms of service.</p>", 
-      "access_level": 0, 
-      "meta_keywords": "", 
-      "meta_robots": "index, follow", 
-      "slug": "terms-of-service", 
+      "title": "Welcome",
+      "content": "<p>Put here your terms homepage text.</p>",
+      "access_level": 0,
+      "meta_keywords": "",
+      "meta_description": "",
+      "meta_robots": "index, follow",
+      "slug": "home",
       "is_published": true
     }
   },
   {
-    "pk": 2, 
-    "model": "cms.page", 
+    "pk": 2,
+    "model": "cms.page",
     "fields": {
-      "meta_description": "", 
-      "updated": "2013-08-02T11:38:17.341Z", 
-      "added": "2013-08-02T11:35:50.419Z", 
-      "title": "Privacy Policy", 
-      "content": "<p>Put here your privacy policy.</p>", 
-      "access_level": 0, 
-      "meta_keywords": "", 
-      "meta_robots": "index, follow", 
-      "slug": "privacy-policy", 
+      "meta_description": "",
+      "updated": "2013-08-02T11:37:47.339Z",
+      "added": "2013-08-02T11:35:50.419Z",
+      "title": "Terms of service",
+      "content": "<p>Put here your terms of service.</p>",
+      "access_level": 0,
+      "meta_keywords": "",
+      "meta_robots": "index, follow",
+      "slug": "terms-of-service",
+      "is_published": true
+    }
+  },
+  {
+    "pk": 3,
+    "model": "cms.page",
+    "fields": {
+      "meta_description": "",
+      "updated": "2013-08-02T11:38:17.341Z",
+      "added": "2013-08-02T11:35:50.419Z",
+      "title": "Privacy Policy",
+      "content": "<p>Put here your privacy policy.</p>",
+      "access_level": 0,
+      "meta_keywords": "",
+      "meta_robots": "index, follow",
+      "slug": "privacy-policy",
       "is_published": true
     }
   }
