@@ -59,7 +59,8 @@ Contents
 .. toctree::
    :maxdepth: 2
    
-   /topics/install
+   /topics/manual_install
+   /topics/automated_install
    /topics/admin
    /topics/api
    /topics/open311

@@ -1,5 +1,6 @@
+.. _manual-install-label:
 *******
-Install
+Manual Install
 *******
 
 .. warning::
