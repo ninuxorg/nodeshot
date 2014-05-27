@@ -94,6 +94,8 @@ class TestOldImporter(TestCase):
         self.assertEqual(nodes[0].elev, 24.5)
         # ensure layer has been picked correctly
         self.assertEqual(nodes[0].layer.slug, 'rome')
+        # ensure owner date_joined is correct
+        self.assertEqual(nodes[0].user.date_joined.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-14T13:30:29')
 
         # node2
         self.assertEqual(nodes[1].id, 2)
@@ -113,6 +115,8 @@ class TestOldImporter(TestCase):
         self.assertEqual(nodes[1].elev, 15.5)
         # ensure layer has been picked correctly
         self.assertEqual(nodes[1].layer.slug, 'rome')
+        # ensure owner date_joined is correct
+        self.assertEqual(nodes[1].user.date_joined.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-19T13:30:29')
 
         # node3
         self.assertEqual(nodes[2].id, 3)
@@ -131,6 +135,8 @@ class TestOldImporter(TestCase):
         self.assertEqual(nodes[2].elev, 10)
         # ensure layer has been picked correctly
         self.assertEqual(nodes[2].layer.slug, 'pisa')
+        # ensure owner date_joined is correct
+        self.assertEqual(nodes[2].user.date_joined.strftime('%Y-%m-%dT%H:%M:%S'), '2013-06-18T13:30:29')
 
         # ensure default layer
         self.assertEqual(nodes[3].layer.slug, 'default-layer')

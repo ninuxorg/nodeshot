@@ -395,6 +395,11 @@ choose (enter the number of) one of the following layers:
             user.email = email
             user.is_active = True
 
+            # extract date joined from old nodes
+            # find the oldest node of this user
+            oldest_node = OldNode.objects.filter(email=email).order_by('added')[0]
+            user.date_joined = oldest_node.added
+
             # be sure username is unique
             counter = 1
             original_username = username
