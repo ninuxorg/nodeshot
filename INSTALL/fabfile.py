@@ -12,10 +12,8 @@ git_repo = 'https://github.com/ninuxorg/nodeshot.git'
 
 
 def initialize():
-    install_dirs = ('root_dir','deploy_dir','project_dir')
-    for install_dir in install_dirs:
-        if install_dir not in globals():
-            initialize_dirs()
+    if 'root_dir' not in globals():
+        initialize_dirs()
 
 def initialize_server():
     if 'server_name' not in globals():
@@ -78,8 +76,17 @@ def install():
     start_server()
     warning_message()
 
-def update():
-    initialize()
+def update(**kwargs):
+    global root_dir
+    global deploy_dir
+    global project_dir
+    global project_name
+    global virtual_env
+    root_dir = kwargs.get('root_dir')
+    project_name = kwargs.get('project_name')
+    deploy_dir = '%snodeshot/' % root_dir
+    project_dir = '%sprojects/%s' % (deploy_dir,project_name)
+    virtual_env = 'source %s/python/bin/activate'  % project_dir
     pull()
     install_requirements()
     sync_data(update=True)  
@@ -91,9 +98,8 @@ def clone():
     with hide('stdout', 'stderr'):
         run('mkdir -p  %s' % root_dir)
         with cd (root_dir):
+            run ('rm -rf nodeshot')
             run('git clone %s nodeshot' % git_repo  )
-        #with cd (deploy_dir):
-        #    run ('git checkout deploy_test') # to be removed when merged into master
 
 def install_git():
     print(green("Installing Git..."))
