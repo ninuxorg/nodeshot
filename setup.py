@@ -2,6 +2,26 @@ from setuptools import setup, find_packages
 from nodeshot import get_version
 
 
+def get_install_requires():
+    """
+    parse requirements.txt, ignore links, exclude comments
+    """
+    requirements = []
+
+    for line in open('requirements.txt').readlines():
+        # skip to next iteration if comment or empty line
+        if line.startswith('#') or line == '':
+            continue
+
+        if line.startswith('http'):
+            continue
+
+        # add line to requirements
+        requirements.append(line)
+
+    return requirements
+
+
 setup(
     name='nodeshot',
     version=get_version(),
@@ -25,4 +45,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Framework :: Django',
     ],
+    install_requires=get_install_requires(),
 )

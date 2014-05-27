@@ -29,9 +29,6 @@ django-rest-swagger
 markdown
 djangorestframework-gis
 
-# email confirmation with configurable user model
--e git+https://github.com/nemesisdesign/django-email-confirmation.git#egg=email_confirmation
-
 # authentication with social networks
 django-social-auth
 
@@ -45,12 +42,22 @@ django-celery-email
 # Postgres HSTORE support
 django_hstore
 
-# fixture management
-# django-smuggler==0.4.1
--e git+https://github.com/semente/django-smuggler#egg=django-smuggler
-
 # migrations
 south
 
 # django-cors-headers
 django-cors-headers==0.12
+
+# websockets
+tornado
+
+# email confirmation with configurable user model
+https://github.com/nemesisdesign/django-email-confirmation/tarball/master#egg=emailconfirmation-0.1
+
+# fixture management
+https://github.com/semente/django-smuggler/tarball/master#egg=django_smuggler-0.4.1
+
+# networking
+netaddr
+https://github.com/jimfunk/django-postgresql-netfields/tarball/master#egg=django_netfields-0.2.1
+https://github.com/ninuxorg/netengine/tarball/master#egg=netengine

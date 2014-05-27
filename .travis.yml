@@ -14,7 +14,6 @@ branches:
 # command to install requirements
 install:
   - pip install -r requirements.txt --use-mirrors
-  - pip install -r requirements_networking.txt --use-mirrors
   - pip install coverage coveralls --use-mirrors
   - python setup.py install
 

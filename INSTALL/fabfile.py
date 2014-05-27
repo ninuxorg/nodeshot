@@ -19,7 +19,7 @@ def initialize_server():
     if 'server_name' not in globals():
         global server_name
         server_name = prompt('Server name: ')
-        
+
 def initialize_ssl():
     print(green("****************************************"))
     print(green("Please insert SSL certificate details..."))
@@ -27,7 +27,7 @@ def initialize_ssl():
     run ('mkdir -p /tmp/nodeshot_install')
     with cd('/tmp/nodeshot_install'):
         run ('openssl req -new -x509 -nodes -days 365 -out server.crt -keyout server.key')
-       
+
 def initialize_db():
     db_params = ('db_user','db_pass')
     for db_param in db_params:
@@ -36,8 +36,8 @@ def initialize_db():
             global db_pass
             db_user = prompt('Set database user: ', default='nodeshot')
             db_pass = prompt('Set database user password: ', )
-            
-def initialize_dirs():        
+
+def initialize_dirs():
     global root_dir
     global deploy_dir
     global project_dir
@@ -53,7 +53,7 @@ def uninstall():
     initialize()
     with cd(project_dir):
         run('cat dependencies.txt | xargs apt-get -y purge')
-    
+
 def install():
     initialize()
     initialize_server()
@@ -89,9 +89,9 @@ def update(**kwargs):
     virtual_env = 'source %s/python/bin/activate'  % project_dir
     pull()
     install_requirements()
-    sync_data(update=True)  
+    sync_data(update=True)
     start_server()
-    
+
 def clone():
     initialize()
     print(green("Cloning repository..."))
@@ -105,7 +105,7 @@ def install_git():
     print(green("Installing Git..."))
     with hide('stdout', 'stderr'):
         run('apt-get -y install git-core')
-        
+
 def install_dependencies():
     initialize()
     print(green("Installing required packages. This may take a while..."))
@@ -142,26 +142,24 @@ def create_virtual_env():
 def install_requirements():
     initialize()
     print(green("Installing requirements. This may take a while..."))
-    with hide( 'stdout', 'stderr'):        
+    with hide( 'stdout', 'stderr'):
         pip_command = 'python/bin/pip install -r %srequirements.txt' % deploy_dir
-        pip_command_networking = 'python/bin/pip install -r %srequirements_networking.txt' % deploy_dir
         pip_command_nodeshot = 'python/bin/pip install -U https://github.com/ninuxorg/nodeshot/tarball/master'
         distribute_command = 'python/bin/pip install -U distribute'
         with cd (project_dir):
             run( virtual_env + ' &&  ' + pip_command  + ' &&  ' + distribute_command)
-            run( virtual_env + ' &&  ' + pip_command_networking)
             run( virtual_env + ' &&  ' + pip_command_nodeshot)
 
 def create_project():
     initialize()
     print(green("Creating project..."))
-    
+
     template_name = "%sINSTALL/project_template" % deploy_dir
     create_project_command = "django-admin.py startproject %s --template=%s ." % (project_name,template_name)
     with hide( 'stdout', 'stderr'):
         with cd (project_dir):
             run( virtual_env + ' &&  ' + create_project_command  )
- 
+
 def create_db():
     initialize_db()
     print(green("Configuring DB..."))
@@ -186,7 +184,7 @@ def create_settings():
         run ('sed -i \'s#<password>#%s#g\' local_settings_template.py ' % db_pass)
         run ('sed -i \'s#<domain>#%s#g\' local_settings_template.py ' % server_name)
         run ('mv local_settings_template.py local_settings.py')
-        
+
 def sync_data(update=None):
     initialize()
     print(green("Initializing Nodeshot..."))
@@ -203,11 +201,11 @@ def sync_data(update=None):
 def create_admin():
     initialize()
     print(green("Creating Nodeshot admin account..."))
-    
+
     create_admin_command = 'python manage.py loaddata %sINSTALL/admin_fixture.json' % deploy_dir
     with cd (project_dir):
         run( virtual_env + ' &&  ' + create_admin_command)
-        
+
 def nginx_config():
     initialize()
     initialize_server()
@@ -221,7 +219,7 @@ def nginx_config():
 
     run('cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/')
     #run ('mkdir -p /var/www/nodeshot/public_html')
-    
+
     run ('cp %sINSTALL/nodeshot.yourdomain.com /etc/nginx/sites-available/nodeshot.yourdomain.com' % deploy_dir)
 
     with cd('/etc/nginx/sites-available'):
@@ -229,7 +227,7 @@ def nginx_config():
         run ('sed -i \'s#PROJECT_PATH#%s#g\' %s ' % (project_dir,server_name))
         run ('sed -i \'s#PROJECT_NAME#%s#g\' %s ' % (project_name,server_name))
         run ('ln -s /etc/nginx/sites-available/%s /etc/nginx/sites-enabled/%s' % (server_name,server_name))
-    
+
 def supervisor_config():
     initialize()
     print(green("Configuring Supervisor..."))
@@ -249,19 +247,19 @@ def supervisor_config():
             run ('sed -i \'s#PROJECT_PATH#%s#g\' celery-beat.conf ' % project_dir)
             run ('sed -i \'s#PROJECT_NAME#%s#g\' celery-beat.conf ' % project_name)
         run('supervisorctl update')
-    
+
 def redis_install():
     initialize()
     print(green("Installing redis..."))
     with hide( 'stdout', 'stderr'):
-        
+
         pip_command = 'python/bin/pip install -U celery[redis]'
         run('add-apt-repository -y ppa:chris-lea/redis-server')
         run('apt-get -y update')
         run('apt-get -y install redis-server')
         with cd (project_dir):
             run( virtual_env + ' &&  ' + pip_command)
-        
+
 def start_server():
     initialize()
     print(green("Starting Nodeshot server..."))
@@ -271,7 +269,7 @@ def start_server():
     print(green("Cleaning installation directory..."))
     run ('rm -rf /tmp/nodeshot_install')
     print(green("Installation completed"))
-    
+
 def warning_message():
     initialize_server()
     print(green("Cleaning installation directory..."))
@@ -281,8 +279,4 @@ def warning_message():
     print (green("                      WARNING:                     "))
     print (green(" Superuser is currently set as 'admin' with password 'admin'"))
     print (green(" Logon on %s/admin and change it " % server_name))
-    print (green("############################################################"))    
-    
-
-
-    
+    print (green("############################################################"))
