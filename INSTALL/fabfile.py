@@ -99,7 +99,7 @@ def clone():
         run('mkdir -p  %s' % root_dir)
         with cd (root_dir):
             run ('rm -rf nodeshot')
-            run('git clone %s nodeshot' % git_repo  )
+            run('git clone %s nodeshot --depth=0' % git_repo  )
 
 def install_git():
     print(green("Installing Git..."))

@@ -105,7 +105,7 @@ Clone git repository and cd into the example project.
 
 *TODO: best to install via pip when the project is at a more mature stage*::
 
-	git clone https://github.com/ninuxorg/nodeshot.git nodeshot
+	git clone https://github.com/ninuxorg/nodeshot.git nodeshot --depth=0
 	cd nodeshot/projects/ninux
 
 Create a **python virtual environment**, a self-contained python installation
