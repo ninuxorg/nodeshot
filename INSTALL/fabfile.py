@@ -68,7 +68,7 @@ def install():
     create_project()
     create_db()
     create_settings()
-    sync_data() # Fails if settings are not correctly set
+    sync_data()  # Fails if settings are not correctly set
     create_admin()
     nginx_config()
     supervisor_config()
@@ -82,8 +82,12 @@ def update(**kwargs):
     global project_dir
     global project_name
     global virtual_env
-    root_dir = kwargs.get('root_dir')
+    root_dir = kwargs.get('root_dir', '/var/www/')  # defaults to /var/www/
     project_name = kwargs.get('project_name')
+    # if no parameter supplied
+    if project_name is None:
+        # ask
+        initialize_dirs()
     deploy_dir = '%snodeshot/' % root_dir
     project_dir = '%sprojects/%s' % (deploy_dir,project_name)
     virtual_env = 'source %s/python/bin/activate'  % project_dir
@@ -219,7 +223,6 @@ def nginx_config():
         run ('cp /tmp/nodeshot_install/server.key .')
 
     run('cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/')
-    #run ('mkdir -p /var/www/nodeshot/public_html')
 
     run ('cp %sINSTALL/nodeshot.yourdomain.com /etc/nginx/sites-available/nodeshot.yourdomain.com' % deploy_dir)
 
