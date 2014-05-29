@@ -124,7 +124,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = '{{ project_name }}.urls' # 
+ROOT_URLCONF = '{{ project_name }}.urls' #
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
@@ -203,7 +203,7 @@ INSTALLED_APPS = [
     # 'debug_toolbar',
     'smuggler',
     'reversion',
-    
+
     # django-cors-headers
     'corsheaders',
 
@@ -592,12 +592,12 @@ if 'social_auth' in INSTALLED_APPS:
         'nodeshot.community.profiles.backends.EmailBackend',
         'social_auth.backends.facebook.FacebookBackend',
         'social_auth.backends.google.GoogleBackend',
-        'social_auth.backends.contrib.github.GithubBackend',
+        'nodeshot.community.profiles.social_auth_extra.github.GithubBackend',
     )
 
     SOCIAL_AUTH_PIPELINE = (
         'social_auth.backends.pipeline.social.social_auth_user',
-        #'social_auth.backends.pipeline.associate.associate_by_email',
+        'social_auth.backends.pipeline.associate.associate_by_email',
         'social_auth.backends.pipeline.user.get_username',
         'social_auth.backends.pipeline.user.create_user',
         'social_auth.backends.pipeline.social.associate_user',
