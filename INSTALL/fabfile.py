@@ -196,7 +196,7 @@ def sync_data(update=None):
     virtual_env = 'source %s/python/bin/activate'  % project_dir
     sync_command = 'python manage.py syncdb --noinput && python manage.py migrate && python manage.py collectstatic --noinput'
     if update is not None:
-        sync_command = 'python manage.py syncdb --noinput %s && python manage.py migrate && python manage.py collectstatic --noinput' % '--no-initial-data'
+        sync_command = 'python manage.py syncdb --no-initial-data && python manage.py migrate --no-initial-data && python manage.py collectstatic --noinput'
     with cd (project_dir):
         run('mkdir -p log'  )
         run('touch log/%s.error.log' % project_name )
