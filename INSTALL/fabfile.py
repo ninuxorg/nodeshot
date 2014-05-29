@@ -170,7 +170,8 @@ def create_db():
         run ('su - postgres -c "psql nodeshot -c \'CREATE EXTENSION postgis_topology;\'"')
         run ('su - postgres -c "createuser %s  -R -S -D "'  % db_user)
         run ('sudo -u postgres psql -U postgres -d postgres -c \"alter user %s with password \'%s\';\"' % (db_user,db_pass))
-        run ('su - postgres -c "psql -c \'GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to %s \'"' % db_user)
+        run ('su - postgres -c "psql -c \'GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to %s;\'"' % db_user)
+        run ('su - postgres -c "psql -c \'GRANT ALL PRIVILEGES ON TABLE spatial_ref_sys TO %s;\'"' % db_user)
 
 def create_settings():
     initialize()
