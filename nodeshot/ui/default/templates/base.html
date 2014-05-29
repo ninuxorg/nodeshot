@@ -133,7 +133,7 @@
                     <span class="hover">&nbsp;</span>
                 </a>
 
-                <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
+                <a href="{% url "socialauth_begin" "google-oauth2" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
                     <span class="text">{% trans 'Sign up with Google' %}</span>
                     <span class="hover">&nbsp;</span>
@@ -201,7 +201,7 @@
                     <span class="hover">&nbsp;</span>
                 </a>
 
-                <a href="{% url "socialauth_begin" "google" %}" class="btn btn-social btn-google">
+                <a href="{% url "socialauth_begin" "google-oauth2" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
                     <span class="text">{% trans 'Sign in with Google' %}</span>
                     <span class="hover">&nbsp;</span>
@@ -266,18 +266,18 @@
             </div>
         </div>
     </script>
-    
+
     <script id="search-template" type="text/template">
         <input type="text" id="general-search-input" placeholder="{% trans 'Search for data' %}">
         <span class="icon-search">&nbsp;</span>
         <span class="icon-spinner animate-spin"></span>
         <ul class="dropdown-menu" id="js-search-results"></ul>
     </script>
-    
+
     <script id="search-result-template" type="text/template">
         <a href="#/nodes/<%= slug %>" class="icon-pin"><%= name %></a>
     </script>
-    
+
     <script id="search-empty-template" type="text/template">
         <a class="empty" href="#">{% trans 'nothing found' %}</a>
     </script>
@@ -368,11 +368,11 @@
     <script id="node-details-template" type="text/template">
         {% include 'includes/node-details.html' %}
     </script>
-    
+
     <script id="node-list-template" type="text/template">
         {% include 'includes/node-list.html' %}
     </script>
-    
+
     <script id="node-list-row-template" type="text/template">
         <td class="name-column">
             <a href="#/nodes/<%= slug %>">
@@ -395,7 +395,7 @@
         <td><%= _.formatDateTime(added) %></td>
         <td><%= _.formatDateTime(updated) %></td>
     </script>
-    
+
     <script id="node-list-empty-template" type="text/template">
         <td colspan="100%" class="empty">{% trans 'nothing found' %}</td>
     </script>
@@ -411,7 +411,7 @@
             <a class="icon-close hastip" title="{% trans 'cancel&nbsp;operation' %}"></a>
         </div>
     </script>
-    
+
     <script id="status-css-template" type="text/template">
         <style>
         <% _.each(Nodeshot.statuses, function(status, key){ %>
@@ -443,7 +443,7 @@
     <script>
         var Nodeshot = new Backbone.Marionette.Application();
         Nodeshot.TILESERVER_URL = '{{ TILESERVER_URL }}';
-        
+
         {% if request.user.is_authenticated %}
             Nodeshot.currentUser = new User({
                 username: '{{ request.user.username }}',
@@ -495,7 +495,7 @@
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/user-details.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>
-    
+
     {% if WEBSOCKETS %}
     <script>
         __websockets__ = {

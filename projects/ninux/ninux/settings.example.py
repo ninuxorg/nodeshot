@@ -610,7 +610,7 @@ if 'social_auth' in INSTALLED_APPS:
         'django.contrib.auth.backends.ModelBackend',
         'nodeshot.community.profiles.backends.EmailBackend',
         'social_auth.backends.facebook.FacebookBackend',
-        'social_auth.backends.google.GoogleBackend',
+        'social_auth.backends.google.GoogleOAuth2Backend',
         'nodeshot.community.profiles.social_auth_extra.github.GithubBackend',
     )
 
@@ -630,6 +630,9 @@ if 'social_auth' in INSTALLED_APPS:
     FACEBOOK_APP_ID = ''  # put your app id
     FACEBOOK_API_SECRET = ''
     FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+
+    GOOGLE_OAUTH2_CLIENT_ID = ''
+    GOOGLE_OAUTH2_CLIENT_SECRET = ''
 
     # register a new app:
     GITHUB_APP_ID = ''
