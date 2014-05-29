@@ -51,6 +51,9 @@ django-cors-headers==0.12
 # websockets
 tornado
 
+# cache
+django-redis
+
 # email confirmation with configurable user model
 https://github.com/nemesisdesign/django-email-confirmation/tarball/master#egg=emailconfirmation-0.1
 

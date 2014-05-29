@@ -285,13 +285,16 @@ LOGGING = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'TIMEOUT': 172800 if not DEBUG else 300,
+        'BACKEND': 'redis_cache.cache.RedisCache',
+        'LOCATION': '127.0.0.1:6379:1',
         'OPTIONS': {
-            'MAX_ENTRIES': 1000
+            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
         }
     }
 }
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
 
 # ------ EMAIL SETTINGS ------ #
 

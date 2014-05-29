@@ -21,4 +21,9 @@ from django.core.cache import cache
 @receiver(post_save, sender=Status)
 @receiver(pre_delete, sender=Status)
 def clear_cache(sender, **kwargs):
-    cache.clear()
+    # clear only cached pages if supported
+    if hasattr(cache, 'delete_pattern'):
+        cache.delete_pattern('views.decorators.cache.cache*')
+    # otherwise clear the entire cache
+    else:
+        cache.clear()
