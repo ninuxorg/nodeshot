@@ -17,29 +17,14 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
     initialize: function(){
         // listen to notifications collection
         this.listenTo(Nodeshot.notifications, 'sync', this.setNotificationsCount);
-        
+
         // setNotificationsPosition on resize
         $(window).on("resize.account", _.bind(this.setNotificationsPosition, this));
     },
-    
+
     onRender: function(){
-        this.truncateUsername();
         this.staySignedInCheck();
         this.setNotificationsCount();
-    },
-
-    /*
-     * truncate long usernames
-     */
-    truncateUsername: function () {
-        var username = this.model.get('username');
-
-        if (typeof (username) !== 'undefined' && username.length > 15) {
-            // add an ellipsis if username is too long
-            var truncated = username.substr(0, 13) + "&hellip;";
-            // update model
-            this.model.set('username', truncated);
-        }
     },
 
     /*
@@ -93,7 +78,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
             notifications.fadeOut(150);
         }
     },
-    
+
     /*
      * positions the notification panel correclty
      */
@@ -105,17 +90,17 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
             var left = button.offset().left,
                 button_width = button.outerWidth(),
                 notifications_width = panel.getHiddenDimensions().width;
-            
+
             panel.css('left', left - notifications_width / 2 + button_width / 2);
         }
     },
-    
+
     /*
      * write notification count and show if greater than 0
      */
     setNotificationsCount: function(e){
         var count = Nodeshot.notifications.getUnreadCount();
-        
+
         if(count > 0){
             $('#js-notifications-count').html(count).show();
         }

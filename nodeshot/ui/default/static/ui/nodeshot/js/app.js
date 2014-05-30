@@ -9,19 +9,19 @@ Nodeshot.addInitializer(function () {
 
 // init layout
 Nodeshot.addInitializer(function () {
-    
+
     Nodeshot.notifications = new NotificationCollection();
     Nodeshot.notificationView = new NotificationCollectionView({
         collection: Nodeshot.notifications
     }).render();
-    
+
     Nodeshot.accountMenu = new AccountMenuView({
         model: Nodeshot.currentUser
     });
     Nodeshot.accountMenu.render();
-    
+
     Nodeshot.generalSearch = new SearchView();
-    
+
     Nodeshot.onNodeClose = '#/map';
 });
 
@@ -80,7 +80,7 @@ var NodeshotController = {
             link.trigger('click');
         }
     },
-    
+
     // node list
     getNodeList: function() {
         new NodeCollection().fetch({
@@ -117,17 +117,29 @@ var NodeshotController = {
         }
         Nodeshot.nodesNamed[slug].openPopup();
     },
-    
+
     // user profile view
     getUser: function (username) {
         var user = new User({ username: username });
-        
+
         user.fetch()
         .done(function(){
             Nodeshot.body.close();
             Nodeshot.body.show(new UserDetailsView({
                 model: user
             }));
+        })
+        .error(function(http){
+            // TODO: D.R.Y.
+            if (http.status === 404) {
+                createModal({
+                    message: 'the requested page was not found'
+                });
+            } else {
+                createModal({
+                    message: 'there was an error while retrieving the page'
+                });
+            }
         });
     }
 }
@@ -243,7 +255,7 @@ $(document).ready(function ($) {
     if(Nodeshot.currentUser.isAuthenticated()){
         Nodeshot.currentUser.fetch();
     }
-    
+
     // create status CSS classes
     css = _.template($('#status-css-template').html(), {});
     $('head').append(css);

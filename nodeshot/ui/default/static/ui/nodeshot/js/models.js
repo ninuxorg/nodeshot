@@ -25,7 +25,7 @@ var Node = Backbone.Model.extend({
 var NodeCollection = Backbone.PageableCollection.extend({
     model: Node,
     url: '/api/v1/nodes/',
-    
+
     // Any `state` or `queryParam` you override in a subclass will be merged with
     // the defaults in `Backbone.PageableCollection` 's prototype.
     state: {
@@ -33,28 +33,28 @@ var NodeCollection = Backbone.PageableCollection.extend({
         firstPage: 1,
         currentPage: 1
     },
-    
+
     queryParams: {
         currentPage: "page",
         pageSize: "limit",
         totalRecords: "count"
     },
-    
+
     hasNextPage: function(){
         return this.next !== null;
     },
-    
+
     hasPreviousPage: function(){
         return this.previous !== null;
     },
-    
+
     getNumberOfPages: function(){
         var total = this.count,
             size = this.state.pageSize;
-        
+
         return Math.ceil(total / size)
     },
-    
+
     search: function(q){
         this.searchTerm = q;
         return this.getPage(1, {
@@ -62,7 +62,7 @@ var NodeCollection = Backbone.PageableCollection.extend({
             processData: true
         });
     },
-    
+
     // needed to use pagination results as the collection
     parse: function(response) {
         this.count = response.count;
@@ -70,7 +70,7 @@ var NodeCollection = Backbone.PageableCollection.extend({
         this.previous = response.previous;
         return response.results;
     },
-    
+
     initialize: function(){
         this.searchTerm = '';
     }
@@ -82,6 +82,25 @@ var User = Backbone.Model.extend({
 
     defaults: {
         "avatar": "http://www.gravatar.com/avatar/default"
+    },
+
+    initialize: function(){
+        this.setTruncatedUsername();
+    },
+
+    /*
+     * truncate long usernames
+     */
+    setTruncatedUsername: function () {
+        var username = this.get('username');
+
+        if (typeof (username) !== 'undefined' && username.length > 15) {
+            // add an ellipsis if username is too long
+            username = username.substr(0, 13) + "&hellip;";
+        }
+
+        // update model
+        this.set('truncatedUsername', username);
     },
 
     isAuthenticated: function(){
@@ -96,11 +115,11 @@ var User = Backbone.Model.extend({
 
 var Notification = Backbone.Model.extend({
     urlRoot: '/api/v1/account/notifications/',
-    
+
     initialize: function(){
         this.setIcon();
     },
-    
+
     /*
      * use type attribute to differentiate icons
      */
@@ -118,12 +137,12 @@ var Notification = Backbone.Model.extend({
 var NotificationCollection = Backbone.Collection.extend({
     model: Notification,
     url: '/api/v1/account/notifications/?action=all&limit=15',
-    
+
     // needed to use pagination results as the collection
     parse: function(response) {
         return response.results;
     },
-    
+
     /*
      * get number of unread notifications
      */
@@ -136,7 +155,7 @@ var NotificationCollection = Backbone.Collection.extend({
         });
         return count;
     },
-    
+
     /*
      * mark notifications as read
      */
