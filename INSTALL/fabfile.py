@@ -146,13 +146,13 @@ def create_virtual_env():
 def install_requirements():
     initialize()
     print(green("Installing requirements. This may take a while..."))
-    with hide( 'stdout', 'stderr'):
+    with hide('stdout', 'stderr'):
         pip_command = 'python/bin/pip install -r %srequirements.txt' % deploy_dir
         pip_command_nodeshot = 'python/bin/pip install -U https://github.com/ninuxorg/nodeshot/tarball/master'
-        distribute_command = 'python/bin/pip install -U distribute'
         with cd (project_dir):
-            run( virtual_env + ' &&  ' + pip_command  + ' &&  ' + distribute_command)
-            run( virtual_env + ' &&  ' + pip_command_nodeshot)
+            run('python/bin/pip install -U distribute pip')
+            run( virtual_env + ' && ' + pip_command)
+            run( virtual_env + ' && ' + pip_command_nodeshot)
 
 def create_project():
     initialize()
