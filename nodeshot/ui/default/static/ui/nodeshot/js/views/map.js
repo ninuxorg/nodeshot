@@ -143,8 +143,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
             )
 
             lat = Math.degrees(cartesian.latitude),
-                lng = Math.degrees(cartesian.longitude),
-                zoom = 9
+            lng = Math.degrees(cartesian.longitude),
+            zoom = 9;
         }
 
         return {
@@ -170,9 +170,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
      */
     rememberCoordinates: function () {
         return {
-            lat: Nodeshot.preferences.mapLat || 42.12,
-            lng: Nodeshot.preferences.mapLng || 12.45,
-            zoom: Nodeshot.preferences.mapZoom || 9
+            lat: Nodeshot.preferences.mapLat || Nodeshot.MAP_CENTER[0],
+            lng: Nodeshot.preferences.mapLng || Nodeshot.MAP_CENTER[1],
+            zoom: Nodeshot.preferences.mapZoom || Nodeshot.MAP_ZOOM
         }
     },
 

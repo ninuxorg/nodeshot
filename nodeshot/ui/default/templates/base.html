@@ -443,6 +443,8 @@
     <script>
         var Nodeshot = new Backbone.Marionette.Application();
         Nodeshot.TILESERVER_URL = '{{ TILESERVER_URL }}';
+        Nodeshot.MAP_ZOOM = {{ MAP_ZOOM }};
+        Nodeshot.MAP_CENTER = {{ MAP_CENTER }};
 
         {% if request.user.is_authenticated %}
             Nodeshot.currentUser = new User({

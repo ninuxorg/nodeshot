@@ -394,8 +394,9 @@ NODESHOT = {
         'PROFILE_EMAIL_CONFIRMATION': True,
         'PROFILE_REQUIRED_FIELDS': ['email'],
 
-        'ADMIN_MAP_COORDS': [41.8934, 12.4960],  # lat, lng
-        'ADMIN_MAP_ZOOM': 1,  # default zoom in the admin
+        'ADMIN_MAP_COORDS': [54.36775, 25.62011],  # lat, lng
+        'ADMIN_MAP_ZOOM': 4,
+        'FRONTEND_MAP_ZOOM': 4,
 
         'REVERSION_LAYERS': True,  # activate django reversion for layers.Layer model
         'REVERSION_NODES': True,  # activate django reversion for nodes.Node model
