@@ -82,6 +82,14 @@ var MapView = Backbone.Marionette.ItemView.extend({
         $('.selectpicker').selectpicker({
             style: 'btn-special'
         });
+
+        // if only 1 layer available
+        // preselect it in the add node form
+        var layer_options = $('#id_layer option[value]');
+        if(layer_options.length === 1){
+            var value = layer_options.eq(0).val();
+            $('#id_layer').selectpicker('val', value)
+        }
     },
 
     onClose: function (e) {
