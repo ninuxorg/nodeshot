@@ -26,9 +26,11 @@ MAP_ZOOM = settings.NODESHOT['SETTINGS'].get('FRONTEND_MAP_ZOOM', 4)
 # improve spaghetti code
 def index(request):
     layers = Layer.objects.published()
+    layers_allowing_new_nodes = layers.filter(new_nodes_allowed=True)
 
     context = {
         'layers': layers,
+        'layers_allowing_new_nodes': layers_allowing_new_nodes,
         'WEBSOCKETS': WEBSOCKETS,
         'TILESERVER_URL': TILESERVER_URL,
         'MAP_CENTER': MAP_CENTER,

@@ -4,7 +4,7 @@ from nodeshot.core.base.tests import BaseTestCase, user_fixtures
 
 
 class DefaultUiTest(BaseTestCase):
-    
+
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -17,4 +17,3 @@ class DefaultUiTest(BaseTestCase):
     def test_index(self):
         response = self.client.get(reverse('ui:index'))
         self.assertEqual(response.status_code, 200)
-    

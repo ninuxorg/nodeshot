@@ -13,7 +13,7 @@
 
 <div id="map">
     <div id="map-js"></div>
-    
+
     <div id="map-legend" class="overlay inverse">
         <h5>Legend</h5>
         <ul>
@@ -29,7 +29,7 @@
         </ul>
         <a class="icon-close" href="#"></a>
     </div>
-    
+
     <div id="fn-search-address" class="side-panel">
         <form action="">
             <div class="input-group">
@@ -40,7 +40,7 @@
             </div><!-- /input-group -->
         </form>
     </div>
-    
+
     <div id="fn-map-layers" class="side-panel adjust-height">
         <div class="panel-inner scroller">
             <h2>{% trans 'Control map data' %}</h2>
@@ -57,7 +57,7 @@
             <% }); %>
         </div>
     </div>
-    
+
     <div id="fn-map-tools" class="side-panel">
         <p>
             <button href="#" class="icon-ruler tool hastip"
@@ -72,93 +72,93 @@
                     data-toggle="tooltip" title="drop placeholder" data-placement="bottom" data-delay="600"></button>
         </p>
     </div>
-    
+
     <div id="fn-map-preferences" class="side-panel adjust-height">
         <div class="panel-inner scroller">
             <h2>map preferences</h2>
-            
+
             <p>
                 <label for="switch1" class="inline">Cool setting 1</label>
                 <input type="checkbox" checked class="switch" id="switch1">
             </p>
-            
+
             <p>
                 <label for="switch2" class="inline">Cool setting 2</label>
                 <input type="checkbox" checked class="switch" id="switch2">
             </p>
-            
+
             <p>
                 <label for="switch3" class="inline">Advanced thing</label>
                 <input type="checkbox" class="switch" id="switch3">
             </p>
-            
+
             <div class="line"></div>
-            
+
             <p>Setting chooser</p>
-            
+
             <select class="selectpicker">
                 <option>Option 1</option>
                 <option>Option 2</option>
                 <option>Option 3</option>
             </select>
-            
+
             <p>Slider</p>
-            
+
             <p>
                 <span class="slider">
                     <input type = "range" min="0" max="100" onchange="rangevalue.value=value"/>
                     <output id="rangevalue">50</output>
                 </span>
             </p>
-            
+
             <div class="line"></div>
-            
+
             <p>
                 <label for="switch4" class="inline">Moaar stuff</label>
                 <input type="checkbox" checked class="switch" id="switch4">
             </p>
-            
+
             <p>
                 <label for="switch5" class="inline">Too advanced</label>
                 <input type="checkbox"  class="switch" id="switch5">
             </p>
-            
+
             <p>
                 <label for="switch6" class="inline">Turn me on</label>
                 <input type="checkbox" class="switch" id="switch6">
             </p>
-            
+
             <div class="line"></div>
-            
+
             <p>Is getting very long!</p>
-            
+
             <select class="selectpicker">
                 <option>Scroll me down</option>
                 <option>Option 1</option>
                 <option>Option 2</option>
                 <option>Option 3</option>
             </select>
-            
+
             <div class="line"></div>
-            
+
             <p>
                 <label for="switch5" class="inline">Not advanced</label>
                 <input type="checkbox" checked class="switch" id="switch5">
             </p>
-            
+
             <p>
                 <label for="switch6" class="inline">Turn me off</label>
                 <input type="checkbox" checked class="switch" id="switch6">
             </p>
         </div>
     </div>
-    
+
     <div id="add-node-step1" tabindex="-1" role="dialog" aria-labelledby="add-node-step1-label" aria-hidden="true"
         class="modal-dialog modal-content modal-body modal-x-slim autocenter bottom">
         <span class="message">{% trans 'Click on the map to indicate the location' %}</span>
         <button type="button" class="btn btn-default">{% trans 'cancel' %}</button>
     </div>
-    
+
     <div id="add-node-step2" tabindex="-1" role="dialog" aria-labelledby="add-node-step2-label" aria-hidden="true"
         class="modal-dialog modal-content modal-body modal-x-slim autocenter bottom">
         <span class="message">{% trans 'Drag to adjust' %}</span>
@@ -170,57 +170,57 @@
 <article id="add-node-container" class="map-overlay animate-width content" style="">
     <h1>{% trans 'Add new node' %}</h1>
     <form action="{% url 'api_node_list' %}" id="add-node-form">
-        
+
         <ul class="error-list"></ul>
-        
+
         <p>
             <label for="id_name">{% trans 'Name' %}</label>
             <span class="error-msg"></span>
             <input name="name" type="text" class="form-control input-sm" placeholder="{% trans 'Enter name (required)' %}" id="id_name">
         </p>
-        
+
         <div>
             <label>Layer</label>
             <span class="error-msg"></span>
-            
+
             <select name="layer" id="id_layer" class="selectpicker" data-live-search="true">
                 <option>{% trans 'Select Layer' %}</option>
-                {% for layer in layers %}
+                {% for layer in layers_allowing_new_nodes %}
                 <option value="{{ layer.slug }}">{{ layer.name }}</option>
                 {% endfor %}
             </select>
         </div>
-        
+
         <p>
             <label for="id_address">{% trans 'Address' %}</label>
             <span class="error-msg"></span>
             <input name="address" type="text" class="form-control input-sm" placeholder="{% trans 'Enter address (optional)' %}" id="id_address">
         </p>
-        
+
         <p>
             <label for="id_elevation">{% trans 'Elevation' %}</label>
             <span class="error-msg"></span>
             <input name="elevation" type="text" class="form-control input-sm" placeholder="{% trans 'Enter elevation (optional)' %}" id="id_elevation">
         </p>
-        
+
         <p>
             <label for="id_description">{% trans 'Description' %}</label>
             <span class="error-msg"></span>
             <textarea name="description" class="form-control input-sm" rows="6" id="id_description" placeholder="{% trans 'Enter description (optional)' %}"></textarea>
         </p>
-        
+
         <p>
             <label for="id_data">{% trans 'Extra data' %}</label>
             <span class="error-msg"></span>
             <textarea name="description" class="form-control input-sm" rows="6" id="id_data" placeholder="{% trans 'Enter extra data (optional)' %}"></textarea>
         </p>
-        
+
         <p>
             <button type="submit" class="btn btn-success">{% trans 'Add node' %}</button>
             &nbsp;
             <button type="button" class="btn btn-default">{% trans 'Cancel' %}</button>
         </p>
-        
+
         <input type="hidden" id="id_geometry" name="geometry">
     </form>
 </article>
