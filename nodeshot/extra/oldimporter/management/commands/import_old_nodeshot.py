@@ -141,7 +141,7 @@ class Command(BaseCommand):
             # blank line
             self.stdout.write('\r\n')
             # store verbosity level in instance attribute for later use
-            self.verbosity = int(options.get('verbosity'))
+            self.verbosity = int(self.options.get('verbosity'))
 
             self.verbose('disabling signals (notififcations, websocket alerts)')
             pause_disconnectable_signals()
@@ -197,7 +197,7 @@ class Command(BaseCommand):
             self.message('Operation completed!')
 
     def delete_imported_data(self):
-        if options.get('nodelete') is True:
+        if self.options.get('nodelete') is True:
             self.message('--nodelete option specified, won\'t delete the imported data')
             return
 
@@ -277,7 +277,7 @@ choose (enter the number of) one of the following layers:
         sys.stdout.write(question + prompt)
 
         while True:
-            if options.get('noinput') is True:
+            if self.options.get('noinput') is True:
                 answer = 'default'
                 break
 
@@ -382,11 +382,15 @@ choose (enter the number of) one of the following layers:
             # check if user exists first
             try:
                 user = User.objects.get(username=username)
-            # otherwise init new
             except User.DoesNotExist:
-                user = User()
-                # generate new password only for new users
-                user.password = self.generate_random_password()
+                try:
+                    # try looking by email
+                    user = User.objects.get(email=email)
+                except User.DoesNotExist:
+                    # otherwise init new
+                    user = User()
+                    # generate new password only for new users
+                    user.password = self.generate_random_password()
 
             # we'll create one user for each unique email address we've got
             user.username = username

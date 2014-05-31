@@ -309,3 +309,32 @@ class TestOldImporter(TestCase):
         self.assertEqual(link.dbm, -75)
 
         self.assertEqual(inwards[1].from_name, 'Added')
+        
+        # ------ try to cause troubles ------ #
+        
+        ot = OldNode(**{
+            "name": "troublingnode",
+            "slug": "troublingnode",
+            "owner": "troublemaker",
+            "description": "troublingnode-description",
+            "postal_code": "00185",
+            "email": "troublemaker@test.com",
+            "password": "",
+            "lat": 42.4064152946931969,
+            "lng": 13.7390629470348003,
+            "alt": 23.5,
+            "status": "a"
+        })
+        ot.save()
+        
+        troublemaker = User(**{
+            "first_name": "Trouble",
+            "last_name": "Maker",
+            "username": "icausetroubles",
+            "email": "troublemaker@test.com"
+        })
+        troublemaker.save()
+        
+        management.call_command('import_old_nodeshot', noinput=True, verbosity=2)
+        
+        self.assertEqual(Node.objects.filter(name='troublingnode').count(), 1)
