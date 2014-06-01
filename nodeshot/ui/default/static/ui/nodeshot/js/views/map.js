@@ -517,17 +517,41 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
     /*
      * hide or show markers from map
+     * TODO: this is cumbersome and needs semplification
      */
     toggleMarkers: function (action, status) {
         // local vars / shortcuts
         var functionName,
-            markers = Nodeshot.statuses[status].cluster;
-
-        // determine action (show or hide)
-        functionName = action === 'show' ? 'addLayer' : 'removeLayer';
-
-        // show or hide from map
-        this.map[functionName](markers);
+            cluster = Nodeshot.statuses[status].cluster,
+            markers = Nodeshot.statuses[status].nodes,
+            visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
+        
+        // mark each marker visibility
+        _.forEach(markers, function(marker){
+            marker.visible = action === 'show';
+        });
+        
+        if(action === 'show'){
+            // add layer to map
+            this.map.addLayer(cluster);
+            // show
+            this.showVisibleClusters();
+            // remember choice
+            if(visibleStatuses.indexOf(status) < 0){
+                visibleStatuses.push(status);
+            }
+        }
+        else if(action === 'hide'){
+            this.map.removeLayer(cluster);
+            // remember choice
+            var index = visibleStatuses.indexOf(status);
+            if(index > -1){
+                visibleStatuses.splice(index, 1);
+            }
+        }
+        
+        // remember choice
+        Nodeshot.preferences.visibleStatuses = visibleStatuses;
     },
 
     /*
@@ -641,10 +665,14 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // store mapMode
         preferences.mapMode = mode;
+        
+        // store visible statuses
+        preferences.visibleStatuses = preferences.visibleStatuses || _.keys(Nodeshot.statuses)
 
         // load data
         this.loadMapData();
         this.clusterizeMarkers();
+        this.rememberVisibleStatuses();
     },
 
     /*
@@ -697,7 +725,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // loop over each layer
         for (var i = 0; i < Nodeshot.layers.length; i++) {
-            var layer = Nodeshot.layers[i];
+            var layer = Nodeshot.layers[i],
+                visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
 
             var leafletLayer = L.geoJson(layer.nodes_geojson, {
                 style: function (feature) {
@@ -717,9 +746,14 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 },
                 pointToLayer: function (feature, latlng) {
                     var marker = L.circleMarker(latlng, options);
-
-                    // TODO: remember with localStorage
-                    marker.visible = true;
+                    
+                    // marks as visible or not depending on preferences
+                    if(visibleStatuses.indexOf(feature.properties.status) >= 0){
+                        marker.visible = true;
+                    }
+                    else{
+                        marker.visible = false;
+                    }
 
                     marker.on('click', function (e) {
                         Backbone.history.navigate('#/map/' + feature.id);
@@ -744,14 +778,14 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
             // TODO: this is ugly!
             $('head').append("\
-				<style type='text/css'>\
-				.marker-" + key + " {\
-					background-color:" + status.fill_color + ";\
-					color:" + status.text_color + ";\
-					border: " + status.stroke_width + "px solid " + status.stroke_color + ";\
-				}\
-				</style>\
-			");
+                <style type='text/css'>\
+                .marker-" + key + " {\
+                    background-color:" + status.fill_color + ";\
+                    color:" + status.text_color + ";\
+                    border: " + status.stroke_width + "px solid " + status.stroke_color + ";\
+                }\
+                </style>\
+            ");
 
             // group markers in clusters
             var group = new L.MarkerClusterGroup({
@@ -771,7 +805,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                     fillColor: status.fill_color,
                     stroke: status.stroke_width > 0,
                     weight: status.stroke_width,
-                    color: status.stroke_color,
+                    color: status.stroke_color
                 },
                 chunkedLoading: true,
                 showCoverageOnHover: true,
@@ -903,5 +937,21 @@ var MapView = Backbone.Marionette.ItemView.extend({
         if (typeof (this.addressFoundMarker) != "undefined") {
             this.map.removeLayer(this.addressFoundMarker)
         }
+    },
+    
+    /*
+     * remember hide/show nodes based on status choices
+     */
+    rememberVisibleStatuses: function(){
+        var visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
+        
+        // find out which statuses have to be disabled in the legend
+        // use underscore array difference
+        toDisable = _.difference(_.keys(Nodeshot.statuses), visibleStatuses)
+        
+        // add disabled class
+        toDisable.forEach(function(status){
+            $('#map-legend a[data-status="'+status+'"]').parents('li').addClass('disabled');
+        });
     }
 });
