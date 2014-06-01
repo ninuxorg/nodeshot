@@ -468,6 +468,7 @@
             Nodeshot.statuses = statuses;
 
             Nodeshot.layers = [];
+            Nodeshot.layersSlugs = [];
             {% for layer in layers %}
                 Nodeshot.layers.push({
                     name: '{{ layer.name }}',
@@ -475,6 +476,7 @@
                     nodes_url: '{% url 'api_layer_nodes_list' layer.slug %}',
                     nodes_geojson_url: '{% url 'api_layer_nodes_geojson' layer.slug %}'
                 });
+                Nodeshot.layersSlugs.push('{{ layer.slug }}');
             {% endfor %}
 
             for (var i=0; i<Nodeshot.layers.length; i++) {

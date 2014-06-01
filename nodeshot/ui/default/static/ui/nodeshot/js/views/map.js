@@ -38,6 +38,13 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         this.resetDataContainers();
         Nodeshot.onNodeClose = '#/map';
+        
+        var preferences = Nodeshot.preferences;
+        
+        // visible statuses
+        preferences.visibleStatuses = preferences.visibleStatuses || _.keys(Nodeshot.statuses)
+        // visible layers
+        preferences.visibleLayers = preferences.visibleLayers || Nodeshot.layersSlugs;
     },
 
     onDomRefresh: function () {
@@ -526,7 +533,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             markers = Nodeshot.statuses[status].nodes,
             visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
         
-        // mark each marker visibility
+        // mark each marker visibility depending on visible layers
         _.forEach(markers, function(marker){
             marker.visible = action === 'show';
         });
@@ -665,9 +672,6 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // store mapMode
         preferences.mapMode = mode;
-        
-        // store visible statuses
-        preferences.visibleStatuses = preferences.visibleStatuses || _.keys(Nodeshot.statuses)
 
         // load data
         this.loadMapData();
@@ -726,7 +730,8 @@ var MapView = Backbone.Marionette.ItemView.extend({
         // loop over each layer
         for (var i = 0; i < Nodeshot.layers.length; i++) {
             var layer = Nodeshot.layers[i],
-                visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
+                visibleStatuses = Nodeshot.preferences.visibleStatuses.split(','),
+                visibleLayers = Nodeshot.preferences.visibleLayers.split(',');
 
             var leafletLayer = L.geoJson(layer.nodes_geojson, {
                 style: function (feature) {
@@ -748,7 +753,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                     var marker = L.circleMarker(latlng, options);
                     
                     // marks as visible or not depending on preferences
-                    if(visibleStatuses.indexOf(feature.properties.status) >= 0){
+                    if(visibleStatuses.indexOf(feature.properties.status) >= 0 && visibleLayers.indexOf(feature.properties.layer) >= 0){
                         marker.visible = true;
                     }
                     else{
@@ -868,19 +873,36 @@ var MapView = Backbone.Marionette.ItemView.extend({
      */
     toggleLayerData: function (e, data) {
         var input = $(e.currentTarget),
-            slug = input.attr('data-slug');
+            slug = input.attr('data-slug'),
+            visibleLayers = Nodeshot.preferences.visibleLayers.split(','),
+            visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
 
         // loop over nodes
         for (var i = 0, len = Nodeshot.nodes.length; i < len; i++) {
             var node = Nodeshot.nodes[i];
 
-            if (node.feature.properties.layer === slug) {
+            // show marker if layer corresponds and status is visible
+            if (node.feature.properties.layer === slug && _.contains(visibleStatuses, node.feature.properties.status)) {
                 // mark appropiately
                 node.visible = data.value;
             }
         }
-
+        
         this.showVisibleClusters();
+        
+        // remember choice
+        if(data.value){
+            if(visibleLayers.indexOf(slug) < 0){
+                visibleLayers.push(slug);
+            }
+        }
+        else{
+            var index = visibleLayers.indexOf(slug);
+            if(index > -1){
+                visibleLayers.splice(index, 1);
+            }
+        }
+        Nodeshot.preferences.visibleLayers = visibleLayers;
     },
 
     /*

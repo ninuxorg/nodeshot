@@ -44,12 +44,13 @@
     <div id="fn-map-layers" class="side-panel adjust-height">
         <div class="panel-inner scroller">
             <h2>{% trans 'Control map data' %}</h2>
-            <% _.each(Nodeshot.layers, function(layer){ %>
+            <% var visibleLayers = Nodeshot.preferences.visibleLayers.split(',');
+                _.each(Nodeshot.layers, function(layer){ %>
                 <p>
                     <label for="map-control-layer-<%= layer.slug %>" class="inline">
                         <%= layer.name %>
                     </label>
-                    <input type="checkbox" checked
+                    <input type="checkbox" <% if(_.contains(visibleLayers, layer.slug)){ %>checked<% } %>
                            class="switch toggle-layer-data"
                            id="map-control-layer-<%= layer.slug %>"
                            data-slug="<%= layer.slug %>">
