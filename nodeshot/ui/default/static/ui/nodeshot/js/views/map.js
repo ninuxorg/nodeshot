@@ -38,13 +38,6 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         this.resetDataContainers();
         Nodeshot.onNodeClose = '#/map';
-        
-        var preferences = Nodeshot.preferences;
-        
-        // visible statuses
-        preferences.visibleStatuses = preferences.visibleStatuses || _.keys(Nodeshot.statuses)
-        // visible layers
-        preferences.visibleLayers = preferences.visibleLayers || Nodeshot.layersSlugs;
     },
 
     onDomRefresh: function () {
@@ -725,7 +718,13 @@ var MapView = Backbone.Marionette.ItemView.extend({
             opacity: 1,
             fillOpacity: 0.7
         },
-            popUpTemplate = _.template($('#map-popup-template').html());
+            popUpTemplate = _.template($('#map-popup-template').html()),
+            preferences = Nodeshot.preferences;
+        
+        // visible statuses
+        preferences.visibleStatuses = preferences.visibleStatuses || _.keys(Nodeshot.statuses)
+        // visible layers
+        preferences.visibleLayers = preferences.visibleLayers || Nodeshot.layersSlugs;
 
         // loop over each layer
         for (var i = 0; i < Nodeshot.layers.length; i++) {
