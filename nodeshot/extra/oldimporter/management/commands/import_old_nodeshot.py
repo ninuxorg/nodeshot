@@ -118,7 +118,7 @@ class Command(BaseCommand):
         ),
         make_option(
             '--nodelete',
-            action='store_false',
+            action='store_true',
             dest='nodelete',
             default=False,
             help='Do not delete imported data if any uncaught exception occurs'
@@ -381,11 +381,12 @@ choose (enter the number of) one of the following layers:
 
             # check if user exists first
             try:
-                user = User.objects.get(username=username)
+                # try looking by email
+                user = User.objects.get(email=email)
             except User.DoesNotExist:
                 try:
-                    # try looking by email
-                    user = User.objects.get(email=email)
+                    # try looking by username
+                    user = User.objects.get(username=username)
                 except User.DoesNotExist:
                     # otherwise init new
                     user = User()
@@ -419,14 +420,23 @@ choose (enter the number of) one of the following layers:
                 # validate data and save
                 user.full_clean()
                 user.save()
+            except Exception as e:
+                # if user already exists use that instance
+                if(User.objects.filter(email=email).count() == 1):
+                    user = User.objects.get(email=email)
+                # otherwise report error
+                else:
+                    user = None
+                    tb = traceback.format_exc()
+                    self.message('Could not save user %s, got exception:\n\n%s' % (user.username, tb))
+            
+            # if we got a user to add
+            if user is not None:
                 # store id
                 self.users_dict[email]['id'] = user.id
                 # append to saved users
                 saved_users.append(user)
                 self.verbose('Saved user %s (%s) with email <%s>' % (user.username, user.get_full_name(), user.email))
-            except Exception as e:
-                tb = traceback.format_exc()
-                self.message('Could not save user %s, got exception:\n\n%s' % (user.username, tb))
 
             # mark email address as confirmed if feature is enabled
             if EMAIL_ADDRESS_APP_INSTALLED and EmailAddress.objects.filter(email=user.email).count() is 0:
