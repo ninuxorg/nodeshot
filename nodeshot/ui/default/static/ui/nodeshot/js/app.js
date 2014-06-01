@@ -189,8 +189,11 @@ $(document).ready(function ($) {
             });
         }).done(function (response) {
             $('#signin-modal').modal('hide');
-            // load User model which will trigger UI refresh
-            Nodeshot.currentUser.set(response.user);
+            // load new user
+            Nodeshot.currentUser = new User(response.user);
+            // assign user to view and trigger refresh
+            Nodeshot.accountMenu.model = Nodeshot.currentUser
+            Nodeshot.accountMenu.render()
         });
     });
 
