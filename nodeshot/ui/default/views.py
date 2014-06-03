@@ -17,7 +17,7 @@ if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
 else:
     WEBSOCKETS = False
 
-TILESERVER_URL = settings.NODESHOT['SETTINGS'].get('TILESERVER_URL', '//a.tiles.mapbox.com/v3/nodeshot-cineca.i6kgg4hb/{z}/{x}/{y}.png')
+TILESERVER_URL = settings.NODESHOT['SETTINGS'].get('TILESERVER_URL', '//otile1.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png')
 MAP_CENTER = json.dumps(settings.NODESHOT['SETTINGS'].get('ADMIN_MAP_COORDS'))
 MAP_ZOOM = settings.NODESHOT['SETTINGS'].get('FRONTEND_MAP_ZOOM', 4)
 

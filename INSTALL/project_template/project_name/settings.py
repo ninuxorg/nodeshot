@@ -400,6 +400,8 @@ NODESHOT = {
 
         'REVERSION_LAYERS': True,  # activate django reversion for layers.Layer model
         'REVERSION_NODES': True,  # activate django reversion for nodes.Node model
+        'REVERSION_DEVICES': True,  # activate django reversion for net.Devices model,
+        'TILESERVER_URL': '//otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png'
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (
