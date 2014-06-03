@@ -56,37 +56,35 @@ function loadLayers(layers) {
     /*
      * Takes all node of a layer and puts them on map in a Leaflet Clustered group
      */
-    var allLayers = []
     for (var i in layers) {
         var color = layers[i].color;
         var clusterClass = layers[i].slug; //CSS class with same name of the layer
         //Creates a Leaflet cluster group styled with layer's colour
         NS_311.mapClusters[layers[i].slug] = createCluster(clusterClass);
         //Loads nodes in the cluster
-        var newClusterNodes = getData(NS_311.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layers[i].slug);
-        //Creates GeoJSON from JSON
-        var GeoJSON = new geojsonColl();
-        for (var n in newClusterNodes) {
+        var url = NS_311.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layers[i].slug
+        var open311GeoJSON = new Geojson;
+        $.ajax({
+                url: url,
+                dataType: 'json',
+                 success: function(response){
+                            open311GeoJSON.load(response,"long","lat");
+                            var newClusterLayer = loadNodes(layers[i].slug, open311GeoJSON, NS_311.colors[i]);
+                            NS_311.mapClusters[layers[i].slug].addLayer(newClusterLayer);
+                             //Adds cluster to map
+                            map.addLayer(NS_311.mapClusters[layers[i].slug]);
+                            //Creates map controls for the layer
+                            var newClusterKey = "<span style='color:" + NS_311.colors[i] + "'>" + layers[i].name + "</span>";
+                            overlaymaps[newClusterKey] = NS_311.mapClusters[layers[i].slug];
+                            mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
+                            legend.addTo(map);
+                            
+        
+                 }
+        })
 
-            var feature = new featureConstructor;
-            feature.geometry.coordinates = [newClusterNodes[n].long,
-            newClusterNodes[n].lat]
-            feature.properties = newClusterNodes[n]
-            GeoJSON.features.push(feature)
-
-
-        }
-
-        var newClusterLayer = loadNodes(layers[i].slug, GeoJSON, NS_311.colors[i]);
-        NS_311.mapClusters[layers[i].slug].addLayer(newClusterLayer);
-        //Adds cluster to map
-        map.addLayer(NS_311.mapClusters[layers[i].slug]);
-        //Creates map controls for the layer
-        var newClusterKey = "<span style='color:" + NS_311.colors[i] + "'>" + layers[i].name + "</span>";
-        overlaymaps[newClusterKey] = NS_311.mapClusters[layers[i].slug];
-        allLayers[i] = NS_311.mapClusters[layers[i].slug];
+        
     }
-    return allLayers;
 
 }
 
@@ -96,7 +94,9 @@ function createCluster(clusterClass) {
      * Creates cluster group
      */
     var newCluster = new L.MarkerClusterGroup({
+        
         iconCreateFunction: function (cluster) {
+            
             return L.divIcon({
                 html: cluster.getChildCount(),
                 className: clusterClass,

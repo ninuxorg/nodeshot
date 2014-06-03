@@ -51,7 +51,7 @@ function getAddress(lat,lng) {
     });
 }
 
-//$('#loading').hide(); //initially hide the loading icon
+
 
 $(document).ajaxStart(function () {
     $('#loading').show();
@@ -66,15 +66,15 @@ function convertToSlug(Text) {
         .replace(/ +/g, '-');
 }
 
-function geojsonColl() {
-    this.type="FeatureCollection",
-    this.features= [] };
-    
-function featureConstructor() {
-    this.type="Feature",
-    this.geometry = {"type":"Point",}
-    this.properties = {}
-    };
+//function geojsonColl() {
+//    this.type="FeatureCollection",
+//    this.features= [] };
+//    
+//function featureConstructor() {
+//    this.type="Feature",
+//    this.geometry = {"type":"Point",}
+//    this.properties = {}
+//    };
     
     /* AUTHENTICATION
  * ============== */

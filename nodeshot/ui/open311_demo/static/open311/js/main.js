@@ -35,23 +35,6 @@ NS_311.status_colors = {
 //Map initialization
 var map = L.map('map').setView([41.87, 12.49], 8);
 var legend = L.control({position: 'bottomleft'});
-
-legend.onAdd = function (map) {
-    var mapLegend = L.DomUtil.create('div','mapLegend')
-    mapLegend.innerHTML="<div><strong>Legend</strong>"
-    _.each(NS_311.status_colors,function(value, key, list){
-        mapLegend.innerHTML += "<div style='clear:both;min-height:10px;width:100px;'>"
-        mapLegend.innerHTML += "<div class='circle' style='float:left;background-color:"+value+"'></div>"
-        mapLegend.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests <strong>("+ NS_311.markerStatusMap[key].length + ")</strong></div>"
-        mapLegend.innerHTML += "</div>"
-        })
-    mapLegend.innerHTML += "</div>"
-    return mapLegend;
-};
-legend.addTo(map);
-
-
-
 var mapBoxLayer = new L.tileLayer(NS_311.TILESERVER_URL).addTo(map);
 var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 var googleHybrid = new L.Google('HYBRID');
@@ -68,7 +51,7 @@ var overlaymaps = {};
 
 //Load data from server
 var layers = getData(window.__BASEURL__ + 'layers/'); //layers
-var geojsonlayers = getData(window.__BASEURL__ + 'layers.geojson'); //layers' area
+//var geojsonlayers = getData(window.__BASEURL__ + 'layers.geojson'); //layers' area
 
 for (var i in layers) {
     createlayersCSS(layers[i].slug, NS_311.colors[i]);
@@ -87,10 +70,23 @@ var baseMaps = {
     "Google Hybrid": googleHybrid
 
 };
-var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
+//var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
 
 //Populate a select field with Layers
 getLayerListSlug(layers);
+
+legend.onAdd = function (map) {
+    var mapLegend = L.DomUtil.create('div','mapLegend')
+    mapLegend.innerHTML="<div><strong>Legend</strong>"
+    _.each(NS_311.status_colors,function(value, key, list){
+        mapLegend.innerHTML += "<div style='clear:both;min-height:10px;width:100px;'>"
+        mapLegend.innerHTML += "<div class='circle' style='float:left;background-color:"+value+"'></div>"
+        mapLegend.innerHTML += "<div style='padding-left:10px;margin-top:-4px;float:left;'>"+key+" requests <strong>("+ NS_311.markerStatusMap[key].length + ")</strong></div>"
+        mapLegend.innerHTML += "</div>"
+        })
+    mapLegend.innerHTML += "</div>"
+    return mapLegend;
+};
 
 
 
