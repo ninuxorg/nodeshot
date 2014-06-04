@@ -52,51 +52,79 @@ function addToList(data) {
     })
 }
 
+//function loadLayers(layers) {
+//    /*
+//     * Takes all node of a layer and puts them on map in a Leaflet Clustered group
+//     */
+//    for (var i in layers) {
+//        var color = layers[i].color;
+//        var clusterClass = layers[i].slug; //CSS class with same name of the layer
+//        //Creates a Leaflet cluster group styled with layer's colour
+//        NS_311.mapClusters[layers[i].slug] = createCluster(clusterClass);
+//        //Loads nodes in the cluster
+//        var url = NS_311.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layers[i].slug
+//        var open311GeoJSON = new Geojson;
+//        $.ajax({
+//            url: url,
+//            dataType: 'json',
+//            success: function (response) {
+//                open311GeoJSON.load(response, "long", "lat");
+//                var newClusterLayer = loadNodes(layers[i].slug, open311GeoJSON, NS_311.colors[i]);
+//                NS_311.mapClusters[layers[i].slug].addLayer(newClusterLayer);
+//                //Adds cluster to map
+//                map.addLayer(NS_311.mapClusters[layers[i].slug]);
+//                //Creates map controls for the layer
+//                var newClusterKey = "<span style='color:" + NS_311.colors[i] + "'>" + layers[i].name + "</span>";
+//                //overlaymaps[newClusterKey] = NS_311.mapClusters[layers[i].slug];
+//                //mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
+//                console.log( legend)
+//                legend.addTo(map);
+//
+//
+//            }
+//        })
+//
+//
+//    }
+//    
+//}
+
 function loadLayers(layers) {
     /*
-     * Takes all node of a layer and puts them on map in a Leaflet Clustered group
-     */
+* Takes all node of a layer and puts them on map in a Leaflet Clustered group
+*/
+    var allLayers = []
     for (var i in layers) {
         var color = layers[i].color;
         var clusterClass = layers[i].slug; //CSS class with same name of the layer
         //Creates a Leaflet cluster group styled with layer's colour
         NS_311.mapClusters[layers[i].slug] = createCluster(clusterClass);
         //Loads nodes in the cluster
-        var url = NS_311.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layers[i].slug
+        var newClusterNodes = getData(NS_311.__BASEURL__ + 'open311/requests.json?service_code=node&layer=' + layers[i].slug);
+        //Creates GeoJSON from JSON
         var open311GeoJSON = new Geojson;
-        $.ajax({
-                url: url,
-                dataType: 'json',
-                 success: function(response){
-                            open311GeoJSON.load(response,"long","lat");
-                            var newClusterLayer = loadNodes(layers[i].slug, open311GeoJSON, NS_311.colors[i]);
-                            NS_311.mapClusters[layers[i].slug].addLayer(newClusterLayer);
-                             //Adds cluster to map
-                            map.addLayer(NS_311.mapClusters[layers[i].slug]);
-                            //Creates map controls for the layer
-                            var newClusterKey = "<span style='color:" + NS_311.colors[i] + "'>" + layers[i].name + "</span>";
-                            overlaymaps[newClusterKey] = NS_311.mapClusters[layers[i].slug];
-                            mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
-                            legend.addTo(map);
-                            
-        
-                 }
-        })
-
-        
+        open311GeoJSON.load(newClusterNodes, "long", "lat")
+        var newClusterLayer = loadNodes(layers[i].slug, open311GeoJSON, NS_311.colors[i]);
+        NS_311.mapClusters[layers[i].slug].addLayer(newClusterLayer);
+        //Adds cluster to map
+        map.addLayer(NS_311.mapClusters[layers[i].slug]);
+        //Creates map controls for the layer
+        var newClusterKey = "<span style='color:" + NS_311.colors[i] + "'>" + layers[i].name + "</span>";
+        overlaymaps[newClusterKey] = NS_311.mapClusters[layers[i].slug];
+        allLayers[i] = NS_311.mapClusters[layers[i].slug];
     }
+    return allLayers;
 
 }
-
 
 function createCluster(clusterClass) {
     /*
      * Creates cluster group
      */
     var newCluster = new L.MarkerClusterGroup({
-        
+
         iconCreateFunction: function (cluster) {
-            
+
             return L.divIcon({
                 html: cluster.getChildCount(),
                 className: clusterClass,
@@ -237,13 +265,13 @@ function openForm(marker) {
                 processData: false,
                 success: function (returndata) {
                     var circle = L.circleMarker(latlng, {
-                                radius: 8,
-                                fillColor: NS_311.status_colors['open'],
-                                //color: color,
-                                weight: 3,
-                                opacity: 1,
-                                fillOpacity: 0.8
-                            }).addTo(map);
+                        radius: 8,
+                        fillColor: NS_311.status_colors['open'],
+                        //color: color,
+                        weight: 3,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map);
                     var newMarker = L.marker(latlng);
                     NS_311.mapClusters[layer_inserted].addLayer(newMarker);
                     NS_311.markerMap[returndata] = newMarker;
@@ -251,7 +279,7 @@ function openForm(marker) {
                     legend.removeFrom(map)
                     legend.addTo(map)
                     popupMessage = "Request has been inserted<br>"
-                    popupMessage += "<strong>Request ID: </strong>"+ returndata
+                    popupMessage += "<strong>Request ID: </strong>" + returndata
                     circle.bindPopup(popupMessage).openPopup();
                     map.panTo(latlng)
                     $('#serviceRequestForm').hide("fast", function () {
@@ -305,14 +333,16 @@ function populateOpen311Div(nodeSlug, create) {
         status: status,
     });
     $(nodeDiv).append(compiledTmpl);
-    $(nodeDiv).on('click',function(){showRequestDetail(requestID,node)});
-    
+    $(nodeDiv).on('click', function () {
+        showRequestDetail(requestID, node)
+    });
+
 
     return (nodeDiv, NS_311.nodeRatingAVG)
 
 }
 
-function showRequestDetail(requestID,node) {
+function showRequestDetail(requestID, node) {
     $('#overlay').fadeIn('fast', function () {
         $('#RequestDetails').show();
         $('#RequestDetails').html('<a class="boxclose"  id="RequestDetailsClose"></a>');
@@ -322,46 +352,45 @@ function showRequestDetail(requestID,node) {
             });
         });
         var tmplMarkup = $('#tmplOpen311RequestBox').html();
-        var compiledTmpl = _.template(tmplMarkup, {
-        });
+        var compiledTmpl = _.template(tmplMarkup, {});
         $("#RequestDetails").append(compiledTmpl);
-    
-    //$("#MainPage").hide();
-    //$("#RequestDetails").show();
-    NS_311.nodeSlug = node.slug
-    NS_311.nodeId = requestID.split("-")[1];
-    NS_311.layerSettings = getData(NS_311.__BASEURL__ + 'layers/' + node.layer_slug + '/participation_settings/');
-    NS_311.nodeSettings = getData(NS_311.__BASEURL__ + 'nodes/' + node.slug + '/participation_settings/');
-    NS_311.nodeParticipation = getData(NS_311.__BASEURL__ + 'nodes/' + node.slug + '/participation/');
-    //getParticipationData()
-    var request = getData(NS_311.__BASEURL__ + 'open311/requests/' + requestID + '.json'); 
-    var tmplMarkup = $('#tmplOpen311Request').html();
-    var compiledTmpl = _.template(tmplMarkup, {
+
+        //$("#MainPage").hide();
+        //$("#RequestDetails").show();
+        NS_311.nodeSlug = node.slug
+        NS_311.nodeId = requestID.split("-")[1];
+        NS_311.layerSettings = getData(NS_311.__BASEURL__ + 'layers/' + node.layer_slug + '/participation_settings/');
+        NS_311.nodeSettings = getData(NS_311.__BASEURL__ + 'nodes/' + node.slug + '/participation_settings/');
+        NS_311.nodeParticipation = getData(NS_311.__BASEURL__ + 'nodes/' + node.slug + '/participation/');
+        //getParticipationData()
+        var request = getData(NS_311.__BASEURL__ + 'open311/requests/' + requestID + '.json');
+        var tmplMarkup = $('#tmplOpen311Request').html();
+        var compiledTmpl = _.template(tmplMarkup, {
             request: request,
             requestID: requestID,
-            
+
         });
-    $("#requestContainer").html('');
-    $("#requestContainer").append(compiledTmpl);
+        $("#requestContainer").html('');
+        $("#requestContainer").append(compiledTmpl);
 
-//Votes
-if (NS_311.nodeSettings.participation_settings.voting_allowed && NS_311.layerSettings.participation_settings.voting_allowed) {
-    //console.log("Votes OK")
-    showVotes(NS_311.nodeParticipation.participation.likes,NS_311.nodeParticipation.participation.dislikes)
-}
+        //Votes
+        if (NS_311.nodeSettings.participation_settings.voting_allowed && NS_311.layerSettings.participation_settings.voting_allowed) {
+            //console.log("Votes OK")
+            showVotes(NS_311.nodeParticipation.participation.likes, NS_311.nodeParticipation.participation.dislikes)
+        }
 
-//Comments       
-if (NS_311.nodeSettings.participation_settings.comments_allowed && NS_311.layerSettings.participation_settings.comments_allowed) {
-    //console.log("Comments OK")
-    showComments(NS_311.nodeSlug,NS_311.nodeParticipation.participation.comment_count); 
-}
+        //Comments       
+        if (NS_311.nodeSettings.participation_settings.comments_allowed && NS_311.layerSettings.participation_settings.comments_allowed) {
+            //console.log("Comments OK")
+            showComments(NS_311.nodeSlug, NS_311.nodeParticipation.participation.comment_count);
+        }
 
-//rating       
-if (NS_311.nodeSettings.participation_settings.rating_allowed && NS_311.layerSettings.participation_settings.rating_allowed) {
-    //console.log("Rating OK")
-    showRating(NS_311.nodeSlug,NS_311.nodeParticipation.participation.rating_avg,NS_311.nodeParticipation.participation.rating_count); 
-}
-})
+        //rating       
+        if (NS_311.nodeSettings.participation_settings.rating_allowed && NS_311.layerSettings.participation_settings.rating_allowed) {
+            //console.log("Rating OK")
+            showRating(NS_311.nodeSlug, NS_311.nodeParticipation.participation.rating_avg, NS_311.nodeParticipation.participation.rating_count);
+        }
+    })
 }
 
 function showMainPage(requestID) {
@@ -518,7 +547,7 @@ function populateRating(nodeID, nodeDiv, nodeRatingAVG) {
     $("#star").raty({
         score: nodeRatingAVG,
         number: 10,
-        width: 250 ,
+        width: 250,
         path: $.myproject.STATIC_URL + 'open311/js/vendor/images',
         click: function (score) {
             var nodeID = NS_311.nodeId;

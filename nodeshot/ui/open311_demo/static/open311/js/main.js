@@ -35,14 +35,14 @@ NS_311.status_colors = {
 //Map initialization
 var map = L.map('map').setView([41.87, 12.49], 8);
 var legend = L.control({position: 'bottomleft'});
-var mapBoxLayer = new L.tileLayer(NS_311.TILESERVER_URL).addTo(map);
-var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+//var mapBoxLayer = new L.tileLayer(NS_311.TILESERVER_URL)
 var googleHybrid = new L.Google('HYBRID');
 var googleMap = new L.Google('ROADMAP');
 var googleSat = new L.Google();
 
 //OSM layer added to map
-mapBoxLayer.addTo(map);
+//mapBoxLayer.addTo(map);
 map.on('click', onMapClick);
 var popup = L.popup();
 
@@ -63,18 +63,14 @@ var mapLayersNodes = loadLayers(layers);
 
 //Map Controls
 var baseMaps = {
-    "MapBox": mapBoxLayer,
     "OpenStreetMap": osmLayer,
+ //   "MapBox": mapBoxLayer,
     "Google Sat": googleSat,
     "Google Map": googleMap,
     "Google Hybrid": googleHybrid
 
 };
 //var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
-
-//Populate a select field with Layers
-getLayerListSlug(layers);
-
 legend.onAdd = function (map) {
     var mapLegend = L.DomUtil.create('div','mapLegend')
     mapLegend.innerHTML="<div><strong>Legend</strong>"
@@ -87,6 +83,13 @@ legend.onAdd = function (map) {
     mapLegend.innerHTML += "</div>"
     return mapLegend;
 };
+legend.addTo(map);
+
+var mapControl = L.control.layers(baseMaps, overlaymaps).addTo(map);
+//Populate a select field with Layers
+getLayerListSlug(layers);
+
+
 
 
 
