@@ -64,41 +64,7 @@
 
         <nav id="nav-bar" class="navbar navbar-inverse" role="navigation">
             <div class="collapse navbar-collapse" id="ns-top-nav-links">
-                <ul class="nav navbar-nav">
-                    <li><a href="#/pages/home"><span class="icon-squares"></span>Dashboard</a></li>
-                    <li><a href="#/map"><span class="icon-globe"></span>Map</a></li>
-                    <li><a href="#/nodes"><span class="icon-nodes"></span>Nodes</a></li>
-                    <li><a href="javascript:createModal({message:'not implemented yet'})"><span class="icon-layer"></span>Layers</a></li>
-                    <li><a href="javascript:createModal({message:'not implemented yet'})"><span class="icon-chart-bar"></span>Statistics</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="icon-info-circle"></span>About
-                            <span class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu">
-                            <li><a href="#/pages/terms-of-service">Terms of services</a></li>
-                            <li><a href="#/pages/privacy-policy">Privacy Policy</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li><a href="#">Separated link</a></li>
-                            <li><a href="#">One more separated link</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="icon-plus-squared"></span>More
-                            <span class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li><a href="#">Separated link</a></li>
-                            <li><a href="#">One more separated link</a></li>
-                        </ul>
-                    </li>
-                </ul>
+                <ul class="nav navbar-nav" id="main-menu-view"></ul>
             </div>
         </nav>
     </header>
@@ -340,6 +306,26 @@
         </li>
     </script>
 
+    <script id="main-menu-item-view-template" type="text/template">
+        <a href="<%= url %>"<% if(children.length){ %> class="dropdown-toggle" data-toggle="dropdown"<% } %>>
+            <span class="<%= classes || 'icon-info-circle' %>"></span><%= name %>
+            <% if(children.length){ %><span class="caret"></span><% } %>
+        </a>
+        <% if(children.length){ %>
+        <ul class="dropdown-menu">
+            <% children.forEach(function(child){ %>
+                <li><a href="<%= child.url %>" class="<%= child.classes %>"><%= child.name %></a></li>
+            <% }) %>
+        </ul>
+        <% } %>
+    </script>
+
+    <script id="main-menu-empty-view-template" type="text/template">
+        <a href="#">
+            <span class="icon-info-circle"></span>{% trans 'No menu item yet' %}
+        </a>
+    </script>
+
     <script id="page-template" type="text/template">
         <h1><%= title %></h1>
         <%= content %>
@@ -492,6 +478,7 @@
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/search.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/account-menu.js"></script>
+    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/main-menu.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/notifications.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/node-details.js"></script>

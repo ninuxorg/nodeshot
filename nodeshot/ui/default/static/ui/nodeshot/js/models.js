@@ -170,3 +170,8 @@ var NotificationCollection = Backbone.Collection.extend({
         }
     }
 });
+
+var MenuItemCollection = Backbone.Collection.extend({
+    model: Backbone.Model,
+    url: '/api/v1/menu/'
+});

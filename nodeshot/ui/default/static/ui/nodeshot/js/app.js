@@ -9,7 +9,6 @@ Nodeshot.addInitializer(function () {
 
 // init layout
 Nodeshot.addInitializer(function () {
-
     Nodeshot.notifications = new NotificationCollection();
     Nodeshot.notificationView = new NotificationCollectionView({
         collection: Nodeshot.notifications
@@ -19,6 +18,12 @@ Nodeshot.addInitializer(function () {
         model: Nodeshot.currentUser
     });
     Nodeshot.accountMenu.render();
+
+    menuCollection = new MenuItemCollection();
+    Nodeshot.mainMenu = new MainMenuView({ collection: menuCollection });
+    menuCollection.fetch().done(function(){
+        Nodeshot.mainMenu.render();
+    })
 
     Nodeshot.generalSearch = new SearchView();
 
