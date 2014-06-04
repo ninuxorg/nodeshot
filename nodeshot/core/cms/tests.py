@@ -1,11 +1,6 @@
-"""
-nodeshot.core.cms unit tests
-"""
-
-import simplejson as json
-
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
 from nodeshot.core.base.tests import user_fixtures
@@ -38,3 +33,14 @@ class CMSTest(TestCase):
         url = reverse('api_menu_list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_nested_menu_item(self):
+        new = MenuItem()
+        new.name = 'new'
+        new.url = '#'
+        new.full_clean()  # validation should be ok
+
+        # set a parent which already has a parent
+        new.parent = MenuItem.objects.exclude(parent=None).first()
+        with self.assertRaises(ValidationError):
+            new.full_clean()

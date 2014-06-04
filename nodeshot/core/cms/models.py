@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrderedACL
 from nodeshot.core.base.managers import AccessLevelPublishedManager
@@ -42,12 +43,19 @@ class MenuItem(BaseOrderedACL):
     """
     name = models.CharField(_('name'), max_length=50)
     url = models.CharField(_('url'), max_length=255)
+    classes = models.CharField(_('classes'), max_length=50, blank=True, help_text=_('space separated css classes'))
+    parent = models.ForeignKey('self', blank=True, null=True)
     is_published = models.BooleanField(default=True)
 
     objects = AccessLevelPublishedManager()
 
     def __unicode__(self):
-        return self.url
+        return self.name
+
+    def clean(self):
+        """ support only 1 level of nesting """
+        if self.parent is not None and self.parent.parent is not None:
+            raise ValidationError(_('1 level of nesting only is supported'))
 
 
 # ------ Signals ------ #

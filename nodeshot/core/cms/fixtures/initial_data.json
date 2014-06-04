@@ -3,8 +3,8 @@
     "pk": 1,
     "model": "cms.page",
     "fields": {
-      "title": "Welcome",
-      "content": "<p>Put here your terms homepage text.</p>",
+      "title": "Home",
+      "content": "<p>Put here your homepage text.<\/p><p><a class=\"btn btn-primary\" style=\"text-decoration: none;\" href=\"#/map\">See the map</a><\/p>",
       "access_level": 0,
       "meta_keywords": "",
       "meta_description": "",
@@ -17,15 +17,13 @@
     "pk": 2,
     "model": "cms.page",
     "fields": {
-      "meta_description": "",
-      "updated": "2013-08-02T11:37:47.339Z",
-      "added": "2013-08-02T11:35:50.419Z",
-      "title": "Terms of service",
-      "content": "<p>Put here your terms of service.</p>",
+      "title": "About this site",
+      "content": "<p>Put here your about text.<\/p>",
       "access_level": 0,
       "meta_keywords": "",
+      "meta_description": "",
       "meta_robots": "index, follow",
-      "slug": "terms-of-service",
+      "slug": "about",
       "is_published": true
     }
   },
@@ -34,14 +32,194 @@
     "model": "cms.page",
     "fields": {
       "meta_description": "",
+      "updated": "2013-08-02T11:37:47.339Z",
+      "added": "2013-08-02T11:35:50.419Z",
+      "title": "Terms of service",
+      "content": "<p>Put here your terms of service.<\/p>",
+      "access_level": 0,
+      "meta_keywords": "",
+      "meta_robots": "index, follow",
+      "slug": "terms-of-service",
+      "is_published": true
+    }
+  },
+  {
+    "pk": 4,
+    "model": "cms.page",
+    "fields": {
+      "meta_description": "",
       "updated": "2013-08-02T11:38:17.341Z",
       "added": "2013-08-02T11:35:50.419Z",
       "title": "Privacy Policy",
-      "content": "<p>Put here your privacy policy.</p>",
+      "content": "<p>Put here your privacy policy.<\/p>",
       "access_level": 0,
       "meta_keywords": "",
       "meta_robots": "index, follow",
       "slug": "privacy-policy",
+      "is_published": true
+    }
+  },
+  {
+    "pk": 5,
+    "model": "cms.page",
+    "fields": {
+      "title": "Software credits",
+      "content": "<p>This website is powered by <a href=\"https://github.com/ninuxorg/nodeshot\" target=\"_blank\">Nodeshot<\/a>, an open source web application for management of community-led georeferenced data.<\/p>",
+      "access_level": 0,
+      "meta_keywords": "",
+      "meta_description": "",
+      "meta_robots": "index, follow",
+      "slug": "credits",
+      "is_published": true
+    }
+  },
+  {
+    "pk": 1,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:45:03.831Z",
+      "added": "2014-06-03T13:32:45.648Z",
+      "name": "Home",
+      "parent": null,
+      "url": "#\/pages\/home",
+      "access_level": 0,
+      "classes": "icon-squares",
+      "order": 0,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 2,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:46:19.662Z",
+      "added": "2014-06-03T13:32:45.648Z",
+      "name": "Map",
+      "parent": null,
+      "url": "#\/map",
+      "access_level": 0,
+      "classes": "icon-globe",
+      "order": 1,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 3,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:46:32.754Z",
+      "added": "2014-06-03T13:32:45.648Z",
+      "name": "Nodes",
+      "parent": null,
+      "url": "#\/nodes",
+      "access_level": 0,
+      "classes": "icon-nodes",
+      "order": 2,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 4,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:47:38.949Z",
+      "added": "2014-06-03T13:32:45.648Z",
+      "name": "Layers",
+      "parent": null,
+      "url": "javascript:createModal({message:'not implemented yet'})",
+      "access_level": 0,
+      "classes": "icon-layer",
+      "order": 3,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 5,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:48:42.970Z",
+      "added": "2014-06-03T13:48:37.798Z",
+      "name": "Statistics",
+      "parent": null,
+      "url": "javascript:createModal({message:'not implemented yet'})",
+      "access_level": 0,
+      "classes": "icon-chart-bar",
+      "order": 4,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 6,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:50:39.654Z",
+      "added": "2014-06-03T13:48:37.798Z",
+      "name": "About",
+      "parent": null,
+      "url": "#",
+      "access_level": 0,
+      "classes": "icon-info-circle",
+      "order": 5,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 7,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:54:03.636Z",
+      "added": "2014-06-03T13:48:37.798Z",
+      "name": "About this site",
+      "parent": 6,
+      "url": "#\/pages\/about",
+      "access_level": 0,
+      "classes": "",
+      "order": 6,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 8,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:55:31.051Z",
+      "added": "2014-06-03T13:48:37.798Z",
+      "name": "Terms of service",
+      "parent": 6,
+      "url": "#\/pages\/terms-of-service",
+      "access_level": 0,
+      "classes": "",
+      "order": 7,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 9,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:55:53.277Z",
+      "added": "2014-06-03T13:48:37.798Z",
+      "name": "Privacy Policy",
+      "parent": 6,
+      "url": "#\/pages\/privacy-policy",
+      "access_level": 0,
+      "classes": "",
+      "order": 8,
+      "is_published": true
+    }
+  },
+  {
+    "pk": 10,
+    "model": "cms.menuitem",
+    "fields": {
+      "updated": "2014-06-03T13:57:19.568Z",
+      "added": "2014-06-03T13:48:37.798Z",
+      "name": "Software Credits",
+      "parent": 6,
+      "url": "#\/pages\/credits",
+      "access_level": 0,
+      "classes": "",
+      "order": 9,
       "is_published": true
     }
   }
