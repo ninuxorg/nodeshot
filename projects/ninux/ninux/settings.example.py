@@ -418,7 +418,7 @@ NODESHOT = {
         'REVERSION_NODES': True,  # activate django reversion for nodes.Node model
 
         # configure your tile server
-        'TILESERVER_URL': '//otile1.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png'
+        'TILESERVER_URL': '//otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png'
     },
     'CHOICES': {
         'AVAILABLE_CRONJOBS': (
