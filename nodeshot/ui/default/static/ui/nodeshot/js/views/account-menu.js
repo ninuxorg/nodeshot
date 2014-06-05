@@ -11,7 +11,8 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
     // listen to models change and update accordingly
     // used for login/logout rendering
     modelEvents: {
-        'change': 'render'
+        'loggedin': 'render',
+        'logout': 'render'
     },
 
     initialize: function(){
@@ -42,13 +43,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
      */
     logout: function (e) {
         e.preventDefault();
-        Nodeshot.currentUser.clear();
-        $.post('api/v1/account/logout/').error(function () {
-            // TODO: improve!
-            createModal({
-                message: 'problem while logging out'
-            });
-        });
+        Nodeshot.currentUser.logout();
     },
 
     /*

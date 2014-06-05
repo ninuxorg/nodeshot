@@ -86,6 +86,7 @@ var User = Backbone.Model.extend({
 
     initialize: function(){
         this.setTruncatedUsername();
+        this.on('change:username', this.setTruncatedUsername);
     },
 
     /*
@@ -103,8 +104,64 @@ var User = Backbone.Model.extend({
         this.set('truncatedUsername', username);
     },
 
+    /*
+     * returns true if the user is authenticated, false otherwise
+     */
     isAuthenticated: function(){
         return this.get('username') !== undefined;
+    },
+
+    /*
+     * performs login
+     */
+    login: function(data){
+        var self = this;
+
+        self.trigger('login');
+
+        // Login
+        $.post('/api/v1/account/login/', data).error(function (http) {
+            // TODO improve
+            var json = http.responseJSON,
+                errorMessage = 'Invalid username or password',
+                zIndex = $('#signin-modal').css('z-index'); // original z-index
+            $('#signin-modal').css('z-index', 1002); // temporarily change
+
+            // determine correct error message to show
+            errorMessage = json.non_field_errors || json.detail ||  errorMessage;
+
+            createModal({
+                message: errorMessage,
+                successAction: function () {
+                    $('#signin-modal').css('z-index', zIndex)
+                } // restore z-index
+            });
+        }).done(function (response) {
+            $('#signin-modal').modal('hide');
+            // load new user
+            Nodeshot.currentUser.set(response.user);
+            // trigger custom event
+            self.trigger('loggedin');
+        });
+    },
+
+    /*
+     * performs logout
+     */
+    logout: function(){
+        var self = this;
+        self.clear();
+        self.trigger('logout');
+
+        $.post('/api/v1/account/logout/').error(function () {
+            // TODO: improve!
+            createModal({
+                message: 'problem while logging out'
+            });
+        }).done(function(){
+            // trigger custom event
+            self.trigger('loggedout');
+        });
     },
 
     url: function () {

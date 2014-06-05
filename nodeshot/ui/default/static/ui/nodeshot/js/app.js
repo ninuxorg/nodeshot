@@ -19,13 +19,9 @@ Nodeshot.addInitializer(function () {
     });
     Nodeshot.accountMenu.render();
 
-    menuCollection = new MenuItemCollection();
-    Nodeshot.mainMenu = new MainMenuView({ collection: menuCollection });
-    menuCollection.fetch().done(function(){
-        Nodeshot.mainMenu.render();
-    })
+    Nodeshot.mainMenu = new MainMenuView(); // renders automatically
 
-    Nodeshot.generalSearch = new SearchView();
+    Nodeshot.generalSearch = new SearchView(); // renders automatically
 
     Nodeshot.onNodeClose = '#/map';
 });
@@ -175,31 +171,7 @@ $(document).ready(function ($) {
         // remember choice
         Nodeshot.preferences.staySignedIn = data.remember;
 
-        // Login
-        $.post('/api/v1/account/login/', data).error(function (http) {
-            // TODO improve
-            var json = http.responseJSON,
-                errorMessage = 'Invalid username or password',
-                zIndex = $('#signin-modal').css('z-index'); // original z-index
-            $('#signin-modal').css('z-index', 1002); // temporarily change
-
-            // determine correct error message to show
-            errorMessage = json.non_field_errors || json.detail ||  errorMessage;
-
-            createModal({
-                message: errorMessage,
-                successAction: function () {
-                    $('#signin-modal').css('z-index', zIndex)
-                } // restore z-index
-            });
-        }).done(function (response) {
-            $('#signin-modal').modal('hide');
-            // load new user
-            Nodeshot.currentUser = new User(response.user);
-            // assign user to view and trigger refresh
-            Nodeshot.accountMenu.model = Nodeshot.currentUser
-            Nodeshot.accountMenu.render()
-        });
+        Nodeshot.currentUser.login(data);
     });
 
     // sign up
