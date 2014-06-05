@@ -63,17 +63,16 @@ class MenuItem(BaseOrderedACL):
 
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, post_save
-from django.core.cache import cache
+from nodeshot.core.base.cache import cache_delete_pattern_or_all
 
 
 @receiver(post_save, sender=Page)
-@receiver(post_save, sender=MenuItem)
 @receiver(pre_delete, sender=Page)
+def clear_page_cache(sender, **kwargs):
+    cache_delete_pattern_or_all('PageList:*')
+    cache_delete_pattern_or_all('PageDetail:*')
+
+@receiver(post_save, sender=MenuItem)
 @receiver(pre_delete, sender=MenuItem)
-def clear_cache(sender, **kwargs):
-    # clear only cached pages if supported
-    if hasattr(cache, 'delete_pattern'):
-        cache.delete_pattern('views.decorators.cache.cache*')
-    # otherwise clear the entire cache
-    else:
-        cache.clear()
+def clear_cache_pages(sender, **kwargs):
+    cache_delete_pattern_or_all('MenuList:*')

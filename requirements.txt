@@ -25,6 +25,7 @@ django-olwidget
 
 # RESTful API and API documentation
 djangorestframework==2.3.13
+drf-extensions==0.2.3
 django-rest-swagger
 markdown
 djangorestframework-gis
