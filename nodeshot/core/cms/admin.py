@@ -4,6 +4,7 @@ from django.conf import settings
 
 import reversion
 
+from nodeshot.core.base.admin import BaseStackedInline
 from .models import Page, MenuItem
 
 
@@ -46,9 +47,17 @@ class PageAdmin(reversion.VersionAdmin):
             return field
 
 
+class MenuItemInline(BaseStackedInline):
+    model = MenuItem
+
+    if 'grappelli' in settings.INSTALLED_APPS:
+        sortable_field_name = 'order'
+        classes = ('grp-collapse grp-open', )
+
+
 class MenuItemAdmin(reversion.VersionAdmin):
     list_display = (
-        'composed_name', 'url', 'classes', 'parent',
+        'name', 'url', 'classes',
         'order', 'is_published', 'access_level',
         'added', 'updated'
     )
@@ -57,23 +66,19 @@ class MenuItemAdmin(reversion.VersionAdmin):
     readonly_fields = ('added', 'updated')
     save_on_top = True
     change_list_template = 'reversion_and_smuggler/change_list.html'
-    list_select_related = ('parent',)
+    inlines = [MenuItemInline]
+
+    def get_queryset(self, request):
+        return MenuItem.objects.published().filter(parent=None)
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'url', 'classes', 'parent')
+            'fields': ('name', 'url', 'classes')
         }),
         ('Settings', {
             'fields': ('access_level', 'is_published', 'order', 'added', 'updated')
         }),
     )
-
-    def composed_name(self, obj):
-        """ return name or parent name » name if parent is available """
-        if obj.parent:
-            return u'%s » %s' % (obj.parent.name, obj.name)
-        else:
-            return obj.name
 
 admin.site.register(Page, PageAdmin)
 admin.site.register(MenuItem, MenuItemAdmin)
