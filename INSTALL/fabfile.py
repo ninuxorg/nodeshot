@@ -147,11 +147,15 @@ def install_requirements():
     initialize()
     print(green("Installing requirements. This may take a while..."))
     with hide('stdout', 'stderr'):
-        pip_command = 'python/bin/pip install -r %srequirements.txt' % deploy_dir
+        pip_command_requirements = 'python/bin/pip install -r %srequirements.txt' % deploy_dir
         pip_command_nodeshot = 'python/bin/pip install -U https://github.com/ninuxorg/nodeshot/tarball/master'
+        pip_command_distribute = 'python/bin/pip install -U distribute'
+        pip_command_pip = 'python/bin/pip install -U pip'
+
         with cd (project_dir):
-            run('python/bin/pip install -U distribute pip')
-            run( virtual_env + ' && ' + pip_command)
+            run( virtual_env + ' && ' + pip_command_distribute)
+            run( virtual_env + ' && ' + pip_command_pip)            
+            run( virtual_env + ' && ' + pip_command_requirements)
             run( virtual_env + ' && ' + pip_command_nodeshot)
 
 def create_project():
@@ -175,7 +179,7 @@ def create_db():
         run ('su - postgres -c "createuser %s  -R -S -D "'  % db_user)
         run ('sudo -u postgres psql -U postgres -d postgres -c \"alter user %s with password \'%s\';\"' % (db_user,db_pass))
         run ('su - postgres -c "psql -c \'GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to %s;\'"' % db_user)
-        run ('su - postgres -c "psql -c \'GRANT ALL PRIVILEGES ON TABLE spatial_ref_sys TO %s;\'"' % db_user)
+        run ('su - postgres  -c "psql -d nodeshot -c \'GRANT ALL PRIVILEGES ON TABLE spatial_ref_sys TO %s;\'"' % db_user)
 
 def create_settings():
     initialize()
