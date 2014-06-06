@@ -17,7 +17,7 @@ def cache_by_group(view_instance, view_method, request, args, kwargs):
     """
     Cache view response by media type and user group.
     The cache_key is constructed this way: "{view_name:path.group.media_type}"
-    EG: "/api/v1/menu/.public.application/json"
+    EG: "MenuList:/api/v1/menu/.public.application/json"
     Possible groups are:
         * public
         * superuser
