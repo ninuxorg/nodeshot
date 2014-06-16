@@ -69,6 +69,7 @@ def install():
     create_db()
     create_settings()
     sync_data()  # Fails if settings are not correctly set
+    debug_to_false()
     create_admin()
     nginx_config()
     supervisor_config()
@@ -206,6 +207,11 @@ def sync_data(update=None):
         run('touch log/%s.error.log' % project_name )
         run('chmod 666 log/%s.error.log' % project_name)
         run( virtual_env + ' &&  ' + sync_command)
+        
+def debug_to_false():
+    with cd ('%s/%s' % (project_dir,project_name)):
+        run ('sed -i \'s#DEBUG = True#DEBUG = False#g\' settings.py ')
+        
 
 def create_admin():
     initialize()
