@@ -109,12 +109,12 @@ def clone():
 def install_git():
     print(green("Installing Git..."))
     with hide('stdout', 'stderr'):
+        run('apt-get update')
         run('apt-get -y install git-core')
 
 def install_dependencies():
     initialize()
     print(green("Installing required packages. This may take a while..."))
-    run('apt-get update')
     with hide( 'stdout', 'stderr'):
         with cd('%sINSTALL' % deploy_dir):
             run('cat dependencies.txt | xargs apt-get -y install')

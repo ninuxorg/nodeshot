@@ -35,7 +35,7 @@ Install on existing remote server
 
 Once Fabric is installed, download the fabfile that will perform the installation from the Nodeshot repository:
 
-https://github.com/ninuxorg/nodeshot/blob/master/INSTALL/fabfile.py
+https://raw.githubusercontent.com/ninuxorg/nodeshot/master/INSTALL/fabfile.py
 
 and run ( from the directory where you have downloaded the file )::
 
