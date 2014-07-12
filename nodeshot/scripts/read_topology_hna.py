@@ -79,6 +79,23 @@ class TopologyParser(object):
             print ("Parsing Topology Information of %s ..." % self.topology_url)
             i = 0
             line = self.topologylines[i]
+
+            while line.find('Table: Links') == -1:
+                i += 1
+                line = self.topologylines[i]
+
+            i += 2 # skip the heading line
+            line = self.topologylines[i]
+            while not line.isspace():
+                try:
+                        ipaddr1, ipaddr2, hyst, lq, nlq, etx = line.split()
+                        self.linklist.append((ipaddr1, ipaddr2, float(etx)))
+                except ValueError:
+                        print ("wrong line or INFINITE ETX: %s" % line)
+                        pass
+                i+=1
+                line = self.topologylines[i]
+
             while line.find('Table: Topology') == -1:
                 i += 1
                 line = self.topologylines[i]
