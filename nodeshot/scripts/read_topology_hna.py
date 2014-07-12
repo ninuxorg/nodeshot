@@ -302,7 +302,7 @@ if __name__ == "__main__":
                 new_hna = Hna(device = i.get().device, route = hna)
                 new_hna.save()
             else:
-                old_hnas[h.get().id] = True
+                old_hnas[h[0].id] = True
 
     #delete old hnas
     for h,v in old_hnas.iteritems() :
