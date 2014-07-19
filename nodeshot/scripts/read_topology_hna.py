@@ -77,6 +77,10 @@ class TopologyParser(object):
             "parse the txtinfo plugin output and make two lists: a link list and an alias (MID) list"
             # parse Topology info
             print ("Parsing Topology Information of %s ..." % self.topology_url)
+            if len(self.topologylines) < 1:
+                print("WARNING: no topology information in %s :( " % self.topology_url)
+                return
+
             i = 0
             line = self.topologylines[i]
 
