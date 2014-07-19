@@ -67,7 +67,7 @@ class TopologyParser(object):
                 req = urllib2.Request(self.topology_url, data=None, headers={'User-agent' : 'Wget/1.12'})
                 self.topologylines = urllib2.urlopen(req, timeout=settings.TOPOLOGY_URL_TIMEOUT).readlines()
             except Exception, e:
-                print "Got exception: ", e
+                print "Got an exception: ", e
                 self.topologylines = []
             print ("Done...")
             self.linklist = list()
@@ -258,6 +258,7 @@ if __name__ == "__main__":
             hnas += tp.hnainfo # list of tuples "ip list" , "hna"
         except Exception, e:
             print "Got exception: ", e
+            #raise
             #values = False
         old_links = dict([ (l.id, False) for l in Link.objects.all()])
         #print tp.linkdict
