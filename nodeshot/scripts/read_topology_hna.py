@@ -80,37 +80,53 @@ class TopologyParser(object):
             i = 0
             line = self.topologylines[i]
 
+            linkstablefound = True
             while line.find('Table: Links') == -1:
                 i += 1
-                line = self.topologylines[i]
+                if i < len(self.topologylines):
+                    line = self.topologylines[i]
+                else:
+                    i = 0
+                    line = self.topologylines[i]
+                    linkstablefound = False
+                    break
 
-            i += 2 # skip the heading line
-            line = self.topologylines[i]
-            while not line.isspace():
-                try:
-                        ipaddr1, ipaddr2, hyst, lq, nlq, etx = line.split()
-                        self.linklist.append((ipaddr1, ipaddr2, float(etx)))
-                except ValueError:
-                        print ("wrong line or INFINITE ETX: %s" % line)
-                        pass
-                i+=1
+            if linkstablefound:
+                i += 2 # skip the heading line
                 line = self.topologylines[i]
+                while not line.isspace():
+                    try:
+                            ipaddr1, ipaddr2, hyst, lq, nlq, etx = line.split()
+                            self.linklist.append((ipaddr1, ipaddr2, float(etx)))
+                    except ValueError:
+                            print ("wrong line or INFINITE ETX: %s" % line)
+                            pass
+                    i+=1
+                    line = self.topologylines[i]
 
+            topologytablefound = True
             while line.find('Table: Topology') == -1:
-                i += 1
-                line = self.topologylines[i]
+                if i < len(self.topologylines):
+                    i += 1
+                    line = self.topologylines[i]
+                else:
+                    i = 0
+                    line = self.topologylines[i]
+                    topologytablefound = False
+                    break
 
-            i += 2 # skip the heading line
-            line = self.topologylines[i]
-            while not line.isspace():
-                try:
-                        ipaddr1, ipaddr2, lq, nlq, etx = line.split()
-                        self.linklist.append((ipaddr1, ipaddr2, float(etx)))
-                except ValueError:
-                        print ("wrong line or INFINITE ETX: %s" % line)
-                        pass
-                i+=1
+            if topologytablefound:
+                i += 2 # skip the heading line
                 line = self.topologylines[i]
+                while not line.isspace():
+                    try:
+                            ipaddr1, ipaddr2, lq, nlq, etx = line.split()
+                            self.linklist.append((ipaddr1, ipaddr2, float(etx)))
+                    except ValueError:
+                            print ("wrong line or INFINITE ETX: %s" % line)
+                            pass
+                    i+=1
+                    line = self.topologylines[i]
 
             j = i + 1
             # parse HNA info
