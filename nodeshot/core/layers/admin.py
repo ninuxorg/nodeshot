@@ -53,11 +53,13 @@ class LayerAdmin(PublishActionsAdminMixin, GeoAdmin):
         super(LayerAdmin, self).publish_action(request, queryset)
         # unpublish all nodes of selected layers
         Layer.node_set.related.model.filter(layer__in=queryset).update(is_published=True)
+    publish_action.short_description = _("Publish selected layers (automatically publishes all nodes of layer)")
     
     def unpublish_action(self, request, queryset):
         super(LayerAdmin, self).unpublish_action(request, queryset)
         # publish all nodes of selected layers
         Layer.node_set.related.model.filter(layer__in=queryset).update(is_published=False)
+    unpublish_action.short_description = _("Unpublish selected layers (automatically unpublishes all nodes of layer)")
 
 
 admin.site.register(Layer, LayerAdmin)
