@@ -13,6 +13,7 @@ from ..signals import node_status_changed
 from .status import Status
 
 DEFAULT_NODE_PUBLISHED = settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True)
+NODE_HSTORE_SCHEMA = settings.NODESHOT['SETTINGS'].get('NODE_HSTORE_SCHEMA', None)
 
 
 class Node(BaseAccessLevel):
@@ -47,7 +48,7 @@ class Node(BaseAccessLevel):
     notes = models.TextField(_('notes'), blank=True, null=True,\
                              help_text=_('for internal use only'))
     
-    data = DictionaryField(_('extra data'), null=True, blank=True,\
+    data = DictionaryField(_('extra data'), null=True, blank=True, schema=NODE_HSTORE_SCHEMA,\
                            help_text=_('store extra attributes in JSON string'))
     
     # manager
