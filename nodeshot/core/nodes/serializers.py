@@ -26,10 +26,15 @@ __all__ = [
     'StatusListSerializer'
 ]
 
-  
+
+try:
+    ADDITIONAL_NODE_FIELDS = Node._hstore_virtual_fields.keys()
+except AttributeError:
+    ADDITIONAL_NODE_FIELDS = []
+
+
 class NodeDetailSerializer(ExtensibleNodeSerializer):
     """ node detail """
-    
     data = HStoreDictionaryField(required=False,
                                  label=_('extra data'),
                                  help_text=_('store extra attributes in JSON string'))
@@ -41,8 +46,8 @@ class NodeDetailSerializer(ExtensibleNodeSerializer):
         primary_fields = [
             'name', 'slug', 'status', 'user',
             'geometry', 'elev', 'address',
-            'description', 'data'
-        ]
+            'description', #'data'
+        ] + ADDITIONAL_NODE_FIELDS
             
         secondary_fields = [
             'access_level', 'layer', 'layer_name',
@@ -57,14 +62,14 @@ class NodeDetailSerializer(ExtensibleNodeSerializer):
 
 class NodeListSerializer(NodeDetailSerializer):
     """ node list """
-    
     details = serializers.HyperlinkedIdentityField(view_name='api_node_details', slug_field='slug')
     
     class Meta:
         model = Node
         fields = [
             'name', 'slug', 'layer', 'layer_name', 'user', 'status',
-            'geometry', 'elev', 'address', 'description', 'data',
+            'geometry', 'elev', 'address', 'description'
+        ] + ADDITIONAL_NODE_FIELDS + [
             'updated', 'added', 'details'
         ]
         
@@ -93,7 +98,6 @@ class NodeGeoSerializer(geoserializers.GeoFeatureModelSerializer, NodeListSerial
 
 class ImageListSerializer(serializers.ModelSerializer):
     """ Serializer used to show list """
-    
     file_url = serializers.SerializerMethodField('get_image_file')
     details = serializers.SerializerMethodField('get_uri')
     
@@ -126,7 +130,6 @@ class ImageListSerializer(serializers.ModelSerializer):
 
 class ImageAddSerializer(ImageListSerializer):
     """ Serializer for image creation """
-    
     class Meta:
         model = Image
         fields = (
@@ -137,7 +140,6 @@ class ImageAddSerializer(ImageListSerializer):
 
 class ImageEditSerializer(ImageListSerializer):
     """ Serializer for image edit """
-    
     class Meta:
         model = Image
         fields = ('id', 'file_url', 'description', 'order', 'access_level', 'added', 'updated', 'details')
@@ -146,7 +148,6 @@ class ImageEditSerializer(ImageListSerializer):
 
 class ImageRelationSerializer(ImageListSerializer):
     """ Serializer to reference images """
-    
     class Meta:
         model = Image
         fields = ('id', 'file', 'file_url', 'description', 'added', 'updated')
