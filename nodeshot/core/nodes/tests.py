@@ -240,7 +240,6 @@ class APITest(BaseTestCase):
             "address": "via dei test",
             "description": "",
             "geometry": json.loads(GEOSGeometry("POINT (12.99 41.8720419277)").json),
-            "data": { "is_test": True }
         }
         
         # POST: 403 - unauthenticated
@@ -255,8 +254,7 @@ class APITest(BaseTestCase):
         self.assertEqual(response.data['user'], 'registered')
         
         node = Node.objects.get(slug='test-distance')
-        self.assertEqual(node.data, { 'is_test': 'true' })
-        self.assertEqual(Node.objects.filter(data__contains={ "is_test": "true" }).count(), 1)
+        self.assertEqual(node.name, "test distance")
     
     def test_node_list_search(self):
         url = reverse('api_node_list')
