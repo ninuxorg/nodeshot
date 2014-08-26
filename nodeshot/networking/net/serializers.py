@@ -9,7 +9,7 @@ from .models import *
 from .models.choices import INTERFACE_TYPES
 from .fields import MacAddressField, IPAddressField, IPNetworkField
 
-from nodeshot.core.base.fields import HStoreDictionaryField
+from rest_framework_hstore.fields import HStoreField
 
 
 __all__ = [
@@ -95,7 +95,7 @@ class DeviceDetailSerializer(DeviceListSerializer):
     vlan = serializers.SerializerMethodField('get_vlan_interfaces')
     vlan_url = serializers.HyperlinkedIdentityField(view_name='api_device_vlan')
     
-    data = HStoreDictionaryField(
+    data = HStoreField(
         required=False,
         label=_('extra data'),
         help_text=_('store extra attributes in JSON string')
@@ -191,7 +191,7 @@ class InterfaceSerializer(serializers.ModelSerializer):
     ip = serializers.SerializerMethodField('get_ip_addresses')
     ip_url = serializers.HyperlinkedIdentityField(view_name='api_interface_ip')
     
-    data = HStoreDictionaryField(
+    data = HStoreField(
         required=False,
         label=_('extra data'),
         help_text=_('store extra attributes in JSON string')
