@@ -1,10 +1,11 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
+from rest_framework_hstore.serializers import HStoreSerializer
 from nodeshot.core.base.serializers import DynamicRelationshipsMixin
 
 
-class ExtensibleNodeSerializer(DynamicRelationshipsMixin, geoserializers.GeoModelSerializer):
+class ExtensibleNodeSerializer(DynamicRelationshipsMixin, geoserializers.GeoModelSerializer, HStoreSerializer):
     """ node detail """
     user = serializers.Field(source='user.username')
     status = serializers.Field(source='status.slug')

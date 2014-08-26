@@ -9,8 +9,6 @@ from nodeshot.core.base.serializers import GeoJSONPaginationSerializer
 from .base import ExtensibleNodeSerializer
 from .models import *
 
-from nodeshot.core.base.fields import HStoreDictionaryField
-
 
 __all__ = [
     'NodeListSerializer',
@@ -35,26 +33,18 @@ except AttributeError:
 
 class NodeDetailSerializer(ExtensibleNodeSerializer):
     """ node detail """
-    data = HStoreDictionaryField(required=False,
-                                 label=_('extra data'),
-                                 help_text=_('store extra attributes in JSON string'))
-    
     layer = serializers.SlugRelatedField(slug_field='slug')
     
     class Meta:
         model = Node
-        primary_fields = [
+        fields = [
             'name', 'slug', 'status', 'user',
-            'geometry', 'elev', 'address',
-            'description', #'data'
-        ] + ADDITIONAL_NODE_FIELDS
-            
-        secondary_fields = [
             'access_level', 'layer', 'layer_name',
+            'geometry', 'elev', 'address',
+            'description',
+        ] + ADDITIONAL_NODE_FIELDS + [
             'added', 'updated', 'relationships'
         ]
-        
-        fields = primary_fields + secondary_fields
         
         read_only_fields = ('added', 'updated')
         geo_field = 'geometry'
@@ -68,8 +58,7 @@ class NodeListSerializer(NodeDetailSerializer):
         model = Node
         fields = [
             'name', 'slug', 'layer', 'layer_name', 'user', 'status',
-            'geometry', 'elev', 'address', 'description'
-        ] + ADDITIONAL_NODE_FIELDS + [
+            'geometry', 'elev', 'address', 'description',
             'updated', 'added', 'details'
         ]
         
