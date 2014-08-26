@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.6.5
+Django==1.6.6
 
 # python libraries
 Pillow
@@ -29,6 +29,7 @@ drf-extensions==0.2.5
 django-rest-swagger
 markdown
 djangorestframework-gis
+djangorestframework-hstore
 
 # authentication with social networks
 django-social-auth
@@ -40,14 +41,11 @@ django-reversion==1.8.2
 celery==3.1.13
 django-celery-email
 
-# Postgres HSTORE support
-django_hstore==1.3.0
-
 # migrations
 south
 
 # django-cors-headers
-django-cors-headers==0.12
+django-cors-headers==0.13
 
 # websockets
 tornado
