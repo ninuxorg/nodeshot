@@ -1,7 +1,7 @@
 #ignore the follow paths
 *.pyc
 .komodotools/
-settings.py
+projects/ninux/ninux/settings.py
 *.komodoproject
 *.DS_Store
 python/
