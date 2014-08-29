@@ -1,9 +1,11 @@
+from datetime import datetime, timedelta
+
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.utils.timezone import utc
 from django.conf import settings
 
-from datetime import datetime, timedelta
+from .settings import DISCONNECTABLE_SIGNALS
 from .exceptions import DependencyError
 
 
@@ -80,7 +82,7 @@ def pause_disconnectable_signals():
     Disconnects non critical signals like notifications, websockets and stuff like that.
     Use when managing large chunks of nodes
     """
-    for signal in settings.NODESHOT['DISCONNECTABLE_SIGNALS']:
+    for signal in DISCONNECTABLE_SIGNALS:
         signal['disconnect']()
 
 
@@ -89,7 +91,7 @@ def resume_disconnectable_signals():
     Reconnects non critical signals like notifications, websockets and stuff like that.
     Use when managing large chunks of nodes
     """
-    for signal in settings.NODESHOT['DISCONNECTABLE_SIGNALS']:
+    for signal in DISCONNECTABLE_SIGNALS:
         signal['reconnect']()
 
 

@@ -53,9 +53,11 @@ def reconnect():
     pre_delete.connect(node_deleted_handler, sender=Node)
 
 
-settings.NODESHOT['DISCONNECTABLE_SIGNALS'].append(
+from nodeshot.core.base.settings import DISCONNECTABLE_SIGNALS
+DISCONNECTABLE_SIGNALS.append(
     {
         'disconnect': disconnect,
         'reconnect': reconnect
     }
 )
+setattr(settings, 'NODESHOT_DISCONNECTABLE_SIGNALS', DISCONNECTABLE_SIGNALS)

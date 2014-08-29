@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+from .settings import ACL_DEFAULT_VALUE, ACL_DEFAULT_EDITABLE
 from .choices import ACCESS_LEVELS
 from .utils import choicify, now
 
@@ -84,34 +85,34 @@ class BaseAccessLevel(BaseDate):
     
     DEFAULT VALUE
         To edit the default value for the access_level field of a certain
-        model you will have to add the following setting in the settings.py file:
+        model you will have to add the following setting in your settings.py file:
     
-        NODESHOT['DEFAULTS']['ACL_{APP_NAME}_{MODEL_NAME}'] = 'public'
+        NODESHOT_ACL_{APP_NAME}_{MODEL_NAME}_DEFAULT = 'public'
     
-        where {APP_NAME} is the uppercase name of an app like "nodes" or "network"
-        and {MODEL_NAME} is the uppercase name of a model like "Node" or "Device"
+        where {APP_NAME} is the uppercase name of an app like "NODES"
+        and {MODEL_NAME} is the uppercase name of a model like "NODE"
         The values will have to be one of the possible values specified in
         "nodeshot.core.base.choices.ACCESS_LEVELS"
         The possible values are public or the id of the group saved in the database
         (default ones are 1 for registered, 2 for community and 3 for trusted)
         
         For the cases in which no setting is specified the fallback setting
-        NODESHOT['DEFAULTS']['ACL_GLOBAL'] will be used.
+        NODESHOT_ACL_DEFAULT_VALUE will be used.
     
     EDITABLE
         If you want to disable the possibility to edit the access_level field
         for a given model you will have to add the following settings in the settings.py file:
         
-        NODESHOT['DEFAULTS']['ACL_{APP_NAME}_{MODEL_NAME}_EDITABLE'] = False
+        NODESHOT_ACL_{APP_NAME}_{MODEL_NAME}_EDITABLE = False
         
-        where {APP_NAME} is the uppercase name of an app like "nodes" or "network"
-        and {MODEL_NAME} is the uppercase name of a model like "Node" or "Device"
+        where {APP_NAME} is the uppercase name of an app like "NODES"
+        and {MODEL_NAME} is the uppercase name of a model like "NODE"
         
         For the cases in which no setting is specified the fallback setting
-        NODESHOT['DEFAULTS']['ACL_GLOBAL_EDITABLE'] will be used.
+        NODESHOT_ACL_DEFAULT_EDITABLE will be used.
     
     """
-    access_level = models.SmallIntegerField(_('access level'), choices=choicify(ACCESS_LEVELS), default=ACCESS_LEVELS.get('public'))
+    access_level = models.SmallIntegerField(_('access level'), choices=choicify(ACCESS_LEVELS), default=ACCESS_LEVELS.get(ACL_DEFAULT_VALUE))
     
     class Meta:
         abstract = True
@@ -122,24 +123,18 @@ class BaseAccessLevel(BaseDate):
         In the case the field is not editable it won't show up at all
         """
         
-        # {APP_NAME}_{MODEL_NAME}, eg: NODES_NODE, SERVICES_SERVICE, NETWORK_IP
+        # {APP_NAME}_{MODEL_NAME}, eg: NODES_NODE
         app_descriptor = '%s_%s' % (self._meta.app_label.upper(), self._meta.object_name.upper())
         
-        try:
-            # looks up in settings.py
-            # example NODESHOT['DEFAULTS']['ACL_NETWORK_NODE']
-            ACL_DEFAULT = ACCESS_LEVELS.get(settings.NODESHOT['DEFAULTS']['ACL_%s' % app_descriptor])
-        except KeyError:
-            # if setting is not found use the global setting 
-            ACL_DEFAULT = ACCESS_LEVELS.get(settings.NODESHOT['DEFAULTS']['ACL_GLOBAL'])
+        # looks up in settings.py
+        # example: NODESHOT_ACL_NODES_NODE_DEFAULT
+        # defaults to NODESHOT_ACL_DEFAULT_VALUE
+        value = getattr(settings, 'NODESHOT_ACL_%s_DEFAULT' % app_descriptor, ACL_DEFAULT_VALUE)
+        ACL_DEFAULT = ACCESS_LEVELS.get(value)
         
-        try:
-            # looks up in settings.py
-            # example NODESHOT['SETTINGS']['ACL_NETWORK_NODE_EDITABLE']
-            ACL_EDITABLE = settings.NODESHOT['SETTINGS']['ACL_%s_EDITABLE' % app_descriptor]
-        except KeyError:
-            # if setting is not found use the global setting 
-            ACL_EDITABLE = settings.NODESHOT['SETTINGS']['ACL_GLOBAL_EDITABLE']
+        # looks up in settings.py
+        # example: NODESHOT_ACL_NODES_NODE_EDITABLE
+        ACL_EDITABLE = getattr(settings, 'NODESHOT_ACL_%s_EDITABLE' % app_descriptor, ACL_DEFAULT_EDITABLE)
         
         # set "default" and "editable" attributes
         self._meta.get_field('access_level').default = ACL_DEFAULT

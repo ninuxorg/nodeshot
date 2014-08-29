@@ -23,6 +23,7 @@ class PageAdmin(reversion.VersionAdmin):
             'fields': ('title', 'slug', 'content')
         }),
         ('Settings', {
+            # TODO: access_level conditional depending on NODESHOT_ACL_EDITABLE_DEFAULT and NODESHOT_ACL_CMS_PAGE_EDITABLE
             'fields': ('access_level', 'is_published', 'added', 'updated')
         }),
         ('Meta tags (optional)', {

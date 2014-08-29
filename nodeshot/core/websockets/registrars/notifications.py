@@ -36,9 +36,11 @@ def reconnect():
     post_save.connect(new_notification_handler, sender=Notification)
 
 
-settings.NODESHOT['DISCONNECTABLE_SIGNALS'].append(
+from nodeshot.core.base.settings import DISCONNECTABLE_SIGNALS
+DISCONNECTABLE_SIGNALS.append(
     {
         'disconnect': disconnect,
         'reconnect': reconnect
     }
 )
+setattr(settings, 'NODESHOT_DISCONNECTABLE_SIGNALS', DISCONNECTABLE_SIGNALS)

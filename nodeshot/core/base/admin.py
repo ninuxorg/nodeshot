@@ -4,6 +4,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
+from .settings import ADMIN_MAP_COORDINATES, ADMIN_MAP_ZOOM
+
 GEODJANGO_IMPROVED_WIDGETS = 'olwidget' in settings.INSTALLED_APPS
 
 
@@ -16,9 +18,9 @@ else:
 def _get_geodjango_map_coords():
     """ point to be used by geodjango """
     try:
-        lat, lng = settings.NODESHOT['SETTINGS']['ADMIN_MAP_COORDS']
+        lat, lng = ADMIN_MAP_COORDINATES
     except KeyError:
-        raise ImproperlyConfigured("missing NODESHOT['SETTINGS']['ADMIN_MAP_COORDS'] in settings")
+        raise ImproperlyConfigured("incorrect NODESHOT_ADMIN_MAP_COORDINATES setting")
     
     point = Point(lng, lat, srid=4326)
     
@@ -31,9 +33,9 @@ def _get_geodjango_map_coords():
 def _get_geodjango_map_zoom():
     """ zoom level to be used by geodjango """
     try:
-        return settings.NODESHOT['SETTINGS']['ADMIN_MAP_ZOOM']
+        return ADMIN_MAP_ZOOM
     except KeyError:
-        raise ImproperlyConfigured("missing NODESHOT['SETTINGS']['ADMIN_MAP_ZOOM'] in settings")
+        raise ImproperlyConfigured("incorrect NODESHOT_ADMIN_MAP_ZOOM setting")
 
 
 class BaseAdmin(admin.ModelAdmin):
