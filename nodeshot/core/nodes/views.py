@@ -2,7 +2,6 @@ from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.conf import settings
 from django.db.models import Q, Count
 
 from rest_framework import permissions, authentication, generics
@@ -10,11 +9,11 @@ from rest_framework import permissions, authentication, generics
 from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
 from nodeshot.core.base.utils import Hider
 
+from .settings import REVERSION_ENABLED
 from .permissions import IsOwnerOrReadOnly
 from .serializers import *
 from .models import *
 
-REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_NODES', True)
 
 if REVERSION_ENABLED:
     from nodeshot.core.base.mixins import RevisionCreate, RevisionUpdate

@@ -1,19 +1,17 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos.collections import GeometryCollection
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.conf import settings
 
 from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
 from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as NodeManager
 
 from django_hstore.fields import DictionaryField
 
+from ..settings import PUBLISHED_DEFAULT, HSTORE_SCHEMA
 from ..signals import node_status_changed
 from .status import Status
-
-DEFAULT_NODE_PUBLISHED = settings.NODESHOT['DEFAULTS'].get('NODE_PUBLISHED', True)
-NODE_HSTORE_SCHEMA = settings.NODESHOT['SETTINGS'].get('NODE_HSTORE_SCHEMA', None)
 
 
 class Node(BaseAccessLevel):
@@ -25,7 +23,7 @@ class Node(BaseAccessLevel):
     name = models.CharField(_('name'), max_length=75, unique=True)
     slug = models.SlugField(max_length=75, db_index=True, unique=True, blank=True)
     status = models.ForeignKey(Status, blank=True, null=True)
-    is_published = models.BooleanField(default=DEFAULT_NODE_PUBLISHED)
+    is_published = models.BooleanField(default=PUBLISHED_DEFAULT)
     
     # TODO: find a way to move this in layers
     if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
@@ -48,7 +46,7 @@ class Node(BaseAccessLevel):
     notes = models.TextField(_('notes'), blank=True, null=True,\
                              help_text=_('for internal use only'))
     
-    data = DictionaryField(_('extra data'), null=True, blank=True, schema=NODE_HSTORE_SCHEMA,\
+    data = DictionaryField(_('extra data'), null=True, blank=True, schema=HSTORE_SCHEMA,\
                            help_text=_('store extra attributes in JSON string'))
     
     # manager

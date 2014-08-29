@@ -2,11 +2,12 @@ from django.contrib import admin
 from django.db import models
 from django.conf import settings
 
-from nodeshot.core.nodes.models import *
 from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline, PublishActionsAdminMixin
 from nodeshot.core.base.widgets import AdvancedFileInput
 
-REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_NODES', True)
+from .settings import REVERSION_ENABLED
+from .models import *
+
 
 # enable django-reversion according to settings
 if REVERSION_ENABLED:
