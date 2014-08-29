@@ -14,7 +14,7 @@ class PageListSerializer(serializers.ModelSerializer):
     """
     Page List Serializer
     """
-    details = serializers.HyperlinkedIdentityField(view_name='api_page_detail', slug_field='slug')
+    details = serializers.HyperlinkedIdentityField(view_name='api_page_detail', lookup_field='slug')
 
     class Meta:
         model = Page

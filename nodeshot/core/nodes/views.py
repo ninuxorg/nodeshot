@@ -112,7 +112,6 @@ class NodeDetail(NodeDetailBase):
     Edit node. Must be authenticated as owner or admin.
     """
     lookup_field = 'slug'
-    model = Node
     serializer_class = NodeDetailSerializer
     authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (IsOwnerOrReadOnly, )
@@ -167,7 +166,6 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
     Set the content-type as **"multipart-formdata"** and send the file param as a binary stream.
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    model = Image
     serializer_class = ImageListSerializer
     serializer_custom_class = ImageAddSerializer
     permission_classes = (IsOwnerOrReadOnly, )
@@ -223,7 +221,6 @@ class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
             "access_level": "public"
         }
     """
-    model = Image
     queryset = Image.objects.all()
     serializer_class = ImageEditSerializer
     authentication_classes = (authentication.SessionAuthentication, )

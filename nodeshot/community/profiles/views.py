@@ -203,7 +203,6 @@ class UserSocialLinksDetail(SocialLinkMixin, generics.RetrieveUpdateDestroyAPIVi
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticatedOrReadOnly, IsProfileOwner)
     serializer_class = SocialLinkSerializer
-    model = SocialLink
 
 user_social_links_detail = UserSocialLinksDetail.as_view()
 

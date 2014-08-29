@@ -23,9 +23,9 @@ class LayerListSerializer(geoserializers.GeoModelSerializer):
     """
     Layer list
     """
-    details = serializers.HyperlinkedIdentityField(view_name='api_layer_detail', slug_field='slug')
-    nodes = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_list', slug_field='slug')
-    geojson = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_geojson', slug_field='slug')
+    details = serializers.HyperlinkedIdentityField(view_name='api_layer_detail', lookup_field='slug')
+    nodes = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_list', lookup_field='slug')
+    geojson = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_geojson', lookup_field='slug')
     
     class Meta:
         model = Layer

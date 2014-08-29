@@ -95,7 +95,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     social_links = SocialLinkSerializer(source='sociallink_set', many=True, read_only=True)
 
     if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
-        nodes = serializers.HyperlinkedIdentityField(view_name='api_user_nodes', slug_field='username')
+        nodes = serializers.HyperlinkedIdentityField(view_name='api_user_nodes', lookup_field='username')
 
     def get_avatar(self, obj):
         """ avatar from gravatar.com """

@@ -52,7 +52,7 @@ class NodeDetailSerializer(ExtensibleNodeSerializer):
 
 class NodeListSerializer(NodeDetailSerializer):
     """ node list """
-    details = serializers.HyperlinkedIdentityField(view_name='api_node_details', slug_field='slug')
+    details = serializers.HyperlinkedIdentityField(view_name='api_node_details', lookup_field='slug')
     
     class Meta:
         model = Node

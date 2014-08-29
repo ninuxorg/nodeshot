@@ -39,7 +39,6 @@ class LayerList(LayerListBase):
     
     Create new layer if authorized (admins and allowed users only).
     """
-    model= Layer
     queryset = Layer.objects.published()
     permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
     authentication_classes = (authentication.SessionAuthentication,)
@@ -61,7 +60,6 @@ class LayerDetail(LayerDetailBase):
     """
     permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
     authentication_classes = (authentication.SessionAuthentication,)
-    model= Layer
     queryset = Layer.objects.published()
     serializer_class= LayerDetailSerializer
     lookup_field = 'slug'
@@ -80,7 +78,6 @@ class LayerNodesList(ListSerializerMixin, NodeList):
      * `limit=0`: turns off pagination
      * `layerinfo`: true shows layer description and other info, false doesn't (defaults to true)
     """
-    
     layer = None
     layer_info_default = True  # show layer info by default
     
@@ -140,7 +137,6 @@ class LayerNodesGeoJSONList(LayerNodesList):
      * `limit=0`: turns off pagination (default)
      * `layerinfo`: true shows layer description and other info, false doesn't (defaults to false)
     """
-    
     serializer_class = NodeGeoSerializer
     paginate_by = 0
     layer_info_default = False  # don't show layer info by default
