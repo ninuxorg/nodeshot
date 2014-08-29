@@ -10,10 +10,10 @@ from nodeshot.core.base.utils import Hider
 from nodeshot.core.nodes.views import NodeList
 from nodeshot.core.nodes.serializers import NodeGeoSerializer
 
+from .settings import REVERSION_ENABLED
 from .models import Layer
 from .serializers import *
 
-REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_NODES', True)
 
 if REVERSION_ENABLED:
     from nodeshot.core.base.mixins import RevisionCreate, RevisionUpdate

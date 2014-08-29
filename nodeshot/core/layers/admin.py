@@ -1,12 +1,11 @@
 from django.contrib.gis import admin
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from nodeshot.core.base.admin import BaseGeoAdmin, PublishActionsAdminMixin
-from models import Layer
 
-REVERSION_ENABLED = settings.NODESHOT['SETTINGS'].get('REVERSION_LAYERS', True)
+from .settings import REVERSION_ENABLED, TEXT_HTML
+from .models import Layer
 
 # enable django-reversion according to settings
 if REVERSION_ENABLED:
@@ -37,7 +36,7 @@ class LayerAdmin(PublishActionsAdminMixin, GeoAdmin):
         'm2m': ['mantainers'],
     }
     
-    if settings.NODESHOT['SETTINGS'].get('LAYER_TEXT_HTML', True) is True:  
+    if TEXT_HTML:
         # enable editor for "extended text description" only
         html_editor_fields = ['text']
     

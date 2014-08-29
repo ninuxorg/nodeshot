@@ -1,10 +1,5 @@
 from nodeshot.core.base.managers import GeoPublishedQuerySet
-from django.conf import settings
-
-if settings.NODESHOT['SETTINGS'].get('HSTORE', True):
-    from nodeshot.core.base.managers import HStoreGeoPublishedManager as BaseLayerManager
-else:
-    from nodeshot.core.base.managers import GeoPublishedManager as BaseLayerManager
+from nodeshot.core.base.managers import HStoreGeoPublishedManager
 
 
 class ExternalMixin(object):
@@ -20,7 +15,7 @@ class ExternalQueryset(GeoPublishedQuerySet, ExternalMixin):
     pass
 
 
-class LayerManager(BaseLayerManager, ExternalMixin):
+class LayerManager(HStoreGeoPublishedManager, ExternalMixin):
     """ extends GeoPublishedManager to add external method """
     
     def get_query_set(self): 

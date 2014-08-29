@@ -7,9 +7,10 @@ from django.conf import settings
 from django_hstore.fields import DictionaryField
 
 from nodeshot.core.base.models import BaseDate
-from nodeshot.core.base.choices import MAP_ZOOM
+from nodeshot.core.base.choices import MAP_ZOOM as MAP_ZOOM_CHOICES
 from nodeshot.core.nodes.models import Node
 
+from ..settings import ZOOM_DEFAULT, NODE_MINIMUM_DISTANCE
 from ..managers import LayerManager
 from ..signals import layer_is_published_changed
 
@@ -30,7 +31,7 @@ class Layer(BaseDate):
     # geographic related fields
     center = models.PointField(_('center coordinates'), null=True, blank=True)
     area = models.PolygonField(_('area'), null=True, blank=True)
-    zoom = models.SmallIntegerField(_('default zoom level'), choices=MAP_ZOOM, default=settings.NODESHOT['DEFAULTS']['LAYER_ZOOM'])
+    zoom = models.SmallIntegerField(_('default zoom level'), choices=MAP_ZOOM_CHOICES, default=ZOOM_DEFAULT)
     
     # organizational
     organization = models.CharField(_('organization'), help_text=_('Organization which is responsible to manage this layer'), max_length=255)
@@ -45,10 +46,11 @@ class Layer(BaseDate):
                                         blank=True)
     
     # settings
-    minimum_distance = models.IntegerField(default=settings.NODESHOT['DEFAULTS']['LAYER_MINIMUM_DISTANCE'],
+    # TODO: rename minimum_distance to nodes_minimum_distance
+    minimum_distance = models.IntegerField(default=NODE_MINIMUM_DISTANCE,
                                            help_text=_('minimum distance between nodes in meters, 0 means feature disabled'))
     new_nodes_allowed = models.BooleanField(_('new nodes allowed'), default=True, help_text=_('indicates whether users can add new nodes to this layer'))
-    
+    # TODO: HSTORE_SCHEMA setting
     data = DictionaryField(_('extra data'), null=True, blank=True,\
                            help_text=_('store extra attributes in JSON string'))
         
