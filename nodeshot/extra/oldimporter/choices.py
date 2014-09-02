@@ -1,5 +1,5 @@
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from .settings import settings
 
 
 ROUTING_PROTOCOLS = (
@@ -17,7 +17,6 @@ ROUTING_PROTOCOLS = (
 
 DEFAULT_ROUTING_PROTOCOL = 'olsr'
 ACTIVATION_DAYS = 7
-DEFAULT_FROM_EMAIL = getattr(settings, 'DEFAULT_FROM_EMAIL', False)
 
 SITE = {
     'name': 'Nodeshot',

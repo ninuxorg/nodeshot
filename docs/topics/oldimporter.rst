@@ -123,27 +123,14 @@ Uncomment ``nodeshot.extra.oldimporter`` in ``settings.INSTALLED_APPS``:
         # ...
     ]
 
-And set the ``DEFAULT_LAYER`` (object id/primary key):
+And set ``NODESHOT_OLDIMPORTER_DEFAULT_LAYER`` (object id/primary key):
 
 .. code-block:: python
 
-    # ...
-
-    'OLD_IMPORTER':{
-        'DEFAULT_LAYER': 1,
-        'STATUS_MAPPING': {
-            'a': 'active',
-            'h': 'active',
-            'ah': 'active',
-            'p': 'potential',
-            'default': 'potential'
-        }
-    },
-
-    # ...
+    NODESHOT_OLDIMPORTER_DEFAULT_LAYER = 1
 
 If you followed exactly the instructions in this document you can leave the default
-``STATUS_MAPPING`` setting unchanged.
+``NODESHOT_OLDIMPORTER_STATUS_MAPPING`` setting unchanged.
 
 ========================
 Install database drivers
@@ -278,10 +265,10 @@ such as name, email, and stuff like that, the script will create user accounts:
             1. use default layer if specified (configured in settings)
             2. discard the node if no default layer specified
     * **STATUS**: assign status depending on configuration:
-        ``settings.NODESHOT['OLD_IMPORTER']['STATUS_MAPPING']`` must be a dictionary in which the
+        ``settings.NODESHOT_OLDIMPORTER_STATUS_MAPPING`` must be a dictionary in which the
         key is the old status value while the value is the new status value
-        if ``settings.NODESHOT['OLD_IMPORTER']['STATUS_MAPPING']`` is False the default status will be used
-    * **HOSTPOT**: if status is hotspot or active and hotspot add this info in *HSTORE* data field
+        if ``settings.NODESHOT_OLDIMPORTER_STATUS_MAPPING`` is False the default status will be used
+    * **HOSTPOT**: if status is hotspot or active and hotspot add this info in the *HSTORE* data field
 
 -----------------
 4. Import devices

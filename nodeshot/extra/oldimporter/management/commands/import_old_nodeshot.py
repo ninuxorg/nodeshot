@@ -12,10 +12,11 @@ from django.db.models import Q
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.gis.geos import Point
 from django.utils.text import slugify
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
+from ...settings import settings, STATUS_MAPPING, DEFAULT_LAYER
 
 if 'emailconfirmation' in settings.INSTALLED_APPS:
     EMAIL_ADDRESS_APP_INSTALLED = True
@@ -71,12 +72,12 @@ class Command(BaseCommand):
                 1. if node has coordinates comprised in a specified layer choose that
                 2. if node has coordinates comprised in more than one layer prompt the user which one to choose
                 3. if node does not have coordinates comprised in any layer:
-                    1. use default layer if specified (configured in settings)
+                    1. use default layer if specified (configured in settings.NODESHOT_OLDIMPORTER_DEFAULT_LAYER)
                     2. discard the node if no default layer specified
             * STATUS: assign status depending on configuration:
-                settings.NODESHOT['OLD_IMPORTER']['STATUS_MAPPING'] must be a dictionary in which the
+                settings.NODESHOT_OLDIMPORTER_STATUS_MAPPING must be a dictionary in which the
                 key is the old status value while the value is the new status value
-                if settings.NODESHOT['OLD_IMPORTER']['STATUS_MAPPING'] is False the default status will be used
+                if settings.NODESHOT_OLDIMPORTER_STATUS_MAPPING is False the default status will be used
             * HOSTPOT: if status is hotspot or active and hotspot add this info in HSTORE data field
 
     4.  Import devices
@@ -92,9 +93,9 @@ class Command(BaseCommand):
     """
     help = 'Import old nodeshot data. Layers and Status must be created first.'
 
-    status_mapping = settings.NODESHOT['OLD_IMPORTER'].get('STATUS_MAPPING', False)
+    status_mapping = STATUS_MAPPING
     # if no default layer some nodes might be discarded
-    default_layer = settings.NODESHOT['OLD_IMPORTER'].get('DEFAULT_LAYER', False)
+    default_layer = DEFAULT_LAYER
 
     old_nodes = []
     saved_users = []
@@ -429,7 +430,7 @@ choose (enter the number of) one of the following layers:
                     user = None
                     tb = traceback.format_exc()
                     self.message('Could not save user %s, got exception:\n\n%s' % (user.username, tb))
-            
+
             # if we got a user to add
             if user is not None:
                 # store id

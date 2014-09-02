@@ -1,8 +1,6 @@
 from django.test import TestCase
 from django.core import mail, management
-from django.conf import settings
 from django.contrib.gis.geos import Point
-from django.test.utils import override_settings
 
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
@@ -10,7 +8,9 @@ from nodeshot.networking.net.models import Device, Interface, Ip, Vap, Wireless
 from nodeshot.networking.links.models import Link
 from nodeshot.community.profiles.models import Profile as User
 from nodeshot.community.mailing.models import Inward
+
 from .models import *
+from . import settings
 
 
 class TestOldImporter(TestCase):
@@ -51,13 +51,12 @@ class TestOldImporter(TestCase):
         l.geometry = Point(40.0, 10.0)
         l.full_clean()
         l.save()
-
-    @override_settings()
+    
     def test_command(self):
         for user in User.objects.all():
             user.delete()
 
-        settings.NODESHOT['OLD_IMPORTER']['DEFAULT_LAYER'] = 5
+        settings.DEFAULT_LAYER = 5
         management.call_command('import_old_nodeshot', noinput=True)
 
         nodes = Node.objects.all().order_by('id')
@@ -309,9 +308,9 @@ class TestOldImporter(TestCase):
         self.assertEqual(link.dbm, -75)
 
         self.assertEqual(inwards[1].from_name, 'Added')
-        
+
         # ------ try to cause troubles ------ #
-        
+
         ot = OldNode(**{
             "name": "troublingnode",
             "slug": "troublingnode",
@@ -326,7 +325,7 @@ class TestOldImporter(TestCase):
             "status": "a"
         })
         ot.save()
-        
+
         troublemaker = User(**{
             "first_name": "Trouble",
             "last_name": "Maker",
@@ -334,7 +333,7 @@ class TestOldImporter(TestCase):
             "email": "troublemaker@test.com"
         })
         troublemaker.save()
-        
+
         management.call_command('import_old_nodeshot', noinput=True, verbosity=2)
-        
+
         self.assertEqual(Node.objects.filter(name='troublingnode').count(), 1)
