@@ -1,18 +1,17 @@
 from django.contrib import admin
 from django.db import models
-from django.conf import settings
 
 from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline, PublishActionsAdminMixin
 from nodeshot.core.base.widgets import AdvancedFileInput
 
-from .settings import REVERSION_ENABLED
+from .settings import settings, REVERSION_ENABLED, DESCRIPTION_HTML
 from .models import *
 
 
 # enable django-reversion according to settings
 if REVERSION_ENABLED:
     import reversion
-    
+
     class GeoAdmin(BaseGeoAdmin, reversion.VersionAdmin):
         change_list_template = 'reversion_and_smuggler/change_list.html'
 else:
@@ -22,11 +21,11 @@ else:
 
 class ImageInline(BaseStackedInline):
     model = Image
-    
+
     formfield_overrides = {
         models.ImageField: {'widget': AdvancedFileInput(image_width=250)},
     }
-    
+
     if 'grappelli' in settings.INSTALLED_APPS:
         sortable_field_name = 'order'
         classes = ('grp-collapse grp-open', )
@@ -57,17 +56,17 @@ class NodeAdmin(PublishActionsAdminMixin, GeoAdmin):
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ImageInline]
-    
+
     # django-grappelli usability improvements
     raw_id_fields = ('layer', 'user')
     autocomplete_lookup_fields = {
         'fk': ('layer', 'user'),
     }
-    
+
     def queryset(self, request):
         return super(NodeAdmin, self).queryset(request).select_related('user', 'layer', 'status')
-    
-    if settings.NODESHOT['SETTINGS'].get('NODE_DESCRIPTION_HTML', True) is True:  
+
+    if DESCRIPTION_HTML:
         # enable editor for "node description" only
         html_editor_fields = ['description']
 
@@ -76,7 +75,7 @@ class StatusAdmin(admin.ModelAdmin):
     list_display  = ('name', 'slug', 'description', 'order', 'is_default')
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ('order', )
-    
+
     change_list_template = 'smuggler/change_list.html'
 
 
