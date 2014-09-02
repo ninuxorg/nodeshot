@@ -6,11 +6,11 @@ from django.contrib.sites.models import Site
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
-from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate
 
 from .choices import INWARD_STATUS_CHOICES
+from ..settings import settings, INWARD_REQUIRE_AUTH, INWARD_MAXLENGTH, INWARD_MINLENGTH, INWARD_LOG
 
 
 user_app_label = settings.AUTH_USER_MODEL.split('.')[0]
@@ -20,7 +20,7 @@ limit = (
     models.Q(app_label=user_app_label, model=user_model_name.lower()) |
     models.Q(app_label='layers', model='layer')
 )
-USER_CAN_BE_BLANK = not settings.NODESHOT['SETTINGS']['CONTACT_INWARD_REQUIRE_AUTH']
+USER_CAN_BE_BLANK = not INWARD_REQUIRE_AUTH
 
 
 class Inward(BaseDate):
@@ -36,32 +36,32 @@ class Inward(BaseDate):
     from_name = models.CharField(_('name'), max_length=50, blank=True)
     from_email = models.EmailField(_('email'), max_length=50, blank=True)
     message = models.TextField(_('message'), validators=[
-        MaxLengthValidator(settings.NODESHOT['SETTINGS']['CONTACT_INWARD_MAXLENGTH']),
-        MinLengthValidator(settings.NODESHOT['SETTINGS']['CONTACT_INWARD_MINLENGTH'])
+        MaxLengthValidator(INWARD_MAXLENGTH),
+        MinLengthValidator(INWARD_MINLENGTH)
     ])
     ip = models.GenericIPAddressField(verbose_name=_('ip address'), blank=True, null=True)
     user_agent = models.CharField(max_length=255, blank=True)
     accept_language = models.CharField(max_length=255, blank=True)
-    
+
     class Meta:
         verbose_name = _('Inward message')
         verbose_name_plural = _('Inward messages')
         app_label= 'mailing'
         ordering = ['-status']
-    
+
     def __unicode__(self):
         return _(u'Message from %(from)s to %(to)s') % ({'from': self.from_name, 'to': self.content_type})
-    
+
     def clean(self, *args, **kwargs):
         """ custom validation """
         if not self.user and (not self.from_name or not self.from_email):
             raise ValidationError(_('If sender is not specified from_name and from_email must be filled in'))
-        
+
         # fill name and email
         if self.user:
             self.from_name = self.user.get_full_name()
             self.from_email = self.user.email
-    
+
     def send(self):
         """
         Sends the email to the recipient
@@ -90,11 +90,11 @@ class Inward(BaseDate):
             # reply-to header
             headers = {'Reply-To': self.from_email}
         )
-        
+
         import socket
         # try sending email
         try:
-            email.send()            
+            email.send()
             self.status = 1
         # if error
         except socket.error as e:
@@ -105,7 +105,7 @@ class Inward(BaseDate):
             log.error(error_msg)
             # set status of the instance as "error"
             self.status = -1
-    
+
     def save(self, *args, **kwargs):
         """
         Custom save method
@@ -114,12 +114,12 @@ class Inward(BaseDate):
         if self.user:
             self.from_name = self.user.get_full_name()
             self.from_email = self.user.email
-        
+
         # if not sent yet
         if int(self.status) < 1:
             # tries sending email (will modify self.status!)
             self.send()
-        
+
         # save in the database unless logging is explicitly turned off in the settings file
-        if settings.NODESHOT['SETTINGS']['CONTACT_INWARD_LOG']:
+        if INWARD_LOG:
             super(Inward, self).save(*args, **kwargs)

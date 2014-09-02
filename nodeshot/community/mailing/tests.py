@@ -25,7 +25,7 @@ from django.utils.timezone import utc
 
 
 class MailingTest(TestCase):
-    
+
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -33,7 +33,7 @@ class MailingTest(TestCase):
         'test_status.json',
         'test_nodes.json'
     ]
-    
+
     def setUp(self):
         # create outward record
         self.message = Outward.objects.create(
@@ -46,105 +46,105 @@ class MailingTest(TestCase):
         self.msg = Outward(
             status = 0,
             subject = 'This is a test',
-            message = self.message.subject,
+            message = self.message.message,
         )
         mail.outbox = []
-    
+
     def test_inward_model(self):
         """ ensure inward model validation works as expected """
         message = Inward(message='this is a test to ensure inward model validation works as expected')
-        
+
         content_type = ContentType.objects.only('id', 'model').get(model='node')
         message.content_type = content_type
         message.object_id = 1
-        
+
         try:
             message.full_clean()
             self.fail('ValidationError not raised')
         except ValidationError as e:
             self.assertIn(_('If sender is not specified from_name and from_email must be filled in'), e.messages)
-        
+
         user = User.objects.get(pk=1)
-        
+
         message.user = user
         message.full_clean()
-        
+
         self.assertEqual(message.from_name, user.get_full_name())
         self.assertEqual(message.from_email, user.email)
-        
+
         message.user = None
         message.full_clean()
-        
+
         message.user = user
         message.save()
-        
+
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(message.status, 1)
-    
+
     def test_contact_node_api(self):
         """ ensure contact node api works as expected """
         url = reverse('api_node_contact', args=['fusolab'])
         self.client.login(username='admin', password='tester')
-        
+
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
-        
+
         response = self.client.post(url, { 'message': 'ensure contact node api works as expected' })
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(Inward.objects.count(), 1)
-    
+
     def test_contact_user_api(self):
         """ ensure contact user api works as expected """
         url = reverse('api_user_contact', args=['romano'])
         self.client.login(username='admin', password='tester')
-        
+
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
-        
+
         response = self.client.post(url, { 'message': 'ensure contact user api works as expected' })
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(Inward.objects.count(), 1)
-    
+
     def test_contact_layer_api(self):
         """ ensure contact layer api works as expected """
         url = reverse('api_layer_contact', args=['rome'])
         self.client.login(username='admin', password='tester')
-        
+
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
-        
+
         response = self.client.post(url, { 'message': 'ensure contact user api works as expected' })
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(Inward.objects.count(), 1)
-        
+
         vienna = Layer.objects.get(slug='vienna')
         vienna.email = ''
         vienna.save()
-        
+
         # cannot be contacted because no email nor mantainers specified
         url = reverse('api_layer_contact', args=['vienna'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
-        
+
         response = self.client.post(url, { 'message': 'ensure contact user api works as expected' })
         self.assertEqual(response.status_code, 400)
-    
+
     def test_no_filter(self):
         """ *** Test no filtering, send to all *** """
         # count users
         users = User.objects.filter(is_active=True)
         recipients = self.message.get_recipients()
-        
+
         # simplest case: send to all
         # fail if recipient list length and user list length differ
         self.assertEqual(len(recipients), len(users))
         # fail if user emails are not in recipients
         for user in users:
             self.assertTrue(user.email in recipients)
-        
+
     def test_group_filtering(self):
         """ *** Test group filtering in multiple combinations *** """
         combinations = [
@@ -157,7 +157,7 @@ class MailingTest(TestCase):
         message = self.message
         message.is_filtered=True
         message.filters = '1'
-        
+
         for combo in combinations:
             # test multiple groups
             groups = combo.split(',')
@@ -170,7 +170,7 @@ class MailingTest(TestCase):
                     q = q | Q(groups=group)
                 # superuser case
                 else:
-                    # group 0 wouldn't be correct, therefore we use is_superuser=True 
+                    # group 0 wouldn't be correct, therefore we use is_superuser=True
                     q = q | Q(is_superuser=True)
             # and is_active = True
             q = q & Q(is_active=True)
@@ -183,7 +183,7 @@ class MailingTest(TestCase):
             # fail if user emails are not in recipients
             for user in users:
                 self.assertTrue(user.email in recipients)
-    
+
     def test_layer_filtering(self):
         """ *** Test layer filtering in multiple combinations *** """
         combinations = [
@@ -195,7 +195,7 @@ class MailingTest(TestCase):
         message = self.message
         message.is_filtered=True
         message.filters = '2'
-        
+
         for combo in combinations:
             layers = combo.split(',')
             # init empty Q
@@ -218,7 +218,7 @@ class MailingTest(TestCase):
             # fail if user emails are not in recipients
             for email in emails:
                 self.assertTrue(email in recipients)
-        
+
     def test_user_filtering(self):
         """ *** Test recipient filtering by user *** """
         combinations = [
@@ -232,7 +232,7 @@ class MailingTest(TestCase):
         message = self.message
         message.is_filtered=True
         message.filters = '3'
-        
+
         for combo in combinations:
             # users id list
             users_string = combo.split(',')
@@ -254,7 +254,7 @@ class MailingTest(TestCase):
             # fail if user emails are not in recipients
             for user in users:
                 self.assertTrue(user.email in recipients)
-    
+
     def test_group_and_layer_filtering(self):
         """ *** Test group & layer filtering in multiple combinations *** """
         combinations = [
@@ -269,11 +269,11 @@ class MailingTest(TestCase):
         message = self.message
         message.is_filtered=True
         message.filters = '1,2'
-        
+
         for combo in combinations:
             groups = combo['groups'].split(',')
             layers = combo['layers'].split(',')
-            
+
             # GROUPS
             q1 = Q()
             for group in groups:
@@ -283,22 +283,22 @@ class MailingTest(TestCase):
                     q1 = q1 | Q(user__groups=group)
                 # superuser case
                 else:
-                    # group 0 wouldn't be correct, therefore we use is_superuser=True 
+                    # group 0 wouldn't be correct, therefore we use is_superuser=True
                     q1 = q1 | Q(user__is_superuser=True)
             # and is_active = True
             q1 = q1 & Q(user__is_active=True)
-            
+
             # LAYERS
             q2 = Q()
             for layer in layers:
                 q2 = q2 | Q(layer=layer)
             # retrieve nodes
             nodes = Node.objects.filter(q1 & q2).select_related()
-            
+
             # message group & layers
             message.groups = combo['groups']
             message.layers = [int(layer) for layer in layers]
-            
+
             # retrieve recipients according to model code
             recipients = message.get_recipients()
             # retrieve list of emails
@@ -311,7 +311,7 @@ class MailingTest(TestCase):
             # fail if user emails are not in recipients
             for email in emails:
                 self.assertTrue(email in recipients)
-    
+
     def test_user_and_layer_filtering(self):
         """ *** Test recipient filtering by user & layers *** """
         combinations = [
@@ -327,89 +327,89 @@ class MailingTest(TestCase):
         message = self.message
         message.is_filtered=True
         message.filters = '2,3'
-        
+
         for combo in combinations:
             users = combo['users'].split(',')
             layers = combo['layers'].split(',')
-            
+
             # ZONES
             q1 = Q()
             for layer in layers:
                 q1 = q1 | Q(layer=layer)
             # retrieve nodes
             nodes = Node.objects.filter(q1).select_related()
-            
+
             # prepare Q object for user query
             q2 = Q()
             for user in users:
                 q2 = q2 | Q(pk=user)
             q2 = q2 & Q(is_active=True)
-            
+
             # message users & layers
             message.users = [int(user) for user in users]
             message.layers = [int(layer) for layer in layers]
-            
+
             # retrieve chosen users
             users = User.objects.filter(q2)
-            
+
             # retrieve recipients according to model code
             recipients = message.get_recipients()
-            
+
             # retrieve list of emails
             emails = []
             for node in nodes:
                 if not node.user.email in emails:
                     emails.append(node.user.email)
-            
+
             # add emails of selected users if necessary
             for user in users:
                 if not user.email in emails:
                     emails.append(user.email)
-            
+
             # fail if recipient list length and user list length differ
             self.assertEqual(len(recipients), len(emails))
             # fail if user emails are not in recipients
             for email in emails:
                 self.assertTrue(email in recipients)
-    
+
     # TODO:
     # test html/plain-text format
-    
+
     def test_outward_validation_scheduled1(self):
         """ *** A scheduled message without any value for scheduled date and time should not pass validation *** """
         self.msg.is_scheduled = 1
         self.msg.scheduled_date = None
-        self.msg.scheduled_time = None        
+        self.msg.scheduled_time = None
         self.assertRaises(ValidationError, self.msg.full_clean)
-    
+
     def test_outward_validation_scheduled2(self):
         """ *** A scheduled message without any value for scheduled time should not pass validation *** """
         self.msg.is_scheduled = 1
         self.msg.scheduled_time = None
         self.msg.scheduled_date = datetime.datetime.utcnow().replace(tzinfo=utc).date() + datetime.timedelta(days=1)
         self.assertRaises(ValidationError, self.msg.full_clean)
-    
+
     def test_outward_validation_scheduled3(self):
         """ *** A scheduled message without any value for scheduled date should not pass validation *** """
         self.msg.is_scheduled = 1
         self.msg.scheduled_date = None
         self.msg.scheduled_time = '00'
         self.assertRaises(ValidationError, self.msg.full_clean)
-    
+
     def test_outward_validation_scheduled4(self):
         """ *** A scheduled message with both date and time should pass validation *** """
         self.msg.is_scheduled = 1
         self.msg.scheduled_date = datetime.datetime.utcnow().replace(tzinfo=utc).date() + datetime.timedelta(days=1)
         self.msg.scheduled_time = '00'
         self.msg.full_clean()
-    
+
     def test_outward_validate_scheduled5(self):
         """ *** A new message with a past scheduled date should not pass validation *** """
         self.msg.is_scheduled = 1
         self.msg.scheduled_date = datetime.datetime.utcnow().replace(tzinfo=utc).date() - datetime.timedelta(days=1)
         self.msg.scheduled_time = '00'
         self.assertRaises(ValidationError, self.msg.full_clean)
-        
+
     def test_outward_validate_filters1(self):
         """ *** A new message with is_filtered == True and no selected filter should not pass validation *** """
         self.msg.is_scheduled = 0
@@ -417,7 +417,7 @@ class MailingTest(TestCase):
         self.msg.scheduled_time = None
         self.msg.is_filtered = 1
         self.assertRaises(ValidationError, self.msg.full_clean)
-    
+
     def test_outward_validate_filters2(self):
         """ *** A new message with group filtering active but not selected group should not pass validation *** """
         self.msg.is_scheduled = 0
@@ -425,9 +425,9 @@ class MailingTest(TestCase):
         self.msg.filters = '%s' % FILTERS.get('groups')
         self.msg.groups = ''
         self.assertRaises(ValidationError, self.msg.full_clean)
-    
+
     # the following two validation routine require more cumbersome procedures ... can't be bothered right now!
-    
+
     #def test_outward_validate_filters3(self):
     #    """ *** A new message with user filtering active but not selected group should not pass validation *** """
     #    self.msg.is_scheduled = 0
@@ -443,7 +443,7 @@ class MailingTest(TestCase):
     #    self.msg.filters = '%s' % FILTERS.get('layers')
     #    self.msg.layers = []
     #    self.assertRaises(ValidationError, self.msg.full_clean)
-    
+
     #def test_outward_plaintext(self):
     #    """ *** TODO: write a test that verifies email is correctly sent as plain text *** """
     #    self.assertEqual(False, True)

@@ -1,10 +1,9 @@
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.base.utils import choicify
+from nodeshot.core.base.settings import ACCESS_LEVELS
 
 
 __all__ = [
-    'AVAILABLE_CRONJOBS',
     'SCHEDULE_CHOICES',
     'FILTERING_CHOICES',
     'FILTER_CHOICES',
@@ -15,15 +14,6 @@ __all__ = [
     'DEFAULT_GROUPS',
     'INWARD_STATUS_CHOICES'
 ]
-
-
-try:
-    AVAILABLE_CRONJOBS = settings.NODESHOT['CHOICES']['AVAILABLE_CRONJOBS']
-except KeyError:
-    AVAILABLE_CRONJOBS = (
-        ('00', _('midnight')),
-        ('04', _('04:00 AM')),
-    )
 
 SCHEDULE_CHOICES = (
     (0, _("Don't schedule, send immediately")),
@@ -68,7 +58,7 @@ OUTWARD_STATUS = {
 GROUPS = []
 DEFAULT_GROUPS = ''
 # convert strings to integers
-for group in choicify(settings.NODESHOT['CHOICES']['ACCESS_LEVELS']):
+for group in choicify(ACCESS_LEVELS):
     GROUPS += [(int(group[0]), group[1])]
     DEFAULT_GROUPS += '%s,' % group[0]
 GROUPS += [(0, _('super users'))]

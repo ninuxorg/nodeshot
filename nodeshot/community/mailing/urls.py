@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from django.conf import settings
+from .settings import settings
 
 
 urlpatterns = patterns('nodeshot.community.mailing.views',
@@ -20,6 +20,3 @@ if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
     urlpatterns += patterns('nodeshot.community.mailing.views',
         url(r'^profiles/(?P<username>[-.\w]+)/contact/$', 'contact_user', name='api_user_contact'),
     )
-
-
-

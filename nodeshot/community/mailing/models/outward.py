@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import strip_tags
-from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from nodeshot.core.base.models import BaseDate
@@ -17,6 +16,7 @@ from nodeshot.core.base.utils import now
 from nodeshot.core.nodes.models import Node
 
 from .choices import *
+from ..settings import settings, OUTWARD_SCHEDULING, OUTWARD_MINLENGTH, OUTWARD_MAXLENGTH, OUTWARD_HTML, OUTWARD_STEP, OUTWARD_DELAY
 
 
 class Outward(BaseDate):
@@ -28,16 +28,16 @@ class Outward(BaseDate):
                                  default=OUTWARD_STATUS.get('draft'))
     subject = models.CharField(_('subject'), max_length=50)
     message = models.TextField(_('message'), validators=[
-        MinLengthValidator(settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_MINLENGTH']),
-        MaxLengthValidator(settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_MAXLENGTH'])        
+        MinLengthValidator(OUTWARD_MINLENGTH),
+        MaxLengthValidator(OUTWARD_MAXLENGTH)
     ])
     is_scheduled = models.SmallIntegerField(_('schedule sending'),
                                             choices=SCHEDULE_CHOICES,
-                                            default=1 if settings.NODESHOT['DEFAULTS']['MAILING_SCHEDULE_OUTWARD'] is True else 0)
+                                            default=0)
     scheduled_date = models.DateField(_('scheduled date'), blank=True, null=True)
     scheduled_time = models.CharField(_('scheduled time'), max_length=20,
-                                      choices=AVAILABLE_CRONJOBS,
-                                      default=settings.NODESHOT['DEFAULTS']['CRONJOB'],
+                                      choices=OUTWARD_SCHEDULING,
+                                      default=OUTWARD_SCHEDULING[0][0],
                                       blank=True)
     is_filtered = models.SmallIntegerField(_('recipient filtering'),
                                            choices=FILTERING_CHOICES,
@@ -49,33 +49,33 @@ class Outward(BaseDate):
                               default=DEFAULT_GROUPS,
                               blank=True,
                               help_text=_('filter specific groups of users'))
-    
+
     if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
         layers = models.ManyToManyField('layers.Layer', verbose_name=_('layers'), blank=True)
-    
+
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('users'), blank=True)
-    
+
     class Meta:
         verbose_name = _('Outward message')
         verbose_name_plural = _('Outward messages')
         app_label= 'mailing'
         ordering = ['status']
-    
+
     def __unicode__(self):
         return '%s' % self.subject
-    
+
     def get_recipients(self):
         """
         Determine recipients depending on selected filtering which can be either:
             * group based
             * layer based
             * user based
-        
+
         Choosing "group" and "layer" filtering together has the effect of sending the message
         only to users for which the following conditions are both true:
             * have a node assigned to one of the selected layers
             * are part of any of the specified groups (eg: registered, community, trusted)
-            
+
         The user based filtering has instead the effect of translating in an **OR** query. Here's a practical example:
         if selecting "group" and "user" filtering the message will be sent to all the users for which ANY of the following conditions is true:
             * are part of any of the specified groups (eg: registered, community, trusted)
@@ -83,16 +83,16 @@ class Outward(BaseDate):
         """
         # user model
         User = get_user_model()
-        
+
         # prepare email list
         emails = []
-        
+
         # the following code is a bit ugly. Considering the titanic amount of work required to build all
         # the cools functionalities that I have in my mind, I can't be bothered to waste time on making it nicer right now.
         # if you have ideas on how to improve it to make it cleaner and less cluttered, please join in
         # this method has unit tests written for it, therefore if you try to change it be sure to check unit tests do not fail after your changes
         # python manage.py test mailing
-        
+
         # send to all case
         if not self.is_filtered:
             # retrieve only email DB column of all active users
@@ -112,12 +112,12 @@ class Outward(BaseDate):
                     # add email to the recipient list if not already there
                     if not user.email in emails:
                         emails += [user.email]
-            
+
             # Q is a django object for "complex" filtering queries (not that complex in this case)
             # init empty Q object that will be needed in case of group filtering
             q = Q()
             q2 = Q()
-            
+
             # if group filtering is checked
             if FILTERS.get('groups') in self.filters:
                 # loop over each group
@@ -132,10 +132,10 @@ class Outward(BaseDate):
                         # this must be done manually because superusers is not a group but an attribute of the User model
                         q = q | Q(is_superuser=True)
                         q2 = q2 | Q(user__is_superuser=True)
-            
+
             # plus users must be active
             q = q & Q(is_active=True)
-            
+
             # if layer filtering is checked
             if FILTERS.get('layers') in self.filters:
                 # retrieve non-external layers
@@ -163,9 +163,9 @@ class Outward(BaseDate):
                     # add email to the recipient list if not already there
                     if not user.email in emails:
                         emails += [user.email]
-        
+
         return emails
-    
+
     def send(self):
         """
         Sends the email to the recipients
@@ -177,19 +177,19 @@ class Outward(BaseDate):
         recipients = self.get_recipients()
         # init empty list that will contain django's email objects
         emails = []
-        
+
         # prepare text plain if necessary
-        if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True:
+        if OUTWARD_HTML:
             # store plain text in var
             html_content = self.message
             # set EmailClass to EmailMultiAlternatives
             EmailClass = EmailMultiAlternatives
         else:
             EmailClass = EmailMessage
-        
+
         # default message is plain text
         message = strip_tags(self.message)
-        
+
         # loop over recipients and fill "emails" list
         for recipient in recipients:
             msg = EmailClass(
@@ -202,22 +202,22 @@ class Outward(BaseDate):
                 # to
                 [recipient],
             )
-            if settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_HTML'] is True:
+            if OUTWARD_HTML:
                 msg.attach_alternative(html_content, "text/html")
             # prepare email object
             emails.append(msg)
-        
+
         # try sending email
         try:
             # counter will count how many emails have been sent
             counter = 0
             for email in emails:
                 # if step reached
-                if counter == settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_STEP']:
+                if counter == OUTWARD_STEP:
                     # reset counter
                     counter = 0
                     # sleep
-                    time.sleep(settings.NODESHOT['SETTINGS']['CONTACT_OUTWARD_DELAY'])
+                    time.sleep(OUTWARD_DELAY)
                 # send email
                 email.send()
                 # increase counter
@@ -233,7 +233,7 @@ class Outward(BaseDate):
         self.status = OUTWARD_STATUS.get('sent')
         # save
         self.save()
-    
+
     def save(self, *args, **kwargs):
         """
         Custom save method
@@ -241,10 +241,10 @@ class Outward(BaseDate):
         # change status to scheduled if necessary
         if self.is_scheduled and self.status is not OUTWARD_STATUS.get('scheduled'):
             self.status = OUTWARD_STATUS.get('scheduled')
-        
+
         # call super.save()
         super(Outward, self).save(*args, **kwargs)
-    
+
     def clean(self, *args, **kwargs):
         """
         Custom validation
@@ -252,16 +252,16 @@ class Outward(BaseDate):
         if self.is_scheduled is 1 and (self.scheduled_date == '' or self.scheduled_date is None\
                                        or self.scheduled_time == '' or self.scheduled_time is None):
             raise ValidationError(_('If message is scheduled both fields "scheduled date" and "scheduled time" must be specified'))
-        
+
         if self.is_scheduled is 1 and self.scheduled_date < now().date():
             raise ValidationError(_('The scheduled date is set to a past date'))
-        
+
         if self.is_filtered is 1 and (len(self.filters) < 1 or self.filters == [''] or\
                                       self.filters == [u''] or self.filters == '' or self.filters is None):
             raise ValidationError(_('If "recipient filtering" is active one of the filtering options should be selected'))
-        
+
         if self.is_filtered is 1 and FILTERS.get('groups') in self.filters and\
            (len(self.groups) < 1 or self.groups == [''] or self.groups == [u''] or self.groups == '' or self.groups is None):
             raise ValidationError(_('If group filtering is active at least one group of users should be selected'))
-        
+
         # TODO: unfortunately layers and users can't be validated easily because they are a many2many field
