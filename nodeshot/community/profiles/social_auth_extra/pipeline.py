@@ -2,12 +2,11 @@ import requests
 import simplejson as json
 from datetime import datetime
 
-from django.conf import settings
 from social_auth.models import UserSocialAuth
 
-PROFILE_EMAIL_CONFIRMATION = settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True)
+from ..settings import settings, EMAIL_CONFIRMATION
 
-if PROFILE_EMAIL_CONFIRMATION:
+if EMAIL_CONFIRMATION:
     from emailconfirmation.models import EmailAddress
 
 
@@ -18,8 +17,8 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
     """
     social_user = social_user or \
                   UserSocialAuth.get_social_auth(backend.name, uid)
-    
-    if kwargs['is_new'] and PROFILE_EMAIL_CONFIRMATION:
+
+    if kwargs['is_new'] and EMAIL_CONFIRMATION:
         emailaddress = EmailAddress(**{
             'user': user,
             'email': user.email,
@@ -27,7 +26,7 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
             'primary': True
         })
         emailaddress.save()
-    
+
     if social_user:
         extra_data = backend.extra_data(user, uid, response, details)
         if kwargs.get('original_email') and 'email' not in extra_data:
@@ -38,20 +37,20 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
             else:
                 social_user.extra_data = extra_data
             social_user.save()
-        
+
         if backend.name == 'facebook' and kwargs['is_new']:
             response = json.loads(requests.get('https://graph.facebook.com/%s?access_token=%s' % (extra_data['id'], extra_data['access_token'])).content)
-            
+
             try:
                 user.city, user.country = response.get('hometown').get('name').split(', ')
             except AttributeError:
                 pass
-            
+
             try:
                 user.birth_date = datetime.strptime(response.get('birthday'), '%m/%d/%Y').date()
             except AttributeError:
                 pass
- 
+
             user.save()
-        
+
         return {'social_user': social_user}

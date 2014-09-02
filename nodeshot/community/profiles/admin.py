@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 
 from django.contrib.auth.forms import UserChangeForm as BaseChangeForm
 from django.contrib.auth.forms import UserCreationForm as BaseCreationForm
@@ -10,6 +9,7 @@ from django.forms import ValidationError
 
 from nodeshot.core.base.admin import BaseStackedInline
 from .models import SocialLink, Profile, PasswordReset
+from .settings import settings, EMAIL_CONFIRMATION
 
 
 # --- User management forms --- #
@@ -21,7 +21,6 @@ class UserChangeForm(BaseChangeForm):
 
 
 class UserCreationForm(BaseCreationForm):
-    
     # this happens to be needed, at least in django 1.6.2
     # http://stackoverflow.com/questions/16953302/django-custom-user-model-in-admin-relation-auth-user-does-not-exist
     def clean_username(self):
@@ -31,7 +30,7 @@ class UserCreationForm(BaseCreationForm):
         except Profile.DoesNotExist:
             return username
         raise ValidationError(self.error_messages['duplicate_username'])
-    
+
     class Meta:
         model = Profile
 
@@ -53,11 +52,11 @@ USER_ADMIN_INLINES = [ProfileSocialLinksInline]
 
 if 'social_auth' in settings.INSTALLED_APPS:
     from social_auth.models import UserSocialAuth
-    
+
     class SocialAuthInline(admin.StackedInline):
         model = UserSocialAuth
         extra = 0
-    
+
     USER_ADMIN_INLINES.append(SocialAuthInline)
 
 
@@ -77,11 +76,11 @@ class UserAdmin(BaseUserAdmin):
     ordering = ['-is_staff', '-date_joined']
     search_fields = ('email', 'username', 'first_name', 'last_name')
     list_filter = ('is_active', 'is_staff', 'is_superuser')
-    
+
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
-    
+
     fieldsets = [
         [None, {'fields': ('username', 'password')}],
         [_('Personal info'), {'fields': [
@@ -95,13 +94,13 @@ class UserAdmin(BaseUserAdmin):
     ]
 
 
-if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+if EMAIL_CONFIRMATION:
     from emailconfirmation.models import EmailAddress
-    
+
     class EmailAddressInline(admin.StackedInline):
         model = EmailAddress
         extra = 0
-    
+
     UserAdmin.inlines = [EmailAddressInline] + UserAdmin.inlines
     UserAdmin.fieldsets[1][1]['fields'].remove('email')
 

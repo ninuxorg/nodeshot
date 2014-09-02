@@ -1,9 +1,9 @@
 # part of the code of this app is based on pinax.account
 
-from django.conf import settings
 from nodeshot.core.base.utils import check_dependencies
+from ..settings import settings, EMAIL_CONFIRMATION
 
-if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+if EMAIL_CONFIRMATION:
     check_dependencies(
         dependencies='emailconfirmation',
         module='nodeshot.community.profiles'
@@ -43,10 +43,10 @@ def new_user(sender, **kwargs):
         user.save()
 
 
-if settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+if EMAIL_CONFIRMATION:
     from emailconfirmation.signals import email_confirmed
     from emailconfirmation.models import EmailConfirmation
-    
+
     @receiver(email_confirmed, sender=EmailConfirmation)
     def activate_user(sender, email_address, **kwargs):
         """

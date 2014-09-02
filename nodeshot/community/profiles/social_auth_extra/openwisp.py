@@ -4,12 +4,12 @@ OpenWISP OAuth support.
 from urllib import urlencode
 import simplejson as json
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from social_auth.utils import dsa_urlopen
 from social_auth.backends import BaseOAuth2, OAuthBackend
 
+from ..settings import settings
 
 # OpenWISP configuration
 try:
@@ -63,7 +63,7 @@ class OpenWISPAuth(BaseOAuth2):
             data = json.load(dsa_urlopen(url))
         except ValueError:
             data = None
-        
+
         return data
 
 # Backend definition

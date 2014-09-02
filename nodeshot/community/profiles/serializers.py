@@ -2,20 +2,18 @@ import hashlib
 
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate
-from django.conf import settings
 
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from nodeshot.core.base.serializers import ExtraFieldSerializer, HyperlinkedField
-from .models import Profile as User
-from .models import PasswordReset, SocialLink
+from .models import Profile as User, PasswordReset, SocialLink
+from .settings import settings, EMAIL_CONFIRMATION
 
-PROFILE_EMAIL_CONFIRMATION = settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True)
 PASSWORD_MAX_LENGTH = User._meta.get_field('password').max_length
 NOTIFICATIONS_INSTALLED = 'nodeshot.community.notifications' in settings.INSTALLED_APPS
 
-if PROFILE_EMAIL_CONFIRMATION:
+if EMAIL_CONFIRMATION:
     from emailconfirmation.models import EmailAddress
 
 
@@ -200,7 +198,7 @@ class AccountSerializer(serializers.ModelSerializer):
     )
     logout = HyperlinkedField(view_name='api_account_logout')
 
-    if PROFILE_EMAIL_CONFIRMATION:
+    if EMAIL_CONFIRMATION:
         email_addresses = HyperlinkedField(view_name='api_account_email_list')
 
     if NOTIFICATIONS_INSTALLED:
@@ -215,7 +213,7 @@ class AccountSerializer(serializers.ModelSerializer):
         model = User
         fields = ['profile', 'social_links', 'change_password', 'logout']
 
-        if PROFILE_EMAIL_CONFIRMATION:
+        if EMAIL_CONFIRMATION:
             fields += ['email_addresses']
 
         if NOTIFICATIONS_INSTALLED:
@@ -275,7 +273,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     def validate_email(self, attrs, source):
         """ ensure email is in the database """
-        if PROFILE_EMAIL_CONFIRMATION:
+        if EMAIL_CONFIRMATION:
             condition = EmailAddress.objects.filter(email__iexact=attrs["email"], verified=True).count() == 0
         else:
             condition = User.objects.get(email__iexact=attrs["email"], is_active=True).count() == 0
@@ -327,8 +325,7 @@ class ResetPasswordKeySerializer(serializers.Serializer):
 
 
 # email addresses
-if PROFILE_EMAIL_CONFIRMATION:
-
+if EMAIL_CONFIRMATION:
     __all__ += [
         'EmailSerializer',
         'EmailAddSerializer',
