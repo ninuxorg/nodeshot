@@ -8,7 +8,7 @@ similarities in common (georeferenced data).
 
 There are mainly four strategies through which we can achieve interoperability:
 
- * **periodic synchronization**: data is synchronized periodically with a background job 
+ * **periodic synchronization**: data is synchronized periodically with a background job
  * **event driven synchronization**: add, change, delete
  * **a mix of the two**: periodic and event driven
  * **RESTful translator**: nodeshot gets data on the fly and converts the format
@@ -55,20 +55,6 @@ data is synchronized, default is 12 hours)::
         # other tasks
     }
 
-the list of available synchronizers is specified in::
-
-    NODESHOT = {
-        # ...
-        'INTEROPERABILITY': [
-            ('nodeshot.interoperability.synchronizers.Nodeshot', 'Nodeshot'),
-            ('nodeshot.interoperability.synchronizers.OpenWISP', 'OpenWISP'),
-            ('nodeshot.interoperability.synchronizers.OpenWISPCitySDK', 'OpenWISPCitySDK'),
-            ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
-            ('nodeshot.interoperability.synchronizers.ProvinciaWIFICitySDK', 'ProvinciaWIFICitySDK'),
-        ],
-        # ...
-    }
-
 =================
 Configure a layer
 =================
@@ -102,9 +88,9 @@ can be used in several different ways, see the help output::
 **Sync all layers except those specified in --exclude**::
 
     python manage.py synchronize --exclude=layer1-slug,layer2-slug
-    
+
     # spaces are allowed as long as string is wrapped in quotes/doublequotes
-    
+
     python manage.py synchronize --exclude="layer1-slug, layer2-slug"
 
 =========================
@@ -117,7 +103,7 @@ in ``/nodeshot/interoperability/synchronizers/base.py``:
 .. code-block:: python
 
     from nodeshot.interoperability.synchronizer.base import GenericGisSynchronizer
-    
+
     class MyVeryCoolApp(GenericGisSynchronizer):
         """ Synchronizer for my MyVeryCoolApp """
         pass
@@ -128,18 +114,14 @@ in ``/nodeshot/interoperability/synchronizers/base.py``:
 Save the synchronizer in your python path, name it exactly as you named the class,
 in our example that would be ``MyVeryCoolApp.py``:
 
-Once the file is saved and you are sure it's on your pythonpath you should add a
-tuple in your settings.py in which the first element is the path to the file and
+Once the file is saved and you are sure it's on your pythonpath you have to add a
+tuple in ``settings.NODESHOT_SYNCHRONIZERS`` in which the first element is the path to the file and
 the second element is the name you want to show in the admin interface in the list *"synchronizer_class"*:
 
 .. code-block:: python
 
-    NODESHOT = {
-        # ...
-        'INTEROPERABILITY': [
-            # ...
-            ('myproject.synchronizers.MyVeryCoolApp', 'MyVeryCoolApp'),
-            # ...
-        ],
-        # ...
-    }
+    NODESHOT_SYNCHRONIZERS = [
+        ('myproject.synchronizers.MyVeryCoolApp', 'MyVeryCoolApp'),
+    ]
+
+This will add your new synchronizer to the default list.

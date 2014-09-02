@@ -1,10 +1,10 @@
 from django.contrib import admin
-from django.conf import settings
 
 from nodeshot.core.layers.admin import  LayerAdmin
 from nodeshot.core.nodes.admin import NodeAdmin
 
-from models import LayerExternal, NodeExternal
+from .models import LayerExternal, NodeExternal
+from .settings import settings
 
 
 class LayerExternalInline(admin.StackedInline):
