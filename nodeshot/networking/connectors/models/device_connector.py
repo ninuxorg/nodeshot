@@ -5,7 +5,6 @@ from netengine.exceptions import NetEngineError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.conf import settings
 from django_hstore.fields import DictionaryField
 
 from nodeshot.core.base.models import BaseDate, BaseOrdered
@@ -13,6 +12,8 @@ from nodeshot.core.base.managers import HStoreNodeshotManager
 from nodeshot.networking.net.models import *
 from nodeshot.networking.net.models.choices import DEVICE_STATUS
 from nodeshot.core.base.utils import now
+
+from ..settings import settings, NETENGINE_BACKENDS
 
 if 'nodeshot.networking.hardware' in settings.INSTALLED_APPS:
     HARDWARE_INSTALLED = True
@@ -26,7 +27,7 @@ class DeviceConnector(BaseDate, BaseOrdered):
     DeviceConnector Model
     """
     backend = models.CharField(_('backend'), max_length=128,
-                              choices=settings.NODESHOT['NETENGINE_BACKENDS'],
+                              choices=NETENGINE_BACKENDS,
                               help_text=_('select the operating system / protocol to use to retrieve info from device'))
     node = models.ForeignKey('nodes.Node', verbose_name=_('node'))
     host = models.CharField(_('host'), max_length=128)
@@ -40,25 +41,25 @@ class DeviceConnector(BaseDate, BaseOrdered):
     device = models.ForeignKey(Device, verbose_name=_('device'),
                                blank=True, null=True,
                                help_text=_('leave blank, will be created automatically'))
-    
+
     # django manager
     objects = HStoreNodeshotManager()
-    
+
     __netengine = None
     __backend_class = None
-    
+
     class Meta:
         ordering = ["order"]
         app_label = 'connectors'
         verbose_name = _('device connector')
         verbose_name_plural = _('device connectors')
-    
+
     def __unicode__(self):
         if self.host:
             return self.host
         else:
             return _(u'Unsaved Device Connector')
-    
+
     def save(self, *args, **kwargs):
         """
         Custom save does the following:
@@ -67,28 +68,28 @@ class DeviceConnector(BaseDate, BaseOrdered):
             * store connection config in DB if store attribute is True
         """
         self.host = self.host.strip()
-        
+
         if not self.id:
             self.device = self.__create_device()
-        
+
         if self.store is True:
             super(DeviceConnector, self).save(*args, **kwargs)
-    
+
     def clean(self, *args, **kwargs):
         """ validation """
         self._validate_backend()
         self._validate_config()
         self._validate_netengine()
         self._validate_duplicates()
-    
+
     @property
     def REQUIRED_CONFIG_KEYS(self):
         return self._get_netengine_arguments(required=True)
-    
+
     @property
     def AVAILABLE_CONFIG_KEYS(self):
         return self._get_netengine_arguments()
-    
+
     @property
     def backend_class(self):
         """
@@ -96,29 +97,29 @@ class DeviceConnector(BaseDate, BaseOrdered):
         """
         if not self.backend:
             return None
-        
+
         if not self.__backend_class:
             self.__backend_class = self._get_netengine_backend()
-        
+
         return self.__backend_class
-    
+
     @property
     def netengine(self):
         """ access netengine instance """
         # return None if no backend chosen yet
         if not self.backend:
             return None
-        
+
         # init instance of the netengine backend if not already done
         if not self.__netengine:
             NetengineBackend = self.backend_class
             arguments = self._build_netengine_arguments()
-            
+
             self.__netengine = NetengineBackend(**arguments)
-        
+
         # return netengine instance
         return self.__netengine
-    
+
     def _validate_backend(self):
         """ ensure backend string representation is correct """
         try:
@@ -126,7 +127,7 @@ class DeviceConnector(BaseDate, BaseOrdered):
         # if we get an import error the specified path is wrong
         except (ImportError, AttributeError) as e:
             raise ValidationError(_('No valid backend found, got the following python exception: "%s"') % e)
-    
+
     def _validate_config(self):
         """ ensure REQUIRED_CONFIG_KEYS are filled """
         # exit if no backend specified
@@ -135,13 +136,13 @@ class DeviceConnector(BaseDate, BaseOrdered):
         # exit if no required config keys
         if len(self.REQUIRED_CONFIG_KEYS) < 1:
             return
-        
+
         self.config = self.config or {}  # default to empty dict of no config
         required_keys_set = set(self.REQUIRED_CONFIG_KEYS)
         config_keys_set = set(self.config.keys())
         missing_required_keys = required_keys_set - config_keys_set
         unrecognized_keys = config_keys_set - required_keys_set
-        
+
         # if any missing required key raise ValidationError
         if len(missing_required_keys) > 0:
             # converts list in comma separated string
@@ -153,7 +154,7 @@ class DeviceConnector(BaseDate, BaseOrdered):
             unrecognized_keys_string = ', '.join(unrecognized_keys)
             # django error
             raise ValidationError(_('Unrecognized config keys: "%s"') % unrecognized_keys_string)
-    
+
     def _validate_netengine(self):
         """
         call netengine validate() method
@@ -164,7 +165,7 @@ class DeviceConnector(BaseDate, BaseOrdered):
                 self.netengine.validate()
             except NetEngineError as e:
                 raise ValidationError(e)
-    
+
     def _validate_duplicates(self):
         """
         Ensure we're not creating a device that already exists
@@ -182,12 +183,12 @@ class DeviceConnector(BaseDate, BaseOrdered):
                 # check in DB
                 if Interface.objects.filter(mac__iexact=interface['mac_address']).count() > 0:
                     duplicates.append(interface['mac_address'])
-            
+
             # if we have duplicates raise validation error
             if len(duplicates) > 0:
                 mac_address_string = ', '.join(duplicates)
                 raise ValidationError(_('interfaces with the following mac addresses already exist: %s') % mac_address_string)
-    
+
     def _get_netengine_arguments(self, required=False):
         """
         returns list of available config params
@@ -202,18 +203,18 @@ class DeviceConnector(BaseDate, BaseOrdered):
         # remove known arguments
         for argument_name in ['self', 'host', 'port']:
             args.remove(argument_name)
-        
+
         if required:
             # list of default values
             default_values = list(argspec.defaults)
             # always remove last default value, which is port number
             default_values = default_values[0:-1]
-            
+
             # remove an amount of arguments equals to number of default values, starting from right
             args = args[0:len(args)-len(default_values)]
-        
+
         return args
-    
+
     def _get_netengine_backend(self):
         """
         returns the netengine backend specified in self.backend
@@ -227,9 +228,9 @@ class DeviceConnector(BaseDate, BaseOrdered):
         module = import_module(backend_path)
         # get netengine backend class
         BackendClass = getattr(module, backend_class_name)
-        
+
         return BackendClass
-    
+
     def _build_netengine_arguments(self):
         """
         returns a python dictionary representing arguments
@@ -239,22 +240,22 @@ class DeviceConnector(BaseDate, BaseOrdered):
         arguments = {
             "host": self.host
         }
-        
+
         if self.config is not None:
             for key, value in self.config.iteritems():
                 arguments[key] = value
-        
+
         if self.port:
             arguments["port"] = self.port
-        
+
         return arguments
-    
+
     def get_auto_order_queryset(self):
         """
         Overriding a method of BaseOrdered Abstract Model
         """
         return self.__class__.objects.filter(device=self.device)
-    
+
     def __create_device(self):
         """
         creates device, internal use only
@@ -274,7 +275,7 @@ class DeviceConnector(BaseDate, BaseOrdered):
         device.last_seen = now()
         device.full_clean()
         device.save()
-        
+
         # add routing protocols
         for routing_protocol in device_dict['routing_protocols']:
             # retrieve routing protocol from DB
@@ -293,7 +294,7 @@ class DeviceConnector(BaseDate, BaseOrdered):
                 rp.save()
             # add to device
             device.routing_protocols.add(rp)
-        
+
         for interface in device_dict['interfaces']:
             interface_object = False
             vap_object = False
@@ -325,23 +326,23 @@ class DeviceConnector(BaseDate, BaseOrdered):
                     'tx_rate': interface['tx_rate'],
                     'rx_rate': interface['rx_rate']
                 })
-                
+
                 for vap in interface['vap']:
                     vap_object = Vap(
                         essid=vap['essid'],
                         bssid=vap['bssid'],
                         encryption=vap['encryption']
                     )
-            
+
             if interface_object:
                 interface_object.full_clean()
                 interface_object.save()
-                
+
                 if vap_object:
                     vap_object.interface = interface_object
                     vap_object.full_clean()
                     vap_object.save()
-                
+
                 for ip in interface['ip']:
                     ip_object = Ip(**{
                         'interface': interface_object,
@@ -349,7 +350,7 @@ class DeviceConnector(BaseDate, BaseOrdered):
                     })
                     ip_object.full_clean()
                     ip_object.save()
-        
+
         if HARDWARE_INSTALLED:
             # try getting device model from db
             try:
@@ -364,19 +365,19 @@ class DeviceConnector(BaseDate, BaseOrdered):
                     manufacturer = Manufacturer(name=device_dict['manufacturer'])
                     manufacturer.full_clean()
                     manufacturer.save()
-                
+
                 device_model = DeviceModel(
                     manufacturer=manufacturer,
                     name=device_dict['model']
                 )
                 device_model.ram = device_dict['RAM_total']
-            
+
             device_model.full_clean()
             device_model.save()
-            
+
             # create relation between device model and device
             rel = DeviceToModelRel(device=device, model=device_model)
             rel.full_clean()
             rel.save()
-        
+
         return device
