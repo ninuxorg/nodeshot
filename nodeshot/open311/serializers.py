@@ -9,6 +9,7 @@ from nodeshot.community.participation.models import Vote, Comment, Rating
 from nodeshot.core.base.serializers import ExtraFieldSerializer
 
 from .base import SERVICES
+from .settings import settings, TYPE
 
 __all__ = [
     'ServiceRatingSerializer',
@@ -29,7 +30,7 @@ __all__ = [
 
 RATING_CHOICES = [ n for n in range(1, 11) ]
 VOTING_CHOICES = [ -1, 1 ]
-    
+
 
 class ServiceListSerializer(serializers.Serializer):
     """
@@ -43,42 +44,42 @@ class ServiceListSerializer(serializers.Serializer):
     service_code = serializers.SerializerMethodField('get_service_code')
     service_name = serializers.SerializerMethodField('get_service_name')
     description = serializers.SerializerMethodField('get_service_description')
-    
+
     def __init__(self, *args, **kwargs):
         self.service_type = kwargs.pop('service_type','node')
         super(ServiceListSerializer, self).__init__(*args, **kwargs)
-    
+
     def get_definition(self, obj):
         request = self.context['request']
         format = self.context['format']
         return reverse('api_service_definition_detail',
                        args=[self.service_type],
                        request=request,
-                       format=format) 
-    
-    def get_service_code(self, obj):        
+                       format=format)
+
+    def get_service_code(self, obj):
         return self.service_type
-    
-    def get_service_name(self, obj):        
+
+    def get_service_name(self, obj):
         return SERVICES[self.service_type]['name']
-    
-    def get_service_description(self, obj):        
+
+    def get_service_description(self, obj):
         return SERVICES[self.service_type]['description']
-    
-    def get_keywords(self, obj):        
+
+    def get_keywords(self, obj):
         return SERVICES[self.service_type]['keywords']
-    
+
     def get_group(self,obj):
         return SERVICES[self.service_type]['group']
-    
+
     def get_metadata(self,obj):
         """ Open311 metadata indicates whether there are custom attributes """
         return 'true'
-    
+
     def get_type(self,obj):
         """ type setting - TODO explain """
-        return settings.NODESHOT['OPEN311']['TYPE']
-    
+        return TYPE
+
     class Meta:
         fields= (
             'service_code',
@@ -96,13 +97,13 @@ class ServiceNodeSerializer(serializers.Serializer):
     """
     Service details
     """
-    service_code = serializers.SerializerMethodField('get_service_code')    
+    service_code = serializers.SerializerMethodField('get_service_code')
     attributes = serializers.SerializerMethodField('get_attributes')
-    
-    def get_service_code(self, obj):        
+
+    def get_service_code(self, obj):
         return 'node'
-    
-    def get_attributes(self, obj):        
+
+    def get_attributes(self, obj):
         return [
             # layer
             {
@@ -114,7 +115,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'required': True,
                 'variable' : True
             },
-            
+
             # name
             {
                 'code': 'name',
@@ -125,7 +126,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'required': True,
                 'variable' : True
             },
-            
+
             # lat
             {
                 'code': 'lat',
@@ -136,7 +137,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'required': True,
                 'variable' : True
             },
-            
+
             # long
             {
                 'code': 'long',
@@ -147,7 +148,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'required': True,
                 'variable' : True
             },
-            
+
             # address
             {
                 'code': 'address',
@@ -158,7 +159,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'required': False,
                 'variable' : True
             },
-            
+
             # elev (elevation)
             {
                 'code': 'elev',
@@ -169,7 +170,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'required': False,
                 'variable' : True
             },
-            
+
             # description
             {
                 'code': 'description',
@@ -180,7 +181,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'required': False,
                 'variable' : True
             },
-            
+
             # images
             {
                 'code': 'images',
@@ -193,7 +194,7 @@ class ServiceNodeSerializer(serializers.Serializer):
                 'variable' : True
             }
         ]
-    
+
     class Meta:
         fields = ('service_code', 'attributes')
 
@@ -202,13 +203,13 @@ class ServiceVoteSerializer(serializers.Serializer):
     """
     Service details
     """
-    service_code = serializers.SerializerMethodField('get_service_code')    
+    service_code = serializers.SerializerMethodField('get_service_code')
     attributes = serializers.SerializerMethodField('get_attributes')
-    
-    def get_service_code(self, obj):        
+
+    def get_service_code(self, obj):
         return 'vote'
-    
-    def get_attributes(self, obj):        
+
+    def get_attributes(self, obj):
         return [
             # node_id
             {
@@ -221,7 +222,7 @@ class ServiceVoteSerializer(serializers.Serializer):
                 'variable' : True
 
             },
-            
+
             # vote
             {
                 'code': 'vote',
@@ -235,7 +236,7 @@ class ServiceVoteSerializer(serializers.Serializer):
             },
 
         ]
-    
+
     class Meta:
         fields = ('service_code', 'attributes')
 
@@ -244,13 +245,13 @@ class ServiceCommentSerializer(serializers.Serializer):
     """
     Service details
     """
-    service_code = serializers.SerializerMethodField('get_service_code')    
+    service_code = serializers.SerializerMethodField('get_service_code')
     attributes = serializers.SerializerMethodField('get_attributes')
-    
-    def get_service_code(self, obj):        
+
+    def get_service_code(self, obj):
         return 'comment'
-    
-    def get_attributes(self, obj):        
+
+    def get_attributes(self, obj):
         return [
             # node_id
             {
@@ -262,7 +263,7 @@ class ServiceCommentSerializer(serializers.Serializer):
                 'required': True,
                 'variable' : True
             },
-            
+
             # vote
             {
                 'code': 'comment',
@@ -276,7 +277,7 @@ class ServiceCommentSerializer(serializers.Serializer):
             },
 
         ]
-    
+
     class Meta:
         fields = ('service_code', 'attributes')
 
@@ -285,13 +286,13 @@ class ServiceRatingSerializer(serializers.Serializer):
     """
     Service details
     """
-    service_code = serializers.SerializerMethodField('get_service_code')    
+    service_code = serializers.SerializerMethodField('get_service_code')
     attributes = serializers.SerializerMethodField('get_attributes')
-    
-    def get_service_code(self, obj):        
+
+    def get_service_code(self, obj):
         return 'rate'
-    
-    def get_attributes(self, obj):        
+
+    def get_attributes(self, obj):
         return [
             # node_id
             {
@@ -305,7 +306,7 @@ class ServiceRatingSerializer(serializers.Serializer):
                 'required': True
 
             },
-            
+
             # rating
             {
                 'code': 'rating',
@@ -319,17 +320,17 @@ class ServiceRatingSerializer(serializers.Serializer):
             },
 
         ]
-    
+
     class Meta:
-        fields = ('service_code', 'attributes')         
+        fields = ('service_code', 'attributes')
 
 
 class NodeRequestListSerializer(ExtraFieldSerializer):
     """
-    Open 311 node request 
+    Open 311 node request
     """
     service_request_id = serializers.SerializerMethodField('get_service_request_id')
-    layer_slug= serializers.SerializerMethodField('get_layer_slug')   
+    layer_slug= serializers.SerializerMethodField('get_layer_slug')
     details = serializers.SerializerMethodField('get_details')
     image_urls = serializers.SerializerMethodField('get_image_urls')
     requested_datetime = serializers.Field(source='added')
@@ -339,15 +340,15 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
     image = serializers.ImageField()
     service_code = serializers.CharField()
     layer = serializers.CharField()
-    
+
     def get_image_urls(self,obj):
         image_url =[]
-        
+
         try:
             image = Image.objects.all().filter(node=obj.id)
         except:
             image=None
-        
+
         if image is not None:
             for i in image:
                     image_url.append( '%s%s' % (settings.MEDIA_URL, i))
@@ -360,30 +361,30 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
             return ""
         layer_name =  obj.layer
         return layer_name
-    
+
     def get_layer_slug(self, obj):
         if obj is None:
             return ""
         layer_slug =  obj.layer.slug
         return layer_slug
-    
+
     def get_service_request_id(self, obj):
         if obj is None:
             return ""
         service_request_id = 'node-%d' % obj.id
         return service_request_id
-    
+
     def get_details(self, obj):
         if obj is None:
             return ""
         request = self.context['request']
         format = self.context['format']
-        
+
         return reverse('api_service_request_detail',
                        args=['node',obj.id],
                        request=request,
                        format=format)
-   
+
     class Meta:
         model = Node
         fields= ('service_request_id', 'slug', 'name', 'service_code', 'layer', 'layer_slug', 'status', 'geometry', 'name',
@@ -393,13 +394,13 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
                             'data','notes','user','added','updated', 'slug', )
         non_native_fields = ( 'service_code', 'lat', 'long',
                                 'elev', 'image', 'layer_slug', )
-        
+
 
 class NodeRequestDetailSerializer(NodeRequestListSerializer):
     """
-    Open 311 node request 
-    """  
-   
+    Open 311 node request
+    """
+
     class Meta:
         model = Node
         fields= ('layer','layer_slug','slug','name','status', 'geometry', 'description', 'address',
@@ -408,70 +409,70 @@ class NodeRequestDetailSerializer(NodeRequestListSerializer):
 
 class NodeRequestSerializer(serializers.ModelSerializer):
     """
-    Open 311 node request 
+    Open 311 node request
     """
-    
+
     class Meta:
         model = Node
-        
+
 
 class VoteRequestListSerializer(ExtraFieldSerializer):
     """
-    Open 311 vote request 
+    Open 311 vote request
     """
     node_id = serializers.CharField()
     service_code = serializers.CharField()
-    
+
     class Meta:
         model = Vote
-        fields= ('service_code', 'node', 'vote',)        
+        fields= ('service_code', 'node', 'vote',)
         non_native_fields = ('node', 'service_code')
 
 
 class VoteRequestSerializer(serializers.ModelSerializer):
     """
-    Open 311 vote request 
+    Open 311 vote request
     """
-    
+
     class Meta:
         model = Vote
 
 
 class CommentRequestListSerializer(ExtraFieldSerializer):
     """
-    Open 311 comment request 
+    Open 311 comment request
     """
     service_code = serializers.CharField()
     class Meta:
         model = Comment
-        fields= ('service_code', 'node', 'text',)        
-        non_native_fields = ('node', 'service_code')       
+        fields= ('service_code', 'node', 'text',)
+        non_native_fields = ('node', 'service_code')
 
-        
+
 class CommentRequestSerializer(serializers.ModelSerializer):
     """
-    Open 311 comment request 
+    Open 311 comment request
     """
-    
+
     class Meta:
         model = Comment
 
 
 class RatingRequestListSerializer(ExtraFieldSerializer):
     """
-    Open 311 rating request 
+    Open 311 rating request
     """
     service_code = serializers.CharField()
     class Meta:
         model = Rating
-        fields= ('service_code', 'node', 'value',)        
+        fields= ('service_code', 'node', 'value',)
         non_native_fields = ('node', 'service_code')
-        
-        
+
+
 class RatingRequestSerializer(serializers.ModelSerializer):
     """
-    Open 311 rating request 
+    Open 311 rating request
     """
-    
+
     class Meta:
         model = Rating
