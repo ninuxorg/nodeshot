@@ -6,9 +6,9 @@ check_dependencies(
 )
 
 
-from django.conf import settings
 from .notification import Notification
 from .user_settings import UserEmailNotificationSettings, UserWebNotificationSettings
+from ..settings import settings, REGISTER
 
 
 __all__ = [
@@ -32,10 +32,10 @@ if 'nodeshot.community.notifications' in settings.INSTALLED_APPS:
         if created:
             UserWebNotificationSettings.objects.create(user=user)
             UserEmailNotificationSettings.objects.create(user=user)
-    
+
     # ------ register notification signals ------ #
-    
+
     from importlib import import_module
-    
-    for registrar in settings.NODESHOT['NOTIFICATIONS']['REGISTRARS']:
-        import_module(registrar)
+
+    for module in REGISTER:
+        import_module(module)

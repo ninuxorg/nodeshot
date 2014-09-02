@@ -6,11 +6,12 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.sites.models import Site
-from django.conf import settings
 
 from nodeshot.core.base.models import BaseDate
 
-NOTIFICATION_TYPE_CHOICES = [(key, _(key)) for key,value in settings.NODESHOT['NOTIFICATIONS']['TEXTS'].iteritems()]
+from ..settings import settings, TEXTS
+
+NOTIFICATION_TYPE_CHOICES = [(key, _(key)) for key,value in TEXTS.iteritems()]
 
 
 class Notification(BaseDate):
@@ -25,46 +26,46 @@ class Notification(BaseDate):
     to_user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 verbose_name=_('to user'),
                                 related_name='notifications_received')
-    
-    # generic foreign key "related_object" indicates whether the 
+
+    # generic foreign key "related_object" indicates whether the
     # notification refers to any particular object
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     related_object = generic.GenericForeignKey('content_type', 'object_id')
-    
-    text = models.CharField(_('text'), max_length=120, blank=True)    
+
+    text = models.CharField(_('text'), max_length=120, blank=True)
     is_read = models. BooleanField(_('read?'), default=False)
-    
+
     class Meta:
         app_label = 'notifications'
         ordering = ('-id',)
-    
+
     def __unicode__(self):
         return 'notification #%s' % self.id
-    
+
     def clean(self, *args, **kwargs):
         """ from_user and to_user must differ """
         if self.from_user and self.from_user_id == self.to_user_id:
             raise ValidationError(_('A user cannot send a notification to herself/himself'))
-    
+
     def save(self, *args, **kwargs):
         """
         custom save method to send email and push notification
         """
         created = self.pk is None
-        
+
         # save notification to database only if user settings allow it
         if self.check_user_settings(medium='web'):
             super(Notification, self).save(*args, **kwargs)
-        
+
         if created:
             # send notifications through other mediums according to user settings
             self.send_notifications()
-    
+
     def send_notifications(self):
         """ send notifications to recipient user according to her settings """
         self.send_email()
-    
+
     def send_email(self):
         """ send email notification according to user settings """
         # send only if user notification setting is set to true
@@ -74,11 +75,11 @@ class Notification(BaseDate):
         else:
             # return false otherwise
             return False
-    
+
     def send_mobile(self):
         """ send push notification according to user settings """
         raise NotImplementedError('mobile notifications not implemented yet')
-    
+
     def check_user_settings(self, medium='email'):
         """
         Ensure user is ok with receiving this notification through the specified medium.
@@ -88,16 +89,16 @@ class Notification(BaseDate):
         # custom notifications are always sent
         if self.type == 'custom':
             return True
-        
+
         try:
             user_settings = getattr(self.to_user, '%s_notification_settings' % medium)
         except ObjectDoesNotExist:
             # user has no settings specified
             # TODO: it would be better to create the settings with default values
             return False
-        
+
         user_setting_type = getattr(user_settings.__class__, self.type).user_setting_type
-        
+
         if user_setting_type == 'boolean':
             return getattr(user_settings, self.type, True)
         elif user_setting_type == 'distance':
@@ -121,7 +122,7 @@ class Notification(BaseDate):
                 # if user has related object in a distance range less than or equal to
                 # his prefered range (specified in number of km), return True and send the notification
                 return queryset.count() >= 1
-    
+
     @property
     def email_message(self):
         """ compose complete email message text """
@@ -133,5 +134,5 @@ class Notification(BaseDate):
             "This is an automatic notification sent from from %s.\n"
             "If you want to stop receiving this notification edit your"
             "email notification settings here: %s") % (site.name, 'TODO')
-        
+
         return "%s\n\n%s%s\n\n%s" % (hello_text, self.text, action_text, explain_text)

@@ -1,7 +1,7 @@
 from celery import task
 
 from django.core import management
-from django.conf import settings
+from .settings import settings, TEXTS
 
 
 @task()
@@ -22,14 +22,14 @@ def create_notifications(users, notification_model, notification_type, related_o
     """
     # shortcuts for readability
     Notification = notification_model
-    
+
     # text
     additional = related_object.__dict__ if related_object else ''
-    notification_text = settings.NODESHOT['NOTIFICATIONS']['TEXTS'][notification_type] % additional
-    
+    notification_text = TEXTS[notification_type] % additional
+
     # loop users, notification settings check is done in Notification model
     for user in users:
-        
+
         n = Notification(
             to_user=user,
             type=notification_type,

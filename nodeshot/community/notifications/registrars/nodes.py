@@ -1,12 +1,12 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from nodeshot.core.nodes.signals import node_status_changed
 from nodeshot.core.nodes.models import Node
 
+from ..settings import settings
 from ..models import Notification
 from ..tasks import create_notifications
 
@@ -18,7 +18,7 @@ def exclude_owner_of_node(node):
     if node.user_id is not None:
         return base_queryset.exclude(pk=node.user_id)
     else:
-        return base_queryset 
+        return base_queryset
 
 
 # ------ NODE CREATED ------ #
@@ -52,7 +52,7 @@ def node_status_changed_handler(**kwargs):
         "notification_type": "node_status_changed",
         "related_object": obj
     })
-    
+
     # if node has owner send a different notification to him
     if obj.user is not None:
         create_notifications.delay(**{
