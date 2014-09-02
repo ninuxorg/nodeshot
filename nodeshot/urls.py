@@ -38,7 +38,9 @@ if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
     )
 
 
-if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and settings.NODESHOT['SETTINGS'].get('PROFILE_EMAIL_CONFIRMATION', True):
+from nodeshot.community.profiles.settings import EMAIL_CONFIRMATION
+
+if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and EMAIL_CONFIRMATION:
     urlpatterns = urlpatterns + patterns('',
         url(r'^confirm_email/(\w+)/$', 'nodeshot.community.profiles.html_views.confirm_email', name='emailconfirmation_confirm_email'),
     )
@@ -46,7 +48,7 @@ if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and settings.NODESHO
 
 # include 'nodeshot.core.api.urls'
 if 'nodeshot.core.api' in settings.INSTALLED_APPS:
-    
+
     urlpatterns = urlpatterns + patterns('',
         url(r'', include('nodeshot.core.api.urls')),
     )
@@ -63,7 +65,7 @@ if 'nodeshot.ui.default' in settings.INSTALLED_APPS:
         url(r'', include('nodeshot.ui.default.urls', namespace='ui', app_name='ui')),
     )
 
-    
+
 if 'rosetta' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         url(r'^rosetta/', include('rosetta.urls')),
