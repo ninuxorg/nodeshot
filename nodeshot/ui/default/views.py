@@ -6,6 +6,8 @@ from django.shortcuts import render
 from nodeshot.core.nodes.models import Node, Status
 from nodeshot.core.layers.models import Layer
 
+from .settings import settings, TILESERVER_URL, MAP_CENTER, MAP_ZOOM
+
 if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
     from nodeshot.core.websockets import DOMAIN, PATH, PORT
 
@@ -16,10 +18,6 @@ if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
     }
 else:
     WEBSOCKETS = False
-
-TILESERVER_URL = settings.NODESHOT['SETTINGS'].get('TILESERVER_URL', '//otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png')
-MAP_CENTER = json.dumps(settings.NODESHOT['SETTINGS'].get('ADMIN_MAP_COORDS'))
-MAP_ZOOM = settings.NODESHOT['SETTINGS'].get('FRONTEND_MAP_ZOOM', 4)
 
 
 # TODO
