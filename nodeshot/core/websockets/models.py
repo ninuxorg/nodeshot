@@ -2,9 +2,9 @@
 register websocket signals
 """
 
-from django.conf import settings
 from importlib import import_module
+from .settings import REGISTER
 
 
-for registrar in settings.NODESHOT['WEBSOCKETS']['REGISTRARS']:
-    import_module(registrar)
+for module in REGISTER:
+    import_module(module)
