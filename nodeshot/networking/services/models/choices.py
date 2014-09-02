@@ -13,17 +13,14 @@ SERVICE_STATUS = (
     (3, _('not reachable'))
 )
 
-try:
-    APPLICATION_PROTOCOLS = settings.NODESHOT['CHOICES']['APPLICATION_PROTOCOLS']
-except KeyError:
-    APPLICATION_PROTOCOLS = (
-        ('http', 'http'),
-        ('https', 'https'),
-        ('ftp', 'FTP'),
-        ('smb', 'Samba'),
-        ('afp', 'AFP'),
-        ('git', 'Git'),
-    )
+APPLICATION_PROTOCOLS = (
+    ('http', 'http'),
+    ('https', 'https'),
+    ('ftp', 'FTP'),
+    ('smb', 'Samba'),
+    ('afp', 'AFP'),
+    ('git', 'Git'),
+)
 
 TRANSPORT_PROTOCOLS = (
     ('tcp', 'TCP'),
