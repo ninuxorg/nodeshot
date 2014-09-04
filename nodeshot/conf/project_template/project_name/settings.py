@@ -8,7 +8,7 @@ SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'nodeshot_dev',
+        'NAME': 'nodeshot',
         'USER': '<user>',
         'PASSWORD':  '<password>',
         'HOST': '127.0.0.1',
