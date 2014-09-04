@@ -96,11 +96,13 @@ class TopologyParser(object):
                     break
 
             if linkstablefound:
+                print("Links table found.")
                 i += 2 # skip the heading line
                 line = self.topologylines[i]
                 while not line.isspace():
                     try:
                             ipaddr1, ipaddr2, hyst, lq, nlq, etx = line.split()
+                            print("Link: %s <--[%s]--> %s" % (ipaddr1, etx, ipaddr2))
                             self.linklist.append((ipaddr1, ipaddr2, float(etx)))
                     except ValueError:
                             print ("wrong line or INFINITE ETX: %s" % line)
@@ -120,11 +122,13 @@ class TopologyParser(object):
                     break
 
             if topologytablefound:
+                print("Topology table found.")
                 i += 2 # skip the heading line
                 line = self.topologylines[i]
                 while not line.isspace():
                     try:
                             ipaddr1, ipaddr2, lq, nlq, etx = line.split()
+                            print("Link: %s --[%s]--> %s" % (ipaddr1, etx, ipaddr2))
                             self.linklist.append((ipaddr1, ipaddr2, float(etx)))
                     except ValueError:
                             print ("wrong line or INFINITE ETX: %s" % line)
@@ -145,6 +149,7 @@ class TopologyParser(object):
                 while not line.isspace() and i < len(self.topologylines):
                     try:
                             hna, announcer = line.split()
+                            print("HNA: %s by %s" % (hna, announcer))
                             self.hnalist.append((announcer, hna))
                     except ValueError:
                             pass
@@ -169,6 +174,7 @@ class TopologyParser(object):
                 try:
                         ipaddr, aliases = line.split()
                         for alias in aliases.split(';'):
+                            print("MID: %s == %s" % (ipaddr, alias))
                             self.aliasmanager.addalias(ipaddr, alias)
                 except ValueError:
                         pass
@@ -299,8 +305,9 @@ if __name__ == "__main__":
                               # create a link if the neighbors are NOT on the same node
                               #print fi, fi.get().id, to, to.get().id
                               if fi.get().device.node != to.get().device.node:
-                                l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx).save()
-                                print "Saved new link: %s" % l
+                                l = Link(from_interface = fi.get(), to_interface = to.get(), etx = etx)
+                                l.save()
+                                print "Saved new link: %s [%s - %s]" % (l, ipA, ipB)
                                 found = True
                                 activenodes.add(fi.get().device.node.id)
                                 activenodes.add(to.get().device.node.id)
