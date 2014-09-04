@@ -53,16 +53,13 @@ tornado
 # cache
 django-redis
 
-# email confirmation with configurable user model
-https://github.com/nemesisdesign/django-email-confirmation/tarball/master#egg=emailconfirmation-0.1
-
 # fixture management
 django-smuggler==0.4.1
 
 # networking
 netaddr
 django-netfields==0.2.2
-https://github.com/ninuxorg/netengine/tarball/master#egg=netengine
+netengine
 
 # dev utils
 bpython

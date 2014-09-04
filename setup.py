@@ -10,10 +10,7 @@ def get_install_requires():
 
     for line in open('requirements.txt').readlines():
         # skip to next iteration if comment or empty line
-        if line.startswith('#') or line == '':
-            continue
-
-        if line.startswith('http'):
+        if line.startswith('#') or line == '' or line.startswith('http') or line.startswith('git'):
             continue
 
         # add line to requirements
