@@ -1,10 +1,10 @@
 .. _manual-install-label:
-*******
+**************
 Manual Install
-*******
+**************
 
 .. warning::
-    This file describes how to install nodeshot on **Ubuntu Server 12.04 LTS**.
+    This file describes how to install nodeshot on **Ubuntu Server 13.10** (other versions of ubuntu and debian should work as well).
 
     Other Linux distribution will be good as well but you will have to use the
     package names according to your distribution package manager.
@@ -26,14 +26,13 @@ instructions including :ref:`production-instructions`.
 * Postgresql 9.1+
 * Geospatial libraries and plugins (GEOS, Proj, Postgresql Contrib, ecc)
 * Postgis 2.0+
-* Python 2.6+
+* Python 2.7+
 * Python Libraries (Virtualenv, setuptools, python-dev)
-* Git
 
 **Required python packages**:
 
-* Django 1.6.2
-* Django Rest Framework 2.3.13
+* Django 1.6
+* Django Rest Framework 2.4
 
 A full list is available in the `requirements.txt file`_.
 
@@ -57,9 +56,9 @@ First of all I suggest to become ``root`` to avoid typing sudo each time::
 
 	sudo -s
 
-Install **postgresql 9.1** or greater and spatial libraries::
+Install the dependencies::
 
-	apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 libxml2-dev libproj-dev libjson0-dev xsltproc docbook-xsl docbook-mathml gdal-bin binutils libxml2 libxml2-dev libxml2-dev checkinstall proj libpq-dev libgdal1-dev postgresql-contrib
+	apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev
 
 Build **GEOS** library from source::
 
@@ -79,57 +78,7 @@ Download and compile **Postgis 2.0**::
 	./configure
 	make
 	make install
-	ldconfig
-	make comments-install
-
-Now you need to install the required python libraries (setup tools, virtual env, python-dev)::
-
-	apt-get install python-setuptools python-virtualenv python-dev
-
-And **Git**::
-
-    apt-get install git-core
-
-.. _install-python-packages:
-
-=======================
-Install python packages
-=======================
-
-First of all, create the directory structure, a typical web app is usually
-installed in ``/var/www/``::
-
-	mkdir /var/www/ && cd /var/www/
-
-Clone git repository and cd into the example project.
-
-*TODO: best to install via pip when the project is at a more mature stage*::
-
-	git clone https://github.com/ninuxorg/nodeshot.git nodeshot --depth=0
-	cd nodeshot/projects/ninux
-
-Create a **python virtual environment**, a self-contained python installation
-which will store all our python packages indipendently from the packages installed systemwide.
-
-The virtual env needs to be activated in order to be used transparently
-(eg: without having to specify the full path of the python executables each time).
-
-This can be done with two simple commands::
-
-    virtualenv python
-    source python/bin/activate
-
-Now install all the required python packages, it will take a bit::
-
-    pip install -r /var/www/nodeshot/requirements.txt
-    # if you are using the networking modules
-    pip install -r /var/www/nodeshot/requirements_networking.txt
-    # additional useful packages
-    pip install -r /var/www/nodeshot/requirements_optional.txt
-
-And update the distribute python package::
-
-    pip install -U distribute  # -U stands for upgrade
+	cd ..
 
 .. _create-database:
 
@@ -160,44 +109,56 @@ exit (press CTRL+D) and go back to being root::
 
     exit
 
+.. _install-python-packages:
+
+=======================
+Install python packages
+=======================
+
+First of all, install virtualenvwrapper::
+
+    pip install virtualenvwrapper
+    echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
+    source ~/.bashrc
+
+Create a **python virtual environment**, a self-contained python installation
+which will store all our python packages indipendently from the packages installed systemwide::
+
+    mkvirtualenv nodeshot
+
+Install all the necessary python packages::
+
+    pip install -U distribute
+    pip install https://github.com/ninuxorg/nodeshot/tarball/master
+
+Now create the directory structure that will contain the project,
+a typical web app is usually installed in ``/var/www/``::
+
+	mkdir /var/www/ && cd /var/www/
+
+Create the nodeshot settings folder::
+
+    nodeshot startproject myproject
+    cd myproject
+
+Replace ``myproject`` with your project name. Avoid names which used by popular python packages, prefer a short and simple name.
+
 .. _project-configuration:
 
 =====================
 Project configuration
 =====================
 
-.. TODO: write how to:
-..  * create a project
-..  * secret key
+Open ``settings.py``::
 
-Copy ``settings.example.py`` and modify according to needs::
+    vim myproject/settings.py
 
-	cp ninux/settings.example.py ninux/settings.py
-	vim ninux/settings.py
+And edit the following settings:
 
-The minimum setting keys that you need to change are the following:
-
-* ``DATABASE`` (host, db, user and pwd)
 * ``DOMAIN`` (domain or ip address)
-* ``PROTOCOL`` (http or https)
-* ``SECRET_KEY`` (see below)
+* ``DATABASE`` (host, db, user and password)
 
-If you are installing for **development**, you should put **"localhost"** as
-``DOMAIN`` and you might comment the ``ALLOWED_HOSTS`` directive.
-
-Remember to uncomment the ``SECRET_KEY`` setting and slighlty change it.
-
-For more information about the secret settings, see the relative `Django Documentation`_ section.
-
-.. _Django Documentation: https://docs.djangoproject.com/en/1.5/ref/settings/#std:setting-SECRET_KEY
-
-Change secret key in ``settings.py``:
-
-.. code-block:: python
-
-	#SECRET_KEY = .....
-	# must be uncommented
-	SECRET_KEY = 'keep same length but change some characters'
+If you are installing for **development**, you should put **"localhost"** as ``DOMAIN``.
 
 Setup database and static files (images, css, js):
 
@@ -264,9 +225,9 @@ Copy ``uwsgi_params`` file::
 
     cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/
 
-Create public folder::
+Create public folder (replace ``myproject`` with your project name)::
 
-    mkdir /var/www/nodeshot/public_html
+    mkdir /var/www/myproject/public_html
 
 Create site configuration (replace ``nodeshot.yourdomain.com`` with your domain)::
 
@@ -278,11 +239,11 @@ Paste this configuration and tweak it according to your needs::
         listen   443; ## listen for ipv4; this line is default and implied
         #listen   [::]:443 default ipv6only=on; ## listen for ipv6
 
-        root /var/www/nodeshot/public_html;
+        root /var/www/myproject/public_html;
         index index.html index.htm;
 
         # error log
-        error_log /var/www/nodeshot/projects/ninux/log/nginx.error.log error;
+        error_log /var/www/myproject/log/nginx.error.log error;
 
         # Make site accessible from hostanme
         # change this according to your domain/hostanme
@@ -308,11 +269,11 @@ Paste this configuration and tweak it according to your needs::
         }
 
         location /static/ {
-            alias /var/www/nodeshot/projects/ninux/ninux/static/;
+            alias /var/www/myproject/myproject/static/;
         }
 
         location /media/ {
-            alias /var/www/nodeshot/projects/ninux/ninux/media/;
+            alias /var/www/myproject/myproject/media/;
         }
 
         #error_page 404 /404.html;
@@ -369,21 +330,21 @@ Install the latest version via pip::
 
 Create a new ini configuration file::
 
-    vim /var/www/nodeshot/projects/ninux/uwsgi.ini
+    vim /var/www/myproject/uwsgi.ini
 
-Paste this config::
+Paste this config (replace ``<user>`` with the user which created the virtualenv)::
 
     [uwsgi]
-    chdir=/var/www/nodeshot/projects/ninux
+    chdir=/var/www/myproject
     module=ninux.wsgi:application
     master=True
-    pidfile=/var/www/nodeshot/projects/ninux/uwsgi.pid
+    pidfile=/var/www/myproject/uwsgi.pid
     socket=127.0.0.1:3031
     processes=2
     harakiri=20
     max-requests=5000
     vacuum=True
-    home=/var/www/nodeshot/projects/ninux/python
+    home=/home/<user>/.virtualenvs/nodeshot
     enable-threads=True
     env=HTTPS=on
     buffer-size=8192
@@ -407,13 +368,13 @@ Save this in ``/etc/supervisor/conf.d/uwsgi.conf``::
 
     [program:uwsgi]
     user=uwsgi
-    directory=/var/www/nodeshot/projects/ninux
+    directory=/var/www/myproject
     command=uwsgi --ini uwsgi.ini
     autostart=true
     autorestart=true
     stopsignal=INT
     redirect_stderr=true
-    stdout_logfile=/var/www/nodeshot/projects/ninux/log/uwsgi.log
+    stdout_logfile=/var/www/myproject/log/uwsgi.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=5
 
@@ -421,16 +382,16 @@ Repeat in a similar way for celery::
 
     vim /etc/supervisor/conf.d/celery.conf
 
-And paste::
+And paste (replace ``<user>`` with the user which created the virtualenv)::
 
     [program:celery]
-    directory=/var/www/nodeshot/projects/ninux
+    directory=/var/www/myproject/myproject
     user=nobody
-    command=/var/www/nodeshot/projects/ninux/python/bin/celery -A ninux worker -l info
+    command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A ninux worker -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
-    stdout_logfile=/var/www/nodeshot/projects/ninux/log/celery.log
+    stdout_logfile=/var/www/myproject/log/celery.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=10
     startsecs=10
@@ -441,15 +402,15 @@ Now repeat in a similar way for celery-beat::
 
     vim /etc/supervisor/conf.d/celery-beat.conf
 
-And paste::
+And paste (replace ``<user>`` with the user which created the virtualenv)::
 
     [program:celery-beat]
-    directory=/var/www/nodeshot/projects/ninux
-    command=/var/www/nodeshot/projects/ninux/python/bin/celery -A ninux beat -s ./celerybeat-schedule -l info
+    directory=/var/www/myproject
+    command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A ninux beat -s ./celerybeat-schedule -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
-    stdout_logfile=/var/www/nodeshot/projects/ninux/log/celery-beat.log
+    stdout_logfile=/var/www/myproject/log/celery-beat.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=10
     startsects=10
@@ -477,14 +438,13 @@ Install **Redis**, we will use it as a message broker for *Celery* and as a *Cac
 
 Install celery bindings in your virtual environment::
 
-    cd /var/www/nodeshot/projects/ninux
-    source python/bin/activate
+    workon nodeshot  # activates virtualenv
     pip install -U celery[redis]
 
 Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
 **might lead to poor performance or security issues**::
 
-    vim /var/www/nodeshot/projects/ninux/ninux/settings.py
+    vim /var/www/myproject/myproject/settings.py
     # set DEBUG to False
     DEBUG = False
     # save and exit
