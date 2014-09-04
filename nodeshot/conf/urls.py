@@ -8,8 +8,18 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
-   url(r'^admin/filebrowser/', include(site.urls)),
+    # (fixture management) must be before admin
+    url(r'^admin/', include('smuggler.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/filebrowser/', include(site.urls)),
 )
+
+
+if settings.DEBUG and settings.SERVE_STATIC:
+    urlpatterns += patterns('django.contrib.staticfiles.views',
+        url(r'^static/(?P<path>.*)$', 'serve'),
+        url(r'^media/(?P<path>.*)$', 'serve'),
+    )
 
 
 if 'social_auth' in settings.INSTALLED_APPS:
