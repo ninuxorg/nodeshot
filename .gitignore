@@ -33,3 +33,6 @@ cache/
 local_settings.py
 /tests/ci/media/
 .coverage
+/build
+/dist
+nodeshot.egg-info/
