@@ -59,7 +59,7 @@ django-smuggler==0.4.1
 # networking
 netaddr
 django-netfields==0.2.2
-netengine
+netengine==0.1.alpha
 
 # dev utils
 bpython
