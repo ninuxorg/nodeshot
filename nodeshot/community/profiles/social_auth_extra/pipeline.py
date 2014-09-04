@@ -7,7 +7,7 @@ from social_auth.models import UserSocialAuth
 from ..settings import settings, EMAIL_CONFIRMATION
 
 if EMAIL_CONFIRMATION:
-    from emailconfirmation.models import EmailAddress
+    from nodeshot.community.emailconfirmation.models import EmailAddress
 
 
 def load_extra_data(backend, details, response, uid, user, social_user=None,

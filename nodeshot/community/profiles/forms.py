@@ -7,7 +7,7 @@ from .models import PasswordReset
 from .settings import settings, EMAIL_CONFIRMATION
 
 if EMAIL_CONFIRMATION:
-    from emailconfirmation.models import EmailAddress
+    from nodeshot.community.emailconfirmation.models import EmailAddress
 
 
 __all__ = [

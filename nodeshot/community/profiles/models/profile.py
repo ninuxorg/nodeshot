@@ -102,7 +102,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         Add email to DB and sends a confirmation mail if PROFILE_EMAL_CONFIRMATION is True
         """
         if EMAIL_CONFIRMATION:
-            from emailconfirmation.models import EmailAddress
+            from nodeshot.community.emailconfirmation.models import EmailAddress
             self.is_active = False
             self.save()
             EmailAddress.objects.add_email(self, self.email)

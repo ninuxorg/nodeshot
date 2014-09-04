@@ -16,7 +16,7 @@ from .settings import settings, EMAIL_CONFIRMATION
 
 if EMAIL_CONFIRMATION:
     from nodeshot.core.nodes.models import Node
-    from emailconfirmation.models import EmailAddress, EmailConfirmation
+    from nodeshot.community.emailconfirmation.models import EmailAddress, EmailConfirmation
 
 from .models import Profile as User
 from .models import PasswordReset, SocialLink

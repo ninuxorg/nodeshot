@@ -20,7 +20,7 @@ from ...settings import settings, STATUS_MAPPING, DEFAULT_LAYER
 
 if 'emailconfirmation' in settings.INSTALLED_APPS:
     EMAIL_ADDRESS_APP_INSTALLED = True
-    from emailconfirmation.models import EmailAddress
+    from nodeshot.community.emailconfirmation.models import EmailAddress
 else:
     EMAIL_ADDRESS_APP_INSTALLED = False
 

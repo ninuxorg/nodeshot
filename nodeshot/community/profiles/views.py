@@ -392,7 +392,7 @@ account_password_reset_key = PasswordResetFromKey.as_view()
 
 
 if EMAIL_CONFIRMATION:
-    from emailconfirmation.models import EmailAddress, EmailConfirmation
+    from nodeshot.community.emailconfirmation.models import EmailAddress, EmailConfirmation
 
     class AccountEmailList(CustomDataMixin, generics.ListCreateAPIView):
         """

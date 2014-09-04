@@ -95,7 +95,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 if EMAIL_CONFIRMATION:
-    from emailconfirmation.models import EmailAddress
+    from nodeshot.community.emailconfirmation.models import EmailAddress
 
     class EmailAddressInline(admin.StackedInline):
         model = EmailAddress

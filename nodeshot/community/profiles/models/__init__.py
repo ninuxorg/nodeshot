@@ -5,7 +5,7 @@ from ..settings import settings, EMAIL_CONFIRMATION
 
 if EMAIL_CONFIRMATION:
     check_dependencies(
-        dependencies='emailconfirmation',
+        dependencies='nodeshot.community.emailconfirmation',
         module='nodeshot.community.profiles'
     )
 
@@ -44,8 +44,8 @@ def new_user(sender, **kwargs):
 
 
 if EMAIL_CONFIRMATION:
-    from emailconfirmation.signals import email_confirmed
-    from emailconfirmation.models import EmailConfirmation
+    from nodeshot.community.emailconfirmation.signals import email_confirmed
+    from nodeshot.community.emailconfirmation.models import EmailConfirmation
 
     @receiver(email_confirmed, sender=EmailConfirmation)
     def activate_user(sender, email_address, **kwargs):

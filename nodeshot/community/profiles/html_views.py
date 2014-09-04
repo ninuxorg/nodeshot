@@ -79,7 +79,7 @@ def password_reset_from_key(request, uidb36, key, **kwargs):
 
 
 if EMAIL_CONFIRMATION:
-    from emailconfirmation.models import EmailConfirmation, EmailAddress
+    from nodeshot.community.emailconfirmation.models import EmailConfirmation, EmailAddress
     from django.contrib.auth import login
 
     def confirm_email(request, confirmation_key):
