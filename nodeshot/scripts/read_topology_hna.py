@@ -104,11 +104,15 @@ class TopologyParser(object):
                             ipaddr1, ipaddr2, hyst, lq, nlq, etx = line.split()
                             print("Link: %s <--[%s]--> %s" % (ipaddr1, etx, ipaddr2))
                             self.linklist.append((ipaddr1, ipaddr2, float(etx)))
+                            self.linklist.append((ipaddr2, ipaddr1, float(etx)))
                     except ValueError:
                             print ("wrong line or INFINITE ETX: %s" % line)
                             pass
                     i+=1
-                    line = self.topologylines[i]
+                    if i < len(self.topologylines):
+                        line = self.topologylines[i]
+                    else:
+                        return
 
             topologytablefound = True
             while line.find('Table: Topology') == -1:
@@ -130,11 +134,15 @@ class TopologyParser(object):
                             ipaddr1, ipaddr2, lq, nlq, etx = line.split()
                             print("Link: %s --[%s]--> %s" % (ipaddr1, etx, ipaddr2))
                             self.linklist.append((ipaddr1, ipaddr2, float(etx)))
+                            self.linklist.append((ipaddr2, ipaddr1, float(etx)))
                     except ValueError:
                             print ("wrong line or INFINITE ETX: %s" % line)
                             pass
                     i+=1
-                    line = self.topologylines[i]
+                    if i < len(self.topologylines):
+                        line = self.topologylines[i]
+                    else:
+                        return
 
             j = i + 1
             # parse HNA info
@@ -154,7 +162,10 @@ class TopologyParser(object):
                     except ValueError:
                             pass
                     i+=1
-                    line = self.topologylines[i]
+                    if i < len(self.topologylines):
+                        line = self.topologylines[i]
+                    else:
+                        return
             else:
                 i = j
 
@@ -179,7 +190,10 @@ class TopologyParser(object):
                 except ValueError:
                         pass
                 i+=1
-                line = self.topologylines[i]
+                if i < len(self.topologylines):
+                    line = self.topologylines[i]
+                else:
+                    return
 
             #debug
             #print self.linklist
