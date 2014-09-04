@@ -46,4 +46,5 @@ setup(
         'Framework :: Django',
     ],
     install_requires=get_install_requires(),
+    scripts=['nodeshot/bin/nodeshot'],
 )

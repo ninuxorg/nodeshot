@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+from __future__ import absolute_import
+import os
+import sys
+from django.core import management
+from nodeshot import conf
+
+
+if __name__ == "__main__":
+    if 'startproject' in sys.argv:
+        project_template = '{nodeshot_conf}/project_template'.format(nodeshot_conf=os.path.dirname(conf.__file__))
+        template_argument = '--template={path}'.format(path=project_template)
+        sys.argv.append(template_argument)
+    management.execute_from_command_line()
