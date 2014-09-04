@@ -63,3 +63,8 @@ django-smuggler==0.4.1
 netaddr
 django-netfields==0.2.2
 https://github.com/ninuxorg/netengine/tarball/master#egg=netengine
+
+# dev utils
+bpython
+django-extensions
+django-debug-toolbar
