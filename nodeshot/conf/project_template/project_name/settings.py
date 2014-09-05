@@ -1,9 +1,21 @@
 import os
-import sys
 
-DOMAIN = '<domain>'
+
+# ------ BEGIN DON'T TOUCH AREA ------ #
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+
+SECRET_KEY = '{{ secret_key }}'
+
+ROOT_URLCONF = '{{ project_name }}.urls' #
+
+WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
+
+# ------ END DON'T TOUCH AREA ------ #
+
+
+DEBUG = True
+DOMAIN = '<domain>'
 
 DATABASES = {
     'default': {
@@ -29,11 +41,13 @@ DATABASES = {
     #}
 }
 
-ADMINS = (
-    #('Your name', 'your@email.com'),
-)
+# import the default nodeshot settings
+# do not move this import
+from nodeshot.conf.settings import *
 
-MANAGERS = ADMINS
+
+# ------ All settings customizations must go here ------ #
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -45,23 +59,31 @@ TIME_ZONE = 'Europe/Amsterdam'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-gb'
 
-SECRET_KEY = '{{ secret_key }}'
+ADMINS = (
+    #('Your name', 'your@email.com'),
+)
 
-ROOT_URLCONF = '{{ project_name }}.urls' #
-
-WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
+MANAGERS = ADMINS
 
 EMAIL_HOST = 'localhost'
 EMAIL_HOST_USER = 'root@localhost'
-
-from nodeshot.conf.settings import *
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER  # used for error reporting
 
 #NODESHOT_ADMIN_MAP_ZOOM = 5
 #NODESHOT_ADMIN_MAP_COORDINATES = [41.8934, 12.4960]
 
+# social auth
+FACEBOOK_APP_ID = ''
+FACEBOOK_API_SECRET = ''
+GOOGLE_OAUTH2_CLIENT_ID = ''
+GOOGLE_OAUTH2_CLIENT_SECRET = ''
+GITHUB_APP_ID = ''
+GITHUB_API_SECRET = ''
+
 #from datetime import timedelta
 #
-#CELERYBEAT_SCHEDULE.update({
+#CELERYBEAT_SCHEDULE = {
 #    'synchronize': {
 #        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
 #        'schedule': timedelta(hours=12),
@@ -78,4 +100,4 @@ from nodeshot.conf.settings import *
 #        'schedule': timedelta(hours=12),
 #        'kwargs': { 'exclude': 'layer1-slug,layer2-slug' }
 #    }
-#})
+#}
