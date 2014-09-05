@@ -67,8 +67,9 @@ Build **GEOS** library from source::
 	cd geos-3.3.8
 	./configure
 	make
-	make install
+	checkinstall  # if you need to uninstall you can do it  with "dpkg -r geos"
 	cd ..
+	rm -rf geos-3.3.8
 
 Download and compile **Postgis 2.0**::
 
@@ -77,8 +78,9 @@ Download and compile **Postgis 2.0**::
 	cd postgis-2.0.3
 	./configure
 	make
-	make install
+	checkinstall  # if you need to uninstall you can do it  with "dpkg -r postgis"
 	cd ..
+	rm -rf postgis-2.0.3
 
 .. _create-database:
 
@@ -140,8 +142,11 @@ Create the nodeshot settings folder::
 
     nodeshot startproject myproject
     cd myproject
+    chmod -R 777 log/
 
 Replace ``myproject`` with your project name. Avoid names which used by popular python packages, prefer a short and simple name.
+
+Do not forget to permissions to the log folder otherwise the celery background process won't be able to write in the log.
 
 .. _project-configuration:
 
@@ -200,7 +205,7 @@ software stack:
 * **Postfixs**: SMTP server
 
 .. note::
-    If you are installing for development you can skip to the next chapter.
+    If you are installing for development you can skip the rest of this chapter.
 
 -----
 Nginx
@@ -295,7 +300,7 @@ Paste this configuration and tweak it according to your needs::
 
     server {
         listen   80; ## listen for ipv4; this line is default and implied
-        listen   [::]:80 default ipv6only=on; ## listen for ipv6
+        #listen   [::]:80 default ipv6only=on; ## listen for ipv6
 
         # Make site accessible from hostanme on port 80
         # change this according to your domain/hostanme
@@ -332,11 +337,11 @@ Create a new ini configuration file::
 
     vim /var/www/myproject/uwsgi.ini
 
-Paste this config (replace ``<user>`` with the user which created the virtualenv)::
+Paste this config (replace ``<user>`` with the user which created the virtualenv and ``<myproject>``)::
 
     [uwsgi]
     chdir=/var/www/myproject
-    module=ninux.wsgi:application
+    module=myproject.wsgi:application
     master=True
     pidfile=/var/www/myproject/uwsgi.pid
     socket=127.0.0.1:3031
@@ -348,83 +353,6 @@ Paste this config (replace ``<user>`` with the user which created the virtualenv
     enable-threads=True
     env=HTTPS=on
     buffer-size=8192
-
-----------
-Supervisor
-----------
-
-We will use `Supervisor`_ as a process manager. Install it via your package
-system (or alternatively via pip)::
-
-	apt-get install supervisor
-
-.. _Supervisor: http://supervisord.org/
-
-Create new config file::
-
-    vim /etc/supervisor/conf.d/uwsgi.conf
-
-Save this in ``/etc/supervisor/conf.d/uwsgi.conf``::
-
-    [program:uwsgi]
-    user=uwsgi
-    directory=/var/www/myproject
-    command=uwsgi --ini uwsgi.ini
-    autostart=true
-    autorestart=true
-    stopsignal=INT
-    redirect_stderr=true
-    stdout_logfile=/var/www/myproject/log/uwsgi.log
-    stdout_logfile_maxbytes=30MB
-    stdout_logfile_backups=5
-
-Repeat in a similar way for celery::
-
-    vim /etc/supervisor/conf.d/celery.conf
-
-And paste (replace ``<user>`` with the user which created the virtualenv)::
-
-    [program:celery]
-    directory=/var/www/myproject/myproject
-    user=nobody
-    command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A ninux worker -l info
-    autostart=true
-    autorestart=true
-    redirect_stderr=true
-    stdout_logfile=/var/www/myproject/log/celery.log
-    stdout_logfile_maxbytes=30MB
-    stdout_logfile_backups=10
-    startsecs=10
-    stopwaitsecs=600
-    numprocs=1
-
-Now repeat in a similar way for celery-beat::
-
-    vim /etc/supervisor/conf.d/celery-beat.conf
-
-And paste (replace ``<user>`` with the user which created the virtualenv)::
-
-    [program:celery-beat]
-    directory=/var/www/myproject
-    command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A ninux beat -s ./celerybeat-schedule -l info
-    autostart=true
-    autorestart=true
-    redirect_stderr=true
-    stdout_logfile=/var/www/myproject/log/celery-beat.log
-    stdout_logfile_maxbytes=30MB
-    stdout_logfile_backups=10
-    startsects=10
-    numprocs=1
-
-Then run::
-
-    supervisorctl update
-
-You can check the status with::
-
-    supervisorctl status
-
-And you can also use other commands like start, stop and restart.
 
 -----
 Redis
@@ -458,6 +386,82 @@ Restart redis and ensure is running::
 
     service redis-server restart
     service redis-server status
+
+----------
+Supervisor
+----------
+
+We will use `Supervisor`_ as a process manager. Install it via your package
+system (or alternatively via pip)::
+
+	apt-get install supervisor
+
+.. _Supervisor: http://supervisord.org/
+
+Create new config file::
+
+    vim /etc/supervisor/conf.d/uwsgi.conf
+
+Save this in ``/etc/supervisor/conf.d/uwsgi.conf``::
+
+    [program:uwsgi]
+    directory=/var/www/myproject
+    command=uwsgi --ini uwsgi.ini
+    autostart=true
+    autorestart=true
+    stopsignal=INT
+    redirect_stderr=true
+    stdout_logfile=/var/www/myproject/log/uwsgi.log
+    stdout_logfile_maxbytes=30MB
+    stdout_logfile_backups=5
+
+Repeat in a similar way for celery::
+
+    vim /etc/supervisor/conf.d/celery.conf
+
+And paste (replace ``<user>`` with the user which created the virtualenv)::
+
+    [program:celery]
+    directory=/var/www/myproject
+    user=nobody
+    command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A myproject worker -l info
+    autostart=true
+    autorestart=true
+    redirect_stderr=true
+    stdout_logfile=/var/www/myproject/log/celery.log
+    stdout_logfile_maxbytes=30MB
+    stdout_logfile_backups=10
+    startsecs=10
+    stopwaitsecs=600
+    numprocs=1
+
+Now repeat in a similar way for celery-beat::
+
+    vim /etc/supervisor/conf.d/celery-beat.conf
+
+And paste (replace ``<user>`` with the user which created the virtualenv)::
+
+    [program:celery-beat]
+    directory=/var/www/myproject
+    command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A myproject beat -s ./celerybeat-schedule -l info
+    autostart=true
+    autorestart=true
+    redirect_stderr=true
+    stdout_logfile=/var/www/myproject/log/celery-beat.log
+    stdout_logfile_maxbytes=30MB
+    stdout_logfile_backups=10
+    startsects=10
+    numprocs=1
+
+Then run::
+
+    supervisorctl update
+
+You can check the status with::
+
+    supervisorctl status
+
+And you can also use other commands like start, stop and restart.
 
 -------
 Postfix
