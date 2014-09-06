@@ -45,7 +45,6 @@ A full list is available in the `requirements.txt file`_.
 * Supervisor
 * Redis
 
-
 .. _install-dependencies:
 
 ====================
@@ -54,33 +53,33 @@ Install dependencies
 
 First of all I suggest to become ``root`` to avoid typing sudo each time::
 
-	sudo -s
+    sudo -s
 
 Install the dependencies::
 
-	apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev
+    apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev
 
 Build **GEOS** library from source::
 
-	wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2
-	tar xvfj geos-3.3.8.tar.bz2
-	cd geos-3.3.8
-	./configure
-	make
-	checkinstall  # if you need to uninstall you can do it  with "dpkg -r geos"
-	cd ..
-	rm -rf geos-3.3.8
+    wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2
+    tar xvfj geos-3.3.8.tar.bz2
+    cd geos-3.3.8
+    ./configure
+    make
+    checkinstall  # if you need to uninstall you can do it  with "dpkg -r geos"
+    cd ..
+    rm -rf geos-3.3.8
 
 Download and compile **Postgis 2.0**::
 
-	wget http://download.osgeo.org/postgis/source/postgis-2.0.3.tar.gz
-	tar xfvz postgis-2.0.3.tar.gz
-	cd postgis-2.0.3
-	./configure
-	make
-	checkinstall  # if you need to uninstall you can do it  with "dpkg -r postgis"
-	cd ..
-	rm -rf postgis-2.0.3
+    wget http://download.osgeo.org/postgis/source/postgis-2.0.3.tar.gz
+    tar xfvz postgis-2.0.3.tar.gz
+    cd postgis-2.0.3
+    ./configure
+    make
+    checkinstall  # if you need to uninstall you can do it  with "dpkg -r postgis"
+    cd ..
+    rm -rf postgis-2.0.3
 
 .. _create-database:
 
@@ -90,22 +89,22 @@ Create database
 
 Set ``postgres`` user password::
 
-	passwd postgres
+    passwd postgres
 
 Become ``postgres`` user::
 
-	su postgres
+    su postgres
 
 Create database, create required postgresql extensions,
 create a user and grant all privileges to the newly created DB::
 
-	createdb  nodeshot
-	psql nodeshot
-	CREATE EXTENSION postgis;
-	CREATE EXTENSION postgis_topology;
-	CREATE EXTENSION hstore;
-	CREATE USER nodeshot WITH PASSWORD 'your_password';
-	GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to nodeshot;
+    createdb  nodeshot
+    psql nodeshot
+    CREATE EXTENSION postgis;
+    CREATE EXTENSION postgis_topology;
+    CREATE EXTENSION hstore;
+    CREATE USER nodeshot WITH PASSWORD 'your_password';
+    GRANT ALL PRIVILEGES ON DATABASE "nodeshot" to nodeshot;
 
 exit (press CTRL+D) and go back to being root::
 
@@ -126,6 +125,7 @@ First of all, install virtualenvwrapper::
 Create a **python virtual environment**, a self-contained python installation
 which will store all our python packages indipendently from the packages installed systemwide::
 
+    exit  # do not create it as root
     mkvirtualenv nodeshot
 
 Install all the necessary python packages::
@@ -136,17 +136,21 @@ Install all the necessary python packages::
 Now create the directory structure that will contain the project,
 a typical web app is usually installed in ``/var/www/``::
 
-	mkdir /var/www/ && cd /var/www/
+    sudo -s  # go back being root
+    mkdir /var/www/ && cd /var/www/
 
 Create the nodeshot settings folder::
 
     nodeshot startproject myproject
     cd myproject
-    chmod -R 777 log/
+    chown -R <user>:www-data .  # set group to www-data
+    adduser www-data <user>
+    chmod 775 . log myproject  # permit www-data to write logs, pid files and static directory
+    chmod 750 manage.py myproject/\*.py  # do not permit www-data to write python files
 
 Replace ``myproject`` with your project name. Avoid names which used by popular python packages, prefer a short and simple name.
 
-Do not forget to permissions to the log folder otherwise the celery background process won't be able to write in the log.
+Replace ``<user>`` with your current non-root user (the one which created the virtualenv).
 
 .. _project-configuration:
 
@@ -169,10 +173,11 @@ Setup database and static files (images, css, js):
 
 .. code-block:: bash
 
-	# will prompt you to create a superuser, proceed!
-	python manage.py syncdb && python manage.py migrate
-	# static files (css, js, images)
-	python manage.py collectstatic
+    exit  # go back being non-root
+    # will prompt you to create a superuser, proceed!
+    python manage.py syncdb && python manage.py migrate
+    # static files (css, js, images)
+    python manage.py collectstatic
 
 If you are installing for **development**, you are done!
 
@@ -218,7 +223,8 @@ but it won't be covered in this doc.
 
 You can install from the system packages with the following command::
 
-	apt-get install nginx-full nginx-common openssl zlib-bin
+    sudo -s  # become root again
+    apt-get install nginx-full nginx-common openssl zlib-bin
 
 Create a temporary self signed SSL certificate (or install your own one if you already have it)::
 
@@ -287,14 +293,14 @@ Paste this configuration and tweak it according to your needs::
         #
         #error_page 500 502 503 504 /50x.html;
         #location = /50x.html {
-        #	root /usr/share/nginx/www;
+        #    root /usr/share/nginx/www;
         #}
 
         # deny access to .htaccess files, if Apache's document root
         # concurs with nginx's one
         #
         #location ~ /\.ht {
-        #	deny all;
+        #    deny all;
         #}
     }
 
@@ -337,11 +343,11 @@ Create a new ini configuration file::
 
     vim /var/www/myproject/uwsgi.ini
 
-Paste this config (replace ``<user>`` with the user which created the virtualenv and ``<myproject>``)::
+Paste this config (replace ``<user>`` with the user which created the virtualenv and replace `<myproject>`` with the project name chosen at the beginning)::
 
     [uwsgi]
     chdir=/var/www/myproject
-    module=myproject.wsgi:application
+    module=<myproject>.wsgi:application
     master=True
     pidfile=/var/www/myproject/uwsgi.pid
     socket=127.0.0.1:3031
@@ -366,7 +372,7 @@ Install **Redis**, we will use it as a message broker for *Celery* and as a *Cac
 
 Install celery bindings in your virtual environment::
 
-    workon nodeshot  # activates virtualenv
+    workon nodeshot  # activates virtualenv again
     pip install -U celery[redis]
 
 Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
@@ -394,7 +400,7 @@ Supervisor
 We will use `Supervisor`_ as a process manager. Install it via your package
 system (or alternatively via pip)::
 
-	apt-get install supervisor
+    apt-get install supervisor
 
 .. _Supervisor: http://supervisord.org/
 
@@ -405,6 +411,7 @@ Create new config file::
 Save this in ``/etc/supervisor/conf.d/uwsgi.conf``::
 
     [program:uwsgi]
+    user=www-data
     directory=/var/www/myproject
     command=uwsgi --ini uwsgi.ini
     autostart=true
@@ -422,8 +429,8 @@ Repeat in a similar way for celery::
 And paste (replace ``<user>`` with the user which created the virtualenv)::
 
     [program:celery]
+    user=www-data
     directory=/var/www/myproject
-    user=nobody
     command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A myproject worker -l info
     autostart=true
     autorestart=true
@@ -442,6 +449,7 @@ Now repeat in a similar way for celery-beat::
 And paste (replace ``<user>`` with the user which created the virtualenv)::
 
     [program:celery-beat]
+    user=www-data
     directory=/var/www/myproject
     command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A myproject beat -s ./celerybeat-schedule -l info
     autostart=true
