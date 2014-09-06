@@ -6,10 +6,8 @@ projects/ninux/ninux/settings.py
 *.DS_Store
 python/
 projects/
-debug.log
 *~
 ._*
-startshell
 activate
 runserver
 TODO.txt
@@ -36,3 +34,4 @@ local_settings.py
 /build
 /dist
 nodeshot.egg-info/
+deploy
