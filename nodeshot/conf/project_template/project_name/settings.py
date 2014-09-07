@@ -16,6 +16,7 @@ WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 
 DEBUG = True
 DOMAIN = '<domain>'
+SITE_NAME = '{{ project_name }}'  # site name, you can change this
 
 DATABASES = {
     'default': {

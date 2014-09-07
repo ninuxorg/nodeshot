@@ -2,7 +2,6 @@ import datetime
 from random import random
 from hashlib import sha1
 
-from django.conf import settings
 from django.db import models, IntegrityError
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -10,9 +9,8 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from django.contrib.sites.models import Site
-
 from ..signals import email_confirmed, email_confirmation_sent
+from ..settings import settings
 
 try:
     from django.utils.timezone import now
@@ -138,38 +136,26 @@ class EmailConfirmationManager(models.Manager):
 
     def send_confirmation(self, email_address):
         confirmation = self.create_emailconfirmation(email_address)
-        current_site = Site.objects.get_current()
         # check for the url with the dotted view path
         try:
             path = reverse("emailconfirmation.views.confirm_email", args=[confirmation.key])
         except NoReverseMatch:
             # or get path with named urlconf instead
-            path = reverse(
-                "emailconfirmation_confirm_email", args=[confirmation.key])
-        protocol = settings.PROTOCOL
-        activate_url = u"%s://%s%s" % (
-            protocol,
-            unicode(current_site.domain),
-            path
-        )
+            path = reverse("emailconfirmation_confirm_email", args=[confirmation.key])
+        activate_url = u"%s%s" % (settings.SITE_URL, path)
         context = {
             "user": email_address.user,
             "activate_url": activate_url,
-            "current_site": current_site,
+            "site_name": settings.SITE_NAME,
             "confirmation_key": confirmation.key,
         }
-        subject = render_to_string(
-            "emailconfirmation/email_confirmation_subject.txt", context)
+        subject = render_to_string("profiles/email_messages/email_confirmation_subject.txt", context)
         # remove superfluous line breaks
         subject = "".join(subject.splitlines())
-        message = render_to_string(
-            "emailconfirmation/email_confirmation_message.txt", context)
+        message = render_to_string("profiles/email_messages/email_confirmation_message.txt", context)
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email_address.email])
 
-        email_confirmation_sent.send(
-            sender=self.model,
-            confirmation=confirmation,
-        )
+        email_confirmation_sent.send(sender=self.model, confirmation=confirmation)
         return confirmation
 
     def delete_expired_confirmations(self):

@@ -344,7 +344,7 @@ class PasswordResetRequestKey(generics.GenericAPIView):
     def permission_denied(self, request):
         raise exceptions.PermissionDenied(_("You can't reset your password if you are already authenticated"))
 
-account_password_reset = PasswordResetRequestKey.as_view()
+account_password_reset_request_key = PasswordResetRequestKey.as_view()
 
 
 class PasswordResetFromKey(generics.GenericAPIView):
@@ -385,7 +385,7 @@ class PasswordResetFromKey(generics.GenericAPIView):
     def permission_denied(self, request):
         raise exceptions.PermissionDenied(_("You can't reset your password if you are already authenticated"))
 
-account_password_reset_key = PasswordResetFromKey.as_view()
+account_password_reset_from_key = PasswordResetFromKey.as_view()
 
 
 # ------ Account Email ------ #

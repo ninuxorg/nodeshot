@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from django.utils.http import int_to_base36
-from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator as token_generator
@@ -28,16 +27,14 @@ class PasswordResetManager(models.Manager):
         password_reset = PasswordReset(user=user, temp_key=temp_key)
         password_reset.save()
 
-        current_site = Site.objects.get_current()
-        domain = unicode(current_site.domain)
-
         # send the password reset email
         subject = _("Password reset email sent")
         message = render_to_string("profiles/email_messages/password_reset_key_message.txt", {
             "user": user,
             "uid": int_to_base36(user.id),
             "temp_key": temp_key,
-            "domain": domain,
+            "site_url": settings.SITE_URL,
+            "site_name": settings.SITE_NAME
         })
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 

@@ -14,7 +14,6 @@ __all__ = [
 
 
 class ResetPasswordForm(forms.Form):
-
     email = forms.EmailField(
         label = _("Email"),
         required = True,

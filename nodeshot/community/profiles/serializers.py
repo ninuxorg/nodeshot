@@ -279,13 +279,14 @@ class ResetPasswordSerializer(serializers.Serializer):
             condition = User.objects.get(email__iexact=attrs["email"], is_active=True).count() == 0
 
         if condition is True:
-            raise serializers.ValidationError(_("Email address not verified for any user account"))
+            raise serializers.ValidationError(_("Email address not found"))
 
         return attrs
 
     def restore_object(self, attrs, instance=None):
         """ create password reset for user """
         password_reset = PasswordReset.objects.create_for_user(attrs["email"])
+        password_reset.email = attrs["email"]
 
         return password_reset
 

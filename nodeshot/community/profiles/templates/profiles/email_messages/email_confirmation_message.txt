@@ -1,0 +1,7 @@
+{% load i18n %}{% blocktrans %}Hi {{ user }},
+welcome at {{ site_name }}, please proceed to confirm your email address by clicking on the following link:
+
+{{ activate_url }}
+
+If you haven't signed up at {{ site_name }} please ignore this email.
+{% endblocktrans %}

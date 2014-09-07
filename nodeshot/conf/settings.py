@@ -18,6 +18,7 @@ SITE_ID = 1
 PROTOCOL = 'http' if DEBUG else 'https'
 PORT = '8000' if DEBUG else None
 SITE_URL = '%s://%s' % (PROTOCOL, settings.DOMAIN)
+SITE_NAME = getattr(settings, 'SITE_NAME', 'Nodeshot instance')
 
 if PORT and PORT not in ['80', '443']:
     SITE_URL = '%s:%s' % (SITE_URL, PORT)

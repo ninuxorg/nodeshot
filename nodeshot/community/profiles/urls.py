@@ -14,8 +14,8 @@ urlpatterns = patterns('nodeshot.community.profiles.views',
     url(r'^account/logout/$', 'account_logout', name='api_account_logout'),
 
     url(r'^account/password/$', 'account_password_change', name='api_account_password_change'),
-    url(r'^account/password/reset/$', 'account_password_reset', name='api_account_password_reset'),
-    url(r'^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$', 'account_password_reset_key', name='api_account_password_reset_key'),
+    url(r'^account/password/reset/$', 'account_password_reset_request_key', name='api_account_password_reset_request_key'),
+    url(r'^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$', 'account_password_reset_from_key', name='api_account_password_reset_from_key'),
 )
 
 

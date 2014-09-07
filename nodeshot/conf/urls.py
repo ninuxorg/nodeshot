@@ -42,9 +42,9 @@ if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
 
 if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
     urlpatterns = urlpatterns + patterns('',
-        url(r"^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
-            "nodeshot.community.profiles.html_views.password_reset_from_key",
-            name="account_password_reset_key"),
+        url(r'^account/password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$',
+            'nodeshot.community.profiles.html_views.password_reset_from_key',
+            name='account_password_reset_from_key'),
     )
 
 
@@ -52,7 +52,9 @@ from nodeshot.community.profiles.settings import EMAIL_CONFIRMATION
 
 if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and EMAIL_CONFIRMATION:
     urlpatterns = urlpatterns + patterns('',
-        url(r'^confirm_email/(\w+)/$', 'nodeshot.community.profiles.html_views.confirm_email', name='emailconfirmation_confirm_email'),
+        url(r'^confirm_email/(\w+)/$',
+            'nodeshot.community.profiles.html_views.confirm_email',
+            name='emailconfirmation_confirm_email'),
     )
 
 

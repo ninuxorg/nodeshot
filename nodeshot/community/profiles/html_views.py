@@ -40,7 +40,6 @@ def group_context(group, bridge):
 
 
 def password_reset_from_key(request, uidb36, key, **kwargs):
-
     form_class = kwargs.get("form_class", ResetPasswordKeyForm)
     template_name = kwargs.get("template_name", "profiles/password_reset_from_key.html")
     token_generator = kwargs.get("token_generator", default_token_generator)
