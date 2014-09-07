@@ -5,7 +5,6 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.contrib.sites.models import Site
 
 from nodeshot.core.base.models import BaseDate
 
@@ -126,13 +125,12 @@ class Notification(BaseDate):
     @property
     def email_message(self):
         """ compose complete email message text """
-        site = Site.objects.get(pk=settings.SITE_ID)
-        url = "%s://%s/" % (getattr(settings, 'PROTOCOL', 'http'), site.domain)
+        url = settings.SITE_URL
         hello_text = __("Hi %s," % self.to_user.get_full_name())
         action_text = __("\n\nMore details here: %s") % url
         explain_text = __(
             "This is an automatic notification sent from from %s.\n"
             "If you want to stop receiving this notification edit your"
-            "email notification settings here: %s") % (site.name, 'TODO')
+            "email notification settings here: %s") % (settings.SITE_NAME, 'TODO')
 
         return "%s\n\n%s%s\n\n%s" % (hello_text, self.text, action_text, explain_text)
