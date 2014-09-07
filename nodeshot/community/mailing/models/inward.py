@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.contrib.sites.models import Site
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
@@ -80,7 +79,7 @@ class Inward(BaseDate):
 
         email = EmailMessage(
             # subject
-            _('Contact request from %(sender)s - %(site)s') % {'sender': self.from_name, 'site': Site.objects.get(pk=settings.SITE_ID)},
+            _('Contact request from %(sender)s - %(site)s') % {'sender': self.from_name, 'site': settings.SITE_NAME},
             # message
             self.message,
             # from
