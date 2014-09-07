@@ -18,5 +18,5 @@ class TestWebsockets(BaseTestCase):
         'test_status.json',
     ]
     
-    def test_start_websocket_server(self):
-        self.assertTrue(False, 'TODO')
+    #def test_start_websocket_server(self):
+    #    self.assertTrue(False, 'TODO')
