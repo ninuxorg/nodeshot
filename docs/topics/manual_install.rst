@@ -137,12 +137,12 @@ Now create the directory structure that will contain the project,
 a typical web app is usually installed in ``/var/www/``::
 
     sudo -s  # go back being root
-    mkdir /var/www/ && cd /var/www/
+    mkdir -p /var/www/nodeshot && cd /var/www/
 
 Create the nodeshot settings folder::
 
-    nodeshot startproject myproject
-    cd myproject
+    nodeshot startproject myproject nodeshot
+    cd nodeshot
     chown -R <user>:www-data .  # set group to www-data
     adduser www-data <user>
     chmod 775 . log myproject  # permit www-data to write logs, pid files and static directory
@@ -236,9 +236,9 @@ Copy ``uwsgi_params`` file::
 
     cp /etc/nginx/uwsgi_params /etc/nginx/sites-available/
 
-Create public folder (replace ``myproject`` with your project name)::
+Create public folder::
 
-    mkdir /var/www/myproject/public_html
+    mkdir /var/www/nodeshot/public_html
 
 Create site configuration (replace ``nodeshot.yourdomain.com`` with your domain)::
 
@@ -250,11 +250,11 @@ Paste this configuration and tweak it according to your needs::
         listen   443; ## listen for ipv4; this line is default and implied
         #listen   [::]:443 default ipv6only=on; ## listen for ipv6
 
-        root /var/www/myproject/public_html;
+        root /var/www/nodeshot/public_html;
         index index.html index.htm;
 
         # error log
-        error_log /var/www/myproject/log/nginx.error.log error;
+        error_log /var/www/nodeshot/log/nginx.error.log error;
 
         # Make site accessible from hostanme
         # change this according to your domain/hostanme
@@ -280,11 +280,11 @@ Paste this configuration and tweak it according to your needs::
         }
 
         location /static/ {
-            alias /var/www/myproject/myproject/static/;
+            alias /var/www/nodeshot/myproject/static/;
         }
 
         location /media/ {
-            alias /var/www/myproject/myproject/media/;
+            alias /var/www/nodeshot/myproject/media/;
         }
 
         #error_page 404 /404.html;
@@ -341,15 +341,15 @@ Install the latest version via pip::
 
 Create a new ini configuration file::
 
-    vim /var/www/myproject/uwsgi.ini
+    vim /var/www/nodeshot/uwsgi.ini
 
 Paste this config (replace ``<user>`` with the user which created the virtualenv and replace `<myproject>`` with the project name chosen at the beginning)::
 
     [uwsgi]
-    chdir=/var/www/myproject
+    chdir=/var/www/nodeshot
     module=<myproject>.wsgi:application
     master=True
-    pidfile=/var/www/myproject/uwsgi.pid
+    pidfile=/var/www/nodeshot/uwsgi.pid
     socket=127.0.0.1:3031
     processes=2
     harakiri=20
@@ -378,7 +378,7 @@ Install celery bindings in your virtual environment::
 Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
 **might lead to poor performance or security issues**::
 
-    vim /var/www/myproject/myproject/settings.py
+    vim /var/www/nodeshot/myproject/settings.py
     # set DEBUG to False
     DEBUG = False
     # save and exit
@@ -412,13 +412,13 @@ Save this in ``/etc/supervisor/conf.d/uwsgi.conf``::
 
     [program:uwsgi]
     user=www-data
-    directory=/var/www/myproject
+    directory=/var/www/nodeshot
     command=uwsgi --ini uwsgi.ini
     autostart=true
     autorestart=true
     stopsignal=INT
     redirect_stderr=true
-    stdout_logfile=/var/www/myproject/log/uwsgi.log
+    stdout_logfile=/var/www/nodeshot/log/uwsgi.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=5
 
@@ -430,12 +430,12 @@ And paste (replace ``<user>`` with the user which created the virtualenv)::
 
     [program:celery]
     user=www-data
-    directory=/var/www/myproject
+    directory=/var/www/nodeshot
     command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A myproject worker -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
-    stdout_logfile=/var/www/myproject/log/celery.log
+    stdout_logfile=/var/www/nodeshot/log/celery.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=10
     startsecs=10
@@ -450,12 +450,12 @@ And paste (replace ``<user>`` with the user which created the virtualenv)::
 
     [program:celery-beat]
     user=www-data
-    directory=/var/www/myproject
+    directory=/var/www/nodeshot
     command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A myproject beat -s ./celerybeat-schedule -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
-    stdout_logfile=/var/www/myproject/log/celery-beat.log
+    stdout_logfile=/var/www/nodeshot/log/celery-beat.log
     stdout_logfile_maxbytes=30MB
     stdout_logfile_backups=10
     startsects=10

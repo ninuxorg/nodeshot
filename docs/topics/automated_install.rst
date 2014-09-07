@@ -2,7 +2,7 @@
 Automated install
 *****************
 
-This section describes how to perform a quick install of Nodeshot on **Ubuntu Server 12.04 LTS**.
+This section describes how to perform a quick install of Nodeshot on **Ubuntu / Debian systems**.
 
 .. warning::
     The quick install procedure described below has been tested on a fresh install of **Ubuntu 13.04** and **debian 6**.
@@ -21,7 +21,7 @@ First of all, we need to install the `Fabric`_ Python library.
 
 .. _Fabric: http://www.fabfile.org/index.html
 
-TO install fabric, you need to have pip installed on your system. See `how to install pip`_ first.
+To install fabric, you need to have pip installed on your system. See `how to install pip`_ first.
 
 .. _how to install pip: http://pip.readthedocs.org/en/latest/installing.html
 
@@ -29,7 +29,7 @@ Proceed to install Fabric::
 
     pip install fabric
 
-More detailed instructions about Fabric installation can be found `here`_
+More detailed instructions about Fabric installation can be found `here`_.
 
 .. _here: http://www.fabfile.org/installing.html
 
