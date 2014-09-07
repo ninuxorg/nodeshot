@@ -12,23 +12,21 @@ from django.utils import timezone
 
 from django.contrib.sites.models import Site
 
-from .signals import email_confirmed, email_confirmation_sent
+from ..signals import email_confirmed, email_confirmation_sent
 
 try:
     from django.utils.timezone import now
 except ImportError:
     now = datetime.datetime.now
 
-try:
-    User = settings.AUTH_USER_MODEL
-except AttributeError:
-    from django.contrib.auth.models import User
 
+__all__ = [
+    'EmailAddress',
+    'EmailConfirmation'
+]
 
-# this code based in-part on django-registration
 
 class EmailAddressManager(models.Manager):
-
     def add_email(self, user, email):
         try:
             email_address = self.create(user=user, email=email)
@@ -62,8 +60,7 @@ class EmailAddressManager(models.Manager):
 
 
 class EmailAddress(models.Model):
-
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='email_set')
     email = models.EmailField()
     verified = models.BooleanField(default=False)
     primary = models.BooleanField(default=False)
@@ -96,6 +93,7 @@ class EmailAddress(models.Model):
         return u"%s (%s)" % (self.email, self.user)
 
     class Meta:
+        app_label = 'profiles'
         verbose_name = _("email address")
         verbose_name_plural = _("email addresses")
         unique_together = (
@@ -104,7 +102,6 @@ class EmailAddress(models.Model):
 
 
 class EmailConfirmationManager(models.Manager):
-
     def generate_key(self, email):
         """
         Generate a new email confirmation key and return it.
@@ -144,13 +141,12 @@ class EmailConfirmationManager(models.Manager):
         current_site = Site.objects.get_current()
         # check for the url with the dotted view path
         try:
-            path = reverse("emailconfirmation.views.confirm_email",
-                args=[confirmation.key])
+            path = reverse("emailconfirmation.views.confirm_email", args=[confirmation.key])
         except NoReverseMatch:
             # or get path with named urlconf instead
             path = reverse(
                 "emailconfirmation_confirm_email", args=[confirmation.key])
-        protocol = getattr(settings, "DEFAULT_HTTP_PROTOCOL", "http")
+        protocol = settings.PROTOCOL
         activate_url = u"%s://%s%s" % (
             protocol,
             unicode(current_site.domain),
@@ -183,7 +179,6 @@ class EmailConfirmationManager(models.Manager):
 
 
 class EmailConfirmation(models.Model):
-
     email_address = models.ForeignKey(EmailAddress)
     created_at = models.DateTimeField()
     key = models.CharField(max_length=40)
@@ -192,8 +187,7 @@ class EmailConfirmation(models.Model):
 
     def key_expired(self):
         confirmation_days = getattr(settings, 'EMAIL_CONFIRMATION_DAYS', 7)
-        expiration_date = self.created_at + datetime.timedelta(
-                days=confirmation_days)
+        expiration_date = self.created_at + datetime.timedelta(days=confirmation_days)
         return expiration_date <= timezone.now()
     key_expired.boolean = True
 
@@ -201,5 +195,6 @@ class EmailConfirmation(models.Model):
         return u"confirmation for %s" % self.email_address
 
     class Meta:
+        app_label = 'profiles'
         verbose_name = _("email confirmation")
         verbose_name_plural = _("email confirmations")

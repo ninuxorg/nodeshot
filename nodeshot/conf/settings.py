@@ -96,7 +96,6 @@ INSTALLED_APPS = [
     'nodeshot.community.participation',
     'nodeshot.community.notifications',
     'nodeshot.community.profiles',
-    'nodeshot.community.emailconfirmation',
     'nodeshot.community.mailing',
     'nodeshot.networking.net',
     'nodeshot.networking.links',

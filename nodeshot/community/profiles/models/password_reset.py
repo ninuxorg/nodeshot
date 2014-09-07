@@ -9,7 +9,6 @@ from django.contrib.auth.tokens import default_token_generator as token_generato
 
 from nodeshot.core.base.utils import now
 
-from .profile import Profile as User
 from ..settings import settings
 
 
@@ -20,6 +19,7 @@ class PasswordResetManager(models.Manager):
         """ create password reset for specified user """
         # support passing email address too
         if type(user) is unicode:
+            from .profile import Profile as User
             user = User.objects.get(email=user)
 
         temp_key = token_generator.make_token(user)
@@ -48,7 +48,7 @@ class PasswordReset(models.Model):
     """
     Password reset Key
     """
-    user = models.ForeignKey(User, verbose_name=_("user"))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("user"))
 
     temp_key = models.CharField(_("temp_key"), max_length=100)
     timestamp = models.DateTimeField(_("timestamp"), default=now)

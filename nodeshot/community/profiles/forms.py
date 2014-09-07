@@ -4,10 +4,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from .models import PasswordReset
-from .settings import settings, EMAIL_CONFIRMATION
-
-if EMAIL_CONFIRMATION:
-    from nodeshot.community.emailconfirmation.models import EmailAddress
+from .settings import EMAIL_CONFIRMATION
 
 
 __all__ = [
@@ -27,6 +24,7 @@ class ResetPasswordForm(forms.Form):
     def clean_email(self):
         """ ensure email is in the database """
         if EMAIL_CONFIRMATION:
+            from .models import EmailAddress
             condition = EmailAddress.objects.filter(email__iexact=self.cleaned_data["email"], verified=True).count() == 0
         else:
             condition = User.objects.get(email__iexact=self.cleaned_data["email"], is_active=True).count() == 0

@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserM
 from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.core.base.utils import now
-from ..settings import settings, EMAIL_CONFIRMATION, REQUIRED_FIELDS
+from ..settings import settings, EMAIL_CONFIRMATION, REQUIRED_FIELDS as PROFILE_REQUIRED_FIELDS
 from ..signals import password_changed
 
 import re
@@ -63,7 +63,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = REQUIRED_FIELDS
+    REQUIRED_FIELDS = PROFILE_REQUIRED_FIELDS
 
     class Meta:
         verbose_name = _('user')
@@ -102,7 +102,7 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         Add email to DB and sends a confirmation mail if PROFILE_EMAL_CONFIRMATION is True
         """
         if EMAIL_CONFIRMATION:
-            from nodeshot.community.emailconfirmation.models import EmailAddress
+            from . import EmailAddress
             self.is_active = False
             self.save()
             EmailAddress.objects.add_email(self, self.email)

@@ -94,17 +94,6 @@ class UserAdmin(BaseUserAdmin):
     ]
 
 
-if EMAIL_CONFIRMATION:
-    from nodeshot.community.emailconfirmation.models import EmailAddress
-
-    class EmailAddressInline(admin.StackedInline):
-        model = EmailAddress
-        extra = 0
-
-    UserAdmin.inlines = [EmailAddressInline] + UserAdmin.inlines
-    UserAdmin.fieldsets[1][1]['fields'].remove('email')
-
-
 class PasswordResetAdmin(admin.ModelAdmin):
     pass
     list_display = ('user', 'timestamp', 'reset', 'temp_key')
@@ -112,3 +101,23 @@ class PasswordResetAdmin(admin.ModelAdmin):
 
 admin.site.register(Profile, UserAdmin)
 admin.site.register(PasswordReset, PasswordResetAdmin)
+
+
+if EMAIL_CONFIRMATION:
+    from .models import EmailAddress, EmailConfirmation
+
+    class EmailAddressAdmin(admin.ModelAdmin):
+        list_display = ('__unicode__', 'verified', 'primary')
+    
+    class EmailConfirmationAdmin(admin.ModelAdmin):
+        list_display = ('__unicode__', 'key_expired')
+    
+    admin.site.register((EmailAddress,), EmailAddressAdmin)
+    admin.site.register((EmailConfirmation,), EmailConfirmationAdmin)
+
+    class EmailAddressInline(admin.StackedInline):
+        model = EmailAddress
+        extra = 0
+
+    UserAdmin.inlines = [EmailAddressInline] + UserAdmin.inlines
+    UserAdmin.fieldsets[1][1]['fields'].remove('email')

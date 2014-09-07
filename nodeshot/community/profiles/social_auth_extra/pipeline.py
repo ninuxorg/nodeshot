@@ -4,10 +4,7 @@ from datetime import datetime
 
 from social_auth.models import UserSocialAuth
 
-from ..settings import settings, EMAIL_CONFIRMATION
-
-if EMAIL_CONFIRMATION:
-    from nodeshot.community.emailconfirmation.models import EmailAddress
+from ..settings import EMAIL_CONFIRMATION
 
 
 def load_extra_data(backend, details, response, uid, user, social_user=None,
@@ -19,6 +16,7 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
                   UserSocialAuth.get_social_auth(backend.name, uid)
 
     if kwargs['is_new'] and EMAIL_CONFIRMATION:
+        from ..models import EmailAddress
         emailaddress = EmailAddress(**{
             'user': user,
             'email': user.email,

@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from .settings import settings, EMAIL_CONFIRMATION
+from .settings import EMAIL_CONFIRMATION
 
 
 urlpatterns = patterns('nodeshot.community.profiles.views',

@@ -14,7 +14,7 @@ PASSWORD_MAX_LENGTH = User._meta.get_field('password').max_length
 NOTIFICATIONS_INSTALLED = 'nodeshot.community.notifications' in settings.INSTALLED_APPS
 
 if EMAIL_CONFIRMATION:
-    from nodeshot.community.emailconfirmation.models import EmailAddress
+    from .models import EmailAddress
 
 
 __all__ = [
