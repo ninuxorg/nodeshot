@@ -23,7 +23,7 @@ class DeviceConnectorAdmin(BaseAdmin):
             'fk': ('node', 'device'),
         }
         
-        change_form_template = '%s/templates/admin/device_connector_customization.html' % os.path.dirname(os.path.realpath(__file__))
+        change_form_template = 'admin/device_connector_customization.html'
 
 admin.site.register(DeviceConnector, DeviceConnectorAdmin)
 
