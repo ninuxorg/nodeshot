@@ -19,8 +19,5 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ci.settings")
 
-# This application object is used by any WSGI server configured to use this
-# file. This includes Django's development server, if the WSGI_APPLICATION
-# setting points here.
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
+from nodeshot.conf.wsgi import application
+
