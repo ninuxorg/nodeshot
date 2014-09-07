@@ -28,17 +28,17 @@ DATABASES = {
     },
     # Import data from older versions
     # More info about this feature here: http://nodeshot.readthedocs.org/en/latest/topics/oldimporter.html
-    #'old_nodeshot': {
-    #    'ENGINE': 'django.db.backends.mysql',
-    #    'NAME': 'nodeshot',
-    #    'USER': 'user',
-    #    'PASSWORD': 'password',
-    #    'OPTIONS': {
-    #           "init_command": "SET storage_engine=INNODB",
-    #    },
-    #    'HOST': '',
-    #    'PORT': '',
-    #}
+    'old_nodeshot': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'nodeshot_old_ci',
+        'USER': 'root',
+        'PASSWORD': '',
+        'OPTIONS': {
+               "init_command": "SET storage_engine=INNODB",
+        },
+        'HOST': '',
+        'PORT': '',
+    }
 }
 
 POSTGIS_VERSION = (2, 1)

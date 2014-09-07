@@ -2,6 +2,7 @@ language: python
 
 services:
   - postgresql
+  - mysql
 
 python:
   - "2.7"
@@ -21,6 +22,7 @@ before_script:
   - psql -U postgres -c 'CREATE DATABASE nodeshot_ci;'
   - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis;"
   - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis_topology;"
+  - mysql -e 'create database nodeshot_old_ci;'
   - cd tests
   - python manage.py syncdb --noinput
   - python manage.py migrate --noinput
