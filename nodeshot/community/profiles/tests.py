@@ -1,7 +1,3 @@
-"""
-ndoeshot.contrib.profiles tests
-"""
-
 import simplejson as json
 
 from django.test import TestCase
@@ -15,7 +11,6 @@ from django.forms import ValidationError
 from .settings import settings, EMAIL_CONFIRMATION
 
 if EMAIL_CONFIRMATION:
-    from nodeshot.core.nodes.models import Node
     from .models import EmailAddress, EmailConfirmation
 
 from .models import Profile as User
@@ -28,18 +23,16 @@ class ProfilesTest(TestCase):
         'test_profiles.json',
         'test_layers.json',
         'test_status.json',
-        'test_nodes.json',
     ]
 
     def setUp(self):
-        self.fusolab = Node.objects.get(slug='fusolab')
         self.client.login(username='registered', password='tester')
         mail.outbox = []
 
     def test_new_users_have_default_group(self):
         """ users should have a default group when created """
         # ensure owner of node fusolab has at least one group
-        self.assertEqual(self.fusolab.user.groups.count(), 1)
+        self.assertEqual(User.objects.get(username='romano').groups.count(), 1)
     
         # create new user and check if it has any group
         new_user = User(username='new_user_test', email='new_user@testing.com', password='tester', is_active=True)
@@ -354,11 +347,11 @@ class ProfilesTest(TestCase):
         self.client.logout()
         
         user = User.objects.get(username='registered')
-
+    
         if EMAIL_CONFIRMATION:
             email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
             email_address.save()
-
+    
         response = self.client.post(url, { 'email': user.email }, HTTP_ACCEPT='text/html')
         self.assertEqual(200, response.status_code)
     
@@ -603,3 +596,30 @@ class ProfilesTest(TestCase):
     def test_delete_user(self):
         User.objects.all().delete()
         self.assertEqual(User.objects.count(), 0)
+    
+    def test_email_address_primary(self):
+        user = User.objects.get(username='registered')
+    
+        email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
+        email_address.full_clean()
+        email_address.save()
+        self.assertEqual(EmailAddress.objects.count(), 1)
+        
+        email_address2 = EmailAddress(user=user, email='test@test.com', verified=True, primary=True)
+        email_address2.full_clean()
+        email_address2.save()
+        self.assertEqual(EmailAddress.objects.count(), 2)
+        self.assertEqual(EmailAddress.objects.filter(user=user, primary=True).count(), 1)
+        self.assertEqual(EmailAddress.objects.filter(user=user, primary=True).first().email, 'test@test.com')
+        self.assertEqual(User.objects.get(username='registered').email, 'test@test.com')
+    
+    def test_email_address_remove_primary(self):
+        user = User.objects.get(username='registered')
+    
+        email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
+        email_address.full_clean()
+        email_address.save()
+        
+        email_address.primary = False
+        with self.assertRaises(ValidationError):
+            email_address.full_clean()

@@ -76,6 +76,9 @@ class UserAdmin(BaseUserAdmin):
     ordering = ['-is_staff', '-date_joined']
     search_fields = ('email', 'username', 'first_name', 'last_name')
     list_filter = ('is_active', 'is_staff', 'is_superuser')
+    
+    if EMAIL_CONFIRMATION:
+        readonly_fields = ['email']
 
     form = UserChangeForm
     add_form = UserCreationForm
@@ -107,7 +110,9 @@ if EMAIL_CONFIRMATION:
     from .models import EmailAddress, EmailConfirmation
 
     class EmailAddressAdmin(admin.ModelAdmin):
-        list_display = ('__unicode__', 'verified', 'primary')
+        search_fields = ('email', 'user__username')
+        list_select_related = True
+        list_display = ('__unicode__', 'verified', 'primary', 'user')
     
     class EmailConfirmationAdmin(admin.ModelAdmin):
         list_display = ('__unicode__', 'key_expired')
@@ -120,4 +125,3 @@ if EMAIL_CONFIRMATION:
         extra = 0
 
     UserAdmin.inlines = [EmailAddressInline] + UserAdmin.inlines
-    UserAdmin.fieldsets[1][1]['fields'].remove('email')

@@ -5,6 +5,7 @@ from hashlib import sha1
 from django.db import models, IntegrityError
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -64,6 +65,20 @@ class EmailAddress(models.Model):
     primary = models.BooleanField(default=False)
 
     objects = EmailAddressManager()
+    
+    def clean(self):
+        try:
+            if self.pk and not self.primary and EmailAddress.objects.filter(user=self.user, primary=True).first().pk == self.pk:
+                raise ValidationError(_("You must have at least one primary email address."))
+        except IndexError:
+            pass
+    
+    def save(self, *args, **kwargs):
+        # if this is not the only primary email address for this user
+        if self.primary and EmailAddress.objects.filter(user=self.user, primary=True).exclude(pk=self.pk).count() > 0:
+            # ensure there's only 1 primary address
+            self.set_as_primary()
+        super(EmailAddress, self).save(*args, **kwargs)
 
     def set_as_primary(self):
         old_primary = EmailAddress.objects.get_primary(self.user)
