@@ -23,6 +23,8 @@ For the **oldimporter** module to work, the following apps must be listed in
  * nodeshot.networking.links
  * nodeshot.community.mailing
  * nodeshot.community.profiles
+ 
+By default these apps are included in ``nodeshot.conf.settings`` so you won't need to do anything.
 
 ===========
 Preparation
@@ -32,7 +34,7 @@ Due to some major differences between the old and the new version some manual
 preparation needs to be done.
 
 ----------------------------------------
-0. Ensure your old database is reachable
+1. Ensure your old database is reachable
 ----------------------------------------
 
 In order for the **oldimporter** to work it musts be able to connect to the remote old database.
@@ -41,25 +43,6 @@ If your old database is MySQL or PostgreSQL you should tweak its configuration t
 allow connections from the IP/hostname where the new version of nodeshot is installed.
 
 If your old database is Sqlite you can just copy the file to the new machine.
-
-------------------------
-1. Create Status Objects
-------------------------
-
-First of all, if you were using the old nodeshot version we assume that you are
-using nodeshot for a community network or a wifi network.
-
-So you must create the status objects which are appropiate for a community network.
-
-Start with the basic ones and then after the imports you might change their names, order, or whatever.
-
-So laod the default status objects::
-
-    cd /var/www/nodeshot/projects/ninux
-    # activate virtual env
-    source python/bin/activate
-
-    python manage.py loaddata default_status
 
 ----------------
 2. Create Layers
@@ -86,48 +69,31 @@ Enable in settings.py
 
 Uncomment the following section in ``settings.py`` and tweak the settings
 ``ENGINE``, ``NAME``, ``USER``, ``PASSWORD``, ``HOST`` and ``PORT``
-according to your configuration, but leave ``DATABASE_ROUTERS`` unchanged:
+according to your configuration:
 
 .. code-block:: python
 
-    if 'test' not in sys.argv:
-        DATABASES['old_nodeshot'] = {
-           'ENGINE': 'django.db.backends.mysql',  # might be also postgresql or sqlite
-           'NAME': 'nodeshot',
-           'USER': 'nodeshot-readonly',
-           'PASSWORD': '*********',
-           'HOST': 'remote-ip',
-           'PORT': 'remote-port',
-        }
-        DATABASE_ROUTERS = [
-            'nodeshot.extra.oldimporter.db.DefaultRouter',
-            'nodeshot.extra.oldimporter.db.OldNodeshotRouter'
-        ]
+    # Import data from older versions
+    # More info about this feature here: http://nodeshot.readthedocs.org/en/latest/topics/oldimporter.html
+    #'old_nodeshot': {
+    #    'ENGINE': 'django.db.backends.mysql',
+    #    'NAME': 'nodeshot',
+    #    'USER': 'user',
+    #    'PASSWORD': 'password',
+    #    'OPTIONS': {
+    #           "init_command": "SET storage_engine=INNODB",
+    #    },
+    #    'HOST': '',
+    #    'PORT': '',
+    #}
 
-Uncomment ``nodeshot.extra.oldimporter`` in ``settings.INSTALLED_APPS``:
-
-.. code-block:: python
-
-    INSTALLED_APPS = [
-        # dependencies
-        'nodeshot.core.nodes',
-        'nodeshot.core.layers',
-        'nodeshot.networking.net',
-        'nodeshot.networking.links',
-        'nodeshot.community.mailing',
-        'nodeshot.community.profiles',
-
-        # oldimporter module
-        'nodeshot.extra.oldimporter',
-
-        # ...
-    ]
-
-And set ``NODESHOT_OLDIMPORTER_DEFAULT_LAYER`` (object id/primary key):
+And set ``NODESHOT_OLDIMPORTER_DEFAULT_LAYER`` (object id/primary key) to your default layer:
 
 .. code-block:: python
 
-    NODESHOT_OLDIMPORTER_DEFAULT_LAYER = 1
+    NODESHOT_OLDIMPORTER_DEFAULT_LAYER = <id>
+
+Replace ``<id>`` with the id of your default layer.
 
 If you followed exactly the instructions in this document you can leave the default
 ``NODESHOT_OLDIMPORTER_STATUS_MAPPING`` setting unchanged.
@@ -146,8 +112,7 @@ For MySQL you can do::
 
     sudo apt-get install libmysqlclient-dev
 
-    cd /var/www/nodeshot/projects/ninux
-    source python/bin/activate
+    workon nodeshot  # activate virtualenv
     pip install MySQL-python
 
 ===========
@@ -201,7 +166,7 @@ It is better to specify the ``--nodelete`` option in order to avoid automatic de
 
     python manage.py import_old_nodeshot --nodelete
 
-To automate the periodic import uncomment the following key in your ``CELERYBEAT_SCHEDULE`` setting::
+To automate the periodic import add the following dictionary in your ``CELERYBEAT_SCHEDULE`` setting::
 
     CELERYBEAT_SCHEDULE = {
 
@@ -224,8 +189,7 @@ This assumes that celery and celerybeat are configured and running correctly.
 Deactivate oldimporter
 ======================
 
-When you are finished using the oldimporter module you can disable it by removing
-it from ``settings.INSTALLED_APPS`` and by removing/commenting the
+When you are finished using the oldimporter module you can disable it by commenting the
 ``DATABASES['old_nodeshot']`` setting.
 
 ===========================
