@@ -21,14 +21,6 @@
         }
     },
     {
-        "model": "sites.site",
-        "pk": 1,
-        "fields": {
-            "domain": "yourdomain.com",
-            "name": "your site name"
-        }
-    },
-    {
         "pk": 1, 
         "model": "nodes.status", 
         "fields": {

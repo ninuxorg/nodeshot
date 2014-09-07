@@ -13,8 +13,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-SITE_ID = 1
-
 PROTOCOL = 'http' if DEBUG else 'https'
 PORT = '8000' if DEBUG else None
 SITE_URL = '%s://%s' % (PROTOCOL, settings.DOMAIN)
@@ -74,7 +72,6 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
