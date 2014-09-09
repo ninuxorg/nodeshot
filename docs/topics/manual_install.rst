@@ -57,29 +57,22 @@ First of all I suggest to become ``root`` to avoid typing sudo each time::
 
 Install the dependencies::
 
-    apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev
+    apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev python-gdal
 
-Build **GEOS** library from source::
+Download and compile **Postgis 2.1.3**::
 
-    wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2
-    tar xvfj geos-3.3.8.tar.bz2
-    cd geos-3.3.8
+    wget http://download.osgeo.org/postgis/source/postgis-2.1.3.tar.gz
+    tar xfvz postgis-2.1.3.tar.gz
+    cd postgis-2.1.3
     ./configure
     make
-    checkinstall  # if you need to uninstall you can do it  with "dpkg -r geos"
+    checkinstall -y  # if you need to uninstall you can do it  with "dpkg -r postgis"
     cd ..
-    rm -rf geos-3.3.8
+    rm -rf postgis-2.1.3
 
-Download and compile **Postgis 2.0**::
+If on **debian 7** you get an error complaining about the fact that ``/usr/share/postgresql/9.1/contrib/`` does not exist run this command before ``checkinstall -y``::
 
-    wget http://download.osgeo.org/postgis/source/postgis-2.0.3.tar.gz
-    tar xfvz postgis-2.0.3.tar.gz
-    cd postgis-2.0.3
-    ./configure
-    make
-    checkinstall  # if you need to uninstall you can do it  with "dpkg -r postgis"
-    cd ..
-    rm -rf postgis-2.0.3
+    mkdir -p '/usr/share/postgresql/9.1/contrib/postgis-2.1'
 
 .. _create-database:
 
@@ -125,7 +118,7 @@ First of all, install virtualenvwrapper::
 Create a **python virtual environment**, a self-contained python installation
 which will store all our python packages indipendently from the packages installed systemwide::
 
-    exit  # do not create it as root
+    exit  # do not create it as root if on ubuntu
     mkvirtualenv nodeshot
 
 Install all the necessary python packages::
@@ -139,14 +132,16 @@ a typical web app is usually installed in ``/var/www/``::
     sudo -s  # go back being root
     mkdir -p /var/www/nodeshot && cd /var/www/
 
-Create the nodeshot settings folder::
+Create the nodeshot settings folder:
+
+.. code-block:: bash
 
     nodeshot startproject myproject nodeshot
     cd nodeshot
     chown -R <user>:www-data .  # set group to www-data
     adduser www-data <user>
     chmod 775 . log myproject  # permit www-data to write logs, pid files and static directory
-    chmod 750 manage.py myproject/\*.py  # do not permit www-data to write python files
+    chmod 750 manage.py myproject/*.py  # do not permit www-data to write on python files*
 
 Replace ``myproject`` with your project name. Avoid names which used by popular python packages, prefer a short and simple name.
 
@@ -366,8 +361,6 @@ Redis
 
 Install **Redis**, we will use it as a message broker for *Celery* and as a *Cache Storage*::
 
-    add-apt-repository ppa:chris-lea/redis-server
-    apt-get update
     apt-get install redis-server
 
 Install celery bindings in your virtual environment::
