@@ -5,7 +5,7 @@ Automated install
 This section describes how to perform a quick install of Nodeshot on **Ubuntu / Debian systems**.
 
 .. warning::
-    The quick install procedure described below has been tested on a fresh install of **Ubuntu 13.04** and **debian 6**.
+    This procedure has been tested on a fresh install of **Ubuntu 13.04** and **debian 7**, other versions of these two distributions might work as well.
 
     If you try it on a server where other applications are running, you might incur in some errors.
 
@@ -75,7 +75,7 @@ These are the informations you will have to supply to the install procedure:
 
 **Database user**: postgres owner of Nodeshot DB (default: nodeshot)
 
-**Database user password**: password for postgres owner of Nodeshot DB (no default)
+**Database user password**: password for postgres owner of Nodeshot DB (default generated randomly)
 
 Next, you will have to supply the details for the SSL certificate that will be used for serving Nodeshot over HTTPS:
 
