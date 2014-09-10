@@ -4,7 +4,7 @@ Manual Install
 **************
 
 .. warning::
-    This file describes how to install nodeshot on **Ubuntu Server 13.10** (other versions of ubuntu and debian should work as well).
+    This file describes how to install nodeshot on **Ubuntu Server 13.10** and **Debian 7** (other versions of ubuntu and debian should work as well).
 
     Other Linux distribution will be good as well but you will have to use the
     package names according to your distribution package manager.
@@ -111,25 +111,25 @@ Install python packages
 
 First of all, install virtualenvwrapper::
 
-    pip install virtualenvwrapper
+    pip install --use-mirrors virtualenvwrapper
+    mkdir /usr/local/lib/virtualenvs
+    echo 'echo 'export WORKON_HOME=/usr/local/lib/virtualenvs' >> /usr/local/bin/virtualenvwrapper.sh'
     echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
     source ~/.bashrc
 
 Create a **python virtual environment**, a self-contained python installation
 which will store all our python packages indipendently from the packages installed systemwide::
 
-    exit  # do not create it as root if on ubuntu
     mkvirtualenv nodeshot
 
 Install all the necessary python packages::
 
-    pip install -U distribute
-    pip install https://github.com/ninuxorg/nodeshot/tarball/master
+    pip install --use-mirrors -U distribute
+    pip install --use-mirrors https://github.com/ninuxorg/nodeshot/tarball/master
 
 Now create the directory structure that will contain the project,
 a typical web app is usually installed in ``/var/www/``::
 
-    sudo -s  # go back being root
     mkdir -p /var/www/nodeshot && cd /var/www/
 
 Create the nodeshot settings folder:
@@ -332,13 +332,13 @@ Install the latest version via pip::
     # deactivate python virtual environment
     deactivate
     # install uwsgi globally
-    pip install uwsgi
+    pip install --use-mirrors uwsgi
 
 Create a new ini configuration file::
 
     vim /var/www/nodeshot/uwsgi.ini
 
-Paste this config (replace ``<user>`` with the user which created the virtualenv and replace `<myproject>`` with the project name chosen at the beginning)::
+Paste this config (replace `<myproject>`` with the project name chosen at the beginning)::
 
     [uwsgi]
     chdir=/var/www/nodeshot
@@ -350,7 +350,7 @@ Paste this config (replace ``<user>`` with the user which created the virtualenv
     harakiri=20
     max-requests=5000
     vacuum=True
-    home=/home/<user>/.virtualenvs/nodeshot
+    home=/usr/local/lib/virtualenvs/nodeshot
     enable-threads=True
     env=HTTPS=on
     buffer-size=8192
@@ -366,7 +366,7 @@ Install **Redis**, we will use it as a message broker for *Celery* and as a *Cac
 Install celery bindings in your virtual environment::
 
     workon nodeshot  # activates virtualenv again
-    pip install -U celery[redis]
+    pip install --use-mirrors -U celery[redis]
 
 Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
 **might lead to poor performance or security issues**::
@@ -419,12 +419,12 @@ Repeat in a similar way for celery::
 
     vim /etc/supervisor/conf.d/celery.conf
 
-And paste (replace ``<user>`` with the user which created the virtualenv)::
+And paste (replace ``<myproject>`` with the project name chosen at the beginning)::
 
     [program:celery]
     user=www-data
     directory=/var/www/nodeshot
-    command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A myproject worker -l info
+    command=/usr/local/lib/virtualenvs/nodeshot/bin/celery -A <myproject> worker -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
@@ -439,12 +439,12 @@ Now repeat in a similar way for celery-beat::
 
     vim /etc/supervisor/conf.d/celery-beat.conf
 
-And paste (replace ``<user>`` with the user which created the virtualenv)::
+And paste (replace ``<myproject>`` with the project name chosen at the beginning)::
 
     [program:celery-beat]
     user=www-data
     directory=/var/www/nodeshot
-    command=/home/<user>/.virtualenvs/nodeshot/bin/celery -A myproject beat -s ./celerybeat-schedule -l info
+    command=/usr/local/lib/virtualenvs/nodeshot/bin/celery -A <myproject> beat -s ./celerybeat-schedule -l info
     autostart=true
     autorestart=true
     redirect_stderr=true
@@ -456,6 +456,7 @@ And paste (replace ``<user>`` with the user which created the virtualenv)::
 
 Then run::
 
+    rm /var/www/nodeshot/log/*.log  # reset logs
     supervisorctl update
 
 You can check the status with::
