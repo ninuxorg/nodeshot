@@ -5,13 +5,13 @@ Automated install
 This section describes how to perform a quick install of Nodeshot on **Ubuntu / Debian systems**.
 
 .. warning::
-    This procedure has been tested on a fresh install of **Ubuntu 13.04** and **debian 7**, other versions of these two distributions might work as well.
+    This procedure has been tested on clean installs of **Debian 7**, **Ubuntu 13.10** and **Ubuntu 14.04 LTS**.
 
-    If you try it on a server where other applications are running, you might incur in some errors.
+    If you try it on a server where other applications are running you might incur in some errors.
 
     The most typical would be having the port 80 already in use by Apache.
 
-    In this case, you should consider using the :ref:`manual install <manual-install-label>` procedure, in order to exactly tweak Nodeshot configuration, according to your needs.
+    In that case, you should consider using the :ref:`manual install <manual-install-label>` procedure in order to install according to your needs.
 
 =============
 Prerequisites

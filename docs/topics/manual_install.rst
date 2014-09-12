@@ -4,9 +4,11 @@ Manual Install
 **************
 
 .. warning::
-    This file describes how to install nodeshot on **Ubuntu Server 13.10** and **Debian 7** (other versions of ubuntu and debian should work as well).
+    This file describes how to install nodeshot on **Ubuntu Server 13.10**,
+    **Ubuntu Server 14.04 LTS** and **Debian 7**
+    (other versions of ubuntu and debian should work as well with minor tweaks).
 
-    Other Linux distribution will be good as well but you will have to use the
+    Other Linux distributions will be good as well but you will have to use the
     package names according to your distribution package manager.
 
 Other linux distributions will work as well but you will need to find the right
@@ -55,9 +57,13 @@ First of all I suggest to become ``root`` to avoid typing sudo each time::
 
     sudo -s
 
-Install the dependencies::
+Install the dependencies (Ubuntu 13 and Debian 7)::
 
     apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev python-gdal
+
+If you are using Ubuntu 14 LTS, use this command instead::
+
+    apt-get install python-software-properties software-properties-common build-essential postgresql postgresql-server-dev-9.3 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev python-gdal
 
 Download and compile **Postgis 2.1.3**::
 
