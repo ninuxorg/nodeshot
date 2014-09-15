@@ -22,8 +22,23 @@ from .settings import settings
 from .tasks import synchronize_external_layers
 
 
-class InteroperabilityTest(TestCase):
+TEST_FILES_PATH = '%snodeshot/testing' % settings.STATIC_URL
 
+
+def capture_output(command, args=[], kwargs={}):
+    """ captures standard output """
+    # start capturing output
+    output = StringIO()
+    sys.stdout = output
+    # execute command
+    command(*args, **kwargs)
+    # stop capturing print statements
+    sys.stdout = sys.__stdout__
+    # return captured output
+    return output.getvalue()
+
+
+class InteroperabilityTest(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -31,9 +46,6 @@ class InteroperabilityTest(TestCase):
         'test_status.json',
         'test_nodes.json'
     ]
-
-    def setUp(self):
-        pass
 
     def test_external_layer_creation(self):
         layer = Layer()
@@ -54,76 +66,34 @@ class InteroperabilityTest(TestCase):
 
     def test_not_interoperable(self):
         """ test not interoperable """
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna')
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
-
+        output = capture_output(management.call_command, ('synchronize', 'vienna'))
         # ensure following text is in output
-        self.assertIn('does not have an interoperability class specified', output.getvalue())
+        self.assertIn('does not have an interoperability class specified', output)
 
     def test_management_command_exclude(self):
         """ test --exclude """
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', exclude='vienna,test')
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
-
-        # ensure following text is in output
-        self.assertIn('no layers to process', output.getvalue())
+        output = capture_output(
+            management.call_command,
+            ['synchronize'],
+            { 'exclude': 'vienna,test' }
+        )
+        self.assertIn('no layers to process', output)
 
     def test_celery_task(self):
         """ ensure celery task works as expected """
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # call task
-        synchronize_external_layers.apply()
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
-
-        # ensure following text is in output
-        self.assertIn('does not have an interoperability class specified', output.getvalue())
+        output = capture_output(synchronize_external_layers.apply)
+        self.assertIn('does not have an interoperability class specified', output)
 
     def test_celery_task_with_arg(self):
-        # same output when calling with parameter
-        output = StringIO()
-        sys.stdout = output
-
-        # call task
-        synchronize_external_layers.apply(['vienna'])
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
-
-        # ensure following text is in output
-        self.assertIn('does not have an interoperability class specified', output.getvalue())
+        output = capture_output(synchronize_external_layers.apply, [['vienna']])
+        self.assertIn('does not have an interoperability class specified', output)
 
     def test_celery_task_with_exclude(self):
-        # same output when calling with parameter
-        output = StringIO()
-        sys.stdout = output
-
-        # call task
-        synchronize_external_layers.apply(kwargs={ 'exclude': 'vienna,test' })
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
-
-        # ensure following text is in output
-        self.assertIn('no layers to process', output.getvalue())
+        output = capture_output(
+            synchronize_external_layers.apply,
+            kwargs={ 'kwargs': { 'exclude': 'vienna,test' } }
+        )
+        self.assertIn('no layers to process', output)
 
     def test_celery_task_with_error(self):
         try:
@@ -137,9 +107,7 @@ class InteroperabilityTest(TestCase):
         """ ensure layer admin does not return any error """
         layer = Layer.objects.external()[0]
         url = reverse('admin:layers_layer_change', args=[layer.id])
-
         self.client.login(username='admin', password='tester')
-
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -172,7 +140,6 @@ class InteroperabilityTest(TestCase):
 
     def test_openwisp(self):
         """ test OpenWISP synchronizer """
-
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -180,28 +147,24 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        xml_url = '%snodeshot/testing/openwisp-georss.xml' % settings.STATIC_URL
+        xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISP'
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('42 nodes added', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('42 total external', output.getvalue())
-        self.assertIn('42 total local', output.getvalue())
+        self.assertIn('42 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('42 total external', output)
+        self.assertIn('42 total local', output)
 
         # start checking DB too
         nodes = layer.node_set.all()
@@ -220,26 +183,22 @@ class InteroperabilityTest(TestCase):
 
         ### --- with the following step we expect some nodes to be deleted --- ###
 
-        xml_url = '%snodeshot/testing/openwisp-georss2.xml' % settings.STATIC_URL
+        xml_url = '%s/openwisp-georss2.xml' % TEST_FILES_PATH
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('4 nodes unmodified', output.getvalue())
-        self.assertIn('38 nodes deleted', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('4 total external', output.getvalue())
-        self.assertIn('4 total local', output.getvalue())
+        self.assertIn('4 nodes unmodified', output)
+        self.assertIn('38 nodes deleted', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('4 total external', output)
+        self.assertIn('4 total local', output)
 
         # ensure all nodes have been imported
         self.assertEqual(nodes.count(), 4)
@@ -255,7 +214,6 @@ class InteroperabilityTest(TestCase):
 
     def test_provinciawifi(self):
         """ test ProvinciaWIFI converter """
-
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -263,28 +221,24 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        xml_url = '%snodeshot/testing/provincia-wifi.xml' % settings.STATIC_URL
+        xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWIFI'
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('5 nodes added', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('5 total external', output.getvalue())
-        self.assertIn('5 total local', output.getvalue())
+        self.assertIn('5 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('5 total external', output)
+        self.assertIn('5 total local', output)
 
         # start checking DB too
         nodes = layer.node_set.all()
@@ -307,27 +261,23 @@ class InteroperabilityTest(TestCase):
 
         ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
 
-        xml_url = '%snodeshot/testing/provincia-wifi2.xml' % settings.STATIC_URL
+        xml_url = '%s/provincia-wifi2.xml' % TEST_FILES_PATH
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('1 nodes added', output.getvalue())
-        self.assertIn('2 nodes unmodified', output.getvalue())
-        self.assertIn('3 nodes deleted', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('3 total external', output.getvalue())
-        self.assertIn('3 total local', output.getvalue())
+        self.assertIn('1 nodes added', output)
+        self.assertIn('2 nodes unmodified', output)
+        self.assertIn('3 nodes deleted', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('3 total external', output)
+        self.assertIn('3 total local', output)
 
         # ensure all nodes have been imported
         self.assertEqual(nodes.count(), 3)
@@ -342,7 +292,6 @@ class InteroperabilityTest(TestCase):
 
     def test_province_rome_traffic(self):
         """ test ProvinceRomeTraffic converter """
-
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -350,8 +299,8 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        streets_url = '%snodeshot/testing/citysdk-wp4-streets.json' % settings.STATIC_URL
-        measurements_url = '%snodeshot/testing/citysdk-wp4-measurements.json' % settings.STATIC_URL
+        streets_url = '%s/citysdk-wp4-streets.json' % TEST_FILES_PATH
+        measurements_url = '%s/citysdk-wp4-measurements.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinceRomeTraffic'
@@ -362,22 +311,18 @@ class InteroperabilityTest(TestCase):
         }, indent=4, sort_keys=True)
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('20 streets added', output.getvalue())
-        self.assertIn('0 streets changed', output.getvalue())
-        self.assertIn('20 total external', output.getvalue())
-        self.assertIn('20 total local', output.getvalue())
-        self.assertIn('Updated measurements of 4 street segments', output.getvalue())
+        self.assertIn('20 streets added', output)
+        self.assertIn('0 streets changed', output)
+        self.assertIn('20 total external', output)
+        self.assertIn('20 total local', output)
+        self.assertIn('Updated measurements of 4 street segments', output)
 
         # start checking DB too
         nodes = layer.node_set.all()
@@ -405,18 +350,14 @@ class InteroperabilityTest(TestCase):
 
         ### --- not much should happen --- ###
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('Street data not processed', output.getvalue())
+        self.assertIn('Street data not processed', output)
 
         # set last_time_streets_checked to 6 days ago
         layer.external.config['last_time_streets_checked'] = str(date.today() - timedelta(days=6))
@@ -425,8 +366,8 @@ class InteroperabilityTest(TestCase):
 
         ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
 
-        streets_url = '%snodeshot/testing/citysdk-wp4-streets2.json' % settings.STATIC_URL
-        measurements_url = '%snodeshot/testing/citysdk-wp4-measurements2.json' % settings.STATIC_URL
+        streets_url = '%s/citysdk-wp4-streets2.json' % TEST_FILES_PATH
+        measurements_url = '%s/citysdk-wp4-measurements2.json' % TEST_FILES_PATH
 
         external.config = json.loads(external.config)
         external.config['streets_url'] = streets_url
@@ -434,24 +375,20 @@ class InteroperabilityTest(TestCase):
         external.config = json.dumps(external.config, indent=4, sort_keys=True)
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('5 streets added', output.getvalue())
-        self.assertIn('16 streets unmodified', output.getvalue())
-        self.assertIn('4 streets deleted', output.getvalue())
-        self.assertIn('0 streets changed', output.getvalue())
-        self.assertIn('21 total external', output.getvalue())
-        self.assertIn('21 total local', output.getvalue())
-        self.assertIn('No measurements found', output.getvalue())
+        self.assertIn('5 streets added', output)
+        self.assertIn('16 streets unmodified', output)
+        self.assertIn('4 streets deleted', output)
+        self.assertIn('0 streets changed', output)
+        self.assertIn('21 total external', output)
+        self.assertIn('21 total local', output)
+        self.assertIn('No measurements found', output)
 
         # ensure all nodes have been imported
         self.assertEqual(nodes.count(), 21)
@@ -463,7 +400,6 @@ class InteroperabilityTest(TestCase):
 
     def test_geojson_sync(self):
         """ test GeoJSON sync """
-
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -471,7 +407,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%snodeshot/testing/geojson1.json' % settings.STATIC_URL
+        url = '%s/geojson1.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
@@ -479,21 +415,17 @@ class InteroperabilityTest(TestCase):
         external.full_clean()
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('2 nodes added', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('2 total external', output.getvalue())
-        self.assertIn('2 total local', output.getvalue())
+        self.assertIn('2 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('2 total external', output)
+        self.assertIn('2 total local', output)
 
         # start checking DB too
         nodes = layer.node_set.all()
@@ -511,50 +443,41 @@ class InteroperabilityTest(TestCase):
 
         ### --- repeat --- ###
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('2 nodes unmodified', output.getvalue())
-        self.assertIn('0 nodes deleted', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('2 total external', output.getvalue())
-        self.assertIn('2 total local', output.getvalue())
+        self.assertIn('2 nodes unmodified', output)
+        self.assertIn('0 nodes deleted', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('2 total external', output)
+        self.assertIn('2 total local', output)
 
         ### --- repeat with slightly different input --- ###
 
-        url = '%snodeshot/testing/geojson2.json' % settings.STATIC_URL
+        url = '%s/geojson2.json' % TEST_FILES_PATH
         external.config = '{ "url": "%s", "map": {} }' % url
         external.full_clean()
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('1 nodes unmodified', output.getvalue())
-        self.assertIn('0 nodes deleted', output.getvalue())
-        self.assertIn('1 nodes changed', output.getvalue())
-        self.assertIn('2 total external', output.getvalue())
-        self.assertIn('2 total local', output.getvalue())
+        self.assertIn('1 nodes unmodified', output)
+        self.assertIn('0 nodes deleted', output)
+        self.assertIn('1 nodes changed', output)
+        self.assertIn('2 total external', output)
+        self.assertIn('2 total local', output)
 
     def test_preexisting_name(self):
         """ test preexisting names """
-
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -567,7 +490,7 @@ class InteroperabilityTest(TestCase):
         node.name = 'simplejson'
         node.save()
 
-        url = '%snodeshot/testing/geojson1.json' % settings.STATIC_URL
+        url = '%s/geojson1.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
@@ -575,25 +498,20 @@ class InteroperabilityTest(TestCase):
         external.full_clean()
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('2 nodes added', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('2 total external', output.getvalue())
-        self.assertIn('2 total local', output.getvalue())
+        self.assertIn('2 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('2 total external', output)
+        self.assertIn('2 total local', output)
 
     def test_key_mappings(self):
         """ importing a file with different keys """
-
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -606,7 +524,7 @@ class InteroperabilityTest(TestCase):
         node.name = 'simplejson'
         node.save()
 
-        url = '%snodeshot/testing/geojson3.json' % settings.STATIC_URL
+        url = '%s/geojson3.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
@@ -622,21 +540,17 @@ class InteroperabilityTest(TestCase):
         external.full_clean()
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('2 nodes added', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('2 total external', output.getvalue())
-        self.assertIn('2 total local', output.getvalue())
+        self.assertIn('2 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('2 total external', output)
+        self.assertIn('2 total local', output)
 
         node = Node.objects.get(slug='verycool')
         self.assertEqual(node.name, 'veryCool')
@@ -652,7 +566,6 @@ class InteroperabilityTest(TestCase):
 
     def test_georss_simple(self):
         """ test GeoRSS simple """
-
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -660,7 +573,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%snodeshot/testing/georss-simple.xml' % settings.STATIC_URL
+        url = '%s/georss-simple.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoRss'
@@ -668,21 +581,17 @@ class InteroperabilityTest(TestCase):
         external.full_clean()
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('3 nodes added', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('3 total external', output.getvalue())
-        self.assertIn('3 total local', output.getvalue())
+        self.assertIn('3 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('3 total external', output)
+        self.assertIn('3 total local', output)
 
         # start checking DB too
         nodes = layer.node_set.all()
@@ -700,26 +609,21 @@ class InteroperabilityTest(TestCase):
 
         ### --- repeat --- ###
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('3 nodes unmodified', output.getvalue())
-        self.assertIn('0 nodes deleted', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('3 total external', output.getvalue())
-        self.assertIn('3 total local', output.getvalue())
+        self.assertIn('3 nodes unmodified', output)
+        self.assertIn('0 nodes deleted', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('3 total external', output)
+        self.assertIn('3 total local', output)
 
     def test_georss_w3c(self):
         """ test GeoRSS w3c """
-
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -727,7 +631,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%snodeshot/testing/georss-w3c.xml' % settings.STATIC_URL
+        url = '%s/georss-w3c.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.GeoRss'
@@ -735,21 +639,17 @@ class InteroperabilityTest(TestCase):
         external.full_clean()
         external.save()
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('2 nodes added', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('2 total external', output.getvalue())
-        self.assertIn('2 total local', output.getvalue())
+        self.assertIn('2 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('2 total external', output)
+        self.assertIn('2 total local', output)
 
         # start checking DB too
         nodes = layer.node_set.all()
@@ -767,22 +667,18 @@ class InteroperabilityTest(TestCase):
 
         ### --- repeat --- ###
 
-        # start capturing print statements
-        output = StringIO()
-        sys.stdout = output
-
-        # execute command
-        management.call_command('synchronize', 'vienna', verbosity=0)
-
-        # stop capturing print statements
-        sys.stdout = sys.__stdout__
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
 
         # ensure following text is in output
-        self.assertIn('2 nodes unmodified', output.getvalue())
-        self.assertIn('0 nodes deleted', output.getvalue())
-        self.assertIn('0 nodes changed', output.getvalue())
-        self.assertIn('2 total external', output.getvalue())
-        self.assertIn('2 total local', output.getvalue())
+        self.assertIn('2 nodes unmodified', output)
+        self.assertIn('0 nodes deleted', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('2 total external', output)
+        self.assertIn('2 total local', output)
 
     def test_openlabor_get_nodes(self):
         layer = Layer.objects.external()[0]
@@ -795,7 +691,7 @@ class InteroperabilityTest(TestCase):
         external = LayerExternal(layer=layer)
         external.interoperability = 'nodeshot.interoperability.synchronizers.OpenLabor'
         external.config = json.dumps({
-            "open311_url": '%snodeshot/testing/' % settings.STATIC_URL,
+            "open311_url": '%s/' % TEST_FILES_PATH,
             "service_code_get": "001",
             "service_code_post": "002",
             "default_status": "active",
