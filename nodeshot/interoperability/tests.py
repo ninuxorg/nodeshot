@@ -12,6 +12,7 @@ from django.core import management
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.contrib.gis.geos import Point, GEOSGeometry
+from django.conf import settings
 
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
@@ -756,3 +757,107 @@ class InteroperabilityTest(TestCase):
 
         node.save()
         self.assertIsNotNone(node.external.external_id)
+
+    def test_nodeshot_sync(self):
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = True
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.Nodeshot'
+        external.config = json.dumps({
+            "layer_url": "https://test.map.ninux.org/api/v1/layers/sicilia/",
+            "verify_ssl": False
+        })
+        external.full_clean()
+        external.save()
+
+        # standard node list
+        url = reverse('api_layer_nodes_list', args=[layer.slug])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('nodes', response.data)
+        self.assertIn('name', response.data)
+        self.assertIn('description', response.data)
+        self.assertEqual(type(response.data['nodes']), dict)
+        self.assertEqual(type(response.data['nodes']['results']), list)
+        self.assertEqual(type(response.data['nodes']['results'][0]), dict)
+
+        # limit pagination to 1
+        url = reverse('api_layer_nodes_list', args=[layer.slug])
+        response = self.client.get('%s?limit=1&page=2' % url)
+        self.assertEqual(len(response.data['nodes']['results']), 1)
+        self.assertIn(settings.SITE_URL, response.data['nodes']['previous'])
+        self.assertIn(url, response.data['nodes']['previous'])
+        self.assertIn(settings.SITE_URL, response.data['nodes']['next'])
+        self.assertIn(url, response.data['nodes']['next'])
+
+        # layerinfo=false
+        url = reverse('api_layer_nodes_list', args=[layer.slug])
+        response = self.client.get('%s?layerinfo=false' % url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('nodes', response.data)
+        self.assertNotIn('name', response.data)
+        self.assertNotIn('description', response.data)
+        self.assertEqual(type(response.data), dict)
+        self.assertEqual(type(response.data['results']), list)
+        self.assertEqual(type(response.data['results'][0]), dict)
+
+        # geojson view
+        url = reverse('api_layer_nodes_geojson', args=[layer.slug])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['type'], 'FeatureCollection')
+        self.assertEqual(type(response.data['features']), list)
+        self.assertEqual(type(response.data['features'][0]), dict)
+
+        # limit pagination to 1 in geojson view
+        url = reverse('api_layer_nodes_geojson', args=[layer.slug])
+        response = self.client.get('%s?limit=1&page=2' % url)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertIn(settings.SITE_URL, response.data['previous'])
+        self.assertIn(url, response.data['previous'])
+        self.assertIn(settings.SITE_URL, response.data['next'])
+        self.assertIn(url, response.data['next'])
+
+        # layerinfo=true in geojson view
+        url = reverse('api_layer_nodes_geojson', args=[layer.slug])
+        response = self.client.get('%s?layerinfo=true' % url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('nodes', response.data)
+        self.assertIn('name', response.data)
+        self.assertIn('description', response.data)
+
+    def test_nodeshot_sync_exceptions(self):
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = True
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+
+        external = LayerExternal(layer=layer)
+
+        for layer_url in ['TOTALLYWRONG', 'wss://yoyo', '/var/www/wrong', 'http://idonotexi.st.com/hey', 'https://test.map.ninux.org/api/v1/layers/']:
+            external.interoperability = 'nodeshot.interoperability.synchronizers.Nodeshot'
+            external.config = json.dumps({
+                "layer_url": layer_url,
+                "verify_ssl": False
+            })
+            external.full_clean()
+            external.save()
+
+            url = reverse('api_layer_nodes_list', args=[layer.slug])
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('error', response.data['nodes'])
+            self.assertIn('exception', response.data['nodes'])
+            # geojson view
+            url = reverse('api_layer_nodes_geojson', args=[layer.slug])
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('error', response.data)
+            self.assertIn('exception', response.data)
