@@ -58,6 +58,20 @@ Interoperability is configured at layer level in the admin interface.
 A layer must be flagged as **"external"** and can be configured by editing the
 field **config**, which is a JSON representation of the configuration keys.
 
+Each synchronizer has different required configuration keys.
+
+Nodeshot synchronizer
+---------------------
+
+This synchronizer is a **RESTful translator** and allows to reference the nodes of an external nodeshot instance.
+
+There are two required configuration keys:
+
+ * ``layer_url`` (string): URL of the layer API resource, eg: ``https://test.map.ninux.org/api/v1/layers/rome/``
+ * ``verify_ssl`` (boolean): indicates wether the SSL certificate of the external layer should be verified or not; if set to ``true`` self signed certificates won't work
+
+ There is no periodic synchronization needed because this synchronizer grabs the data on the fly.
+
 ===================
 Synchronize command
 ===================
