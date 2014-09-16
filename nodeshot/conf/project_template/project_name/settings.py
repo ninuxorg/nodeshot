@@ -84,7 +84,7 @@ GITHUB_API_SECRET = ''
 
 #from datetime import timedelta
 #
-#CELERYBEAT_SCHEDULE = {
+#CELERYBEAT_SCHEDULE.update({
 #    'synchronize': {
 #        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
 #        'schedule': timedelta(hours=12),
@@ -101,4 +101,4 @@ GITHUB_API_SECRET = ''
 #        'schedule': timedelta(hours=12),
 #        'kwargs': { 'exclude': 'layer1-slug,layer2-slug' }
 #    }
-#}
+#})
