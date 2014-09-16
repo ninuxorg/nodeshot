@@ -8,14 +8,14 @@ similarities in common (georeferenced data).
 
 There are mainly four strategies through which we can achieve interoperability:
 
- * **periodic synchronization**: data is synchronized periodically with a background job
- * **event driven synchronization**: add, change, delete
- * **a mix of the two**: periodic and event driven
- * **RESTful translator**: nodeshot gets data on the fly and converts the format
+ * **periodic synchronization**: data is synchronized periodically (which means it is saved in the database) by a background job
+ * **event driven synchronization**: data is synchronized whenever local data is added, changed or deleted
+ * **RESTful translator**: data is retrieved on the fly and converted to json/geojson, no data is saved in the database
+ * **mixed**: custom synchronizers might implement a mixed behaviour
 
-These strategies are implemented through some Python classes called **"Synchronizers"**.
+These strategies are implemented through **"Synchronizers"**.
 
-New synchronizers can be written ad hoc for each application that need to be supported.
+New synchronizers can be written ad-hoc for each application that need to be supported.
 
 =====================
 Internal dependencies
@@ -27,37 +27,31 @@ For the **interoperability** module to work, the following apps must be listed i
  * nodeshot.core.nodes
  * nodeshot.interoperability
 
+By default these three apps are installed.
+
 =================
 Required settings
 =================
 
-the module ``nodeshot.interoperability`` needs to be in ``settings.INSTALLED_APPS``::
+The module ``nodeshot.interoperability`` is activated by default in ``nodeshot.conf.settings.INSTALLED_APPS``.
 
-    INSTALLED_APPS = [
-        # dependencies
-        'nodeshot.core.layers',
-        'nodeshot.core.nodes',
-        # interoperabiliy module
-        'nodeshot.interoperability',
-        # ...
-    ]
-
-the celery beat settings must be uncommented (you might want to tweak how often
-data is synchronized, default is 12 hours)::
+For periodic synchronization ``CELERYBEAT_SCHEDULE`` must be uncommented in your ``settings.py``::
 
     from datetime import timedelta
 
-    CELERYBEAT_SCHEDULE = {
+    CELERYBEAT_SCHEDULE.update({
         'synchronize': {
             'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
             'schedule': timedelta(hours=12),
         },
-        # other tasks
-    }
+        # ... other tasks ...
+    })
 
-=================
-Configure a layer
-=================
+You might want to tweak how often data is synchronized, in the previous example we configured the task to run every 12 hours.
+
+===================
+Layer configuration
+===================
 
 Interoperability is configured at layer level in the admin interface.
 
@@ -68,12 +62,11 @@ field **config**, which is a JSON representation of the configuration keys.
 Synchronize command
 ===================
 
-When developing you can use the django management command "synchronize", which
-can be used in several different ways, see the help output::
+This is the command which is used to perform **periodic synchronization**, use ``--help`` to know its options::
 
     python manage.py synchronize --help
 
-**Sync one layer**::
+**Sync a specific layer**::
 
     python manage.py synchronize layer-slug
 
@@ -81,7 +74,7 @@ can be used in several different ways, see the help output::
 
     python manage.py synchronize layer1-slug layer2-slug
 
-**Sync all layers** is as simple as that::
+**Sync all layers** is as simple as::
 
     python manage.py synchronize
 
