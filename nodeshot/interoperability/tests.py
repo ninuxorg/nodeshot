@@ -870,83 +870,185 @@ class InteroperabilityTest(TestCase):
             self.assertIn('error', response.data)
             self.assertIn('exception', response.data)
 
-    def test_openwisp_citysdk_tourism(self):
-        layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
-        layer.area = None
-        layer.new_nodes_allowed = False
-        layer.save()
-        layer = Layer.objects.get(pk=layer.pk)
+    if CITYSDK_TOURISM_TEST_CONFIG:
+        def test_openwisp_citysdk_tourism(self):
+            layer = Layer.objects.external()[0]
+            layer.minimum_distance = 0
+            layer.area = None
+            layer.new_nodes_allowed = False
+            layer.save()
+            layer = Layer.objects.get(pk=layer.pk)
 
-        xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
+            xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
 
-        external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISPCitySDK'
-        config = CITYSDK_TOURISM_TEST_CONFIG.copy()
-        config.update({
-            "status": "active",
-            "url": xml_url,
-            "verify_SSL": False
-        })
-        external.config = json.dumps(config)
-        external.full_clean()
-        external.save()
+            external = LayerExternal(layer=layer)
+            external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISPCitySDK'
+            config = CITYSDK_TOURISM_TEST_CONFIG.copy()
+            config.update({
+                "status": "active",
+                "url": xml_url,
+                "verify_SSL": False
+            })
+            external.config = json.dumps(config)
+            external.full_clean()
+            external.save()
 
-        testing_layer_url = 'http://citysdk.inroma.roma.it/citysdk/pois/search'
-        querystring_params = {
-            'category': 'Testing Layer',
-            'limit': '-1'
-        }
+            testing_layer_url = 'http://citysdk.inroma.roma.it/citysdk/pois/search'
+            querystring_params = {
+                'category': 'Testing Layer',
+                'limit': '-1'
+            }
 
-        data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
-        self.assertEqual(len(data['poi']), 0)
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 0)
 
-        output = capture_output(
-            management.call_command,
-            ['synchronize', 'vienna'],
-            kwargs={ 'verbosity': 0 }
-        )
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
 
-        # ensure following text is in output
-        self.assertIn('42 nodes added', output)
-        self.assertIn('0 nodes changed', output)
-        self.assertIn('42 total external', output)
-        self.assertIn('42 total local', output)
+            # ensure following text is in output
+            self.assertIn('42 nodes added', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('42 total external', output)
+            self.assertIn('42 total local', output)
 
-        sleep(2)  # wait 2 seconds
+            sleep(2)  # wait 2 seconds
 
-        data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
-        self.assertEqual(len(data['poi']), 42)
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 42)
 
-        ### --- with the following step we expect some nodes to be deleted --- ###
+            ### --- with the following step we expect some nodes to be deleted --- ###
 
-        xml_url = '%s/openwisp-georss2.xml' % TEST_FILES_PATH
-        config['url'] = xml_url
-        external.config = json.dumps(config)
-        external.save()
+            xml_url = '%s/openwisp-georss2.xml' % TEST_FILES_PATH
+            config['url'] = xml_url
+            external.config = json.dumps(config)
+            external.save()
 
-        output = capture_output(
-            management.call_command,
-            ['synchronize', 'vienna'],
-            kwargs={ 'verbosity': 0 }
-        )
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
 
-        # ensure following text is in output
-        self.assertIn('4 nodes unmodified', output)
-        self.assertIn('38 nodes deleted', output)
-        self.assertIn('0 nodes changed', output)
-        self.assertIn('4 total external', output)
-        self.assertIn('4 total local', output)
+            # ensure following text is in output
+            self.assertIn('4 nodes unmodified', output)
+            self.assertIn('38 nodes deleted', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('4 total external', output)
+            self.assertIn('4 total local', output)
 
-        data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
-        self.assertEqual(len(data['poi']), 4)
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 4)
 
-        ### --- delete everything --- ###
+            ### --- delete everything --- ###
 
-        for node in layer.node_set.all():
-            node.delete()
+            for node in layer.node_set.all():
+                node.delete()
 
-        sleep(2)  # wait 2 seconds
+            sleep(2)  # wait 2 seconds
 
-        data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
-        self.assertEqual(len(data['poi']), 0)
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 0)
+
+        def test_geojson_citysdk_tourism(self):
+            layer = Layer.objects.external()[0]
+            layer.minimum_distance = 0
+            layer.area = None
+            layer.new_nodes_allowed = False
+            layer.save()
+            layer = Layer.objects.get(pk=layer.pk)
+
+            url = '%s/geojson1.json' % TEST_FILES_PATH
+
+            external = LayerExternal(layer=layer)
+            external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkTourism'
+            config = CITYSDK_TOURISM_TEST_CONFIG.copy()
+            config.update({
+                "status": "active",
+                "url": url,
+                "verify_SSL": False,
+                "map": {}
+            })
+            external.config = json.dumps(config)
+            external.full_clean()
+            external.save()
+
+            testing_layer_url = 'http://citysdk.inroma.roma.it/citysdk/pois/search'
+            querystring_params = {
+                'category': 'Testing Layer',
+                'limit': '-1'
+            }
+
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 0)
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('2 nodes added', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('2 total external', output)
+            self.assertIn('2 total local', output)
+            self.assertEqual(layer.node_set.count(), 2)
+
+            sleep(2)  # wait 2 seconds
+
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 2)
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('2 nodes unmodified', output)
+            self.assertIn('0 nodes deleted', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('2 total external', output)
+            self.assertIn('2 total local', output)
+            self.assertEqual(layer.node_set.count(), 2)
+
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 2)
+
+            ### --- repeat with slightly different input --- ###
+
+            url = '%s/geojson4.json' % TEST_FILES_PATH
+            config = json.loads(external.config)
+            config['url'] = url
+            external.config = json.dumps(config)
+            external.save()
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('1 nodes unmodified', output)
+            self.assertIn('1 nodes deleted', output)
+            self.assertIn('1 total external', output)
+            self.assertIn('1 total local', output)
+            self.assertEqual(layer.node_set.count(), 1)
+
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 1)
+
+            ### --- delete everything --- ###
+
+            for node in layer.node_set.all():
+                node.delete()
+
+            sleep(2)  # wait 2 seconds
+
+            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 0)
