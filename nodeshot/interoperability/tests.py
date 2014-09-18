@@ -882,7 +882,7 @@ class InteroperabilityTest(TestCase):
             xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISPCitySDK'
+            external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWispCitySdkTourism'
             config = CITYSDK_TOURISM_TEST_CONFIG.copy()
             config.update({
                 "status": "active",

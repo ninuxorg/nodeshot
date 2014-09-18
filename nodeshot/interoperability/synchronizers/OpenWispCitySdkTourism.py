@@ -2,9 +2,9 @@ from nodeshot.interoperability.synchronizers.OpenWisp import OpenWisp
 from .CitySdkTourism import CitySdkTourismMixin
 
 
-class OpenWISPCitySDK(CitySdkTourismMixin, OpenWisp):
+class OpenWispCitySdkTourism(CitySdkTourismMixin, OpenWisp):
     """
-    OpenWISPCitySDK interoperability class
+    OpenWispCitySdkTourism interoperability class
     Imports data from OpenWISP GeoRSS and then exports the data to the CitySDK database
     """
 
