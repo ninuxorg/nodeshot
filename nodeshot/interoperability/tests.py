@@ -135,14 +135,14 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISP'
+        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWisp'
         external.config = '{ "WRONG_parameter_name": "foo" }'
 
         with self.assertRaises(ValidationError):
             external.clean()
 
     def test_openwisp(self):
-        """ test OpenWISP synchronizer """
+        """ test OpenWisp synchronizer """
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -153,7 +153,7 @@ class InteroperabilityTest(TestCase):
         xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISP'
+        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWisp'
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
 
