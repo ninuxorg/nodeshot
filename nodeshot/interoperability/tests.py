@@ -4,6 +4,8 @@ nodeshot.interoperability unit tests
 
 import sys
 import simplejson as json
+import requests
+from time import sleep
 from cStringIO import StringIO
 from datetime import date, timedelta
 
@@ -19,7 +21,7 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.core.base.tests import user_fixtures
 
 from .models import LayerExternal
-from .settings import settings
+from .settings import settings, CITYSDK_TOURISM_TEST_CONFIG
 from .tasks import synchronize_external_layers
 
 
@@ -841,7 +843,13 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
 
-        for layer_url in ['TOTALLYWRONG', 'wss://yoyo', '/var/www/wrong', 'http://idonotexi.st.com/hey', 'https://test.map.ninux.org/api/v1/layers/']:
+        for layer_url in [
+            'TOTALLYWRONG',
+            'wss://yoyo',
+            '/var/www/wrong',
+            'http://idonotexi.st.com/hey',
+            'https://test.map.ninux.org/api/v1/layers/'
+        ]:
             external.interoperability = 'nodeshot.interoperability.synchronizers.Nodeshot'
             external.config = json.dumps({
                 "layer_url": layer_url,
@@ -861,3 +869,84 @@ class InteroperabilityTest(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn('error', response.data)
             self.assertIn('exception', response.data)
+
+    def test_openwisp_citysdk_tourism(self):
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+
+        xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
+
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWISPCitySDK'
+        config = CITYSDK_TOURISM_TEST_CONFIG.copy()
+        config.update({
+            "status": "active",
+            "url": xml_url,
+            "verify_SSL": False
+        })
+        external.config = json.dumps(config)
+        external.full_clean()
+        external.save()
+
+        testing_layer_url = 'http://citysdk.inroma.roma.it/citysdk/pois/search'
+        querystring_params = {
+            'category': 'Testing Layer',
+            'limit': '-1'
+        }
+
+        data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+        self.assertEqual(len(data['poi']), 0)
+
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
+
+        # ensure following text is in output
+        self.assertIn('42 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('42 total external', output)
+        self.assertIn('42 total local', output)
+
+        sleep(2)  # wait 2 seconds
+
+        data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+        self.assertEqual(len(data['poi']), 42)
+
+        ### --- with the following step we expect some nodes to be deleted --- ###
+
+        xml_url = '%s/openwisp-georss2.xml' % TEST_FILES_PATH
+        config['url'] = xml_url
+        external.config = json.dumps(config)
+        external.save()
+
+        output = capture_output(
+            management.call_command,
+            ['synchronize', 'vienna'],
+            kwargs={ 'verbosity': 0 }
+        )
+
+        # ensure following text is in output
+        self.assertIn('4 nodes unmodified', output)
+        self.assertIn('38 nodes deleted', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('4 total external', output)
+        self.assertIn('4 total local', output)
+
+        data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+        self.assertEqual(len(data['poi']), 4)
+
+        ### --- delete everything --- ###
+
+        for node in layer.node_set.all():
+            node.delete()
+
+        sleep(2)  # wait 2 seconds
+
+        data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+        self.assertEqual(len(data['poi']), 0)

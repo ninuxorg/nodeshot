@@ -4,7 +4,6 @@ from .CitySDKMixin import CitySDKMixin
 
 class GeoJsonCitySdkTourism(CitySDKMixin, GeoJson):
     """ Import GeoJson and sync CitySDK tourism API """
-    
     REQUIRED_CONFIG_KEYS = [
         'url',
         'map',
@@ -16,14 +15,14 @@ class GeoJsonCitySdkTourism(CitySDKMixin, GeoJson):
         'citysdk_lang',
         'citysdk_term',
     ]
-    
+
     def convert_format(self, node):
         # determine description or fill some hopefully useful value
         if node.description.strip() == '':
             description = node.name
         else:
             description = node.description
-            
+
         return {
             self.config['citysdk_type'] :{
                 "location":{
