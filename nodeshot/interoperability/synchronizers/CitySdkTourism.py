@@ -3,15 +3,16 @@ import simplejson as json
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 
-from ..models import NodeExternal
+from nodeshot.interoperability.synchronizers.base import BaseSynchronizer
+from nodeshot.interoperability.models import NodeExternal
 
 from celery.utils.log import get_logger
 logger = get_logger(__name__)
 
 
-class CitySDKMixin(object):
+class CitySdkTourismMixin(object):
     """
-    CitySDKMixin interoperability mixin
+    CitySdkTourismMixin interoperability mixin
     Provides methods to perform following operations:
         * perform authentication into citysdk API
         * create or find a category
@@ -31,7 +32,7 @@ class CitySDKMixin(object):
     ]
 
     def __init__(self, *args, **kwargs):
-        super(CitySDKMixin, self).__init__(*args, **kwargs)
+        super(CitySdkTourismMixin, self).__init__(*args, **kwargs)
         self._init_config()
 
     def _init_config(self):
@@ -329,3 +330,7 @@ END:VCARD""" % (
         logger.info(message)
 
         return True
+
+
+class CitySdkTourism(CitySdkTourismMixin, BaseSynchronizer):
+    pass

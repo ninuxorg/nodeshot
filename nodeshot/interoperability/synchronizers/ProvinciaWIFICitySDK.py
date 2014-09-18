@@ -1,8 +1,8 @@
 from .ProvinciaWIFI import ProvinciaWIFI
-from .CitySDKMixin import CitySDKMixin
+from .CitySdkTourism import CitySdkTourismMixin
 
 
-class ProvinciaWIFICitySDK(CitySDKMixin, ProvinciaWIFI):
+class ProvinciaWIFICitySDK(CitySdkTourismMixin, ProvinciaWIFI):
     """
     ProvinciaWIFICitySDK interoperability class
     Imports data from Provincia WIFI Open Data and then exports the data to the CitySDK database

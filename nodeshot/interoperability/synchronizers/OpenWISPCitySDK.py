@@ -1,20 +1,20 @@
-from .OpenWISP import OpenWISP
-from .CitySDKMixin import CitySDKMixin
+from nodeshot.interoperability.synchronizers.OpenWISP import OpenWISP
+from .CitySdkTourism import CitySdkTourismMixin
 
 
-class OpenWISPCitySDK(CitySDKMixin, OpenWISP):
+class OpenWISPCitySDK(CitySdkTourismMixin, OpenWISP):
     """
     OpenWISPCitySDK interoperability class
     Imports data from OpenWISP GeoRSS and then exports the data to the CitySDK database
     """
-    
+
     def convert_format(self, node):
         # determine description or fill some hopefully useful value
         if node.description.strip() == '':
             description = '%s in %s' % (node.name, node.address)
         else:
             description = node.description
-            
+
         return {
             self.config['citysdk_type'] :{
                 "location":{

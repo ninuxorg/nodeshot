@@ -1,8 +1,8 @@
-from .GeoJson import GeoJson
-from .CitySDKMixin import CitySDKMixin
+from nodeshot.interoperability.synchronizers.GeoJson import GeoJson
+from .CitySdkTourism import CitySdkTourismMixin
 
 
-class GeoJsonCitySdkTourism(CitySDKMixin, GeoJson):
+class GeoJsonCitySdkTourism(CitySdkTourismMixin, GeoJson):
     """ Import GeoJson and sync CitySDK tourism API """
     REQUIRED_CONFIG_KEYS = [
         'url',
