@@ -893,13 +893,12 @@ class InteroperabilityTest(TestCase):
             external.full_clean()
             external.save()
 
-            testing_layer_url = 'http://citysdk.inroma.roma.it/citysdk/pois/search'
             querystring_params = {
-                'category': 'Testing Layer',
+                'category': CITYSDK_TOURISM_TEST_CONFIG['citysdk_category'],
                 'limit': '-1'
             }
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 0)
 
             output = capture_output(
@@ -914,9 +913,9 @@ class InteroperabilityTest(TestCase):
             self.assertIn('42 total external', output)
             self.assertIn('42 total local', output)
 
-            sleep(2)  # wait 2 seconds
+            sleep(1)  # wait 2 seconds
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 42)
 
             ### --- with the following step we expect some nodes to be deleted --- ###
@@ -939,7 +938,7 @@ class InteroperabilityTest(TestCase):
             self.assertIn('4 total external', output)
             self.assertIn('4 total local', output)
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 4)
 
             ### --- delete everything --- ###
@@ -947,9 +946,9 @@ class InteroperabilityTest(TestCase):
             for node in layer.node_set.all():
                 node.delete()
 
-            sleep(2)  # wait 2 seconds
+            sleep(1)  # wait 2 seconds
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 0)
 
         def test_geojson_citysdk_tourism(self):
@@ -975,13 +974,12 @@ class InteroperabilityTest(TestCase):
             external.full_clean()
             external.save()
 
-            testing_layer_url = 'http://citysdk.inroma.roma.it/citysdk/pois/search'
             querystring_params = {
-                'category': 'Testing Layer',
+                'category': CITYSDK_TOURISM_TEST_CONFIG['citysdk_category'],
                 'limit': '-1'
             }
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 0)
 
             output = capture_output(
@@ -997,9 +995,9 @@ class InteroperabilityTest(TestCase):
             self.assertIn('2 total local', output)
             self.assertEqual(layer.node_set.count(), 2)
 
-            sleep(2)  # wait 2 seconds
+            sleep(1)  # wait 2 seconds
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 2)
 
             output = capture_output(
@@ -1016,7 +1014,7 @@ class InteroperabilityTest(TestCase):
             self.assertIn('2 total local', output)
             self.assertEqual(layer.node_set.count(), 2)
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 2)
 
             ### --- repeat with slightly different input --- ###
@@ -1040,7 +1038,7 @@ class InteroperabilityTest(TestCase):
             self.assertIn('1 total local', output)
             self.assertEqual(layer.node_set.count(), 1)
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 1)
 
             ### --- delete everything --- ###
@@ -1048,7 +1046,92 @@ class InteroperabilityTest(TestCase):
             for node in layer.node_set.all():
                 node.delete()
 
-            sleep(2)  # wait 2 seconds
+            sleep(1)  # wait 2 seconds
 
-            data = json.loads(requests.get(testing_layer_url, params=querystring_params).content)
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 0)
+
+        def test_provinciawifi_citysdk_tourism(self):
+            layer = Layer.objects.external()[0]
+            layer.minimum_distance = 0
+            layer.area = None
+            layer.new_nodes_allowed = False
+            layer.save()
+            layer = Layer.objects.get(pk=layer.pk)
+
+            xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
+
+            external = LayerExternal(layer=layer)
+            external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWIFICitySDK'
+            config = CITYSDK_TOURISM_TEST_CONFIG.copy()
+            config.update({
+                "status": "active",
+                "url": xml_url,
+                "verify_SSL": False,
+                "map": {}
+            })
+            external.config = json.dumps(config)
+            external.full_clean()
+            external.save()
+
+            querystring_params = {
+                'category': CITYSDK_TOURISM_TEST_CONFIG['citysdk_category'],
+                'limit': '-1'
+            }
+
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 0)
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('5 nodes added', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('5 total external', output)
+            self.assertIn('5 total local', output)
+            self.assertEqual(layer.node_set.count(), 5)
+
+            sleep(1)
+
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 5)
+
+            ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
+
+            config['url'] = '%s/provincia-wifi2.xml' % TEST_FILES_PATH
+            external.config = json.dumps(config)
+            external.save()
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('1 nodes added', output)
+            self.assertIn('2 nodes unmodified', output)
+            self.assertIn('3 nodes deleted', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('3 total external', output)
+            self.assertIn('3 total local', output)
+            self.assertEqual(layer.node_set.count(), 3)
+
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
+            self.assertEqual(len(data['poi']), 3)
+
+            sleep(1)
+
+            ### --- delete everything --- ###
+
+            for node in layer.node_set.all():
+                node.delete()
+
+            sleep(1)  # wait 2 seconds
+
+            data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 0)
