@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos.collections import GeometryCollection
+from django.contrib.gis.geos import GEOSException
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
 
