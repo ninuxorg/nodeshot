@@ -38,7 +38,7 @@ class NodeshotMixin(object):
         except RequestException as e:
             return {
                 'error': _('external layer not reachable'),
-                'exception': str(e.message)
+                'exception': str(e)
             }
 
         if response.status_code != 200:
@@ -52,7 +52,7 @@ class NodeshotMixin(object):
         except json.scanner.JSONDecodeError as e:
             return {
                 'error': _('external layer is experiencing some issues because it returned invalid data'),
-                'exception': list(e)
+                'exception': str(e)
             }
 
         if 'nodes' in response.data:
