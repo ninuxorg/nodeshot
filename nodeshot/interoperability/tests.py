@@ -913,7 +913,7 @@ class InteroperabilityTest(TestCase):
             self.assertIn('42 total external', output)
             self.assertIn('42 total local', output)
 
-            sleep(1)  # wait 2 seconds
+            sleep(1)  # wait 1 second
 
             data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 42)
@@ -946,7 +946,7 @@ class InteroperabilityTest(TestCase):
             for node in layer.node_set.all():
                 node.delete()
 
-            sleep(1)  # wait 2 seconds
+            sleep(1)  # wait 1 second
 
             data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 0)
@@ -995,7 +995,7 @@ class InteroperabilityTest(TestCase):
             self.assertIn('2 total local', output)
             self.assertEqual(layer.node_set.count(), 2)
 
-            sleep(1)  # wait 2 seconds
+            sleep(1)  # wait 1 second
 
             data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 2)
@@ -1046,7 +1046,7 @@ class InteroperabilityTest(TestCase):
             for node in layer.node_set.all():
                 node.delete()
 
-            sleep(1)  # wait 2 seconds
+            sleep(1)  # wait 1 second
 
             data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 0)
@@ -1131,7 +1131,7 @@ class InteroperabilityTest(TestCase):
             for node in layer.node_set.all():
                 node.delete()
 
-            sleep(1)  # wait 2 seconds
+            sleep(1)  # wait 1 second
 
             data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 0)
@@ -1181,7 +1181,7 @@ class InteroperabilityTest(TestCase):
             self.assertEqual(layer.node_set.count(), 2)
             self.assertNotEqual(layer.node_set.first().external.external_id, '')
 
-            sleep(1)  # wait 2 seconds
+            sleep(1)  # wait 1 second
 
             data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
             self.assertEqual(len(data['results']), 2)
@@ -1232,7 +1232,92 @@ class InteroperabilityTest(TestCase):
             for node in layer.node_set.all():
                 node.delete()
 
-            sleep(1)  # wait 2 seconds
+            sleep(1)  # wait 1 second
+
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 0)
+
+        def test_provinciawifi_citysdk_mobility(self):
+            layer = Layer.objects.external()[0]
+            layer.minimum_distance = 0
+            layer.area = None
+            layer.new_nodes_allowed = False
+            layer.save()
+            layer = Layer.objects.get(pk=layer.pk)
+
+            xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
+
+            external = LayerExternal(layer=layer)
+            external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkMobility'
+            config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
+            config.update({
+                "status": "active",
+                "url": xml_url,
+                "verify_SSL": False,
+                "map": {}
+            })
+            external.config = json.dumps(config)
+            external.full_clean()
+            external.save()
+
+            querystring_params = {
+                'layer': CITYSDK_MOBILITY_TEST_CONFIG['citysdk_layer'],
+                'per_page': '1000'
+            }
+            citysdk_nodes_url = '%s/nodes' % CITYSDK_MOBILITY_TEST_CONFIG['citysdk_url']
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 0)
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('5 nodes added', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('5 total external', output)
+            self.assertIn('5 total local', output)
+            self.assertEqual(layer.node_set.count(), 5)
+
+            sleep(1)
+
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 5)
+
+            ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
+
+            config['url'] = '%s/provincia-wifi2.xml' % TEST_FILES_PATH
+            external.config = json.dumps(config)
+            external.save()
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('1 nodes added', output)
+            self.assertIn('2 nodes unmodified', output)
+            self.assertIn('3 nodes deleted', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('3 total external', output)
+            self.assertIn('3 total local', output)
+            self.assertEqual(layer.node_set.count(), 3)
+
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 3)
+
+            sleep(1)
+
+            ### --- delete everything --- ###
+
+            for node in layer.node_set.all():
+                node.delete()
+
+            sleep(1)  # wait 1 second
 
             data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
             self.assertEqual(len(data['results']), 0)
