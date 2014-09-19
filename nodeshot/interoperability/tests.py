@@ -21,7 +21,7 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.core.base.tests import user_fixtures
 
 from .models import LayerExternal
-from .settings import settings, CITYSDK_TOURISM_TEST_CONFIG
+from .settings import settings, CITYSDK_TOURISM_TEST_CONFIG, CITYSDK_MOBILITY_TEST_CONFIG
 from .tasks import synchronize_external_layers
 
 
@@ -1135,3 +1135,104 @@ class InteroperabilityTest(TestCase):
 
             data = json.loads(requests.get(CITYSDK_TOURISM_TEST_CONFIG['search_url'], params=querystring_params).content)
             self.assertEqual(len(data['poi']), 0)
+
+    if CITYSDK_MOBILITY_TEST_CONFIG:
+        def test_geojson_citysdk_mobility(self):
+            layer = Layer.objects.external()[0]
+            layer.minimum_distance = 0
+            layer.area = None
+            layer.new_nodes_allowed = False
+            layer.save()
+            layer = Layer.objects.get(pk=layer.pk)
+
+            url = '%s/geojson1.json' % TEST_FILES_PATH
+
+            external = LayerExternal(layer=layer)
+            external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkMobility'
+            config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
+            config.update({
+                "url": url,
+                "verify_SSL": False,
+                "map": {}
+            })
+            external.config = json.dumps(config)
+            external.full_clean()
+            external.save()
+
+            querystring_params = {
+                'layer': CITYSDK_MOBILITY_TEST_CONFIG['citysdk_layer'],
+                'per_page': '1000'
+            }
+            citysdk_nodes_url = '%s/nodes' % CITYSDK_MOBILITY_TEST_CONFIG['citysdk_url']
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 0)
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('2 nodes added', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('2 total external', output)
+            self.assertIn('2 total local', output)
+            self.assertEqual(layer.node_set.count(), 2)
+            self.assertNotEqual(layer.node_set.first().external.external_id, '')
+
+            sleep(1)  # wait 2 seconds
+
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 2)
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('2 nodes unmodified', output)
+            self.assertIn('0 nodes deleted', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('2 total external', output)
+            self.assertIn('2 total local', output)
+            self.assertEqual(layer.node_set.count(), 2)
+
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 2)
+
+            ### --- repeat with slightly different input --- ###
+
+            url = '%s/geojson4.json' % TEST_FILES_PATH
+            config = json.loads(external.config)
+            config['url'] = url
+            external.config = json.dumps(config)
+            external.save()
+
+            output = capture_output(
+                management.call_command,
+                ['synchronize', 'vienna'],
+                kwargs={ 'verbosity': 0 }
+            )
+
+            # ensure following text is in output
+            self.assertIn('1 nodes unmodified', output)
+            self.assertIn('1 nodes deleted', output)
+            self.assertIn('1 total external', output)
+            self.assertIn('1 total local', output)
+            self.assertEqual(layer.node_set.count(), 1)
+
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 1)
+
+            ### --- delete everything --- ###
+
+            for node in layer.node_set.all():
+                node.delete()
+
+            sleep(1)  # wait 2 seconds
+
+            data = json.loads(requests.get(citysdk_nodes_url, params=querystring_params, verify=False).content)
+            self.assertEqual(len(data['results']), 0)
