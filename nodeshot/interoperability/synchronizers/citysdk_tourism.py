@@ -33,6 +33,8 @@ class CitySdkTourismMixin(object):
         'citysdk_term',
     ]
 
+    _persisted_cookies = None
+
     def __init__(self, *args, **kwargs):
         super(CitySdkTourismMixin, self).__init__(*args, **kwargs)
         self._init_config()
@@ -63,17 +65,21 @@ class CitySdkTourismMixin(object):
         # first time
         self.authenticate(force_http_request=True)
         # store cookies in a string
-        self.config['cookies'] = self.cookies
+        self._persisted_cookies = self.cookies
         # save config
         self.layer.external.config = json.dumps(self.config, indent=4, sort_keys=True)
         self.layer.external.save(after_save=False)
 
+    def after_complete(self, *args, **kwargs):
+        """ clear self._persisted_cookies """
+        self._persisted_cookies = None
+
     def authenticate(self, force_http_request=False):
         """ authenticate into the CitySDK API if necessary """
-        # if session cookie is stored in DB no need to reauthenticate
+        # if session cookie is persisted in memory no need to reauthenticate
         # if force_http_request is True do HTTP request anyway
-        if force_http_request is False and self.config.get('cookies', False):
-            self.cookies = self.config['cookies']
+        if force_http_request is False and self._persisted_cookies is not None:
+            self.cookies = self._persisted_cookies
             return True
 
         self.verbose('Authenticating to CitySDK')
