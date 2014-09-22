@@ -20,7 +20,7 @@ from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.base.tests import user_fixtures
 
-from .models import LayerExternal
+from .models import LayerExternal, NodeExternal
 from .settings import settings, CITYSDK_TOURISM_TEST_CONFIG, CITYSDK_MOBILITY_TEST_CONFIG
 from .tasks import synchronize_external_layers
 
@@ -66,6 +66,13 @@ class InteroperabilityTest(TestCase):
         external.config = ''
         external.full_clean()
         external.save()
+
+    def test_node_external_creation(self):
+        n = NodeExternal()
+        n.node = Node.objects.first()
+        n.external_id = 7
+        n.full_clean()
+        n.save()
 
     def test_not_interoperable(self):
         """ test not interoperable """
