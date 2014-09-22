@@ -98,7 +98,7 @@ class Command(BaseCommand):
         for layer in layers:
             # retrieve interop class if available
             try:
-                synchronizer_path = layer.external.interoperability
+                synchronizer_path = layer.external.synchronizer_path
             except (ObjectDoesNotExist, AttributeError):
                 self.stdout.write('External Layer %s does not have an interoperability class specified\n\r' % layer.name)
                 continue

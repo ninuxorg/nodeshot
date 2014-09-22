@@ -37,7 +37,7 @@ def push_changes_to_external_layers(node, external_layer, operation):
         node = Node.objects.get(pk=node.pk)
 
     # import synchronizer
-    Synchronizer = import_by_path(external_layer.interoperability)
+    Synchronizer = import_by_path(external_layer.synchronizer_path)
     instance = Synchronizer(external_layer.layer)
 
     # call method only if supported

@@ -10,7 +10,7 @@ from ..settings import SYNCHRONIZERS
 
 # choices
 SYNCHRONIZERS = [
-    ('None', _('Not interoperable'))
+    ('None', _('None'))
 ] + SYNCHRONIZERS
 
 
@@ -20,7 +20,7 @@ class LayerExternal(models.Model):
     These are the layers that are managed by local groups or other organizations
     """
     layer = models.OneToOneField('layers.Layer', verbose_name=_('layer'), parent_link=True, related_name='external')
-    interoperability = models.CharField(_('interoperability'), max_length=128, choices=SYNCHRONIZERS, default=False)
+    synchronizer_path = models.CharField(_('synchronizer'), max_length=128, choices=SYNCHRONIZERS, default=False)
     config = models.TextField(_('configuration'), blank=True,
                               help_text=_('JSON format, will be parsed by the interoperability class to retrieve config keys'))
     map = models.URLField(_('map URL'), blank=True)
@@ -36,41 +36,48 @@ class LayerExternal(models.Model):
         verbose_name_plural = _('external layer info')
 
     def __unicode__(self):
-        return '%s additional data' % self.layer.name
+        return '%s external layer config' % self.layer.name
+
+    def __init__(self, *args, **kwargs):
+        """ custom init method """
+        super(LayerExternal, self).__init__(*args, **kwargs)
+        # avoid blocking page loading in case of missing required config keys in configuration
+        try:
+            synchronizer = self.synchronizer
+        except ImproperlyConfigured:
+            return
+        # if synchronizer has get_nodes method
+        # add get_nodes method to current LayerExternal instance
+        if synchronizer is not False and hasattr(synchronizer, 'get_nodes'):
+            self.get_nodes = synchronizer.get_nodes
 
     def clean(self, *args, **kwargs):
         """
         Custom Validation:
-
             * must specify config if interoperability class is not none
             * indent json config nicely
             * validate any synchronizer.REQUIRED_CONFIG_KEYS
             * call synchronizer clean method for any third party validation
         """
-
         # if is interoperable some configuration needs to be specified
-        if self.interoperability != 'None' and not self.config:
+        if self.synchronizer_path != 'None' and not self.config:
             raise ValidationError(_('Please specify the necessary configuration for the interoperation'))
-
         # configuration needs to be valid JSON
-        if self.interoperability != 'None' and self.config:
+        if self.synchronizer_path != 'None' and self.config:
             # convert ' to "
             self.config = self.config.replace("'", '"')
-
             # ensure valid JSON
             try:
                 config = json.loads(self.config)
             except json.decoder.JSONDecodeError:
                 raise ValidationError(_('The specified configuration is not valid JSON'))
-
             # ensure good indentation
             self.config = json.dumps(config, indent=4, sort_keys=True)
-
             # ensure REQUIRED_CONFIG_KEYS are filled
             for key in self.synchronizer_class.REQUIRED_CONFIG_KEYS:
                 if key not in config:
                     raise ValidationError(_('Required config key "%s" missing from external layer configuration' % key))
-
+            # validate synchronizer config
             try:
                 self.synchronizer.config = config
                 self.synchronizer.clean()
@@ -83,60 +90,35 @@ class LayerExternal(models.Model):
         for any additional operation that must be executed after save
         """
         after_save = kwargs.pop('after_save', True)
-
         super(LayerExternal, self).save(*args, **kwargs)
-
+        # call after_external_layer_saved method of synchronizer
         if after_save and self.synchronizer:
             self.synchronizer.after_external_layer_saved(self.config)
 
     @property
     def synchronizer(self):
         """ access synchronizer """
-        if not self.interoperability or self.interoperability == 'None' or not self.layer:
+        if not self.synchronizer_path or self.synchronizer_path == 'None' or not self.layer:
             return False
-
         # ensure data is up to date
-        if (self._synchronizer is not None and self._synchronizer_class.__name__ not in self.interoperability):
+        if (self._synchronizer is not None and self._synchronizer_class.__name__ not in self.synchronizer_path):
             self._synchronizer = None
             self._synchronizer_class = None
-
-        # init synchronizer if not already done
+        # init synchronizer only if necessary
         if not self._synchronizer:
-            synchronizer_class = self.synchronizer_class
-            self._synchronizer = synchronizer_class(self.layer)
-
+            self._synchronizer = self.synchronizer_class(self.layer)
         return self._synchronizer
 
     @property
     def synchronizer_class(self):
         """ returns synchronizer class """
-        if not self.interoperability or self.interoperability == 'None' or not self.layer:
+        if not self.synchronizer_path or self.synchronizer_path == 'None' or not self.layer:
             return False
-
         # ensure data is up to date
-        if (self._synchronizer_class is not None and self._synchronizer_class.__name__ not in self.interoperability):
+        if (self._synchronizer_class is not None and self._synchronizer_class.__name__ not in self.synchronizer_path):
             self._synchronizer = None
             self._synchronizer_class = None
-
+        # import synchronizer class only if not imported already
         if not self._synchronizer_class:
-            self._synchronizer_class = import_by_path(self.interoperability)
-
+            self._synchronizer_class = import_by_path(self.synchronizer_path)
         return self._synchronizer_class
-
-    def __init__(self, *args, **kwargs):
-        """ custom init method """
-        super(LayerExternal, self).__init__(*args, **kwargs)
-
-        # avoid blocking page loading in case of missing required config keys in configuration
-        try:
-            synchronizer = self.synchronizer
-        except ImproperlyConfigured:
-            return
-
-        # if synchronizer has get_nodes method
-        # add get_nodes method to current LayerExternal instance
-        if synchronizer is not False and hasattr(synchronizer, 'get_nodes'):
-            def get_nodes(class_name, params):
-                return synchronizer.get_nodes(class_name, params)
-
-            self.get_nodes = get_nodes

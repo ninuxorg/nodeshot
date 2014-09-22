@@ -41,7 +41,7 @@ def save_external_nodes(sender, **kwargs):
     node = kwargs['instance']
     operation = 'add' if kwargs['created'] is True else 'change'
 
-    if node.layer.is_external is False or not hasattr(node.layer, 'external') or node.layer.external.interoperability is None:
+    if node.layer.is_external is False or not hasattr(node.layer, 'external') or node.layer.external.synchronizer_path is None:
         return False
 
     push_changes_to_external_layers.delay(node=node, external_layer=node.layer.external, operation=operation)
@@ -52,7 +52,7 @@ def delete_external_nodes(sender, **kwargs):
     """ sync by deleting nodes from external layers when needed """
     node = kwargs['instance']
 
-    if node.layer.is_external is False or not hasattr(node.layer, 'external') or node.layer.external.interoperability is None:
+    if node.layer.is_external is False or not hasattr(node.layer, 'external') or node.layer.external.synchronizer_path is None:
         return False
 
     if hasattr(node, 'external') and node.external.external_id:

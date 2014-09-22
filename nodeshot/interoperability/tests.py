@@ -1,7 +1,3 @@
-"""
-nodeshot.interoperability unit tests
-"""
-
 import sys
 import simplejson as json
 import requests
@@ -62,7 +58,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'None'
+        external.synchronizer_path = 'None'
         external.config = ''
         external.full_clean()
         external.save()
@@ -122,7 +118,7 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.Nodeshot'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
         external.config = '{ "layer_url": "http://test.com/" }'
         external.save()
 
@@ -142,7 +138,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWisp'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWisp'
         external.config = '{ "WRONG_parameter_name": "foo" }'
 
         with self.assertRaises(ValidationError):
@@ -159,7 +155,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/geojson1.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
         external.config = '{ "url": "%s", "map": {} }' % url
         external.full_clean()
         external.save()
@@ -214,7 +210,7 @@ class InteroperabilityTest(TestCase):
         xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWisp'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWisp'
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
 
@@ -288,7 +284,7 @@ class InteroperabilityTest(TestCase):
         xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWifi'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifi'
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
 
@@ -367,7 +363,7 @@ class InteroperabilityTest(TestCase):
         measurements_url = '%s/citysdk-wp4-measurements.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinceRomeTraffic'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinceRomeTraffic'
         external.config = json.dumps({
             "streets_url": streets_url,
             "measurements_url": measurements_url,
@@ -474,7 +470,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/geojson1.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
         external.config = '{ "url": "%s", "map": {} }' % url
         external.full_clean()
         external.save()
@@ -554,7 +550,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/geojson1.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
         external.config = '{ "url": "%s", "map": {} }' % url
         external.full_clean()
         external.save()
@@ -588,7 +584,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/geojson3.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
         external.config = json.dumps({
             "url": url,
             "map": {
@@ -637,7 +633,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/georss-simple.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoRss'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoRss'
         external.config = '{ "url": "%s", "map": {} }' % url
         external.full_clean()
         external.save()
@@ -695,7 +691,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/georss-w3c.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoRss'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoRss'
         external.config = '{ "url": "%s", "map": {} }' % url
         external.full_clean()
         external.save()
@@ -750,7 +746,7 @@ class InteroperabilityTest(TestCase):
         layer = Layer.objects.get(pk=layer.pk)
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenLabor'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenLabor'
         external.config = json.dumps({
             "open311_url": '%s/' % TEST_FILES_PATH,
             "service_code_get": "001",
@@ -789,7 +785,7 @@ class InteroperabilityTest(TestCase):
         url = 'http://devopenlabor.lynxlab.com/api/v1'
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.OpenLabor'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenLabor'
         external.config = json.dumps({
             "open311_url": url,
             "service_code_get": "001",
@@ -827,7 +823,7 @@ class InteroperabilityTest(TestCase):
         layer = Layer.objects.get(pk=layer.pk)
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.Nodeshot'
+        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
         external.config = json.dumps({
             "layer_url": "https://test.map.ninux.org/api/v1/layers/sicilia/",
             "verify_ssl": False
@@ -908,7 +904,7 @@ class InteroperabilityTest(TestCase):
             'http://idonotexi.st.com/hey',
             'https://test.map.ninux.org/api/v1/layers/'
         ]:
-            external.interoperability = 'nodeshot.interoperability.synchronizers.Nodeshot'
+            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
             external.config = json.dumps({
                 "layer_url": layer_url,
                 "verify_ssl": False
@@ -940,7 +936,7 @@ class InteroperabilityTest(TestCase):
             xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.interoperability = 'nodeshot.interoperability.synchronizers.OpenWispCitySdkTourism'
+            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWispCitySdkTourism'
             config = CITYSDK_TOURISM_TEST_CONFIG.copy()
             config.update({
                 "status": "active",
@@ -1020,7 +1016,7 @@ class InteroperabilityTest(TestCase):
             url = '%s/geojson1.json' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkTourism'
+            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkTourism'
             config = CITYSDK_TOURISM_TEST_CONFIG.copy()
             config.update({
                 "status": "active",
@@ -1120,7 +1116,7 @@ class InteroperabilityTest(TestCase):
             xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkTourism'
+            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkTourism'
             config = CITYSDK_TOURISM_TEST_CONFIG.copy()
             config.update({
                 "status": "active",
@@ -1206,7 +1202,7 @@ class InteroperabilityTest(TestCase):
             url = '%s/geojson1.json' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkMobility'
+            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkMobility'
             config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
             config.update({
                 "url": url,
@@ -1306,7 +1302,7 @@ class InteroperabilityTest(TestCase):
             xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkMobility'
+            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkMobility'
             config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
             config.update({
                 "status": "active",
