@@ -4,8 +4,9 @@ from .CitySdkMobility import CitySdkMobilityMixin
 
 class ProvinciaWifiCitySdkMobility(CitySdkMobilityMixin, ProvinciaWifi):
     """
-    ProvinciaWIFICitySDK interoperability class
-    Imports data from Provincia WIFI Open Data and then exports the data to the CitySDK Mobility API database
+    ProvinciaWifiCitySdkMobility synchronizer
+    Imports data from Provincia WIFI in the local DB and it also sends it
+    to CitySDK mobility API
     """
 
     REQUIRED_CONFIG_KEYS = [
