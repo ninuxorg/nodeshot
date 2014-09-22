@@ -7,7 +7,7 @@ DEFAULT_SYNCHRONIZERS = [
     ('nodeshot.interoperability.synchronizers.GeoRss', 'GeoRSS'),
     ('nodeshot.interoperability.synchronizers.OpenWisp', 'OpenWisp'),
     ('nodeshot.interoperability.synchronizers.OpenWispCitySdkTourism', 'OpenWispCitySdkTourism'),
-    ('nodeshot.interoperability.synchronizers.ProvinciaWIFI', 'Provincia WiFi'),
+    ('nodeshot.interoperability.synchronizers.ProvinciaWifi', 'Provincia WiFi'),
     ('nodeshot.interoperability.synchronizers.ProvinciaWIFICitySDK', 'ProvinciaWIFICitySDK'),
     ('nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkMobility', 'Synchronize Provincia Wifi with CitySDK Mobility'),
     ('nodeshot.interoperability.synchronizers.CitySdkMobility', 'CitySDK Mobility (event driven)'),

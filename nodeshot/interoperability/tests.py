@@ -216,7 +216,7 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(node.added.strftime('%Y-%m-%d'), '2013-06-14')
 
     def test_provinciawifi(self):
-        """ test ProvinciaWIFI converter """
+        """ test ProvinciaWifi synchronizer """
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0
         layer.area = None
@@ -227,7 +227,7 @@ class InteroperabilityTest(TestCase):
         xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWIFI'
+        external.interoperability = 'nodeshot.interoperability.synchronizers.ProvinciaWifi'
         external.config = '{ "url": "%s" }' % xml_url
         external.save()
 
