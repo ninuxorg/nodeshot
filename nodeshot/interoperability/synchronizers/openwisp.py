@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from django.contrib.gis.geos import Point
 from .base import XMLParserMixin, GenericGisSynchronizer
 

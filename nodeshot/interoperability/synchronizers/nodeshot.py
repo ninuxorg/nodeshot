@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import requests
 from requests.exceptions import RequestException
 import simplejson as json

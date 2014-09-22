@@ -1,5 +1,7 @@
-from .ProvinciaWifi import ProvinciaWifi
-from .CitySdkMobility import CitySdkMobilityMixin
+from __future__ import absolute_import
+
+from .provinciawifi import ProvinciaWifi
+from .citysdk_mobility import CitySdkMobilityMixin
 
 
 class ProvinciaWifiCitySdkMobility(CitySdkMobilityMixin, ProvinciaWifi):

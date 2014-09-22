@@ -118,9 +118,6 @@ in ``/nodeshot/interoperability/synchronizers/base.py``:
 .. note::
     this section is a work in progress.
 
-Save the synchronizer in your python path, name it exactly as you named the class,
-in our example that would be ``MyVeryCoolApp.py``:
-
 Once the file is saved and you are sure it's on your pythonpath you have to add a
 tuple in ``settings.NODESHOT_SYNCHRONIZERS`` in which the first element is the path to the file and
 the second element is the name you want to show in the admin interface in the list *"synchronizer_class"*:
@@ -128,7 +125,7 @@ the second element is the name you want to show in the admin interface in the li
 .. code-block:: python
 
     NODESHOT_SYNCHRONIZERS = [
-        ('myproject.synchronizers.MyVeryCoolApp', 'MyVeryCoolApp'),
+        ('myproject.synchronizers.my_very_cool_app.MyVeryCoolApp', 'MyVeryCoolApp'),
     ]
 
 This will add your new synchronizer to the default list.

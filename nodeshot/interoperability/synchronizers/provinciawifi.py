@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from django.template.defaultfilters import slugify
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError, ImproperlyConfigured

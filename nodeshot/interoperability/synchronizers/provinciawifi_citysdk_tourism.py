@@ -1,5 +1,7 @@
-from .ProvinciaWifi import ProvinciaWifi
-from .CitySdkTourism import CitySdkTourismMixin
+from __future__ import absolute_import
+
+from .provinciawifi import ProvinciaWifi
+from .citysdk_tourism import CitySdkTourismMixin
 
 
 class ProvinciaWifiCitySdkTourism(CitySdkTourismMixin, ProvinciaWifi):

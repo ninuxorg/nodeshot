@@ -1,5 +1,7 @@
-from nodeshot.interoperability.synchronizers.GeoJson import GeoJson
-from .CitySdkTourism import CitySdkTourismMixin
+from __future__ import absolute_import
+
+from nodeshot.interoperability.synchronizers import GeoJson
+from .citysdk_tourism import CitySdkTourismMixin
 
 
 class GeoJsonCitySdkTourism(CitySdkTourismMixin, GeoJson):

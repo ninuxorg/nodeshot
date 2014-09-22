@@ -1,5 +1,7 @@
-from nodeshot.interoperability.synchronizers.OpenWisp import OpenWisp
-from .CitySdkTourism import CitySdkTourismMixin
+from __future__ import absolute_import
+
+from nodeshot.interoperability.synchronizers import OpenWisp
+from .citysdk_tourism import CitySdkTourismMixin
 
 
 class OpenWispCitySdkTourism(CitySdkTourismMixin, OpenWisp):
