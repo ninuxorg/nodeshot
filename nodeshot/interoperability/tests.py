@@ -141,6 +141,60 @@ class InteroperabilityTest(TestCase):
         with self.assertRaises(ValidationError):
             external.clean()
 
+    def test_admin_synchronize_action(self):
+        layer = Layer.objects.external()[0]
+        layer.minimum_distance = 0
+        layer.area = None
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+
+        url = '%s/geojson1.json' % TEST_FILES_PATH
+
+        external = LayerExternal(layer=layer)
+        external.interoperability = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.config = '{ "url": "%s", "map": {} }' % url
+        external.full_clean()
+        external.save()
+
+        from django.http.request import HttpRequest
+        from django.contrib.admin.sites import AdminSite
+        from nodeshot.interoperability.admin import LayerAdmin
+
+        admin = LayerAdmin(Layer, AdminSite())
+        request = HttpRequest()
+
+        # expect no output because trying to synchronize non-external layers
+        output = capture_output(
+            admin.synchronize_action,
+            [request, Layer.objects.filter(is_external=False)]
+        )
+
+        self.assertEqual(output, '')
+
+        # expect no output because trying to synchronize a single non-external layer
+        output = capture_output(
+            admin.synchronize_action,
+            [request, Layer.objects.filter(is_external=False)[0:1]]
+        )
+
+        self.assertEqual(output, '')
+
+        # expects output
+        output = capture_output(
+            admin.synchronize_action,
+            [request, Layer.objects.filter(pk=layer.pk)]
+        )
+
+        # ensure following text is in output
+        self.assertIn('2 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('2 total external', output)
+        self.assertIn('2 total local', output)
+
+        # ensure all nodes have been imported
+        self.assertEqual(layer.node_set.count(), 2)
+
     def test_openwisp(self):
         """ test OpenWisp synchronizer """
         layer = Layer.objects.external()[0]
@@ -430,11 +484,8 @@ class InteroperabilityTest(TestCase):
         self.assertIn('2 total external', output)
         self.assertIn('2 total local', output)
 
-        # start checking DB too
-        nodes = layer.node_set.all()
-
         # ensure all nodes have been imported
-        self.assertEqual(nodes.count(), 2)
+        self.assertEqual(layer.node_set.count(), 2)
 
         # check one particular node has the data we expect it to have
         node = Node.objects.get(slug='simplegeojson')
