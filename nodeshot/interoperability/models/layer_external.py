@@ -23,7 +23,6 @@ class LayerExternal(models.Model):
     synchronizer_path = models.CharField(_('synchronizer'), max_length=128, choices=SYNCHRONIZERS, default=False)
     config = models.TextField(_('configuration'), blank=True,
                               help_text=_('JSON format, will be parsed by the interoperability class to retrieve config keys'))
-    map = models.URLField(_('map URL'), blank=True)
 
     # will hold an instance of the synchronizer class
     _synchronizer = None
