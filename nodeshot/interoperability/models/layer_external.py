@@ -1,9 +1,9 @@
-from importlib import import_module
 import simplejson as json
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.utils.module_loading import import_by_path
 
 from ..settings import SYNCHRONIZERS
 
@@ -119,11 +119,7 @@ class LayerExternal(models.Model):
             self._synchronizer_class = None
 
         if not self._synchronizer_class:
-            synchronizer_module = import_module(self.interoperability)
-            # retrieve class name (split and get last piece)
-            class_name = self.interoperability.split('.')[-1]
-            # retrieve class
-            self._synchronizer_class = getattr(synchronizer_module, class_name)
+            self._synchronizer_class = import_by_path(self.interoperability)
 
         return self._synchronizer_class
 
