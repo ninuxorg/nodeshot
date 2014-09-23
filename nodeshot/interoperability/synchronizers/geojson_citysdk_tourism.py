@@ -8,7 +8,6 @@ class GeoJsonCitySdkTourism(CitySdkTourismMixin, GeoJson):
     """ Import GeoJson and sync CitySDK tourism API """
     REQUIRED_CONFIG_KEYS = [
         'url',
-        'map',
         'citysdk_url',
         'citysdk_category',
         'citysdk_type',

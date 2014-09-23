@@ -8,7 +8,7 @@ class GeoRss(XMLParserMixin, GenericGisSynchronizer):
     """ Generic GeoRSS (simple version only) synchronizer """
 
     def key_mapping(self, ):
-        key_map = self.config.get('map', {})
+        key_map = self.field_mapping
 
         if 'summary' in self.data:
             description_default_key = 'summary'

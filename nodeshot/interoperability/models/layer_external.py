@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.utils.module_loading import import_by_path
 
+from django_hstore.fields import DictionaryField
+
 from ..settings import SYNCHRONIZERS
 
 
@@ -23,6 +25,10 @@ class LayerExternal(models.Model):
     synchronizer_path = models.CharField(_('synchronizer'), max_length=128, choices=SYNCHRONIZERS, default=False)
     config = models.TextField(_('configuration'), blank=True,
                               help_text=_('JSON format, will be parsed by the interoperability class to retrieve config keys'))
+    field_mapping = DictionaryField(_('field mapping'),
+                                    blank=True,
+                                    null=True,
+                                    help_text=_('Map nodeshot field names to the field names used by the external application'))
 
     # will hold an instance of the synchronizer class
     _synchronizer = None

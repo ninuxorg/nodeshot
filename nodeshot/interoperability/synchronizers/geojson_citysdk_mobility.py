@@ -9,7 +9,6 @@ class GeoJsonCitySdkMobility(CitySdkMobilityMixin, GeoJson):
 
     REQUIRED_CONFIG_KEYS = [
         'url',
-        'map',
         'citysdk_url',
         'citysdk_layer',
         'citysdk_username',

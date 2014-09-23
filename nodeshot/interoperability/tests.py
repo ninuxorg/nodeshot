@@ -156,7 +156,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
-        external.config = '{ "url": "%s", "map": {} }' % url
+        external.config = '{ "url": "%s" }' % url
         external.full_clean()
         external.save()
 
@@ -471,7 +471,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
-        external.config = '{ "url": "%s", "map": {} }' % url
+        external.config = '{ "url": "%s" }' % url
         external.full_clean()
         external.save()
 
@@ -516,7 +516,7 @@ class InteroperabilityTest(TestCase):
         ### --- repeat with slightly different input --- ###
 
         url = '%s/geojson2.json' % TEST_FILES_PATH
-        external.config = '{ "url": "%s", "map": {} }' % url
+        external.config = '{ "url": "%s" }' % url
         external.full_clean()
         external.save()
 
@@ -551,7 +551,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
-        external.config = '{ "url": "%s", "map": {} }' % url
+        external.config = '{ "url": "%s" }' % url
         external.full_clean()
         external.save()
 
@@ -585,15 +585,13 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
-        external.config = json.dumps({
-            "url": url,
-            "map": {
-                "name": "nome",
-                "description": "descrizione",
-                "address": "indirizzo",
-                "elevation": "altitudine"
-            }
-        })
+        external.config = json.dumps({ "url": url })
+        external.field_mapping = {
+            "name": "nome",
+            "description": "descrizione",
+            "address": "indirizzo",
+            "elevation": "altitudine"
+        }
         external.full_clean()
         external.save()
 
@@ -634,7 +632,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoRss'
-        external.config = '{ "url": "%s", "map": {} }' % url
+        external.config = '{ "url": "%s" }' % url
         external.full_clean()
         external.save()
 
@@ -692,7 +690,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoRss'
-        external.config = '{ "url": "%s", "map": {} }' % url
+        external.config = '{ "url": "%s" }' % url
         external.full_clean()
         external.save()
 
@@ -1021,8 +1019,7 @@ class InteroperabilityTest(TestCase):
             config.update({
                 "status": "active",
                 "url": url,
-                "verify_SSL": False,
-                "map": {}
+                "verify_SSL": False
             })
             external.config = json.dumps(config)
             external.full_clean()
@@ -1121,8 +1118,7 @@ class InteroperabilityTest(TestCase):
             config.update({
                 "status": "active",
                 "url": xml_url,
-                "verify_SSL": False,
-                "map": {}
+                "verify_SSL": False
             })
             external.config = json.dumps(config)
             external.full_clean()
@@ -1207,7 +1203,6 @@ class InteroperabilityTest(TestCase):
             config.update({
                 "url": url,
                 "verify_SSL": False,
-                "map": {}
             })
             external.config = json.dumps(config)
             external.full_clean()
@@ -1307,8 +1302,7 @@ class InteroperabilityTest(TestCase):
             config.update({
                 "status": "active",
                 "url": xml_url,
-                "verify_SSL": False,
-                "map": {}
+                "verify_SSL": False
             })
             external.config = json.dumps(config)
             external.full_clean()

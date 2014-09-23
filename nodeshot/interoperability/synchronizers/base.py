@@ -176,9 +176,12 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
     """
 
     REQUIRED_CONFIG_KEYS = [
-        'url',
-        'map',
+        'url'
     ]
+
+    def __init__(self, layer, *args, **kwargs):
+        super(GenericGisSynchronizer, self).__init__(layer, *args, **kwargs)
+        self.field_mapping = layer.external.field_mapping
 
     def parse_item(self, item):
         """
@@ -198,7 +201,6 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             "notes": "string or empty string",
             "added", "string date representation",
             "updated", "string date representation",
-            "data": {}  # dictionary with additional key/values or empty dict
         }
         """
         raise NotImplementedError("Not Implemented")
@@ -285,8 +287,8 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
 
         return result
 
-    def key_mapping(self, ):
-        key_map = self.config.get('map', {})
+    def key_mapping(self):
+        key_map = self.field_mapping
         self.keys = {
             "name": key_map.get('name', 'name'),
             "status": key_map.get('status', 'status'),

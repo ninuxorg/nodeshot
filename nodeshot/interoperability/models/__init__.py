@@ -2,6 +2,7 @@ from nodeshot.core.base.utils import check_dependencies
 
 check_dependencies(
     dependencies=[
+        'django_hstore',
         'nodeshot.core.layers',
         'nodeshot.core.nodes',
     ],
