@@ -67,7 +67,7 @@ class CitySdkMobilityMixin(object):
         try:
             response = requests.get(
                 authentication_url,
-                verify=self.config.get('verify_SSL', True)
+                verify=self.verify_ssl
             )
         except Exception as e:
             message = 'API Authentication Error: "%s"' % e
@@ -92,7 +92,7 @@ class CitySdkMobilityMixin(object):
         release_url = '%srelease_session' % self.citysdk_url
         response = requests.get(
             release_url,
-            verify=self.config.get('verify_SSL', True),
+            verify=self.verify_ssl,
             headers={ 'Content-type': 'application/json', 'X-Auth': session }
         )
 
@@ -103,7 +103,6 @@ class CitySdkMobilityMixin(object):
 
     def convert_format(self, node, create_type="create"):
         """ Prepares the JSON that will be sent to the CitySDK API """
-
         data = node.data or {}
 
         if node.status: data['status'] = node.status.slug
@@ -146,7 +145,7 @@ class CitySdkMobilityMixin(object):
         response = requests.put(
             citysdk_api_url,
             data=json.dumps(citysdk_record),
-            verify=self.config.get('verify_SSL', True),
+            verify=self.verify_ssl,
             headers={ 'Content-type': 'application/json', 'X-Auth': session }
         )
 
@@ -188,7 +187,7 @@ class CitySdkMobilityMixin(object):
         response = requests.put(
             citysdk_api_url,
             data=json.dumps(citysdk_record),
-            verify=self.config.get('verify_SSL', True),
+            verify=self.verify_ssl,
             headers={ 'Content-type': 'application/json', 'X-Auth': session }
         )
 
@@ -224,7 +223,7 @@ class CitySdkMobilityMixin(object):
         response = requests.delete(
             citysdk_api_url,
             params={ 'delete_node': True },
-            verify=self.config.get('verify_SSL', True),
+            verify=self.verify_ssl,
             headers={ 'Content-type': 'application/json', 'X-Auth': session }
         )
 

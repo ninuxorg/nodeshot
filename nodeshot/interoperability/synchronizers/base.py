@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import requests
-import simplejson as json
 from xml.dom import minidom
 from dateutil import parser as DateParser
 
@@ -19,7 +18,6 @@ __all__ = [
     'BaseSynchronizer',
     'XmlSynchronizer',
     'GenericGisSynchronizer',
-
     # mixins
     'HttpRetrieverMixin',
     'XMLParserMixin',
@@ -47,14 +45,18 @@ class BaseSynchronizer(object):
         """
         self.layer = layer
         self.verbosity = kwargs.get('verbosity', 1)
-        self.config = json.loads(layer.external.config)
+        self.load_config()
+
+    def load_config(self, config=None):
+        self.config = config or self.layer.external.config
+        self.verify_ssl = self.config.get('verify_ssl', 'true') == 'true'
 
     def validate(self):
         """ External Layer config validation, must be called before saving the external layer instance """
         for field in self.REQUIRED_CONFIG_KEYS:
             if not self.config.get(field, False):
                 raise ImproperlyConfigured('Required %s parameter missing from configuration' % field)
-
+        # call clean method
         self.clean()
 
     def clean(self):
@@ -135,10 +137,9 @@ class HttpRetrieverMixin(object):
         """ retrieve data from an HTTP URL """
         # shortcuts for readability
         url = self.config.get('url')
-        verify_SSL = self.config.get('verify_SSL', True)
 
         # do HTTP request and store content
-        self.data = requests.get(url, verify=verify_SSL).content
+        self.data = requests.get(url, verify=self.verify_ssl).content
 
 
 class XMLParserMixin(object):

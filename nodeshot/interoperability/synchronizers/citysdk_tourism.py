@@ -66,8 +66,7 @@ class CitySdkTourismMixin(object):
         self.authenticate(force_http_request=True)
         # store cookies in a string
         self._persisted_cookies = self.cookies
-        # save config
-        self.layer.external.config = json.dumps(self.config, indent=4, sort_keys=True)
+        self.layer.external.config = self.config
         self.layer.external.save(after_save=False)
 
     def after_complete(self, *args, **kwargs):
@@ -114,7 +113,7 @@ class CitySdkTourismMixin(object):
         self._init_config()
 
         if layer_config:
-            self.config = json.loads(layer_config)
+            self.config = layer_config
 
         citysdk_category_id = self.config.get('citysdk_category_id', False)
         response = requests.get(self.citysdk_categories_url, cookies=self.cookies)
@@ -186,7 +185,7 @@ class CitySdkTourismMixin(object):
 
             # now store ID in the database both in case category has been created or not
             self.config['citysdk_category_id'] = citysdk_category_id
-            self.layer.external.config = json.dumps(self.config, indent=4, sort_keys=True)
+            self.layer.external.config = self.config
             self.layer.external.save()
             # verbose output
             message = 'category with ID "%s" has been stored in config' % citysdk_category_id

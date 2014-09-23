@@ -194,7 +194,7 @@ class OpenLabor(BaseSynchronizer):
             try:
                 response = requests.get(
                     self.get_url,
-                    verify=self.config.get('verify_SSL', True)
+                    verify=self.verify_ssl
                 )
             except requests.exceptions.ConnectionError as e:
                 return {

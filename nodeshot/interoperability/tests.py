@@ -59,7 +59,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'None'
-        external.config = ''
+        external.config = {}
         external.full_clean()
         external.save()
 
@@ -119,7 +119,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
-        external.config = '{ "layer_url": "http://test.com/" }'
+        external.config = { "layer_url": "http://test.com/" }
         external.save()
 
         response = self.client.get(url)
@@ -139,7 +139,7 @@ class InteroperabilityTest(TestCase):
         layer = Layer.objects.get(pk=layer.pk)
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWisp'
-        external.config = '{ "WRONG_parameter_name": "foo" }'
+        external.config = { "WRONG_parameter_name": "foo" }
 
         with self.assertRaises(ValidationError):
             external.clean()
@@ -156,7 +156,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
-        external.config = '{ "url": "%s" }' % url
+        external.config = { "url": url }
         external.full_clean()
         external.save()
 
@@ -211,7 +211,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWisp'
-        external.config = '{ "url": "%s" }' % xml_url
+        external.config = { "url": xml_url }
         external.save()
 
         output = capture_output(
@@ -244,7 +244,7 @@ class InteroperabilityTest(TestCase):
         ### --- with the following step we expect some nodes to be deleted --- ###
 
         xml_url = '%s/openwisp-georss2.xml' % TEST_FILES_PATH
-        external.config = '{ "url": "%s" }' % xml_url
+        external.config = { "url": xml_url }
         external.save()
 
         output = capture_output(
@@ -285,7 +285,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifi'
-        external.config = '{ "url": "%s" }' % xml_url
+        external.config = { "url": xml_url }
         external.save()
 
         output = capture_output(
@@ -322,7 +322,7 @@ class InteroperabilityTest(TestCase):
         ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
 
         xml_url = '%s/provincia-wifi2.xml' % TEST_FILES_PATH
-        external.config = '{ "url": "%s" }' % xml_url
+        external.config = { "url": xml_url }
         external.save()
 
         output = capture_output(
@@ -364,11 +364,11 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinceRomeTraffic'
-        external.config = json.dumps({
+        external.config = {
             "streets_url": streets_url,
             "measurements_url": measurements_url,
             "check_streets_every_n_days": 2
-        }, indent=4, sort_keys=True)
+        }
         external.save()
 
         output = capture_output(
@@ -405,7 +405,6 @@ class InteroperabilityTest(TestCase):
 
         # ensure last_time_streets_checked is today
         layer = Layer.objects.get(pk=layer.id)
-        layer.external.config = json.loads(layer.external.config)
         self.assertEqual(layer.external.config['last_time_streets_checked'], str(date.today()))
 
         ### --- not much should happen --- ###
@@ -421,7 +420,6 @@ class InteroperabilityTest(TestCase):
 
         # set last_time_streets_checked to 6 days ago
         layer.external.config['last_time_streets_checked'] = str(date.today() - timedelta(days=6))
-        layer.external.config = json.dumps(layer.external.config, indent=4, sort_keys=True)
         layer.external.save()
 
         ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
@@ -429,10 +427,8 @@ class InteroperabilityTest(TestCase):
         streets_url = '%s/citysdk-wp4-streets2.json' % TEST_FILES_PATH
         measurements_url = '%s/citysdk-wp4-measurements2.json' % TEST_FILES_PATH
 
-        external.config = json.loads(external.config)
         external.config['streets_url'] = streets_url
         external.config['measurements_url'] = measurements_url
-        external.config = json.dumps(external.config, indent=4, sort_keys=True)
         external.save()
 
         output = capture_output(
@@ -455,7 +451,6 @@ class InteroperabilityTest(TestCase):
 
         # ensure last_time_streets_checked is today
         layer = Layer.objects.get(pk=layer.id)
-        layer.external.config = json.loads(layer.external.config)
         self.assertEqual(layer.external.config['last_time_streets_checked'], str(date.today()))
 
     def test_geojson_sync(self):
@@ -471,7 +466,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
-        external.config = '{ "url": "%s" }' % url
+        external.config = { "url": url }
         external.full_clean()
         external.save()
 
@@ -516,7 +511,7 @@ class InteroperabilityTest(TestCase):
         ### --- repeat with slightly different input --- ###
 
         url = '%s/geojson2.json' % TEST_FILES_PATH
-        external.config = '{ "url": "%s" }' % url
+        external.config = { "url": url }
         external.full_clean()
         external.save()
 
@@ -551,7 +546,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
-        external.config = '{ "url": "%s" }' % url
+        external.config = { "url": url }
         external.full_clean()
         external.save()
 
@@ -585,7 +580,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
-        external.config = json.dumps({ "url": url })
+        external.config = { "url": url }
         external.field_mapping = {
             "name": "nome",
             "description": "descrizione",
@@ -632,7 +627,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoRss'
-        external.config = '{ "url": "%s" }' % url
+        external.config = { "url": url }
         external.full_clean()
         external.save()
 
@@ -690,7 +685,7 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoRss'
-        external.config = '{ "url": "%s" }' % url
+        external.config = { "url": url }
         external.full_clean()
         external.save()
 
@@ -745,13 +740,13 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenLabor'
-        external.config = json.dumps({
+        external.config = {
             "open311_url": '%s/' % TEST_FILES_PATH,
             "service_code_get": "001",
             "service_code_post": "002",
             "default_status": "active",
             "api_key": "DEVO1395445966"
-        })
+        }
         external.full_clean()
         external.save()
 
@@ -784,13 +779,13 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenLabor'
-        external.config = json.dumps({
+        external.config = {
             "open311_url": url,
             "service_code_get": "001",
             "service_code_post": "002",
             "default_status": "active",
             "api_key": "DEVO1395445966"
-        })
+        }
         external.full_clean()
         external.save()
 
@@ -822,10 +817,10 @@ class InteroperabilityTest(TestCase):
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
-        external.config = json.dumps({
+        external.config = {
             "layer_url": "https://test.map.ninux.org/api/v1/layers/sicilia/",
             "verify_ssl": False
-        })
+        }
         external.full_clean()
         external.save()
 
@@ -903,10 +898,10 @@ class InteroperabilityTest(TestCase):
             'https://test.map.ninux.org/api/v1/layers/'
         ]:
             external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
-            external.config = json.dumps({
+            external.config = {
                 "layer_url": layer_url,
                 "verify_ssl": False
-            })
+            }
             external.full_clean()
             external.save()
 
@@ -935,13 +930,12 @@ class InteroperabilityTest(TestCase):
 
             external = LayerExternal(layer=layer)
             external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWispCitySdkTourism'
-            config = CITYSDK_TOURISM_TEST_CONFIG.copy()
-            config.update({
+            external.config = CITYSDK_TOURISM_TEST_CONFIG.copy()
+            external.config.update({
                 "status": "active",
                 "url": xml_url,
-                "verify_SSL": False
+                "verify_ssl": False
             })
-            external.config = json.dumps(config)
             external.full_clean()
             external.save()
 
@@ -973,8 +967,7 @@ class InteroperabilityTest(TestCase):
             ### --- with the following step we expect some nodes to be deleted --- ###
 
             xml_url = '%s/openwisp-georss2.xml' % TEST_FILES_PATH
-            config['url'] = xml_url
-            external.config = json.dumps(config)
+            external.config['url'] = xml_url
             external.save()
 
             output = capture_output(
@@ -1015,13 +1008,12 @@ class InteroperabilityTest(TestCase):
 
             external = LayerExternal(layer=layer)
             external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkTourism'
-            config = CITYSDK_TOURISM_TEST_CONFIG.copy()
-            config.update({
+            external.config = CITYSDK_TOURISM_TEST_CONFIG.copy()
+            external.config.update({
                 "status": "active",
                 "url": url,
-                "verify_SSL": False
+                "verify_ssl": False
             })
-            external.config = json.dumps(config)
             external.full_clean()
             external.save()
 
@@ -1071,9 +1063,7 @@ class InteroperabilityTest(TestCase):
             ### --- repeat with slightly different input --- ###
 
             url = '%s/geojson4.json' % TEST_FILES_PATH
-            config = json.loads(external.config)
-            config['url'] = url
-            external.config = json.dumps(config)
+            external.config['url'] = url
             external.save()
 
             output = capture_output(
@@ -1114,13 +1104,12 @@ class InteroperabilityTest(TestCase):
 
             external = LayerExternal(layer=layer)
             external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkTourism'
-            config = CITYSDK_TOURISM_TEST_CONFIG.copy()
-            config.update({
+            external.config = CITYSDK_TOURISM_TEST_CONFIG.copy()
+            external.config.update({
                 "status": "active",
                 "url": xml_url,
-                "verify_SSL": False
+                "verify_ssl": False
             })
-            external.config = json.dumps(config)
             external.full_clean()
             external.save()
 
@@ -1152,8 +1141,7 @@ class InteroperabilityTest(TestCase):
 
             ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
 
-            config['url'] = '%s/provincia-wifi2.xml' % TEST_FILES_PATH
-            external.config = json.dumps(config)
+            external.config['url'] = '%s/provincia-wifi2.xml' % TEST_FILES_PATH
             external.save()
 
             output = capture_output(
@@ -1199,12 +1187,11 @@ class InteroperabilityTest(TestCase):
 
             external = LayerExternal(layer=layer)
             external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkMobility'
-            config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
-            config.update({
+            external.config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
+            external.config.update({
                 "url": url,
-                "verify_SSL": False,
+                "verify_ssl": False,
             })
-            external.config = json.dumps(config)
             external.full_clean()
             external.save()
 
@@ -1255,9 +1242,7 @@ class InteroperabilityTest(TestCase):
             ### --- repeat with slightly different input --- ###
 
             url = '%s/geojson4.json' % TEST_FILES_PATH
-            config = json.loads(external.config)
-            config['url'] = url
-            external.config = json.dumps(config)
+            external.config['url'] = url
             external.save()
 
             output = capture_output(
@@ -1298,13 +1283,12 @@ class InteroperabilityTest(TestCase):
 
             external = LayerExternal(layer=layer)
             external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkMobility'
-            config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
-            config.update({
+            external.config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
+            external.config.update({
                 "status": "active",
                 "url": xml_url,
-                "verify_SSL": False
+                "verify_ssl": False
             })
-            external.config = json.dumps(config)
             external.full_clean()
             external.save()
 
@@ -1336,8 +1320,7 @@ class InteroperabilityTest(TestCase):
 
             ### --- with the following step we expect some nodes to be deleted and some to be added --- ###
 
-            config['url'] = '%s/provincia-wifi2.xml' % TEST_FILES_PATH
-            external.config = json.dumps(config)
+            external.config['url'] = '%s/provincia-wifi2.xml' % TEST_FILES_PATH
             external.save()
 
             output = capture_output(

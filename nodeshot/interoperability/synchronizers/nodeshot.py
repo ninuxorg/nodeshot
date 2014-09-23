@@ -27,7 +27,6 @@ class NodeshotMixin(object):
 
     def get_nodes(self, class_name, params):
         prefix = self.config['layer_url']
-        verify_ssl = self.config['verify_ssl']
 
         is_geojson = 'geojson' in class_name.lower()
 
@@ -36,7 +35,7 @@ class NodeshotMixin(object):
         url = '%s%s' % (prefix, suffix)
 
         try:
-            response = requests.get(url, params=params, verify=verify_ssl)
+            response = requests.get(url, params=params, verify=self.verify_ssl)
         except RequestException as e:
             return {
                 'error': _('external layer not reachable'),

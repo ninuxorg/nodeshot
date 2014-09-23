@@ -28,21 +28,19 @@ class ProvinceRomeTraffic(BaseSynchronizer):
         check_streets_every_n_days = int(self.config.get('check_streets_every_n_days', 2))
         last_time_streets_checked = self.config.get('last_time_streets_checked', None)
         measurements_url = self.config.get('measurements_url')
-        verify_SSL = self.config.get('verify_SSL', True)
 
         # do HTTP request and store content
-        self.measurements = requests.get(measurements_url, verify=verify_SSL).content
+        self.measurements = requests.get(measurements_url, verify=self.verify_ssl).content
 
         try:
-            last_time_streets_checked = datetime.strptime(last_time_streets_checked,
-                                                          '%Y-%m-%d').date()
+            last_time_streets_checked = datetime.strptime(last_time_streets_checked, '%Y-%m-%d').date()
         except TypeError:
             pass
 
         # if last time checked more than days specified
         if last_time_streets_checked is None or last_time_streets_checked < date.today() - timedelta(days=check_streets_every_n_days):
             # get huge streets file
-            self.streets = requests.get(streets_url, verify=verify_SSL).content
+            self.streets = requests.get(streets_url, verify=self.verify_ssl).content
         else:
             self.streets = False
 
@@ -205,7 +203,7 @@ class ProvinceRomeTraffic(BaseSynchronizer):
                 self.verbose('node "%s" deleted' % node_name)
 
         self.config['last_time_streets_checked'] = str(date.today())
-        self.layer.external.config = json.dumps(self.config, indent=4, sort_keys=True)
+        self.layer.external.config = self.config
         self.layer.external.save()
 
         # message that will be returned

@@ -23,8 +23,10 @@ class LayerExternal(models.Model):
     """
     layer = models.OneToOneField('layers.Layer', verbose_name=_('layer'), parent_link=True, related_name='external')
     synchronizer_path = models.CharField(_('synchronizer'), max_length=128, choices=SYNCHRONIZERS, default=False)
-    config = models.TextField(_('configuration'), blank=True,
-                              help_text=_('JSON format, will be parsed by the interoperability class to retrieve config keys'))
+    config = DictionaryField(_('configuration'),
+                             blank=True,
+                             null=True,
+                             help_text=_('Synchronizer specific configuration (eg: API URL, auth info, ecc)'))
     field_mapping = DictionaryField(_('field mapping'),
                                     blank=True,
                                     null=True,
@@ -69,22 +71,13 @@ class LayerExternal(models.Model):
             raise ValidationError(_('Please specify the necessary configuration for the interoperation'))
         # configuration needs to be valid JSON
         if self.synchronizer_path != 'None' and self.config:
-            # convert ' to "
-            self.config = self.config.replace("'", '"')
-            # ensure valid JSON
-            try:
-                config = json.loads(self.config)
-            except json.decoder.JSONDecodeError:
-                raise ValidationError(_('The specified configuration is not valid JSON'))
-            # ensure good indentation
-            self.config = json.dumps(config, indent=4, sort_keys=True)
             # ensure REQUIRED_CONFIG_KEYS are filled
             for key in self.synchronizer_class.REQUIRED_CONFIG_KEYS:
-                if key not in config:
+                if key not in self.config:
                     raise ValidationError(_('Required config key "%s" missing from external layer configuration' % key))
             # validate synchronizer config
             try:
-                self.synchronizer.config = config
+                self.synchronizer.load_config(self.config)
                 self.synchronizer.clean()
             except ImproperlyConfigured as e:
                 raise ValidationError(e.message)
