@@ -92,18 +92,18 @@ GITHUB_API_SECRET = ''
 #
 #CELERYBEAT_SCHEDULE = {
 #    'synchronize': {
-#        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
+#        'task': 'nodeshot.interop.sync.tasks.synchronize_external_layers',
 #        'schedule': timedelta(hours=12),
 #    },
 #    # example of how to synchronize one of the layers with a different periodicity
 #    'synchronize': {
-#        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
+#        'task': 'nodeshot.interop.sync.tasks.synchronize_external_layers',
 #        'schedule': timedelta(minutes=30),
 #        'args': ('layer_slug',)
 #    },
 #    # example of how to synchronize all layers except two layers
 #    'synchronize': {
-#        'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
+#        'task': 'nodeshot.interop.sync.tasks.synchronize_external_layers',
 #        'schedule': timedelta(hours=12),
 #        'kwargs': { 'exclude': 'layer1-slug,layer2-slug' }
 #    }

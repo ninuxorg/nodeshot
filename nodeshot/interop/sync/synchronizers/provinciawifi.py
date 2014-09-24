@@ -6,11 +6,11 @@ from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.conf import settings
 
 from nodeshot.core.nodes.models import Node, Status
-from nodeshot.interoperability.synchronizers.base import XmlSynchronizer
+from nodeshot.interop.sync.synchronizers.base import XmlSynchronizer
 
 
 class ProvinciaWifi(XmlSynchronizer):
-    """ ProvinciaWifi interoperability class """
+    """ ProvinciaWifi synchronizer class """
 
     def save(self):
         """ synchronize DB """

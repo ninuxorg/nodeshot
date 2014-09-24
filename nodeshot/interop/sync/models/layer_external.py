@@ -37,7 +37,7 @@ class LayerExternal(models.Model):
     _synchronizer_class = None
 
     class Meta:
-        app_label = 'interoperability'
+        app_label = 'sync'
         db_table = 'layers_external'
         verbose_name = _('external layer')
         verbose_name_plural = _('external layer info')
@@ -61,7 +61,7 @@ class LayerExternal(models.Model):
     def clean(self, *args, **kwargs):
         """
         Custom Validation:
-            * must specify config if interoperability class is not none
+            * must specify config if synchronizer_path is not 'None'
             * indent json config nicely
             * validate any synchronizer.REQUIRED_CONFIG_KEYS
             * call synchronizer clean method for any third party validation

@@ -100,12 +100,12 @@ class Command(BaseCommand):
             try:
                 synchronizer_path = layer.external.synchronizer_path
             except (ObjectDoesNotExist, AttributeError):
-                self.stdout.write('External Layer %s does not have an interoperability class specified\n\r' % layer.name)
+                self.stdout.write('External Layer %s does not have a synchronizer class specified\n\r' % layer.name)
                 continue
 
             # if no synchronizer_path jump to next layer
             if synchronizer_path == 'None':
-                self.stdout.write('External Layer %s does not have an interoperability class specified\n\r' % layer.name)
+                self.stdout.write('External Layer %s does not have a synchronizer class specified\n\r' % layer.name)
                 continue
 
             if layer.external.config is None:

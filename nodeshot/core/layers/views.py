@@ -95,7 +95,7 @@ class LayerNodesList(ListSerializerMixin, NodeList):
         return super(LayerNodesList, self).get_queryset().filter(layer_id=self.layer.id)
 
     def get_nodes(self, request, *args, **kwargs):
-        """ this method might be overridden by other modules (eg: interoperability) """
+        """ this method might be overridden by other modules (eg: nodeshot.interop.sync) """
         # ListSerializerMixin.list returns a serializer object
         return (self.list(request, *args, **kwargs)).data
 

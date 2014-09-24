@@ -6,7 +6,7 @@ check_dependencies(
         'nodeshot.core.layers',
         'nodeshot.core.nodes',
     ],
-    module='nodeshot.interoperability'
+    module='nodeshot.interop.sync'
 )
 
 

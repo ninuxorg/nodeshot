@@ -1,17 +1,16 @@
-****************
-Interoperability
-****************
+*************
+Synchronizers
+*************
 
-Nodeshot has a built mechanism named "interoperability", which is basically an
-abstraction layer between nodeshot and other third party applications which have
-similarities in common (georeferenced data).
+``nodeshot.interop.sync`` is a django-app that enables nodeshot to build an
+abstraction layer between itself and other third party web-applications which deal with georeferenced data.
 
-There are mainly four strategies through which we can achieve interoperability:
+There are mainly four strategies through which we can achieve interoperability with third party web apps:
 
- * **periodic synchronization**: data is synchronized periodically (which means it is saved in the database) by a background job
- * **event driven synchronization**: data is synchronized whenever local data is added, changed or deleted
+ * **periodic synchronization**: data is imported periodically into the local database by a background job which reads an external source
+ * **event driven synchronization**: data is exported to a third party API whenever local data is added, changed or deleted
  * **RESTful translator**: data is retrieved on the fly and converted to json/geojson, no data is saved in the database
- * **mixed**: custom synchronizers might implement a mixed behaviour
+ * **mixed**: custom synchronizers might implement mixed strategies
 
 These strategies are implemented through **"Synchronizers"**.
 
@@ -21,11 +20,11 @@ New synchronizers can be written ad-hoc for each application that need to be sup
 Internal dependencies
 =====================
 
-For the **interoperability** module to work, the following apps must be listed in ``settings.INSTALLED_APPS``:
+To enable this feature, the following apps must be listed in ``settings.INSTALLED_APPS``:
 
  * nodeshot.core.layers
  * nodeshot.core.nodes
- * nodeshot.interoperability
+ * nodeshot.interop.sync
 
 By default these three apps are installed.
 
@@ -33,7 +32,7 @@ By default these three apps are installed.
 Required settings
 =================
 
-The module ``nodeshot.interoperability`` is activated by default in ``nodeshot.conf.settings.INSTALLED_APPS``.
+The module ``nodeshot.interop.sync`` is activated by default in ``nodeshot.conf.settings.INSTALLED_APPS``.
 
 For periodic synchronization ``CELERYBEAT_SCHEDULE`` must be uncommented in your ``settings.py``::
 
@@ -41,7 +40,7 @@ For periodic synchronization ``CELERYBEAT_SCHEDULE`` must be uncommented in your
 
     CELERYBEAT_SCHEDULE.update({
         'synchronize': {
-            'task': 'nodeshot.interoperability.tasks.synchronize_external_layers',
+            'task': 'nodeshot.interop.sync.tasks.synchronize_external_layers',
             'schedule': timedelta(hours=12),
         },
         # ... other tasks ...
@@ -56,7 +55,7 @@ Layer configuration
 Interoperability is configured at layer level in the admin interface.
 
 A layer must be flagged as **"external"** and can be configured by editing the
-field **config**, which is a JSON representation of the configuration keys.
+its **config** and **field_mapping**.
 
 Each synchronizer has different required configuration keys.
 
@@ -109,7 +108,7 @@ in ``/nodeshot/interoperability/synchronizers/base.py``:
 
 .. code-block:: python
 
-    from nodeshot.interoperability.synchronizer.base import GenericGisSynchronizer
+    from nodeshot.interop.sync.synchronizer.base import GenericGisSynchronizer
 
     class MyVeryCoolApp(GenericGisSynchronizer):
         """ Synchronizer for my MyVeryCoolApp """
@@ -120,7 +119,7 @@ in ``/nodeshot/interoperability/synchronizers/base.py``:
 
 Once the file is saved and you are sure it's on your pythonpath you have to add a
 tuple in ``settings.NODESHOT_SYNCHRONIZERS`` in which the first element is the path to the file and
-the second element is the name you want to show in the admin interface in the list *"synchronizer_class"*:
+the second element is the name you want to show in the admin interface in the *"Synchronizer"* select:
 
 .. code-block:: python
 

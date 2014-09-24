@@ -1,19 +1,26 @@
 from __future__ import absolute_import
 
-from nodeshot.interoperability.synchronizers import OpenWisp
+from nodeshot.interop.sync.synchronizers import GeoJson
 from .citysdk_tourism import CitySdkTourismMixin
 
 
-class OpenWispCitySdkTourism(CitySdkTourismMixin, OpenWisp):
-    """
-    OpenWispCitySdkTourism interoperability class
-    Imports data from OpenWISP GeoRSS and then exports the data to the CitySDK database
-    """
+class GeoJsonCitySdkTourism(CitySdkTourismMixin, GeoJson):
+    """ Import GeoJson and sync CitySDK tourism API """
+    REQUIRED_CONFIG_KEYS = [
+        'url',
+        'citysdk_url',
+        'citysdk_category',
+        'citysdk_type',
+        'citysdk_username',
+        'citysdk_password',
+        'citysdk_lang',
+        'citysdk_term',
+    ]
 
     def convert_format(self, node):
         # determine description or fill some hopefully useful value
         if node.description.strip() == '':
-            description = '%s in %s' % (node.name, node.address)
+            description = node.name
         else:
             description = node.description
 
@@ -35,7 +42,7 @@ N:;%s;;;;
 ADR;INTL;PARCEL;WORK:;;%s;
 END:VCARD""" % (
                             node.name,
-                            node.address
+                            description
                         ),
                         "type": "text/vcard"
                     },

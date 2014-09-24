@@ -14,8 +14,8 @@ from rest_framework_gis import serializers as geoserializers
 from nodeshot.core.base.utils import now_after
 from nodeshot.core.nodes.models import Node, Status
 from nodeshot.core.nodes.serializers import NodeListSerializer
-from nodeshot.interoperability.models import NodeExternal
-from nodeshot.interoperability.synchronizers.base import BaseSynchronizer
+from nodeshot.interop.sync.models import NodeExternal
+from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer
 
 from celery.utils.log import get_logger
 logger = get_logger(__name__)

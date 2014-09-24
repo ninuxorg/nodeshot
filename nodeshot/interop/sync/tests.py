@@ -37,7 +37,7 @@ def capture_output(command, args=[], kwargs={}):
     return output.getvalue()
 
 
-class InteroperabilityTest(TestCase):
+class SyncTest(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -74,7 +74,7 @@ class InteroperabilityTest(TestCase):
         """ test not interoperable """
         output = capture_output(management.call_command, ('synchronize', 'vienna'))
         # ensure following text is in output
-        self.assertIn('does not have an interoperability class specified', output)
+        self.assertIn('does not have a synchronizer class specified', output)
 
     def test_management_command_exclude(self):
         """ test --exclude """
@@ -88,11 +88,11 @@ class InteroperabilityTest(TestCase):
     def test_celery_task(self):
         """ ensure celery task works as expected """
         output = capture_output(synchronize_external_layers.apply)
-        self.assertIn('does not have an interoperability class specified', output)
+        self.assertIn('does not have a synchronizer class specified', output)
 
     def test_celery_task_with_arg(self):
         output = capture_output(synchronize_external_layers.apply, [['vienna']])
-        self.assertIn('does not have an interoperability class specified', output)
+        self.assertIn('does not have a synchronizer class specified', output)
 
     def test_celery_task_with_exclude(self):
         output = capture_output(
@@ -118,7 +118,7 @@ class InteroperabilityTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Nodeshot'
         external.config = { "layer_url": "http://test.com/" }
         external.save()
 
@@ -138,7 +138,7 @@ class InteroperabilityTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWisp'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.OpenWisp'
         external.config = { "WRONG_parameter_name": "foo" }
 
         with self.assertRaises(ValidationError):
@@ -155,14 +155,14 @@ class InteroperabilityTest(TestCase):
         url = '%s/geojson1.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
         external.config = { "url": url }
         external.full_clean()
         external.save()
 
         from django.http.request import HttpRequest
         from django.contrib.admin.sites import AdminSite
-        from nodeshot.interoperability.admin import LayerAdmin
+        from nodeshot.interop.sync.admin import LayerAdmin
 
         admin = LayerAdmin(Layer, AdminSite())
         request = HttpRequest()
@@ -210,7 +210,7 @@ class InteroperabilityTest(TestCase):
         xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWisp'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.OpenWisp'
         external.config = { "url": xml_url }
         external.save()
 
@@ -284,7 +284,7 @@ class InteroperabilityTest(TestCase):
         xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifi'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.ProvinciaWifi'
         external.config = { "url": xml_url }
         external.save()
 
@@ -363,7 +363,7 @@ class InteroperabilityTest(TestCase):
         measurements_url = '%s/citysdk-wp4-measurements.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinceRomeTraffic'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.ProvinceRomeTraffic'
         external.config = {
             "streets_url": streets_url,
             "measurements_url": measurements_url,
@@ -465,7 +465,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/geojson1.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
         external.config = { "url": url }
         external.full_clean()
         external.save()
@@ -545,7 +545,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/geojson1.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
         external.config = { "url": url }
         external.full_clean()
         external.save()
@@ -579,7 +579,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/geojson3.json' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJson'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
         external.config = { "url": url }
         external.field_mapping = {
             "name": "nome",
@@ -626,7 +626,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/georss-simple.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoRss'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoRss'
         external.config = { "url": url }
         external.full_clean()
         external.save()
@@ -684,7 +684,7 @@ class InteroperabilityTest(TestCase):
         url = '%s/georss-w3c.xml' % TEST_FILES_PATH
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoRss'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoRss'
         external.config = { "url": url }
         external.full_clean()
         external.save()
@@ -739,7 +739,7 @@ class InteroperabilityTest(TestCase):
         layer = Layer.objects.get(pk=layer.pk)
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenLabor'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.OpenLabor'
         external.config = {
             "open311_url": '%s/' % TEST_FILES_PATH,
             "service_code_get": "001",
@@ -778,7 +778,7 @@ class InteroperabilityTest(TestCase):
         url = 'http://devopenlabor.lynxlab.com/api/v1'
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenLabor'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.OpenLabor'
         external.config = {
             "open311_url": url,
             "service_code_get": "001",
@@ -816,7 +816,7 @@ class InteroperabilityTest(TestCase):
         layer = Layer.objects.get(pk=layer.pk)
 
         external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Nodeshot'
         external.config = {
             "layer_url": "https://test.map.ninux.org/api/v1/layers/sicilia/",
             "verify_ssl": False
@@ -897,7 +897,7 @@ class InteroperabilityTest(TestCase):
             'http://idonotexi.st.com/hey',
             'https://test.map.ninux.org/api/v1/layers/'
         ]:
-            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.Nodeshot'
+            external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Nodeshot'
             external.config = {
                 "layer_url": layer_url,
                 "verify_ssl": False
@@ -929,7 +929,7 @@ class InteroperabilityTest(TestCase):
             xml_url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.OpenWispCitySdkTourism'
+            external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.OpenWispCitySdkTourism'
             external.config = CITYSDK_TOURISM_TEST_CONFIG.copy()
             external.config.update({
                 "status": "active",
@@ -1007,7 +1007,7 @@ class InteroperabilityTest(TestCase):
             url = '%s/geojson1.json' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkTourism'
+            external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJsonCitySdkTourism'
             external.config = CITYSDK_TOURISM_TEST_CONFIG.copy()
             external.config.update({
                 "status": "active",
@@ -1103,7 +1103,7 @@ class InteroperabilityTest(TestCase):
             xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkTourism'
+            external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.ProvinciaWifiCitySdkTourism'
             external.config = CITYSDK_TOURISM_TEST_CONFIG.copy()
             external.config.update({
                 "status": "active",
@@ -1186,7 +1186,7 @@ class InteroperabilityTest(TestCase):
             url = '%s/geojson1.json' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.GeoJsonCitySdkMobility'
+            external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJsonCitySdkMobility'
             external.config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
             external.config.update({
                 "url": url,
@@ -1282,7 +1282,7 @@ class InteroperabilityTest(TestCase):
             xml_url = '%s/provincia-wifi.xml' % TEST_FILES_PATH
 
             external = LayerExternal(layer=layer)
-            external.synchronizer_path = 'nodeshot.interoperability.synchronizers.ProvinciaWifiCitySdkMobility'
+            external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.ProvinciaWifiCitySdkMobility'
             external.config = CITYSDK_MOBILITY_TEST_CONFIG.copy()
             external.config.update({
                 "status": "active",

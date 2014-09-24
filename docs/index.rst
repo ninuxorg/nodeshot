@@ -65,7 +65,7 @@ Contents
    /topics/admin
    /topics/api
    /topics/open311
-   /topics/interoperability
+   /topics/synchronizers
    /topics/participation
    /topics/oldimporter
    /topics/connectors

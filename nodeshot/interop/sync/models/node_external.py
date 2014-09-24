@@ -17,7 +17,7 @@ class NodeExternal(models.Model):
                                                or whatever other format the external application uses to store IDs"""))
 
     class Meta:
-        app_label = 'interoperability'
+        app_label = 'sync'
         db_table = 'nodes_external'
         verbose_name = _('external node')
         verbose_name_plural = _('external node info')

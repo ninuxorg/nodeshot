@@ -90,7 +90,7 @@ INSTALLED_APPS = [
     'nodeshot.core.nodes',
     'nodeshot.core.cms',
     'nodeshot.core.websockets',
-    'nodeshot.interoperability',
+    'nodeshot.interop.sync',
     'nodeshot.community.participation',
     'nodeshot.community.notifications',
     'nodeshot.community.profiles',

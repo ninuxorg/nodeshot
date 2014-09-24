@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from nodeshot.interoperability.synchronizers import GeoJson
+from nodeshot.interop.sync.synchronizers import GeoJson
 from .citysdk_mobility import CitySdkMobilityMixin
 
 

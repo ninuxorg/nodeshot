@@ -5,7 +5,7 @@ from .base import XMLParserMixin, GenericGisSynchronizer
 
 
 class OpenWisp(XMLParserMixin, GenericGisSynchronizer):
-    """ OpenWisp GeoRSS interoperability class """
+    """ OpenWisp GeoRSS synchronizer class """
 
     def parse(self):
         """ parse data """

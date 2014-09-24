@@ -5,8 +5,8 @@ import simplejson as json
 
 from django.core.exceptions import ImproperlyConfigured
 
-from nodeshot.interoperability.synchronizers.base import BaseSynchronizer
-from nodeshot.interoperability.models import NodeExternal
+from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer
+from nodeshot.interop.sync.models import NodeExternal
 
 from celery.utils.log import get_logger
 logger = get_logger(__name__)
@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 class CitySdkMobilityMixin(object):
     """
-    CitySdkMobility interoperability mixin
+    CitySdkMobility synchronizer mixin
     Provides methods to perform following operations:
         * perform authentication into citysdk mobility API
         * add new records

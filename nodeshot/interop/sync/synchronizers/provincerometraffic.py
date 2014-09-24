@@ -9,11 +9,11 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 
 from nodeshot.core.nodes.models import Node, Status
-from nodeshot.interoperability.synchronizers.base import BaseSynchronizer
+from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer
 
 
 class ProvinceRomeTraffic(BaseSynchronizer):
-    """ Province of Rome Traffic interoperability class """
+    """ Province of Rome Traffic synchronizer class """
 
     REQUIRED_CONFIG_KEYS = [
         'streets_url',
