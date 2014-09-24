@@ -71,33 +71,33 @@ There are two required configuration keys:
 
  There is no periodic synchronization needed because this synchronizer grabs the data on the fly.
 
-===================
-Synchronize command
-===================
+=======================
+Sync management command
+=======================
 
 This is the command which is used to perform **periodic synchronization**, use ``--help`` to know its options::
 
-    python manage.py synchronize --help
+    python manage.py sync --help
 
 **Sync a specific layer**::
 
-    python manage.py synchronize layer-slug
+    python manage.py sync layer-slug
 
 **Sync multiple layers** by specifying space separated layer slugs::
 
-    python manage.py synchronize layer1-slug layer2-slug
+    python manage.py sync layer1-slug layer2-slug
 
 **Sync all layers** is as simple as::
 
-    python manage.py synchronize
+    python manage.py sync
 
 **Sync all layers except those specified in --exclude**::
 
-    python manage.py synchronize --exclude=layer1-slug,layer2-slug
+    python manage.py sync --exclude=layer1-slug,layer2-slug
 
     # spaces are allowed as long as string is wrapped in quotes/doublequotes
 
-    python manage.py synchronize --exclude="layer1-slug, layer2-slug"
+    python manage.py sync --exclude="layer1-slug, layer2-slug"
 
 =========================
 Writing new synchronizers

@@ -8,7 +8,7 @@ def synchronize_external_layers(*args, **kwargs):
     """
     runs "python manage.py synchronize"
     """
-    management.call_command('synchronize', *args, **kwargs)
+    management.call_command('sync', *args, **kwargs)
 
 
 # ------ Asynchronous tasks ------ #
@@ -30,16 +30,14 @@ def push_changes_to_external_layers(node, external_layer, operation):
     # subsequent imports go and look into sys.modules before reimporting the module again
     # so performance is not affected
     from nodeshot.core.nodes.models import Node
-
     # get node because for some reason the node instance object is not passed entirely,
     # pheraphs because objects are serialized by celery or transport/queuing mechanism
     if not isinstance(node, basestring):
         node = Node.objects.get(pk=node.pk)
-
     # import synchronizer
     Synchronizer = import_by_path(external_layer.synchronizer_path)
+    # create instance
     instance = Synchronizer(external_layer.layer)
-
     # call method only if supported
     if hasattr(instance, operation):
         getattr(instance, operation)(node)

@@ -78,7 +78,7 @@ class Command(BaseCommand):
             self.stdout.write('%s\n\r' % message)
 
     def handle(self, *args, **options):
-        """ execute synchronize command """
+        """ execute sync command """
         # store verbosity level in instance attribute for later use
         self.verbosity = int(options.get('verbosity'))
 

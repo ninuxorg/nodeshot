@@ -72,7 +72,7 @@ class SyncTest(TestCase):
 
     def test_not_interoperable(self):
         """ test not interoperable """
-        output = capture_output(management.call_command, ('synchronize', 'vienna'))
+        output = capture_output(management.call_command, ('sync', 'vienna'))
         # ensure following text is in output
         self.assertIn('does not have a synchronizer class specified', output)
 
@@ -80,7 +80,7 @@ class SyncTest(TestCase):
         """ test --exclude """
         output = capture_output(
             management.call_command,
-            ['synchronize'],
+            ['sync'],
             { 'exclude': 'vienna,test' }
         )
         self.assertIn('no layers to process', output)
@@ -216,7 +216,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -249,7 +249,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -290,7 +290,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -327,7 +327,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -373,7 +373,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -411,7 +411,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -433,7 +433,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -472,7 +472,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -497,7 +497,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -517,7 +517,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -552,7 +552,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -592,7 +592,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -633,7 +633,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -661,7 +661,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -691,7 +691,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -719,7 +719,7 @@ class SyncTest(TestCase):
 
         output = capture_output(
             management.call_command,
-            ['synchronize', 'vienna'],
+            ['sync', 'vienna'],
             kwargs={ 'verbosity': 0 }
         )
 
@@ -949,7 +949,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -972,7 +972,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1027,7 +1027,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1045,7 +1045,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1068,7 +1068,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1123,7 +1123,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1146,7 +1146,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1205,7 +1205,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1224,7 +1224,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1247,7 +1247,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1302,7 +1302,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
@@ -1325,7 +1325,7 @@ class SyncTest(TestCase):
 
             output = capture_output(
                 management.call_command,
-                ['synchronize', 'vienna'],
+                ['sync', 'vienna'],
                 kwargs={ 'verbosity': 0 }
             )
 
