@@ -15,6 +15,7 @@ DEFAULT_SYNCHRONIZERS = [
     ('nodeshot.interop.sync.synchronizers.GeoJsonCitySdkMobility', 'GeoJSON CitySDK Mobility (periodic sync)'),
     ('nodeshot.interop.sync.synchronizers.GeoJsonCitySdkTourism', 'GeoJSON CitySDK Tourism (periodic sync)'),
     ('nodeshot.interop.sync.synchronizers.OpenLabor', 'OpenLabor (RESTful translator + event driven)'),
+    ('nodeshot.interop.sync.synchronizers.ProvinceRomeTraffic', 'Province of Rome Traffic')
 ]
 
 SYNCHRONIZERS = DEFAULT_SYNCHRONIZERS + getattr(settings, 'NODESHOT_SYNCHRONIZERS', [])
