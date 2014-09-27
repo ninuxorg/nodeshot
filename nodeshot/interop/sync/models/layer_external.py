@@ -2,7 +2,7 @@ import simplejson as json
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.exceptions import ValidationError, ImproperlyConfigured, ObjectDoesNotExist
 from django.utils.module_loading import import_by_path
 
 from django_hstore.fields import DictionaryField
@@ -43,7 +43,10 @@ class LayerExternal(models.Model):
         verbose_name_plural = _('external layer info')
 
     def __unicode__(self):
-        return '%s external layer config' % self.layer.name
+        try:
+            return '%s external layer config' % self.layer.name
+        except ObjectDoesNotExist:
+            return 'LayerExternal object'
 
     def __init__(self, *args, **kwargs):
         """ custom init method """

@@ -45,6 +45,12 @@ class SyncTest(TestCase):
         'test_status.json',
         'test_nodes.json'
     ]
+    
+    def test_external_layer_representation(self):
+        self.assertIn('object', str(LayerExternal()))
+        e = LayerExternal()
+        e.layer = Layer.objects.external().first()
+        self.assertIn('config', str(e))
 
     def test_external_layer_creation(self):
         layer = Layer()
