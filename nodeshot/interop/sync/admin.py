@@ -16,6 +16,18 @@ class LayerExternalInline(admin.StackedInline):
     if 'grappelli' in settings.INSTALLED_APPS:
         inline_classes = ('grp-collapse grp-open',)
 
+    def get_formset(self, request, obj=None, **kwargs):
+        """
+        Load Synchronizer schema to display specific fields in admin
+        """
+        if obj is not None:
+            try:
+                # this is enough to load the new schema
+                obj.external
+            except LayerExternal.DoesNotExist:
+                pass
+        return super(LayerExternalInline, self).get_formset(request, obj=None, **kwargs)
+
 
 def synchronize_action(self, request, queryset):
     synchronized = []

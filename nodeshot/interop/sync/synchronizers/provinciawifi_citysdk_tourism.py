@@ -10,4 +10,4 @@ class ProvinciaWifiCitySdkTourism(CitySdkTourismMixin, ProvinciaWifi):
     Imports data from Provincia WIFI in the local DB and it also sends it
     to CitySDK tourism API
     """
-    pass
+    SCHEMA = ProvinciaWifi.SCHEMA + CitySdkTourismMixin.SCHEMA

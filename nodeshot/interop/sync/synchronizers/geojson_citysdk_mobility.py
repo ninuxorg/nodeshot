@@ -6,11 +6,4 @@ from .citysdk_mobility import CitySdkMobilityMixin
 
 class GeoJsonCitySdkMobility(CitySdkMobilityMixin, GeoJson):
     """ Import GeoJson and sync CitySDK """
-
-    REQUIRED_CONFIG_KEYS = [
-        'url',
-        'citysdk_url',
-        'citysdk_layer',
-        'citysdk_username',
-        'citysdk_password'
-    ]
+    SCHEMA = GeoJson.SCHEMA + CitySdkMobilityMixin.SCHEMA

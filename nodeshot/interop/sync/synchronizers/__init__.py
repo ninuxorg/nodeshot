@@ -29,11 +29,11 @@ __all__ = __all__ + [
     'CitySdkMobility',
     'CitySdkTourism',
     'GeoJsonCitySdkMobility',
-    'GeoJsonCitySdkTourism'
+    'GeoJsonCitySdkTourism',
     'OpenWispCitySdkTourism',
     'ProvinciaWifi',
     'ProvinciaWifiCitySdkMobility',
-    'ProvinciaWifiCitySdkTourism'
+    'ProvinciaWifiCitySdkTourism',
     'ProvinceRomeTraffic',
-    'OpenLabor'
+    'OpenLabor',
 ]

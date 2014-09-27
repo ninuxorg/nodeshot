@@ -4,8 +4,9 @@ import requests
 import simplejson as json
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext_lazy as _
 
-from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer
+from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer, GenericGisSynchronizer
 from nodeshot.interop.sync.models import NodeExternal
 
 from celery.utils.log import get_logger
@@ -21,12 +22,37 @@ class CitySdkMobilityMixin(object):
         * change existing records
         * delete existing records
     """
-
-    REQUIRED_CONFIG_KEYS = [
-        'citysdk_url',
-        'citysdk_layer',
-        'citysdk_username',
-        'citysdk_password',
+    SCHEMA = [
+        {
+            'name': 'url',
+            'class': 'URLField',
+            'kwargs': {
+                'help_text': _('Data source URL')
+            }
+        },
+        {
+            'name': 'citysdk_url',
+            'class': 'URLField',
+            'kwargs': {
+                'help_text': _('CitySDK Mobility API URL')
+            }
+        },
+        {
+            'name': 'citysdk_username',
+            'class': 'CharField',
+            'kwargs': {
+                'max_length': 128,
+                'help_text': _('Username of user who has write permission')
+            }
+        },
+        {
+            'name': 'citysdk_password',
+            'class': 'CharField',
+            'kwargs': {
+                'max_length': 128,
+                'help_text': _('Password of user who has write permission'),
+            }
+        }
     ]
 
     def __init__(self, *args, **kwargs):
@@ -243,4 +269,4 @@ class CitySdkMobilityMixin(object):
 
 
 class CitySdkMobility(CitySdkMobilityMixin, BaseSynchronizer):
-    pass
+    SCHEMA = CitySdkMobilityMixin.SCHEMA + [GenericGisSynchronizer.SCHEMA[1]]

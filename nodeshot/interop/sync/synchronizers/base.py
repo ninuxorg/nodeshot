@@ -6,6 +6,7 @@ from dateutil import parser as DateParser
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -36,8 +37,7 @@ class BaseSynchronizer(object):
         * save data into DB
         * log messages with different levels of verbosity
     """
-
-    REQUIRED_CONFIG_KEYS = []
+    SCHEMA = None
 
     def __init__(self, layer, *args, **kwargs):
         """
@@ -49,15 +49,7 @@ class BaseSynchronizer(object):
 
     def load_config(self, config=None):
         self.config = config or self.layer.external.config
-        self.verify_ssl = self.config.get('verify_ssl', 'true') == 'true'
-
-    def validate(self):
-        """ External Layer config validation, must be called before saving the external layer instance """
-        for field in self.REQUIRED_CONFIG_KEYS:
-            if not self.config.get(field, False):
-                raise ImproperlyConfigured('Required %s parameter missing from configuration' % field)
-        # call clean method
-        self.clean()
+        self.verify_ssl = self.config.get('verify_ssl', True)
 
     def clean(self):
         """ complex ad hoc validation here, will be executed before the external layer is saved """
@@ -175,14 +167,93 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
 
     You must implement a "parse_item" method to support different formats.
     """
-
-    REQUIRED_CONFIG_KEYS = [
-        'url'
+    SCHEMA = [
+        {
+            'name': 'url',
+            'class': 'URLField',
+            'kwargs': {
+                'help_text': _('URL containing geographical data')
+            }
+        },
+        {
+            'name': 'verify_ssl',
+            'class': 'BooleanField',
+            'kwargs': {
+                'default': True,
+                'help_text': _('Wether the SSL certificates of the external services used should be verified or not')
+            }
+        },
+        {
+            'name': 'default_status',
+            'class': 'CharField',
+            'kwargs': {
+                'blank': True,
+                'max_length': 255,
+                'help_text': _('Status for imported nodes, leave blank to use the default one')
+            }
+        },
+        {
+            'name': 'field_name',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'name', 'verbose_name': _('name field'), 'help_text': _('corresponding name field on external source') }
+        },
+        {
+            'name': 'field_status',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'status', 'verbose_name': _('status field'), 'help_text': _('corresponding status field on external source') }
+        },
+        {
+            'name': 'field_description',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'description', 'verbose_name': _('description field'), 'help_text': _('corresponding description field on external source') }
+        },
+        {
+            'name': 'field_address',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'address', 'verbose_name': _('address field'), 'help_text': _('corresponding address field on external source') }
+        },
+        {
+            'name': 'field_is_published',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'is_published', 'verbose_name': _('is_published field'), 'help_text': _('corresponding is_published field on external source') }
+        },
+        {
+            'name': 'field_user',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'user', 'verbose_name': _('user field'), 'help_text': _('corresponding user field on external source') }
+        },
+        {
+            'name': 'field_elev',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'elev', 'verbose_name': _('elev field'), 'help_text': _('corresponding elev field on external source') }
+        },
+        {
+            'name': 'field_notes',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'notes', 'verbose_name': _('notes field'), 'help_text': _('corresponding notes field on external source') }
+        },
+        {
+            'name': 'field_added',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'added', 'verbose_name': _('added field'), 'help_text': _('corresponding added field on external source') }
+        },
+        {
+            'name': 'field_updated',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 64, 'default': 'updated', 'verbose_name': _('updated field'), 'help_text': _('corresponding updated field on external source') }
+        }
     ]
 
     def __init__(self, layer, *args, **kwargs):
         super(GenericGisSynchronizer, self).__init__(layer, *args, **kwargs)
-        self.field_mapping = layer.external.field_mapping
+        # init empty dict
+        self.field_mapping = {}
+        # include all keys which start with 'field_'
+        for key, value in layer.external.config.items():
+            if key.startswith('field_'):
+                # replace 'field_' prefix
+                key = key.replace('field_', '')
+                self.field_mapping[key] = value
 
     def parse_item(self, item):
         """
@@ -284,7 +355,7 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
 
         # ensure all additional data items are strings
         for key, value in item['data'].items():
-            result["data"][key] = unicode(value)
+            result["data"][key] = value
 
         return result
 
@@ -297,7 +368,7 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             "address": key_map.get('address', 'address'),
             "is_published": key_map.get('is_published', 'is_published'),
             "user": key_map.get('user', 'user'),
-            "elev": key_map.get('elevation', 'elev'),
+            "elev": key_map.get('elev', 'elev'),
             "notes": key_map.get('notes', 'notes'),
             "added": key_map.get('added', 'added'),
             "updated": key_map.get('updated', 'updated'),
@@ -408,7 +479,6 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
                     else:
                         node.save()
                 except Exception as e:
-                    # TODO: are we sure we want to interrupt the execution?
                     raise Exception('error while processing "%s": %s' % (node.name, e))
 
             if added:
@@ -457,5 +527,3 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
 
 class XmlSynchronizer(HttpRetrieverMixin, XMLParserMixin, BaseSynchronizer):
     """ XML HTTP syncrhonizer """
-
-    REQUIRED_CONFIG_KEYS = ['url']

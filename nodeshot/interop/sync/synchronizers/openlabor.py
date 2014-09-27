@@ -15,7 +15,7 @@ from nodeshot.core.base.utils import now_after
 from nodeshot.core.nodes.models import Node, Status
 from nodeshot.core.nodes.serializers import NodeListSerializer
 from nodeshot.interop.sync.models import NodeExternal
-from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer
+from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer, GenericGisSynchronizer
 
 from celery.utils.log import get_logger
 logger = get_logger(__name__)
@@ -23,7 +23,6 @@ logger = get_logger(__name__)
 
 class OpenLaborSerializer(NodeListSerializer):
     """ node list """
-
     layer_name = serializers.Field('layer_name')
     details = serializers.SerializerMethodField('get_details')
 
@@ -40,13 +39,27 @@ class OpenLabor(BaseSynchronizer):
     """
     OpenLabor RESTful translator
     """
-
-    REQUIRED_CONFIG_KEYS = [
-        'open311_url',
-        'service_code_get',
-        'service_code_post',
-        'api_key',
-        'default_status'
+    SCHEMA = [
+        {
+            'name': 'open311_url',
+            'class': 'URLField'
+        },
+        {
+            'name': 'service_code_get',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 16 }
+        },
+        {
+            'name': 'service_code_post',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 16 }
+        },
+        {
+            'name': 'default_status',
+            'class': 'CharField',
+            'kwargs': { 'max_length': 255, 'blank': True }
+        },
+        GenericGisSynchronizer.SCHEMA[1]  # verify_ssl
     ]
 
     def __init__(self, *args, **kwargs):

@@ -4,6 +4,7 @@ import requests
 import simplejson as json
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.utils.translation import ugettext_lazy as _
 
 from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer
 from nodeshot.interop.sync.models import NodeExternal
@@ -22,15 +23,75 @@ class CitySdkTourismMixin(object):
         * change existing records
         * delete existing records
     """
-    REQUIRED_CONFIG_KEYS = [
-        'url',
-        'citysdk_url',
-        'citysdk_category',
-        'citysdk_type',
-        'citysdk_username',
-        'citysdk_password',
-        'citysdk_lang',
-        'citysdk_term',
+    SCHEMA = [
+        {
+            'name': 'url',
+            'class': 'URLField',
+            'kwargs': {
+                'help_text': _('Data source URL')
+            }
+        },
+        {
+            'name': 'citysdk_url',
+            'class': 'URLField',
+            'kwargs': {
+                'help_text': _('CitySDK Tourism API URL')
+            }
+        },
+        {
+            'name': 'citysdk_category',
+            'class': 'CharField',
+            'kwargs': {
+                'max_length': 128,
+                'help_text': _('CitySDK Tourism API category name')
+            }
+        },
+        {
+            'name': 'citysdk_category_id',
+            'class': 'CharField',
+            'kwargs': {
+                'max_length': 128,
+                'blank': True,
+                'help_text': _('CitySDK Tourism API category ID, if left blank a new category will be created')
+            }
+        },
+        {
+            'name': 'citysdk_username',
+            'class': 'CharField',
+            'kwargs': {
+                'max_length': 128,
+                'help_text': _('Username of user who has write permission')
+            }
+        },
+        {
+            'name': 'citysdk_password',
+            'class': 'CharField',
+            'kwargs': {
+                'max_length': 128,
+                'help_text': _('Password of user who has write permission'),
+            }
+        },
+        {
+            'name': 'citysdk_lang',
+            'class': 'CharField',
+            'kwargs': {
+                'max_length': 8,
+                'help_text': _('language code'),
+            }
+        },
+        {
+            'name': 'citysdk_term',
+            'class': 'CharField',
+            'kwargs': {
+                'max_length': 16,
+                'help_text': _('term (eg: center)'),
+            }
+        },
+        {
+            'name': 'verify_ssl',
+            'class': 'BooleanField',
+            'kwargs': { 'default': True }
+        }
     ]
 
     _persisted_cookies = None

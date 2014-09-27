@@ -14,11 +14,20 @@ from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer
 
 class ProvinceRomeTraffic(BaseSynchronizer):
     """ Province of Rome Traffic synchronizer class """
-
-    REQUIRED_CONFIG_KEYS = [
-        'streets_url',
-        'measurements_url',
-        'check_streets_every_n_days'
+    SCHEMA = [
+        {
+            'name': 'streets_url',
+            'class': 'URLField'
+        },
+        {
+            'name': 'measurements_url',
+            'class': 'URLField'
+        },
+        {
+            'name': 'check_streets_every_n_days',
+            'class': 'IntegerField',
+            'kwargs': { 'default': 2 }
+        }
     ]
 
     def retrieve_data(self):
@@ -122,7 +131,6 @@ class ProvinceRomeTraffic(BaseSynchronizer):
             while True:
                 # items might have the same name... so we add a number..
                 # check in DB too
-                # TODO: this must be DRYED!!
                 if slug in external_nodes_slug or Node.objects.filter(slug__exact=slug).exclude(pk=pk).count() > 0:
                     needed_different_name = True
                     number = number + 1
@@ -174,7 +182,6 @@ class ProvinceRomeTraffic(BaseSynchronizer):
                     node.full_clean()
                     node.save()
                 except ValidationError as e:
-                    # TODO: are we sure we want to interrupt the execution?
                     raise Exception("%s errors: %s" % (name, e.messages))
 
             if added:

@@ -9,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from .base import BaseSynchronizer
+from .base import BaseSynchronizer, GenericGisSynchronizer
 
 
 __all__ = ['NodeshotMixin', 'Nodeshot']
@@ -20,9 +20,15 @@ class NodeshotMixin(object):
     Nodeshot synchronizer mixin
     RESTfrul translator type
     """
-    REQUIRED_CONFIG_KEYS = [
-        'layer_url',
-        'verify_ssl'
+    SCHEMA = [
+        {
+            'name': 'layer_url',
+            'class': 'URLField',
+            'kwargs': {
+                'help_text': _('URL of external layer, in the form of https://HOST/api/v1/layers/LAYER_NAME/')
+            }
+        },
+        GenericGisSynchronizer.SCHEMA[1]  # verify ssl
     ]
 
     def get_nodes(self, class_name, params):

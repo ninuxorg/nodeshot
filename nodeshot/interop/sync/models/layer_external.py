@@ -22,17 +22,14 @@ class LayerExternal(models.Model):
     These are the layers that are managed by local groups or other organizations
     """
     layer = models.OneToOneField('layers.Layer', verbose_name=_('layer'), parent_link=True, related_name='external')
-    synchronizer_path = models.CharField(_('synchronizer'), max_length=128, choices=SYNCHRONIZERS, default=False)
+    synchronizer_path = models.CharField(_('synchronizer'), max_length=128, choices=SYNCHRONIZERS, default='None')
     config = DictionaryField(_('configuration'),
+                             help_text=_('Synchronizer specific configuration (eg: API URL, auth info, ecc)'),
                              blank=True,
                              null=True,
-                             help_text=_('Synchronizer specific configuration (eg: API URL, auth info, ecc)'))
-    field_mapping = DictionaryField(_('field mapping'),
-                                    blank=True,
-                                    null=True,
-                                    help_text=_('Map nodeshot field names to the field names used by the external application'))
-
-    # will hold an instance of the synchronizer class
+                             editable=False,
+                             schema=None)
+    # private attributes that will hold synchronizer info
     _synchronizer = None
     _synchronizer_class = None
 
@@ -60,25 +57,23 @@ class LayerExternal(models.Model):
         # add get_nodes method to current LayerExternal instance
         if synchronizer is not False and hasattr(synchronizer, 'get_nodes'):
             self.get_nodes = synchronizer.get_nodes
+        # load schema
+        self._reload_schema()
+
+    def _reload_schema(self):
+        if self.synchronizer_class:
+            schema = self.synchronizer_class.SCHEMA
+        else:
+            schema = None
+        if self.config.field.schema is not schema:
+            self.config.field.reload_schema(schema)
 
     def clean(self, *args, **kwargs):
         """
-        Custom Validation:
-            * must specify config if synchronizer_path is not 'None'
-            * indent json config nicely
-            * validate any synchronizer.REQUIRED_CONFIG_KEYS
-            * call synchronizer clean method for any third party validation
+        Call self.synchronizer.clean method
         """
-        # if is interoperable some configuration needs to be specified
-        if self.synchronizer_path != 'None' and not self.config:
-            raise ValidationError(_('Please specify the necessary configuration for the interoperation'))
-        # configuration needs to be valid JSON
         if self.synchronizer_path != 'None' and self.config:
-            # ensure REQUIRED_CONFIG_KEYS are filled
-            for key in self.synchronizer_class.REQUIRED_CONFIG_KEYS:
-                if key not in self.config:
-                    raise ValidationError(_('Required config key "%s" missing from external layer configuration' % key))
-            # validate synchronizer config
+            # call synchronizer custom clean
             try:
                 self.synchronizer.load_config(self.config)
                 self.synchronizer.clean()
@@ -95,6 +90,8 @@ class LayerExternal(models.Model):
         # call after_external_layer_saved method of synchronizer
         if after_save and self.synchronizer:
             self.synchronizer.after_external_layer_saved(self.config)
+        # reload schema
+        self._reload_schema()
 
     @property
     def synchronizer(self):

@@ -41,9 +41,9 @@ class OpenWisp(XMLParserMixin, GenericGisSynchronizer):
             "elev": None,
             "description": description,
             "notes": guid,
-            "data": {},
             "added": created_at,
-            "updated": updated_at
+            "updated": updated_at,
+            "data": {}
         }
 
         return result

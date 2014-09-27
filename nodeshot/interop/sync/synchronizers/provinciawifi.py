@@ -6,11 +6,12 @@ from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.conf import settings
 
 from nodeshot.core.nodes.models import Node, Status
-from nodeshot.interop.sync.synchronizers.base import XmlSynchronizer
+from nodeshot.interop.sync.synchronizers.base import XmlSynchronizer, GenericGisSynchronizer
 
 
 class ProvinciaWifi(XmlSynchronizer):
     """ ProvinciaWifi synchronizer class """
+    SCHEMA = GenericGisSynchronizer.SCHEMA[0:1]
 
     def save(self):
         """ synchronize DB """
@@ -117,7 +118,6 @@ class ProvinciaWifi(XmlSynchronizer):
                     node.full_clean()
                     node.save()
                 except ValidationError as e:
-                    # TODO: are we sure we want to interrupt the execution?
                     raise Exception("%s errors: %s" % (name, e.messages))
 
             if added:
