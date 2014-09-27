@@ -20,9 +20,6 @@ requests
 django-grappelli==2.5.3
 django-filebrowser==3.5.6
 
-# geodjango improved widgets
-django-olwidget
-
 # RESTful API and API documentation
 djangorestframework==2.4.3
 drf-extensions==0.2.5
