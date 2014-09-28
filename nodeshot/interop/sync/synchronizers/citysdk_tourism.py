@@ -173,12 +173,12 @@ class CitySdkTourismMixin(object):
             self.config = layer_config
 
         citysdk_category_id = self.config.get('citysdk_category_id', False)
+        self.authenticate()
         response = requests.get(self.citysdk_categories_url, cookies=self.cookies)
 
         # do we already have the category id in the db config?
         # And is the category present in the API response?
         if citysdk_category_id is not False and citysdk_category_id in response.content:
-
             message = 'category with ID "%s" already present in config' % citysdk_category_id
             self.verbose(message)
             logger.info(message)
