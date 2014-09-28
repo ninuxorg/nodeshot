@@ -158,7 +158,24 @@ class SyncTest(TestCase):
         external._reload_schema()
         with self.assertRaises(ValidationError):
             external.full_clean()
-    
+
+    def test_layer_external_reload_schema_view(self):
+        external = LayerExternal(layer=Layer.objects.external().first())
+        external.full_clean()
+        external.save()
+        # login
+        self.client.login(username='admin', password='tester')
+        url = reverse('layer_external_reload_schema', args=[external.layer_id])
+        # loop over all synchronizer and try them all
+        for sync_tuple in SYNCHRONIZERS:
+            path = sync_tuple[0]
+            response = self.client.post(url, { "synchronizer_path": path })
+            # ensure http response is ok
+            self.assertEqual(response.status_code, 200)
+            # ensure data has really changed
+            external = LayerExternal.objects.get(pk=external.pk)
+            self.assertEqual(external.synchronizer_path, path)
+
     def test_admin_synchronize_action(self):
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0

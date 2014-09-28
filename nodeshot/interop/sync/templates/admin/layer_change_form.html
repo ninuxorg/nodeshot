@@ -19,6 +19,29 @@
                 external.change(function(e){
                     external_info.fadeToggle(250);
                 });
+                // when synchronizer_path is changed
+                var reload_schema_url = "{% url 'layer_external_reload_schema' object_id %}",
+                    csrftoken = $('#layer_form input[name=csrfmiddlewaretoken]').val();
+                $('#external-group').delegate(
+                    '#id_external-0-synchronizer_path',
+                    'change',
+                    function(e){
+                        // temporarily disable inputs
+                        $('input,select,textarea', '#external0 .grp-module').attr('disabled', 'disabled')
+                        // reload config
+                        $.post(reload_schema_url, {
+                            "synchronizer_path": $(this).val(),
+                            "csrfmiddlewaretoken": csrftoken
+                        }).done(function(response){
+                            // load new fragment
+                            var html = $.parseHTML(response),
+                                fragment = $(html).find('#external-group').html();
+                            $('#external-group').html(fragment);
+                            // focus on select
+                            $('#id_external-0-synchronizer_path').trigger('focus');
+                        });
+                    }
+                )
             });
         })(grp.jQuery);
     </script>
