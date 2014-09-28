@@ -1,7 +1,7 @@
 from django.conf import settings
-# TODO: improve consistency
-from nodeshot.core.base.settings import ADMIN_MAP_COORDINATES as MAP_CENTER
+from leaflet import app_settings as LEAFLET_SETTINGS
 
 
-TILESERVER_URL = getattr(settings, 'NODESHOT_UI_TILESERVER_URL', 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png')
-MAP_ZOOM = getattr(settings, 'NODESHOT_FRONTEND_MAP_ZOOM', 4)
+TILESERVER_URL = LEAFLET_SETTINGS['TILES'][0][1]
+MAP_ZOOM = LEAFLET_SETTINGS['DEFAULT_ZOOM']
+MAP_CENTER = LEAFLET_SETTINGS['DEFAULT_CENTER']

@@ -71,8 +71,13 @@ EMAIL_HOST_USER = 'root@localhost'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER  # used for error reporting
 
-#NODESHOT_ADMIN_MAP_ZOOM = 5
-#NODESHOT_ADMIN_MAP_COORDINATES = [41.8934, 12.4960]
+LEAFLET_CONFIG.update({
+    'DEFAULT_CENTER': (49.06775, 30.62011),
+    'DEFAULT_ZOOM': 4,
+    'MIN_ZOOM': 1,
+    'MAX_ZOOM': 18,
+    'TILES': 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png',
+})
 
 # social auth
 FACEBOOK_APP_ID = ''
