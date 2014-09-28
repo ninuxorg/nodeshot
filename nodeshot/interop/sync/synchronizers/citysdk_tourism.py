@@ -6,7 +6,7 @@ import simplejson as json
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 
-from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer
+from nodeshot.interop.sync.synchronizers.base import BaseSynchronizer, GenericGisSynchronizer
 from nodeshot.interop.sync.models import NodeExternal
 
 from celery.utils.log import get_logger
@@ -24,13 +24,6 @@ class CitySdkTourismMixin(object):
         * delete existing records
     """
     SCHEMA = [
-        {
-            'name': 'url',
-            'class': 'URLField',
-            'kwargs': {
-                'help_text': _('Data source URL')
-            }
-        },
         {
             'name': 'citysdk_url',
             'class': 'URLField',
@@ -98,7 +91,10 @@ class CitySdkTourismMixin(object):
 
     def __init__(self, *args, **kwargs):
         super(CitySdkTourismMixin, self).__init__(*args, **kwargs)
-        self._init_config()
+        try:
+            self._init_config()
+        except KeyError as e:
+            raise ImproperlyConfigured(e)
 
     def _init_config(self):
         """ Init required attributes if necessary (for internal use only) """
@@ -401,4 +397,4 @@ END:VCARD""" % (
 
 
 class CitySdkTourism(CitySdkTourismMixin, BaseSynchronizer):
-    pass
+    SCHEMA = CitySdkTourismMixin.SCHEMA + [GenericGisSynchronizer.SCHEMA[1]]

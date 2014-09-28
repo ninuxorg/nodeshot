@@ -15,6 +15,12 @@ urlpatterns = patterns('',
 )
 
 
+if 'nodeshot.interop.sync' in settings.INSTALLED_APPS:
+    urlpatterns = urlpatterns + patterns('',
+        url(r'', include('nodeshot.interop.sync.urls')),
+    )
+
+
 if settings.DEBUG and settings.SERVE_STATIC:
     urlpatterns += patterns('django.contrib.staticfiles.views',
         url(r'^static/(?P<path>.*)$', 'serve'),
@@ -60,7 +66,6 @@ if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and EMAIL_CONFIRMATI
 
 # include 'nodeshot.core.api.urls'
 if 'nodeshot.core.api' in settings.INSTALLED_APPS:
-
     urlpatterns = urlpatterns + patterns('',
         url(r'', include('nodeshot.core.api.urls')),
     )

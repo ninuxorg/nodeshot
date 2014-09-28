@@ -6,7 +6,7 @@ from .citysdk_tourism import CitySdkTourismMixin
 
 class GeoJsonCitySdkTourism(CitySdkTourismMixin, GeoJson):
     """ Import GeoJson and sync CitySDK tourism API """
-    SCHEMA = GeoJson.SCHEMA + CitySdkTourismMixin.SCHEMA
+    SCHEMA = CitySdkTourismMixin.SCHEMA + GeoJson.SCHEMA
 
     def convert_format(self, node):
         # determine description or fill some hopefully useful value

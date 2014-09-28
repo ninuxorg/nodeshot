@@ -7,6 +7,7 @@ from datetime import datetime
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis.geos import Point
 from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 
 from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
@@ -68,16 +69,22 @@ class OpenLabor(BaseSynchronizer):
 
     def _init_config(self):
         """ init config attributes """
+        try:
+            url = self.config['open311_url']
+            service_code = self.config['service_code_get']
+        except KeyError as e:
+            raise ImproperlyConfigured(e)
+        
         # add trailing slash if missing
         if self.config['open311_url'].endswith('/'):
-            self.open311_url = self.config['open311_url']
+            self.open311_url = url
         else:
-            self.open311_url = '%s/' % self.config['open311_url']
+            self.open311_url = '%s/' % url
 
         # url from where to fetch nodes
         self.get_url = '%srequests.json?service_code=%s' % (
             self.open311_url,
-            self.config['service_code_get']
+            service_code
         )
 
         # url for POST

@@ -52,7 +52,7 @@ class LayerExternal(models.Model):
         try:
             synchronizer = self.synchronizer
         except ImproperlyConfigured:
-            return
+            synchronizer = False
         # if synchronizer has get_nodes method
         # add get_nodes method to current LayerExternal instance
         if synchronizer is not False and hasattr(synchronizer, 'get_nodes'):
@@ -67,6 +67,9 @@ class LayerExternal(models.Model):
             schema = None
         if self.config.field.schema is not schema:
             self.config.field.reload_schema(schema)
+            # if schema is None set editable to False
+            if schema is None:
+                self.config.field.editable = False
 
     def clean(self, *args, **kwargs):
         """
@@ -88,8 +91,14 @@ class LayerExternal(models.Model):
         after_save = kwargs.pop('after_save', True)
         super(LayerExternal, self).save(*args, **kwargs)
         # call after_external_layer_saved method of synchronizer
-        if after_save and self.synchronizer:
-            self.synchronizer.after_external_layer_saved(self.config)
+        if after_save:
+            try:
+                synchronizer = self.synchronizer
+            except ImproperlyConfigured:
+                pass
+            else:
+                if synchronizer:
+                    synchronizer.after_external_layer_saved(self.config)
         # reload schema
         self._reload_schema()
 

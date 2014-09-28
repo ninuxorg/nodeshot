@@ -10,4 +10,4 @@ class ProvinciaWifiCitySdkMobility(CitySdkMobilityMixin, ProvinciaWifi):
     Imports data from Provincia WIFI in the local DB and it also sends it
     to CitySDK mobility API
     """
-    SCHEMA = ProvinciaWifi.SCHEMA + CitySdkMobilityMixin.SCHEMA
+    SCHEMA = CitySdkMobilityMixin.SCHEMA + ProvinciaWifi.SCHEMA

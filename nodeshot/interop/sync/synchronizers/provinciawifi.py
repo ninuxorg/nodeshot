@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from django.template.defaultfilters import slugify
 from django.contrib.gis.geos import Point
-from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.exceptions import ValidationError
 from django.conf import settings
 
 from nodeshot.core.nodes.models import Node, Status
@@ -11,7 +11,7 @@ from nodeshot.interop.sync.synchronizers.base import XmlSynchronizer, GenericGis
 
 class ProvinciaWifi(XmlSynchronizer):
     """ ProvinciaWifi synchronizer class """
-    SCHEMA = GenericGisSynchronizer.SCHEMA[0:1]
+    SCHEMA = GenericGisSynchronizer.SCHEMA[0:2]
 
     def save(self):
         """ synchronize DB """

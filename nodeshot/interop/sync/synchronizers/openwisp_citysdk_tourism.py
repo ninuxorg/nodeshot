@@ -9,7 +9,7 @@ class OpenWispCitySdkTourism(CitySdkTourismMixin, OpenWisp):
     OpenWispCitySdkTourism synchronizer class
     Imports data from OpenWISP GeoRSS and then exports the data to the CitySDK database
     """
-    SCHEMA = OpenWisp.SCHEMA + CitySdkTourismMixin.SCHEMA
+    SCHEMA = CitySdkTourismMixin.SCHEMA + OpenWisp.SCHEMA
 
     def convert_format(self, node):
         # determine description or fill some hopefully useful value

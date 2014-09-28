@@ -4,7 +4,6 @@ import requests
 from xml.dom import minidom
 from dateutil import parser as DateParser
 
-from django.core.exceptions import ImproperlyConfigured
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model

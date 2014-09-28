@@ -6,4 +6,4 @@ from .citysdk_mobility import CitySdkMobilityMixin
 
 class GeoJsonCitySdkMobility(CitySdkMobilityMixin, GeoJson):
     """ Import GeoJson and sync CitySDK """
-    SCHEMA = GeoJson.SCHEMA + CitySdkMobilityMixin.SCHEMA
+    SCHEMA = CitySdkMobilityMixin.SCHEMA + GeoJson.SCHEMA

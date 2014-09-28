@@ -24,13 +24,6 @@ class CitySdkMobilityMixin(object):
     """
     SCHEMA = [
         {
-            'name': 'url',
-            'class': 'URLField',
-            'kwargs': {
-                'help_text': _('Data source URL')
-            }
-        },
-        {
             'name': 'citysdk_url',
             'class': 'URLField',
             'kwargs': {
@@ -61,14 +54,15 @@ class CitySdkMobilityMixin(object):
 
     def _init_config(self):
         """ Init required attributes if necessary (for internal use only) """
-        # cache key for session (depends on layer_id)
-        self.session_cache_key = 'citysdk-mobility-session'
-
+        try:
+            citysdk_url = self.config['citysdk_url']
+        except KeyError as e:
+            raise ImproperlyConfigured(e)
         # add trailing slash if missing
-        if self.config['citysdk_url'].endswith('/'):
-            self.citysdk_url = self.config['citysdk_url']
+        if citysdk_url.endswith('/'):
+            self.citysdk_url = citysdk_url
         else:
-            self.citysdk_url = '%s/' % self.config['citysdk_url']
+            self.citysdk_url = '%s/' % citysdk_url
 
     def clean(self):
         """
