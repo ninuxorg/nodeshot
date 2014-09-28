@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     # 3d parthy django apps
     'rest_framework',
     'rest_framework_swagger',
+    'leaflet',
     'south',
     'smuggler',
     'reversion',
@@ -325,3 +326,15 @@ if 'social_auth' in INSTALLED_APPS:
     LOGIN_URL = '/'
     LOGIN_REDIRECT_URL = '/'
     LOGIN_ERROR_URL    = '/'
+
+# ------ DJANGO-LEAFLET SETTINGS ------ #
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (49.06775, 30.62011),
+    'DEFAULT_ZOOM': 4,
+    'MIN_ZOOM': 1,
+    'MAX_ZOOM': 18,
+    'TILES': 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png',
+    'ATTRIBUTION_PREFIX': '<a href="http://github.com/ninuxorg/nodeshot">Nodeshot</a> - Maps thank to <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    'RESET_VIEW': False
+}

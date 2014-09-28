@@ -3,27 +3,8 @@ from django.contrib.gis import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.gis.admin import ModelAdmin as GeoModelAdmin
 
-# TODO these settings at the moment are not being used
-from .settings import ADMIN_MAP_COORDINATES, ADMIN_MAP_ZOOM
-
-
-def _get_geodjango_map_coords():
-    """ point to be used by geodjango """
-    try:
-        lat, lng = ADMIN_MAP_COORDINATES
-    except KeyError:
-        raise ImproperlyConfigured("incorrect NODESHOT_ADMIN_MAP_COORDINATES setting")
-    return lat, lng
-
-
-def _get_geodjango_map_zoom():
-    """ zoom level to be used by geodjango """
-    try:
-        return ADMIN_MAP_ZOOM
-    except KeyError:
-        raise ImproperlyConfigured("incorrect NODESHOT_ADMIN_MAP_ZOOM setting")
+from leaflet.admin import LeafletGeoAdmin as GeoModelAdmin
 
 
 class BaseAdmin(admin.ModelAdmin):
@@ -50,20 +31,10 @@ class BaseAdmin(admin.ModelAdmin):
             return field
 
 
-class GeoForm(forms.ModelForm):
-    # TODO entirely configurable
-    geometry = forms.GeometryField(widget=forms.OSMWidget(attrs={
-        'map_width': 758,
-        'map_height': 500,
-        'display_raw': settings.DEBUG
-    }))
-
-
 class BaseGeoAdmin(BaseAdmin, GeoModelAdmin):
     """
     BaseAdmin + Geodjango support
     """
-    form = GeoForm
 
 
 class PublishActionsAdminMixin(object):
