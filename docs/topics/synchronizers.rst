@@ -54,22 +54,83 @@ Layer configuration
 
 Interoperability is configured at layer level in the admin interface.
 
-A layer must be flagged as **"external"** and can be configured by editing the
-its **config** and **field_mapping**.
+A layer must be flagged as **"external"**, after doing so a new box labeled "External layer info"
+will appear in the bottom of the page. If the layer is new and not saved in the database proceed to save and reload the admin page.
 
-Each synchronizer has different required configuration keys.
+Then change the synchronizer field and the configuration fields will appear.
 
-Nodeshot synchronizer
----------------------
+Each synchronizer has different fields, an brief explaination of the default synchronizers follows.
+
+Nodeshot (RESTful translator)
+-----------------------------
 
 This synchronizer is a **RESTful translator** and allows to reference the nodes of an external nodeshot instance.
 
 There are two required configuration keys:
 
- * ``layer_url`` (string): URL of the layer API resource, eg: ``https://test.map.ninux.org/api/v1/layers/rome/``
- * ``verify_ssl`` (boolean): indicates wether the SSL certificate of the external layer should be verified or not; if set to ``true`` self signed certificates won't work
+ * **layer url**: URL of the layer API resource, eg: ``https://test.map.ninux.org/api/v1/layers/rome/``
+ * **verify ssl**: indicates wether the SSL certificate of the external layer should be verified or not; if checked self signed certificates won't work
 
- There is no periodic synchronization needed because this synchronizer grabs the data on the fly.
+There is no periodic synchronization needed because this synchronizer grabs the data on the fly.
+
+GeoJSON (periodic sync)
+-----------------------
+
+This synchronizer implements the **periodic synchronization** strategy and therefore needs to be enabled
+in the ``CELERYBEAT_SCHEDULE`` setting.
+
+The main configuration keys are:
+
+ * **url**: URL to retrieve the geojson file
+ * **verify_ssl**: indicates wether the SSL certificate of the external layer should be verified or not; if checked self signed certificates won't work
+ * **default status**: status to be used for new nodes, to use the system default leave blank
+
+There are other configuration keys which enable to parse geojson files which use radically different names for corresponding fields.
+
+ * **name**: corresponding name field, for example, on the data source file the name field could be labeled **title**
+ * **status**: corresponding status field, if present
+ * **description**: corresponding description field, if present
+ * **address**: corresponding address field, if present
+ * **is_published**: corresponding is_published field, if present
+ * **user**: corresponding user field, if present
+ * **elev**: corresponding elev field, if present
+ * **notes**: corresponding notes field, if present
+ * **added**: corresponding added field, if present
+ * **updated**: corresponding updated field, if present
+
+GeoRSS (periodic sync)
+----------------------
+
+This synchronizer implements the **periodic synchronization** strategy and therefore needs to be enabled
+in the ``CELERYBEAT_SCHEDULE`` setting.
+
+The main configuration keys are:
+
+ * **url**: URL to retrieve the georss file
+ * **verify_ssl**: indicates wether the SSL certificate of the external layer should be verified or not; if checked self signed certificates won't work
+ * **default status**: status to be used for new nodes, to use the system default leave blank
+
+There are other configuration keys which enable to parse georss files which use radically different names for corresponding fields.
+
+ * **name**: corresponding name field, defaults to **title**
+ * **status**: corresponding status field, if present
+ * **description**: corresponding description field, if present
+ * **address**: corresponding address field, if present
+ * **is_published**: corresponding is_published field, if present
+ * **user**: corresponding user field, if present
+ * **elev**: corresponding elev field, if present
+ * **notes**: corresponding notes field, if present
+ * **added**: corresponding added field, defaults to **pubDate**
+ * **updated**: corresponding updated field, if present
+
+OpenWisp (periodic sync)
+------------------------
+
+This synchronizer inherits from the **GeoRSS** synchronizer, the available options and configurations are the same.
+
+The only difference is that this synchronizer is designed to grab data from the GeoRSS file produced by `OpenWISP Geographic Monitoring`_.
+
+.. _OpenWISP Geographic Monitoring: https://github.com/openwisp/OpenWISP-Geographic-Monitoring
 
 =======================
 Sync management command
@@ -108,6 +169,8 @@ in ``/nodeshot/interoperability/synchronizers/base.py``:
 
 .. code-block:: python
 
+    # my_very_cool_app.py
+
     from nodeshot.interop.sync.synchronizer.base import GenericGisSynchronizer
 
     class MyVeryCoolApp(GenericGisSynchronizer):
@@ -128,3 +191,9 @@ the second element is the name you want to show in the admin interface in the *"
     ]
 
 This will add your new synchronizer to the default list.
+
+====================
+Third party packages
+====================
+
+ * nodeshot-citysdk-synchronizers: https://github.com/nemesisdesign/nodeshot-citysdk-synchronizers
