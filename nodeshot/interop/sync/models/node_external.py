@@ -1,8 +1,5 @@
-import simplejson as json
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
 
 from nodeshot.core.nodes.models import Node
 

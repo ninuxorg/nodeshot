@@ -1,5 +1,4 @@
 from django.contrib.admin.sites import site
-from django.core.exceptions import ValidationError
 from nodeshot.core.layers.models import Layer
 
 from .models import LayerExternal

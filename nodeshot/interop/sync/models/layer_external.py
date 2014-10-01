@@ -1,5 +1,3 @@
-import simplejson as json
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ImproperlyConfigured, ObjectDoesNotExist
@@ -113,7 +111,7 @@ class LayerExternal(models.Model):
             self._synchronizer_class = None
         # init synchronizer only if necessary
         if not self._synchronizer:
-            self._synchronizer = self.synchronizer_class(self.layer)
+            self._synchronizer = (self.synchronizer_class)(self.layer)
         return self._synchronizer
 
     @property

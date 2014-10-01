@@ -35,52 +35,104 @@ class GeoRss(XMLParserMixin, GenericGisSynchronizer):
         {
             'name': 'field_name',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'title', 'verbose_name': _('name field'), 'help_text': _('corresponding name field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': 'title',
+                'verbose_name': _('name field'),
+                'help_text': _('corresponding name field on external source')
+            }
         },
         {
             'name': 'field_status',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'status', 'verbose_name': _('status field'), 'help_text': _('corresponding status field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': 'status',
+                'verbose_name': _('status field'),
+                'help_text': _('corresponding status field on external source')
+            }
         },
         {
             'name': 'field_description',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': '', 'blank': True, 'verbose_name': _('description field'), 'help_text': _('corresponding description field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': '',
+                'blank': True,
+                'verbose_name': _('description field'),
+                'help_text': _('corresponding description field on external source')
+            }
         },
         {
             'name': 'field_address',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'address', 'verbose_name': _('address field'), 'help_text': _('corresponding address field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default':
+                'address',
+                'verbose_name': _('address field'),
+                'help_text': _('corresponding address field on external source')
+            }
         },
         {
             'name': 'field_is_published',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'is_published', 'verbose_name': _('is_published field'), 'help_text': _('corresponding is_published field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': 'is_published',
+                'verbose_name': _('is_published field'),
+                'help_text': _('corresponding is_published field on external source')
+            }
         },
         {
             'name': 'field_user',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'user', 'verbose_name': _('user field'), 'help_text': _('corresponding user field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': 'user',
+                'verbose_name': _('user field'),
+                'help_text': _('corresponding user field on external source')
+            }
         },
         {
             'name': 'field_elev',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'elev', 'verbose_name': _('elev field'), 'help_text': _('corresponding elev field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': 'elev',
+                'verbose_name': _('elev field'),
+                'help_text': _('corresponding elev field on external source')
+            }
         },
         {
             'name': 'field_notes',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'notes', 'verbose_name': _('notes field'), 'help_text': _('corresponding notes field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': 'notes',
+                'verbose_name': _('notes field'),
+                'help_text': _('corresponding notes field on external source')
+            }
         },
         {
             'name': 'field_added',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'pubDate', 'verbose_name': _('added field'), 'help_text': _('corresponding added field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': 'pubDate',
+                'verbose_name': _('added field'),
+                'help_text': _('corresponding added field on external source')
+            }
         },
         {
             'name': 'field_updated',
             'class': 'CharField',
-            'kwargs': { 'max_length': 64, 'default': 'updated', 'verbose_name': _('updated field'), 'help_text': _('corresponding updated field on external source') }
+            'kwargs': {
+                'max_length': 64,
+                'default': 'updated',
+                'verbose_name': _('updated field'),
+                'help_text': _('corresponding updated field on external source')
+            }
         }
     ]
 
