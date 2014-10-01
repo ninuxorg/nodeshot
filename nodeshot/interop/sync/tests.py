@@ -143,6 +143,10 @@ class SyncTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+        url = reverse('admin:layers_layer_add')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
     def test_config_validation(self):
         layer = Layer.objects.external()[0]
         layer.minimum_distance = 0

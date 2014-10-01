@@ -20,6 +20,7 @@
                     external_info.fadeToggle(250);
                 });
                 // when synchronizer_path is changed
+                {% if object_id %}
                 var reload_schema_url = "{% url 'layer_external_reload_schema' object_id %}",
                     csrftoken = $('#layer_form input[name=csrfmiddlewaretoken]').val();
                 $('#external-group').delegate(
@@ -42,6 +43,7 @@
                         });
                     }
                 )
+                {% endif %}
             });
         })(grp.jQuery);
     </script>
