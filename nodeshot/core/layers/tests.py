@@ -54,14 +54,14 @@ class LayerTest(TestCase):
 
     def test_layer_new_nodes_allowed(self):
         layer = Layer.objects.get(pk=1)
-        layer.area = None
-        layer.nodes_minimum_distance = 0
         layer.new_nodes_allowed = False
+        layer.full_clean()
         layer.save()
 
         # ensure changing an existing node works
         node = layer.node_set.all()[0]
         node.name = 'changed'
+        node.full_clean()
         node.save()
         # re-get from DB, just to be sure
         node = Node.objects.get(pk=node.pk)
@@ -127,9 +127,13 @@ class LayerTest(TestCase):
             new_node.full_clean()
         except ValidationError as e:
             self.assertIn(_('Node must be inside layer area'), e.messages)
-            return
+        else:
+            self.fail('validation not working as expected')
 
-        self.assertTrue(False, 'validation not working as expected')
+        # if area is a point the contains check won't be done
+        layer.area = GEOSGeometry('POINT (30.0 30.0)')
+        layer.save()
+        new_node.full_clean()
 
     def test_layers_api(self,*args,**kwargs):
         """

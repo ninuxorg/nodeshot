@@ -280,7 +280,6 @@ class APITest(BaseTestCase):
     def test_node_details(self):
         """ test node details """
         url = reverse('api_node_details', args=['fusolab'])
-
         # GET: 200
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)

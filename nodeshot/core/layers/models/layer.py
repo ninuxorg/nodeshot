@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib.gis.measure import D
+from django.contrib.gis.geos import Polygon
 
 from django_hstore.fields import DictionaryField
 
@@ -32,7 +33,7 @@ class Layer(BaseDate):
 
     # geographic related fields
     center = models.PointField(_('center coordinates'), null=True, blank=True)
-    area = models.PolygonField(_('area'), null=True, blank=True)
+    area = models.GeometryField(_('area'), null=True)
 
     # organizational
     organization = models.CharField(_('organization'), max_length=255, blank=True,

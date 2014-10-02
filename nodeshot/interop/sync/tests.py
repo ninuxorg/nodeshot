@@ -59,6 +59,7 @@ class SyncTest(TestCase):
         layer.is_external = True
         layer.organization = 'test'
         layer.center = Point(8.96166, 44.4185)
+        layer.area = Point(8.96166, 44.4185)
         layer.full_clean()
         layer.save()
 
@@ -148,7 +149,6 @@ class SyncTest(TestCase):
 
     def test_config_validation(self):
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -180,7 +180,6 @@ class SyncTest(TestCase):
 
     def test_admin_synchronize_action(self):
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -235,7 +234,6 @@ class SyncTest(TestCase):
     def test_openwisp(self):
         """ test OpenWisp synchronizer """
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -308,7 +306,6 @@ class SyncTest(TestCase):
     def test_geojson_sync(self):
         """ test GeoJSON sync """
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -380,7 +377,6 @@ class SyncTest(TestCase):
     def test_preexisting_name(self):
         """ test preexisting names """
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -414,7 +410,6 @@ class SyncTest(TestCase):
     def test_key_mappings(self):
         """ importing a file with different keys """
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -477,7 +472,6 @@ class SyncTest(TestCase):
     def test_georss_simple(self):
         """ test GeoRSS simple """
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -535,7 +529,6 @@ class SyncTest(TestCase):
     def test_georss_w3c(self):
         """ test GeoRSS w3c """
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -592,7 +585,6 @@ class SyncTest(TestCase):
 
     def test_nodeshot_sync(self):
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = True
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
@@ -664,7 +656,6 @@ class SyncTest(TestCase):
 
     def test_nodeshot_sync_exceptions(self):
         layer = Layer.objects.external()[0]
-        layer.area = None
         layer.new_nodes_allowed = True
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
