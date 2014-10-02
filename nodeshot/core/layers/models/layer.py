@@ -35,7 +35,8 @@ class Layer(BaseDate):
     area = models.PolygonField(_('area'), null=True, blank=True)
 
     # organizational
-    organization = models.CharField(_('organization'), help_text=_('Organization which is responsible to manage this layer'), max_length=255)
+    organization = models.CharField(_('organization'), max_length=255, blank=True,
+                                    help_text=_('Organization which is responsible to manage this layer'))
     website = models.URLField(_('Website'), blank=True, null=True)
     email = models.EmailField(_('email'),
                               help_text=_("""possibly an email address that delivers messages to all the active participants;
