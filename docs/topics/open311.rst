@@ -56,7 +56,7 @@ In its simpliest form, the configuration would be this::
 
 Or, if more statuses are possible in your configuration, like in the example below:
 
-.. figure:: statuses.png
+.. figure:: images/statuses.png
 
 each status can be mapped to one of the two values 'open' or 'closed', depending on your needs::
 

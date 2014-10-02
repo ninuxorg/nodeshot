@@ -6,7 +6,7 @@ The participation module makes possible, for registered users, the insertion of 
 
 The actions that can be taken are:
 
-**Vote** : 'like' or 'dislike' 
+**Vote** : 'like' or 'dislike'
 
 **Comment** :  comments on nodes
 
@@ -24,7 +24,7 @@ The modules ``nodeshot.layers`` and ``nodeshot.nodes``  need to be in ``settings
         'nodeshot.core.nodes',
         # ...
     ]
-    
+
 ---------------
 Configuration
 ---------------
@@ -33,11 +33,11 @@ Admins can configure which of the above actions can be taken through the Admin I
 
 Participation actions can be enabled or disabled for an entire **layer**:
 
-.. image:: layer_participation_settings.png
+.. image:: images/layer_participation_settings.png
 
 Or for a single **node**:
 
-.. image:: node_participation_settings.png
+.. image:: images/node_participation_settings.png
 
 ----
 API
@@ -63,6 +63,3 @@ In particular:
 While:
 
 **http://<server-name>/api/v1/<node_slug>/participation/** will return participation data for the specified node
-
-
-

@@ -3,7 +3,7 @@
 Self documented RESTful API
 ***************************
 
-.. image:: nodeshot-api.png
+.. image:: images/nodeshot-api.png
 
 Nodeshot provides a JSON RESTful API to manage most of the data in its database.
 
@@ -23,17 +23,17 @@ The API is enabled by default in ``settings.py``:
 
     INSTALLED_APPS = [
         # ...
-        
+
         # nodeshot
         'nodeshot.core.api',
-        
+
         # ...
     ]
-    
+
     # ...
-    
+
     NODESHOT = {
-        
+
         'SETTINGS': {
             # api prefix examples:
             #   * api/
@@ -42,9 +42,9 @@ The API is enabled by default in ``settings.py``:
             'API_PREFIX': 'api/v1/',
             # other settings ...
         },
-        
+
         # other settings ...
-        
+
         'API': {
             'APPS_ENABLED': [
                 'nodeshot.core.nodes',
@@ -59,7 +59,7 @@ The API is enabled by default in ``settings.py``:
                 'nodeshot.networking.services'
             ]
         },
-        
+
         # other settings ...
     }
 
@@ -69,14 +69,14 @@ API Documentation
 
 By default when you open the API you will see the **self-documented** HTML version.
 
-.. image:: API-resource.png
+.. image:: images/API-resource.png
 
 Each resource has a general description of what is its purpose and which operations supports.
 
 The resources which perform write operations will also have an HTML form with which you can experiment and test the API.
 
-.. image:: API-form.png
+.. image:: images/API-form.png
 
 There's also another auto generated documentation that makes use of the standard **swagger** format which you can see at **http://localhost:8000/api/v1/docs/**
 
-.. image:: swagger.png
+.. image:: images/swagger.png

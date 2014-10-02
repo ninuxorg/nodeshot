@@ -63,7 +63,7 @@ Start the fabfile script with::
 
 The install procedure will start, asking you to insert the parameters that will customize your nodeshot instance:
 
-.. image:: deploy1.png
+.. image:: images/deploy1.png
 
 These are the informations you will have to supply to the install procedure:
 
@@ -79,7 +79,7 @@ These are the informations you will have to supply to the install procedure:
 
 Next, you will have to supply the details for the SSL certificate that will be used for serving Nodeshot over HTTPS:
 
-.. image:: deploy2.png
+.. image:: images/deploy2.png
 
 That's all you have to do: the installation process will start.
 
@@ -91,7 +91,7 @@ As final step, it will start all services and leave you with a full running vers
 
 A message will remind you to change the default admin account password:
 
-.. image:: deploy4.png
+.. image:: images/deploy4.png
 
 =============================
 Updating an existing instance
