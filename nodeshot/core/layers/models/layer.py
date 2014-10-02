@@ -30,7 +30,8 @@ class Layer(BaseDate):
     is_published = models.BooleanField(_('published'), default=True)
     is_external = models.BooleanField(_('is it external?'), default=False)
     # geographic related fields
-    area = models.GeometryField(_('area'), null=True)
+    area = models.GeometryField(_('area'), help_text=_('If a polygon is used nodes of this layer will have to be contained in it.\
+                                                        If a point is used nodes of this layer can be located anywhere. Lines are not allowed.'))
     # organizational
     organization = models.CharField(_('organization'), max_length=255, blank=True,
                                     help_text=_('Organization which is responsible to manage this layer'))

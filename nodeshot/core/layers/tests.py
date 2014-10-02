@@ -312,7 +312,7 @@ class LayerTest(TestCase):
         self.assertEqual(200, response.status_code)
 
         # Node update should succeed because layer area is disabled
-        layer.area = None
+        layer.area = GEOSGeometry("POINT (12.7822391919 41.8720419277)")
         layer.save()
         json_data['geometry'] = json.loads(GEOSGeometry("POINT (50 50)").json)
         url = reverse('api_node_details', args=[node_slug])
