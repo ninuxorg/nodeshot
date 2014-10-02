@@ -1,3 +1,5 @@
+import simplejson as json
+
 from rest_framework import serializers, pagination
 from rest_framework_gis import serializers as geoserializers
 
@@ -26,10 +28,13 @@ class LayerListSerializer(geoserializers.GeoModelSerializer):
     details = serializers.HyperlinkedIdentityField(view_name='api_layer_detail', lookup_field='slug')
     nodes = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_list', lookup_field='slug')
     geojson = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_geojson', lookup_field='slug')
+    center = serializers.SerializerMethodField('get_center')
+
+    def get_center(self, obj):
+        return json.loads(obj.center.geojson)
 
     class Meta:
         model = Layer
-
         fields= (
             'id', 'slug', 'name', 'center', 'area',
             'details', 'nodes', 'geojson'
@@ -50,10 +55,9 @@ class GeoLayerListSerializer(geoserializers.GeoFeatureModelSerializer, LayerList
     class Meta:
         model = Layer
         geo_field = 'area'
-
         fields= ('id', 'name', 'slug')
 
-        
+
 class LayerDetailSerializer(LayerListSerializer):
     """
     Layer details
@@ -82,5 +86,4 @@ class LayerNodeListSerializer(LayerDetailSerializer):
     """
     class Meta:
         model = Layer
-
         fields = ('name', 'description', 'text', 'organization', 'website')

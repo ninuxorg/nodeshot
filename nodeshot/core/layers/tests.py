@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Point
 
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.core.nodes.models import Node  # test additional validation added by layer model
@@ -325,3 +325,14 @@ class LayerTest(TestCase):
 
         # delete new nodes just added before
         n.delete()
+
+    def test_layer_center(self):
+        l = Layer.objects.first()
+        self.assertIsInstance(l.center, Point)
+        self.assertEqual(l.center, l.area)
+        l.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
+        l.save()
+        self.assertIsInstance(l.center, Point)
+        self.assertNotEqual(l.center, l.area)
+        l.area = None
+        self.assertIsNone(l.center)

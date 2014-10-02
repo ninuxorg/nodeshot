@@ -58,7 +58,6 @@ class SyncTest(TestCase):
         layer.description = 'test'
         layer.is_external = True
         layer.organization = 'test'
-        layer.center = Point(8.96166, 44.4185)
         layer.area = Point(8.96166, 44.4185)
         layer.full_clean()
         layer.save()

@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib.gis.measure import D
-from django.contrib.gis.geos import Polygon, Point
+from django.contrib.gis.geos import Polygon, Point, GEOSException
 
 from django_hstore.fields import DictionaryField
 
@@ -26,15 +26,11 @@ class Layer(BaseDate):
                                    help_text=_('short description of this layer'))
     text = models.TextField(_('extended text'), blank=True, null=True,
                             help_text=_('extended description, specific instructions, links, ecc.'))
-
     # record management
     is_published = models.BooleanField(_('published'), default=True)
     is_external = models.BooleanField(_('is it external?'), default=False)
-
     # geographic related fields
-    center = models.PointField(_('center coordinates'), null=True, blank=True)
     area = models.GeometryField(_('area'), null=True)
-
     # organizational
     organization = models.CharField(_('organization'), max_length=255, blank=True,
                                     help_text=_('Organization which is responsible to manage this layer'))
@@ -102,6 +98,20 @@ class Layer(BaseDate):
         """
         if not isinstance(self.area, (Polygon, Point)):
             raise ValidationError('area can be only of type Polygon or Point')
+
+    @property
+    def center(self):
+        # if area is point just return that
+        if isinstance(self.area, Point) or self.area is None:
+            return self.area
+        # otherwise return point_on_surface or centroid
+        try:
+            # point_on_surface guarantees that the point is within the geometry
+            return  self.area.point_on_surface
+        except GEOSException:
+            # fall back on centroid which may not be within the geometry
+            # for example, a horseshoe shaped polygon
+            return self.area.centroid
 
     def update_nodes_published(self):
         """ publish or unpublish nodes of current layer """
