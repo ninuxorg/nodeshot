@@ -44,8 +44,3 @@ PLANNED_STATUS = (
     (1, 'completed'),
     (-1, 'cancelled')
 )
-
-# from 0 to 18
-MAP_ZOOM = (
-    [(n, n) for n in range(0, 19)]
-)

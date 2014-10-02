@@ -26,7 +26,7 @@ class LayerListSerializer(geoserializers.GeoModelSerializer):
     details = serializers.HyperlinkedIdentityField(view_name='api_layer_detail', lookup_field='slug')
     nodes = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_list', lookup_field='slug')
     geojson = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_geojson', lookup_field='slug')
-    
+
     class Meta:
         model = Layer
 
@@ -52,7 +52,7 @@ class GeoLayerListSerializer(geoserializers.GeoFeatureModelSerializer, LayerList
         geo_field = 'area'
 
         fields= ('id', 'name', 'slug')
-        
+
         
 class LayerDetailSerializer(LayerListSerializer):
     """
@@ -60,9 +60,9 @@ class LayerDetailSerializer(LayerListSerializer):
     """
     class Meta:
         model = Layer
-        fields = ('name', 'center', 'area', 'zoom', 'is_external',
+        fields = ('name', 'center', 'area', 'is_external',
                   'description', 'text', 'organization', 'website', 'nodes', 'geojson')
-        
+
 
 class CustomNodeListSerializer(NodeListSerializer):
     class Meta:

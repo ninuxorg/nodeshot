@@ -6,10 +6,9 @@ from django.contrib.gis.measure import D
 from django_hstore.fields import DictionaryField
 
 from nodeshot.core.base.models import BaseDate
-from nodeshot.core.base.choices import MAP_ZOOM as MAP_ZOOM_CHOICES
 from nodeshot.core.nodes.models import Node
 
-from ..settings import settings, ZOOM_DEFAULT, NODE_MINIMUM_DISTANCE
+from ..settings import settings, NODE_MINIMUM_DISTANCE
 from ..managers import LayerManager
 from ..signals import layer_is_published_changed
 
@@ -30,7 +29,6 @@ class Layer(BaseDate):
     # geographic related fields
     center = models.PointField(_('center coordinates'), null=True, blank=True)
     area = models.PolygonField(_('area'), null=True, blank=True)
-    zoom = models.SmallIntegerField(_('default zoom level'), choices=MAP_ZOOM_CHOICES, default=ZOOM_DEFAULT)
 
     # organizational
     organization = models.CharField(_('organization'), help_text=_('Organization which is responsible to manage this layer'), max_length=255)
