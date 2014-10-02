@@ -123,36 +123,31 @@ def new_nodes_allowed_for_layer(self):
     """
     ensure new nodes are allowed for this layer
     """
-    try:
-        if not self.pk and not self.layer.new_nodes_allowed:
-            raise ValidationError(_('New nodes are not allowed for this layer'))
-    except ObjectDoesNotExist:
-        # this happens if node.layer is None
-        return
+    if not self.pk and self.layer and not self.layer.new_nodes_allowed:
+        raise ValidationError(_('New nodes are not allowed for this layer'))
 
 
-def node_layer_validation(self):
+def nodes_minimum_distance_validation(self):
     """
-    1. if minimum distance is specified, ensure node is not too close to other nodes;
-    2. if layer defines an area, ensure node coordinates are contained in the area
+    if minimum distance is specified, ensure node is not too close to other nodes;
     """
-    try:
+    if self.layer and self.layer.nodes_minimum_distance:
         minimum_distance = self.layer.nodes_minimum_distance
-        geometry = self.geometry
-        layer_area = self.layer.area
-    except ObjectDoesNotExist:
-        # this happens if node.layer is None
-        return
-
-    # TODO - lower priority: do this check only when coordinates are changing
-    if minimum_distance > 0:
-        near_nodes = Node.objects.exclude(pk=self.id).filter(geometry__distance_lte=(geometry, D(m=minimum_distance))).count()
+        # TODO - lower priority: do this check only when coordinates are changing
+        near_nodes = Node.objects.exclude(pk=self.id).filter(geometry__distance_lte=(self.geometry, D(m=minimum_distance))).count()
         if near_nodes > 0 :
             raise ValidationError(_('Distance between nodes cannot be less than %s meters') % minimum_distance)
 
-    if layer_area is not None and not layer_area.contains(geometry):
+
+def node_contained_in_layer_area_validation(self):
+    """
+    if layer defines an area, ensure node coordinates are contained in the area
+    """
+    # if area is a polygon ensure it contains the node
+    if self.layer and isinstance(self.layer.area, Polygon) and not self.layer.area.contains(self.geometry):
         raise ValidationError(_('Node must be inside layer area'))
 
 
 Node.add_validation_method(new_nodes_allowed_for_layer)
-Node.add_validation_method(node_layer_validation)
+Node.add_validation_method(nodes_minimum_distance_validation)
+Node.add_validation_method(node_contained_in_layer_area_validation)
