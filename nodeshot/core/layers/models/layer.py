@@ -38,14 +38,11 @@ class Layer(BaseDate):
     organization = models.CharField(_('organization'), max_length=255, blank=True,
                                     help_text=_('Organization which is responsible to manage this layer'))
     website = models.URLField(_('Website'), blank=True, null=True)
-    email = models.EmailField(_('email'),
+    email = models.EmailField(_('email'), blank=True,
                               help_text=_("""possibly an email address that delivers messages to all the active participants;
-                                          if you don't have such an email you can add specific users in the "mantainers" field"""),
-                              blank=True)
-    mantainers = models.ManyToManyField(settings.AUTH_USER_MODEL,
-                                        verbose_name=_('mantainers'),
-                                        help_text=_('you can specify the users who are mantaining this layer so they will receive emails from the system'),
-                                        blank=True)
+                                          if you don't have such an email you can add specific users in the "mantainers" field"""))
+    mantainers = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('mantainers'), blank=True,
+                                        help_text=_('you can specify the users who are mantaining this layer so they will receive emails from the system'))
 
     # settings
     nodes_minimum_distance = models.IntegerField(default=NODES_MINIMUM_DISTANCE,
