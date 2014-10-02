@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib.gis.measure import D
-from django.contrib.gis.geos import Polygon
+from django.contrib.gis.geos import Polygon, Point
 
 from django_hstore.fields import DictionaryField
 
@@ -95,6 +95,13 @@ class Layer(BaseDate):
 
         # update _current_is_published
         self._current_is_published = self.is_published
+
+    def clean(self):
+        """
+        Ensure area is either a Point or a Polygon
+        """
+        if not isinstance(self.area, (Polygon, Point)):
+            raise ValidationError('area can be only of type Polygon or Point')
 
     def update_nodes_published(self):
         """ publish or unpublish nodes of current layer """

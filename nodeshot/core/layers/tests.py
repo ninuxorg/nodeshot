@@ -109,32 +109,6 @@ class LayerTest(TestCase):
 
         self.assertTrue(False, 'validation not working as expected')
 
-    def test_layer_area_validation(self):
-        """ ensure area validation works as expected """
-        layer = Layer.objects.get(slug='rome')
-        layer.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
-        layer.save()
-
-        # creating node with same coordinates should not be an issue
-        new_node = Node(**{
-            'name': 'new_node',
-            'slug': 'new_node',
-            'layer': layer,
-            'geometry': 'POINT (50.0 50.0)'
-        })
-
-        try:
-            new_node.full_clean()
-        except ValidationError as e:
-            self.assertIn(_('Node must be inside layer area'), e.messages)
-        else:
-            self.fail('validation not working as expected')
-
-        # if area is a point the contains check won't be done
-        layer.area = GEOSGeometry('POINT (30.0 30.0)')
-        layer.save()
-        new_node.full_clean()
-
     def test_layers_api(self,*args,**kwargs):
         """
         Layers endpoint should be reachable and return 404 if layer is not found.
@@ -201,7 +175,6 @@ class LayerTest(TestCase):
 
     def test_layers_api_post(self):
         layer_count = Layer.objects.all().count()
-
         # POST to create, 400
         self.client.login(username='registered', password='tester')
         data = {
@@ -224,15 +197,58 @@ class LayerTest(TestCase):
     def test_unpublish_layer_should_unpublish_nodes(self):
         layer = Layer.objects.first()
         layer.is_published = False
+        layer.full_clean()
         layer.save()
         for node in layer.node_set.all():
             self.assertFalse(node.is_published)
 
         layer = Layer.objects.first()
         layer.is_published = True
+        layer.full_clean()
         layer.save()
         for node in layer.node_set.all():
             self.assertTrue(node.is_published)
+
+    def test_layer_area_point_or_polygon(self):
+        layer = Layer.objects.get(slug='rome')
+        layer.area = GEOSGeometry('LINESTRING (12.19 41.92, 12.58 42.17)')
+        try:
+            layer.full_clean()
+        except ValidationError as e:
+            self.assertIn('Polygon', str(e))
+            self.assertIn('Point', str(e))
+        else:
+            self.fail('ValidationError not raised (Polygon/Point area check)')
+        layer.area = GEOSGeometry('POINT (12.19 41.92)')
+        layer.full_clean()
+
+    def test_layer_area_contains_node_validation(self):
+        """ ensure area validation works as expected """
+        layer = Layer.objects.get(slug='rome')
+        layer.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
+        layer.full_clean()
+        layer.save()
+
+        # creating node with same coordinates should not be an issue
+        new_node = Node(**{
+            'name': 'new_node',
+            'slug': 'new_node',
+            'layer': layer,
+            'geometry': 'POINT (50.0 50.0)'
+        })
+
+        try:
+            new_node.full_clean()
+        except ValidationError as e:
+            self.assertIn(_('Node must be inside layer area'), e.messages)
+        else:
+            self.fail('validation not working as expected')
+
+        # if area is a point the contains check won't be done
+        layer.area = GEOSGeometry('POINT (30.0 30.0)')
+        layer.full_clean()
+        layer.save()
+        new_node.full_clean()
 
     def test_node_geometry_distance_and_area(self):
         """ test minimum distance check between nodes """
@@ -250,6 +266,7 @@ class LayerTest(TestCase):
         }
         layer = Layer.objects.get(pk=1)
         layer.nodes_minimum_distance = 100
+        layer.full_clean()
         layer.save()
 
         # Node coordinates don't respect minimum distance. Insert should fail because coords are near to already existing PoI ( fusolab )
