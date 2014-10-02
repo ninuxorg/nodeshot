@@ -61,6 +61,7 @@ Contents
 
    /topics/manual_install
    /topics/automated_install
+   /topics/layers
    /topics/social_login
    /topics/admin
    /topics/api
