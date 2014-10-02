@@ -17,7 +17,7 @@ from .models import Layer
 
 
 class LayerTest(TestCase):
-    
+
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -25,17 +25,17 @@ class LayerTest(TestCase):
         'test_status.json',
         'test_nodes.json'
     ]
-    
+
     def setUp(self):
         pass
-    
+
     def test_layer_manager(self):
         """ test Layer custom Manager """
         # published() method
         layers_count = Layer.objects.all().count()
         published_layers_count = Layer.objects.published().count()
         self.assertEquals(published_layers_count, layers_count)
-        
+
         # after unpublishing one layer we should get 1 less layer in total
         l = Layer.objects.get(pk=1)
         l.is_published = False
@@ -43,22 +43,22 @@ class LayerTest(TestCase):
         layers_count = Layer.objects.all().count()
         published_layers_count = Layer.objects.published().count()
         self.assertEquals(published_layers_count, layers_count-1)
-        
+
         # external() method
         self.assertEquals(Layer.objects.external().count(), Layer.objects.filter(is_external=True).count())
-        
+
         # mix external and published
         count = Layer.objects.filter(is_external=True, is_published=True).count()
         self.assertEquals(Layer.objects.external().published().count(), count)
         self.assertEquals(Layer.objects.published().external().count(), count)
-    
+
     def test_layer_new_nodes_allowed(self):
         layer = Layer.objects.get(pk=1)
-        layer.new_nodes_allowed = False
         layer.area = None
-        layer.minimum_distance = 0
+        layer.nodes_minimum_distance = 0
+        layer.new_nodes_allowed = False
         layer.save()
-        
+
         # ensure changing an existing node works
         node = layer.node_set.all()[0]
         node.name = 'changed'
@@ -66,7 +66,7 @@ class LayerTest(TestCase):
         # re-get from DB, just to be sure
         node = Node.objects.get(pk=node.pk)
         self.assertEqual(node.name, 'changed')
-        
+
         # ensure new node cannot be added
         node = Node(**{
             'name': 'test new node',
@@ -76,18 +76,18 @@ class LayerTest(TestCase):
         })
         with self.assertRaises(ValidationError):
             node.full_clean()
-        
+
         try:
             node.full_clean()
             assert()
         except ValidationError as e:
             self.assertIn(_('New nodes are not allowed for this layer'), e.messages)
-    
-    def test_layer_minimum_distance(self):
+
+    def test_layer_nodes_minimum_distance(self):
         """ ensure minimum distance settings works as expected """
         layer = Layer.objects.get(slug='rome')
         node = layer.node_set.all()[0]
-        
+
         # creating node with same coordinates should not be an issue
         new_node = Node(**{
             'name': 'new_node',
@@ -97,24 +97,24 @@ class LayerTest(TestCase):
         })
         new_node.full_clean()
         new_node.save()
-        
-        layer.minimum_distance = 100
+
+        layer.nodes_minimum_distance = 100
         layer.save()
-        
+
         try:
             new_node.full_clean()
         except ValidationError as e:
-            self.assertIn(_('Distance between nodes cannot be less than %s meters') % layer.minimum_distance, e.messages)
+            self.assertIn(_('Distance between nodes cannot be less than %s meters') % layer.nodes_minimum_distance, e.messages)
             return
-        
+
         self.assertTrue(False, 'validation not working as expected')
-    
+
     def test_layer_area_validation(self):
         """ ensure area validation works as expected """
         layer = Layer.objects.get(slug='rome')
         layer.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
         layer.save()
-        
+
         # creating node with same coordinates should not be an issue
         new_node = Node(**{
             'name': 'new_node',
@@ -122,15 +122,15 @@ class LayerTest(TestCase):
             'layer': layer,
             'geometry': 'POINT (50.0 50.0)'
         })
-        
+
         try:
             new_node.full_clean()
         except ValidationError as e:
             self.assertIn(_('Node must be inside layer area'), e.messages)
             return
-        
+
         self.assertTrue(False, 'validation not working as expected')
-    
+
     def test_layers_api(self,*args,**kwargs):
         """
         Layers endpoint should be reachable and return 404 if layer is not found.
@@ -138,30 +138,30 @@ class LayerTest(TestCase):
         layer = Layer.objects.get(pk=1)
         layer_slug = layer.slug
         fake_layer_slug = "idontexist"
-        
+
         # api_layer list
         response = self.client.get(reverse('api_layer_list'))
         self.assertEqual(response.status_code, 200)
-        
+
         # api's expecting slug in request,test with existing and fake slug
         # api_layer_detail
         response = self.client.get(reverse('api_layer_detail', args=[layer_slug]))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('api_layer_detail', args=[fake_layer_slug]))
         self.assertEqual(response.status_code, 404)
-        
+
         # api_layer_nodes
         response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('api_layer_nodes_list', args=[fake_layer_slug]))
         self.assertEqual(response.status_code, 404)
-        
+
         # api_layer_nodes_geojson
         response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('api_layer_nodes_geojson', args=[fake_layer_slug]))
         self.assertEqual(response.status_code, 404)
-        
+
     def test_layers_api_results(self,*args,**kwargs):
         """
         layers resources should return the expected number of objects
@@ -170,62 +170,137 @@ class LayerTest(TestCase):
         layer_count = Layer.objects.all().count()
         layer_nodes = layer.node_set.count()
         layer_slug = layer.slug
-        
+
         # api_layer list
         response = self.client.get(reverse('api_layer_list'))
         api_layer_count = len(response.data)
         self.assertEqual(api_layer_count, layer_count)
-        
-        # api_layer_nodes_list 
+
+        # api_layer_nodes_list
         response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]))
         layer_public_nodes_count = Node.objects.filter(layer=layer).published().access_level_up_to('public').count()
         self.assertEqual(len(response.data['nodes']['results']), layer_public_nodes_count)
-        
+
         # ensure number of elements is the expected, even by disabling layerinfo and pagination
         response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]), { 'limit': 0, 'layerinfo': 'false' })
         self.assertEqual(len(response.data), layer_public_nodes_count)
-        
+
         # api_layer_nodes_geojson
         response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]), { 'limit': 0, 'layerinfo': 'true' })
         # each of 'features' values in geojson is a node
         self.assertEqual(len(response.data['nodes']['features']), layer_public_nodes_count)
-        
+
         # test layer info geojson without layerinfo
         response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]), { 'limit': 0 })
         # ensure "features" are at root level
         self.assertEqual(len(response.data['features']), layer_public_nodes_count)
-        
+
     def test_layers_api_post(self):
         layer_count = Layer.objects.all().count()
-        
+
         # POST to create, 400
         self.client.login(username='registered', password='tester')
         data = {
             "name": "test",
-            "slug": "test", 
-            "center": "POINT (38.1154075128999921 12.5107643007999929)", 
-            "area": None
+            "slug": "test",
+            "center": "POINT (38.1154075128999921 12.5107643007999929)",
+            "area": "POINT (38.1154075128999921 12.5107643007999929)"
         }
         response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 403)
         self.assertEqual(layer_count, Layer.objects.all().count())
-        
+
         # POST to create 200
         self.client.logout()
         self.client.login(username='admin', password='tester')
         response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(layer_count + 1, Layer.objects.all().count())
-    
+        self.assertEqual(Layer.objects.all().count(), layer_count + 1)
+
     def test_unpublish_layer_should_unpublish_nodes(self):
         layer = Layer.objects.first()
         layer.is_published = False
         layer.save()
         for node in layer.node_set.all():
             self.assertFalse(node.is_published)
-        
+
         layer = Layer.objects.first()
         layer.is_published = True
         layer.save()
         for node in layer.node_set.all():
             self.assertTrue(node.is_published)
+
+    def test_node_geometry_distance_and_area(self):
+        """ test minimum distance check between nodes """
+        self.client.login(username='admin', password='tester')
+
+        url = reverse('api_node_list')
+
+        json_data = {
+            "layer": "rome",
+            "name": "test_distance",
+            "slug": "test_distance",
+            "address": "via dei test",
+            "description": "",
+            "geometry": json.loads(GEOSGeometry("POINT (12.5822391919000012 41.8720419276999820)").json),
+        }
+        layer = Layer.objects.get(pk=1)
+        layer.nodes_minimum_distance = 100
+        layer.save()
+
+        # Node coordinates don't respect minimum distance. Insert should fail because coords are near to already existing PoI ( fusolab )
+        response = self.client.post(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+
+        # Node coordinates respect minimum distance. Insert should succed
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (12.7822391919 41.8720419277)").json);
+        response = self.client.post(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(201, response.status_code)
+
+        # Disable minimum distance control in layer and update node inserting coords too near. Insert should succed
+        layer.nodes_minimum_distance = 0
+        layer.save()
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (12.5822391917 41.872042278)").json)
+        n = Node.objects.get(slug='test_distance')
+        node_slug = n.slug
+        url = reverse('api_node_details', args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+
+        # re-enable minimum distance and update again with coords too near. Insert should fail
+        layer.nodes_minimum_distance = 100
+        layer.save()
+        url = reverse('api_node_details', args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+
+        # Defining an area for the layer and testing if node is inside the area
+        layer.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
+        layer.save()
+
+        # Node update should fail because coords are outside layer area
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (50 50)").json)
+        url = reverse('api_node_details', args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(400, response.status_code)
+
+        # Node update should succeed because coords are inside layer area and respect minimum distance
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (12.7822391919 41.8720419277)").json)
+        url = reverse('api_node_details', args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+
+        # Node update should succeed because layer area is disabled
+        layer.area = None
+        layer.save()
+        json_data['geometry'] = json.loads(GEOSGeometry("POINT (50 50)").json)
+        url = reverse('api_node_details', args=[node_slug])
+        response = self.client.put(url, json.dumps(json_data), content_type='application/json')
+        self.assertEqual(200, response.status_code)
+
+        # re-enable minimum distance
+        layer.nodes_minimum_distance = 100
+        layer.save()
+
+        # delete new nodes just added before
+        n.delete()

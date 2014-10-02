@@ -148,7 +148,6 @@ class SyncTest(TestCase):
 
     def test_config_validation(self):
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
@@ -181,7 +180,6 @@ class SyncTest(TestCase):
 
     def test_admin_synchronize_action(self):
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
@@ -237,7 +235,6 @@ class SyncTest(TestCase):
     def test_openwisp(self):
         """ test OpenWisp synchronizer """
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
@@ -311,7 +308,6 @@ class SyncTest(TestCase):
     def test_geojson_sync(self):
         """ test GeoJSON sync """
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
@@ -384,7 +380,6 @@ class SyncTest(TestCase):
     def test_preexisting_name(self):
         """ test preexisting names """
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
@@ -419,7 +414,6 @@ class SyncTest(TestCase):
     def test_key_mappings(self):
         """ importing a file with different keys """
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
@@ -483,7 +477,6 @@ class SyncTest(TestCase):
     def test_georss_simple(self):
         """ test GeoRSS simple """
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
@@ -542,7 +535,6 @@ class SyncTest(TestCase):
     def test_georss_w3c(self):
         """ test GeoRSS w3c """
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = False
         layer.save()
@@ -600,7 +592,6 @@ class SyncTest(TestCase):
 
     def test_nodeshot_sync(self):
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = True
         layer.save()
@@ -673,7 +664,6 @@ class SyncTest(TestCase):
 
     def test_nodeshot_sync_exceptions(self):
         layer = Layer.objects.external()[0]
-        layer.minimum_distance = 0
         layer.area = None
         layer.new_nodes_allowed = True
         layer.save()

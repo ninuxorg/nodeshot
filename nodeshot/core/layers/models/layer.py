@@ -8,13 +8,17 @@ from django_hstore.fields import DictionaryField
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
 
-from ..settings import settings, NODE_MINIMUM_DISTANCE
+from ..settings import settings, NODES_MINIMUM_DISTANCE
 from ..managers import LayerManager
 from ..signals import layer_is_published_changed
 
 
 class Layer(BaseDate):
-    """ Layer Model """
+    """
+    Layer Model
+    A layer represent a categorization of nodes.
+    Layers might have geographical boundaries and might be managed by certain organizations.
+    """
     name = models.CharField(_('name'), max_length=50, unique=True)
     slug = models.SlugField(max_length=50, db_index=True, unique=True)
     description = models.CharField(_('description'), max_length=250, blank=True, null=True,
@@ -43,9 +47,8 @@ class Layer(BaseDate):
                                         blank=True)
 
     # settings
-    # TODO: rename minimum_distance to nodes_minimum_distance
-    minimum_distance = models.IntegerField(default=NODE_MINIMUM_DISTANCE,
-                                           help_text=_('minimum distance between nodes in meters, 0 means feature disabled'))
+    nodes_minimum_distance = models.IntegerField(default=NODES_MINIMUM_DISTANCE,
+                                                help_text=_('minimum distance between nodes in meters, 0 means there is no minimum distance'))
     new_nodes_allowed = models.BooleanField(_('new nodes allowed'), default=True, help_text=_('indicates whether users can add new nodes to this layer'))
     # TODO: HSTORE_SCHEMA setting
     data = DictionaryField(_('extra data'), null=True, blank=True,\
@@ -107,6 +110,7 @@ class Layer(BaseDate):
 
 # ------ Add Layer related methods to Node class ------ #
 
+
 @property
 def intersecting_layers(self):
     return Layer.objects.filter(area__contains=self.point)
@@ -115,6 +119,7 @@ Node.intersecting_layers = intersecting_layers
 
 
 # ------ Additional validation for Node model ------ #
+
 
 def new_nodes_allowed_for_layer(self):
     """
@@ -127,14 +132,14 @@ def new_nodes_allowed_for_layer(self):
         # this happens if node.layer is None
         return
 
-# TODO: thes features must be tested inside the layer's app code (nodeshot.core.layers.tests)
+
 def node_layer_validation(self):
     """
     1. if minimum distance is specified, ensure node is not too close to other nodes;
     2. if layer defines an area, ensure node coordinates are contained in the area
     """
     try:
-        minimum_distance = self.layer.minimum_distance
+        minimum_distance = self.layer.nodes_minimum_distance
         geometry = self.geometry
         layer_area = self.layer.area
     except ObjectDoesNotExist:
@@ -149,6 +154,7 @@ def node_layer_validation(self):
 
     if layer_area is not None and not layer_area.contains(geometry):
         raise ValidationError(_('Node must be inside layer area'))
+
 
 Node.add_validation_method(new_nodes_allowed_for_layer)
 Node.add_validation_method(node_layer_validation)
