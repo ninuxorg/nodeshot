@@ -9,7 +9,7 @@ from django_hstore.fields import DictionaryField
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.nodes.models import Node
 
-from ..settings import settings, NODES_MINIMUM_DISTANCE
+from ..settings import settings, NODES_MINIMUM_DISTANCE, HSTORE_SCHEMA
 from ..managers import LayerManager
 from ..signals import layer_is_published_changed
 
@@ -41,14 +41,11 @@ class Layer(BaseDate):
                                           if you don't have such an email you can add specific users in the "mantainers" field"""))
     mantainers = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('mantainers'), blank=True,
                                         help_text=_('you can specify the users who are mantaining this layer so they will receive emails from the system'))
-
     # settings
     nodes_minimum_distance = models.IntegerField(default=NODES_MINIMUM_DISTANCE,
                                                 help_text=_('minimum distance between nodes in meters, 0 means there is no minimum distance'))
     new_nodes_allowed = models.BooleanField(_('new nodes allowed'), default=True, help_text=_('indicates whether users can add new nodes to this layer'))
-    # TODO: HSTORE_SCHEMA setting
-    data = DictionaryField(_('extra data'), null=True, blank=True,\
-                           help_text=_('store extra attributes in JSON string'))
+    data = DictionaryField(_('extra data'), schema=HSTORE_SCHEMA, null=True, editable=False)
 
     # default manager
     objects = LayerManager()

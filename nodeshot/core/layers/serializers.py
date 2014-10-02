@@ -2,6 +2,7 @@ import simplejson as json
 
 from rest_framework import serializers, pagination
 from rest_framework_gis import serializers as geoserializers
+from rest_framework_hstore.serializers import HStoreSerializer
 
 from nodeshot.core.base.serializers import GeoJSONPaginationSerializer
 from nodeshot.core.nodes.models import Node
@@ -21,7 +22,13 @@ __all__ = [
 ]
 
 
-class LayerListSerializer(geoserializers.GeoModelSerializer):
+try:
+    ADDITIONAL_LAYER_FIELDS = Layer._hstore_virtual_fields.keys()
+except AttributeError:
+    ADDITIONAL_LAYER_FIELDS = []
+
+
+class LayerListSerializer(geoserializers.GeoModelSerializer, HStoreSerializer):
     """
     Layer list
     """
@@ -35,10 +42,10 @@ class LayerListSerializer(geoserializers.GeoModelSerializer):
 
     class Meta:
         model = Layer
-        fields= (
+        fields= [
             'id', 'slug', 'name', 'center', 'area',
             'details', 'nodes', 'geojson'
-        )
+        ] + ADDITIONAL_LAYER_FIELDS
 
 
 class PaginatedLayerListSerializer(pagination.PaginationSerializer):
@@ -55,7 +62,7 @@ class GeoLayerListSerializer(geoserializers.GeoFeatureModelSerializer, LayerList
     class Meta:
         model = Layer
         geo_field = 'area'
-        fields= ('id', 'name', 'slug')
+        fields= ['id', 'name', 'slug'] + ADDITIONAL_LAYER_FIELDS
 
 
 class LayerDetailSerializer(LayerListSerializer):
@@ -64,8 +71,9 @@ class LayerDetailSerializer(LayerListSerializer):
     """
     class Meta:
         model = Layer
-        fields = ('name', 'center', 'area', 'is_external',
-                  'description', 'text', 'organization', 'website', 'nodes', 'geojson')
+        fields = ['name', 'center', 'area', 'is_external',
+                  'description', 'text', 'organization',
+                  'website', 'nodes', 'geojson'] + ADDITIONAL_LAYER_FIELDS
 
 
 class CustomNodeListSerializer(NodeListSerializer):
@@ -86,4 +94,4 @@ class LayerNodeListSerializer(LayerDetailSerializer):
     """
     class Meta:
         model = Layer
-        fields = ('name', 'description', 'text', 'organization', 'website')
+        fields = ['name', 'description', 'text', 'organization', 'website'] + ADDITIONAL_LAYER_FIELDS
