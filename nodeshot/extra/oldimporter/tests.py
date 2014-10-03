@@ -48,10 +48,10 @@ class TestOldImporter(TestCase):
         l.description = 'Default Layer'
         l.organization = 'Test'
         l.published = True
-        l.geometry = Point(40.0, 10.0)
+        l.area = Point(40.0, 10.0)
         l.full_clean()
         l.save()
-    
+
     def test_command(self):
         for user in User.objects.all():
             user.delete()
