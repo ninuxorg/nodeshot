@@ -4,7 +4,7 @@ from django.contrib.gis.geos import GEOSException
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
 
-from nodeshot.core.base.models import BaseAccessLevel, BaseOrdered
+from nodeshot.core.base.models import BaseAccessLevel
 from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as NodeManager
 
 from django_hstore.fields import DictionaryField

@@ -1,5 +1,3 @@
-from django.utils.translation import ugettext_lazy as _
-
 from rest_framework import serializers, pagination
 from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers

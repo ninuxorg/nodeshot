@@ -2,7 +2,7 @@ from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.db.models import Q, Count
+from django.db.models import Q
 
 from rest_framework import permissions, authentication, generics
 
