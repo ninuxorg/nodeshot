@@ -17,9 +17,9 @@ Replace *http://localhost:8000* with your actual hostname.
 Settings
 ========
 
-The API app is in ``nodeshot.core.api`` and is enabled by default in ``nodeshot.conf.settings``.
+``nodeshot.core.api`` is enabled by default in ``nodeshot.conf.settings.INSTALLED_APPS``.
 
-These are the following customizable settings:
+These are the available customizable settings:
 
  * ``NODESHOT_API_PREFIX``
  * ``NODESHOT_API_APPS_ENABLED``
