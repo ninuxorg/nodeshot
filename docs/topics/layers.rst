@@ -10,18 +10,23 @@ The **area** field is required and can be either a **polygon** or a **point**. I
 its nodes will have to be contained in it and its center will be calculated automatically;
 otherwise, if a point is used its nodes will be allowed to be located anywhere and the point will be considered its center.
 
-``nodeshot.core.layers`` is installed by default.
-
 ==================
 Available settings
 ==================
 
-Follows an explaination of the available customizable settings.
+``nodeshot.core.layers`` is enabled by default in ``nodeshot.conf.settings.INSTALLED_APPS``.
+
+These are the available customizable settings:
+
+ * ``NODESHOT_LAYERS_HSTORE_SCHEMA``
+ * ``NODESHOT_API_APPS_ENABLED``
 
 NODESHOT_LAYERS_HSTORE_SCHEMA
 -----------------------------
 
-``NODESHOT_LAYERS_HSTORE_SCHEMA``: custom **django-hstore** schema to add new fields on the ``Layer`` model and API, defaults to ``None``.
+**default**: ``None``
+
+custom **django-hstore** schema to add new fields on the ``Layer`` model and API.
 
 The following example will add a category field with a select of 3 choices:
 
@@ -49,21 +54,27 @@ Consult the `django-hstore documentation`_ for more information (look for ``sche
 
 .. _django-hstore documentation: http://djangonauts.github.io/django-hstore/#_model_setup
 
-NODES_MINIMUM_DISTANCE
-----------------------
+NODESHOT_LAYERS_NODES_MINIMUM_DISTANCE
+--------------------------------------
 
-Default value for the field ``nodes_minimum_distance``, defaults to ``0``.
+**default**: ``0``
 
-REVERSION_ENABLED
------------------
+Default value for the field ``nodes_minimum_distance`` on the ``Layer`` model.
 
-Indicates whether the Layer model can revert changes saved in the history by using `django-reversion`_, defaults to ``True``.
+NODESHOT_LAYERS_REVERSION_ENABLED
+---------------------------------
+
+**default**: ``True``
+
+Indicates whether the Layer model can revert changes saved in the history by using `django-reversion`_.
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 
-TEXT_HTML
----------
+NODESHOT_LAYERS_TEXT_HTML
+-------------------------
 
-Indicates whether the **"Extended text"** field of the ``Layer`` model allows **HTML** or not, defaults to ``True``.
+**default**: ``True``
 
-If ``True`` an **WYSIWYG** editor will be used in the admin site.
+Indicates whether the **"Extended text"** field of the ``Layer`` model allows **HTML** or not.
+
+If ``True`` a **WYSIWYG** editor will be used in the admin site.
