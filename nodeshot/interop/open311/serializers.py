@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -9,7 +8,8 @@ from nodeshot.community.participation.models import Vote, Comment, Rating
 from nodeshot.core.base.serializers import ExtraFieldSerializer
 
 from .base import SERVICES
-from .settings import settings, TYPE
+from .settings import settings, TYPE, STATUS
+
 
 __all__ = [
     'ServiceRatingSerializer',
@@ -344,14 +344,11 @@ class NodeRequestListSerializer(ExtraFieldSerializer):
     def get_image_urls(self,obj):
         image_url =[]
 
-        try:
-            image = Image.objects.all().filter(node=obj.id)
-        except:
-            image=None
+        images = Image.objects.filter(node=obj.id)
 
-        if image is not None:
-            for i in image:
-                    image_url.append( '%s%s' % (settings.MEDIA_URL, i))
+        if images:
+            for image in images:
+                image_url.append('%s%s' % (settings.MEDIA_URL, image.file))
             return image_url
         else:
             return ""

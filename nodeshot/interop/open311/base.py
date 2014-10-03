@@ -5,7 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from nodeshot.core.nodes.models import Node
 from nodeshot.community.participation.models import Vote, Comment, Rating
 
-from .settings import DISCOVERY, STATUS
+from .settings import DISCOVERY
+
 
 SERVICES = {
     'node': {
