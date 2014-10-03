@@ -43,11 +43,11 @@ class Node(BaseAccessLevel):
 
     # descriptive information
     description = models.TextField(_('description'), max_length=255, blank=True, null=True)
-    notes = models.TextField(_('notes'), blank=True, null=True,\
+    notes = models.TextField(_('notes'), blank=True, null=True,
                              help_text=_('for internal use only'))
 
-    data = DictionaryField(_('extra data'), null=True, blank=True, schema=HSTORE_SCHEMA,\
-                           help_text=_('store extra attributes in JSON string'))
+    data = DictionaryField(_('extra data'), null=True, blank=True,
+                           editable=False, schema=HSTORE_SCHEMA)
 
     # manager
     objects = NodeManager()
