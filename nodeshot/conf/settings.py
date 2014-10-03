@@ -120,10 +120,10 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'profiles.Profile'
 
 if 'old_nodeshot' in settings.DATABASES:
-    INSTALLED_APPS.append('nodeshot.extra.oldimporter')
+    INSTALLED_APPS.append('nodeshot.interop.oldimporter')
     DATABASE_ROUTERS = [
-        'nodeshot.extra.oldimporter.db.DefaultRouter',
-        'nodeshot.extra.oldimporter.db.OldNodeshotRouter'
+        'nodeshot.interop.oldimporter.db.DefaultRouter',
+        'nodeshot.interop.oldimporter.db.OldNodeshotRouter'
     ]
 
 # ------ DJANGO CACHE ------ #

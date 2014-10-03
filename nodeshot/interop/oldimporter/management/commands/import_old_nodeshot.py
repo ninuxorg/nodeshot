@@ -38,7 +38,7 @@ from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 from nodeshot.networking.links.models import Link
 from nodeshot.networking.links.models.choices import LINK_STATUS, LINK_TYPES, METRIC_TYPES
 from nodeshot.community.mailing.models import Inward
-from nodeshot.extra.oldimporter.models import *
+from nodeshot.interop.oldimporter.models import *
 
 
 class Command(BaseCommand):
@@ -46,7 +46,7 @@ class Command(BaseCommand):
     Will try to import data from old nodeshot.
 
     Requirements for settings:
-        * nodeshot.extra.oldimporter must be in INSTALLED_APPS
+        * nodeshot.interop.oldimporter must be in INSTALLED_APPS
         * old_nodeshot database must be configured
         * database routers directives must be uncommented
 

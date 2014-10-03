@@ -23,7 +23,7 @@ For the **oldimporter** module to work, the following apps must be listed in
  * nodeshot.networking.links
  * nodeshot.community.mailing
  * nodeshot.community.profiles
- 
+
 By default these apps are included in ``nodeshot.conf.settings`` so you won't need to do anything.
 
 ===========
@@ -173,7 +173,7 @@ To automate the periodic import add the following dictionary in your ``CELERYBEA
         # ...
 
         'import_old_nodeshot': {
-           'task': 'nodeshot.extra.oldimporter.tasks.import_old_nodeshot',
+           'task': 'nodeshot.interop.oldimporter.tasks.import_old_nodeshot',
            'schedule': timedelta(hours=12),
            # pass --noinput and --nodelete options
            'kwargs': { 'noinput': True, 'nodelete': True }

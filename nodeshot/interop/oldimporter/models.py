@@ -15,7 +15,7 @@ check_dependencies(
         'nodeshot.community.mailing',
         'nodeshot.community.profiles',
     ],
-    module='nodeshot.extra.oldimporter'
+    module='nodeshot.interop.oldimporter'
 )
 
 from django.db import models
@@ -46,25 +46,25 @@ class OldNode(models.Model):
     email3 = models.EmailField(blank=True, null=True)
     password =  models.CharField(max_length=255, help_text=_('Use "[algo]$[salt]$[hexdigest]" or use the  <a href="password/">change password form</a>.'))
     lat = models.FloatField(_('latitude'))
-    lng = models.FloatField(_('longitude')) 
+    lng = models.FloatField(_('longitude'))
     alt = models.FloatField(_('altitude'), blank=True, null=True)
     status = models.CharField(_('status'), max_length=3, choices=NODE_STATUS, default='p')
     activation_key = models.CharField(_('activation key'), max_length=40, blank=True, null=True, help_text=_('Key needed for activation of the node. It\'s deleted once the node is activated.'))
     notes = models.TextField(_('notes'), blank=True, null=True)
     added = models.DateTimeField(_('added on'), auto_now_add=True)
     updated = models.DateTimeField(_('updated on'), auto_now=True)
-    
+
     def get_lat(self):
         """ returns latitude as string (avoid django converting the dot . into a comma , in certain language sets) """
         return str(self.lat)
-        
+
     def get_lng(self):
         """ returns longitude as string (avoid django converting the dot . into a comma , in certain language sets) """
-        return str(self.lng)    
-    
+        return str(self.lng)
+
     def __unicode__(self):
         return u'%s' % (self.name)
-    
+
     class Meta:
         verbose_name = _('Node')
         verbose_name_plural = _('Nodes')
@@ -75,16 +75,16 @@ class OldDevice(models.Model):
     name = models.CharField(_('name'), max_length=50, unique=True)
     cname = models.SlugField(_('CNAME'), help_text=_('Name used for DNS resolution. Example: grid1 becomes grid1.nodename.domain.org. If left empty device name is used as default.'), max_length=30, blank=True, null=True)
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
-    type = models.CharField(_('type'), max_length=50, blank=True, null=True) 
+    type = models.CharField(_('type'), max_length=50, blank=True, null=True)
     node = models.ForeignKey(OldNode, verbose_name=_('node'))
     routing_protocol = models.CharField(_('routing protocol'), max_length=20, choices=ROUTING_PROTOCOLS, default=DEFAULT_ROUTING_PROTOCOL)
     routing_protocol_version = models.CharField(_('routing protocol version'), max_length=10, blank=True, null=True)
     added = models.DateTimeField(_('added on'), auto_now_add=True)
     updated = models.DateTimeField(_('updated on'), auto_now=True)
-    
+
     def __unicode__(self):
         return self.name
-    
+
     class Meta:
         unique_together = (('node', 'cname'),)
         verbose_name = _('OldDevice')
@@ -95,10 +95,10 @@ class OldDevice(models.Model):
 class OldHna(models.Model):
     device = models.ForeignKey(OldDevice)
     route = models.CharField(max_length=43)
-    
+
     def __unicode__(self):
         return u'%s' % (self.route)
-        
+
     class Meta:
         verbose_name = _('Hna')
         verbose_name_plural = _('Hna')
@@ -115,13 +115,13 @@ class OldInterface(models.Model):
     draw_link = models.BooleanField(_('Draw links'), help_text=_('Draw links from/to this interface (not valid for VPN interfaces)'), default=True, blank=True)
     wireless_mode = models.CharField(max_length=5, choices=WIRELESS_MODE, blank=True, null=True)
     wireless_channel = models.CharField(max_length=4, choices=WIRELESS_CHANNEL, blank=True, null=True)
-    wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)    
+    wireless_polarity = models.CharField(max_length=1, choices=WIRELESS_POLARITY, blank=True, null=True)
     essid = models.CharField(max_length=50, null=True, blank=True, default=None)
     bssid = models.CharField(max_length=50, null=True, blank=True, default=None)
     status = models.CharField(_('status'), max_length=1, choices=INTERFACE_STATUS, default='u')
     added = models.DateTimeField(auto_now_add=True,)
     updated = models.DateTimeField(auto_now=True)
-    
+
     def __unicode__(self):
         if self.ipv4_address:
             value = self.ipv4_address
@@ -132,7 +132,7 @@ class OldInterface(models.Model):
         else:
             value = self.device.name
         return value
-    
+
     class Meta:
         unique_together = (('device', 'cname'),)
         verbose_name = _('Interface')
@@ -148,7 +148,7 @@ class OldLink(models.Model):
     sync_tx = models.IntegerField(default=0)
     sync_rx = models.IntegerField(default=0)
     hide = models.BooleanField(_('Hide from map'), default=False)
-    
+
     def get_quality(self, type='etx'):
         """ used to determine color of links"""
         if type == 'etx':
@@ -166,14 +166,14 @@ class OldLink(models.Model):
             else:
                 quality = 3
         return quality
-    
+
     def get_etx(self):
         """ return etx as a string to avoid dot to comma conversion (it happens only with certain LANGUAGE_CODEs like IT)"""
         return str(self.etx)
-    
+
     def __unicode__(self):
         return u'%s » %s' % (self.from_interface.device, self.to_interface.device)
-        
+
     class Meta:
         verbose_name = _('Link')
         verbose_name_plural = _('Links')
@@ -187,10 +187,10 @@ class OldStatistic(models.Model):
     links = models.IntegerField(_('active links'))
     km = models.FloatField(_('Km'))
     date = models.DateTimeField(_('Added on'), auto_now_add=True)
-    
+
     def __unicode__(self):
         return u'%s' % (self.date)
-    
+
     class Meta:
         verbose_name = _('Statistic')
         verbose_name_plural = _('Statistics')
@@ -207,10 +207,10 @@ class OldContact(models.Model):
     http_referer = models.CharField(max_length=200, blank=True)
     accept_language = models.CharField(max_length=60, blank=True)
     date = models.DateTimeField(auto_now_add=True)
-    
+
     def __unicode__(self):
         return _(u'Message from %(from)s to %(to)s') % ({'from':self.from_name, 'to':self.node.name})
-    
+
     class Meta:
         verbose_name = _('Contact Log')
         verbose_name_plural = _('Contact Logs')
