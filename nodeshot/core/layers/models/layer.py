@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ValidationError
 from django.contrib.gis.measure import D
 from django.contrib.gis.geos import Polygon, Point, GEOSException
 

@@ -9,7 +9,7 @@ from nodeshot.core.base.utils import Hider
 from nodeshot.core.nodes.views import NodeList
 from nodeshot.core.nodes.serializers import NodeGeoSerializer
 
-from .settings import settings, REVERSION_ENABLED
+from .settings import REVERSION_ENABLED
 from .models import Layer
 from .serializers import *
 
