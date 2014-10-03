@@ -51,7 +51,6 @@ For past activities consult `The Nodeshot Archives`_.
 
 .. _The Nodeshot Archives: http://ml.ninux.org/pipermail/nodeshot/
 
-
 ========
 Contents
 ========
@@ -61,18 +60,16 @@ Contents
 
    /topics/manual_install
    /topics/automated_install
-   /topics/layers
    /topics/social_login
    /topics/admin
    /topics/api
    /topics/open311
+   /topics/nodes
+   /topics/layers
    /topics/synchronizers
    /topics/participation
    /topics/oldimporter
    /topics/connectors
-
-
-
 
 ==================
 Indices and tables
