@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 
-urlpatterns = patterns('nodeshot.open311.views',
+urlpatterns = patterns('nodeshot.interop.open311.views',
     url(r'^open311/$', 'service_discovery', name='api_service_discovery'),
     url(r'^open311/services.json$', 'service_definition_list', name='api_service_definition_list'),
     url(r'^open311/services/(?P<service_type>[-\w]+).json$', 'service_definition_detail', name='api_service_definition_detail'),

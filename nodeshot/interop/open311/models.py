@@ -6,5 +6,5 @@ check_dependencies(
         'nodeshot.core.layers',
         'nodeshot.community.participation'
     ],
-    module='nodeshot.open311'
+    module='nodeshot.interop.open311'
 )

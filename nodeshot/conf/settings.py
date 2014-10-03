@@ -101,7 +101,7 @@ INSTALLED_APPS = [
     'nodeshot.networking.hardware',
     'nodeshot.networking.connectors',
     'nodeshot.ui.default',
-    'nodeshot.open311',
+    'nodeshot.interop.open311',
     'nodeshot.ui.open311_demo',
     # 3d parthy django apps
     'rest_framework',

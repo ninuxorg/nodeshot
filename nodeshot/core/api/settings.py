@@ -13,5 +13,5 @@ API_APPS_ENABLED = getattr(settings, 'NODESHOT_API_APPS_ENABLED', [
     'nodeshot.networking.net',
     'nodeshot.networking.links',
     'nodeshot.networking.services',
-    'nodeshot.open311'
+    'nodeshot.interop.open311'
 ])

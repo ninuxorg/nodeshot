@@ -1,28 +1,20 @@
 .. _open311-label:
-=========================
+***********
 Open311 API
-=========================
+***********
 
-Nodeshot comes with a self-documented API, in order to insert nodes, comments,
-votes or ratings as service requests, according to the Open 311 standard (http://open311.org/).
+Nodeshot comes with a self-documented open311 API, in order to insert nodes, comments,
+votes or ratings as service requests, according to the Open 311 specification (http://open311.org/).
 
-It depends from **participation** module, be sure to read its :ref:`documentation <participation-label>`.
+This app depends on the **participation** app, be sure to read its :ref:`documentation <participation-label>`.
 
----------------
+========
 Settings
----------------
-The modules ``nodeshot.layers`` , ``nodeshot.nodes`` , ``nodeshot.participation``
-and ``nodeshot.open311`` need to be in ``settings.INSTALLED_APPS``::
+========
 
-    INSTALLED_APPS = [
-        # dependencies
-        'nodeshot.community.participation'
-        'nodeshot.core.layers',
-        'nodeshot.core.nodes',
-        # Open 311 module
-        'nodeshot.open311',
-        # ...
-    ]
+``nodeshot.interop.open311`` and its dependencies are enabled by deafult.
+
+In case you want to disable this app consult the **"Uninstall"** section below.
 
 The available settings for the Open311 app are the following:
 
@@ -65,3 +57,21 @@ each status can be mapped to one of the two values 'open' or 'closed', depending
         'planned' : 'open',
         'active' : 'closed'
     }
+
+=========
+Uninstall
+=========
+
+To uninstall ``nodeshot.interop.open311`` simply remove it from your ``settings.INSTALLED_APPS``
+
+.. code-block:: python
+
+    # setings.py
+
+    # import the default nodeshot settings
+    # do not move this import
+    from nodeshot.conf.settings import *
+
+    # ------ All settings customizations must go here ------ #
+
+    INSTALLED_APPS.remove('nodeshot.interop.open311')
