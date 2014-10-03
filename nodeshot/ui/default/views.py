@@ -1,12 +1,9 @@
-import simplejson as json
-
 from django.conf import settings
 from django.shortcuts import render
 
-from nodeshot.core.nodes.models import Node, Status
 from nodeshot.core.layers.models import Layer
 
-from .settings import settings, TILESERVER_URL, MAP_CENTER, MAP_ZOOM
+from .settings import TILESERVER_URL, MAP_CENTER, MAP_ZOOM
 
 if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
     from nodeshot.core.websockets import DOMAIN, PATH, PORT
