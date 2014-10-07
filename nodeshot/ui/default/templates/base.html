@@ -440,39 +440,38 @@
         {% else %}
             Nodeshot.currentUser = new User();
         {% endif %}
-
-        // TODO: very ugly.. needs more structure, simplification and readability
-        var loadNodeData = function(){
-            var data = $.getDataSync('{% url 'api_status_list' %}'),
-                statuses = {};
-
-            for (var i=0; i<data.length; i++) {
-                data[i].nodes = [];
-                statuses[data[i].slug] = data[i];
+        
+        Nodeshot.loadEssentialData = function(){
+            Nodeshot.data = $.getDataSync('{% url 'api_ui_essential_data' %}');
+            
+            Nodeshot.statuses = {}
+            for (var i=0; i<Nodeshot.data.status.length; i++) {
+                var status = Nodeshot.data.status[i]
+                Nodeshot.statuses[status.slug] = status;
+                Nodeshot.statuses[status.slug].nodes = []
             }
-
-            Nodeshot.statuses = statuses;
-
+            
             Nodeshot.layers = [];
+            Nodeshot.layersNamed = {}
             Nodeshot.layersSlugs = [];
-            {% for layer in layers %}
-                Nodeshot.layers.push({
-                    name: '{{ layer.name }}',
-                    slug: '{{ layer.slug }}',
-                    nodes_url: '{% url 'api_layer_nodes_list' layer.slug %}',
-                    nodes_geojson_url: '{% url 'api_layer_nodes_geojson' layer.slug %}'
-                });
-                Nodeshot.layersSlugs.push('{{ layer.slug }}');
-            {% endfor %}
-
-            for (var i=0; i<Nodeshot.layers.length; i++) {
-                var layer = Nodeshot.layers[i];
-                // get JSON data
-                layer.nodes_geojson = $.getDataSync(layer.nodes_geojson_url);
+            for (var i=0; i<Nodeshot.data.layers.length; i++) {
+                var layer = Nodeshot.data.layers[i]
+                Nodeshot.layers.push(layer);
+                Nodeshot.layersNamed[layer.slug] = layer
+                Nodeshot.layersSlugs.push(layer.slug)
+                layer.nodes_geojson = {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            }
+            
+            for (var i=0; i<Nodeshot.data.nodes.features.length; i++) {
+                var node = Nodeshot.data.nodes.features[i];
+                Nodeshot.layersNamed[node.properties.layer].nodes_geojson.features.push(node)
             }
         }
-
-        loadNodeData();
+        
+        Nodeshot.loadEssentialData();
     </script>
 
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>

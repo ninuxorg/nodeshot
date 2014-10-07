@@ -303,7 +303,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             self.closeAddNode(function () {
                 // show added node
                 // TODO: improve ugly code
-                loadNodeData();
+                Nodeshot.loadEssentialData();
                 self.resetDataContainers();
                 self.loadMapData();
                 self.clusterizeMarkers();

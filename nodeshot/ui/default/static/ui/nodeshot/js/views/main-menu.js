@@ -19,13 +19,10 @@ var MainMenuView = Backbone.Marionette.CollectionView.extend({
 
     initialize: function(){
         this.initCollection()
-        // render view when collection changes
-        this.listenTo(this.collection, 'sync', this.render);
         // re-fetch collection when user logs in or out
         this.listenTo(Nodeshot.currentUser, 'loggedin', this.fetch);
         this.listenTo(Nodeshot.currentUser, 'loggedout', this.fetch);
-        // fetch collection for the first time
-        this.fetch();
+        this.render();
     },
 
     /*
@@ -33,7 +30,7 @@ var MainMenuView = Backbone.Marionette.CollectionView.extend({
      */
     initCollection: function(){
         if(this.collection === undefined){
-            this.collection = new MenuItemCollection();
+            this.collection = new MenuItemCollection(Nodeshot.data.menu);
         }
     },
 
