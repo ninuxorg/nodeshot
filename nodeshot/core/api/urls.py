@@ -16,7 +16,8 @@ if 'rest_framework_swagger' in settings.INSTALLED_APPS:
 for app_path in API_APPS_ENABLED:
 
     # enable only API modules listed in INSTALLED_APPS
-    if app_path not in settings.INSTALLED_APPS:
+    # replace paths terminating with .api in order to match entries in settings.INSTALLED_APPS
+    if app_path.replace('.api', '') not in settings.INSTALLED_APPS:
         # fail silently
         continue
 

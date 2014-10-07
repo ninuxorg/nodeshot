@@ -55,7 +55,8 @@ NODESHOT_API_APPS_ENABLED
         'nodeshot.networking.net',
         'nodeshot.networking.links',
         'nodeshot.networking.services',
-        'nodeshot.interop.open311'
+        'nodeshot.interop.open311',
+        'nodeshot.ui.default.api'
     ]
 
 Each nodeshot django app contains some API resources, this setting tells the API
