@@ -3,9 +3,12 @@
  * will be converted to a more structured set of files with backbone.js
  */
 // menu
-$('#ns-top-nav-links > ul > li > a').click(function (e) {
-    $('#ns-top-nav-links li.active').removeClass('active');
-    $(this).parents('li').eq(0).addClass('active');
+$('#nav-bar').delegate('#ns-top-nav-links > ul > li > a', 'click', function (e) {
+    var a = $(this);
+    if (a.attr('href').substr(0, 10) != 'javascript') {
+        $('#ns-top-nav-links li.open').removeClass('open');
+        a.parents('li').eq(0).addClass('open');
+    }
 });
 
 // set max height of collapsible menu (mobile)
