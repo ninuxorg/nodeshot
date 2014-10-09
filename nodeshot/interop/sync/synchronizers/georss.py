@@ -10,9 +10,10 @@ class GeoRss(XMLParserMixin, GenericGisSynchronizer):
     SCHEMA = [
         {
             'name': 'url',
-            'class': 'URLField',
+            'class': 'CharField',
             'kwargs': {
-                'help_text': _('URL containing geographical data')
+                'help_text': _('URL containing geographical data'),
+                'max_length': 128,
             }
         },
         {

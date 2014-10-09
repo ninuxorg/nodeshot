@@ -169,8 +169,9 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
     SCHEMA = [
         {
             'name': 'url',
-            'class': 'URLField',
+            'class': 'CharField',
             'kwargs': {
+                'max_length': 128,
                 'help_text': _('URL containing geographical data')
             }
         },
