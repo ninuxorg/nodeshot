@@ -9,6 +9,7 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.core.nodes.serializers import NodeListSerializer
 
 from .models import Layer
+from .settings import ADDITIONAL_LAYER_FIELDS
 
 
 __all__ = [
@@ -20,12 +21,6 @@ __all__ = [
     'PaginatedLayerListSerializer',
     'PaginatedGeojsonLayerListSerializer'
 ]
-
-
-try:
-    ADDITIONAL_LAYER_FIELDS = Layer._hstore_virtual_fields.keys()
-except AttributeError:
-    ADDITIONAL_LAYER_FIELDS = []
 
 
 class LayerListSerializer(geoserializers.GeoModelSerializer, HStoreSerializer):
