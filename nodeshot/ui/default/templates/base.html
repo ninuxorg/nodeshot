@@ -440,17 +440,17 @@
         {% else %}
             Nodeshot.currentUser = new User();
         {% endif %}
-        
+
         Nodeshot.loadEssentialData = function(){
             Nodeshot.data = $.getDataSync('{% url 'api_ui_essential_data' %}');
-            
+
             Nodeshot.statuses = {}
             for (var i=0; i<Nodeshot.data.status.length; i++) {
                 var status = Nodeshot.data.status[i]
                 Nodeshot.statuses[status.slug] = status;
                 Nodeshot.statuses[status.slug].nodes = []
             }
-            
+
             Nodeshot.layers = [];
             Nodeshot.layersNamed = {}
             Nodeshot.layersSlugs = [];
@@ -464,13 +464,13 @@
                     "features": []
                 }
             }
-            
+
             for (var i=0; i<Nodeshot.data.nodes.features.length; i++) {
                 var node = Nodeshot.data.nodes.features[i];
                 Nodeshot.layersNamed[node.properties.layer].nodes_geojson.features.push(node)
             }
         }
-        
+
         Nodeshot.loadEssentialData();
     </script>
 

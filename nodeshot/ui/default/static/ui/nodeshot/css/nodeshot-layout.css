@@ -205,7 +205,7 @@
     top: -12px;
     left: 48.3%;
     width: 0;
-	height: 0;
+    height: 0;
 }
 
 #notifications .header{
@@ -292,7 +292,7 @@ article.center-stage{
 }
 
 .content{
-	padding: 25px 35px;
+    padding: 25px 35px;
 }
 
 /* --- TABLETS AND DESKTOPS --- */
@@ -477,7 +477,7 @@ article.center-stage{
 
     body > article > h1,
     body > article h2{ letter-spacing: -3px; word-spacing: -1px }
-    
+
     .avatar200{ float: none !important }
 }
 
@@ -511,11 +511,12 @@ article.center-stage{
 }
 
 .loading{
-	top: 145px;
+    top: 145px;
     padding: 7px 14px;
     cursor: default;
     display: none;
-	z-index: 9999;
+    z-index: 9999;
+    min-width: 152px;
 }
 .loading .icon-loading{
     font-size: 17px;
@@ -525,10 +526,10 @@ article.center-stage{
 .icon-close:before{ margin: 0 !important }
 .loading .text{
     position: relative;
-    top: -1px
+    top: -1px;
 }
 
-.loading .icon-close{ position: static }
+.loading .icon-close{ top: 9px }
 
 #map-container{
     position: relative;
@@ -615,7 +616,7 @@ article.center-stage{
 }
 
 #signup-modal .tooltip-inner{
-	max-width: 400px !important;
+    max-width: 400px !important;
     white-space: nowrap;
 }
 
@@ -629,7 +630,7 @@ article.center-stage{
 }
 
 #map-legend a{
-	float: left;
+    float: left;
 }
 
 #map-legend.right{
@@ -843,13 +844,13 @@ article.center-stage{
 }
 
 .side-panel:before{
-	content: '';
-	position: absolute;
-	top: 0;
-	right: -1px;
-	width: 2px;
-	height: 53px;
-	background-color: #e4e4e4;
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 2px;
+    height: 53px;
+    background-color: #e4e4e4;
 }
 
 .side-panel .tool{
@@ -927,23 +928,23 @@ article.center-stage{
 }
 
 .map-overlay{
-	display: none;
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 999;
-	overflow: auto;
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    overflow: auto;
 }
 
 .animate-width{
-	width: 0%;
+    width: 0%;
 }
 
 .error-msg{
-	display: none;
-	margin-left: 10px;
+    display: none;
+    margin-left: 10px;
 }
 
 /*  --- Node Details --- */
