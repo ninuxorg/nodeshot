@@ -18,12 +18,12 @@
         <h5>Legend</h5>
         <ul>
             <% _.each(Nodeshot.statuses, function(status){ %>
-            <li>
+            <li id="legend-status-<%= status.slug %>">
                 <a href="#" data-status="<%= status.slug %>">
                     <span class="circle" style="background-color:<%= status.fill_color %>"></span>
                     <%= status.name %>
                 </a>
-                <span class="stats"><%= status.nodes_count %></span>
+                <span class="stats"></span>
             </li>
             <% }) %>
         </ul>

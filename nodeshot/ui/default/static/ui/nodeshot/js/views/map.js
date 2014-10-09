@@ -525,12 +525,12 @@ var MapView = Backbone.Marionette.ItemView.extend({
             cluster = Nodeshot.statuses[status].cluster,
             markers = Nodeshot.statuses[status].nodes,
             visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
-        
+
         // mark each marker visibility depending on visible layers
         _.forEach(markers, function(marker){
             marker.visible = action === 'show';
         });
-        
+
         if(action === 'show'){
             // add layer to map
             this.map.addLayer(cluster);
@@ -549,7 +549,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 visibleStatuses.splice(index, 1);
             }
         }
-        
+
         // remember choice
         Nodeshot.preferences.visibleStatuses = visibleStatuses;
     },
@@ -720,7 +720,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         },
             popUpTemplate = _.template($('#map-popup-template').html()),
             preferences = Nodeshot.preferences;
-        
+
         // visible statuses
         preferences.visibleStatuses = preferences.visibleStatuses || _.keys(Nodeshot.statuses)
         // visible layers
@@ -750,7 +750,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 },
                 pointToLayer: function (feature, latlng) {
                     var marker = L.circleMarker(latlng, options);
-                    
+
                     // marks as visible or not depending on preferences
                     if(visibleStatuses.indexOf(feature.properties.status) >= 0 && visibleLayers.indexOf(feature.properties.layer) >= 0){
                         marker.visible = true;
@@ -770,6 +770,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 }
             });
         }
+        this.countVisibleNodesByStatus();
     },
 
     clusterizeMarkers: function () {
@@ -865,6 +866,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             // show visible markers
             self.showVisibleMarkers(cluster, Nodeshot.statuses[cluster.status].nodes);
         });
+        this.countVisibleNodesByStatus();
     },
 
     /*
@@ -886,9 +888,9 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 node.visible = data.value;
             }
         }
-        
+
         this.showVisibleClusters();
-        
+
         // remember choice
         if(data.value){
             if(visibleLayers.indexOf(slug) < 0){
@@ -959,20 +961,42 @@ var MapView = Backbone.Marionette.ItemView.extend({
             this.map.removeLayer(this.addressFoundMarker)
         }
     },
-    
+
     /*
      * remember hide/show nodes based on status choices
      */
     rememberVisibleStatuses: function(){
         var visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
-        
+
         // find out which statuses have to be disabled in the legend
         // use underscore array difference
         toDisable = _.difference(_.keys(Nodeshot.statuses), visibleStatuses)
-        
+
         // add disabled class
         toDisable.forEach(function(status){
             $('#map-legend a[data-status="'+status+'"]').parents('li').addClass('disabled');
         });
+    },
+
+    /*
+     * count nodes of a certain status
+     * TODO this logic should probably be a separate view or something can be managed separately
+     */
+    countVisibleNodesByStatus: function(){
+        // reset visibleNodes counter
+        for(key in Nodeshot.statuses){
+            Nodeshot.statuses[key].visibleNodes = []
+        }
+        // determine how many visible nodes
+        for (var i=0; i<Nodeshot.nodes.length; i++) {
+            var node = Nodeshot.nodes[i];
+            if (node.visible) {
+                Nodeshot.statuses[node.feature.properties.status].visibleNodes.push(node);
+            }
+        }
+        // update UI ... very ugly
+        for(key in Nodeshot.statuses){
+            $('#legend-status-' + key + ' .stats').text(Nodeshot.statuses[key].visibleNodes.length)
+        }
     }
 });
