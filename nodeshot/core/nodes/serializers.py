@@ -153,7 +153,6 @@ ExtensibleNodeSerializer.add_relationship(
 
 class StatusListSerializer(serializers.ModelSerializer):
     """ status list """
-    nodes_count = serializers.Field(source='nodes_count')
 
     class Meta:
         model = Status
@@ -166,5 +165,4 @@ class StatusListSerializer(serializers.ModelSerializer):
             'fill_color',
             'stroke_color',
             'text_color',
-            'nodes_count'
         ]
