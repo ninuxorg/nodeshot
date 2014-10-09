@@ -3,7 +3,7 @@ from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as geoserializers
 
 from nodeshot.core.base.serializers import GeoJSONPaginationSerializer
-from .settings import settings
+from .settings import settings, ADDITIONAL_NODE_FIELDS
 from .base import ExtensibleNodeSerializer
 from .models import *
 
@@ -21,12 +21,6 @@ __all__ = [
     'ImageRelationSerializer',
     'StatusListSerializer'
 ]
-
-
-try:
-    ADDITIONAL_NODE_FIELDS = Node._hstore_virtual_fields.keys()
-except AttributeError:
-    ADDITIONAL_NODE_FIELDS = []
 
 
 class NodeDetailSerializer(ExtensibleNodeSerializer):
