@@ -42,6 +42,11 @@ DATABASES = {
     #}
 }
 
+# sentry integration
+#RAVEN_CONFIG = {
+#    'dsn': 'https://<api-public-key>:<api-secret-key>@<sentry.host>/<id>?timeout=5&verify_ssl=0',
+#}
+
 # import the default nodeshot settings
 # do not move this import
 from nodeshot.conf.settings import *

@@ -69,6 +69,7 @@ Contents
    /topics/synchronizers
    /topics/participation
    /topics/oldimporter
+   /topics/sentry
    /topics/connectors
 
 ==================

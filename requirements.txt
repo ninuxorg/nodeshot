@@ -63,3 +63,6 @@ netengine==0.1.alpha
 bpython
 django-extensions
 django-debug-toolbar
+
+# monitoring
+raven

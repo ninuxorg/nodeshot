@@ -49,6 +49,8 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
+    'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',  # sentry
+    'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',  # sentry
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -119,6 +121,9 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'profiles.Profile'
 
+if getattr(settings, 'RAVEN_CONFIG', {}):
+    INSTALLED_APPS.append('raven.contrib.django.raven_compat')
+
 if 'old_nodeshot' in settings.DATABASES:
     INSTALLED_APPS.append('nodeshot.interop.oldimporter')
     DATABASE_ROUTERS = [
@@ -158,13 +163,31 @@ EMAIL_PORT = 1025 if DEBUG else 25  # 1025 if you are in development mode, while
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
         }
     },
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
+    'formatters': {
+        'verbose': {
+            'format': '\n\n[%(levelname)s %(asctime)s] module: %(module)s, process: %(process)d, thread: %(thread)d\n%(message)s'
+        },
+    },
     'handlers': {
+        'sentry': {
+            'level': 'ERROR',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
@@ -195,18 +218,22 @@ LOGGING = {
             'handlers': ['logfile'],
             'level': 'ERROR',
         },
-    },
-    'formatters': {
-        'verbose': {
-            'format': '\n\n[%(levelname)s %(asctime)s] module: %(module)s, process: %(process)d, thread: %(thread)d\n%(message)s'
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
         },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
         },
-        'custom': {
-            'format': '%(levelname)s %(asctime)s\n%(message)s'
-        },
-    },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        }
+    }
 }
 
 # ------ CELERY ------ #
