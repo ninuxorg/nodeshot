@@ -69,7 +69,7 @@ These are the informations you will have to supply to the install procedure:
 
 **Install directory**: the directory where Nodeshot will be installed ( default: /var/www/)
 
-**Project name**: the name for your project (default: myproject)
+**Project name**: the name for your project (default: myproject), **avoid using nodeshot, test, or other existing python packages or the installer will break**
 
 **Server name**: the FQDN of your server (no default)
 

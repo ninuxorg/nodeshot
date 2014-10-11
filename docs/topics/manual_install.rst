@@ -149,7 +149,7 @@ Create the nodeshot settings folder:
     chmod 775 . log myproject  # permit www-data to write logs, pid files and static directory
     chmod 750 manage.py myproject/*.py  # do not permit www-data to write on python files*
 
-Replace ``myproject`` with your project name. Avoid names which used by popular python packages, prefer a short and simple name.
+Replace ``myproject`` with your project name. **Avoid names which are used by existing python packages like test and avoid calling it nodeshot**, prefer a short and simple name.
 
 Replace ``<user>`` with your current non-root user (the one which created the virtualenv).
 
