@@ -122,6 +122,10 @@ Import data
 .. warning::
     The first import should start with a clean database
 
+First of all, enable your python-virtualenv if you haven't already::
+
+    workon nodeshot
+
 Ready? Go!::
 
     python manage.py import_old_nodeshot
