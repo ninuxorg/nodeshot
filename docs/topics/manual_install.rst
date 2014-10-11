@@ -119,7 +119,7 @@ First of all, install virtualenvwrapper::
 
     pip install --use-mirrors virtualenvwrapper
     mkdir /usr/local/lib/virtualenvs
-    echo 'echo 'export WORKON_HOME=/usr/local/lib/virtualenvs' >> /usr/local/bin/virtualenvwrapper.sh'
+    echo 'export WORKON_HOME=/usr/local/lib/virtualenvs' >> /usr/local/bin/virtualenvwrapper.sh
     echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
     source ~/.bashrc
 
