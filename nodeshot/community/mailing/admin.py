@@ -41,7 +41,7 @@ class OutwardAdmin(BaseAdmin):
     filter_horizontal = ['layers', 'users']
     search_fields = ('subject',)
     actions = [send_now]
-    change_form_template = '%s/templates/admin/outward_change_form.html' % os.path.dirname(os.path.realpath(__file__))
+    change_form_template = 'admin/outward_change_form.html'
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == 'layers':
