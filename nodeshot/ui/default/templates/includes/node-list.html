@@ -9,7 +9,7 @@
     <% _.each(Nodeshot.statuses, function(s, key){ %>
         <span class="status pull-left <%= key %>"
               data-slug="<%= key %>">
-            <%= s.nodes_count %>
+            <%= s.nodes.length %>
             <%= s.name.toLowerCase() %>
         </span>
     <% }) %>
