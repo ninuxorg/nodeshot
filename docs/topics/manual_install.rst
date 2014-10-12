@@ -42,10 +42,11 @@ A full list is available in the `requirements.txt file`_.
 
 **Recommended stack for production environment**:
 
-* Nginx
-* uWSGI
-* Supervisor
-* Redis
+* **Nginx**: main web server
+* **uWSGI**: application server (serves requests to django)
+* **Supervisor**: daemon process manager (used to manage uwsgi, celery and celery-beat)
+* **Redis**: in memory key-value store (used as a message broker and cache storage)
+* **Postfix**: SMTP server (send mails to users)
 
 .. _install-dependencies:
 
@@ -208,7 +209,7 @@ software stack:
 * **uWSGI**: application server (serves requests to django)
 * **Supervisor**: daemon process manager (used to manage uwsgi, celery and celery-beat)
 * **Redis**: in memory key-value store (used as a message broker and cache storage)
-* **Postfixs**: SMTP server
+* **Postfix**: SMTP server (send mails to users)
 
 .. note::
     If you are installing for development you can skip the rest of this chapter.
