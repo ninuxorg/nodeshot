@@ -157,9 +157,8 @@ $(document).ready(function ($) {
     $('#nav-bar').delegate('#ns-top-nav-links li a', 'click', function (e) {
         var a = $(this);
         if (a.attr('href').substr(0, 10) != 'javascript') {
-            $('#ns-top-nav-links li.active').removeClass('active');
             if(!a.hasClass('dropdown-toggle')){
-                a.parents('li').eq(0).addClass('active');
+                $('#ns-top-nav-links li.active').removeClass('active');
             }
         }
     });

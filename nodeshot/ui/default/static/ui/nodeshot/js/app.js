@@ -72,13 +72,11 @@ var NodeshotController = {
 
         var link = $('#nav-bar a[href="#/pages/' + slug + '"]');
 
-        // ensure no duplicate active links
-        $('#nav-bar li').removeClass('active');
-
         if (link.length && link.parents('.dropdown').length) {
             link.parents('.dropdown').addClass('active');
         } else {
             link.trigger('click');
+            link.parent().addClass('active');
         }
     },
 
@@ -93,6 +91,7 @@ var NodeshotController = {
                 }));
             }
         });
+        $('#nav-bar a[href="#/nodes"]').parent().addClass('active');
     },
 
     // node details
@@ -108,7 +107,7 @@ var NodeshotController = {
     getMap: function () {
         Nodeshot.body.close();
         Nodeshot.body.show(new MapView());
-        $('#nav-bar a[href="#/map"]').trigger('click');
+        $('#nav-bar a[href="#/map"]').trigger('click').parent().addClass('active');
     },
 
     // map node popup
@@ -142,6 +141,8 @@ var NodeshotController = {
                 });
             }
         });
+        
+        $('#nav-bar li').removeClass('active');
     }
 }
 
