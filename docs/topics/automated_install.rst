@@ -103,11 +103,11 @@ To run an update do::
 
 If you need to specify parameters without the need to be prompted do::
 
-    fab update:project_name=<project_name> -H <remote_host> -u <user> -p <password>
+    fab update:use_defaults=True,project_name=<project_name> -H <remote_host> -u <user> -p <password>
 
 You could also set a different ``root_dir`` with::
 
-    fab update:root_dir=/custom/path/,project_name=<project_name> -H <remote_host> -u root -p <password>
+    fab update:use_defaults=True,root_dir=/custom/path/,project_name=<project_name> -H <remote_host> -u root -p <password>
 
 ======================================
 Install on a VM hosted on your machine
