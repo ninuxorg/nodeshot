@@ -13,8 +13,8 @@ branches:
 
 # command to install requirements
 install:
-  - pip install -r requirements.txt --use-mirrors
-  - pip install coverage coveralls --use-mirrors
+  - pip install -r requirements.txt
+  - pip install coverage coveralls
   - python setup.py install
   - pip install MySQL-python
 
