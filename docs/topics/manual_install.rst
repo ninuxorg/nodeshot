@@ -118,7 +118,7 @@ Install python packages
 
 First of all, install virtualenvwrapper::
 
-    pip install --use-mirrors virtualenvwrapper
+    pip install virtualenvwrapper
     mkdir /usr/local/lib/virtualenvs
     echo 'export WORKON_HOME=/usr/local/lib/virtualenvs' >> /usr/local/bin/virtualenvwrapper.sh
     echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
@@ -131,8 +131,8 @@ which will store all our python packages indipendently from the packages install
 
 Install all the necessary python packages::
 
-    pip install --use-mirrors -U distribute
-    pip install --use-mirrors https://github.com/ninuxorg/nodeshot/tarball/master
+    pip install -U distribute
+    pip install https://github.com/ninuxorg/nodeshot/tarball/master
 
 Now create the directory structure that will contain the project,
 a typical web app is usually installed in ``/var/www/``::
@@ -339,7 +339,7 @@ Install the latest version via pip::
     # deactivate python virtual environment
     deactivate
     # install uwsgi globally
-    pip install --use-mirrors uwsgi
+    pip install uwsgi
 
 Create a new ini configuration file::
 
@@ -373,7 +373,7 @@ Install **Redis**, we will use it as a message broker for *Celery* and as a *Cac
 Install celery bindings in your virtual environment::
 
     workon nodeshot  # activates virtualenv again
-    pip install --use-mirrors -U celery[redis]
+    pip install -U celery[redis]
 
 Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
 **might lead to poor performance or security issues**::
