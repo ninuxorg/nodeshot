@@ -129,10 +129,28 @@ which will store all our python packages indipendently from the packages install
 
     mkvirtualenv nodeshot
 
-Install all the necessary python packages::
+Update the distribute package::
 
     pip install -U distribute
+
+Now, if you are installing for **production** you should install nodeshot and its dependencies with::
+
     pip install https://github.com/ninuxorg/nodeshot/tarball/master
+
+Otherwise if you are installing for **development** and you intend to contribute to nodeshot, you should install by using git::
+
+    # install git if not installed yet
+    apt-get install git-core
+    # be sure to be in the virtualenv
+    workon nodeshot
+    # install nodeshot via git
+    pip install -e git+git://github.com/<YOUR-FORK>/nodeshot#egg=nodeshot
+
+Replace ``<YOUR-FORK>`` with your github username (have you `forked nodeshot`_, right?).
+
+You will find the cloned git repository in ``/usr/local/lib/virtualenvs/nodeshot/src/nodeshot``.
+
+.. _forked nodeshot: https://github.com/ninuxorg/nodeshot/fork
 
 Now create the directory structure that will contain the project,
 a typical web app is usually installed in ``/var/www/``::
