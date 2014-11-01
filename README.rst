@@ -28,4 +28,15 @@ Documentation_ - `Mailing List`_
 .. _Documentation: http://nodeshot.readthedocs.org/en/latest/
 .. _`Mailing List`: http://ml.ninux.org/mailman/listinfo/nodeshot
 
-New version in development. Stay tuned.
+**New version in development. Stay tuned**.
+
+------------
+
+.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-nodeshot-map.png
+   :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-nodeshot-map.png
+
+.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-list.png
+   :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-list.png
+
+.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-details-mobile.png
+   :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-details-mobile.png
