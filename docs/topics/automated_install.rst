@@ -11,7 +11,7 @@ This section describes how to perform a quick install of Nodeshot on **Ubuntu / 
 
     The most typical would be having the port 80 already in use by Apache.
 
-    In that case, you should consider using the :ref:`manual install <manual-install-label>` procedure in order to install according to your needs.
+    In that case, you should consider using the :doc:`manual_install` procedure in order to install according to your needs.
 
 =============
 Prerequisites
