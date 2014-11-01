@@ -7,7 +7,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ci.settings")
 
 
 if __name__ == "__main__":
-
     args = sys.argv
     args.insert(1, "test")
     from ci.settings import INSTALLED_APPS
