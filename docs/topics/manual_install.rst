@@ -161,14 +161,14 @@ Create the nodeshot settings folder:
 
 .. code-block:: bash
 
-    nodeshot startproject myproject nodeshot
+    nodeshot startproject <myproject> nodeshot
     cd nodeshot
     chown -R <user>:www-data .  # set group to www-data
     adduser www-data <user>
-    chmod 775 . log myproject  # permit www-data to write logs, pid files and static directory
-    chmod 750 manage.py myproject/*.py  # do not permit www-data to write on python files*
+    chmod 775 . log <myproject>  # permit www-data to write logs, pid files and static directory
+    chmod 750 manage.py <myproject>/*.py  # do not permit www-data to write on python files*
 
-Replace ``myproject`` with your project name. **Avoid names which are used by existing python packages like test and avoid calling it nodeshot**, prefer a short and simple name.
+Replace ``<myproject>`` with your project name. **Avoid names which are used by existing python packages (eg: test) and avoid calling it nodeshot (that's already taken by nodeshot itself)**, prefer a short and simple name, for example: **ninux**, **yourcommunity**, **yourdomain**.
 
 Replace ``<user>`` with your current non-root user (the one which created the virtualenv).
 
@@ -180,7 +180,7 @@ Project configuration
 
 Open ``settings.py``::
 
-    vim myproject/settings.py
+    vim <myproject>/settings.py
 
 And edit the following settings:
 
@@ -300,11 +300,11 @@ Paste this configuration and tweak it according to your needs::
         }
 
         location /static/ {
-            alias /var/www/nodeshot/myproject/static/;
+            alias /var/www/nodeshot/<myproject>/static/;
         }
 
         location /media/ {
-            alias /var/www/nodeshot/myproject/media/;
+            alias /var/www/nodeshot/<myproject>/media/;
         }
 
         #error_page 404 /404.html;
@@ -336,6 +336,8 @@ Paste this configuration and tweak it according to your needs::
         return 301 https://$host$request_uri;
     }
 
+Keep replacing ``<myproject>`` with the project name chosen at the beginning.
+
 Create a symbolic link to sites-enabled directory::
 
     ln -s /etc/nginx/sites-available/nodeshot.yourdomain.com /etc/nginx/sites-enabled/nodeshot.yourdomain.com
@@ -363,7 +365,7 @@ Create a new ini configuration file::
 
     vim /var/www/nodeshot/uwsgi.ini
 
-Paste this config (replace `<myproject>`` with the project name chosen at the beginning)::
+Paste this config (keep replacing ``<myproject>`` with the project name chosen at the beginning)::
 
     [uwsgi]
     chdir=/var/www/nodeshot
@@ -396,7 +398,7 @@ Install celery bindings in your virtual environment::
 Change the ``DEBUG`` setting to ``False``, leaving it to ``True``
 **might lead to poor performance or security issues**::
 
-    vim /var/www/nodeshot/myproject/settings.py
+    vim /var/www/nodeshot/<myproject>/settings.py
     # set DEBUG to False
     DEBUG = False
     # save and exit
