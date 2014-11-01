@@ -16,8 +16,16 @@ Nodeshot
    :target: https://requires.io/github/ninuxorg/nodeshot/requirements/?branch=master
    :alt: Requirements Status
 
-Extensible Django web application for management of community-led georeferenced data.
+.. image:: https://badge.fury.io/py/nodeshot.png
+    :target: http://badge.fury.io/py/nodeshot
+
+------------
+
+Nodeshot is a tool that enables grassroots communities to crowdsource georeferenced data, collaborate and stay in touch with one another.
+
+Documentation_ - `Mailing List`_
+
+.. _Documentation: http://nodeshot.readthedocs.org/en/latest/
+.. _`Mailing List`: http://ml.ninux.org/mailman/listinfo/nodeshot
 
 New version in development. Stay tuned.
-
-Find the documentation (work in progress) here: http://nodeshot.readthedocs.org/en/latest/
