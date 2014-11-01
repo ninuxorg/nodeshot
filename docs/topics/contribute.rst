@@ -121,9 +121,9 @@ ensure to document your changes by editing the files in the ``/doc`` folder.
 
 The format used in the docs is **reStructured Text** while the python package used is **python-sphinx**.
 
-`More information about Sphinx and reStructured Text`_.
+`Read more information about Sphinx and reStructured Text`_.
 
-.. _More information about sphinx and RestructuredText: http://sphinx-doc.org/tutorial.html
+.. _Read more information about Sphinx and reStructured Text: http://sphinx-doc.org/tutorial.html
 
 =====================
 11. Open pull request
