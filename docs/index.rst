@@ -7,6 +7,25 @@
 Nodeshot
 ********
 
+.. image:: https://travis-ci.org/ninuxorg/nodeshot.png
+   :target: https://travis-ci.org/ninuxorg/nodeshot
+
+.. image:: https://coveralls.io/repos/ninuxorg/nodeshot/badge.png
+  :target: https://coveralls.io/r/ninuxorg/nodeshot
+
+.. image:: https://landscape.io/github/ninuxorg/nodeshot/master/landscape.png
+   :target: https://landscape.io/github/ninuxorg/nodeshot/master
+   :alt: Code Health
+
+.. image:: https://requires.io/github/ninuxorg/nodeshot/requirements.png?branch=master
+   :target: https://requires.io/github/ninuxorg/nodeshot/requirements/?branch=master
+   :alt: Requirements Status
+
+.. image:: https://badge.fury.io/py/nodeshot.png
+    :target: http://badge.fury.io/py/nodeshot
+
+------------
+
 Nodeshot is an open source platform for **crowdsourcing georeferenced data**.
 
 Its goal it's to provide some robust tools to build a modern customized crowdsourcing web application quickly.
@@ -15,21 +34,14 @@ It is designed to be modular, flexible, configurable and extensible.
 
 **This documentation is a work in progress**.
 
-======================
-Status of this project
-======================
+.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-nodeshot-map.png
+   :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-nodeshot-map.png
 
-The first version of nodeshot was released in **October 2011** and was designed specifically for the community `Ninux.org`_.
+.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-list.png
+   :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-list.png
 
-.. _Ninux.org: http://ninux.org
-
-The project evolved to become more generic, modular and reusable.
-The version described in this documentation refers to the development version, which has been rewritten from scratch.
-
-The roadmap is the following:
-
- * a first early release is expected for **end of February 2014**
- * a second more complete release is expected for **May 2014**
+.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-details-mobile.png
+   :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-details-mobile.png
 
 ====
 Code
