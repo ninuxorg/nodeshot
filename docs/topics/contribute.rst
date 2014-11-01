@@ -134,15 +134,9 @@ Now you can finally open a **pull request** on **github** for review.
 Optionally, you could open a pull request right after the first commit, so that
 the participants can review your commits as you push them.
 
-***********
-Other notes
-***********
-
-Keep reading if you want to invest more than a few days in contributing to nodeshot.
-
-==========================================
-Acknowledge Continuous Integration Testing
-==========================================
+==============================================
+12. Acknowledge Continuous Integration Testing
+==============================================
 
 Each time commits are sent to the master branch or are added to a pull request,
 the test suite is automatically run on **travis-ci.org**, the result is shown in
@@ -152,9 +146,9 @@ You can `check the build status at travis-ci.org`_.
 
 .. _check the build status at travis-ci.org: https://travis-ci.org/ninuxorg/nodeshot
 
-===================================
-Adding features in separate modules
-===================================
+=======================================
+13. Adding features in separate modules
+=======================================
 
 If you plan to add dramatic new features to nodeshot, it might better to explore
 the possibility of writing a new python package in a separate repository.
