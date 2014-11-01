@@ -137,7 +137,7 @@ Now, if you are installing for **production** you should install nodeshot and it
 
     pip install https://github.com/ninuxorg/nodeshot/tarball/master
 
-Otherwise if you are installing for **development** and you intend to contribute to nodeshot, you should install by using git::
+Otherwise if you are installing for **development** and you intend to :doc:`contribute to nodeshot <contribute>`, you should install by using git::
 
     # install git if not installed yet
     apt-get install git-core
@@ -199,9 +199,8 @@ Setup database and static files (images, css, js):
     # static files (css, js, images)
     python manage.py collectstatic
 
-If you are installing for **development**, you are done!
-
-You just need to **run the django development server** in order to see the web application:
+If you are installing for **development** there's one last step:
+you just need to **run the django development server** in order to reach the web application:
 
 .. code-block:: bash
 
@@ -213,6 +212,8 @@ You just need to **run the django development server** in order to see the web a
     # alternatively, if you need to reach the dev server for other computers
     # on the same LAN, tell it to listen on all the interfaces:
     python manage.py runserver 0.0.0.0:8000
+
+**If you intend to contribute to nodeshot**, be sure to read :doc:`How to contribute to nodeshot <contribute>`.
 
 .. _production-instructions:
 
