@@ -36,26 +36,19 @@ It is designed to be modular, flexible, configurable and extensible.
 
 .. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-nodeshot-map.png
    :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-nodeshot-map.png
-
-.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-list.png
-   :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-list.png
-
-.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-details-mobile.png
-   :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-details-mobile.png
+|
 
 ====
 Code
 ====
 
-The development version is hosted at https://github.com/ninuxorg/nodeshot.
-
-Once the new version will be ready it will be merged back into the original repository (ninuxorg/nodeshot).
+The code is hosted at **Github**: https://github.com/ninuxorg/nodeshot.
 
 ============
 Mailing list
 ============
 
-If you have any issue or you want to follow the development of this software you can reach us at our `Mailing List`_.
+If you have any issue or you want to follow the development of this project you can reach us at our `Mailing List`_.
 
 .. _Mailing List: http://ml.ninux.org/mailman/listinfo/nodeshot
 
