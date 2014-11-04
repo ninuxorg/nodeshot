@@ -36,7 +36,7 @@ django-social-auth
 django-reversion==1.8.2
 
 # asynchronous tasks
-celery==3.1.15
+celery==3.1.16
 django-celery-email
 
 # migrations
