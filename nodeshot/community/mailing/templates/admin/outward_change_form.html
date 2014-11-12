@@ -36,14 +36,12 @@
                             selector += ', .' + fields[i]
                         }
                     });
-                    console.log(selector)
                     return $(selector);
                 }
                 
                 $('.filters, .groups, .layers, .users').hide();
                 var filtered_select = $('#id_is_filtered');
                 filtered_select.change(function(e){
-                      
                     fields = get_filtering_fields();
                     if($(this).val() == false){
                         fields.fadeOut(300);
