@@ -1,15 +1,13 @@
 #ignore the follow paths
 *.pyc
 .komodotools/
-projects/ninux/ninux/settings.py
 *.komodoproject
 *.DS_Store
 python/
 projects/
+project/
 *~
 ._*
-activate
-runserver
 TODO.txt
 nodeshot.websockets.private
 nodeshot.websockets.public
@@ -35,3 +33,4 @@ local_settings.py
 /dist
 nodeshot.egg-info/
 deploy
+/manage.py
