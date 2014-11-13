@@ -48,6 +48,19 @@ watch out for the instructions to install a **development environment**.
 
 Now try to run the test suites of the different modules.
 
+.. warning::
+    These instructions should apply to development environments only
+
+Enable user ``nodeshot`` to create and destroy databases::
+
+    ALTER USER nodeshot SUPERUSER;
+
+Install the hstore extension on template1 according to `how to run tests with django-hstore`_.::
+
+    psql template1 -c 'CREATE EXTENSION hstore;'
+
+.. _how to run tests with django-hstore: http://djangonauts.github.io/django-hstore/#_running_tests
+
 Ensure your virtualenv is activated::
 
     workon nodeshot
