@@ -48,6 +48,19 @@ watch out for the instructions to install a **development environment**.
 
 Now try to run the test suites of the different modules.
 
+.. warning::
+    These instructions should apply to development environments only
+
+Enable user ``nodeshot`` to create and destroy databases::
+
+    ALTER USER nodeshot SUPERUSER;
+
+Install the hstore extension on template1 according to `how to run tests with django-hstore`_.::
+
+    psql template1 -c 'CREATE EXTENSION hstore;'
+
+.. _how to run tests with django-hstore: http://djangonauts.github.io/django-hstore/#_running_tests
+
 Ensure your virtualenv is activated::
 
     workon nodeshot
@@ -61,7 +74,11 @@ If you want to test more modules at once you can use::
 
     python manage.py test nodeshot.core.nodes nodeshot.core.layers nodeshot.core.cms
 
-If you want to test all the modules at once you can use::
+If you want to test all the modules at once you have start the development server::
+
+    python manage.py runserver
+
+and then use::
 
     python manage.py test nodeshot
 
@@ -117,7 +134,7 @@ Run the test coverage utility::
 =========================
 
 If you are adding features to modules or changing the default behaviour
-ensure to document your changes by editing the files in the ``/doc`` folder.
+ensure to document your changes by editing the files in the ``/docs`` folder.
 
 The format used in the docs is **reStructured Text** while the python package used is **python-sphinx**.
 
