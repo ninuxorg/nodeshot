@@ -74,7 +74,11 @@ If you want to test more modules at once you can use::
 
     python manage.py test nodeshot.core.nodes nodeshot.core.layers nodeshot.core.cms
 
-If you want to test all the modules at once you can use::
+If you want to test all the modules at once you have start the development server::
+
+    python manage.py runserver
+
+and then use::
 
     python manage.py test nodeshot
 
@@ -130,7 +134,7 @@ Run the test coverage utility::
 =========================
 
 If you are adding features to modules or changing the default behaviour
-ensure to document your changes by editing the files in the ``/doc`` folder.
+ensure to document your changes by editing the files in the ``/docs`` folder.
 
 The format used in the docs is **reStructured Text** while the python package used is **python-sphinx**.
 
