@@ -24,6 +24,8 @@ Nodeshot
 
 ------------
 
+.. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/nodeshot-logo.png
+
 Nodeshot is a tool that enables grassroots communities to crowdsource georeferenced data, collaborate and stay in touch with one another.
 
 Documentation_ - `Mailing List`_
