@@ -9,6 +9,7 @@ from nodeshot.core.layers.models import Layer
 
 from .models import Inward, Outward
 from .settings import settings, OUTWARD_HTML
+from .tasks import send_outward_mails
 
 import os
 
@@ -27,9 +28,7 @@ def send_now(modeladmin, request, queryset):
     """
     Send now action available in change outward list
     """
-    objects = queryset
-    for obj in objects:
-        obj.send()
+    send_outward_mails.delay(queryset)
     send_now.short_description = _('Send selected messages now')
     # show message in the admin
     messages.info(request, _('Message sent successfully'))

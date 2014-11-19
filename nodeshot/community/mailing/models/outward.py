@@ -163,7 +163,6 @@ class Outward(BaseDate):
                     # add email to the recipient list if not already there
                     if not user.email in emails:
                         emails += [user.email]
-
         return emails
 
     def send(self):
