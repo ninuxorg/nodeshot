@@ -122,6 +122,7 @@ First of all, install virtualenvwrapper::
     mkdir /usr/local/lib/virtualenvs
     echo 'export WORKON_HOME=/usr/local/lib/virtualenvs' >> /usr/local/bin/virtualenvwrapper.sh
     echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
+    echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bash_profile
     source ~/.bashrc
 
 Create a **python virtual environment**, a self-contained python installation
