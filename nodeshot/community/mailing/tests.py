@@ -145,6 +145,22 @@ class MailingTest(TestCase):
         for user in users:
             self.assertTrue(user.email in recipients)
 
+    def test_outward_admin_send_action(self):
+        """ simulate sending mails from the admin """
+        from django.http.request import HttpRequest
+        from django.contrib.admin.sites import AdminSite
+        from .admin import OutwardAdmin
+        admin = OutwardAdmin(Outward, AdminSite())
+        request = HttpRequest()
+        self.assertEqual(Outward.objects.count(), 1)
+        # trigger send action
+        admin.send(request, Outward.objects.all())
+        # ensure outward message has status == sent
+        message = Outward.objects.first()
+        self.assertEqual(message.status, 2)
+        # ensure messages have been sent to users
+        self.assertEqual(len(mail.outbox), User.objects.count())
+
     def test_group_filtering(self):
         """ *** Test group filtering in multiple combinations *** """
         combinations = [

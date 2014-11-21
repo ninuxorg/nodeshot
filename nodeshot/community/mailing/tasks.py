@@ -5,7 +5,7 @@ from celery import task
 
 
 @task
-def send_outward_mails(queryset, kwargs):
+def send_outward_mails(queryset):
     """
     Call send method on Outward objects in the background
     """

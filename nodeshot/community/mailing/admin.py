@@ -24,23 +24,22 @@ class InwardAdmin(BaseAdmin):
         }
 
 
-def send_now(modeladmin, request, queryset):
-    """
-    Send now action available in change outward list
-    """
-    send_outward_mails.delay(queryset)
-    send_now.short_description = _('Send selected messages now')
-    # show message in the admin
-    messages.info(request, _('Message sent successfully'))
-
-
 class OutwardAdmin(BaseAdmin):
     list_display  = ('subject', 'status', 'is_scheduled', 'added', 'updated')
     list_filter   = ('status', 'is_scheduled')
     filter_horizontal = ['layers', 'users']
     search_fields = ('subject',)
-    actions = [send_now]
+    actions = ['send']
     change_form_template = 'admin/outward_change_form.html'
+
+    def send(self, request, queryset):
+        """
+        Send action available in change outward list
+        """
+        send_outward_mails.delay(queryset)
+        # show message in the admin
+        messages.info(request, _('Message sent successfully'), fail_silently=True)
+    send.short_description = _('Send selected messages')
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == 'layers':
