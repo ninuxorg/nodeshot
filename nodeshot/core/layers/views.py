@@ -74,7 +74,6 @@ class LayerNodesList(ListSerializerMixin, NodeList):
 
      * `search=<word>`: search <word> in name of nodes of specified layer
      * `limit=<n>`: specify number of items per page (defaults to 40)
-     * `limit=0`: turns off pagination
      * `layerinfo`: true shows layer description and other info, false doesn't (defaults to true)
     """
     layer = None
@@ -133,7 +132,6 @@ class LayerNodesGeoJSONList(LayerNodesList):
 
      * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (defaults to 40)
-     * `limit=0`: turns off pagination (default)
      * `layerinfo`: true shows layer description and other info, false doesn't (defaults to false)
     """
     serializer_class = NodeGeoSerializer
@@ -154,7 +152,6 @@ class LayerGeoJSONList(generics.ListAPIView):
     Parameters:
 
      * `limit=<n>`: specify number of items per page (defaults to 40)
-     * `limit=0`: turns off pagination
      * `page=<n>`: show page n
     """
     pagination_serializer_class = PaginatedGeojsonLayerListSerializer

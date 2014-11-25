@@ -52,7 +52,6 @@ class NodeList(NodeListBase):
 
      * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (defaults to 50)
-     * `limit=0`: turns off pagination
 
     ### POST
 
@@ -127,7 +126,6 @@ class NodeGeoJSONList(NodeList):
 
      * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (defaults to 50)
-     * `limit=0`: turns off pagination
      * `page=<n>`: show page n
     """
     pagination_serializer_class = PaginatedGeojsonNodeListSerializer

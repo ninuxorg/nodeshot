@@ -232,7 +232,7 @@ class APITest(BaseTestCase):
         url = reverse('api_node_list')
 
         # GET: 200
-        response = self.client.get(url, { "limit": 0 })
+        response = self.client.get(url)
         public_node_count = Node.objects.published().access_level_up_to('public').count()
         self.assertEqual(public_node_count, len(response.data['results']))
 
