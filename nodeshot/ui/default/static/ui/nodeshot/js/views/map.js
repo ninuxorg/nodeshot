@@ -106,6 +106,38 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
     /* --- Nodeshot methods --- */
 
+    /*
+     * set width and height of map
+     */
+    setMapDimensions: function () {
+        if (!$('#map-overlay-container').length) {
+            var height = $(window).height() - $('body > header').height();
+            $('#map-container, #map-toolbar').height(height);
+        } else {
+            var height = $('#map-overlay-container').height() + parseInt($('#map-overlay-container').css('top'));
+            $('#map-container').height(height);
+        }
+
+        var map_toolbar = $('#map-toolbar'),
+            add_node_container = $('#add-node-container');
+        width = $(window).width();
+
+        // take in consideration #add-node-container if visible
+        if (add_node_container.is(':visible')) {
+            width = width - add_node_container.outerWidth();
+        }
+        // take in consideration map toolbar if visible
+        else if (map_toolbar.is(':visible')) {
+            width = width - map_toolbar.outerWidth();
+        }
+        $('#map').width(width);
+
+        var map = Nodeshot.body.currentView.map;
+        if (map && map.invalidateSize) {
+            map.invalidateSize();
+        }
+    },
+
     // reset containers with pointers to markers and other map objects
     resetDataContainers: function () {
         Nodeshot.nodes = [];
@@ -117,7 +149,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
     },
 
     resize: function () {
-        setMapDimensions();
+        this.setMapDimensions();
 
         // when narrowing the window to medium-small size
         if($(window).width() <= 767){
@@ -205,7 +237,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // hide toolbar and enlarge map
         this.ui.toolbar.hide();
-        setMapDimensions();
+        this.setMapDimensions();
         this.toggleMarkersOpacity('fade');
 
         // show step1
@@ -262,11 +294,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 }, {
                     duration: 400,
                     progress: function () {
-                        setMapDimensions();
+                        self.setMapDimensions();
                         self.map.panTo(marker._latlng);
                     },
                     complete: function () {
-                        setMapDimensions();
+                        self.setMapDimensions();
                         self.map.panTo(marker._latlng);
                     }
                 });
@@ -353,7 +385,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             }, {
                 duration: 400,
                 progress: function () {
-                    setMapDimensions();
+                    self.setMapDimensions();
                     if (marker) {
                         self.map.panTo(marker._latlng);
                     }
@@ -363,7 +395,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                         self.map.panTo(marker._latlng);
                     }
                     container.hide();
-                    setMapDimensions();
+                    self.setMapDimensions();
 
                     if (callback && typeof (callback) === 'function') {
                         callback();
@@ -382,7 +414,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
         // show toolbar and adapt map width
         this.ui.toolbar.show();
-        setMapDimensions();
+        this.setMapDimensions();
         this.toggleMarkersOpacity();
 
         // hide step1 if necessary
@@ -400,7 +432,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             this.map.removeLayer(marker);
         }
 
-        setMapDimensions();
+        this.setMapDimensions();
     },
 
     /*
@@ -589,7 +621,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
                 $('body>header').trigger('click');
             }
         }
-        setMapDimensions();
+        this.setMapDimensions();
     },
 
     /*
@@ -639,7 +671,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             $('#map-js').html('');
         }
 
-        setMapDimensions();
+        this.setMapDimensions();
 
         // init map
         this.map = this['_initMap' + mode]();

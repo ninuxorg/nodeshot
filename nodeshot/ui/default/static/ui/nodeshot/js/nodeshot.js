@@ -8,36 +8,6 @@ var setCollapsibleMainMenuMaxHeight = function () {
     $('#nav-bar .navbar-collapse').css('max-height', $(window).height() - 50);
 }
 
-// dynamic map dimensions
-var setMapDimensions = function () {
-    if (!$('#map-overlay-container').length) {
-        var height = $(window).height() - $('body > header').height();
-        $('#map-container, #map-toolbar').height(height);
-    } else {
-        var height = $('#map-overlay-container').height() + parseInt($('#map-overlay-container').css('top'));
-        $('#map-container').height(height);
-    }
-
-    var map_toolbar = $('#map-toolbar'),
-        add_node_container = $('#add-node-container');
-    width = $(window).width();
-
-    // take in consideration #add-node-container if visible
-    if (add_node_container.is(':visible')) {
-        width = width - add_node_container.outerWidth();
-    }
-    // take in consideration map toolbar if visible
-    else if (map_toolbar.is(':visible')) {
-        width = width - map_toolbar.outerWidth();
-    }
-    $('#map').width(width);
-
-    var map = Nodeshot.body.currentView.map;
-    if (map && map.invalidateSize) {
-        map.invalidateSize();
-    }
-}
-
 // automatically center modal depending on its width
 $('body').delegate('.modal.autocenter', 'show.bs.modal', function (e) {
     var dialog = $(this).find('.modal-dialog'),
@@ -152,7 +122,7 @@ $(document).ready(function ($) {
     $('#nav-bar').delegate('#ns-top-nav-links.in a:not(.dropdown-toggle)', 'click', function (e) {
         $('#ns-top-nav-links').collapse('hide');
     });
-    
+
     // menu
     $('#nav-bar').delegate('#ns-top-nav-links li a', 'click', function (e) {
         var a = $(this);

@@ -31,7 +31,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         'mouseover @ui.stars': 'mouseOverStar',
         'mouseout @ui.stars': 'mouseOutStar',
         'click @ui.stars': 'rate',
-        
+
         'click .icon-close': 'goBack'
     },
 
@@ -64,12 +64,12 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             'overflow-x': 'hidden',
             'overflow-y': 'auto'
         });
-        setMapDimensions();
+        this.setMapDimensions();
         this.setMinHeight();
 
         // enable tooltips
         $('.hastip').tooltip();
-        
+
         // store coordinates in preferences
         if(this.model && this.model.get('geometry')){
             var coords = this.model.get('geometry')['coordinates'];
@@ -100,8 +100,15 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
      * resize window event
      */
     resize: function () {
-        setMapDimensions();
+        this.setMapDimensions();
         this.setMinHeight();
+    },
+
+    /*
+     * set width and height of map
+     */
+    setMapDimensions: function(){
+        MapView.prototype.setMapDimensions();
     },
 
     /*
@@ -345,7 +352,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             createModal({ message: xhr.responseJSON["__all__"] });
         });
     },
-    
+
     /*
      * go back (to map or node list)
      */
