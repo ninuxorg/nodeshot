@@ -52,8 +52,8 @@
                         {% trans 'Notifications' %}
                     </div>
                     <div class="right">
-                        <a href="javascript:createModal({message:'not implemented yet'})">{% trans 'See all' %}</a> <span>-</span>
-                        <a href="javascript:createModal({message:'not implemented yet'})">{% trans 'Settings' %}</a>
+                        <a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'See all' %}</a> <span>-</span>
+                        <a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'Settings' %}</a>
                     </div>
                 </div>
                 <div class="scroller">
@@ -210,7 +210,7 @@
                 <p><button class="btn btn-default">{% trans 'Sign in' %}</button></p>
             </form>
 
-            <p class="text"><a href="javascript:createModal({message:'not implemented yet'})">{% trans 'Forgot your password?' %}</a></p>
+            <p class="text"><a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'Forgot your password?' %}</a></p>
 
             <p class="text">{% trans "Don't have an account yet?" %} <a href="#" id="js-signup-link">{% trans 'Sign up' %}</a></p>
 
@@ -274,7 +274,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="javascript:createModal({message:'not implemented yet'})" id="js-settings">
+                    <a href="javascript:$.createModal({message:'not implemented yet'})" id="js-settings">
                         <span class="icon-wrench"></span>{% trans 'Settings' %}
                     </a>
                 </li>
@@ -484,7 +484,6 @@
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/node-list.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/views/user-details.js"></script>
     <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/nodeshot.js"></script>
 
     {% if WEBSOCKETS %}
     <script>

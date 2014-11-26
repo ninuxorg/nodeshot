@@ -23,28 +23,28 @@
         <p class="actions">
             <% if(user) { %>
                 <a href="#/users/<%= user %>"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
-                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
+                <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
             <% } %>
             <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
             <% if(Nodeshot.accountMenu.model.get('username') !== undefined){ %>
-                <a href="javascript:createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
+                <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
             <% } %>
         </p>
 
         <ul class="nav nav-tabs hidden-xs" id="node-menu">
-            <li class="active"><a href="javascript:createModal({message:'not implemented yet'})">{% trans 'General info' %}</a></li>
-            <!--<li><a href="javascript:createModal({message:'not implemented yet'})">Images (4)</a></li>
-            <li><a href="javascript:createModal({message:'not implemented yet'})">Devices (3)</a></li>-->
+            <li class="active"><a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'General info' %}</a></li>
+            <!--<li><a href="javascript:$.createModal({message:'not implemented yet'})">Images (4)</a></li>
+            <li><a href="javascript:$.createModal({message:'not implemented yet'})">Devices (3)</a></li>-->
         </ul>
 
         <ul class="nav nav-pills visible-xs" id="node-menu-mobile">
             <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:createModal({message:'not implemented yet'})">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:$.createModal({message:'not implemented yet'})">
                     {% trans 'General info' %} <span class="caret"></span>
                 </a>
                 <!--<ul class="dropdown-menu">
-                    <li><a href="javascript:createModal({message:'not implemented yet'})">Images (4)</a></li>
-                    <li><a href="javascript:createModal({message:'not implemented yet'})">Devices (3)</a></li>
+                    <li><a href="javascript:$.createModal({message:'not implemented yet'})">Images (4)</a></li>
+                    <li><a href="javascript:$.createModal({message:'not implemented yet'})">Devices (3)</a></li>
                 </ul> -->
             </li>
         </ul>
@@ -67,7 +67,7 @@
                             {% trans 'Layer' %}:
                         </td>
                         <td class="right">
-                            <a href="javascript:createModal({message:'not implemented yet'})"><%= layer_name %></a>
+                            <a href="javascript:$.createModal({message:'not implemented yet'})"><%= layer_name %></a>
                         </td>
                     </tr>
                     <% if(address){ %>
@@ -121,7 +121,7 @@
                             {% trans 'Rating' %}:
                         </td>
                         <td class="right" id="js-rating" data-thanks-message="{% trans 'Thanks for rating' %}">
-                            <a href="javascript:createModal({message:'not implemented yet'})" class="rating">
+                            <a href="javascript:$.createModal({message:'not implemented yet'})" class="rating">
                                 <% _.each(Nodeshot.body.currentView.ratingTo5Stars(), function(style, i){ %>
                                     <span class="icon-star-<%= style %>"
                                           data-original-class="icon-star-<%= style %>"

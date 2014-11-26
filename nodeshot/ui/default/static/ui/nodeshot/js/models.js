@@ -130,7 +130,7 @@ var User = Backbone.Model.extend({
             // determine correct error message to show
             errorMessage = json.non_field_errors || json.detail ||  errorMessage;
 
-            createModal({
+            $.createModal({
                 message: errorMessage,
                 successAction: function () {
                     $('#signin-modal').css('z-index', zIndex)
@@ -155,7 +155,7 @@ var User = Backbone.Model.extend({
 
         $.post('/api/v1/account/logout/').error(function () {
             // TODO: improve!
-            createModal({
+            $.createModal({
                 message: 'problem while logging out'
             });
         }).done(function(){

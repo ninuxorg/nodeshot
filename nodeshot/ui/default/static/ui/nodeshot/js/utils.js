@@ -92,6 +92,18 @@ _.mixin({
     }
 });
 
+// extend underscore with formatDateTime shortcut
+_.formatDateTime = function(dateString){
+    // TODO: format configurable
+    return $.format.date(dateString, "dd MMMM yyyy, HH:mm");
+};
+
+// extend underscore with formatDate shortcut
+_.formatDate = function(dateString){
+    // TODO: format configurable
+    return $.format.date(dateString, "dd MMMM yyyy");
+};
+
 /*
  * Toggle Loading Div
  * @param operation: string "show" or "hide"
@@ -178,3 +190,44 @@ $.fn.getHiddenDimensions = function () {
     // return width
     return dimensions;
 }
+
+/*
+ * Create Modal Dialog
+ * @param options: object
+ *     - message: message to return to user
+ *     - successMessage: success button message
+ *     - successAction: function to execute when clicking success button, defaults to void
+ *     - defaultMessage: default button message, hidden by default
+ *     - defaultAction: function to execute when clicking default button, defaults to void
+ */
+$.createModal = function (opts) {
+    var template_html = $('#modal-template').html(),
+        close = function () {
+            $('#tmp-modal').modal('hide')
+        },
+        options = $.extend({
+            message: '',
+            successMessage: 'ok',
+            successAction: function () {},
+            defaultMessage: null,
+            defaultAction: function () {}
+        }, opts);
+
+    $('body').append(_.template(template_html, options));
+
+    $('#tmp-modal').modal('show');
+
+    $('#tmp-modal .btn-success').one('click', function (e) {
+        close();
+        options.successAction()
+    });
+
+    $('#tmp-modal .btn-default').one('click', function (e) {
+        close();
+        options.defaultAction()
+    });
+
+    $('#tmp-modal').one('hidden.bs.modal', function (e) {
+        $('#tmp-modal').remove();
+    })
+};

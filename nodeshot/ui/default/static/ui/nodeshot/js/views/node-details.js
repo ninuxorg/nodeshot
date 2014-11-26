@@ -159,7 +159,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             $('.icon-thumbs-down').removeClass('fade');
             relationships.counts.likes = backup;
             self.model.set('relationships', relationships);
-            createModal({ message: 'error' })
+            $.createModal({ message: 'error' })
         });
     },
 
@@ -189,7 +189,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             $('.icon-thumbs-down').removeClass('fade');
             relationships.counts.dislikes = backup;
             self.model.set('relationships', relationships);
-            createModal({ message: 'error' })
+            $.createModal({ message: 'error' })
         });
     },
 
@@ -272,7 +272,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
             self.model.set('relationships', relationships);
             self.model.trigger('change');
             // display error
-            createModal({ message: 'error' });
+            $.createModal({ message: 'error' });
         });
     },
 
@@ -345,11 +345,11 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
 
         $.post(relationships.ratings_url, { "value": value })
         .done(function(){
-            createModal({ message: $('#js-rating').attr('data-thanks-message') });
+            $.createModal({ message: $('#js-rating').attr('data-thanks-message') });
             self.model.fetch();
         })
         .error(function(xhr){
-            createModal({ message: xhr.responseJSON["__all__"] });
+            $.createModal({ message: xhr.responseJSON["__all__"] });
         });
     },
 

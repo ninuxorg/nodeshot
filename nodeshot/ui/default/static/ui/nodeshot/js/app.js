@@ -42,11 +42,11 @@ Nodeshot.addInitializer(function () {
 
     Nodeshot.page.on('error', function (model, http) {
         if (http.status === 404) {
-            createModal({
+            $.createModal({
                 message: 'the requested page was not found'
             });
         } else {
-            createModal({
+            $.createModal({
                 message: 'there was an error while retrieving the page'
             });
         }
@@ -132,11 +132,11 @@ var NodeshotController = {
         .error(function(http){
             // TODO: D.R.Y.
             if (http.status === 404) {
-                createModal({
+                $.createModal({
                     message: 'the requested page was not found'
                 });
             } else {
-                createModal({
+                $.createModal({
                     message: 'there was an error while retrieving the page'
                 });
             }
@@ -162,6 +162,16 @@ var NodeshotRouter = new Marionette.AppRouter({
 
 $(document).ready(function ($) {
     Nodeshot.start();
+
+    // menu
+    $('#nav-bar').delegate('#ns-top-nav-links li a', 'click', function (e) {
+        var a = $(this);
+        if (a.attr('href').substr(0, 10) != 'javascript') {
+            if(!a.hasClass('dropdown-toggle')){
+                $('#ns-top-nav-links li.active').removeClass('active');
+            }
+        }
+    });
 
     // login / sign in
     $('#js-signin-form').submit(function (e) {
@@ -203,10 +213,28 @@ $(document).ready(function ($) {
 
         }).done(function (response) {
             $('#signup-modal').modal('hide');
-            createModal({
+            $.createModal({
                 message: 'sent confirmation mail'
             });
         });
+    });
+
+    // password strength
+    $('#js-signup-password').pwstrength({
+        common: {
+            minChar: 1
+        },
+        ui: {
+            container: "#js-password-strength-message",
+            viewports: {
+                progress: ".pwstrength_viewport_progress",
+                verdict: ".pwstrength_viewport_verdict"
+            },
+            verdicts: ["Very weak", "Weak", "Normal", "Medium", "Strong"],
+            scores: [10, 17, 26, 40, 50]
+        }
+    }).focus(function (e) {
+        $('#js-password-strength-message').fadeIn(255);
     });
 
     // signup link in sign in overlay
@@ -215,7 +243,6 @@ $(document).ready(function ($) {
         $('#signin-modal').modal('hide');
         $('#signup-modal').modal('show');
     });
-
 
     // signin link in signup overlay
     $('#js-signin-link').click(function (e) {
@@ -240,39 +267,47 @@ $(document).ready(function ($) {
     // create status CSS classes
     css = _.template($('#status-css-template').html(), {});
     $('head').append(css);
+
+    $('#mobile-nav').click(function (e) {
+        e.preventDefault();
+    });
+
+    $('#nav-bar').delegate('#ns-top-nav-links.in a:not(.dropdown-toggle)', 'click', function (e) {
+        $('#ns-top-nav-links').collapse('hide');
+    });
+
+    // automatically center modal depending on its width
+    $('body').delegate('.modal.autocenter', 'show.bs.modal', function (e) {
+        var dialog = $(this).find('.modal-dialog'),
+            dialog_dimensions = dialog.getHiddenDimensions(),
+            coefficient = $(this).attr('data-autocenter-coefficient');
+
+        if (!coefficient) {
+            coefficient = 2.1
+        }
+
+        dialog.css({
+            width: dialog_dimensions.width,
+            right: 0
+        });
+
+        // vertically align to center
+        new_height = ($(window).height() - dialog_dimensions.height) / coefficient;
+        // ensure new position is greater than zero
+        new_height = new_height > 0 ? new_height : 0;
+        // set new height
+        dialog.css('top', new_height);
+    })
 });
 
-var createModal = function (opts) {
-    var template_html = $('#modal-template').html(),
-        close = function () {
-            $('#tmp-modal').modal('hide')
-        },
-        options = $.extend({
-            message: '',
-            successMessage: 'ok',
-            successAction: function () {},
-            defaultMessage: null,
-            defaultAction: function () {}
-        }, opts);
-
-    $('body').append(_.template(template_html, options));
-
-    $('#tmp-modal').modal('show');
-
-    $('#tmp-modal .btn-success').one('click', function (e) {
-        close();
-        options.successAction()
+$(window).load(function(e){
+    $('#preloader').fadeOut(255, function () {
+        // clear overflow hidden except if map view
+        if (!$('#map').length) {
+            $('body').removeAttr('style');
+        }
     });
-
-    $('#tmp-modal .btn-default').one('click', function (e) {
-        close();
-        options.defaultAction()
-    });
-
-    $('#tmp-modal').one('hidden.bs.modal', function (e) {
-        $('#tmp-modal').remove();
-    })
-};
+});
 
 $(document).ajaxSend(function (event, xhr, settings) {
     if(settings.url.indexOf('notifications') > -1){
@@ -286,14 +321,4 @@ $(document).ajaxStop(function () {
     $.toggleLoading('hide');
 });
 
-// extend underscore with formatDateTime shortcut
-_.formatDateTime = function(dateString){
-    // TODO: format configurable
-    return $.format.date(dateString, "dd MMMM yyyy, HH:mm");
-};
 
-// extend underscore with formatDate shortcut
-_.formatDate = function(dateString){
-    // TODO: format configurable
-    return $.format.date(dateString, "dd MMMM yyyy");
-};

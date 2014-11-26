@@ -329,7 +329,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         // TODO: refactor this to use backbone and automatic validation
         $.post(url, data).done(function () {
             // TODO: fire custom event here
-            createModal({
+            $.createModal({
                 message: 'new node added'
             });
             self.closeAddNode(function () {
@@ -875,7 +875,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
      */
     switchMapMode: function (e) {
         e.preventDefault();
-        createModal({message:'not implemented yet'});
+        $.createModal({message:'not implemented yet'});
         return
         // automatically determine which mod to use depending on the icon's button
         var mode = this.ui.switchMapMode.hasClass('icon-3d') ? '3D' : '2D';
@@ -972,7 +972,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
             dataType: 'json',
             success: function (response) {
                 if (_.isEmpty(response)) {
-                    createModal({
+                    $.createModal({
                         message: 'Address not found'
                     });
                 } else {
