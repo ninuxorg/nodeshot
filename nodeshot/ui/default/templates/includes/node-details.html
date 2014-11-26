@@ -5,7 +5,6 @@
 
 <div id="map-overlay-container">
     <article id="node-details" class="center-stage responsive-padding">
-
         <h2>
             <%= name %>
             <% if(relationships){ %>
@@ -121,7 +120,7 @@
                             {% trans 'Rating' %}:
                         </td>
                         <td class="right" id="js-rating" data-thanks-message="{% trans 'Thanks for rating' %}">
-                            <a href="javascript:$.createModal({message:'not implemented yet'})" class="rating">
+                            <a href="#" class="rating">
                                 <% _.each(Nodeshot.body.currentView.ratingTo5Stars(), function(style, i){ %>
                                     <span class="icon-star-<%= style %>"
                                           data-original-class="icon-star-<%= style %>"
