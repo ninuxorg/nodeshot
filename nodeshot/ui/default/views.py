@@ -28,6 +28,7 @@ def index(request):
         'TILESERVER_URL': ui_settings.TILESERVER_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
-        'VOTING_ENABLED': ui_settings.VOTING_ENABLED
+        'VOTING_ENABLED': ui_settings.VOTING_ENABLED,
+        'RATING_ENABLED': ui_settings.RATING_ENABLED
     }
     return render(request, 'index.html', context)

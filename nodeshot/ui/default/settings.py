@@ -9,7 +9,10 @@ MAP_CENTER = list(LEAFLET_SETTINGS['DEFAULT_CENTER'])
 
 if 'nodeshot.community.participation' in settings.INSTALLED_APPS:
     VOTING_ENABLED = getattr(settings, 'NODESHOT_UI_VOTING_ENABLED', True)
+    RATING_ENABLED = getattr(settings, 'NODESHOT_UI_RATING_ENABLED', True)
 else:
     VOTING_ENABLED = False
+    RATING_ENABLED = False
 
 VOTING_ENABLED = json.dumps(VOTING_ENABLED)
+RATING_ENABLED = json.dumps(RATING_ENABLED)
