@@ -3,11 +3,6 @@
  * will be converted to a more structured set of files with backbone.js
  */
 
-// set max height of collapsible menu (mobile)
-var setCollapsibleMainMenuMaxHeight = function () {
-    $('#nav-bar .navbar-collapse').css('max-height', $(window).height() - 50);
-}
-
 // automatically center modal depending on its width
 $('body').delegate('.modal.autocenter', 'show.bs.modal', function (e) {
     var dialog = $(this).find('.modal-dialog'),
@@ -88,11 +83,7 @@ clearPreloader = function () {
     });
 }
 
-// map
-$(window).resize(function (e) {
-    setCollapsibleMainMenuMaxHeight();
-}).load(function (e) {
-    setCollapsibleMainMenuMaxHeight();
+$(window).load(function(e){
     clearPreloader();
 });
 

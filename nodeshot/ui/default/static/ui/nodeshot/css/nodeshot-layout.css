@@ -454,15 +454,14 @@ article.center-stage{
         min-height: 0 !important;
         padding: 0;
     }
-
-    #nav-bar ul{ margin: 0; padding-top: 5px !important }
+	
+    #nav-bar .navbar-collapse{ max-height: none; padding: 0 }
+    #nav-bar .navbar-nav{ margin: 10px 0 0; padding: 0; width: 100% !important }
 
     #nav-bar > div{
         border: 0 none;
         background: #383838;
     }
-
-    #nav-bar ul.nav{ padding: 0 }
 
     #nav-bar ul.navbar-nav > li{
         width: 100%;
