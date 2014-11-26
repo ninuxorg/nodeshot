@@ -7,7 +7,7 @@
     <article id="node-details" class="center-stage responsive-padding">
         <h2>
             <%= name %>
-            <% if(relationships){ %>
+            <% if(Nodeshot.VOTING_ENABLED && relationships){ %>
             <span class="vote">
                 <a href="#like" class="icon-thumbs-up<%= (relationships.has_already_voted === -1) ? ' fade' : '' %>">
                     <%= relationships.counts.likes %>
