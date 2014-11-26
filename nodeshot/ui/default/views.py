@@ -29,6 +29,7 @@ def index(request):
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
         'VOTING_ENABLED': ui_settings.VOTING_ENABLED,
-        'RATING_ENABLED': ui_settings.RATING_ENABLED
+        'RATING_ENABLED': ui_settings.RATING_ENABLED,
+        'COMMENTS_ENABLED': ui_settings.COMMENTS_ENABLED
     }
     return render(request, 'index.html', context)

@@ -144,7 +144,7 @@
             </div>-->
         </div>
 
-        <% if(relationships){ %>
+        <% if(Nodeshot.COMMENTS_ENABLED && relationships){ %>
         <div id="comments">
             <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
 
@@ -197,5 +197,5 @@
         <% } %>
 
         <a href="#/close" class="icon-close"></a>
-    </div>
+    </article>
 </div>

@@ -56,7 +56,6 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         map.panBy([0, 90], {
             animate: false
         });
-        // TODO: configurable tiles
         this.osmLayer = new L.tileLayer(Nodeshot.TILESERVER_URL).addTo(map);
         this.map = map;
 
@@ -86,6 +85,8 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
         this.model.fetch();
 
         this.listenTo(Nodeshot.currentUser, 'change', this.render);
+        // trick for background color
+        $('html').css('background-color', '#aba49c');
     },
 
     /*
@@ -94,6 +95,8 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     onClose: function () {
         // unbind the namespaced events
         $(window).off("resize.node-details");
+        // restore background color
+        $('html').attr('style', '');
     },
 
     /*
@@ -112,12 +115,17 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     },
 
     /*
+     * layout corrections for node-details
      * set min-heigh css property on map-container div
      */
     setMinHeight: function () {
+        // ensure content fills until the bottom of the window
+        $('#map-container').height($(window).height() - $('header').eq(0).outerHeight());
+
         var containerHeight = $('#map-container').outerHeight(),
-            topDistance = parseInt($('#map-overlay-container').css('top').replace('px', ''));
-        newMinHeight = containerHeight - topDistance;
+            // distance of map-overlay container from top
+            topDistance = parseInt($('#map-overlay-container').css('top'));
+            newMinHeight = containerHeight - topDistance;
 
         if (newMinHeight > 150) {
             $('#node-details').css('min-height', newMinHeight);
