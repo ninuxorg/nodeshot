@@ -274,8 +274,6 @@ var createModal = function (opts) {
     })
 };
 
-
-
 $(document).ajaxSend(function (event, xhr, settings) {
     if(settings.url.indexOf('notifications') > -1){
         return;

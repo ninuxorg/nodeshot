@@ -127,3 +127,54 @@ $.toggleLoading = function (operation) {
         loading.fadeToggle(255);
     }
 };
+
+/*
+ * Get width and height of a hidden element
+ * returns an object with height and width
+ */
+$.fn.getHiddenDimensions = function () {
+    var self = $(this);
+
+    // return immediately if element is visible
+    if (self.is(':visible')) {
+        return {
+            width: self.outerWidth(),
+            height: self.outerHeight()
+        }
+    }
+
+    var hidden = self, // this element is hidden
+        parents = self.parents(':hidden'); // look for hidden parent elements
+
+    // if any hidden parent element
+    if (parents.length) {
+        // add to hidden collection
+        hidden = $().add(parents).add(hidden);
+    }
+
+    /*
+     trick all the hidden elements in a way that
+     they wont be shown but we'll be able to calculate their width
+    */
+    hidden.css({
+        position: 'absolute',
+        visibility: 'hidden',
+        display: 'block'
+    });
+
+    // store width of current element
+    var dimensions = {
+        width: self.outerWidth(),
+        height: self.outerHeight()
+    }
+
+    // reset hacked css on hidden elements
+    hidden.css({
+        position: '',
+        visibility: '',
+        display: ''
+    });
+
+    // return width
+    return dimensions;
+}
