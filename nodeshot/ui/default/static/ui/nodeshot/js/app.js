@@ -65,7 +65,7 @@ var NodeshotController = {
 
     // page details
     getPage: function (slug) {
-        toggleLoading('show');
+        $.toggleLoading('show');
 
         Nodeshot.page.set('slug', slug);
         Nodeshot.page.fetch();
@@ -141,7 +141,7 @@ var NodeshotController = {
                 });
             }
         });
-        
+
         $('#nav-bar li').removeClass('active');
     }
 }
@@ -274,48 +274,18 @@ var createModal = function (opts) {
     })
 };
 
-var toggleLoading = function (operation) {
-    var loading = $('#loading');
 
-    if (!loading.length) {
-        $('body').append(_.template($('#loading-template').html(), {}));
-        loading = $('#loading');
-
-        var dimensions = loading.getHiddenDimensions();
-        loading.outerWidth(dimensions.width);
-        loading.css({
-            left: 0,
-            margin: '0 auto'
-        });
-
-        // close loading
-        $('#loading .icon-close').click(function (e) {
-            toggleLoading();
-            if (Nodeshot.currentXHR) {
-                Nodeshot.currentXHR.abort();
-            }
-        });
-    }
-
-    if (operation == 'show') {
-        loading.fadeIn(255);
-    } else if (operation == 'hide') {
-        loading.fadeOut(255);
-    } else {
-        loading.fadeToggle(255);
-    }
-};
 
 $(document).ajaxSend(function (event, xhr, settings) {
     if(settings.url.indexOf('notifications') > -1){
         return;
     }
-    toggleLoading('show');
+    $.toggleLoading('show');
     Nodeshot.currentXHR = xhr;
 });
 
 $(document).ajaxStop(function () {
-    toggleLoading('hide');
+    $.toggleLoading('hide');
 });
 
 // extend underscore with formatDateTime shortcut

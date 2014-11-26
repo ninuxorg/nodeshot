@@ -91,3 +91,39 @@ _.mixin({
         return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
     }
 });
+
+/*
+ * Toggle Loading Div
+ * @param operation: string "show" or "hide"
+ */
+$.toggleLoading = function (operation) {
+    var loading = $('#loading');
+
+    if (!loading.length) {
+        $('body').append(_.template($('#loading-template').html(), {}));
+        loading = $('#loading');
+
+        var dimensions = loading.getHiddenDimensions();
+        loading.outerWidth(dimensions.width);
+        loading.css({
+            left: 0,
+            margin: '0 auto'
+        });
+
+        // close loading
+        $('#loading .icon-close').click(function (e) {
+            $.toggleLoading();
+            if (Nodeshot.currentXHR) {
+                Nodeshot.currentXHR.abort();
+            }
+        });
+    }
+
+    if (operation == 'show') {
+        loading.fadeIn(255);
+    } else if (operation == 'hide') {
+        loading.fadeOut(255);
+    } else {
+        loading.fadeToggle(255);
+    }
+};
