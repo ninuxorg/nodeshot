@@ -77,6 +77,7 @@ Contents
    /topics/synchronizers
    /topics/ui
    /topics/participation
+   /topics/websockets
    /topics/oldimporter
    /topics/sentry
    /topics/connectors
