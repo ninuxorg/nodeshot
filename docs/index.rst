@@ -75,6 +75,7 @@ Contents
    /topics/nodes
    /topics/layers
    /topics/synchronizers
+   /topics/ui
    /topics/participation
    /topics/oldimporter
    /topics/sentry
