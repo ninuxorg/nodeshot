@@ -30,3 +30,14 @@ else:
     GOOGLE_ENABLED = False
     GITHUB_ENABLED = False
     SOCIAL_AUTH_ENABLED = False
+
+if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
+    from nodeshot.core.websockets import DOMAIN, PATH, PORT
+
+    WEBSOCKETS = {
+        'DOMAIN': DOMAIN,
+        'PATH': PATH,
+        'PORT': PORT
+    }
+else:
+    WEBSOCKETS = False

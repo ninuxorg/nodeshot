@@ -3,20 +3,8 @@ from django.conf import settings
 from nodeshot.core.layers.models import Layer
 from . import settings as ui_settings
 
-if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
-    from nodeshot.core.websockets import DOMAIN, PATH, PORT
 
-    WEBSOCKETS = {
-        'DOMAIN': DOMAIN,
-        'PATH': PATH,
-        'PORT': PORT
-    }
-else:
-    WEBSOCKETS = False
-
-
-# TODO
-# improve spaghetti code
+# TODO: improve ugly code
 def index(request):
     layers = Layer.objects.published()
     layers_allowing_new_nodes = layers.filter(new_nodes_allowed=True)
@@ -24,7 +12,6 @@ def index(request):
     context = {
         'layers': layers,
         'layers_allowing_new_nodes': layers_allowing_new_nodes,
-        'WEBSOCKETS': WEBSOCKETS,
         'TILESERVER_URL': ui_settings.TILESERVER_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
@@ -37,5 +24,7 @@ def index(request):
         'FACEBOOK_ENABLED': ui_settings.FACEBOOK_ENABLED,
         'GOOGLE_ENABLED': ui_settings.GOOGLE_ENABLED,
         'GITHUB_ENABLED': ui_settings.GITHUB_ENABLED,
+        # websockets
+        'WEBSOCKETS': ui_settings.WEBSOCKETS,
     }
     return render(request, 'index.html', context)
