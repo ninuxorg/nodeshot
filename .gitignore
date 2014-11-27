@@ -35,3 +35,4 @@ local_settings.py
 /dist
 nodeshot.egg-info/
 deploy
+docs/_*

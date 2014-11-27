@@ -68,16 +68,16 @@ Contents
    /topics/automated_install
    /topics/manual_install
    /topics/contribute
-   /topics/social_login
    /topics/admin
    /topics/api
-   /topics/open311
    /topics/nodes
    /topics/layers
-   /topics/synchronizers
    /topics/ui
    /topics/participation
+   /topics/social_login
    /topics/websockets
+   /topics/synchronizers
+   /topics/open311
    /topics/oldimporter
    /topics/sentry
    /topics/connectors
