@@ -17,13 +17,16 @@ from nodeshot.core.nodes.views import NodeList
 from .models import Profile, PasswordReset, SocialLink
 from .serializers import *
 from .permissions import *
-from .settings import settings, EMAIL_CONFIRMATION
+from .settings import settings, EMAIL_CONFIRMATION, REGISTRATION_OPEN
 
 
-# ------ User Profile ------ #
+if REGISTRATION_OPEN:
+    ProfileBase = generics.ListCreateAPIView
+else:
+    ProfileBase = generics.ListAPIView
 
 
-class ProfileList(generics.ListCreateAPIView):
+class ProfileList(ProfileBase):
     """
     Return profile of current authenticated user or return 401.
 

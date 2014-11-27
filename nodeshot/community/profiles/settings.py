@@ -1,5 +1,6 @@
 from django.conf import settings
 
 
-EMAIL_CONFIRMATION = getattr(settings, 'PROFILE_EMAIL_CONFIRMATION', True)
-REQUIRED_FIELDS = getattr(settings, 'PROFILE_REQUIRED_FIELDS', ['email'])
+REGISTRATION_OPEN = getattr(settings, 'NODESHOT_PROFILES_REGISTRATION_OPEN', True)
+EMAIL_CONFIRMATION = getattr(settings, 'NODESHOT_PROFILES_EMAIL_CONFIRMATION', True)
+REQUIRED_FIELDS = getattr(settings, 'NODESHOT_PROFILES_REQUIRED_FIELDS', ['email'])
