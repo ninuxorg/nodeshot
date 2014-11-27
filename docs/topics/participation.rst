@@ -2,32 +2,30 @@
 =============
 Participation
 =============
-The participation module makes possible, for registered users, the insertion of participation data on nodes.
 
-The actions that can be taken are:
+``nodeshot.community.participation`` is a django apps that enables 3 features to make
+the site more "social":
 
-**Vote** : 'like' or 'dislike'
+ * **Vote** : like or dislike
+ * **Comment**: comments on nodes
+ * **Rating**: 1 to 10 rating
 
-**Comment** :  comments on nodes
+``nodeshot.community.participation`` is enabled by default in ``nodeshot.conf.settings.INSTALLED_APPS``.
 
-**Rating** : 1 to 10 rating
+--------------
+How to disable
+--------------
 
----------------
-Settings
----------------
+If you need to disable this feature altogether add this at the bottom of your ``settings.py``:
 
-The modules ``nodeshot.layers`` and ``nodeshot.nodes``  need to be in ``settings.INSTALLED_APPS``::
+.. code-block:: python
 
-    INSTALLED_APPS = [
-        # dependencies
-        'nodeshot.core.layers',
-        'nodeshot.core.nodes',
-        # ...
-    ]
+    INSTALLED_APPS.remove('nodeshot.interop.open311')
+    INSTALLED_APPS.remove('nodeshot.community.participation')
 
----------------
+-------------
 Configuration
----------------
+-------------
 
 Admins can configure which of the above actions can be taken through the Admin Interface.
 
@@ -39,16 +37,15 @@ Or for a single **node**:
 
 .. image:: images/node_participation_settings.png
 
-----
+---
 API
-----
+---
 
 ^^^^^^^^^^^^^^
 Inserting data
 ^^^^^^^^^^^^^^
 
 Comments, votes and ratings can be inserted through :ref:`Nodeshot API <api-label>` or :ref:`Open 311 API <open311-label>` .
-
 
 ^^^^^^^^^^^^^^
 Querying data
