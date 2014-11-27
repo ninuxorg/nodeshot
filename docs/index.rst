@@ -73,6 +73,7 @@ Contents
    /topics/nodes
    /topics/layers
    /topics/ui
+   /topics/profiles
    /topics/participation
    /topics/social_login
    /topics/websockets
