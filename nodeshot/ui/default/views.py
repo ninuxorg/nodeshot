@@ -26,5 +26,7 @@ def index(request):
         'GITHUB_ENABLED': ui_settings.GITHUB_ENABLED,
         # websockets
         'WEBSOCKETS': ui_settings.WEBSOCKETS,
+        # profiles
+        'REGISTRATION_OPEN': ui_settings.REGISTRATION_OPEN
     }
     return render(request, 'index.html', context)

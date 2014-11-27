@@ -41,3 +41,5 @@ if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
     }
 else:
     WEBSOCKETS = False
+
+from nodeshot.community.profiles.settings import REGISTRATION_OPEN

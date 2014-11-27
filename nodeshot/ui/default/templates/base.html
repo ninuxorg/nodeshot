@@ -81,6 +81,7 @@
     {% block body %}{% endblock %}
     </div>
 
+    {% if REGISTRATION_OPEN %}
     <!-- Sign up -->
     <div class="modal fade narrow autocenter enlarge-on-mobile" id="signup-modal"
          tabindex="-1"
@@ -159,6 +160,7 @@
             <a class="icon-close" data-dismiss="modal" href="#"></a>
         </div>
     </div>
+    {% endif %}
 
     <!-- Sign in -->
     <div class="modal fade narrow autocenter enlarge-on-mobile" id="signin-modal"
@@ -227,8 +229,9 @@
             </form>
 
             <p class="text"><a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'Forgot your password?' %}</a></p>
-
+            {% if REGISTRATION_OPEN %}
             <p class="text">{% trans "Don't have an account yet?" %} <a href="#" id="js-signup-link">{% trans 'Sign up' %}</a></p>
+            {% endif %}
 
             <a class="icon-close" data-dismiss="modal" href="#"></a>
         </div>
@@ -302,12 +305,14 @@
             </ul>
         </li>
         <% } else { %>
+        {% if REGISTRATION_OPEN %}
         <li>
             <a href="#" data-toggle="modal" data-target="#signup-modal">
                 <span class="icon-user-add"></span>
                 <span class="text">{% trans 'Sign up' %}</span>
             </a>
         </li>
+        {% endif %}
         <li>
             <a href="#" data-toggle="modal" data-target="#signin-modal">
                 <span class="icon-user"></span>
