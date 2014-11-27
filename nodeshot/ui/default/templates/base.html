@@ -92,30 +92,38 @@
 
             <p class="text">{% trans 'By signing up to this service you agree to our <a href="#/pages/privacy-policy" class="js-dismiss">privacy policy</a>' %}</p>
 
+            {% if SOCIAL_AUTH_ENABLED %}
             <p class="social-buttons">
+                {% if FACEBOOK_ENABLED %}
                 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
                     <span class="icon icon-facebook"></span>
                     <span class="text">{% trans 'Sign up with Facebook' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
+                {% endif %}
 
+                {% if GOOGLE_ENABLED %}
                 <a href="{% url "socialauth_begin" "google-oauth2" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
                     <span class="text">{% trans 'Sign up with Google' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
+                {% endif %}
 
+                {% if GITHUB_ENABLED %}
                 <a href="{% url "socialauth_begin" "github" %}" class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
                     <span class="text">{% trans 'Sign up with Github' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
+                {% endif %}
             </p>
 
             <p class="separator">
                 <span class="line"></span>
                 <span class="text">{% trans 'or' %}</span>
             </p>
+            {% endif %}
 
             <form action="" method="post" id="js-signup-form">
                 <p class="input-group hastip" data-placement="right" data-trigger="manual">
@@ -160,30 +168,38 @@
          aria-hidden="true">
         <div class="modal-dialog modal-content modal-body inverse user-dialog">
 
+            {% if SOCIAL_AUTH_ENABLED %}
             <p class="social-buttons">
+                {% if FACEBOOK_ENABLED %}
                 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-social btn-facebook">
                     <span class="icon icon-facebook"></span>
                     <span class="text">{% trans 'Sign in with Facebook' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
+                {% endif %}
 
+                {% if GOOGLE_ENABLED %}
                 <a href="{% url "socialauth_begin" "google-oauth2" %}" class="btn btn-social btn-google">
                     <span class="icon icon-google"></span>
                     <span class="text">{% trans 'Sign in with Google' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
+                {% endif %}
 
+                {% if GITHUB_ENABLED %}
                 <a href="{% url "socialauth_begin" "github" %}"  class="btn btn-social btn-github">
                     <span class="icon icon-github"></span>
                     <span class="text">{% trans 'Sign in with Github' %}</span>
                     <span class="hover">&nbsp;</span>
                 </a>
+                {% endif %}
             </p>
 
             <p class="separator">
                 <span class="line"></span>
                 <span class="text">{% trans 'or' %}</span>
             </p>
+            {% endif %}
 
             <form action="" method="post" id="js-signin-form">
                 <p class="input-group">

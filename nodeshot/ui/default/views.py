@@ -28,8 +28,14 @@ def index(request):
         'TILESERVER_URL': ui_settings.TILESERVER_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
+        # participation
         'VOTING_ENABLED': ui_settings.VOTING_ENABLED,
         'RATING_ENABLED': ui_settings.RATING_ENABLED,
-        'COMMENTS_ENABLED': ui_settings.COMMENTS_ENABLED
+        'COMMENTS_ENABLED': ui_settings.COMMENTS_ENABLED,
+        # social auth
+        'SOCIAL_AUTH_ENABLED': ui_settings.SOCIAL_AUTH_ENABLED,
+        'FACEBOOK_ENABLED': ui_settings.FACEBOOK_ENABLED,
+        'GOOGLE_ENABLED': ui_settings.GOOGLE_ENABLED,
+        'GITHUB_ENABLED': ui_settings.GITHUB_ENABLED,
     }
     return render(request, 'index.html', context)
