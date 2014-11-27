@@ -27,43 +27,41 @@ class DefaultUiTest(BaseTestCase):
         self.assertIn('menu', response.data)
 
     def test_social_auth_optional(self):
+        # enable social auth
+        setattr(settings, 'SOCIAL_AUTH_ENABLED', True)
         response = self.client.get(reverse('ui:index'))
         self.assertContains(response, 'social-buttons')
         # disable social auth
         setattr(settings, 'SOCIAL_AUTH_ENABLED', False)
         response = self.client.get(reverse('ui:index'))
         self.assertNotContains(response, 'social-buttons')
-        # re-enable social auth
-        setattr(settings, 'SOCIAL_AUTH_ENABLED', True)
-        response = self.client.get(reverse('ui:index'))
-        self.assertContains(response, 'social-buttons')
 
     def test_facebook_optional(self):
+        setattr(settings, 'SOCIAL_AUTH_ENABLED', True)
+        setattr(settings, 'FACEBOOK_ENABLED', True)
         response = self.client.get(reverse('ui:index'))
         self.assertContains(response, 'btn-facebook')
         setattr(settings, 'FACEBOOK_ENABLED', False)
         response = self.client.get(reverse('ui:index'))
         self.assertNotContains(response, 'btn-facebook')
-        setattr(settings, 'FACEBOOK_ENABLED', True)
-        response = self.client.get(reverse('ui:index'))
-        self.assertContains(response, 'btn-facebook')
+        setattr(settings, 'SOCIAL_AUTH_ENABLED', False)
 
     def test_google_optional(self):
+        setattr(settings, 'SOCIAL_AUTH_ENABLED', True)
+        setattr(settings, 'GOOGLE_ENABLED', True)
         response = self.client.get(reverse('ui:index'))
         self.assertContains(response, 'btn-google')
         setattr(settings, 'GOOGLE_ENABLED', False)
         response = self.client.get(reverse('ui:index'))
         self.assertNotContains(response, 'btn-google')
-        setattr(settings, 'GOOGLE_ENABLED', True)
-        response = self.client.get(reverse('ui:index'))
-        self.assertContains(response, 'btn-google')
+        setattr(settings, 'SOCIAL_AUTH_ENABLED', False)
 
     def test_github_optional(self):
+        setattr(settings, 'SOCIAL_AUTH_ENABLED', True)
+        setattr(settings, 'GITHUB_ENABLED', True)
         response = self.client.get(reverse('ui:index'))
         self.assertContains(response, 'btn-github')
         setattr(settings, 'GITHUB_ENABLED', False)
         response = self.client.get(reverse('ui:index'))
         self.assertNotContains(response, 'btn-github')
-        setattr(settings, 'GITHUB_ENABLED', True)
-        response = self.client.get(reverse('ui:index'))
-        self.assertContains(response, 'btn-github')
+        setattr(settings, 'SOCIAL_AUTH_ENABLED', False)
