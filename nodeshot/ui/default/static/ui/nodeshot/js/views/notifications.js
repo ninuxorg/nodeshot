@@ -19,7 +19,7 @@ var NotificationCollectionView = Backbone.Marionette.CollectionView.extend({
     name: 'NotificationCollectionView',
     el: '#js-notifications-container',
     tagName: 'ul',
-    itemView: NotificationItemView,
+    childView: NotificationItemView,
     emptyView: NotificationEmptyView,
 
     events:{

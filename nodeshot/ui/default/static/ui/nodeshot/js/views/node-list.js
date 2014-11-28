@@ -15,8 +15,8 @@ var NodeListView = Backbone.Marionette.CompositeView.extend({
     className: 'center-stage',
     id: 'node-list',
     template: '#node-list-template',
-    itemView: NodeRowView,
-    itemViewContainer: '#js-rows',
+    childView: NodeRowView,
+    childViewContainer: '#js-rows',
     emptyView: NodeEmptyView,
 
     ui:{
@@ -49,7 +49,7 @@ var NodeListView = Backbone.Marionette.CompositeView.extend({
         $('#nav-bar a[href="#/nodes"]').addClass('active');
     },
 
-    onClose: function () {
+    onDestroy: function () {
         // unbind custom resize event
         $(window).off("resize.nodelist");
     },

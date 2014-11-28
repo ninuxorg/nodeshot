@@ -112,7 +112,7 @@ $.toggleLoading = function (operation) {
     var loading = $('#loading');
 
     if (!loading.length) {
-        $('body').append(_.template($('#loading-template').html(), {}));
+        $('body').append(_.template($('#loading-template').html()));
         loading = $('#loading');
 
         var dimensions = loading.getHiddenDimensions();
@@ -203,7 +203,7 @@ $.fn.getHiddenDimensions = function () {
 $.createModal = function (opts) {
     var template_html = $('#modal-template').html(),
         close = function () {
-            $('#tmp-modal').modal('hide')
+            $('#tmp-modal').modal('hide');
         },
         options = $.extend({
             message: '',
@@ -213,7 +213,7 @@ $.createModal = function (opts) {
             defaultAction: function () {}
         }, opts);
 
-    $('body').append(_.template(template_html, options));
+    $('body').append(_.template(template_html)(options));
 
     $('#tmp-modal').modal('show');
 

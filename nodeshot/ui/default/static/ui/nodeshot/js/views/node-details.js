@@ -92,7 +92,7 @@ var NodeDetailsView = Backbone.Marionette.ItemView.extend({
     /*
      * unbind resize event when view is closed
      */
-    onClose: function () {
+    onDestroy: function () {
         // unbind the namespaced events
         $(window).off("resize.node-details");
         // restore background color

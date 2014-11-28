@@ -34,7 +34,7 @@ Nodeshot.addInitializer(function () {
     Nodeshot.page = new Page();
 
     Nodeshot.page.on('sync', function () {
-        Nodeshot.body.close();
+        Nodeshot.body.empty();
         Nodeshot.body.show(new PageView({
             model: Nodeshot.page
         }));
@@ -84,9 +84,9 @@ var NodeshotController = {
     getNodeList: function() {
         new NodeCollection().fetch({
             success: function(collection){
-                Nodeshot.body.close();
+                Nodeshot.body.empty();
                 Nodeshot.body.show(new NodeListView({
-                    model: new Backbone.Model({ total: collection.count }),
+                    model: new Backbone.Model({ collection: collection }),
                     collection: collection
                 }));
             }
@@ -97,7 +97,7 @@ var NodeshotController = {
     // node details
     getNode: function (slug) {
         var node = new Node(Nodeshot.nodesNamed[slug].feature.properties);
-        Nodeshot.body.close();
+        Nodeshot.body.empty();
         Nodeshot.body.show(new NodeDetailsView({
             model: node
         }));
@@ -105,7 +105,7 @@ var NodeshotController = {
 
     // map view
     getMap: function () {
-        Nodeshot.body.close();
+        Nodeshot.body.empty();
         Nodeshot.body.show(new MapView());
         $('#nav-bar a[href="#/map"]').trigger('click').parent().addClass('active');
     },
@@ -124,7 +124,7 @@ var NodeshotController = {
 
         user.fetch()
         .done(function(){
-            Nodeshot.body.close();
+            Nodeshot.body.empty();
             Nodeshot.body.show(new UserDetailsView({
                 model: user
             }));
@@ -265,7 +265,7 @@ $(document).ready(function ($) {
     }
 
     // create status CSS classes
-    css = _.template($('#status-css-template').html(), {});
+    css = _.template($('#status-css-template').html());
     $('head').append(css);
 
     $('#mobile-nav').click(function (e) {
@@ -320,5 +320,3 @@ $(document).ajaxSend(function (event, xhr, settings) {
 $(document).ajaxStop(function () {
     $.toggleLoading('hide');
 });
-
-

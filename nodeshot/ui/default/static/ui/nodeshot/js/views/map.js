@@ -92,7 +92,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         }
     },
 
-    onClose: function (e) {
+    onDestroy: function (e) {
         // show breadcrumb on mobile
         $('#breadcrumb').addClass('visible-xs').show();
 

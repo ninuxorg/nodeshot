@@ -4,7 +4,7 @@
         {% trans 'Nodes' %}
     </h2>
     <span class="status pull-left">
-        <%= total %> total
+        <%= collection.total %> total
     </span>
     <% _.each(Nodeshot.statuses, function(s, key){ %>
         <span class="status pull-left <%= key %>"
@@ -21,7 +21,7 @@
             <input type="text" class="form-control" placeholder="{% trans 'Quick search' %}" value="<%= collection.searchTerm %>">
             <span class="input-group-addon icon-search"></span>
     </form>
-    
+
     <div class="dropdown input-group width30 marginright">
         <button class="btn dropdown-toggle" type="button" id="js-open-filter-panel">
             {% trans 'Filter' %}
@@ -37,7 +37,7 @@
                     {% endfor %}
                 </select>
             </div>
-            
+
             <div class="group">
                 <label>{% trans 'Status' %}</label>
                 <select id="status-filter" class="selectpicker">
@@ -47,7 +47,7 @@
                     <% }) %>
                 </select>
             </div>
-            
+
             <div class="group">
                 <label>{% trans 'User' %}</label>
                 <div class="input-group nput-group-sm">
@@ -55,7 +55,7 @@
                     <span class="input-group-addon icon-search"></span>
                 </div>
             </div>
-            
+
             <div class="group">
                 <label>{% trans 'Created on' %}</label>
                 <select class="selectpicker">
@@ -68,7 +68,7 @@
             </div>
         </div>
     </div>
-    
+
     <% if(collection.searchTerm){ %>
     <div class="pull-left filter-status slimtip boldtip">
         <%= collection.count %> {% trans 'results' %}
@@ -78,9 +78,9 @@
         </span>
     </div>
     <% } %>
-    
+
     <button class="btn btn-light icon-plus pull-right" id="js-add-node">{% trans 'Add node' %}</button>
-    
+
     <div class="clearfix"></div>
 </div>
 
@@ -121,23 +121,23 @@
                 <% }) %>
             </select>
         </div>
-        
+
         <div class="pull-right list-actions not-implemented">
             <select class="selectpicker">
                 <option>{% trans 'Choose action' %}</option>
                 <option>do something</option>
             </select>
         </div>
-        
+
         <div class="pull-right select-all not-implemented">
             <span class="custom-checkbox">
                 <input type="checkbox" id="select-all-checkbox" />
                 <label for="select-all-checkbox"></label>
             </span>
-            
+
             <label for="select-all-checkbox">{% trans 'Select all' %}</label>
         </div>
-        
+
         <br class="clearfix">
     </div>
 </footer>

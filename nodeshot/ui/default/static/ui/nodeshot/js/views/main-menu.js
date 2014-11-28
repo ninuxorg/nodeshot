@@ -14,7 +14,7 @@ var MainMenuEmptyView = Backbone.Marionette.ItemView.extend({
 
 var MainMenuView = Backbone.Marionette.CollectionView.extend({
     el: "#main-menu-view",
-    itemView: MainMenuItemView,
+    childView: MainMenuItemView,
     emptyView: MainMenuEmptyView,
 
     initialize: function(){
