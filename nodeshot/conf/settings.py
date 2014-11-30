@@ -14,7 +14,8 @@ USE_L10N = True
 USE_TZ = True
 
 PROTOCOL = 'http' if DEBUG else 'https'
-PORT = '8000' if DEBUG else None
+PORT = getattr(settings, 'PORT', '8000') if DEBUG else None
+
 SITE_URL = '%s://%s' % (PROTOCOL, settings.DOMAIN)
 SITE_NAME = getattr(settings, 'SITE_NAME', 'Nodeshot instance')
 
