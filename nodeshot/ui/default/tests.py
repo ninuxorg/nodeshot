@@ -133,3 +133,8 @@ class DefaultUiTest(TestCase):
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
         self.browser.css('#node-details')
         self.assertIn('Pomezia', self.browser.page_source)
+    
+    def test_user_profile(self):
+        self._hashchange('#/users/romano')
+        self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'user-details-container'"))
+        self.assertIn('romano', self.browser.page_source)
