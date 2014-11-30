@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.conf import settings
 
 from nodeshot.core.base.tests import user_fixtures
+from nodeshot.core.nodes.models import Node
 from nodeshot.ui.default import settings as local_settings
 
 from selenium import webdriver
@@ -115,6 +116,14 @@ class DefaultUiTest(TestCase):
         self.browser.css("a[href='#/pages/about']").click()
         self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
     
-    def test_map_opens(self):
+    def test_map(self):
         self._hashchange('#/map')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
+    
+    def test_node_list(self):
+        self.browser.css('a[href="#/nodes"]').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Timeout')
+        self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'node-list'"))
+        
+        for node in Node.objects.access_level_up_to('public'):
+            self.assertIn(node.name, self.browser.page_source)
