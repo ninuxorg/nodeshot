@@ -23,7 +23,7 @@ __GRAFICA
 celery.log
 projects/ninux/server.py
 /static/
-/tests/static/
+/tests/ci/static/
 cesium/
 cache/
 *.log

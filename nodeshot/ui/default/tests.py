@@ -127,3 +127,9 @@ class DefaultUiTest(TestCase):
         
         for node in Node.objects.access_level_up_to('public'):
             self.assertIn(node.name, self.browser.page_source)
+    
+    def test_node_details(self):
+        self._hashchange('#/nodes/pomezia')
+        self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
+        self.browser.css('#node-details')
+        self.assertIn('Pomezia', self.browser.page_source)
