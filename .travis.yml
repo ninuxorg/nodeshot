@@ -14,11 +14,13 @@ branches:
 # command to install requirements
 install:
   - pip install -r requirements.txt
-  - pip install coverage coveralls
+  - pip install coverage coveralls selenium
   - python setup.py install
   - pip install MySQL-python
 
 before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
   - psql template1 -c 'CREATE EXTENSION hstore;'
   - psql -U postgres -c 'CREATE DATABASE nodeshot_ci;'
   - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis;"
@@ -29,6 +31,7 @@ before_script:
   - python manage.py migrate --noinput
   - python manage.py collectstatic --noinput
   - python manage.py runserver 0.0.0.0:8000 &
+  - sleep 2 # give django server time to bind to sockets
 
 # command to run tests, e.g. python setup.py test
 script:

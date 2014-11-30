@@ -36,3 +36,4 @@ local_settings.py
 nodeshot.egg-info/
 deploy
 docs/_*
+/manage.py
