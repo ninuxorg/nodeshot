@@ -1,21 +1,21 @@
-<!DOCTYPE html>{% load i18n %}
+<!DOCTYPE html>{% load i18n static %}
 <html>
 <head>
     <title>Nodeshot</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
-    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap.switch.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/lib/css/bootstrap-select.min.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/lib/css/scroller.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-layout.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-colors.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-typography.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/nodeshot/css/nodeshot-typography.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/fontello/css/nodeshot.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}ui/fontello/css/animation.css" rel="stylesheet">
+    <link href="{% static 'ui/lib/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/lib/css/bootstrap.switch.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/lib/css/bootstrap-select.min.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/lib/css/scroller.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/nodeshot/css/nodeshot-layout.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/nodeshot/css/nodeshot-colors.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/nodeshot/css/nodeshot-typography.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/nodeshot/css/nodeshot-typography.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/fontello/css/nodeshot.css' %}" rel="stylesheet">
+    <link href="{% static 'ui/fontello/css/animation.css' %}" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
-    <link rel="icon" href="{{ STATIC_URL }}/ui/nodeshot/images/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="{% static 'ui/nodeshot/images/favicon.ico' %}" type="image/x-icon" />
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -24,8 +24,6 @@
     <![endif]-->
 
     <!-- leaflet -->
-    <link rel="stylesheet" href="{{ STATIC_URL }}ui/leaflet/leaflet.css" />
-    <script src="{{ STATIC_URL }}ui/leaflet/leaflet.js"></script>
     <link rel="stylesheet" href="{% static 'ui/leaflet/leaflet.css' %}" />
     <script src="{% static 'ui/leaflet/leaflet.js' %}"></script>
 </head>
@@ -429,21 +427,21 @@
     </script>
 
     <script src="https://code.jquery.com/jquery.min.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.min.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap.switch.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/bootstrap-select.min.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/pwstrength.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/scroller.min.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/leaflet.markercluster.js"></script>
+    <script src="{% static 'ui/lib/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/bootstrap.switch.js' %}"></script>
+    <script src="{% static 'ui/lib/js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/pwstrength.js' %}"></script>
+    <script src="{% static 'ui/lib/js/scroller.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/leaflet.markercluster.js"' %}></script>
 
-    <script src="{{ STATIC_URL }}ui/lib/js/underscore.min.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/backbone.min.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/backbone.marionette.min.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/backbone.paginator.min.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/jquery.dateFormat.js"></script>
-    <script src="{{ STATIC_URL }}ui/lib/js/jquery.serializeJSON.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/utils.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/models.js"></script>
+    <script src="{% static 'ui/lib/js/underscore.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone.marionette.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone.paginator.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/jquery.dateFormat.js' %}"></script>
+    <script src="{% static 'ui/lib/js/jquery.serializeJSON.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/utils.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/models.js' %}"></script>
 
     <script>
         var Nodeshot = new Backbone.Marionette.Application();
@@ -496,16 +494,16 @@
         Nodeshot.loadEssentialData();
     </script>
 
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/page.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/search.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/account-menu.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/main-menu.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/notifications.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/map.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/node-details.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/node-list.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/views/user-details.js"></script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/app.js"></script>
+    <script src="{% static 'ui/nodeshot/js/views/page.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/search.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/account-menu.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/main-menu.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/notifications.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/map.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/node-details.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/node-list.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/user-details.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/app.js' %}"></script>
 
     {% if WEBSOCKETS %}
     <script>
@@ -515,7 +513,7 @@
             'PORT': '{{ WEBSOCKETS.PORT }}'
         }
     </script>
-    <script src="{{ STATIC_URL }}ui/nodeshot/js/websockets.js"></script>
+    <script src="{% static 'ui/nodeshot/js/websockets.js' %}"></script>
     {% endif %}
 </body>
 </html>
