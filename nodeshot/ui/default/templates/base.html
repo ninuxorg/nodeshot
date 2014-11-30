@@ -26,11 +26,8 @@
     <!-- leaflet -->
     <link rel="stylesheet" href="{{ STATIC_URL }}ui/leaflet/leaflet.css" />
     <script src="{{ STATIC_URL }}ui/leaflet/leaflet.js"></script>
-
-    <!-- cesium -->
-    <!-- TODO: find a way to keep these files out of the repo! -->
-    <!-- <link href="{{ STATIC_URL }}ui/cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="{{ STATIC_URL }}ui/cesium/Cesium.js"></script> -->
+    <link rel="stylesheet" href="{% static 'ui/leaflet/leaflet.css' %}" />
+    <script src="{% static 'ui/leaflet/leaflet.js' %}"></script>
 </head>
 <body style="overflow:hidden">
     <div id="preloader">
