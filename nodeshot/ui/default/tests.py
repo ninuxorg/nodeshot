@@ -14,7 +14,7 @@ from selenium.common.exceptions import WebDriverException
 
 def ajax_complete(driver):
     try:
-        return 0 == driver.execute_script("return jQuery.active")
+        return driver.execute_script("return jQuery.active == 0")
     except WebDriverException:
         pass
 
@@ -114,3 +114,7 @@ class DefaultUiTest(TestCase):
         self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
         self.browser.css("a[href='#/pages/about']").click()
         self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
+    
+    def test_map_opens(self):
+        self._hashchange('#/map')
+        self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
