@@ -166,8 +166,10 @@ $(document).ready(function ($) {
     // menu
     $('#nav-bar').delegate('#ns-top-nav-links li a', 'click', function (e) {
         var a = $(this);
+        // if href doesn't start with javascript
         if (a.attr('href').substr(0, 10) != 'javascript') {
-            if(!a.hasClass('dropdown-toggle')){
+            // if not dropdown and not clicking again on an active link
+            if(!a.hasClass('dropdown-toggle') && !a.parents('li.active').length){
                 $('#ns-top-nav-links li.active').removeClass('active');
             }
         }

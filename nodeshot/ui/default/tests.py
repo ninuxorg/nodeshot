@@ -33,7 +33,7 @@ class DefaultUiTest(TestCase):
     
     def _hashchange(self, hash):
         self.browser.get('%s%s' % (self.INDEX_URL, hash))
-        WebDriverWait(self.browser, 3).until(ajax_complete, 'Timeout')
+        WebDriverWait(self.browser, 10).until(ajax_complete, 'Timeout')
     
     @classmethod
     def setUpClass(cls):
@@ -102,3 +102,15 @@ class DefaultUiTest(TestCase):
     def test_home(self):
         self._hashchange('#')
         self.assertEqual(self.browser.css('article.center-stage h1').text, 'Home')
+
+    def test_menu_already_active(self):
+        self._hashchange('#')
+        # ensure clicking multiple times on a level1 menu item  still displays it as active
+        self.browser.css('#nav-bar li.active a').click()
+        self.browser.css('#nav-bar li.active a').click()
+        # ensure the same on a nested menu item
+        self.browser.css('#nav-bar a.dropdown-toggle').click()
+        self.browser.css("a[href='#/pages/about']").click()
+        self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
+        self.browser.css("a[href='#/pages/about']").click()
+        self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
