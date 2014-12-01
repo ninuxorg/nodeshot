@@ -1,4 +1,5 @@
 import json
+from time import sleep
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -29,13 +30,13 @@ class DefaultUiTest(TestCase):
         'test_nodes.json',
         'test_images.json'
     ]
-    
+
     INDEX_URL = '%s%s' % (settings.SITE_URL, reverse('ui:index'))
-    
+
     def _hashchange(self, hash):
         self.browser.get('%s%s' % (self.INDEX_URL, hash))
         WebDriverWait(self.browser, 10).until(ajax_complete, 'Timeout')
-    
+
     @classmethod
     def setUpClass(cls):
         cls.browser = webdriver.Firefox()
@@ -115,26 +116,47 @@ class DefaultUiTest(TestCase):
         self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
         self.browser.css("a[href='#/pages/about']").click()
         self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
-    
+
     def test_map(self):
         self._hashchange('#/map')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
-    
+
     def test_node_list(self):
         self.browser.css('a[href="#/nodes"]').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Timeout')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'node-list'"))
-        
+
         for node in Node.objects.access_level_up_to('public'):
             self.assertIn(node.name, self.browser.page_source)
-    
+
     def test_node_details(self):
         self._hashchange('#/nodes/pomezia')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
         self.browser.css('#node-details')
         self.assertIn('Pomezia', self.browser.page_source)
-    
+
     def test_user_profile(self):
         self._hashchange('#/users/romano')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'user-details-container'"))
         self.assertIn('romano', self.browser.page_source)
+
+    def test_authentication(self):
+        # open sign in modal
+        self.browser.css('#main-actions a[data-target="#signin-modal"]').click()
+        sleep(0.5)
+        # insert credentials
+        username = self.browser.css('#js-signin-form input[name=username]')
+        username.send_keys('admin')
+        password = self.browser.css('#js-signin-form input[name=password]')
+        password.send_keys('tester')
+        # log in
+        self.browser.css('#js-signin-form button.btn-default').click()
+        # check username
+        self.assertEqual(self.browser.css('#js-username').text, 'admin')
+        # open account menu
+        self.browser.css('#js-username').click()
+        # log out
+        self.browser.css('#js-logout').click()
+        sleep(0.3)
+        # ensure UI has gone back to initial state
+        self.browser.css('#main-actions a[data-target="#signin-modal"]')
