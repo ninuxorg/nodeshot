@@ -43,15 +43,11 @@ DATABASES = {
 
 POSTGIS_VERSION = (2, 1)
 
-try:
-    from local_settings import *
-except ImportError:
-    pass
-
 # import the default nodeshot settings
 # do not move this import
 from nodeshot.conf.settings import *
 
+INSTALLED_APPS.remove('debug_toolbar')
 
 # ------ All settings customizations must go here ------ #
 
@@ -121,3 +117,8 @@ else:
         print("To run tests with django <= 1.5 you should install "
               "django-discover-runner.")
         sys.exit(-1)
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
