@@ -123,7 +123,7 @@ class DefaultUiTest(TestCase):
 
     def test_node_list(self):
         self.browser.css('a[href="#/nodes"]').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Timeout')
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Node list timeout')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'node-list'"))
 
         for node in Node.objects.access_level_up_to('public'):
@@ -140,7 +140,7 @@ class DefaultUiTest(TestCase):
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'user-details-container'"))
         self.assertIn('romano', self.browser.page_source)
 
-    def test_authentication(self):
+    def test_login_and_logout(self):
         # open sign in modal
         self.browser.css('#main-actions a[data-target="#signin-modal"]').click()
         sleep(0.5)
@@ -151,12 +151,13 @@ class DefaultUiTest(TestCase):
         password.send_keys('tester')
         # log in
         self.browser.css('#js-signin-form button.btn-default').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
         # check username
         self.assertEqual(self.browser.css('#js-username').text, 'admin')
         # open account menu
         self.browser.css('#js-username').click()
         # log out
         self.browser.css('#js-logout').click()
-        sleep(0.3)
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
         # ensure UI has gone back to initial state
         self.browser.css('#main-actions a[data-target="#signin-modal"]')
