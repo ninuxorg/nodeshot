@@ -12,6 +12,7 @@ from nodeshot.ui.default import settings as local_settings
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.keys import Keys
 
 
 def ajax_complete(driver):
@@ -41,7 +42,6 @@ class DefaultUiTest(TestCase):
     def setUpClass(cls):
         cls.browser = webdriver.Firefox()
         cls.browser.get(cls.INDEX_URL)
-        cls.browser.css = cls.browser.find_element_by_css_selector
         super(DefaultUiTest, cls).setUpClass()
 
     @classmethod
@@ -103,26 +103,26 @@ class DefaultUiTest(TestCase):
 
     def test_home(self):
         self._hashchange('#')
-        self.assertEqual(self.browser.css('article.center-stage h1').text, 'Home')
+        self.assertEqual(self.browser.find_element_by_css_selector('article.center-stage h1').text, 'Home')
 
     def test_menu_already_active(self):
         self._hashchange('#')
         # ensure clicking multiple times on a level1 menu item  still displays it as active
-        self.browser.css('#nav-bar li.active a').click()
-        self.browser.css('#nav-bar li.active a').click()
+        self.browser.find_element_by_css_selector('#nav-bar li.active a').click()
+        self.browser.find_element_by_css_selector('#nav-bar li.active a').click()
         # ensure the same on a nested menu item
-        self.browser.css('#nav-bar a.dropdown-toggle').click()
-        self.browser.css("a[href='#/pages/about']").click()
-        self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
-        self.browser.css("a[href='#/pages/about']").click()
-        self.browser.css('#nav-bar li.active a.dropdown-toggle').click()
+        self.browser.find_element_by_css_selector('#nav-bar a.dropdown-toggle').click()
+        self.browser.find_element_by_css_selector("a[href='#/pages/about']").click()
+        self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
+        self.browser.find_element_by_css_selector("a[href='#/pages/about']").click()
+        self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
 
     def test_map(self):
         self._hashchange('#/map')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
 
     def test_node_list(self):
-        self.browser.css('a[href="#/nodes"]').click()
+        self.browser.find_element_by_css_selector('a[href="#/nodes"]').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Node list timeout')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'node-list'"))
 
@@ -132,7 +132,7 @@ class DefaultUiTest(TestCase):
     def test_node_details(self):
         self._hashchange('#/nodes/pomezia')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
-        self.browser.css('#node-details')
+        self.browser.find_element_by_css_selector('#node-details')
         self.assertIn('Pomezia', self.browser.page_source)
 
     def test_user_profile(self):
@@ -142,22 +142,41 @@ class DefaultUiTest(TestCase):
 
     def test_login_and_logout(self):
         # open sign in modal
-        self.browser.css('#main-actions a[data-target="#signin-modal"]').click()
+        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
         sleep(0.5)
         # insert credentials
-        username = self.browser.css('#js-signin-form input[name=username]')
+        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
         username.send_keys('admin')
-        password = self.browser.css('#js-signin-form input[name=password]')
+        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
         password.send_keys('tester')
         # log in
-        self.browser.css('#js-signin-form button.btn-default').click()
+        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
         # check username
-        self.assertEqual(self.browser.css('#js-username').text, 'admin')
+        self.assertEqual(self.browser.find_element_by_css_selector('#js-username').text, 'admin')
         # open account menu
-        self.browser.css('#js-username').click()
+        self.browser.find_element_by_css_selector('#js-username').click()
         # log out
-        self.browser.css('#js-logout').click()
+        self.browser.find_element_by_css_selector('#js-logout').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
         # ensure UI has gone back to initial state
-        self.browser.css('#main-actions a[data-target="#signin-modal"]')
+        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]')
+
+    def test_general_search(self):
+        self._hashchange('#')
+        search = self.browser.find_element_by_css_selector('#general-search-input')
+        search.send_keys('RD')
+        search.send_keys(Keys.ENTER)
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search timeout')
+        results = self.browser.find_elements_by_css_selector('#js-search-results li')
+        self.assertEqual(len(results), 4)
+        search = self.browser.find_element_by_css_selector('#general-search-input')
+        search.clear()
+        search.send_keys('RDP')
+        search.send_keys(Keys.ENTER)
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
+        results = self.browser.find_elements_by_css_selector('#js-search-results li')
+        self.assertEqual(len(results), 1)
+        self.browser.find_element_by_css_selector('#js-search-results li a').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
+        self.assertIn('RDP', self.browser.find_element_by_css_selector('#node-details h2').text)
