@@ -146,8 +146,10 @@ class DefaultUiTest(TestCase):
         sleep(0.5)
         # insert credentials
         username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
+        username.clear()
         username.send_keys('admin')
         password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
+        password.clear()
         password.send_keys('tester')
         # log in
         self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
@@ -180,3 +182,30 @@ class DefaultUiTest(TestCase):
         self.browser.find_element_by_css_selector('#js-search-results li a').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
         self.assertIn('RDP', self.browser.find_element_by_css_selector('#node-details h2').text)
+
+    def test_notifications(self):
+        # open sign in modal
+        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
+        sleep(0.5)
+        # insert credentials
+        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
+        username.clear()
+        username.send_keys('admin')
+        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
+        password.clear()
+        password.send_keys('tester')
+        # log in
+        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
+
+        # open notifications
+        self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
+        self.browser.find_element_by_css_selector('#js-notifications-container .empty')
+
+        # open account menu
+        self.browser.find_element_by_css_selector('#js-username').click()
+        # log out
+        self.browser.find_element_by_css_selector('#js-logout').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
+        # ensure UI has gone back to initial state
+        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]')
