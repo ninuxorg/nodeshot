@@ -13,6 +13,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 def ajax_complete(driver):
@@ -215,6 +216,54 @@ class DefaultUiTest(TestCase):
         self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
         self.browser.find_element_by_css_selector('#js-notifications-container .empty')
         self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
+
+        # open account menu
+        self.browser.find_element_by_css_selector('#js-username').click()
+        # log out
+        self.browser.find_element_by_css_selector('#js-logout').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
+        # ensure UI has gone back to initial state
+        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]')
+
+    def test_add_node(self):
+        # open sign in modal
+        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
+        sleep(0.5)  # animation
+        # insert credentials
+        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
+        username.clear()
+        username.send_keys('admin')
+        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
+        password.clear()
+        password.send_keys('tester')
+        # log in
+        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
+
+        # click on add node button
+        self._hashchange('#/map')
+        sleep(0.5)  # animation
+        a = self.browser.find_element_by_css_selector('#map-toolbar a.icon-pin-add')
+        a.click()
+        self.browser.find_element_by_css_selector('#add-node-step1 .btn-default').click()
+        a.click()
+        self.browser.execute_script('Nodeshot.body.currentView.map.setView([41.86741963140808, 12.507655620574951], 18)')
+        self.browser.find_element_by_css_selector('#add-node-step1')
+        map_element = self.browser.find_element_by_css_selector('#map-js')
+        actions = ActionChains(self.browser)
+        actions.move_to_element_with_offset(map_element, 50, 50)
+        map_element.click()
+        # confirm
+        self.browser.find_element_by_css_selector('#add-node-step2 .btn-success').click()
+        sleep(0.5)  # animation
+        # add node form
+        self.assertTrue(self.browser.find_element_by_css_selector('#add-node-container').is_displayed())
+        self.browser.find_element_by_css_selector('#add-node-container .btn-success').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
+        self.assertNotEqual(self.browser.find_element_by_css_selector('#add-node-container .error-msg').text, '')
+        self.browser.find_element_by_css_selector('#add-node-container .btn-default').click()
+        sleep(0.5)  # animation
+        self.assertFalse(self.browser.find_element_by_css_selector('#add-node-container').is_displayed())
 
         # open account menu
         self.browser.find_element_by_css_selector('#js-username').click()
