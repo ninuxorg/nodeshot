@@ -121,6 +121,19 @@ class DefaultUiTest(TestCase):
         self._hashchange('#/map')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
 
+    def test_map_legend(self):
+        self._hashchange('#/map')
+        button = self.browser.find_element_by_css_selector('#btn-legend.disabled')
+        legend = self.browser.find_element_by_css_selector('#map-legend')
+        self.browser.find_element_by_css_selector('#map-legend .icon-close').click()
+        sleep(0.5)
+        self.assertFalse(legend.is_displayed())
+        self.assertNotIn('disabled', button.get_attribute('class'))
+        button.click()
+        sleep(0.5)
+        self.assertIn('disabled', button.get_attribute('class'))
+        self.assertTrue(legend.is_displayed())
+
     def test_node_list(self):
         self.browser.find_element_by_css_selector('a[href="#/nodes"]').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Node list timeout')
@@ -201,6 +214,7 @@ class DefaultUiTest(TestCase):
         # open notifications
         self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
         self.browser.find_element_by_css_selector('#js-notifications-container .empty')
+        self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
 
         # open account menu
         self.browser.find_element_by_css_selector('#js-username').click()
