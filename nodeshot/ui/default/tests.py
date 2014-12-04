@@ -121,6 +121,8 @@ class DefaultUiTest(TestCase):
     def test_map(self):
         self._hashchange('#/map')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
+        self.browser.find_element_by_css_selector('#map-js.leaflet-container')
+        self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.map._leaflet_id > -1"))
 
     def test_map_legend(self):
         self._hashchange('#/map')
