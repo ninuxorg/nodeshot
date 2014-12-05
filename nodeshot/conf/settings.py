@@ -362,7 +362,10 @@ LEAFLET_CONFIG = {
     'DEFAULT_ZOOM': 4,
     'MIN_ZOOM': 1,
     'MAX_ZOOM': 18,
-    'TILES': 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png',
-    'ATTRIBUTION_PREFIX': '<a href="http://github.com/ninuxorg/nodeshot">Nodeshot</a> - Maps thank to <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    'RESET_VIEW': False
+    'TILES': [
+        ('Map', 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> &nbsp;<img src="http://developer.mapquest.com/content/osm/mq_logo.png">'),
+        ('Satellite', 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', '&copy; Source: <a href="http://www.esri.com/">Esri</a>, DigitalGlobe, GeoEye, i-cubed, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AEX, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community ')
+    ],
+    'ATTRIBUTION_PREFIX': '<a href="http://github.com/ninuxorg/nodeshot" target="_blank">Nodeshot</a>',
+    'RESET_VIEW': False,
 }

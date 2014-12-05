@@ -123,6 +123,11 @@ class DefaultUiTest(TestCase):
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.$el.attr('id') == 'map-container'"))
         self.browser.find_element_by_css_selector('#map-js.leaflet-container')
         self.assertTrue(self.browser.execute_script("return Nodeshot.body.currentView.map._leaflet_id > -1"))
+        # layers control
+        self.browser.find_element_by_css_selector('#map-js .leaflet-control-layers-list')
+        layerscontrol = 'return _.values(Nodeshot.body.currentView.map.layerscontrol._layers)'
+        self.assertEqual(self.browser.execute_script('%s[0].name' % layerscontrol), 'Map')
+        self.assertEqual(self.browser.execute_script('%s[1].name' % layerscontrol), 'Satellite')
 
     def test_map_legend(self):
         self._hashchange('#/map')

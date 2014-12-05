@@ -81,7 +81,12 @@ LEAFLET_CONFIG.update({
     'DEFAULT_ZOOM': 4,
     'MIN_ZOOM': 1,
     'MAX_ZOOM': 18,
-    'TILES': 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png',
+    # Uncomment to customize map tiles
+    # More information here: https://github.com/makinacorpus/django-leaflet#default-tiles-layer
+    #'TILES': [
+    #    ('Map', 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> &nbsp;<img src="http://developer.mapquest.com/content/osm/mq_logo.png">'),
+    #    ('Satellite', 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', '&copy; Source: <a href="http://www.esri.com/">Esri</a>, DigitalGlobe, GeoEye, i-cubed, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AEX, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community ')
+    #],
 })
 
 # social auth
@@ -92,6 +97,8 @@ GOOGLE_OAUTH2_CLIENT_SECRET = ''
 GITHUB_APP_ID = ''
 GITHUB_API_SECRET = ''
 
+# Uncomment this section to enable periodic tasks
+#
 #from datetime import timedelta
 #
 #CELERYBEAT_SCHEDULE.update({
