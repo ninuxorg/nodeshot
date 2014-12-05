@@ -171,26 +171,10 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * get current map coordinates (lat, lng, zoom)
      */
     getCoordinates: function () {
-        var lat, lng, zoom;
-
-        if (Nodeshot.preferences.mapMode == '2D') {
-            lat = this.map.getCenter().lat;
-            lng = this.map.getCenter().lng;
-            zoom = this.map.getZoom()
-        } else {
-            var cartesian = Cesium.Ellipsoid.WGS84.cartesianToCartographic(
-                this.map.scene.getCamera().position
-            )
-
-            lat = Math.degrees(cartesian.latitude),
-            lng = Math.degrees(cartesian.longitude),
-            zoom = 9;
-        }
-
         return {
-            lat: lat,
-            lng: lng,
-            zoom: zoom
+            lat: this.map.getCenter().lat,
+            lng: this.map.getCenter().lng,
+            zoom: this.map.getZoom()
         }
     },
 
@@ -199,7 +183,6 @@ var MapView = Backbone.Marionette.ItemView.extend({
      */
     storeCoordinates: function () {
         var coords = this.getCoordinates()
-
         Nodeshot.preferences.mapLat = coords.lat;
         Nodeshot.preferences.mapLng = coords.lng;
         Nodeshot.preferences.mapZoom = coords.zoom;
@@ -625,48 +608,20 @@ var MapView = Backbone.Marionette.ItemView.extend({
     },
 
     /*
-     * initMap according to mode argument
-     * mode can be undefined, 2D or 3D
+     * Initialize Map
      */
     initMap: function (mode) {
         var button = this.ui.switchMapMode,
-            unloadMethod,
-            replacedString,
-            replacerString,
-            removedClass,
-            addedClass,
             legend = this.ui.legend,
             buttonTitle = button.attr('data-original-title'),
             preferences = Nodeshot.preferences;
-
-        // mode is either specified, or taken from localStorage or defaults to 2D
-        mode = mode || preferences.mapMode || '2D';
-
-        // ensure mode is either 2D or 3D, defaults to 2D
-        if (mode !== '2D' && mode !== '3D') {
-            mode = '2D'
-        }
-
-        if (mode === '2D') {
-            unloadMethod = 'destroy';
-            replacedString = '2D';
-            replacerString = '3D';
-            removedClass = 'right';
-            addedClass = 'inverse';
-        } else if (mode === '3D') {
-            unloadMethod = 'remove';
-            replacedString = '3D';
-            replacerString = '2D';
-            removedClass = 'inverse';
-            addedClass = 'right';
-        }
 
         // unload map if already initialized
         if (typeof (this.map) !== 'undefined') {
             // store current coordinates
             this.storeCoordinates();
             // unload map
-            this.map[unloadMethod]();
+            this.map.remove();
             // clear any HTML in map container
             $('#map-js').html('');
         }
@@ -674,33 +629,18 @@ var MapView = Backbone.Marionette.ItemView.extend({
         this.setMapDimensions();
 
         // init map
-        this.map = this.loadMap();
+        this.map = this.loadDjangoLeafletMap();
+        // remember latest coordinates
         var coords = this.rememberCoordinates();
         this.map.setView([coords.lat, coords.lng], coords.zoom, {
             trackResize: true
         });
-
-        // switch icon
-        button.removeClass('icon-' + replacedString.toLowerCase())
-            .addClass('icon-' + replacerString.toLowerCase());
-
-        // change tooltip message
-        button.attr(
-            'data-original-title',
-            buttonTitle.replace(replacedString, replacerString)
-        );
 
         if (preferences.legendOpen === false || preferences.legendOpen === 'false') {
             legend.hide();
         } else {
             this.ui.legendButton.addClass('disabled');
         }
-
-        // adapt legend position and colors
-        legend.removeClass(removedClass).addClass(addedClass);
-
-        // store mapMode
-        preferences.mapMode = mode;
 
         // load data
         this.loadMapData();
@@ -712,41 +652,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * Overridden by custom django-leaflet template in
      * {UI}/templates/leaflet/_lefalet_map.html
      */
-    loadMap: function(){},
+    loadDjangoLeafletMap: function(){},
 
     /*
-     * init 2D map
-     * internal use only
+     * Loads Map Content
      */
-    _initMap2D: function () {
-        this.osmLayer = new L.tileLayer(Nodeshot.TILESERVER_URL).addTo(map);
-        return map;
-    },
-
-    /*
-     * init 3D map
-     * internal use only
-     */
-    _initMap3D: function () {
-        var coords = this.rememberCoordinates(),
-            map = new Cesium.CesiumWidget('map-js'),
-            zoomLevels = [
-                148500
-            ],
-            flight = Cesium.CameraFlightPath.createAnimationCartographic(map.scene, {
-                destination: Cesium.Cartographic.fromDegrees(coords.lng, coords.lat, 16500 * coords.zoom),
-                duration: 0
-            });
-
-        map.centralBody.terrainProvider = new Cesium.CesiumTerrainProvider({
-            url: 'http://cesiumjs.org/smallterrain'
-        });
-
-        map.scene.getAnimations().add(flight);
-
-        return map;
-    },
-
     loadMapData: function () {
         var options = {
             fill: true,
@@ -881,10 +791,6 @@ var MapView = Backbone.Marionette.ItemView.extend({
     switchMapMode: function (e) {
         e.preventDefault();
         $.createModal({message:'not implemented yet'});
-        return
-        // automatically determine which mod to use depending on the icon's button
-        var mode = this.ui.switchMapMode.hasClass('icon-3d') ? '3D' : '2D';
-        this.initMap(mode);
     },
 
     showVisibleMarkers: function (cluster, markers) {
@@ -947,14 +853,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
      * Get Address using OSM Nominatim service
      */
     getAddress: function (latlng) {
-
-        //var latlngToString = latlng.toString();
         var arrayLatLng = latlng.toString().split(",");
         var lat = arrayLatLng[0].slice(7);
         var lng = arrayLatLng[1].slice(0, -1);
         var url = 'http://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=0';
         $.ajax({
-            async: true,
             url: url,
             dataType: 'json',
             success: function (response) {
@@ -966,13 +869,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
 
     searchAddress: function (e) {
         e.preventDefault();
-
         this.removeAddressFoundMarker()
         var self = this
         var searchString = $("#fn-search-address input").val()
         var url = "http://nominatim.openstreetmap.org/search?format=json&q=" + searchString
         $.ajax({
-            async: true,
             url: url,
             dataType: 'json',
             success: function (response) {

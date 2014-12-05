@@ -13,6 +13,6 @@
     if (loadevents.length === 0) loadmap();
     else if (window.addEventListener) for (var i=0; i<loadevents.length; i++) window.addEventListener(loadevents[i], loadmap, false);
     else if (window.jQuery) jQuery(window).on(loadevents.join(' '), loadmap);
-    MapView.prototype.loadMap = loadmap;
+    MapView.prototype.loadDjangoLeafletMap = loadmap;
 })();
 </script>
