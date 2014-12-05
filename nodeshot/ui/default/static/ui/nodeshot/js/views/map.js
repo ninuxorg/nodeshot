@@ -674,7 +674,11 @@ var MapView = Backbone.Marionette.ItemView.extend({
         this.setMapDimensions();
 
         // init map
-        this.map = this['_initMap' + mode]();
+        this.map = this.loadMap();
+        var coords = this.rememberCoordinates();
+        this.map.setView([coords.lat, coords.lng], coords.zoom, {
+            trackResize: true
+        });
 
         // switch icon
         button.removeClass('icon-' + replacedString.toLowerCase())
@@ -705,16 +709,17 @@ var MapView = Backbone.Marionette.ItemView.extend({
     },
 
     /*
+     * Overridden by custom django-leaflet template in
+     * {UI}/templates/leaflet/_lefalet_map.html
+     */
+    loadMap: function(){},
+
+    /*
      * init 2D map
      * internal use only
      */
     _initMap2D: function () {
-        var coords = this.rememberCoordinates(),
-            map = L.map('map-js').setView([coords.lat, coords.lng], coords.zoom, {
-                trackResize: true
-            });
         this.osmLayer = new L.tileLayer(Nodeshot.TILESERVER_URL).addTo(map);
-
         return map;
     },
 
