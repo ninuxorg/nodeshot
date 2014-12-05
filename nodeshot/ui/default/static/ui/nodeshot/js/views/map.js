@@ -856,7 +856,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         var arrayLatLng = latlng.toString().split(",");
         var lat = arrayLatLng[0].slice(7);
         var lng = arrayLatLng[1].slice(0, -1);
-        var url = 'http://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=0';
+        var url = '//nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=0';
         $.ajax({
             url: url,
             dataType: 'json',
@@ -872,7 +872,7 @@ var MapView = Backbone.Marionette.ItemView.extend({
         this.removeAddressFoundMarker()
         var self = this
         var searchString = $("#fn-search-address input").val()
-        var url = "http://nominatim.openstreetmap.org/search?format=json&q=" + searchString
+        var url = "//nominatim.openstreetmap.org/search?format=json&q=" + searchString
         $.ajax({
             url: url,
             dataType: 'json',
