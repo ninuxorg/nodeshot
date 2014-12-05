@@ -1,4 +1,4 @@
-<!DOCTYPE html>{% load i18n static %}
+<!DOCTYPE html>{% load i18n static leaflet_tags %}
 <html>
 <head>
     <title>Nodeshot</title>
@@ -24,8 +24,8 @@
     <![endif]-->
 
     <!-- leaflet -->
-    <link rel="stylesheet" href="{% static 'ui/leaflet/leaflet.css' %}" />
-    <script src="{% static 'ui/leaflet/leaflet.js' %}"></script>
+    {% leaflet_js %}
+    {% leaflet_css %}
 </head>
 <body style="overflow:hidden">
     <div id="preloader">
@@ -504,6 +504,8 @@
     <script src="{% static 'ui/nodeshot/js/views/node-list.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/user-details.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/app.js' %}"></script>
+
+    {% leaflet_map "map-js" creatediv=False %}
 
     {% if WEBSOCKETS %}
     <script>
