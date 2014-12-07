@@ -4,11 +4,11 @@ from django.conf import settings
 
 import reversion
 
-from nodeshot.core.base.admin import BaseStackedInline
+from nodeshot.core.base.admin import BaseStackedInline, PublishActionsAdminMixin
 from .models import Page, MenuItem
 
 
-class PageAdmin(reversion.VersionAdmin):
+class PageAdmin(PublishActionsAdminMixin, reversion.VersionAdmin):
     list_display = ('title', 'slug', 'is_published', 'access_level', 'added', 'updated')
     list_filter = ('is_published',)
     prepopulated_fields = { 'slug': ('title',) }
@@ -56,7 +56,7 @@ class MenuItemInline(BaseStackedInline):
         classes = ('grp-collapse grp-open', )
 
 
-class MenuItemAdmin(reversion.VersionAdmin):
+class MenuItemAdmin(PublishActionsAdminMixin, reversion.VersionAdmin):
     list_display = (
         'name', 'url', 'classes',
         'order', 'is_published', 'access_level',
@@ -70,7 +70,7 @@ class MenuItemAdmin(reversion.VersionAdmin):
     inlines = [MenuItemInline]
 
     def get_queryset(self, request):
-        return MenuItem.objects.published().filter(parent=None)
+        return MenuItem.objects.filter(parent=None)
 
     fieldsets = (
         (None, {
