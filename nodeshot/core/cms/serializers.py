@@ -38,7 +38,7 @@ class ChildrenSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = MenuItem
-        fields = ('name', 'url', 'classes', 'added', 'updated')
+        fields = ('name', 'url', 'classes')
 
 
 class MenuSerializer(serializers.ModelSerializer):
@@ -52,4 +52,4 @@ class MenuSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MenuItem
-        fields = ('name', 'url', 'classes', 'added', 'updated', 'children')
+        fields = ('name', 'url', 'classes', 'children')
