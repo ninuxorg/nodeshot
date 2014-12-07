@@ -48,7 +48,9 @@ class MenuSerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField('get_children')
 
     def get_children(self, obj):
-        return ChildrenSerializer(obj.menuitem_set.published(), many=True).data
+        user = self.context['request'].user
+        queryset = obj.menuitem_set.published().accessible_to(user)
+        return ChildrenSerializer(queryset, many=True).data
 
     class Meta:
         model = MenuItem
