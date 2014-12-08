@@ -147,16 +147,15 @@ ExtensibleNodeSerializer.add_relationship(
 
 class StatusListSerializer(serializers.ModelSerializer):
     """ status list """
-
     class Meta:
         model = Status
         fields = [
             'name',
             'slug',
             'description',
-            'is_default',
-            'stroke_width',
             'fill_color',
             'stroke_color',
+            'stroke_width',
             'text_color',
+            'is_default',
         ]

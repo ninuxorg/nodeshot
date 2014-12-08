@@ -441,7 +441,7 @@ article .icon-close:focus{
     color: #000
 }
 
-#map-legend .stats{ color: #7f7f7f !important }
+#map-legend .stats{ color: #7f7f7f !important; cursor: default }
 
 .disabled{ opacity: 0.4 }
 
@@ -857,9 +857,9 @@ label.inline{ margin: 0 }
 }
 
 .cluster-size-0{
-    width: 26px !important;
-    height: 26px !important;
-    line-height: 26px !important;
+    width: 24px !important;
+    height: 24px !important;
+    line-height: 25px !important;
 }
 
 .cluster-size-1{
@@ -868,10 +868,23 @@ label.inline{ margin: 0 }
     line-height: 33px !important;
 }
 
+.cluster-size-2{
+    width: 45px !important;
+    height: 45px !important;
+    line-height: 45px !important;
+}
+
 .cluster-size-3{
-    width: 42px !important;
-    height: 42px !important;
-    line-height: 42px !important;
+    width: 55px !important;
+    height: 55px !important;
+    line-height: 55px !important;
+}
+
+.leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow {
+    -webkit-transition: -webkit-transform 0.3s ease-out, opacity 0.3s ease-in;
+    -moz-transition: -moz-transform 0.3s ease-out, opacity 0.3s ease-in;
+    -o-transition: -o-transform 0.3s ease-out, opacity 0.3s ease-in;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-in;
 }
 
 .icon-ok,

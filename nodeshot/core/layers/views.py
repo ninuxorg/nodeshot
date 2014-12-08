@@ -41,7 +41,7 @@ class LayerList(LayerListBase):
     queryset = Layer.objects.published()
     permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
     authentication_classes = (authentication.SessionAuthentication,)
-    serializer_class= LayerListSerializer
+    serializer_class = LayerListSerializer
     pagination_serializer_class = PaginatedLayerListSerializer
     paginate_by_param = 'limit'
     paginate_by = None
@@ -60,7 +60,7 @@ class LayerDetail(LayerDetailBase):
     permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
     authentication_classes = (authentication.SessionAuthentication,)
     queryset = Layer.objects.published()
-    serializer_class= LayerDetailSerializer
+    serializer_class = LayerDetailSerializer
     lookup_field = 'slug'
 
 layer_detail = LayerDetail.as_view()

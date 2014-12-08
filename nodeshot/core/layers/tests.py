@@ -17,7 +17,6 @@ from .models import Layer
 
 
 class LayerTest(TestCase):
-
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -25,9 +24,6 @@ class LayerTest(TestCase):
         'test_status.json',
         'test_nodes.json'
     ]
-
-    def setUp(self):
-        pass
 
     def test_layer_manager(self):
         """ test Layer custom Manager """
@@ -336,3 +332,18 @@ class LayerTest(TestCase):
         self.assertNotEqual(l.center, l.area)
         l.area = None
         self.assertIsNone(l.center)
+
+
+    def test_external_layer_nodes_geojson(self):
+        """ test node geojson list """
+        url = reverse('api_layer_nodes_geojson', args=['vienna'])
+        # GET: 200
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_external_layer_nodes(self):
+        """ test node geojson list """
+        url = reverse('api_layer_nodes_list', args=['vienna'])
+        # GET: 200
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)

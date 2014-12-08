@@ -1,32 +1,59 @@
 from django.shortcuts import render
-from django.conf import settings
+
+from rest_framework.renderers import JSONRenderer
+
 from nodeshot.core.layers.models import Layer
+from nodeshot.core.nodes.models import Status
+from nodeshot.core.cms.models import MenuItem
+from nodeshot.community.profiles.models import Profile
+from nodeshot.core.layers.serializers import LayerListSerializer
+from nodeshot.core.nodes.serializers import StatusListSerializer
+from nodeshot.core.cms.serializers import MenuSerializer
+from nodeshot.community.profiles.serializers import ProfileSerializer
+
 from . import settings as ui_settings
 
 
-# TODO: improve ugly code
 def index(request):
+    # django-rest-framework serializer context
+    serializer_context = {'request': request}
+    # load models
     layers = Layer.objects.published()
-    layers_allowing_new_nodes = layers.filter(new_nodes_allowed=True)
-
+    status = Status.objects.all()
+    menu = MenuItem.objects.published().filter(parent=None).accessible_to(request.user)
+    # initialize serializers
+    layers = LayerListSerializer(layers, many=True, context=serializer_context).data
+    status = StatusListSerializer(status, many=True, context=serializer_context).data
+    menu = MenuSerializer(menu, many=True, context=serializer_context).data
+    # initialize user serializer if authenticated
+    if request.user.is_authenticated():
+        user = ProfileSerializer(request.user, many=False, context=serializer_context).data
+    else:
+        user = {}
+    # initialize django-rest-framework JSON renderer
+    json = JSONRenderer()
+    # template context
     context = {
-        'layers': layers,
-        'layers_allowing_new_nodes': layers_allowing_new_nodes,
-        'TILESERVER_URL': ui_settings.TILESERVER_URL,
+        # preloaded data
+        'layers': json.render(layers),
+        'legend': json.render(status),
+        'menu': json.render(menu),
+        'user': json.render(user),
+        # settings
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
-        # participation
+        # participation settings
         'VOTING_ENABLED': ui_settings.VOTING_ENABLED,
         'RATING_ENABLED': ui_settings.RATING_ENABLED,
         'COMMENTS_ENABLED': ui_settings.COMMENTS_ENABLED,
-        # social auth
+        # social auth settings
         'SOCIAL_AUTH_ENABLED': ui_settings.SOCIAL_AUTH_ENABLED,
         'FACEBOOK_ENABLED': ui_settings.FACEBOOK_ENABLED,
         'GOOGLE_ENABLED': ui_settings.GOOGLE_ENABLED,
         'GITHUB_ENABLED': ui_settings.GITHUB_ENABLED,
-        # websockets
+        # websockets settings
         'WEBSOCKETS': ui_settings.WEBSOCKETS,
-        # profiles
+        # profiles settings
         'REGISTRATION_OPEN': ui_settings.REGISTRATION_OPEN
     }
     return render(request, 'index.html', context)

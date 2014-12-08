@@ -62,7 +62,7 @@ class Node(BaseAccessLevel):
 
     class Meta:
         db_table = 'nodes_node'
-        app_label= 'nodes'
+        app_label = 'nodes'
 
     def __unicode__(self):
         return '%s' % self.name
@@ -74,7 +74,7 @@ class Node(BaseAccessLevel):
         if self.pk:
             self._current_status = self.status_id
 
-    def clean(self , *args, **kwargs):
+    def clean(self, *args, **kwargs):
         """ call extensible validation """
         self.extensible_validation()
 
@@ -155,7 +155,7 @@ class Node(BaseAccessLevel):
         else:
             try:
                 # point_on_surface guarantees that the point is within the geometry
-                return  self.geometry.point_on_surface
+                return self.geometry.point_on_surface
             except GEOSException:
                 # fall back on centroid which may not be within the geometry
                 # for example, a horseshoe shaped polygon

@@ -1,13 +1,12 @@
-var AccountMenuView = Backbone.Marionette.ItemView.extend({
-    name: 'AccountMenuView',
+'use strict';
+
+Ns.views.Account = Marionette.ItemView.extend({
     el: '#main-actions',
     template: '#account-menu-template',
-
     events: {
         'click #js-logout': 'logout',
         'click .notifications': 'openNotificationsPanel'
     },
-
     // listen to models change and update accordingly
     // used for login/logout rendering
     modelEvents: {
@@ -17,7 +16,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
 
     initialize: function(){
         // listen to notifications collection
-        this.listenTo(Nodeshot.notifications, 'sync', this.setNotificationsCount);
+        this.listenTo(Ns.notifications, 'sync', this.setNotificationsCount);
 
         // setNotificationsPosition on resize
         $(window).on("resize.account", _.bind(this.setNotificationsPosition, this));
@@ -33,7 +32,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
      */
     staySignedInCheck: function () {
         // check stay signed in checkbox
-        var remember = Nodeshot.preferences.staySignedIn,
+        var remember = Ns.preferences.staySignedIn,
             checked =  (remember === "true" || remember === true) ? true : false;
         $('#remember-signup').prop('checked', checked);
     },
@@ -43,7 +42,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
      */
     logout: function (e) {
         e.preventDefault();
-        Nodeshot.currentUser.logout();
+        Ns.db.user.logout();
     },
 
     /*
@@ -65,7 +64,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
                 // clicking anywhere else closes the panel
                 $('html').one('click', function () {
                     notifications.fadeOut(150, function(){
-                        Nodeshot.notifications.read();
+                        Ns.notifications.read();
                     });
                 });
             });
@@ -94,7 +93,7 @@ var AccountMenuView = Backbone.Marionette.ItemView.extend({
      * write notification count and show if greater than 0
      */
     setNotificationsCount: function(e){
-        var count = Nodeshot.notifications.getUnreadCount();
+        var count = Ns.notifications.getUnreadCount();
 
         if(count > 0){
             $('#js-notifications-count').html(count).show();

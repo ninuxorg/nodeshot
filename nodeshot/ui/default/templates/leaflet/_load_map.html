@@ -1,0 +1,14 @@
+<script>
+(function () {
+    $.loadDjangoLeafletMap = function() {
+        var djoptions = {% autoescape off %}{{ djoptions }}{% endautoescape %},
+            options = {
+                djoptions: djoptions,
+                initfunc: $.loadDjangoLeafletMap,
+                globals: {{ NO_GLOBALS|yesno:"false,true"}},
+                callback: {{ callback|default:"null" }}
+            };
+        return L.Map.djangoMap('{{ name }}', options);
+    };
+})();
+</script>

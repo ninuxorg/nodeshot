@@ -7,7 +7,7 @@
     <article id="node-details" class="center-stage responsive-padding">
         <h2>
             <%= name %>
-            <% if(Nodeshot.VOTING_ENABLED && relationships){ %>
+            <% if(Ns.settings.votes && relationships){ %>
             <span class="vote">
                 <a href="#like" class="icon-thumbs-up<%= (relationships.has_already_voted === -1) ? ' fade' : '' %>">
                     <%= relationships.counts.likes %>
@@ -25,7 +25,7 @@
                 <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
             <% } %>
             <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
-            <% if(Nodeshot.accountMenu.model.get('username') !== undefined){ %>
+            <% if(Ns.accountMenu.model.get('username') !== undefined){ %>
                 <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
             <% } %>
         </p>
@@ -57,7 +57,7 @@
                         </td>
                         <td class="right">
                             <span class="status <%= status %>">
-                                <%= Nodeshot.statuses[status].slug.toLowerCase() %>
+                                <%= status %>
                             </span>
                         </td>
                     </tr>
@@ -114,16 +114,16 @@
                             <span class="icon-cancel"></span>
                         </td>
                     </tr>-->
-                    <% if(Nodeshot.RATING_ENABLED && relationships){ %>
+                    <% if(Ns.settings.ratings && relationships){ %>
                     <tr>
                         <td class="left">
                             {% trans 'Rating' %}:
                         </td>
                         <td class="right" id="js-rating" data-thanks-message="{% trans 'Thanks for rating' %}">
                             <a href="#" class="rating">
-                                <% _.each(Nodeshot.body.currentView.ratingTo5Stars(), function(style, i){ %>
-                                    <span class="icon-star-<%= style %>"
-                                          data-original-class="icon-star-<%= style %>"
+                                <% _.each(_.numberTo5Stars(relationships.counts.rating_avg / 2), function(value, i){ %>
+                                    <span class="icon-star-<%= value %>"
+                                          data-original-class="icon-star-<%= value %>"
                                           data-number="<%= i %>"></span>
                                 <% }) %>
                             </a>
@@ -144,15 +144,15 @@
             </div>-->
         </div>
 
-        <% if(Nodeshot.COMMENTS_ENABLED && relationships){ %>
+        <% if(Ns.settings.comments && relationships){ %>
         <div id="comments">
             <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
 
-            <% if(Nodeshot.currentUser.isAuthenticated()){ %>
+            <% if(Ns.db.user.isAuthenticated()){ %>
             <form action="" class="new-comment" method="post">
                 <div class="input-group">
                     <span class="input-group-addon">
-                        <img class="avatar" src="<%= Nodeshot.currentUser.get('avatar') %>" alt="">
+                        <img class="avatar" src="<%= Ns.db.user.get('avatar') %>" alt="">
                     </span>
                     <div class="form-control">
                         <textarea name="text"

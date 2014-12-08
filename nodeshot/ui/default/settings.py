@@ -1,11 +1,11 @@
 import json
 from django.conf import settings
-from leaflet import app_settings as LEAFLET_SETTINGS
+from leaflet import app_settings as leaflet_settings
 
 
-TILESERVER_URL = LEAFLET_SETTINGS['TILES'][0][1]
-MAP_ZOOM = LEAFLET_SETTINGS['DEFAULT_ZOOM']
-MAP_CENTER = list(LEAFLET_SETTINGS['DEFAULT_CENTER'])
+TILESERVER_URL = leaflet_settings['TILES'][0][1]
+MAP_ZOOM = leaflet_settings['DEFAULT_ZOOM']
+MAP_CENTER = list(leaflet_settings['DEFAULT_CENTER'])
 
 if 'nodeshot.community.participation' in settings.INSTALLED_APPS:
     VOTING_ENABLED = getattr(settings, 'NODESHOT_UI_VOTING_ENABLED', True)
@@ -21,10 +21,10 @@ RATING_ENABLED = json.dumps(RATING_ENABLED)
 COMMENTS_ENABLED = json.dumps(COMMENTS_ENABLED)
 
 if 'social_auth' in settings.INSTALLED_APPS:
-    FACEBOOK_ENABLED = bool(settings.FACEBOOK_APP_ID) and bool(settings.FACEBOOK_API_SECRET)
-    GOOGLE_ENABLED = bool(settings.GOOGLE_OAUTH2_CLIENT_ID) and bool(settings.GOOGLE_OAUTH2_CLIENT_SECRET)
-    GITHUB_ENABLED = bool(settings.GITHUB_APP_ID) and bool(settings.GITHUB_API_SECRET)
-    SOCIAL_AUTH_ENABLED = FACEBOOK_ENABLED or GOOGLE_ENABLED or GITHUB_ENABLED
+    FACEBOOK_ENABLED = bool(settings.FACEBOOK_APP_ID) and bool(settings.FACEBOOK_API_SECRET)  # noqa
+    GOOGLE_ENABLED = bool(settings.GOOGLE_OAUTH2_CLIENT_ID) and bool(settings.GOOGLE_OAUTH2_CLIENT_SECRET)  # noqa
+    GITHUB_ENABLED = bool(settings.GITHUB_APP_ID) and bool(settings.GITHUB_API_SECRET)  # noqa
+    SOCIAL_AUTH_ENABLED = FACEBOOK_ENABLED or GOOGLE_ENABLED or GITHUB_ENABLED  # noqa
 else:
     FACEBOOK_ENABLED = False
     GOOGLE_ENABLED = False
@@ -42,4 +42,4 @@ if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
 else:
     WEBSOCKETS = False
 
-from nodeshot.community.profiles.settings import REGISTRATION_OPEN
+from nodeshot.community.profiles.settings import REGISTRATION_OPEN  # noqa

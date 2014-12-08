@@ -72,7 +72,7 @@ class NodeAdmin(PublishActionsAdminMixin, GeoAdmin):
 
 
 class StatusAdmin(admin.ModelAdmin):
-    list_display  = ('name', 'slug', 'description', 'order', 'is_default')
+    list_display = ('name', 'slug', 'description', 'order', 'is_default')
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ('order', )
 

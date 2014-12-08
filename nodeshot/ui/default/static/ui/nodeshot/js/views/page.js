@@ -1,6 +1,9 @@
-var PageView = Backbone.Marionette.ItemView.extend({
-    name: 'PageView',
-    tagName: 'article',
-    className: 'center-stage',
-    template: '#page-template'
-});
+(function(){
+    'use strict';
+
+    Ns.views.Page = Backbone.Marionette.ItemView.extend({
+        tagName: 'article',
+        className: 'center-stage',
+        template: '#page-template'
+    });
+})();

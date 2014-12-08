@@ -1,940 +1,1154 @@
-var MapView = Backbone.Marionette.ItemView.extend({
-    name: 'MapView',
-    id: 'map-container',
-    template: '#map-template',
-
-    ui: {
-        'toolbar': '#map-toolbar',
-        'toolbarButtons': '#map-toolbar a',
-        'legendTogglers': '#btn-legend, #map-legend a.icon-close',
-        'switchMapMode': '#btn-map-mode',
-        'legend': '#map-legend',
-        'legendButton': '#btn-legend',
-        'addNodeStep1': '#add-node-step1',
-        'addNodeStep2': '#add-node-step2',
-        'addNodeContainer': '#add-node-container',
-        'addNodeForm': '#add-node-form'
-    },
-
-    events: {
-        'click #map-toolbar .icon-pin-add': 'addNode',
-        'click #map-toolbar .icon-search': 'removeAddressFoundMarker',
-        'submit #fn-search-address form': 'searchAddress',
-        'click @ui.toolbarButtons': 'togglePanel',
-        'click @ui.legendTogglers': 'toggleLegend',
-        'click #map-legend li a': 'toggleLegendControl',
-        'click #fn-map-tools .tool': 'toggleTool',
-        'click #toggle-toolbar': 'toggleToolbar',
-        'click @ui.switchMapMode': 'switchMapMode',
-        'click #add-node-form .btn-default': 'closeAddNode',
-        'submit #add-node-form': 'submitAddNode',
-        'switch-change #fn-map-layers .toggle-layer-data': 'toggleLayerData'
-    },
-
-    initialize: function () {
-        // bind to namespaced events
-        $(window).on("beforeunload.map", _.bind(this.beforeunload, this));
-        $(window).on("resize.map", _.bind(this.resize, this));
-
-        this.resetDataContainers();
-        Nodeshot.onNodeClose = '#/map';
-    },
-
-    onDomRefresh: function () {
-        $('#breadcrumb').removeClass('visible-xs').hide();
-
-        // init tooltip
-        $('#map-toolbar a').tooltip();
-
-        this.initMap();
-
-        // activate switch
-        $('#map-container input.switch').bootstrapSwitch();
-        $('#map-container input.switch').bootstrapSwitch('setSizeClass', 'switch-small');
-
-        // activate scroller
-        $("#map-container .scroller").scroller({
-            trackMargin: 6
-        });
-
-        // correction for map tools
-        $('#map-toolbar a.icon-tools').click(function (e) {
-            var button = $(this),
-                preferences_button = $('#map-toolbar a.icon-config');
-            if (button.hasClass('active')) {
-                preferences_button.tooltip('disable');
-            } else {
-                preferences_button.tooltip('enable');
+(function(){
+    'use strict';
+    
+    Ns.views.map.Layout = Marionette.LayoutView.extend({
+        id: 'map-container',
+        template: '#map-layout-template',
+    
+        regions: {
+            content: '#map-js',
+            legend: '#legend-js',
+            panels: '#map-panels',
+            toolbar: '#map-toolbar',
+            add: '#map-add-node-js'
+        },
+    
+        /**
+         * show regions
+         */
+        onShow: function () {
+            var options = { parent: this };
+            this.content.show(new Ns.views.map.Content(options));
+            this.toolbar.show(new Ns.views.map.Toolbar(options));
+            this.panels.show(new Ns.views.map.Panels(options));
+            this.legend.show(new Ns.views.map.Legend(options));
+        },
+        
+        /*
+         * show add node view
+         */
+        addNode: function () {
+            this.reset();
+            this.add.show(new Ns.views.map.Add({ parent: this }));
+        },
+    
+        /*
+         * resets to view initial state
+         */
+        reset: function () {
+            this.content.currentView.closeLeafletPopup();
+            this.add.empty();
+        }
+    
+    }, {  // static methods
+    
+        /*
+         * Resize page elements so that the leaflet map
+         * takes most of the available space in the window
+         */
+        resizeMap: function () {
+            var overlayContainer = $('#map-overlay-container'),
+                height,
+                selector,
+                width;
+            // map
+            if (!overlayContainer.length) {
+                height = $(window).height() - $('body > header').height();
+                selector = '#map-container, #map-toolbar';
             }
-        });
-
-        // correction for map-filter
-        $('#map-toolbar a.icon-layer-2').click(function (e) {
-            var button = $(this),
-                other_buttons = $('a.icon-config, a.icon-3d, a.icon-tools', '#map-toolbar');
-            if (button.hasClass('active')) {
-                other_buttons.tooltip('disable');
-            } else {
-                other_buttons.tooltip('enable');
+            // node details
+            else {
+                height = overlayContainer.height() + parseInt(overlayContainer.css('top'), 10);
+                selector = '#map-container';
             }
-        });
-
-        $('.selectpicker').selectpicker({
-            style: 'btn-special'
-        });
-
-        // if only 1 layer available
-        // preselect it in the add node form
-        var layer_options = $('#id_layer option[value]');
-        if(layer_options.length === 1){
-            var value = layer_options.eq(0).val();
-            $('#id_layer').selectpicker('val', value)
-        }
-    },
-
-    onDestroy: function (e) {
-        // show breadcrumb on mobile
-        $('#breadcrumb').addClass('visible-xs').show();
-
-        // store current coordinates when changing view
-        this.storeCoordinates();
-
-        // unbind the namespaced events
-        $(window).off("beforeunload.map");
-        $(window).off("resize.map");
-    },
-
-    /* --- Nodeshot methods --- */
-
-    /*
-     * set width and height of map
-     */
-    setMapDimensions: function () {
-        if (!$('#map-overlay-container').length) {
-            var height = $(window).height() - $('body > header').height();
-            $('#map-container, #map-toolbar').height(height);
-        } else {
-            var height = $('#map-overlay-container').height() + parseInt($('#map-overlay-container').css('top'));
-            $('#map-container').height(height);
-        }
-
-        var map_toolbar = $('#map-toolbar'),
-            add_node_container = $('#add-node-container');
-        width = $(window).width();
-
-        // take in consideration #add-node-container if visible
-        if (add_node_container.is(':visible')) {
-            width = width - add_node_container.outerWidth();
-        }
-        // take in consideration map toolbar if visible
-        else if (map_toolbar.is(':visible')) {
-            width = width - map_toolbar.outerWidth();
-        }
-        $('#map').width(width);
-
-        var map = Nodeshot.body.currentView.map;
-        if (map && map.invalidateSize) {
-            map.invalidateSize();
-        }
-    },
-
-    // reset containers with pointers to markers and other map objects
-    resetDataContainers: function () {
-        Nodeshot.nodes = [];
-        Nodeshot.nodesNamed = [];
-        Nodeshot.clusters = [];
-        _.each(Nodeshot.statuses, function (status) {
-            status.nodes = [];
-        });
-    },
-
-    resize: function () {
-        this.setMapDimensions();
-
-        // when narrowing the window to medium-small size
-        if($(window).width() <= 767){
-            // if any side-panel remains open
-            var panels = $('.side-panel:visible');
-            if(panels.length){
-                // trigger click on header to close it
-                $('body>header').trigger('click');
+            // set new height
+            $(selector).height(height);
+            width =  $(window).width();
+            // take in consideration #map-add-node-js if visible
+            if ($('#map-add-node-js').is(':visible')) {
+                width = width - $('#map-add-node-js').outerWidth();
+            }
+            // take in consideration map toolbar if visible
+            else if ($('#map-toolbar').is(':visible')) {
+                width = width - $('#map-toolbar').outerWidth();
+            }
+            // set width
+            $('#map').width(width);
+            // TODO: this is ugly!
+            // call leaflet invalidateSize() to download any gray spot
+            if (Ns.body.currentView instanceof Ns.views.map.Layout &&
+                Ns.body.currentView.content &&
+                typeof Ns.body.currentView.content.currentView.map !== 'undefined'){
+                Ns.body.currentView.content.currentView.map.invalidateSize();
             }
         }
-    },
-
-    beforeunload: function () {
-        // store current coordinates before leaving the page
-        this.storeCoordinates();
-    },
-
-    /*
-     * get current map coordinates (lat, lng, zoom)
-     */
-    getCoordinates: function () {
-        return {
-            lat: this.map.getCenter().lat,
-            lng: this.map.getCenter().lng,
-            zoom: this.map.getZoom()
-        }
-    },
-
-    /*
-     * store current map coordinates in localStorage
-     */
-    storeCoordinates: function () {
-        var coords = this.getCoordinates()
-        Nodeshot.preferences.mapLat = coords.lat;
-        Nodeshot.preferences.mapLng = coords.lng;
-        Nodeshot.preferences.mapZoom = coords.zoom;
-    },
-
-    /*
-     * get latest stored coordinates or default ones
-     */
-    rememberCoordinates: function () {
-        return {
-            lat: Nodeshot.preferences.mapLat || Nodeshot.MAP_CENTER[0],
-            lng: Nodeshot.preferences.mapLng || Nodeshot.MAP_CENTER[1],
-            zoom: Nodeshot.preferences.mapZoom || Nodeshot.MAP_ZOOM
-        }
-    },
-
-    /*
-     * add node procedure
-     */
-    addNode: function (e) {
-        var self = this,
-            reopenLegend = false,
-            dialog = this.ui.addNodeStep1,
-            dialog_dimensions = dialog.getHiddenDimensions();
-
-        if (!Nodeshot.currentUser.get('username')) {
-            $('#signin-modal').modal('show');
-            return;
-        }
-
-        // hide legend
-        if (this.ui.legend.is(':visible')) {
-            $('#map-legend').hide();
-        }
-
-        // hide toolbar and enlarge map
-        this.ui.toolbar.hide();
-        this.setMapDimensions();
-        this.toggleMarkersOpacity('fade');
-
-        // show step1
-        dialog.css({
-            width: dialog_dimensions.width,
-            right: 0
-        });
-        dialog.fadeIn(255);
-
-        // cancel
-        $('#add-node-step1 button').one('click', function (e) {
-            self.closeAddNode();
-        });
-
-        // on map click (only once)
-        this.map.once('click', function (e) {
-            // drop marker on cliked point
-            var marker = L.marker([e.latlng.lat, e.latlng.lng], {
-                draggable: true
-            }).addTo(self.map);
-            self.newNodeMarker = marker;
-
-            self.getAddress(e.latlng)
-
-            self.newNodeMarker.on('dragend', function (event) {
-                var marker = event.target;
-                var result = marker.getLatLng();
-                self.getAddress(result)
+    });
+    
+    Ns.views.map.Content = Marionette.ItemView.extend({
+        template: false,
+    
+        collectionEvents: {
+            // populate map as items are added to collection
+            'add': 'addGeoModelToMap',
+            // remove items from map when models are removed
+            'remove': 'removeGeoModelFromMap'
+        },
+    
+        initialize: function (options) {
+            this.parent = options.parent;
+            this.collection = new Ns.collections.Geo();
+            this.popUpTemplate = _.template($('#map-popup-template').html());
+            // reload data when user logs in or out
+            this.listenTo(Ns.db.user, 'loggedin loggedout', this.reloadMapData);
+            // bind to namespaced events
+            $(window).on('resize.map', _.bind(this.resize, this));
+            $(window).on('beforeunload.map', _.bind(this.storeMapProperties, this));
+            // TODO: de-uglyfy
+            Ns.onNodeClose = '#/map';
+        },
+    
+        onShow: function () {
+            this.initMap();
+            // load data
+            this.loadMapData();
+        },
+    
+        onDestroy: function (e) {
+            // store current coordinates when changing view
+            this.storeMapProperties();
+            // unbind the namespaced events
+            $(window).off('beforeunload.map');
+            $(window).off('resize.map');
+        },
+    
+        /*
+         * get current map coordinates (lat, lng, zoom)
+         */
+        getMapProperties: function () {
+            var latLng = this.map.getCenter();
+            return {
+                lat: latLng.lat,
+                lng: latLng.lng,
+                zoom: this.map.getZoom(),
+                baseLayer: this.getCurrentBaseLayer()
+            };
+        },
+    
+        /*
+         * store current map coordinates in localStorage
+         */
+        storeMapProperties: function () {
+            localStorage.setObject('map', this.getMapProperties());
+        },
+    
+        /*
+         * get latest stored coordinates or default ones
+         */
+        rememberMapProperties: function () {
+            return localStorage.getObject('map') || Ns.settings.map;
+        },
+    
+        /*
+         * resize window event
+         */
+        resize: function () {
+            Ns.views.map.Layout.resizeMap();
+            // when narrowing the window to medium-small size and toolbar is hidden and any panel is still visible
+            if ($(window).width() <= 767 && $('#map-toolbar').is(':hidden') && $('.side-panel:visible').length) {
+                // close panel
+                $('.mask').trigger('click');
+            }
+        },
+    
+        /*
+         * initialize leaflet map
+         */
+        initMap: function () {
+            var self = this,
+                coords = this.rememberMapProperties();
+            this.resize();
+            // init map
+            this.map = $.loadDjangoLeafletMap();
+            // remember latest coordinates
+            this.map.setView([coords.lat, coords.lng], coords.zoom, {
+                trackResize: true
             });
-            self.map.panTo(e.latlng);
-
-            // hide step1
-            dialog.hide();
-
+            // store baseLayers
+            this.baseLayers = {};
+            _.each(this.map.layerscontrol._layers, function (baseLayer) {
+                self.baseLayers[baseLayer.name] = baseLayer.layer;
+                // keep name reference
+                self.baseLayers[baseLayer.name].name = baseLayer.name;
+            });
+            this.switchBaseLayer(coords.baseLayer);
+        },
+        
+        /**
+         * changes base layer of the map, only if necessary
+         * (calling the same action twice has no effect)
+         */
+        switchBaseLayer: function(name){
+            // ignore if name is undefined
+            if(typeof name === 'undefined'){ return; }
+            // remove all base layers that are not relevant
+            for (var key in this.baseLayers){
+                if (this.baseLayers[key].name !== name) {
+                    this.map.removeLayer(this.baseLayers[key]);
+                }
+            }
+            // if the relevant layer is still not there add it
+            if (!this.map.hasLayer(this.baseLayers[name])) {
+                this.map.addLayer(this.baseLayers[name]);
+            }
+        },
+        
+        /**
+         * returns name of the current map base layer
+         */
+        getCurrentBaseLayer: function () {
+            for (var name in this.baseLayers){
+                if (Boolean(this.baseLayers[name]._map)) {
+                    return name;
+                }
+            }
+            return null;
+        },
+    
+        /*
+         * loads data from API
+         */
+        loadMapData: function () {
+            var self = this,
+                // trigger collection ready after all sources have been fetched
+                ready = _.after(Ns.db.layers.length, function () {
+                    self.collection.trigger('ready');
+                    // unbind event
+                    self.collection.off('sync', ready);
+                });
+            this.collection.on('sync', ready);
+            // create (empty) clusters on map (will be filled by addGeoModelToMap)
+            this.createClusters();
+            // fetch data from API
+            Ns.db.layers.forEach(function (layer) {
+                self.collection.merge({ slug: layer.id });
+            });
+            // toggle legend group from map when visible attribute changes
+            this.listenTo(Ns.db.legend, 'change:visible', this.toggleLegendGroup);
+            // toggle layer data when visible attribute changes
+            this.listenTo(Ns.db.layers, 'change:visible', this.toggleLayerData);
+        },
+        
+        /*
+         * clear collection and reload data
+         */
+        reloadMapData: function () {
+            this.collection.remove(this.collection.models);
+            this.loadMapData();
+        },
+        
+        createClusters: function () {
+            var self = this,
+                legend;
+            // loop over each legend item
+            Ns.db.legend.forEach(function (legendModel) {
+                legend = legendModel.toJSON();
+                // group markers in clusters
+                var cluster = new L.MarkerClusterGroup({
+                    iconCreateFunction: function (cluster) {
+                        var count = cluster.getChildCount(),
+                            // determine size with the last number of the exponential notation
+                            // 0 for < 10, 1 for < 100, 2 for < 1000 and so on
+                            size = count.toExponential().split('+')[1];
+                        return L.divIcon({
+                            html: count,
+                            className: 'cluster cluster-size-' + size + ' marker-' + this.cssClass
+                        });
+                    },
+                    polygonOptions: {
+                        fillColor: legend.fill_color,
+                        stroke: legend.stroke_width > 0,
+                        weight: legend.stroke_width,
+                        color: legend.stroke_color,
+                        opacity: 0.4
+                    },
+                    cssClass: legend.slug,
+                    chunkedLoading: true,
+                    showCoverageOnHover: true,
+                    zoomToBoundsOnClick: true,
+                    removeOutsideVisibleBounds: true,
+                    // TODO: make these configurable
+                    disableClusteringAtZoom: Ns.settings.disableClusteringAtZoom,
+                    maxClusterRadius: Ns.settings.maxClusterRadius
+                });
+                // store reference
+                legendModel.cluster = cluster;
+                // show cluster only if corresponding legend item is visible
+                if(legend.visible){
+                    self.map.addLayer(cluster);
+                }
+            });
+        },
+    
+        /**
+         * adds a geo model to its cluster
+         * binds popup
+         * called whenever a model is added to the collection
+         */
+        addGeoModelToMap: function (model) {
+            var self = this,
+                leafletLayer = model.get('leaflet'),
+                legend = model.get('legend'),
+                data = model.toJSON();
+            // bind leaflet popup
+            leafletLayer.bindPopup(this.popUpTemplate(data));
+            // when popup opens, change the URL fragment
+            leafletLayer.on('popupopen', function () {
+                Ns.router.navigate('map/' + data.slug);
+            });
+            // when popup closes (and no new popup opens)
+            // URL fragment goes back to initial state
+            leafletLayer.on('popupclose', function () {
+                setTimeout(function () {
+                    if (self.map._popup === null && Backbone.history.fragment != 'map/add') {
+                        Ns.router.navigate('map');
+                    }
+                }, 200);
+            });
+            // show on map only if corresponding nodeshot layer is visible
+            if(Ns.db.layers.get(data.layer).get('visible')){
+                legend.cluster.addLayer(leafletLayer);
+            }
+        },
+    
+        /**
+         * remove geo model from its cluster
+         * called whenever a model is removed from the collection
+         */
+        removeGeoModelFromMap: function (model) {
+            var cluster = model.get('legend').cluster;
+            cluster.removeLayer(model.get('leaflet'));
+        },
+        
+        /*
+         * show / hide from map items of a legend group
+         */
+        toggleLegendGroup: function (legend, visible) {
+            var method = (visible) ? 'addLayer' : 'removeLayer';
+            this.map[method](legend.cluster);
+        },
+    
+        /*
+        * show / hide from map items of a legend group
+        */
+        toggleLayerData: function (layer, visible) {
+            var filtered = this.collection.whereCollection({ layer: layer.id }),
+                method = (visible) ? 'addLayer' : 'removeLayer';
+            filtered.forEach(function(geo){
+                geo.get('legend').cluster[method](geo.get('leaflet'));
+            });
+        },
+    
+        /*
+         * Open leaflet popup of the specified element
+         */
+        openLeafletPopup: function (id) {
+            var collection = this.collection,
+                self = this,
+                leafletLayer;
+            // open leaflet pop up if ready
+            if (collection.length && typeof collection !== 'undefined') {
+                try {
+                    leafletLayer = this.collection.get(id).get('leaflet');
+                } catch (e) {
+                    $.createModal({
+                        message: id + ' not found',  // TODO: i18n
+                        onClose: function () {
+                            Ns.router.navigate('map');
+                        }
+                    });
+                    return;
+                }
+                try {
+                    leafletLayer.openPopup();
+                }
+                // clustering plugin hides leafletLayers when clustered or outside viewport
+                // so we have to zoom in and center the map
+                catch (e){
+                    this.map.fitBounds(leafletLayer.getBounds());
+                    leafletLayer.openPopup();
+                }
+            }
+            // if not ready wait for map.collectionReady and call again
+            else {
+                this.collection.once('ready', function () {
+                    self.openLeafletPopup(id);
+                });
+            }
+            return;
+        },
+    
+        /*
+         * Close leaflet popup if open
+         */
+        closeLeafletPopup: function () {
+            var popup = $('#map-js .leaflet-popup-close-button');
+            if (popup.length) {
+                popup.get(0).click();
+            }
+        }
+    });
+    
+    Ns.views.map.Legend = Marionette.ItemView.extend({
+        id: 'map-legend',
+        className: 'overlay inverse',
+        template: '#map-legend-template',
+    
+        ui: {
+            'close': 'a.icon-close'
+        },
+    
+        events: {
+            'click @ui.close': 'toggleLegend',
+            'click li a': 'toggleGroup'
+        },
+    
+        collectionEvents: {
+            // automatically render when toggling group or recounting
+            'change:visible counted': 'render'
+        },
+    
+        initialize: function (options) {
+            this.parent = options.parent;
+            this.collection = Ns.db.legend;
+            this.legendButton = this.parent.toolbar.currentView.ui.legendButton;
+            // display count in legend
+            this.listenTo(this.parent.content.currentView.collection, 'ready', this.count);
+            this.listenTo(Ns.db.layers, 'change:visible', this.count);
+        },
+    
+        onRender: function () {
+            // default is true
+            if (localStorage.getObject('legendOpen') === false) {
+                this.$el.hide();
+            } else {
+                this.legendButton.addClass('disabled');
+            }
+        },
+    
+        /*
+         * calculate counts
+         */
+        count: function () {
+            this.collection.forEach(function (legend) {
+                legend.set('count', legend.cluster.getLayers().length);
+            });
+            // trigger once all legend items have been counted
+            this.collection.trigger('counted');
+        },
+    
+        /*
+         * open or close legend
+         */
+        toggleLegend: function (e) {
+            e.preventDefault();
+    
+            var legend = this.$el,
+                button = this.legendButton,
+                open;
+    
+            if (legend.is(':visible')) {
+                legend.fadeOut(255);
+                button.removeClass('disabled');
+                button.tooltip('enable');
+                open = false;
+            } else {
+                legend.fadeIn(255);
+                button.addClass('disabled');
+                button.tooltip('disable').tooltip('hide');
+                open = true;
+            }
+    
+            localStorage.setItem('legendOpen', open);
+        },
+    
+        /*
+         * enable or disable something on the map
+         * by clicking on its related legend control
+         */
+        toggleGroup: function (e) {
+            e.preventDefault();
+            var status = $(e.currentTarget).attr('data-status'),
+                item = this.collection.get(status);
+            item.set('visible', !item.get('visible'));
+        }
+    });
+    
+    Ns.views.map.Toolbar = Marionette.ItemView.extend({
+        template: '#map-toolbar-template',
+    
+        ui: {
+            'buttons': 'a',
+            'switchMapMode': '#btn-map-mode',
+            'legendButton': '#btn-legend',
+            'toolsButton': 'a.icon-tools',
+            'prefButton': 'a.icon-config',
+            'layersControl': 'a.icon-layer-2'
+        },
+    
+        events: {
+            'click .icon-pin-add': 'addNode',
+            'click @ui.buttons': 'togglePanel',
+            'click @ui.switchMapMode': 'switchMapMode',
+            // siblings events
+            'click @ui.legendButton': 'toggleLegend'
+        },
+    
+        initialize: function (options) {
+            this.parent = options.parent;
+        },
+    
+        onRender: function () {
+            var self = this;
+            // init tooltip
+            this.ui.buttons.tooltip();
+            // correction for map tools
+            this.ui.toolsButton.click(function (e) {
+                var button = $(this),
+                    prefButton = self.ui.prefButton;
+                if (button.hasClass('active')) {
+                    prefButton.tooltip('disable');
+                } else {
+                    prefButton.tooltip('enable');
+                }
+            });
+            // correction for map-filter
+            this.ui.layersControl.click(function (e) {
+                var button = $(this),
+                    otherButtons = self.$el.find('a.icon-config, a.icon-3d, a.icon-tools');
+                if (button.hasClass('active')) {
+                    otherButtons.tooltip('disable');
+                } else {
+                    otherButtons.tooltip('enable');
+                }
+            });
+        },
+    
+        /*
+         * show / hide map toolbar on narrow screens
+         */
+        toggleToolbar: function (e) {
+            e.preventDefault();
+            // shortcut
+            var toolbar = this.parent.toolbar.$el,
+                target = $(e.currentTarget);
+            // show toolbar
+            if (toolbar.is(':hidden')) {
+                // just add display:block
+                // which overrides css media-query
+                toolbar.show();
+                // overimpose on toolbar
+                target.css('right', '-60px');
+            }
+            // hide toolbar
+            else {
+                // instead of using jQuery.hide() which would hide the toolbar also
+                // if the user enlarged the screen, we clear the style attribute
+                // which will cause the toolbar to be hidden only on narrow screens
+                toolbar.attr('style', '');
+                // close any open panel
+                if ($('.side-panel:visible').length) {
+                    $('.mask').trigger('click');
+                }
+                // eliminate negative margin correction
+                target.css('right', '0');
+            }
+            Ns.views.map.Layout.resizeMap();
+        },
+        
+        /*
+         * proxy to call add node
+         */
+        addNode: function (e) {
+            e.preventDefault();
+            this.parent.addNode();
+        },
+    
+        /*
+         * redirects to Ns.views.map.Panels
+         */
+        toggleLegend: function (e) {
+            this.parent.legend.currentView.toggleLegend(e);
+        },
+    
+        /*
+         * redirects to Ns.views.map.Panels
+         */
+        togglePanel: function (e) {
+            this.parent.panels.currentView.togglePanel(e);
+        },
+    
+        /*
+         * toggle 3D or 2D map
+         */
+        switchMapMode: function (e) {
+            e.preventDefault();
+            $.createModal({message: 'not implemented yet'});
+        }
+    });
+    
+    Ns.views.map.Panels = Marionette.ItemView.extend({
+        template: '#map-panels-template',
+    
+        ui: {
+            'switches': 'input.switch',
+            'scrollers': '.scroller',
+            'selects': '.selectpicker',
+            'tools': '.tool'
+        },
+    
+        events: {
+            'submit #fn-search-address form': 'searchAddress',
+            'click #fn-map-tools .tool': 'toggleTool',
+            'click #toggle-toolbar': 'toggleToolbar',
+            'change .js-base-layers input': 'switchBaseLayer',
+            'switch-change #fn-map-layers .toggle-layer-data': 'toggleLayer',
+            'switch-change #fn-map-layers .toggle-legend-data': 'toggleLegend'
+        },
+    
+        initialize: function (options) {
+            this.parent = options.parent;
+            this.mapView = this.parent.content.currentView;
+            this.toolbarView = this.parent.toolbar.currentView;
+            this.toolbarButtons = this.toolbarView.ui.buttons;
+            // listen to legend change event
+            this.listenTo(Ns.db.legend, 'change:visible', this.syncLegendSwitch);
+            this.populateBaseLayers();
+        },
+        
+        // populate this.baseLayers
+        populateBaseLayers: function () {
+            var self = this,
+                layer;
+            this.baseLayers = [];
+            // get ordering of baselayers django-leaflet options
+            this.mapView.map.options.djoptions.layers.forEach(function (layerConfig) {
+                layer = self.mapView.baseLayers[layerConfig[0]];
+                self.baseLayers.push({
+                    checked: Boolean(layer._map),  // if _map is not null it means this is the active layer
+                    name: layer.name
+                });
+            });
+        },
+        
+        serializeData: function(){
+            return {
+                'layers': Ns.db.layers.toJSON(),
+                'legend': Ns.db.legend.toJSON(),
+                'baseLayers': this.baseLayers
+            }
+        },
+    
+        onRender: function () {
+            this.ui.tools.tooltip();
+            // activate switch
+            this.ui.switches.bootstrapSwitch();
+            this.ui.switches.bootstrapSwitch('setSizeClass', 'switch-small');
+            // activate scroller
+            this.ui.scrollers.scroller({
+                trackMargin: 6
+            });
+            // fancy selects
+            this.ui.selects.selectpicker({
+                style: 'btn-special'
+            });
+        },
+    
+        /*
+         * show / hide toolbar panels
+         */
+        togglePanel: function (e) {
+            e.preventDefault();
+    
+            var button = $(e.currentTarget),
+                panelId = button.attr('data-panel'),
+                panel = $('#' + panelId),
+                self = this,
+                // determine distance from top
+                distanceFromTop = button.offset().top - $('body > header').eq(0).outerHeight(),
+                preferencesHeight;
+    
+            // if no panel return here
+            if (!panel.length) {
+                return;
+            }
+    
+            // hide any open tooltip
+            $('#map-toolbar .tooltip').hide();
+            panel.css('top', distanceFromTop);
+    
+            // adjust height of panel if marked as 'adjust-height'
+            if (panel.hasClass('adjust-height')) {
+                preferencesHeight = $('#map-toolbar').height() - distanceFromTop - 18;
+                panel.height(preferencesHeight);
+            }
+    
+            panel.fadeIn(25, function () {
+                panel.find('.scroller').scroller('reset');
+                button.addClass('active');
+                button.tooltip('hide').tooltip('disable');
+                // create a mask for easy closing
+                $.mask(panel, function (e) {
+                    // close function
+                    if (panel.is(':visible')) {
+                        panel.hide();
+                        self.toolbarButtons.removeClass('active');
+                        button.tooltip('enable');
+                        // if clicking again on the same button avoid reopening the panel
+                        if ($(e.target).attr('data-panel') === panelId) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                        }
+                    }
+                });
+            });
+        },
+    
+        /*
+         * toggle map tool
+         */
+        toggleTool: function (e) {
+            e.preventDefault();
+            $.createModal({ message: 'not implemented yet' });
+            return false;
+            //var button = $(e.currentTarget),
+            //    active_buttons = $('#fn-map-tools .tool.active');
+            //// if activating a tool
+            //if (!button.hasClass('active')) {
+            //    // deactivate any other
+            //    active_buttons.removeClass('active');
+            //    active_buttons.tooltip('enable');
+            //    button.addClass('active');
+            //    button.tooltip('hide');
+            //    button.tooltip('disable');
+            //// deactivate
+            //} else {
+            //    button.removeClass('active');
+            //    button.tooltip('enable');
+            //}
+        },
+    
+        /*
+         * proxy to Ns.views.map.Toolbar.toggleToolbar
+         */
+        toggleToolbar: function (e) {
+            this.toolbarView.toggleToolbar(e);
+        },
+    
+        /*
+         * search for an address
+         * put a marker on the map and zoom in
+         */
+        searchAddress: function (e) {
+            e.preventDefault();
+            this.removeAddressMarker();
+            var self = this,
+                searchString = $('#fn-search-address input').val(),
+                url = '//nominatim.openstreetmap.org/search?format=json&q=' + searchString;
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                success: function (response) {
+                    // not found
+                    if (_.isEmpty(response)) {
+                        $.createModal({ message: 'Address not found' });
+                    }
+                    // found
+                    else {
+                        // only the first result returned from OSM is displayed on map
+                        var firstPlaceFound = (response[0]),
+                            lat = parseFloat(firstPlaceFound.lat),
+                            lng = parseFloat(firstPlaceFound.lon),
+                            latlng = L.latLng(lat, lng),
+                            map = self.mapView.map;
+                        // put marker on the map
+                        self.addressMarker = L.marker(latlng);
+                        self.addressMarker.addTo(map);
+                        // go to marker and zoom in
+                        map.setView(latlng, 17);
+                        // bind for removal
+                        $('#fn-search-address-mask').one('click', function () {
+                            self.removeAddressMarker(1500);  // add a fadeOut
+                        });
+                    }
+                }
+            });
+        },
+    
+        /*
+         * remove the marker added in searchAddress
+         */
+        removeAddressMarker: function (speed) {
+            // remove istantly by default
+            speed = speed || 0;
+            var marker = this.addressMarker,
+                self = this;
+            if (typeof(marker) !== 'undefined') {
+                $([marker._icon, marker._shadow]).fadeOut(speed, function () {
+                    self.mapView.map.removeLayer(marker);
+                    delete(self.addressMarker);
+                });
+            }
+        },
+        
+        /**
+         * changes base layer of the map
+         * proxy to Ns.views.map.Content.switchBaseLayer
+         */
+        switchBaseLayer: function (event) {
+            this.mapView.switchBaseLayer($(event.target).attr('data-name'));
+        },
+    
+        /**
+         * hide / show layer data on map
+         */
+        toggleLayer: function (event, data) {
+            var layer = Ns.db.layers.get(data.el.attr('data-slug'));
+            layer.set('visible', data.value);
+        },
+        
+        /**
+         * hide / show legend data on map
+         */
+        toggleLegend: function(event, data){
+            this.parent.legend.currentView.$('a[data-status=' + data.el.attr('data-slug') + ']').trigger('click');
+        },
+        
+        /**
+         * sync legend state with switches in panel
+         */
+        syncLegendSwitch: function(legend, state){
+            var input = this.$('#map-control-legend-' + legend.get('slug'));
+            if(input.bootstrapSwitch('state') !== state){
+                // second parameter indicates wheter to skip triggering switch event
+                input.bootstrapSwitch('toggleState', true);
+            }
+        }
+    });
+    
+    Ns.views.map.Add = Marionette.ItemView.extend({
+        template: '#map-add-node-template',
+        tagName: 'article',
+        
+        ui: {
+            'form': '#add-node-form',
+            'select': '#add-node-form select',
+            'address': '#id_address'
+        },
+        
+        events: {
+            'click #add-node-form .btn-default': 'destroy',
+            'submit #add-node-form': 'submitAddNode'
+        },
+        
+        initialize: function (options) {
+            this.parent = options.parent;
+            // references to objects of other views
+            this.ext = {
+                legend: this.parent.legend.$el,
+                toolbar: this.parent.toolbar.$el,
+                map: this.parent.content.$el,
+                leafletMap: this.parent.content.currentView.map,
+                geo: this.parent.content.currentView.collection,
+                step1: $('#add-node-step1'),
+                step2: $('#add-node-step2')
+            };
+            // elements that must be hidden
+            this.hidden =  $().add(this.ext.legend)
+                              .add(this.ext.toolbar)
+                              .add(this.ext.map.find('.leaflet-control-attribution'));
+            // needed for toggleLeafletLayers
+            this.dimmed = false;
+        },
+        
+        serializeData: function(){
+            return { 'layers': Ns.db.layers.toJSON() };
+        },
+        
+        onShow: function () {
+            Ns.router.navigate('map/add');
+            this.ui.select.selectpicker({ style: 'btn-special' });
+            // go to step1 when collection is ready
+            if (this.ext.geo.length){
+                this.step1();
+            }
+            else {
+                this.listenToOnce(this.ext.geo, 'ready', this.step1);
+            }
+        },
+        
+        /*
+         * when the view is destroyed the map is taken backto its original state
+         */
+        onBeforeDestroy: function () {
+            this.closeAddNode();
+            // change url fragment but only if we are still on the map
+            if (Backbone.history.fragment.substr(0,3) == 'map'){
+                Ns.router.navigate('map');
+            }
+        },
+        
+        /*
+         * proxy to Ns.views.map.Layout.resizeMap
+         */
+        resizeMap: function() {
+            Ns.views.map.Layout.resizeMap();
+        },
+        
+        /*
+         * hide elements that are not needed when adding a new node
+         * show them back when finished
+         */
+        toggleHidden: function(){
+            this.hidden.toggle();
+            this.resizeMap(),
+            this.toggleLeafletLayers();
+        },
+        
+        /*
+         * dim out leaflet layers from map when adding a new node
+         * reset default options when finished
+         * clusters are toggled (hidden and shown back) through an additional style tag in <head>
+         * because clusters are re-rendered whenever the map is moved or resized so inline changes
+         * do not persist when resizing or moving
+         */
+        toggleLeafletLayers: function () {
+            var leafletOptions = Ns.settings.leafletOptions,
+                tmpOpacity = leafletOptions.temporaryOpacity,
+                clusterCss = $('#add-node-cluster-css'),
+                dimOut = !this.dimmed,
+                leaflet;
+            // dim out or reset all leaflet layers
+            this.ext.geo.forEach(function(model){
+                leaflet = model.get('leaflet');
+                if (dimOut) {
+                    leaflet.options.opacity = tmpOpacity;
+                    leaflet.options.fillOpacity = tmpOpacity;
+                    leaflet.setStyle(leaflet.options);
+                }
+                else {
+                    leaflet.options.opacity = leafletOptions.opacity;
+                    leaflet.options.fillOpacity = leafletOptions.fillOpacity;
+                    leaflet.setStyle(leaflet.options);
+                }
+            });
+            if (clusterCss.length === 0) {
+                $('head').append('<style id="add-node-cluster-css">.cluster{ display: none }</style>');
+            }
+            else{
+                clusterCss.remove();
+            }
+            // change dimmed state
+            this.dimmed = dimOut;
+        },
+        
+        /*
+         * step1 of adding a new node
+         */
+        step1: function (e) {
+            var self = this,
+                dialog = this.ext.step1,
+                dialog_dimensions = dialog.getHiddenDimensions();
+            if (Ns.db.user.isAuthenticated() === false) {
+                $('#signin-modal').modal('show');
+                // listen to loggedin event and come back to this method
+                this.listenToOnce(Ns.db.user, 'loggedin', this.onShow);
+                return;
+            }
+            // hide toolbar and enlarge map
+            this.toggleHidden();
+            // show step1
+            dialog.css({
+                width: dialog_dimensions.width,
+                right: 0
+            });
+            dialog.fadeIn(255);
+            // cancel
+            this.ext.step1.find('button').one('click', function () { self.destroy() });
+            // on map click (only once)
+            this.ext.leafletMap.once('click', function (e) {
+                dialog.fadeOut(255);
+                self.step2(e);
+            });
+        },
+        
+        step2: function (e) {
+            var self = this,
+                dialog = this.ext.step2,
+                dialog_dimensions = dialog.getHiddenDimensions(),
+                map = this.ext.leafletMap,
+                callback,
+                latlng,
+                // draggable marker
+                marker = L.marker([e.latlng.lat, e.latlng.lng], {draggable: true}).addTo(map);
+            // keep a global reference
+            self.newNodeMarker = marker;
+            // set address on form
+            self.setAddressFromLatLng(e.latlng);
+            // update address when moving the marker
+            marker.on('dragend', function (event) {
+                latlng = event.target.getLatLng();
+                self.setAddressFromLatLng(latlng);
+                map.panTo(latlng);
+            });
+            // zoom in to marker
+            map.setView(marker.getLatLng(), 18, { animate: true });
             // show step2
-            dialog = self.ui.addNodeStep2,
+            dialog = self.ext.step2,
             dialog_dimensions = dialog.getHiddenDimensions();
             dialog.css({
                 width: dialog_dimensions.width,
                 right: 0
             });
             dialog.fadeIn(255);
-
             // bind cancel button once
-            $('#add-node-step2 .btn-default').one('click', function (e) {
-                self.closeAddNode();
-            });
-
-            // add new node there
-            $('#add-node-step2 .btn-success').one('click', function (e) {
+            this.ext.step2.find('.btn-default').one('click', function () { self.destroy() });
+            // bind confirm button once
+            this.ext.step2.find('.btn-success').one('click', function () {
+                callback = function () {
+                    self.resizeMap();
+                    map.panTo(marker._latlng);
+                };
                 dialog.fadeOut(255);
-                self.ui.addNodeContainer.show().animate({
-                    width: '+70%'
-                }, {
+                // show form with a nice animation
+                self.parent.add.$el.show().animate({ width: '+70%'}, {
                     duration: 400,
-                    progress: function () {
-                        self.setMapDimensions();
-                        self.map.panTo(marker._latlng);
-                    },
-                    complete: function () {
-                        self.setMapDimensions();
-                        self.map.panTo(marker._latlng);
-                    }
+                    progress: callback,
+                    complete: callback
                 });
             });
-        });
-    },
-
-    /*
-     * submit new node
-     */
-    submitAddNode: function (e) {
-        e.preventDefault();
-
-        var self = this,
-            form = this.ui.addNodeForm;
-        geojson = JSON.stringify(this.newNodeMarker.toGeoJSON().geometry),
-        url = form.attr('action'),
-        errorList = form.find('.error-list');
-
-        form.find('.error-msg').text('').hide();
-        form.find('.error').removeClass('error');
-        errorList.html('').hide();
-
-        $('#id_geometry').val(geojson);
-
-        var data = form.serialize();
-
-        // TODO: refactor this to use backbone and automatic validation
-        $.post(url, data).done(function () {
-            // TODO: fire custom event here
-            $.createModal({
-                message: 'new node added'
-            });
-            self.closeAddNode(function () {
-                // show added node
-                // TODO: improve ugly code
-                Nodeshot.loadEssentialData();
-                self.resetDataContainers();
-                self.loadMapData();
-                self.clusterizeMarkers();
-            });
-        }).error(function (http) {
-            var json = http.responseJSON;
-
-            for (key in json) {
-                var input = $('#id_' + key);
-                if (input.length) {
-                    input.addClass('error');
-
-                    if (input.selectpicker) {
-                        input.selectpicker('setStyle');
-                    }
-
-                    var errorContainer = input.parent().find('.error-msg');
-
-                    if (!errorContainer.length) {
-                        errorContainer = input.parent().parent().find('.error-msg');
-                    }
-
-                    errorContainer.text(json[key]).fadeIn(255);
-                } else {
-                    errorList.show();
-                    errorList.append('<li>' + json[key] + '</li>');
-                }
-            }
-        });
-    },
-
-    /*
-     * cancel addNode operation
-     * resets normal map functions
-     */
-    closeAddNode: function (callback) {
-        var marker = this.newNodeMarker;
-        // unbind click event
-        this.map.off('click');
-
-        var self = this,
-            container = this.ui.addNodeContainer;
-
-        if (container.is(':visible')) {
-            container.animate({
-                width: '0'
-            }, {
-                duration: 400,
-                progress: function () {
-                    self.setMapDimensions();
-                    if (marker) {
-                        self.map.panTo(marker._latlng);
-                    }
-                },
-                complete: function () {
-                    if (marker) {
-                        self.map.panTo(marker._latlng);
-                    }
-                    container.hide();
-                    self.setMapDimensions();
-
-                    if (callback && typeof (callback) === 'function') {
-                        callback();
-                    }
-                }
-            });
-        }
-
-        // reopen legend if necessary
-        if (
-            (Nodeshot.preferences.legendOpen === true || Nodeshot.preferences.legendOpen === "true") &&
-            this.ui.legend.is(':hidden')
-        ) {
-            this.ui.legend.show();
-        }
-
-        // show toolbar and adapt map width
-        this.ui.toolbar.show();
-        this.setMapDimensions();
-        this.toggleMarkersOpacity();
-
-        // hide step1 if necessary
-        if (this.ui.addNodeStep1.is(':visible')) {
-            this.ui.addNodeStep1.fadeOut(255);
-        }
-
-        // hide step2 if necessary
-        if (this.ui.addNodeStep2.is(':visible')) {
-            this.ui.addNodeStep2.fadeOut(255);
-        }
-
-        // remove marker if necessary
-        if (marker) {
-            this.map.removeLayer(marker);
-        }
-
-        this.setMapDimensions();
-    },
-
-    /*
-     * partially fade out or reset markers from the map
-     * used when adding a node
-     */
-    toggleMarkersOpacity: function (action) {
-        var tmpOpacity = 0.3;
-
-        // loop over nodes
-        for (var i = 0, len = Nodeshot.nodes.length; i < len; i++) {
-            var node = Nodeshot.nodes[i];
-
-            if (action === 'fade') {
-                node.options.opacity = tmpOpacity;
-                node.options.fillOpacity = tmpOpacity;
-                node.setStyle(node.options);
-            } else {
-                node.setStyle(node.defaultOptions);
-            }
-        }
-    },
-
-    /*
-     * show / hide toolbar panels
-     */
-    togglePanel: function (e) {
-        e.preventDefault();
-
-        var button = $(e.currentTarget),
-            panel_id = button.attr('data-panel'),
-            panel = $('#' + panel_id),
-            self = this;
-
-        // if no panel return here
-        if (!panel.length) {
-            return;
-        }
-
-        // hide any open tooltip
-        $('#map-toolbar .tooltip').hide();
-
-        var distance_from_top = button.offset().top - $('body > header').eq(0).outerHeight();
-        panel.css('top', distance_from_top);
-
-        // here we should use an event
-        if (panel.hasClass('adjust-height')) {
-            var preferences_height = this.$el.height() - distance_from_top - 18;
-            panel.height(preferences_height);
-        }
-
-        panel.fadeIn(25, function(){
-            panel.find('.scroller').scroller('reset');
-            button.addClass('active');
-            button.tooltip('disable');
-
-            // clicking anywhere else closes the panel
-            $('#map-toolbar, body > header, #map > div:not(.side-panel)').one('click', function(e){
-                if(panel.is(':visible')){
-                    panel.hide();
-                    self.ui.toolbarButtons.removeClass('active');
-                    button.tooltip('enable');
-                    // if clicking again on the same button avoid reopening the panel
-                    if($(e.target).attr('data-panel') == panel_id){
-                        e.stopPropagation();
-                        e.preventDefault();
-                    }
-                }
-            });
-        });
-    },
-
-    /*
-     * open or close legend
-     */
-    toggleLegend: function (e) {
-        e.preventDefault();
-
-        var legend = this.ui.legend,
-            button = this.ui.legendButton;
-
-        if (legend.is(':visible')) {
-            legend.fadeOut(255);
-            button.removeClass('disabled');
-            button.tooltip('enable');
-            Nodeshot.preferences.legendOpen = false;
-        } else {
-            legend.fadeIn(255);
-            button.addClass('disabled');
-            button.tooltip('disable').tooltip('hide');
-            Nodeshot.preferences.legendOpen = true;
-        }
-    },
-
-    /*
-     * enable or disable something on the map
-     * by clicking on its related legend control
-     */
-    toggleLegendControl: function (e) {
-        e.preventDefault();
-
-        var a = $(e.currentTarget),
-            li = a.parent(),
-            status = a.attr('data-status');
-
-        if (li.hasClass('disabled')) {
-            li.removeClass('disabled');
-            this.toggleMarkers('show', status);
-        } else {
-            li.addClass('disabled');
-            this.toggleMarkers('hide', status);
-        }
-    },
-
-    /*
-     * hide or show markers from map
-     * TODO: this is cumbersome and needs semplification
-     */
-    toggleMarkers: function (action, status) {
-        // local vars / shortcuts
-        var functionName,
-            cluster = Nodeshot.statuses[status].cluster,
-            markers = Nodeshot.statuses[status].nodes,
-            visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
-
-        // mark each marker visibility depending on visible layers
-        _.forEach(markers, function(marker){
-            marker.visible = action === 'show';
-        });
-
-        if(action === 'show'){
-            // add layer to map
-            this.map.addLayer(cluster);
-            // show
-            this.showVisibleClusters();
-            // remember choice
-            if(visibleStatuses.indexOf(status) < 0){
-                visibleStatuses.push(status);
-            }
-        }
-        else if(action === 'hide'){
-            this.map.removeLayer(cluster);
-            // remember choice
-            var index = visibleStatuses.indexOf(status);
-            if(index > -1){
-                visibleStatuses.splice(index, 1);
-            }
-        }
-
-        // remember choice
-        Nodeshot.preferences.visibleStatuses = visibleStatuses;
-    },
-
-    /*
-     * toggle map tool
-     */
-    toggleTool: function (e) {
-        e.preventDefault();
-        var button = $(e.currentTarget),
-            active_buttons = $('#fn-map-tools .tool.active');
-
-        if (!button.hasClass('active')) {
-            // deactivate any other
-            active_buttons.removeClass('active');
-            active_buttons.tooltip('enable');
-
-            button.addClass('active');
-            button.tooltip('hide');
-            button.tooltip('disable');
-        } else {
-            button.removeClass('active');
-            button.tooltip('enable');
-        }
-    },
-
-    /*
-     * show / hide map toolbar on mobiles
-     */
-    toggleToolbar: function (e) {
-        e.preventDefault();
-        this.ui.toolbar.toggle();
-        // if toolbar has just been hidden
-        if(this.ui.toolbar.is(':hidden')){
-            // close any open panel
-            if($('.side-panel:visible').length){
-                $('body>header').trigger('click');
-            }
-        }
-        this.setMapDimensions();
-    },
-
-    /*
-     * Initialize Map
-     */
-    initMap: function (mode) {
-        var button = this.ui.switchMapMode,
-            legend = this.ui.legend,
-            buttonTitle = button.attr('data-original-title'),
-            preferences = Nodeshot.preferences;
-
-        // unload map if already initialized
-        if (typeof (this.map) !== 'undefined') {
-            // store current coordinates
-            this.storeCoordinates();
-            // unload map
-            this.map.remove();
-            // clear any HTML in map container
-            $('#map-js').html('');
-        }
-
-        this.setMapDimensions();
-
-        // init map
-        this.map = this.loadDjangoLeafletMap();
-        // remember latest coordinates
-        var coords = this.rememberCoordinates();
-        this.map.setView([coords.lat, coords.lng], coords.zoom, {
-            trackResize: true
-        });
-
-        if (preferences.legendOpen === false || preferences.legendOpen === 'false') {
-            legend.hide();
-        } else {
-            this.ui.legendButton.addClass('disabled');
-        }
-
-        // load data
-        this.loadMapData();
-        this.clusterizeMarkers();
-        this.rememberVisibleStatuses();
-    },
-
-    /*
-     * Overridden by custom django-leaflet template in
-     * {UI}/templates/leaflet/_lefalet_map.html
-     */
-    loadDjangoLeafletMap: function(){},
-
-    /*
-     * Loads Map Content
-     */
-    loadMapData: function () {
-        var options = {
-            fill: true,
-            lineCap: 'circle',
-            radius: 6,
-            opacity: 1,
-            fillOpacity: 0.7
         },
-            popUpTemplate = _.template($('#map-popup-template').html()),
-            preferences = Nodeshot.preferences;
-
-        // visible statuses
-        preferences.visibleStatuses = preferences.visibleStatuses || _.keys(Nodeshot.statuses)
-        // visible layers
-        preferences.visibleLayers = preferences.visibleLayers || Nodeshot.layersSlugs;
-
-        // loop over each layer
-        for (var i = 0; i < Nodeshot.layers.length; i++) {
-            var layer = Nodeshot.layers[i],
-                visibleStatuses = Nodeshot.preferences.visibleStatuses.split(','),
-                visibleLayers = Nodeshot.preferences.visibleLayers.split(',');
-
-            var leafletLayer = L.geoJson(layer.nodes_geojson, {
-                style: function (feature) {
-                    var status = Nodeshot.statuses[feature.properties.status];
-                    options.fillColor = status.fill_color;
-                    options.stroke = status.stroke_width > 0;
-                    options.weight = status.stroke_width;
-                    options.color = status.stroke_color;
-                    options.className = 'marker-' + status.slug;
-                    return options
-                },
-                onEachFeature: function (feature, layer) {
-                    // add slug in properties
-                    feature.properties.slug = feature.id;
-                    // bind leaflet popup
-                    layer.bindPopup(popUpTemplate(feature.properties));
-                },
-                pointToLayer: function (feature, latlng) {
-                    var marker = L.circleMarker(latlng, options);
-
-                    // marks as visible or not depending on preferences
-                    if(visibleStatuses.indexOf(feature.properties.status) >= 0 && visibleLayers.indexOf(feature.properties.layer) >= 0){
-                        marker.visible = true;
+    
+        /*
+         * submit new node
+         */
+        submitAddNode: function (e) {
+            e.preventDefault();
+            var self = this,
+                form = this.ui.form,
+                geojson = JSON.stringify(this.newNodeMarker.toGeoJSON().geometry),
+                errorList = form.find('.error-list'),
+                node, geo;
+            form.find('.error-msg').text('').hide();
+            form.find('.error').removeClass('error');
+            errorList.html('').hide();
+            this.$('#id_geometry').val(geojson);
+            node = new Ns.models.Node(form.serializeJSON());
+            // TODO: refactor this to use backbone and automatic validation
+            node.save().done(function () {
+                // convert to Geo model
+                node = new Ns.models.Geo(node.toJSON());
+                // add to geo collection
+                self.ext.geo.add(node);
+                // destroy this view
+                self.destroy();
+                // open new node popup
+                node.get('leaflet').openPopup();
+            }).error(function (http) {
+                var json = http.responseJSON,
+                    key, input, errorContainer;
+                for (key in json) {
+                    input = $('#id_' + key);
+                    if (input.length) {
+                        input.addClass('error');
+                        if (input.selectpicker) {
+                            input.selectpicker('setStyle');
+                        }
+                        errorContainer = input.parent().find('.error-msg');
+                        if (!errorContainer.length) {
+                            errorContainer = input.parent().parent().find('.error-msg');
+                        }
+                        errorContainer.text(json[key]).fadeIn(255);
+                    } else {
+                        errorList.show();
+                        errorList.append('<li>' + json[key] + '</li>');
                     }
-                    else{
-                        marker.visible = false;
-                    }
-
-                    marker.on('click', function (e) {
-                        Backbone.history.navigate('#/map/' + feature.id);
-                    });
-
-                    Nodeshot.statuses[feature.properties.status].nodes.push(marker);
-                    Nodeshot.nodes.push(marker);
-                    Nodeshot.nodesNamed[feature.id] = marker;
-                    return marker
                 }
             });
-        }
-        this.countVisibleNodesByStatus();
-    },
-
-    clusterizeMarkers: function () {
-        // loop over each status
-        for (var key in Nodeshot.statuses) {
-
-            var status = Nodeshot.statuses[key],
-                // group marker in layerGroup
-                leafletLayer = L.layerGroup(status.nodes);
-
-            // TODO: this is ugly!
-            $('head').append("\
-                <style type='text/css'>\
-                .marker-" + key + " {\
-                    background-color:" + status.fill_color + ";\
-                    color:" + status.text_color + ";\
-                    border: " + status.stroke_width + "px solid " + status.stroke_color + ";\
-                }\
-                </style>\
-            ");
-
-            // group markers in clusters
-            var group = new L.MarkerClusterGroup({
-                iconCreateFunction: function (cluster) {
-
-                    var count = cluster.getChildCount(),
-                        // determine size with the last number of the exponential notation
-                        // 0 for < 10, 1 for < 100, 2 for < 1000 and so on
-                        size = count.toExponential().split('+')[1];
-
-                    return L.divIcon({
-                        html: count,
-                        className: 'cluster cluster-size-' + size + ' marker-' + this.cssClass
-                    });
-                },
-                polygonOptions: {
-                    fillColor: status.fill_color,
-                    stroke: status.stroke_width > 0,
-                    weight: status.stroke_width,
-                    color: status.stroke_color
-                },
-                chunkedLoading: true,
-                showCoverageOnHover: true,
-                zoomToBoundsOnClick: true,
-                removeOutsideVisibleBounds: true,
-                // TODO: make these configurable
-                disableClusteringAtZoom: 12,
-                maxClusterRadius: 90,
-                singleMarkerMode: true,
-                // custom option
-                cssClass: key
+        },
+    
+        /*
+         * cancel addNode operation
+         * resets normal map functions
+         */
+        closeAddNode: function () {
+            var marker = this.newNodeMarker,
+                container = this.parent.add.$el,
+                map = this.ext.leafletMap,
+                self = this,
+                resetToOriginalState = function () {
+                    container.hide();
+                    // show hidden elements again
+                    self.toggleHidden();
+                };
+            // unbind click events
+            map.off('click');
+            this.ext.step1.find('button').off('click');
+            this.ext.step2.find('.btn-default').off('click');
+            this.ext.step2.find('.btn-success').off('click');
+            // remove marker if necessary
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            // hide step1 if necessary
+            if (this.ext.step1.is(':visible')) {
+                this.ext.step1.fadeOut(255);
+            }
+            // hide step2 if necessary
+            if (this.ext.step2.is(':visible')) {
+                this.ext.step2.fadeOut(255);
+            }
+            // if container is visible
+            if (container.is(':visible')) {
+                // hide it with a nice animation
+                container.animate({ width: '0' }, {
+                    duration: 400,
+                    progress: function () {
+                        self.resizeMap();
+                        if (marker) { map.panTo(marker._latlng); }
+                    },
+                    complete: resetToOriginalState
+                });
+            }
+            // reset original state
+            else{
+                resetToOriginalState();
+            }
+        },
+    
+        /*
+         * retrieve address from latlng through OSM Nominatim service
+         * and set it on the add node form
+         */
+        setAddressFromLatLng: function (latlng) {
+            var self = this,
+                properties,
+                url = '//nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1'
+                    + '&lat=' + latlng.lat
+                    + '&lon=' + latlng.lng
+                    + '&accept-language=' + navigator.language;
+            $.getJSON(url).done(function(json){
+                // _.compact removes falsy values
+                properties = _.compact([
+                    json.address.road,
+                    json.address.house_number,
+                    json.address.village,
+                    json.address.town,
+                    json.address.city,
+                    json.address.postcode,
+                    json.address.country
+                ]);
+                self.ui.address.val(properties.join(', '));
             });
-
-            group.status = key;
-
-            // store for future reference
-            status.cluster = group;
-            Nodeshot.clusters.push(group);
-
-            // show visible markers
-            this.showVisibleMarkers(group, status.nodes);
-
-            // Adds cluster to map
-            this.map.addLayer(group);
         }
-    },
-
-    /*
-     * toggle 3D or 2D map
-     */
-    switchMapMode: function (e) {
-        e.preventDefault();
-        $.createModal({message:'not implemented yet'});
-    },
-
-    showVisibleMarkers: function (cluster, markers) {
-        for (var i = 0, len = markers.length; i < len; i++) {
-            var marker = markers[i];
-            if (marker.visible) {
-                cluster.addLayer(marker);
-            }
-        }
-    },
-
-    showVisibleClusters: function () {
-        var self = this;
-        _.each(Nodeshot.clusters, function (cluster) {
-            cluster.clearLayers();
-            // show visible markers
-            self.showVisibleMarkers(cluster, Nodeshot.statuses[cluster.status].nodes);
-        });
-        this.countVisibleNodesByStatus();
-    },
-
-    /*
-     * show or hide markers of a layer
-     */
-    toggleLayerData: function (e, data) {
-        var input = $(e.currentTarget),
-            slug = input.attr('data-slug'),
-            visibleLayers = Nodeshot.preferences.visibleLayers.split(','),
-            visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
-
-        // loop over nodes
-        for (var i = 0, len = Nodeshot.nodes.length; i < len; i++) {
-            var node = Nodeshot.nodes[i];
-
-            // show marker if layer corresponds and status is visible
-            if (node.feature.properties.layer === slug && _.contains(visibleStatuses, node.feature.properties.status)) {
-                // mark appropiately
-                node.visible = data.value;
-            }
-        }
-
-        this.showVisibleClusters();
-
-        // remember choice
-        if(data.value){
-            if(visibleLayers.indexOf(slug) < 0){
-                visibleLayers.push(slug);
-            }
-        }
-        else{
-            var index = visibleLayers.indexOf(slug);
-            if(index > -1){
-                visibleLayers.splice(index, 1);
-            }
-        }
-        Nodeshot.preferences.visibleLayers = visibleLayers;
-    },
-
-    /*
-     * Get Address using OSM Nominatim service
-     */
-    getAddress: function (latlng) {
-        var arrayLatLng = latlng.toString().split(",");
-        var lat = arrayLatLng[0].slice(7);
-        var lng = arrayLatLng[1].slice(0, -1);
-        var url = '//nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=0';
-        $.ajax({
-            url: url,
-            dataType: 'json',
-            success: function (response) {
-                var address = response.display_name;
-                $("#id_address").val(address);
-            }
-        });
-    },
-
-    searchAddress: function (e) {
-        e.preventDefault();
-        this.removeAddressFoundMarker()
-        var self = this
-        var searchString = $("#fn-search-address input").val()
-        var url = "//nominatim.openstreetmap.org/search?format=json&q=" + searchString
-        $.ajax({
-            url: url,
-            dataType: 'json',
-            success: function (response) {
-                if (_.isEmpty(response)) {
-                    $.createModal({
-                        message: 'Address not found'
-                    });
-                } else {
-                    var firstPlaceFound = (response[0]); // first place returned from OSM is displayed on map
-                    var lat = parseFloat(firstPlaceFound.lat);
-                    var lng = parseFloat(firstPlaceFound.lon);
-                    var latlng = L.latLng(lat, lng);
-                    self.addressFoundMarker = L.marker(latlng)
-                    self.addressFoundMarker.addTo(self.map);
-                    self.map.setView(latlng, 16);
-                }
-            }
-        });
-    },
-
-    removeAddressFoundMarker: function () {
-        if (typeof (this.addressFoundMarker) != "undefined") {
-            this.map.removeLayer(this.addressFoundMarker)
-        }
-    },
-
-    /*
-     * remember hide/show nodes based on status choices
-     */
-    rememberVisibleStatuses: function(){
-        var visibleStatuses = Nodeshot.preferences.visibleStatuses.split(',');
-
-        // find out which statuses have to be disabled in the legend
-        // use underscore array difference
-        toDisable = _.difference(_.keys(Nodeshot.statuses), visibleStatuses)
-
-        // add disabled class
-        toDisable.forEach(function(status){
-            $('#map-legend a[data-status="'+status+'"]').parents('li').addClass('disabled');
-        });
-    },
-
-    /*
-     * count nodes of a certain status
-     * TODO this logic should probably be a separate view or something can be managed separately
-     */
-    countVisibleNodesByStatus: function(){
-        // reset visibleNodes counter
-        for(key in Nodeshot.statuses){
-            Nodeshot.statuses[key].visibleNodes = []
-        }
-        // determine how many visible nodes
-        for (var i=0; i<Nodeshot.nodes.length; i++) {
-            var node = Nodeshot.nodes[i];
-            if (node.visible) {
-                Nodeshot.statuses[node.feature.properties.status].visibleNodes.push(node);
-            }
-        }
-        // update UI ... very ugly
-        for(key in Nodeshot.statuses){
-            $('#legend-status-' + key + ' .stats').text(Nodeshot.statuses[key].visibleNodes.length)
-        }
-    }
-});
+    });
+})();

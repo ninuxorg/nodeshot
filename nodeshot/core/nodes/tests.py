@@ -272,7 +272,6 @@ class APITest(BaseTestCase):
     def test_node_geojson_list(self):
         """ test node geojson list """
         url = reverse('api_node_gejson_list')
-
         # GET: 200
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)

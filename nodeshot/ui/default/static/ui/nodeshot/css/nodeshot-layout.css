@@ -454,7 +454,7 @@ article.center-stage{
         min-height: 0 !important;
         padding: 0;
     }
-	
+
     #nav-bar .navbar-collapse{ max-height: none; padding: 0 }
     #nav-bar .navbar-nav{ margin: 10px 0 0; padding: 0; width: 100% !important }
 
@@ -490,6 +490,8 @@ article.center-stage{
         box-shadow: none;
         border-color: rgba(0,0,0,0.1);
     }
+
+    .leaflet-control-attribution{ display: none !important }
 }
 
 .overlay{
@@ -499,6 +501,14 @@ article.center-stage{
     z-index: 10;
     padding: 15px;
     border-radius: 7px;
+}
+
+.mask{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .icon-close{
@@ -542,6 +552,8 @@ article.center-stage{
 }
 #map-js,
 .short-map #map{ width: 100% }
+/* base layer control is handled by our UI */
+#map-js .leaflet-control-layers.leaflet-control{ display: none }
 
 #cesiumContainer {
     position: absolute;
@@ -628,9 +640,9 @@ article.center-stage{
     min-width: 120px;
 }
 
-#map-legend a{
-    float: left;
-}
+#map-legend a{ float: left }
+#map-legend .circle{ margin-right: 5px }
+#map-legend a:hover{ font-weight: bold }
 
 #map-legend.right{
     left: auto;
@@ -875,22 +887,29 @@ article.center-stage{
     padding: 13px 20px 5px !important;
 }
 
-.side-panel label.inline{
-    position: relative;
-    bottom: -4px;
-}
 .side-panel .has-switch{
-    float: right
+    float: left;
+    margin-right: 8px;
 }
 
 .side-panel p{
     overflow: hidden;
     clear: both;
+    margin-bottom: 10px;
+    line-height: 20px;
 }
 
-.side-panel p{ margin-bottom: 13px }
+.side-panel label.inline{
+    vertical-align: top;
+    line-height: 25px;
+}
+.side-panel label.inline.h18{
+    line-height: 18px;
+}
+
 .side-panel .line,
-.side-panel .btn-group{ margin-bottom: 13px !important }
+.side-panel .btn-group{ margin-bottom: 15px !important }
+.side-panel .line { margin-top: 15px !important }
 
 #fn-map-tools{
     min-width: 100px;
@@ -1385,3 +1404,5 @@ td.empty{
 }
 
 /* --- End Node List --- */
+
+#map-add-node-js > article{ min-width: 300px }

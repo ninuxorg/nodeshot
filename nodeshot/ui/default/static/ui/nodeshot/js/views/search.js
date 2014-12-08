@@ -1,147 +1,150 @@
-var SearchResultView = Backbone.Marionette.ItemView.extend({
-    tagName: "li",
-    template: "#search-result-template"
-});
+(function(){
+    'use strict';
 
-var SearchEmptyView = Backbone.Marionette.ItemView.extend({
-    tagName: "li",
-    template: '#search-empty-template'
-});
+    var ItemView = Marionette.ItemView.extend({
+        tagName: "li",
+        template: "#search-result-template"
+    });
 
-var SearchView = Backbone.Marionette.CompositeView.extend({
-    name: 'SearchView',
-    el: '#general-search',
-    tagName: 'div',
-    template: '#search-template',
-    childView: SearchResultView,
-    childViewContainer: '#js-search-results',
-    emptyView: SearchEmptyView,
+    var EmptyView = Marionette.ItemView.extend({
+        tagName: "li",
+        template: '#search-empty-template'
+    });
 
-    ui: {
-        'input': 'input',
-        'loading': '.animate-spin',
-        'icon': '.icon-search',
-        'results': 'ul'
-    },
+    Ns.views.Search = Marionette.CompositeView.extend({
+        el: '#general-search',
+        tagName: 'div',
+        template: '#search-template',
+        childView: ItemView,
+        childViewContainer: '#js-search-results',
+        emptyView: EmptyView,
 
-    events:{
-        'keyup input': 'keyupOnSearch',
-        'mouseover ul': 'removeArtificialFocus',
-        'click a': 'getNode'
-    },
+        ui: {
+            'input': 'input',
+            'loading': '.animate-spin',
+            'icon': '.icon-search',
+            'results': 'ul'
+        },
 
-    collectionEvents: {
-        'sync': 'render'
-    },
+        events:{
+            'keyup input': 'keyupOnSearch',
+            'mouseover ul': 'removeArtificialFocus',
+            'click a': 'getNode'
+        },
 
-    initialize: function(){
-        this.collection = new NodeCollection();
-        this.render();
-        // bind to keydown event
-        $(window).on('keydown', _.bind(this.keydown, this));
-    },
+        collectionEvents: {
+            'sync': 'render'
+        },
 
-    /* --- layout --- */
+        initialize: function(){
+            this.collection = new Ns.collections.Node();
+            this.render();
+            // bind to keydown event
+            $(window).on('keydown', _.bind(this.keydown, this));
+        },
 
-    startSpinning: function () {
-        this.ui.icon.hide();
-        this.ui.loading.fadeIn(255);
-    },
+        /* --- layout --- */
 
-    stopSpinning: function () {
-        this.ui.loading.hide();
-        this.ui.icon.fadeIn(255);
-    },
+        startSpinning: function () {
+            this.ui.icon.hide();
+            this.ui.loading.fadeIn(255);
+        },
 
-    showResults: function(){
-        var self = this;
-        this.ui.results.fadeIn(255);
+        stopSpinning: function () {
+            this.ui.loading.hide();
+            this.ui.icon.fadeIn(255);
+        },
 
-        $('html').on('click.search', function(e){
-            // if clicking outside
-            if(!$(e.target).parents('#general-search').length){
-                self.hideResults();
-                $('html').unbind('click.search');
+        showResults: function(){
+            var self = this;
+            this.ui.results.fadeIn(255);
+
+            $('html').on('click.search', function(e){
+                // if clicking outside
+                if(!$(e.target).parents('#general-search').length){
+                    self.hideResults();
+                    $('html').unbind('click.search');
+                }
+            })
+        },
+
+        hideResults: function(){
+            this.ui.results.hide();
+        },
+
+        removeArtificialFocus: function(e){
+            $('#js-search-results a.focus').removeClass('focus').trigger('blur');
+        },
+
+        /* --- user interaction --- */
+
+        keyupOnSearch: function(e){
+            if (e.keyCode === 13) {
+                this.search(e.target.value);
             }
-        })
-    },
+            else if(e.keyCode === 27){
+                this.ui.input.trigger('blur');
+                this.stopSpinning();
+                this.hideResults();
+            }
+        },
 
-    hideResults: function(){
-        this.ui.results.hide();
-    },
+        search: function(q){
+            var self = this;
 
-    removeArtificialFocus: function(e){
-        $('#js-search-results a.focus').removeClass('focus').trigger('blur');
-    },
+            // show loading indicator
+            this.startSpinning();
 
-    /* --- user interaction --- */
+            // fetch results
+            this.collection.search(q)
+            .done(function(){
+                // hide loading indicator
+                self.stopSpinning();
+                self.showResults();
+                // keep word
+                self.ui.input.trigger('focus').val(q);
+            });
+        },
 
-    keyupOnSearch: function(e){
-        if (e.keyCode === 13) {
-            this.search(e.target.value);
-        }
-        else if(e.keyCode === 27){
-            this.ui.input.trigger('blur');
-            this.stopSpinning();
+        keydown: function(e){
+            if(this.ui.results.is(':hidden')){
+                return
+            }
+            if(e.keyCode == 40){
+                this.moveThroughResults('down', e);
+            }
+            else if(e.keyCode == 38){
+                this.moveThroughResults('up', e);
+            }
+        },
+
+        moveThroughResults: function(direction, e){
+            e.preventDefault();
+            e.stopPropagation();
+
+            var method = direction === 'down' ? 'next' : 'prev',
+                current = $('#js-search-results a.focus');
+
+            // remove any focus
+            current.removeClass('focus');
+
+            if(!current.length){
+                $('#js-search-results a').eq(0)
+                    .addClass('focus').focus();
+            }
+            else{
+                current.eq(-1)
+                    .parent()[method]()
+                    .find('a')
+                    .addClass('focus').focus();
+            }
+        },
+
+        getNode: function(e){
+            if($(e.target).hasClass('empty')){
+                e.preventDefault();
+            }
             this.hideResults();
         }
-    },
-
-    search: function(q){
-        var self = this;
-
-        // show loading indicator
-        this.startSpinning();
-
-        // fetch results
-        this.collection.search(q)
-        .done(function(){
-            // hide loading indicator
-            self.stopSpinning();
-            self.showResults();
-            // keep word
-            self.ui.input.trigger('focus').val(q);
-        });
-    },
-
-    keydown: function(e){
-        if(this.ui.results.is(':hidden')){
-            return
-        }
-        if(e.keyCode == 40){
-            this.moveThroughResults('down', e);
-        }
-        else if(e.keyCode == 38){
-            this.moveThroughResults('up', e);
-        }
-    },
-
-    moveThroughResults: function(direction, e){
-        e.preventDefault();
-        e.stopPropagation();
-
-        var method = direction === 'down' ? 'next' : 'prev',
-            current = $('#js-search-results a.focus');
-
-        // remove any focus
-        current.removeClass('focus');
-
-        if(!current.length){
-            $('#js-search-results a').eq(0)
-                .addClass('focus').focus();
-        }
-        else{
-            current.eq(-1)
-                .parent()[method]()
-                .find('a')
-                .addClass('focus').focus();
-        }
-    },
-
-    getNode: function(e){
-        if($(e.target).hasClass('empty')){
-            e.preventDefault();
-        }
-        this.hideResults();
-    }
-});
+    });
+})();

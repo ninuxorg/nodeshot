@@ -4,8 +4,8 @@
         url,
         querystring = '';
         
-        if(Nodeshot.currentUser.isAuthenticated()){
-            querystring = '?user_id='+Nodeshot.currentUser.get('id');
+        if(Ns.db.user.isAuthenticated()){
+            querystring = '?user_id='+Ns.db.user.get('id');
         }
         
         url = "ws://"+ __websockets__.DOMAIN + __websockets__.PATH + ":" + __websockets__.PORT + "/" + querystring;
@@ -18,7 +18,7 @@
                     data = JSON.parse(msg.data);
                     // if we got a notification update the UI
                     if(data.model == 'notification'){
-                        Nodeshot.notifications.fetch({ reset: true })
+                        Ns.notifications.fetch({ reset: true })
                     }
                 }
                 catch(e){
@@ -35,7 +35,7 @@
             }
         }
     },
-    user = Nodeshot.currentUser;
+    user = Ns.db.user;
     
     user.on('change:username', function(){
         // close any previous connection if present

@@ -6,11 +6,11 @@
     <span class="status pull-left">
         <%= collection.total %> total
     </span>
-    <% _.each(Nodeshot.statuses, function(s, key){ %>
-        <span class="status pull-left <%= key %>"
-              data-slug="<%= key %>">
-            <%= s.nodes.length %>
-            <%= s.name.toLowerCase() %>
+    <% Ns.db.legend.toJSON().forEach(function(legend){ %>
+        <span class="status pull-left <%= legend.slug %>"
+              data-slug="<%= legend.slug %>">
+            <%= legend.count %>
+            <%= legend.name.toLowerCase() %>
         </span>
     <% }) %>
     <div class="clearfix"></div>
@@ -32,9 +32,9 @@
                 <label>{% trans 'Layer' %}</label>
                 <select id="layer-filter" class="selectpicker">
                     <option>{% trans 'All' %}</option>
-                    {% for layer in layers %}
-                    <option value="{{ layer.slug }}">{{ layer.name }}</option>
-                    {% endfor %}
+                    <% Ns.db.layers.forEach(function(layer){ %>
+                        <option value="<%= layer.get('slug') %>"><%= layer.get('name') %></option>
+                    <% }) %>
                 </select>
             </div>
 
@@ -42,8 +42,8 @@
                 <label>{% trans 'Status' %}</label>
                 <select id="status-filter" class="selectpicker">
                     <option>{% trans 'All' %}</option>
-                    <% _.each(Nodeshot.statuses, function(status, key){ %>
-                        <option value="<%=  key %>"><%= status.name %></option>
+                    <% Ns.db.legend.forEach(function(legend){ %>
+                        <option value="<%= legend.get('slug') %>"><%= legend.get('name') %></option>
                     <% }) %>
                 </select>
             </div>

@@ -1,43 +1,39 @@
-var MainMenuItemView = Backbone.Marionette.ItemView.extend({
-    tagName: "li",
-    template: "#main-menu-item-view-template",
-    className: function(){
-        // li element has "dropdown" css class if has got children otherwise no class
-        return this.model.get('children').length ? 'dropdown' : '';
-    }
-});
+(function(){
+    'use strict';
 
-var MainMenuEmptyView = Backbone.Marionette.ItemView.extend({
-    tagName: "li",
-    template: "#main-menu-empty-view-template"
-});
-
-var MainMenuView = Backbone.Marionette.CollectionView.extend({
-    el: "#main-menu-view",
-    childView: MainMenuItemView,
-    emptyView: MainMenuEmptyView,
-
-    initialize: function(){
-        this.initCollection()
-        // re-fetch collection when user logs in or out
-        this.listenTo(Nodeshot.currentUser, 'loggedin', this.fetch);
-        this.listenTo(Nodeshot.currentUser, 'loggedout', this.fetch);
-        this.render();
-    },
-
-    /*
-     * initalize collection if not already done
-     */
-    initCollection: function(){
-        if(this.collection === undefined){
-            this.collection = new MenuItemCollection(Nodeshot.data.menu);
+    var ItemView = Marionette.ItemView.extend({
+        tagName: 'li',
+        template: '#main-menu-item-view-template',
+        className: function(){
+            // li element has 'dropdown' css class if has got children otherwise no class
+            return this.model.get('children').length ? 'dropdown' : '';
         }
-    },
+    });
 
-    /*
-     * fetch collection
-     */
-    fetch: function(){
-        this.collection.fetch();
-    }
-});
+    var EmptyView = Marionette.ItemView.extend({
+        tagName: 'li',
+        template: '#main-menu-empty-view-template'
+    });
+
+    Ns.views.Menu = Marionette.CollectionView.extend({
+        el: '#main-menu-view',
+        childView: ItemView,
+        emptyView: EmptyView,
+
+        initialize: function(){
+            this.collection = Ns.db.menu;
+            // re-fetch collection when user logs in or out
+            this.listenTo(Ns.db.user, 'loggedin', this.fetch);
+            this.listenTo(Ns.db.user, 'loggedout', this.fetch);
+            this.listenTo(this.collection, 'sync', this.render);
+            this.render();
+        },
+
+        /*
+         * fetch collection
+         */
+        fetch: function(){
+            this.collection.fetch();
+        }
+    });
+})();

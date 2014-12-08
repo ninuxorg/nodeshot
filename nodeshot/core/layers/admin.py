@@ -24,7 +24,7 @@ class LayerAdmin(PublishActionsAdminMixin, GeoAdmin):
         'organization', 'email', 'is_external',
         'new_nodes_allowed', 'added', 'updated'
     )
-    list_filter   = ('is_external', 'is_published')
+    list_filter = ('is_external', 'is_published')
     search_fields = ('name', 'description', 'organization', 'email')
     filter_horizontal = ('mantainers',)
     prepopulated_fields = {'slug': ('name',)}
