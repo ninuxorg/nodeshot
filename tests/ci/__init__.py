@@ -1,11 +1,7 @@
-from __future__ import absolute_import
+from nodeshot.conf.celery import init_celery
 
-import os
-from nodeshot.conf.celery import Celery
-from django.conf import settings
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ci.settings')
+__all__ = ['app']
 
-app = Celery('ci')
-app.config_from_object('django.conf:settings')
-app.autodiscover_tasks(settings.INSTALLED_APPS, related_name='tasks')
+
+app = init_celery('ci')
