@@ -16,11 +16,20 @@ USE_TZ = True
 PROTOCOL = 'http' if DEBUG else 'https'
 PORT = getattr(settings, 'PORT', '8000') if DEBUG else None
 
-SITE_URL = '%s://%s' % (PROTOCOL, settings.DOMAIN)
-SITE_NAME = getattr(settings, 'SITE_NAME', 'Nodeshot instance')
+if PORT and str(PORT) not in ['80', '443']:
+    PORT_STRING = ':%s' % PORT
+else:
+    PORT_STRING = ''
 
-if PORT and PORT not in ['80', '443']:
-    SITE_URL = '%s:%s' % (SITE_URL, PORT)
+SUBDIR = getattr(settings, 'SUBDIR', '')
+
+if SUBDIR and not SUBDIR.startswith('/'):
+    SUBDIR = '/%s' % SUBDIR
+elif SUBDIR and SUBDIR.endswith('/'):
+    SUBDIR = SUBDIR[0:-1]
+
+SITE_URL = '%s://%s%s%s' % (PROTOCOL, settings.DOMAIN, PORT_STRING, SUBDIR)
+SITE_NAME = getattr(settings, 'SITE_NAME', 'Nodeshot instance')
 
 MEDIA_ROOT = '%s/media/' % settings.SITE_ROOT
 

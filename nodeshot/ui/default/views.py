@@ -5,7 +5,6 @@ from rest_framework.renderers import JSONRenderer
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Status
 from nodeshot.core.cms.models import MenuItem
-from nodeshot.community.profiles.models import Profile
 from nodeshot.core.layers.serializers import LayerListSerializer
 from nodeshot.core.nodes.serializers import StatusListSerializer
 from nodeshot.core.cms.serializers import MenuSerializer
@@ -40,6 +39,7 @@ def index(request):
         'menu': json.render(menu),
         'user': json.render(user),
         # settings
+        'SITE_URL': ui_settings.settings.SITE_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
         # participation settings

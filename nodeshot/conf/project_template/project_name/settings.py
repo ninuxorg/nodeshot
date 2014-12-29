@@ -16,6 +16,7 @@ WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 
 DEBUG = True
 DOMAIN = '<domain>'
+SUBDIR = '/'  # edit this line if you are installing in a sub directory, like /nodeshot
 SITE_NAME = '{{ project_name }}'  # site name, you can change this
 
 DATABASES = {
