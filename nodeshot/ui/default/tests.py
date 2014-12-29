@@ -530,6 +530,7 @@ class DefaultUiTest(TestCase):
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
 
         # ensure elements have been hidden
+        sleep(0.3)
         self.assertFalse(legend.is_displayed())
         self.assertFalse(toolbar.is_displayed())
         cluster = browser.find_element_by_css_selector('#map-js .cluster')
