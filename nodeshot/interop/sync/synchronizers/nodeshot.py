@@ -22,8 +22,9 @@ class NodeshotMixin(object):
     SCHEMA = [
         {
             'name': 'layer_url',
-            'class': 'URLField',
+            'class': 'CharField',
             'kwargs': {
+                'max_length': 255,
                 'help_text': _('URL of external layer, in the form of https://HOST/api/v1/layers/LAYER_NAME/')
             }
         },

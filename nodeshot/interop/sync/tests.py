@@ -1,15 +1,12 @@
 import sys
-import simplejson as json
-import requests
+
 from cStringIO import StringIO
-from datetime import date, timedelta
 
 from django.test import TestCase
 from django.core import management
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.contrib.gis.geos import Point, GEOSGeometry
-from django.conf import settings
 
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
@@ -91,7 +88,7 @@ class SyncTest(TestCase):
         output = capture_output(
             management.call_command,
             ['sync'],
-            { 'exclude': 'vienna,test' }
+            {'exclude': 'vienna,test'}
         )
         self.assertIn('no layers to process', output)
 
@@ -107,7 +104,7 @@ class SyncTest(TestCase):
     def test_celery_task_with_exclude(self):
         output = capture_output(
             synchronize_external_layers.apply,
-            kwargs={ 'kwargs': { 'exclude': 'vienna,test' } }
+            kwargs={'kwargs': {'exclude': 'vienna,test'}}
         )
         self.assertIn('no layers to process', output)
 
@@ -170,7 +167,7 @@ class SyncTest(TestCase):
         # loop over all synchronizer and try them all
         for sync_tuple in SYNCHRONIZERS:
             path = sync_tuple[0]
-            response = self.client.post(url, { "synchronizer_path": path })
+            response = self.client.post(url, {"synchronizer_path": path})
             # ensure http response is ok
             self.assertEqual(response.status_code, 200)
             # ensure data has really changed
@@ -247,7 +244,7 @@ class SyncTest(TestCase):
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -271,7 +268,7 @@ class SyncTest(TestCase):
         self.assertEqual(node.updated.strftime('%Y-%m-%d'), '2013-07-10')
         self.assertEqual(node.added.strftime('%Y-%m-%d'), '2011-08-24')
 
-        ### --- with the following step we expect some nodes to be deleted --- ###
+        # --- with the following step we expect some nodes to be deleted --- #
 
         external.url = '%s/openwisp-georss2.xml' % TEST_FILES_PATH
         external.full_clean()
@@ -280,7 +277,7 @@ class SyncTest(TestCase):
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -319,7 +316,7 @@ class SyncTest(TestCase):
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -339,12 +336,12 @@ class SyncTest(TestCase):
         self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
         self.assertEqual(node.elev, 10.0)
 
-        ### --- repeat --- ###
+        # --- repeat --- #
 
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -354,7 +351,7 @@ class SyncTest(TestCase):
         self.assertIn('2 total external', output)
         self.assertIn('2 total local', output)
 
-        ### --- repeat with slightly different input --- ###
+        # --- repeat with slightly different input --- #
 
         external.url = '%s/geojson2.json' % TEST_FILES_PATH
         external.full_clean()
@@ -363,7 +360,7 @@ class SyncTest(TestCase):
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -390,14 +387,14 @@ class SyncTest(TestCase):
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
         external._reload_schema()
-        external.config = { "url": url }
+        external.config = {"url": url}
         external.full_clean()
         external.save()
 
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -434,7 +431,7 @@ class SyncTest(TestCase):
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -458,7 +455,7 @@ class SyncTest(TestCase):
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
         # no changes
         self.assertIn('0 nodes added', output)
@@ -480,14 +477,14 @@ class SyncTest(TestCase):
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoRss'
         external._reload_schema()
-        external.config = { "url": url }
+        external.config = {"url": url}
         external.full_clean()
         external.save()
 
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -510,12 +507,12 @@ class SyncTest(TestCase):
         geometry = GEOSGeometry('POINT (-70.92 44.256)')
         self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
 
-        ### --- repeat --- ###
+        # --- repeat --- #
 
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -537,14 +534,14 @@ class SyncTest(TestCase):
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoRss'
         external._reload_schema()
-        external.config = { "url": url }
+        external.config = {"url": url}
         external.full_clean()
         external.save()
 
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -563,16 +560,15 @@ class SyncTest(TestCase):
         node = Node.objects.get(slug='test-2')
         self.assertEqual(node.name, 'test 2')
         self.assertEqual(node.address, '')
-        #self.assertEqual(node.updated.strftime('%Y-%m-%d'), '2006-08-17')
         geometry = GEOSGeometry('POINT (95.8932 5.6319)')
         self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
 
-        ### --- repeat --- ###
+        # --- repeat --- #
 
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
-            kwargs={ 'verbosity': 0 }
+            kwargs={'verbosity': 0}
         )
 
         # ensure following text is in output
@@ -591,7 +587,7 @@ class SyncTest(TestCase):
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Nodeshot'
         external._reload_schema()
-        external.layer_url = "https://test.map.ninux.org/api/v1/layers/sicilia/"
+        external.layer_url = "%s/api/v1/layers/rome/" % settings.SITE_URL
         external.full_clean()
         external.verify_ssl = False
         external.full_clean()
