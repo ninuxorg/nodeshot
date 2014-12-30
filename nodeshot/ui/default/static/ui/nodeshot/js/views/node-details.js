@@ -18,23 +18,20 @@
         events: {
             // actions
             'click .icon-link': 'permalink',
-
             // vote
             'click .icon-thumbs-up': 'like',
             'click .icon-thumbs-down': 'dislike',
-
             // comments
             'keypress @ui.commentTextarea': 'keyPressCommentTextarea',
             'keydown @ui.commentTextarea': 'keyDownCommentTextarea',
             'keyup @ui.commentTextarea': 'keyUpCommentTextarea',
             'focusout @ui.commentTextarea': 'focusOutCommentTextarea',
             'submit form.new-comment': 'submitComment',
-
             // rate
             'mouseover @ui.stars': 'mouseOverStar',
             'mouseout @ui.stars': 'mouseOutStar',
             'click @ui.stars': 'rate',
-
+            // go back
             'click .icon-close': 'goBack'
         },
 
@@ -45,8 +42,6 @@
         initialize: function () {
             // bind to namespaced events
             $(window).on("resize.node-details", _.bind(this.resize, this));
-            // fetch details from DB
-            this.model.fetch();
             this.listenTo(Ns.db.user, 'loggedin loggedout', this.render);
             // trick for background color
             $('html').css('background-color', '#aba49c');
@@ -55,8 +50,9 @@
         onShow: function () {
             var map = $.loadDjangoLeafletMap(),
                 geomodel = new Ns.models.Geo(this.model.toJSON()),
-                leaflet = geomodel.toLeaflet();
-            
+                leaflet = geomodel.toLeaflet(),
+                mapPreferences = localStorage.getObject('map') || Ns.settings.map;
+
             map.fitBounds(leaflet.getBounds());
             // add leaflet layer to map
             map.addLayer(leaflet);
@@ -78,11 +74,9 @@
             $('.hastip').tooltip();
 
             // store coordinates in preferences
-            if(this.model && this.model.get('geometry')){
-                var coords = this.model.get('geometry').coordinates;
-                Ns.preferences.mapLat = coords[1];
-                Ns.preferences.mapLng = coords[0];
-            }
+            mapPreferences.lat = leaflet.getBounds().getCenter().lat
+            mapPreferences.lng = leaflet.getBounds().getCenter().lng
+            localStorage.setObject('map', mapPreferences);
         },
 
         /*

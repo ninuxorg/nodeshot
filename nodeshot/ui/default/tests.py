@@ -120,10 +120,10 @@ class DefaultUiTest(TestCase):
         self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
 
     def test_map(self):
+        self._reset()
+        self._hashchange('#map')
         browser = self.browser
         LEAFLET_MAP = self.LEAFLET_MAP
-        self._hashchange('#map')
-
         # basic test
         self.assertTrue(browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'map-container'"))
         browser.find_element_by_css_selector('#map-js.leaflet-container')
@@ -726,6 +726,7 @@ class DefaultUiTest(TestCase):
         # log in
         self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
+        sleep(0.2)
 
         # open notifications
         self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
