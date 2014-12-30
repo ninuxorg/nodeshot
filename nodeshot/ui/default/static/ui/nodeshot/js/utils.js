@@ -138,28 +138,26 @@
     */
     $.toggleLoading = function (operation) {
         var loading = $('#loading'),
-        dimensions;
-
+            dimensions;
+        // create loading div if not already present
         if (!loading.length) {
             $('body').append(_.template($('#loading-template').html()));
             loading = $('#loading');
-
             dimensions = loading.getHiddenDimensions();
             loading.outerWidth(dimensions.width);
             loading.css({
                 left: 0,
                 margin: '0 auto'
             });
-
             // close loading
             $('#loading .icon-close').click(function (e) {
                 $.toggleLoading();
-                if (Ns.currentXHR) {
-                    Ns.currentXHR.abort();
+                if (Ns.state.currentAjaxRequest) {
+                    Ns.state.currentAjaxRequest.abort();
                 }
             });
         }
-
+        // show, hide or toggle
         if (operation === 'show') {
             loading.fadeIn(255);
         } else if (operation === 'hide') {

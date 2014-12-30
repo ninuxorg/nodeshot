@@ -38,6 +38,12 @@ class DefaultUiTest(TestCase):
         self.browser.get('%s%s' % (self.INDEX_URL, hash))
         WebDriverWait(self.browser, 10).until(ajax_complete, 'Timeout')
 
+    def _reset(self):
+        """ reset browser (clear localstorage and go to index) """
+        self._hashchange('#/')
+        self.browser.execute_script('localStorage.clear()')
+        self.browser.refresh()
+
     @classmethod
     def setUpClass(cls):
         cls.browser = webdriver.Firefox()
@@ -114,11 +120,11 @@ class DefaultUiTest(TestCase):
         self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
 
     def test_map(self):
-        self._hashchange('#/map')
         browser = self.browser
+        LEAFLET_MAP = self.LEAFLET_MAP
+        self._hashchange('#map')
 
         # basic test
-        LEAFLET_MAP = self.LEAFLET_MAP
         self.assertTrue(browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'map-container'"))
         browser.find_element_by_css_selector('#map-js.leaflet-container')
         self.assertTrue(browser.execute_script("return %s._leaflet_id > -1" % LEAFLET_MAP))
@@ -173,11 +179,45 @@ class DefaultUiTest(TestCase):
         self.assertEqual(browser.execute_script('return $("#map-js .cluster.marker-active").length'), 1)
         self.assertEqual(browser.execute_script('return $("#map-js .cluster.marker-potential").length'), 1)
 
-    def test_map_popup(self):
+    def test_map_data_caching_and_reload(self):
+        self._reset()
         browser = self.browser
+        # ensure Ns.db.geo is empty
+        self.assertTrue(browser.execute_script('return Ns.db.geo.isEmpty() === true'))
+        self._hashchange('#map')
+        # ensure Ns.db.geo is not empty anymore (cached)
+        self.assertTrue(browser.execute_script('return Ns.db.geo.isEmpty() === false'))
+        # ensure node with higher ACL not visible
+        self.assertTrue(browser.execute_script("return Ns.db.geo.get('hidden-rome') === undefined"))
 
-        # changing url fragment opens popup
+        # log in as admin
+        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
+        sleep(0.2)
+        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
+        username.clear()
+        username.send_keys('admin')
+        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
+        password.clear()
+        password.send_keys('tester')
+        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
+        sleep(0.3)
+        # ensure node with higher ACL is now visible
+        self.assertFalse(browser.execute_script("return Ns.db.geo.get('hidden-rome') === undefined"))
+
+        # log out
+        self.browser.find_element_by_css_selector('#js-username').click()
+        self.browser.find_element_by_css_selector('#js-logout').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
+
+        # ensure node with higher ACL not visible anymore
+        self.assertTrue(browser.execute_script("return Ns.db.geo.get('hidden-rome') === undefined"))
+
+    def test_map_popup(self):
+        self._reset()
         self._hashchange('#/map/pomezia')
+        browser = self.browser
+        # changing url fragment opens popup
         sleep(0.2)
         self.assertEqual(len(browser.find_elements_by_css_selector('#map-js .leaflet-popup-content-wrapper')), 1)
         self.assertEqual(browser.find_element_by_css_selector('#map-js .leaflet-popup-content-wrapper h4').text, 'Pomezia')
@@ -501,9 +541,9 @@ class DefaultUiTest(TestCase):
         self.assertEqual(browser.execute_script("return $('#map-js .marker-potential.cluster').length"), 1)
 
     def test_map_add_node(self):
-        self._hashchange('#/map')
         browser = self.browser
         leaflet_map = self.LEAFLET_MAP
+        self._hashchange('#map')
         # test for a toggleLeafletLayers() bug
         browser.find_element_by_css_selector('#map-toolbar .icon-pin-add').click()
         sleep(0.2)
@@ -632,7 +672,7 @@ class DefaultUiTest(TestCase):
     def test_login_and_logout(self):
         # open sign in modal
         self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
-        sleep(0.5)
+        sleep(0.2)
         # insert credentials
         username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
         username.clear()
@@ -675,7 +715,7 @@ class DefaultUiTest(TestCase):
     def test_notifications(self):
         # open sign in modal
         self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
-        sleep(0.5)
+        sleep(0.2)
         # insert credentials
         username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
         username.clear()

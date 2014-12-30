@@ -1,9 +1,9 @@
 (function() {
     'use strict';
-    
+
     Ns.models = {};
     Ns.collections = {};
-    
+
     Ns.models.Base = Backbone.Model.extend({
         url: function () {
             var origUrl = Backbone.Model.prototype.url.call(this);
@@ -73,18 +73,6 @@
     Ns.collections.Geo = Backbone.Collection.extend({
         _url: Ns.url('layers/:slug/nodes.geojson'),
         model: Ns.models.Geo,
-
-        /*
-        * fetch contents and merges it with the previous ones
-        */
-        merge: function (options) {
-            options = $.extend({
-                add: true,
-                merge: true,
-                remove: false
-            }, options);
-            return this.fetch(options);
-        },
 
         /*
         * adds slug to object attributes

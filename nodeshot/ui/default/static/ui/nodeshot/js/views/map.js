@@ -99,9 +99,7 @@
             // populate map as items are added to collection
             'add': 'addGeoModelToMap',
             // remove items from map when models are removed
-            'remove': 'removeGeoModelFromMap',
-            // cache map data for subsequent page views
-            'ready': 'cacheMapData'
+            'remove': 'removeGeoModelFromMap'
         },
 
         initialize: function (options) {
@@ -109,7 +107,7 @@
             this.collection = new Ns.collections.Geo();
             this.popUpTemplate = _.template($('#map-popup-template').html());
             // reload data when user logs in or out
-            this.listenTo(Ns.db.user, 'loggedin loggedout', this.reloadMapData);
+            this.listenTo(Ns.db.user, 'loggedin loggedout', this.fetchMapData);
             // bind to namespaced events
             $(window).on('resize.map', _.bind(this.resize, this));
             $(window).on('beforeunload.map', _.bind(this.storeMapProperties, this));
@@ -120,7 +118,7 @@
         onShow: function () {
             this.initMap();
             // load data
-            this.loadMapData();
+            this.initMapData();
         },
 
         onDestroy: function (e) {
@@ -227,29 +225,20 @@
         /*
          * loads data from API
          */
-        loadMapData: function () {
+        initMapData: function () {
             // create (empty) clusters on map (will be filled by addGeoModelToMap)
             this.createClusters();
-            // load data if not present
-            if (Ns.db.geo.isEmpty()) {
-                var self = this,
-                    // trigger collection ready after all sources have been fetched
-                    ready = _.after(Ns.db.layers.length, function () {
-                        self.collection.trigger('ready');
-                        // unbind event
-                        self.collection.off('sync', ready);
-                    });
-                this.collection.on('sync', ready);
-                // fetch data from API
-                Ns.db.layers.forEach(function (layer) {
-                    self.collection.merge({ slug: layer.id });
-                });
-            }
-            // otherwise use the cached geo collection
-            else {
+            // load cached data if present
+            if (Ns.db.geo.isEmpty() === false) {
                 this.collection.add(Ns.db.geo.models);
                 this.collection.trigger('ready');
+                // disable loading indicator while data gets refreshed
+                Ns.state.autoToggleLoading = false;
+                // re-enable once refreshed
+                this.collection.once('ready', function(){ Ns.state.autoToggleLoading = true });
             }
+            // always refresh data from server to ensure consistency
+            this.fetchMapData();
             // toggle legend group from map when visible attribute changes
             this.listenTo(Ns.db.legend, 'change:visible', this.toggleLegendGroup);
             // toggle layer data when visible attribute changes
@@ -257,18 +246,33 @@
         },
 
         /*
-        * cache map data (in memory) for subsequent requests
-        */
-        cacheMapData: function () {
-            Ns.db.geo = this.collection.clone();
-        },
-
-        /*
-         * clear collection and reload data
+         * fetch map data, merging changes if necessary
          */
-        reloadMapData: function () {
-            this.collection.remove(this.collection.models);
-            this.loadMapData();
+        fetchMapData: function () {
+            var self = this,
+                // will contain fresh data
+                geo = new Ns.collections.Geo(),
+                // will be used to fetch data to merge in geo
+                tmp = geo.clone(),
+                ready;
+            // will be called when all sources have been fetched
+            ready = _.after(Ns.db.layers.length, function () {
+                self.collection.set(geo.models);
+                // cache geo collection
+                Ns.db.geo = self.collection;
+                // trigger ready event
+                self.collection.trigger('ready');
+                // unbind event
+                self.collection.off('sync', ready);
+            });
+            geo.on('sync', ready);
+            // fetch data from API
+            Ns.db.layers.forEach(function (layer) {
+                tmp.fetch({ slug: layer.id }).done(function () {
+                    geo.add(tmp.models);
+                    geo.trigger('sync');
+                });
+            });
         },
 
         createClusters: function () {

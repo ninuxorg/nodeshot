@@ -6,6 +6,12 @@
         node: {}
     };
 
+    // auxiliary object that keeps some details about the state of the app
+    Ns.state = {
+        currentAjaxRequest: null,
+        autoToggleLoading: true
+    };
+
     Ns.url = function(resource){
         return Ns.settings.api + resource;
     };
@@ -321,11 +327,15 @@
         if (settings.url.indexOf('notifications') > -1) {
             return;
         }
-        $.toggleLoading('show');
-        Ns.currentXHR = xhr;
+        if (Ns.state.autoToggleLoading) {
+            $.toggleLoading('show');
+        }
+        Ns.state.currentAjaxRequest = xhr;
     });
 
     $(document).ajaxStop(function () {
-        $.toggleLoading('hide');
+        if (Ns.state.autoToggleLoading) {
+            $.toggleLoading('hide');
+        }
     });
 }());
