@@ -1006,7 +1006,7 @@
             this.toggleHidden();
             // show step1
             dialog.css({
-                width: dialog_dimensions.width,
+                width: dialog_dimensions.width+2,
                 right: 0
             });
             dialog.fadeIn(255);
@@ -1044,7 +1044,7 @@
             dialog = self.ext.step2,
             dialog_dimensions = dialog.getHiddenDimensions();
             dialog.css({
-                width: dialog_dimensions.width,
+                width: dialog_dimensions.width+2,
                 right: 0
             });
             dialog.fadeIn(255);
