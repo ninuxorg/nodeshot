@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    
+
     Ns.views = {
         map: {},
         node: {}
@@ -118,7 +118,7 @@
             // TODO this should be inside view
             $('#nav-bar a[href="#/map"]').trigger('click').parent().addClass('active');
         },
-        
+
         addNode: function () {
             this.getMap();
             Ns.body.currentView.addNode();

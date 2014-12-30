@@ -720,6 +720,7 @@
         Ns.db.legend = new Ns.collections.Legend({{ legend|safe }});
         Ns.db.layers = new Ns.collections.Layer({{ layers|safe }});
         Ns.db.user = new Ns.models.User({{ user|safe }});
+        Ns.db.geo = new Ns.collections.Geo();  // fetch later
     </script>
 
     {% nodeshot_map "map-js" creatediv=False %}

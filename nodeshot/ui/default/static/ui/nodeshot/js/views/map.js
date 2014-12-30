@@ -1,10 +1,10 @@
 (function(){
     'use strict';
-    
+
     Ns.views.map.Layout = Marionette.LayoutView.extend({
         id: 'map-container',
         template: '#map-layout-template',
-    
+
         regions: {
             content: '#map-js',
             legend: '#legend-js',
@@ -12,7 +12,7 @@
             toolbar: '#map-toolbar',
             add: '#map-add-node-js'
         },
-    
+
         /**
          * show regions
          */
@@ -23,7 +23,7 @@
             this.panels.show(new Ns.views.map.Panels(options));
             this.legend.show(new Ns.views.map.Legend(options));
         },
-        
+
         /*
          * show add node view
          */
@@ -31,7 +31,7 @@
             this.reset();
             this.add.show(new Ns.views.map.Add({ parent: this }));
         },
-    
+
         /*
          * resets to view initial state
          */
@@ -39,9 +39,9 @@
             this.content.currentView.closeLeafletPopup();
             this.add.empty();
         }
-    
+
     }, {  // static methods
-    
+
         /*
          * Resize page elements so that the leaflet map
          * takes most of the available space in the window
@@ -83,17 +83,19 @@
             }
         }
     });
-    
+
     Ns.views.map.Content = Marionette.ItemView.extend({
         template: false,
-    
+
         collectionEvents: {
             // populate map as items are added to collection
             'add': 'addGeoModelToMap',
             // remove items from map when models are removed
-            'remove': 'removeGeoModelFromMap'
+            'remove': 'removeGeoModelFromMap',
+            // cache map data for subsequent page views
+            'ready': 'cacheMapData'
         },
-    
+
         initialize: function (options) {
             this.parent = options.parent;
             this.collection = new Ns.collections.Geo();
@@ -106,13 +108,13 @@
             // TODO: de-uglyfy
             Ns.onNodeClose = '#/map';
         },
-    
+
         onShow: function () {
             this.initMap();
             // load data
             this.loadMapData();
         },
-    
+
         onDestroy: function (e) {
             // store current coordinates when changing view
             this.storeMapProperties();
@@ -120,7 +122,7 @@
             $(window).off('beforeunload.map');
             $(window).off('resize.map');
         },
-    
+
         /*
          * get current map coordinates (lat, lng, zoom)
          */
@@ -133,21 +135,21 @@
                 baseLayer: this.getCurrentBaseLayer()
             };
         },
-    
+
         /*
          * store current map coordinates in localStorage
          */
         storeMapProperties: function () {
             localStorage.setObject('map', this.getMapProperties());
         },
-    
+
         /*
          * get latest stored coordinates or default ones
          */
         rememberMapProperties: function () {
             return localStorage.getObject('map') || Ns.settings.map;
         },
-    
+
         /*
          * resize window event
          */
@@ -159,7 +161,7 @@
                 $('.mask').trigger('click');
             }
         },
-    
+
         /*
          * initialize leaflet map
          */
@@ -182,7 +184,7 @@
             });
             this.switchBaseLayer(coords.baseLayer);
         },
-        
+
         /**
          * changes base layer of the map, only if necessary
          * (calling the same action twice has no effect)
@@ -201,7 +203,7 @@
                 this.map.addLayer(this.baseLayers[name]);
             }
         },
-        
+
         /**
          * returns name of the current map base layer
          */
@@ -213,31 +215,46 @@
             }
             return null;
         },
-    
+
         /*
          * loads data from API
          */
         loadMapData: function () {
-            var self = this,
-                // trigger collection ready after all sources have been fetched
-                ready = _.after(Ns.db.layers.length, function () {
-                    self.collection.trigger('ready');
-                    // unbind event
-                    self.collection.off('sync', ready);
-                });
-            this.collection.on('sync', ready);
             // create (empty) clusters on map (will be filled by addGeoModelToMap)
             this.createClusters();
-            // fetch data from API
-            Ns.db.layers.forEach(function (layer) {
-                self.collection.merge({ slug: layer.id });
-            });
+            // load data if not present
+            if (Ns.db.geo.isEmpty()) {
+                var self = this,
+                    // trigger collection ready after all sources have been fetched
+                    ready = _.after(Ns.db.layers.length, function () {
+                        self.collection.trigger('ready');
+                        // unbind event
+                        self.collection.off('sync', ready);
+                    });
+                this.collection.on('sync', ready);
+                // fetch data from API
+                Ns.db.layers.forEach(function (layer) {
+                    self.collection.merge({ slug: layer.id });
+                });
+            }
+            // otherwise use the cached geo collection
+            else {
+                this.collection.add(Ns.db.geo.models);
+                this.collection.trigger('ready');
+            }
             // toggle legend group from map when visible attribute changes
             this.listenTo(Ns.db.legend, 'change:visible', this.toggleLegendGroup);
             // toggle layer data when visible attribute changes
             this.listenTo(Ns.db.layers, 'change:visible', this.toggleLayerData);
         },
-        
+
+        /*
+        * cache map data (in memory) for subsequent requests
+        */
+        cacheMapData: function () {
+            Ns.db.geo = this.collection.clone();
+        },
+
         /*
          * clear collection and reload data
          */
@@ -245,7 +262,7 @@
             this.collection.remove(this.collection.models);
             this.loadMapData();
         },
-        
+
         createClusters: function () {
             var self = this,
                 legend;
@@ -288,7 +305,7 @@
                 }
             });
         },
-    
+
         /**
          * adds a geo model to its cluster
          * binds popup
@@ -319,7 +336,7 @@
                 legend.cluster.addLayer(leafletLayer);
             }
         },
-    
+
         /**
          * remove geo model from its cluster
          * called whenever a model is removed from the collection
@@ -328,7 +345,7 @@
             var cluster = model.get('legend').cluster;
             cluster.removeLayer(model.get('leaflet'));
         },
-        
+
         /*
          * show / hide from map items of a legend group
          */
@@ -336,7 +353,7 @@
             var method = (visible) ? 'addLayer' : 'removeLayer';
             this.map[method](legend.cluster);
         },
-    
+
         /*
         * show / hide from map items of a legend group
         */
@@ -347,7 +364,7 @@
                 geo.get('legend').cluster[method](geo.get('leaflet'));
             });
         },
-    
+
         /*
          * Open leaflet popup of the specified element
          */
@@ -386,7 +403,7 @@
             }
             return;
         },
-    
+
         /*
          * Close leaflet popup if open
          */
@@ -397,26 +414,26 @@
             }
         }
     });
-    
+
     Ns.views.map.Legend = Marionette.ItemView.extend({
         id: 'map-legend',
         className: 'overlay inverse',
         template: '#map-legend-template',
-    
+
         ui: {
             'close': 'a.icon-close'
         },
-    
+
         events: {
             'click @ui.close': 'toggleLegend',
             'click li a': 'toggleGroup'
         },
-    
+
         collectionEvents: {
             // automatically render when toggling group or recounting
             'change:visible counted': 'render'
         },
-    
+
         initialize: function (options) {
             this.parent = options.parent;
             this.collection = Ns.db.legend;
@@ -425,7 +442,7 @@
             this.listenTo(this.parent.content.currentView.collection, 'ready', this.count);
             this.listenTo(Ns.db.layers, 'change:visible', this.count);
         },
-    
+
         onRender: function () {
             // default is true
             if (localStorage.getObject('legendOpen') === false) {
@@ -434,7 +451,7 @@
                 this.legendButton.addClass('disabled');
             }
         },
-    
+
         /*
          * calculate counts
          */
@@ -445,17 +462,17 @@
             // trigger once all legend items have been counted
             this.collection.trigger('counted');
         },
-    
+
         /*
          * open or close legend
          */
         toggleLegend: function (e) {
             e.preventDefault();
-    
+
             var legend = this.$el,
                 button = this.legendButton,
                 open;
-    
+
             if (legend.is(':visible')) {
                 legend.fadeOut(255);
                 button.removeClass('disabled');
@@ -467,10 +484,10 @@
                 button.tooltip('disable').tooltip('hide');
                 open = true;
             }
-    
+
             localStorage.setItem('legendOpen', open);
         },
-    
+
         /*
          * enable or disable something on the map
          * by clicking on its related legend control
@@ -482,10 +499,10 @@
             item.set('visible', !item.get('visible'));
         }
     });
-    
+
     Ns.views.map.Toolbar = Marionette.ItemView.extend({
         template: '#map-toolbar-template',
-    
+
         ui: {
             'buttons': 'a',
             'switchMapMode': '#btn-map-mode',
@@ -494,7 +511,7 @@
             'prefButton': 'a.icon-config',
             'layersControl': 'a.icon-layer-2'
         },
-    
+
         events: {
             'click .icon-pin-add': 'addNode',
             'click @ui.buttons': 'togglePanel',
@@ -502,11 +519,11 @@
             // siblings events
             'click @ui.legendButton': 'toggleLegend'
         },
-    
+
         initialize: function (options) {
             this.parent = options.parent;
         },
-    
+
         onRender: function () {
             var self = this;
             // init tooltip
@@ -532,7 +549,7 @@
                 }
             });
         },
-    
+
         /*
          * show / hide map toolbar on narrow screens
          */
@@ -564,7 +581,7 @@
             }
             Ns.views.map.Layout.resizeMap();
         },
-        
+
         /*
          * proxy to call add node
          */
@@ -572,21 +589,21 @@
             e.preventDefault();
             this.parent.addNode();
         },
-    
+
         /*
          * redirects to Ns.views.map.Panels
          */
         toggleLegend: function (e) {
             this.parent.legend.currentView.toggleLegend(e);
         },
-    
+
         /*
          * redirects to Ns.views.map.Panels
          */
         togglePanel: function (e) {
             this.parent.panels.currentView.togglePanel(e);
         },
-    
+
         /*
          * toggle 3D or 2D map
          */
@@ -595,17 +612,17 @@
             $.createModal({message: 'not implemented yet'});
         }
     });
-    
+
     Ns.views.map.Panels = Marionette.ItemView.extend({
         template: '#map-panels-template',
-    
+
         ui: {
             'switches': 'input.switch',
             'scrollers': '.scroller',
             'selects': '.selectpicker',
             'tools': '.tool'
         },
-    
+
         events: {
             'submit #fn-search-address form': 'searchAddress',
             'click #fn-map-tools .tool': 'toggleTool',
@@ -614,7 +631,7 @@
             'switch-change #fn-map-layers .toggle-layer-data': 'toggleLayer',
             'switch-change #fn-map-layers .toggle-legend-data': 'toggleLegend'
         },
-    
+
         initialize: function (options) {
             this.parent = options.parent;
             this.mapView = this.parent.content.currentView;
@@ -624,7 +641,7 @@
             this.listenTo(Ns.db.legend, 'change:visible', this.syncLegendSwitch);
             this.populateBaseLayers();
         },
-        
+
         // populate this.baseLayers
         populateBaseLayers: function () {
             var self = this,
@@ -639,7 +656,7 @@
                 });
             });
         },
-        
+
         serializeData: function(){
             return {
                 'layers': Ns.db.layers.toJSON(),
@@ -647,7 +664,7 @@
                 'baseLayers': this.baseLayers
             }
         },
-    
+
         onRender: function () {
             this.ui.tools.tooltip();
             // activate switch
@@ -662,13 +679,13 @@
                 style: 'btn-special'
             });
         },
-    
+
         /*
          * show / hide toolbar panels
          */
         togglePanel: function (e) {
             e.preventDefault();
-    
+
             var button = $(e.currentTarget),
                 panelId = button.attr('data-panel'),
                 panel = $('#' + panelId),
@@ -676,22 +693,22 @@
                 // determine distance from top
                 distanceFromTop = button.offset().top - $('body > header').eq(0).outerHeight(),
                 preferencesHeight;
-    
+
             // if no panel return here
             if (!panel.length) {
                 return;
             }
-    
+
             // hide any open tooltip
             $('#map-toolbar .tooltip').hide();
             panel.css('top', distanceFromTop);
-    
+
             // adjust height of panel if marked as 'adjust-height'
             if (panel.hasClass('adjust-height')) {
                 preferencesHeight = $('#map-toolbar').height() - distanceFromTop - 18;
                 panel.height(preferencesHeight);
             }
-    
+
             panel.fadeIn(25, function () {
                 panel.find('.scroller').scroller('reset');
                 button.addClass('active');
@@ -712,7 +729,7 @@
                 });
             });
         },
-    
+
         /*
          * toggle map tool
          */
@@ -736,14 +753,14 @@
             //    button.tooltip('enable');
             //}
         },
-    
+
         /*
          * proxy to Ns.views.map.Toolbar.toggleToolbar
          */
         toggleToolbar: function (e) {
             this.toolbarView.toggleToolbar(e);
         },
-    
+
         /*
          * search for an address
          * put a marker on the map and zoom in
@@ -783,7 +800,7 @@
                 }
             });
         },
-    
+
         /*
          * remove the marker added in searchAddress
          */
@@ -799,7 +816,7 @@
                 });
             }
         },
-        
+
         /**
          * changes base layer of the map
          * proxy to Ns.views.map.Content.switchBaseLayer
@@ -807,7 +824,7 @@
         switchBaseLayer: function (event) {
             this.mapView.switchBaseLayer($(event.target).attr('data-name'));
         },
-    
+
         /**
          * hide / show layer data on map
          */
@@ -815,14 +832,14 @@
             var layer = Ns.db.layers.get(data.el.attr('data-slug'));
             layer.set('visible', data.value);
         },
-        
+
         /**
          * hide / show legend data on map
          */
         toggleLegend: function(event, data){
             this.parent.legend.currentView.$('a[data-status=' + data.el.attr('data-slug') + ']').trigger('click');
         },
-        
+
         /**
          * sync legend state with switches in panel
          */
@@ -834,22 +851,22 @@
             }
         }
     });
-    
+
     Ns.views.map.Add = Marionette.ItemView.extend({
         template: '#map-add-node-template',
         tagName: 'article',
-        
+
         ui: {
             'form': '#add-node-form',
             'select': '#add-node-form select',
             'address': '#id_address'
         },
-        
+
         events: {
             'click #add-node-form .btn-default': 'destroy',
             'submit #add-node-form': 'submitAddNode'
         },
-        
+
         initialize: function (options) {
             this.parent = options.parent;
             // references to objects of other views
@@ -869,11 +886,11 @@
             // needed for toggleLeafletLayers
             this.dimmed = false;
         },
-        
+
         serializeData: function(){
             return { 'layers': Ns.db.layers.toJSON() };
         },
-        
+
         onShow: function () {
             Ns.router.navigate('map/add');
             this.ui.select.selectpicker({ style: 'btn-special' });
@@ -885,7 +902,7 @@
                 this.listenToOnce(this.ext.geo, 'ready', this.step1);
             }
         },
-        
+
         /*
          * when the view is destroyed the map is taken backto its original state
          */
@@ -896,14 +913,14 @@
                 Ns.router.navigate('map');
             }
         },
-        
+
         /*
          * proxy to Ns.views.map.Layout.resizeMap
          */
         resizeMap: function() {
             Ns.views.map.Layout.resizeMap();
         },
-        
+
         /*
          * hide elements that are not needed when adding a new node
          * show them back when finished
@@ -913,7 +930,7 @@
             this.resizeMap(),
             this.toggleLeafletLayers();
         },
-        
+
         /*
          * dim out leaflet layers from map when adding a new node
          * reset default options when finished
@@ -950,7 +967,7 @@
             // change dimmed state
             this.dimmed = dimOut;
         },
-        
+
         /*
          * step1 of adding a new node
          */
@@ -980,7 +997,7 @@
                 self.step2(e);
             });
         },
-        
+
         step2: function (e) {
             var self = this,
                 dialog = this.ext.step2,
@@ -1027,7 +1044,7 @@
                 });
             });
         },
-    
+
         /*
          * submit new node
          */
@@ -1075,7 +1092,7 @@
                 }
             });
         },
-    
+
         /*
          * cancel addNode operation
          * resets normal map functions
@@ -1124,7 +1141,7 @@
                 resetToOriginalState();
             }
         },
-    
+
         /*
          * retrieve address from latlng through OSM Nominatim service
          * and set it on the add node form
@@ -1136,7 +1153,7 @@
                     + '&lat=' + latlng.lat
                     + '&lon=' + latlng.lng
                     + '&accept-language=' + navigator.language;
-            $.getJSON(url).done(function(json){
+            $.getJSON(url).done(function (json) {
                 // _.compact removes falsy values
                 properties = _.compact([
                     json.address.road,
