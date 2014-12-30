@@ -383,10 +383,12 @@
         * show / hide from map items of a legend group
         */
         toggleLayerData: function (layer, visible) {
-            var filtered = this.collection.whereCollection({ layer: layer.id }),
-                method = (visible) ? 'addLayer' : 'removeLayer';
-            filtered.forEach(function(geo){
-                geo.get('legend').cluster[method](geo.get('leaflet'));
+            var geo = this.collection,
+                method = (visible) ? 'addLayers' : 'removeLayers',
+                l;
+            Ns.db.legend.forEach(function(legend){
+                l = geo.whereCollection({ legend: legend, layer: layer.id }).pluck('leaflet');
+                legend.cluster[method](l);
             });
         },
 

@@ -36,7 +36,7 @@
                 pointToLayer: function (feature, latlng) {
                     return L.circleMarker(latlng, options);
                 }
-            });
+            }).getLayers()[0];  // GeometryCollection objects not supported!
         },
 
         /*
@@ -46,8 +46,6 @@
             var obj = geojson.properties;
             obj.slug = geojson.id;
             obj.geometry = geojson.geometry;
-            delete(obj.legend);
-            delete(obj.marker);
             return obj;
         },
 
