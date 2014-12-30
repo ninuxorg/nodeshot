@@ -155,10 +155,11 @@ class DefaultUiTest(TestCase):
         map_size['width'] = browser.execute_script("return $('#map-js').width()")
         map_size['height'] = browser.execute_script("return $('#map-js').height()")
         browser.set_window_size(window_size['width'] - 10, window_size['height'] - 10)
-
+        sleep(0.2)
         self.assertEqual(browser.execute_script("return $('#map-js').width()"), map_size['width'] - 10)
         self.assertEqual(browser.execute_script("return $('#map-js').height()"), map_size['height'] - 10)
         browser.set_window_size(window_size['width'], window_size['height'])
+        sleep(0.2)
         self.assertEqual(browser.execute_script("return $('#map-js').width()"), map_size['width'])
         self.assertEqual(browser.execute_script("return $('#map-js').height()"), map_size['height'])
 
@@ -503,6 +504,14 @@ class DefaultUiTest(TestCase):
         self._hashchange('#/map')
         browser = self.browser
         leaflet_map = self.LEAFLET_MAP
+        # test for a toggleLeafletLayers() bug
+        browser.find_element_by_css_selector('#map-toolbar .icon-pin-add').click()
+        sleep(0.2)
+        self._hashchange('#/')
+        sleep(0.1)
+        self._hashchange('#map')
+        sleep(0.1)
+        self.assertNotEqual(browser.execute_script("return $('#map-js path').attr('fill-opacity')"), '0.3')
 
         # ensure "hidden" elements are visible
         legend = browser.find_element_by_css_selector('#legend-js')

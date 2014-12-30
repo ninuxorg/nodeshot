@@ -29,6 +29,14 @@
          */
         addNode: function () {
             this.reset();
+            // if not authenticated
+            if (Ns.db.user.isAuthenticated() === false) {
+                // show sign-in modal
+                $('#signin-modal').modal('show');
+                // listen to loggedin event and come back here
+                this.listenToOnce(Ns.db.user, 'loggedin', this.addNode);
+                return;
+            }
             this.add.show(new Ns.views.map.Add({ parent: this }));
         },
 
@@ -975,12 +983,6 @@
             var self = this,
                 dialog = this.ext.step1,
                 dialog_dimensions = dialog.getHiddenDimensions();
-            if (Ns.db.user.isAuthenticated() === false) {
-                $('#signin-modal').modal('show');
-                // listen to loggedin event and come back to this method
-                this.listenToOnce(Ns.db.user, 'loggedin', this.onShow);
-                return;
-            }
             // hide toolbar and enlarge map
             this.toggleHidden();
             // show step1
