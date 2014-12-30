@@ -32,9 +32,7 @@ Ns.views.Account = Marionette.ItemView.extend({
      */
     staySignedInCheck: function () {
         // check stay signed in checkbox
-        var remember = Ns.preferences.staySignedIn,
-            checked =  (remember === "true" || remember === true) ? true : false;
-        $('#remember-signup').prop('checked', checked);
+        $('#remember-signup').prop('checked', localStorage.getObject('staySignedIn', false));
     },
 
     /*

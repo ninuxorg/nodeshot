@@ -20,11 +20,6 @@
         body: '#body'
     });
 
-    // localStorage check
-    Ns.addInitializer(function () {
-        Ns.preferences = window.localStorage || {};  // TODO: remove
-    });
-
     // init layout
     Ns.addInitializer(function () {
         Ns.notifications = new Ns.collections.Notification();
@@ -76,8 +71,6 @@
 
         // page details
         getPage: function (slug) {
-            $.toggleLoading('show');
-
             Ns.page.set('slug', slug);
             Ns.page.fetch();
 
@@ -199,8 +192,7 @@
             // data.remember is true if "on", false otherwise
             data.remember = data.hasOwnProperty('remember') ? true : false;
             // remember choice
-            Ns.preferences.staySignedIn = data.remember;
-
+            localStorage.setObject('staySignedIn', data.remember);
             Ns.db.user.login(data);
         });
 
