@@ -107,7 +107,7 @@
             this.collection = new Ns.collections.Geo();
             this.popUpTemplate = _.template($('#map-popup-template').html());
             // reload data when user logs in or out
-            this.listenTo(Ns.db.user, 'loggedin loggedout', this.fetchMapData);
+            this.listenTo(Ns.db.user, 'loggedin loggedout', this.reloadMapData);
             // bind to namespaced events
             $(window).on('resize.map', _.bind(this.resize, this));
             $(window).on('beforeunload.map', _.bind(this.storeMapProperties, this));
@@ -232,13 +232,11 @@
             if (Ns.db.geo.isEmpty() === false) {
                 this.collection.add(Ns.db.geo.models);
                 this.collection.trigger('ready');
-                // disable loading indicator while data gets refreshed
-                Ns.state.autoToggleLoading = false;
-                // re-enable once refreshed
-                this.collection.once('ready', function(){ Ns.state.autoToggleLoading = true });
             }
-            // always refresh data from server to ensure consistency
-            this.fetchMapData();
+            // otherwise fetch from server
+            else {
+                this.fetchMapData();
+            }
             // toggle legend group from map when visible attribute changes
             this.listenTo(Ns.db.legend, 'change:visible', this.toggleLegendGroup);
             // toggle layer data when visible attribute changes
@@ -275,6 +273,21 @@
             });
         },
 
+        /**
+         * reload map data in the background
+         */
+        reloadMapData: function () {
+            // disable loading indicator while data gets refreshed
+            Ns.state.autoToggleLoading = false;
+            // fetch data
+            this.fetchMapData();
+            // re-enable loading indicator once data is refreshed
+            this.collection.once('ready', function(){ Ns.state.autoToggleLoading = true });
+        },
+
+        /**
+         * prepare empty Leaflet.MarkerCluster objects
+         */
         createClusters: function () {
             var self = this,
                 legend;
