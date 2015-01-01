@@ -45,3 +45,8 @@ Documentation_ - `Mailing List`_
 
 .. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-details-mobile.png
    :target: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-node-details-mobile.png
+
+------------
+
+.. image:: https://ga-beacon.appspot.com/UA-46086503-3/your-repo/page-name
+      :target: https://github.com/igrigorik/ga-beacon
