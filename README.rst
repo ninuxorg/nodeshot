@@ -48,5 +48,5 @@ Documentation_ - `Mailing List`_
 
 ------------
 
-.. image:: https://ga-beacon.appspot.com/UA-46086503-3/your-repo/page-name
+.. image:: https://ga-beacon.appspot.com/UA-46086503-3/nodeshot/README.rst
       :target: https://github.com/igrigorik/ga-beacon
