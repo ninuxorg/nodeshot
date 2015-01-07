@@ -29,7 +29,7 @@
         events:{
             'keyup input': 'keyupOnSearch',
             'mouseover ul': 'removeArtificialFocus',
-            'click a': 'getNode'
+            'click a': 'getResult'
         },
 
         collectionEvents: {
@@ -39,8 +39,6 @@
         initialize: function(){
             this.collection = new Ns.collections.Node();
             this.render();
-            // bind to keydown event
-            $(window).on('keydown', _.bind(this.keydown, this));
         },
 
         /* --- layout --- */
@@ -57,10 +55,15 @@
 
         showResults: function(){
             var self = this;
+            // unbind any previously bound custom keydown event
+            $(window).off('keydown.search');
+            // bind to custom keydown event
+            $(window).on('keydown.search', _.bind(this.keydown, this));
+            // show results
             this.ui.results.fadeIn(255);
-
+            // bind click on entire page
             $('html').on('click.search', function(e){
-                // if clicking outside
+                // if clicking outside hide
                 if(!$(e.target).parents('#general-search').length){
                     self.hideResults();
                     $('html').unbind('click.search');
@@ -70,6 +73,8 @@
 
         hideResults: function(){
             this.ui.results.hide();
+            // unbind keydown event
+            $(window).off('keydown.search');
         },
 
         removeArtificialFocus: function(e){
@@ -79,11 +84,12 @@
         /* --- user interaction --- */
 
         keyupOnSearch: function(e){
+            // ENTER
             if (e.keyCode === 13) {
                 this.search(e.target.value);
             }
+            // ESC
             else if(e.keyCode === 27){
-                this.ui.input.trigger('blur');
                 this.stopSpinning();
                 this.hideResults();
             }
@@ -91,10 +97,8 @@
 
         search: function(q){
             var self = this;
-
             // show loading indicator
             this.startSpinning();
-
             // fetch results
             this.collection.search(q)
             .done(function(){
@@ -110,37 +114,68 @@
             if(this.ui.results.is(':hidden')){
                 return
             }
-            if(e.keyCode == 40){
+            // Must be before down commands because of shift + tab
+            // Page up, Up arrow, Up numpad, Page-up numpad or shift + tab
+            if(_.contains([33, 38, 104, 105], e.keyCode) || (e.shiftKey && e.keyCode === 9)){
+                this.moveThroughResults('up', e);
+            }
+            // Tab, Page down, Down arrow, Down numpad, Page-down numpad
+            else if(_.contains([9, 34, 40, 98, 99], e.keyCode)){
                 this.moveThroughResults('down', e);
             }
-            else if(e.keyCode == 38){
-                this.moveThroughResults('up', e);
+            // Home gets first
+            else if(e.keyCode === 36) {
+                this.moveThroughResults('home', e);
+            }
+            else if(e.keyCode === 35) {
+                this.moveThroughResults('end', e);
+            }
+            // ESC
+            else if(e.keyCode === 27){
+                this.ui.input.focus();
+                this.keyupOnSearch(e);
+            }
+            // in all the other cases user is probably typing / deleting
+            // except if pressing shift or enter
+            else if (!e.shiftKey && e.keyCode != 13) {
+                this.ui.input.focus();
+                this.removeArtificialFocus();
             }
         },
 
         moveThroughResults: function(direction, e){
             e.preventDefault();
             e.stopPropagation();
-
-            var method = direction === 'down' ? 'next' : 'prev',
-                current = $('#js-search-results a.focus');
-
+            var prevOrNext = direction === 'down' ? 'next' : 'prev',
+                homeOrEnd = direction === 'home' ? 0 : -1,
+                current = this.$('a.focus'),
+                a;
             // remove any focus
             current.removeClass('focus');
-
-            if(!current.length){
-                $('#js-search-results a').eq(0)
+            // if no element wifh focus go to first result
+            if (!current.length) {
+                this.$('a').eq(0)
                     .addClass('focus').focus();
             }
-            else{
-                current.eq(-1)
-                    .parent()[method]()
-                    .find('a')
-                    .addClass('focus').focus();
+            // if up or down
+            else if (_.contains(['down', 'up'], direction)){
+                a = current.eq(0).parent()[prevOrNext]().find('a');
+                // if any next or prev move focus
+                if (a.length) {
+                    a.addClass('focus').focus();
+                }
+                // if no prev and going up move focus to input
+                else if (direction === 'up') {
+                    this.ui.input.focus();
+                }
+            }
+            // home or end
+            else {
+                this.$('a').eq(homeOrEnd).addClass('focus').focus();
             }
         },
 
-        getNode: function(e){
+        getResult: function(e){
             if($(e.target).hasClass('empty')){
                 e.preventDefault();
             }
