@@ -20,15 +20,15 @@ def get_install_requires():
 
 
 setup(
-    name='nodeshot',
+    name='goodbench',
     version=get_version(),
     description="Extensible Django web application for management of community-led georeferenced data.",
     long_description=open('README.rst').read(),
-    author='Federico Capoano',
-    author_email='nodeshot@ml.ninux.org',
+    author='Eden Ray Gardner',
+    author_email='edenraygardner@gmail.com',
     license='GPL3',
     url='https://github.com/ninuxorg/nodeshot',
-    download_url='https://github.com/ninuxorg/nodeshot/releases',
+    download_url='https://bitbucket.org/edenraygardner/goodbench',
     packages=find_packages(exclude=['docs', 'docs.*']),
     include_package_data=True,
     zip_safe=False,
