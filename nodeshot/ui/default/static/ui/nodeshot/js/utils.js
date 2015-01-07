@@ -280,4 +280,15 @@
             $(this).remove();
         });
     };
+
+    /*
+    * synchronous $.getJSON
+    */
+    $.getSyncJSON = function (url, data) {
+        return $.ajax({
+            async: false,
+            url: url,
+            data: data
+        }).responseJSON;
+    }
 }());

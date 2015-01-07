@@ -408,7 +408,7 @@ class DefaultUiTest(TestCase):
         submit.click()
         WebDriverWait(browser, 5).until(ajax_complete, 'Search address timeout')
         self.assertEqual(browser.execute_script('return typeof(Ns.body.currentView.panels.currentView.addressMarker)'), 'object')
-        self.assertEqual(browser.execute_script('return Ns.body.currentView.content.currentView.map.getZoom()'), 17)
+        self.assertEqual(browser.execute_script('return Ns.body.currentView.content.currentView.map.getZoom()'), 18)
         input.clear()
         # close panel
         self.browser.find_element_by_css_selector('#fn-search-address-mask').click()
@@ -649,6 +649,15 @@ class DefaultUiTest(TestCase):
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
         # ensure UI has gone back to initial state
         self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]')
+
+    def test_map_lat_lng(self):
+        LEAFLET_MAP = self.LEAFLET_MAP
+        browser = self.browser
+        self._hashchange('#map/latlng/41.8625675,12.4931263')
+        self.assertEqual(browser.execute_script("return %s.getCenter().lat.toString().substr(0, 8)" % LEAFLET_MAP), "41.86256")
+        self.assertEqual(browser.execute_script("return %s.getCenter().lng.toString().substr(0, 8)" % LEAFLET_MAP), "12.49312")
+        self.assertEqual(browser.execute_script("return %s.getZoom()" % LEAFLET_MAP), 18)
+        self.assertEqual(len(browser.find_elements_by_css_selector('.leaflet-marker-icon.leaflet-zoom-animated.leaflet-clickable')), 1)
 
     def test_node_list(self):
         self.browser.find_element_by_css_selector('a[href="#/nodes"]').click()

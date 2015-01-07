@@ -129,6 +129,12 @@
             Ns.body.currentView.content.currentView.openLeafletPopup(id);
         },
 
+        // map node popup
+        getMapLatLng: function (latlng) {
+            this.getMap();
+            Ns.body.currentView.content.currentView.goToLatLng(latlng);
+        },
+
         // user profile view
         getUser: function (username) {
             var user = new Ns.models.User({ username: username });
@@ -164,6 +170,7 @@
             'pages/:slug': 'getPage',
             'map': 'getMap',
             'map/add': 'addNode',
+            'map/latlng/:latlng': 'getMapLatLng',
             'map/:slug': 'getMapPopup',
             'nodes': 'getNodeList',
             'nodes/:slug': 'getNode',

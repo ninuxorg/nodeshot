@@ -254,6 +254,40 @@
         }
     });
 
+    Ns.models.SearchResult = Backbone.Model.extend({
+        icons: {
+            'node': 'pin',
+            'address': 'globe'
+        },
+
+        toJSON: function () {
+            var action, name, type;
+            // if node
+            if (typeof this.get('slug') !== 'undefined'){
+                type = 'node';
+                action = '#/nodes/' + this.get('slug');
+                name = this.get('name');
+            }
+            // if address
+            else if (typeof this.get('lat') !== 'undefined') {
+                type = 'address';
+                action = '#/map/latlng/' + this.get('lat') + ',' + this.get('lon');
+                name = this.get('display_name');
+            }
+            return {
+                type: type,
+                action: action,
+                name: name,
+                icon: 'icon-' + this.icons[type]
+            }
+        }
+    });
+
+    Ns.collections.Search = Ns.collections.Node.extend({
+        url: Ns.url('nodes/'),
+        model: Ns.models.SearchResult
+    });
+
     Ns.models.User = Ns.models.Base.extend({
         urlRoot: Ns.url('profiles/'),
         idAttribute: 'username',

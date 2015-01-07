@@ -37,8 +37,11 @@
         },
 
         initialize: function(){
-            this.collection = new Ns.collections.Node();
+            this.collection = new Ns.collections.Search();
             this.render();
+            // set max width of dropdown result box on init and on window resize
+            this.setResultsMaxWidth();
+            $(window).on('resize.search', _.bind(this.setResultsMaxWidth, this));
         },
 
         /* --- layout --- */
@@ -51,6 +54,12 @@
         stopSpinning: function () {
             this.ui.loading.hide();
             this.ui.icon.fadeIn(255);
+        },
+
+        setResultsMaxWidth: function () {
+            // determine max width for results dropdown
+            var maxWidth = $(window).width() - this.ui.input.offset().left - 10;
+            this.ui.results.css('max-width', maxWidth);
         },
 
         showResults: function(){
@@ -96,18 +105,29 @@
         },
 
         search: function(q){
-            var self = this;
+            var self = this,
+                tmpCollection = this.collection.clone(),
+                addresses;
             // show loading indicator
             this.startSpinning();
-            // fetch results
-            this.collection.search(q)
-            .done(function(){
+            // reset any previous results
+            this.collection.reset();
+            // fetch results in clone so that eventual address results might not be erased
+            tmpCollection.search(q).done(function(){
+                self.collection.add(tmpCollection.models);
                 // hide loading indicator
                 self.stopSpinning();
                 self.showResults();
                 // keep word
                 self.ui.input.trigger('focus').val(q);
             });
+            // search address if on map
+            // and if query is longer than 10 char and contains a comma
+            if (Ns.body.currentView instanceof Ns.views.map.Layout && q.length >= 10 && _.contains(q, ',')) {
+                addresses = $.getSyncJSON('//nominatim.openstreetmap.org/search?format=json&q=' + q);
+                addresses = new Ns.collections.Search(addresses);
+                this.collection.add(addresses.models);
+            }
         },
 
         keydown: function(e){

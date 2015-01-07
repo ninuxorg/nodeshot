@@ -439,6 +439,21 @@
             if (popup.length) {
                 popup.get(0).click();
             }
+        },
+
+        /*
+         * Go to specified latitude and longitude
+         */
+        goToLatLng: function (latlng) {
+            latlng = latlng.split(',')
+            latlng = L.latLng(latlng[0], latlng[1]);
+            var addressMarker = L.marker(latlng);
+            addressMarker.addTo(this.map);
+            // go to marker and zoom in
+            this.map.setView(latlng, 18);
+            // fade out marker
+            this.parent.panels.currentView.addressMarker = addressMarker;
+            this.parent.panels.currentView.removeAddressMarker(4000);
         }
     });
 
@@ -818,7 +833,8 @@
                         self.addressMarker = L.marker(latlng);
                         self.addressMarker.addTo(map);
                         // go to marker and zoom in
-                        map.setView(latlng, 17);
+                        map.setView(latlng, 18);
+                        Ns.router.navigate('map/latlng/' + lat + ',' + lng);
                         // bind for removal
                         $('#fn-search-address-mask').one('click', function () {
                             self.removeAddressMarker(1500);  // add a fadeOut
@@ -1170,10 +1186,12 @@
         setAddressFromLatLng: function (latlng) {
             var self = this,
                 properties,
+                // pick the preferred language or default to the language of the browser
+                lang = (typeof navigator.languages !== 'undefined' && navigator.languages.length) ? navigator.languages[0] : navigator.language,
                 url = '//nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1'
                     + '&lat=' + latlng.lat
                     + '&lon=' + latlng.lng
-                    + '&accept-language=' + navigator.language;
+                    + '&accept-language=' + lang;
             $.getJSON(url).done(function (json) {
                 // _.compact removes falsy values
                 properties = _.compact([
