@@ -15,9 +15,6 @@ Available settings
 
 These are the available customizable settings:
 
- * ``NODESHOT_UI_VOTING_ENABLED``
- * ``NODESHOT_UI_RATING_ENABLED``
- * ``NODESHOT_UI_COMMENTS_ENABLED``
  * ``LEAFLET_CONFIG``
  * ``NODESHOT_UI_LEAFLET_OPTIONS``
  * ``NODESHOT_UI_DISABLE_CLUSTERING_AT_ZOOM``
@@ -25,27 +22,9 @@ These are the available customizable settings:
  * ``NODESHOT_UI_DATETIME_FORMAT``
  * ``NODESHOT_UI_DATE_FORMAT``
  * ``NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS``
-
-NODESHOT_UI_VOTING_ENABLED
---------------------------
-
-**default**: ``True``
-
-Indicates wheter it is possible to like or dislike nodes.
-
-NODESHOT_UI_RATING_ENABLED
---------------------------
-
-**default**: ``True``
-
-Indicates wheter it is possible to rate nodes (stars).
-
-NODESHOT_UI_COMMENTS_ENABLED
-----------------------------
-
-**default**: ``True``
-
-Indicates wheter it is possible to leave comments on nodes.
+ * ``NODESHOT_UI_VOTING_ENABLED``
+ * ``NODESHOT_UI_RATING_ENABLED``
+ * ``NODESHOT_UI_COMMENTS_ENABLED``
 
 LEAFLET_CONFIG
 --------------
@@ -71,7 +50,7 @@ General options of the map:
 * ``DEFAULT_ZOOM``: default zoom of the map
 * ``MIN_ZOOM``: minimum zoom level
 * ``MAX_ZOOM``: maximum zoom level
-* ``TILES``: base layers available (eg: map, satellite), addding more tile is explained on the `django-leaflet documentation`_
+* ``TILES``: base layers available (eg: map, satellite), learn how to tweak this on the `django-leaflet documentation`_
 
 .. _django-leaflet documentation: https://github.com/makinacorpus/django-leaflet#default-tiles-layer
 
@@ -164,3 +143,24 @@ NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS
     ]
 
 Special strings that trigger geolocation when searching in the address bar.
+
+NODESHOT_UI_VOTING_ENABLED
+--------------------------
+
+**default**: ``True``
+
+Indicates wheter it is possible to like or dislike nodes.
+
+NODESHOT_UI_RATING_ENABLED
+--------------------------
+
+**default**: ``True``
+
+Indicates wheter it is possible to rate nodes (stars).
+
+NODESHOT_UI_COMMENTS_ENABLED
+----------------------------
+
+**default**: ``True``
+
+Indicates wheter it is possible to leave comments on nodes.
