@@ -42,6 +42,7 @@ def index(request):
         'SITE_URL': ui_settings.settings.SITE_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
+        'ADDRESS_SEARCH_TRIGGERS': ui_settings.ADDRESS_SEARCH_TRIGGERS,
         # participation settings
         'VOTING_ENABLED': ui_settings.VOTING_ENABLED,
         'RATING_ENABLED': ui_settings.RATING_ENABLED,

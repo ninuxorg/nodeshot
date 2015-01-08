@@ -6,6 +6,20 @@ from leaflet import app_settings as leaflet_settings
 TILESERVER_URL = leaflet_settings['TILES'][0][1]
 MAP_ZOOM = leaflet_settings['DEFAULT_ZOOM']
 MAP_CENTER = list(leaflet_settings['DEFAULT_CENTER'])
+ADDRESS_SEARCH_TRIGGERS = [
+    ',',
+    'st.',
+    ' street',
+    ' square',
+    ' road',
+    'via ',
+    'viale ',
+    'piazza ',
+    'strada ',
+    'plaza',
+    'calle '
+]
+ADDRESS_SEARCH_TRIGGERS = getattr(settings, 'NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS', ADDRESS_SEARCH_TRIGGERS)
 
 if 'nodeshot.community.participation' in settings.INSTALLED_APPS:
     VOTING_ENABLED = getattr(settings, 'NODESHOT_UI_VOTING_ENABLED', True)

@@ -18,6 +18,7 @@ These are the available customizable settings:
  * ``NODESHOT_UI_VOTING_ENABLED``
  * ``NODESHOT_UI_RATING_ENABLED``
  * ``NODESHOT_UI_COMMENTS_ENABLED``
+ * ``NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS``
 
 NODESHOT_UI_VOTING_ENABLED
 --------------------------
@@ -39,3 +40,26 @@ NODESHOT_UI_COMMENTS_ENABLED
 **default**: ``True``
 
 Indicates wheter it is possible to leave comments on nodes.
+
+NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS
+-----------------------------------
+
+**default**:
+
+.. code-block:: python
+
+    [
+        ',',
+        'st.',
+        ' street',
+        ' square',
+        ' road',
+        'via ',
+        'viale ',
+        'piazza ',
+        'strada ',
+        'plaza',
+        'calle '
+    ]
+
+Special strings that trigger geolocation when searching in the address bar.

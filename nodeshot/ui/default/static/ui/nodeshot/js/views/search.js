@@ -150,7 +150,7 @@
 
         searchAddress: function (q) {
             // query must be longer than 10 characters
-            if (q.length > 10 && _.containsAny(q, Ns.settings.searchAddressSpecialWords)) {
+            if (q.length > 10 && _.containsAny(q, Ns.settings.addressSearchTriggers)) {
                 var addresses;
                 addresses = $.getSyncJSON('//nominatim.openstreetmap.org/search?format=json&q=' + q);
                 addresses = new Ns.collections.Search(addresses);
