@@ -36,6 +36,24 @@
             'sync': 'render'
         },
 
+        /**
+         * local cache methods
+         */
+        cache: {},
+
+        setCache: function (key, value) {
+            if (value instanceof Ns.collections.Search){
+                this.cache[key] = value.clone();
+            }
+        },
+
+        getCache: function (key) {
+            if (typeof this.cache[key] === 'undefined') {
+                return null;
+            }
+            return this.cache[key];
+        },
+
         initialize: function(){
             this.collection = new Ns.collections.Search();
             this.render();
@@ -106,7 +124,13 @@
 
         search: function(q){
             var self = this,
-                clone = this.collection.clone();
+                clone = this.collection.clone(),
+                cache = this.getCache(q);
+            if (cache !== null) {
+                this.collection.reset(cache.models);
+                self.showResults();
+                return;
+            }
             // show loading indicator
             this.startSpinning();
             // reset any previous results
@@ -114,6 +138,7 @@
             // fetch results in cloned collection so that eventual address results might not be erased
             clone.search(q).done(function(){
                 self.collection.add(clone.models);
+                self.setCache(q, self.collection);
                 // hide loading indicator
                 self.stopSpinning();
                 self.showResults();
@@ -130,6 +155,7 @@
                 addresses = $.getSyncJSON('//nominatim.openstreetmap.org/search?format=json&q=' + q);
                 addresses = new Ns.collections.Search(addresses);
                 this.collection.add(addresses.models);
+                this.setCache(q, this.collection);
             }
         },
 
