@@ -43,6 +43,7 @@ def index(request):
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
         'DISABLE_CLUSTERING_AT_ZOOM': ui_settings.DISABLE_CLUSTERING_AT_ZOOM,
+        'MAX_CLUSTER_RADIUS': ui_settings.MAX_CLUSTER_RADIUS,
         'DATETIME_FORMAT': ui_settings.DATETIME_FORMAT,
         'DATE_FORMAT': ui_settings.DATE_FORMAT,
         'ADDRESS_SEARCH_TRIGGERS': ui_settings.ADDRESS_SEARCH_TRIGGERS,
