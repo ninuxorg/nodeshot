@@ -20,7 +20,7 @@ def get_install_requires():
 
 
 setup(
-    name='goodbench',
+    name='nodeshot',
     version=get_version(),
     description="Extensible Django web application for management of community-led georeferenced data.",
     long_description=open('README.rst').read(),
