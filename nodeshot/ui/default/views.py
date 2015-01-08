@@ -42,6 +42,7 @@ def index(request):
         'SITE_URL': ui_settings.settings.SITE_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
+        'LEAFLET_OPTIONS': json.render(ui_settings.LEAFLET_OPTIONS),
         'DISABLE_CLUSTERING_AT_ZOOM': ui_settings.DISABLE_CLUSTERING_AT_ZOOM,
         'MAX_CLUSTER_RADIUS': ui_settings.MAX_CLUSTER_RADIUS,
         'DATETIME_FORMAT': ui_settings.DATETIME_FORMAT,

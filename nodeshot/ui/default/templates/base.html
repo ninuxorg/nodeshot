@@ -690,15 +690,7 @@
         // TODO: make these configurable
         Ns.settings.dateTimeFormat = '{{ DATETIME_FORMAT }}';
         Ns.settings.dateFormat = '{{ DATE_FORMAT }}';
-        Ns.settings.leafletOptions = {
-            fill: true,
-            lineCap: 'circle',
-            radius: 6,
-            opacity: 1,
-            fillOpacity: 0.7,
-            // when adding new nodes other leaflet layers are dimmed to the following opacity:
-            temporaryOpacity: 0.3
-        };
+        Ns.settings.leafletOptions = {{ LEAFLET_OPTIONS|safe }};
         Ns.settings.disableClusteringAtZoom = {{ DISABLE_CLUSTERING_AT_ZOOM }};
         Ns.settings.maxClusterRadius = {{ MAX_CLUSTER_RADIUS }};
         Ns.settings.addressSearchTriggers = {{ ADDRESS_SEARCH_TRIGGERS|safe }};

@@ -18,6 +18,11 @@ These are the available customizable settings:
  * ``NODESHOT_UI_VOTING_ENABLED``
  * ``NODESHOT_UI_RATING_ENABLED``
  * ``NODESHOT_UI_COMMENTS_ENABLED``
+ * ``NODESHOT_UI_LEAFLET_OPTIONS``
+ * ``NODESHOT_UI_DISABLE_CLUSTERING_AT_ZOOM``
+ * ``NODESHOT_UI_MAX_CLUSTER_RADIUS``
+ * ``NODESHOT_UI_DATETIME_FORMAT``
+ * ``NODESHOT_UI_DATE_FORMAT``
  * ``NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS``
 
 NODESHOT_UI_VOTING_ENABLED
@@ -40,6 +45,37 @@ NODESHOT_UI_COMMENTS_ENABLED
 **default**: ``True``
 
 Indicates wheter it is possible to leave comments on nodes.
+
+NODESHOT_UI_LEAFLET_OPTIONS
+---------------------------
+
+**default**:
+
+.. code-block:: python
+
+    {
+        'fillOpacity': 0.7,
+        'opacity': 1,
+        'dashArray': None,
+        'lineCap': None,
+        'lineJoin': None,
+        'radius': 6,
+        'temporaryOpacity': 0.3
+    }
+
+These options control some details of the map:
+
+ * ``fillOpacity``: fill color opacity of objects on the map
+ * ``opacity``: stroke opacity of objects on the map
+ * ``dashArray``: explained in the `Leaflet documentation`_
+ * ``lineCap``: explained in the `Leaflet documentation`_
+ * ``lineJoin``: explained in the `Leaflet documentation`_
+ * ``radius``: width of the radius circles on the map in pixel, valid only for points (*Nodeshot can display also other shapes*)
+ * ``temporaryOpacity``: when adding a new node the other nodes are dimmed according to this option
+
+Other options like fill color and stroke width are managed in the admin site under ``/admin/nodes/status/`` because they vary for each status.
+
+.. _Leaflet documentation: http://leafletjs.com/reference.html#path
 
 NODESHOT_UI_DISABLE_CLUSTERING_AT_ZOOM
 --------------------------------------
