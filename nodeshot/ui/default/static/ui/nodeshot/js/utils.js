@@ -119,16 +119,15 @@
          * extend underscore with formatDateTime shortcut
          */
         formatDateTime: function (dateString) {
-            // TODO: format configurable
-            return $.format.date(dateString, "dd MMMM yyyy, HH:mm");
+            return $.format.date(dateString, Ns.settings.dateTimeFormat);
         },
 
         /**
          * extend underscore with formatDate shortcut
          */
         formatDate: function (dateString) {
-            // TODO: format configurable
-            return $.format.date(dateString, "dd MMMM yyyy");
+            return $.format.date(dateString, Ns.settings.dateFormat);
+        },
 
         /**
         * returns true if the value is present in any of the values in the list

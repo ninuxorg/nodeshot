@@ -688,6 +688,8 @@
         Ns.settings.comments = {{ COMMENTS_ENABLED }};
         Ns.settings.api = '{{ SITE_URL }}{% url "api_root_endpoint" %}';
         // TODO: make these configurable
+        Ns.settings.dateTimeFormat = '{{ DATETIME_FORMAT }}';
+        Ns.settings.dateFormat = '{{ DATE_FORMAT }}';
         Ns.settings.leafletOptions = {
             fill: true,
             lineCap: 'circle',

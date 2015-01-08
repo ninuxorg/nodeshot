@@ -42,6 +42,8 @@ def index(request):
         'SITE_URL': ui_settings.settings.SITE_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
+        'DATETIME_FORMAT': ui_settings.DATETIME_FORMAT,
+        'DATE_FORMAT': ui_settings.DATE_FORMAT,
         'ADDRESS_SEARCH_TRIGGERS': ui_settings.ADDRESS_SEARCH_TRIGGERS,
         # participation settings
         'VOTING_ENABLED': ui_settings.VOTING_ENABLED,

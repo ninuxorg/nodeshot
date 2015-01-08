@@ -35,11 +35,29 @@ NODESHOT_UI_RATING_ENABLED
 Indicates wheter it is possible to rate nodes (stars).
 
 NODESHOT_UI_COMMENTS_ENABLED
---------------------------
+----------------------------
 
 **default**: ``True``
 
 Indicates wheter it is possible to leave comments on nodes.
+
+NODESHOT_UI_DATETIME_FORMAT
+---------------------------
+
+**default**: ``dd MMMM yyyy, HH:mm``
+
+``DateTime`` formatting according to the `jQuery dateFormat docs`_.
+
+.. _jQuery dateFormat docs: https://github.com/phstc/jquery-dateFormat#date-and-time-patterns
+
+NODESHOT_UI_DATE_FORMAT
+-----------------------
+
+**default**: ``dd MMMM yyyy``
+
+``Date`` formatting according to the `jQuery dateFormat docs`_.
+
+.. _jQuery dateFormat docs: https://github.com/phstc/jquery-dateFormat#date-and-time-patterns
 
 NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS
 -----------------------------------
