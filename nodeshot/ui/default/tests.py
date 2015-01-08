@@ -721,6 +721,49 @@ class DefaultUiTest(TestCase):
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
         self.assertIn('RDP', self.browser.find_element_by_css_selector('#node-details h2').text)
 
+    def test_general_search_address(self):
+        self._hashchange('#')
+        search = self.browser.find_element_by_css_selector('#general-search-input')
+        search.clear()
+        # no results
+        search.send_keys('streetnode')
+        search.send_keys(Keys.ENTER)
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search timeout')
+        results = self.browser.find_elements_by_css_selector('#js-search-results li')
+        self.assertEqual(len(results), 1)
+        self.assertIn('nothing', results[0].text)
+        search.send_keys(Keys.ESCAPE)
+        search.clear()
+        # 1 result
+        search.send_keys('via Roma, Pomezia')
+        search.send_keys(Keys.ENTER)
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search timeout')
+        results = self.browser.find_elements_by_css_selector('#js-search-results li')
+        self.assertEqual(len(results), 1)
+        self.assertNotIn('nothing', results[0].text)
+        search.send_keys(Keys.ESCAPE)
+        search.clear()
+        # 1 result
+        search.send_keys('google street')
+        search.send_keys(Keys.ENTER)
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search timeout')
+        results = self.browser.find_elements_by_css_selector('#js-search-results li')
+        self.assertEqual(len(results), 1)
+        self.assertNotIn('nothing', results[0].text)
+        search.send_keys(Keys.ESCAPE)
+        search.clear()
+        # 2 results
+        search.send_keys('VIA delle zoccolette')
+        search.send_keys(Keys.ENTER)
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
+        results = self.browser.find_elements_by_css_selector('#js-search-results li')
+        self.assertEqual(len(results), 2)
+        search.clear()
+        # go to first result
+        self.browser.find_element_by_css_selector('#js-search-results li a').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
+        self.assertIn('#/map/latlng/41.89', self.browser.current_url)
+
     def test_notifications(self):
         # open sign in modal
         self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()

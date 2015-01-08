@@ -699,6 +699,19 @@
         };
         Ns.settings.disableClusteringAtZoom = 12;
         Ns.settings.maxClusterRadius = 90;
+        Ns.settings.searchAddressSpecialWords = [
+            ',',
+            'st.',
+            ' street',
+            ' square',
+            ' road',
+            'via ',
+            'viale ',
+            'piazza ',
+            'strada ',
+            'plaza',
+            'calle '
+        ];
     </script>
     <!-- nodeshot JS -->
     <script src="{% static 'ui/nodeshot/js/utils.js' %}"></script>

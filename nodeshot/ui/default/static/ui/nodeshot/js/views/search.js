@@ -106,24 +106,27 @@
 
         search: function(q){
             var self = this,
-                tmpCollection = this.collection.clone(),
-                addresses;
+                clone = this.collection.clone();
             // show loading indicator
             this.startSpinning();
             // reset any previous results
             this.collection.reset();
-            // fetch results in clone so that eventual address results might not be erased
-            tmpCollection.search(q).done(function(){
-                self.collection.add(tmpCollection.models);
+            // fetch results in cloned collection so that eventual address results might not be erased
+            clone.search(q).done(function(){
+                self.collection.add(clone.models);
                 // hide loading indicator
                 self.stopSpinning();
                 self.showResults();
                 // keep word
                 self.ui.input.trigger('focus').val(q);
             });
-            // search address if on map
-            // and if query is longer than 10 char and contains a comma
-            if (Ns.body.currentView instanceof Ns.views.map.Layout && q.length >= 10 && _.contains(q, ',')) {
+            this.searchAddress(q);
+        },
+
+        searchAddress: function (q) {
+            // query must be longer than 10 characters
+            if (q.length > 10 && _.containsAny(q, Ns.settings.searchAddressSpecialWords)) {
+                var addresses;
                 addresses = $.getSyncJSON('//nominatim.openstreetmap.org/search?format=json&q=' + q);
                 addresses = new Ns.collections.Search(addresses);
                 this.collection.add(addresses.models);
