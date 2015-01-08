@@ -18,6 +18,7 @@ These are the available customizable settings:
  * ``NODESHOT_UI_VOTING_ENABLED``
  * ``NODESHOT_UI_RATING_ENABLED``
  * ``NODESHOT_UI_COMMENTS_ENABLED``
+ * ``LEAFLET_CONFIG``
  * ``NODESHOT_UI_LEAFLET_OPTIONS``
  * ``NODESHOT_UI_DISABLE_CLUSTERING_AT_ZOOM``
  * ``NODESHOT_UI_MAX_CLUSTER_RADIUS``
@@ -45,6 +46,34 @@ NODESHOT_UI_COMMENTS_ENABLED
 **default**: ``True``
 
 Indicates wheter it is possible to leave comments on nodes.
+
+LEAFLET_CONFIG
+--------------
+
+**default**:
+
+.. code-block:: python
+
+    {
+        'DEFAULT_CENTER': (49.06775, 30.62011),
+        'DEFAULT_ZOOM': 4,
+        'MIN_ZOOM': 1,
+        'MAX_ZOOM': 18,
+        'TILES': [
+            ('Map', 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> &nbsp;<img src="http://developer.mapquest.com/content/osm/mq_logo.png">'),
+            ('Satellite', 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Source: <a href="http://www.esri.com/">Esri</a> &copy; and the GIS User Community ')
+        ],
+    }
+
+General options of the map:
+
+* ``DEFAULT_CENTER``: default center of the map
+* ``DEFAULT_ZOOM``: default zoom of the map
+* ``MIN_ZOOM``: minimum zoom level
+* ``MAX_ZOOM``: maximum zoom level
+* ``TILES``: base layers available (eg: map, satellite), addding more tile is explained on the `django-leaflet documentation`_
+
+.. _django-leaflet documentation: https://github.com/makinacorpus/django-leaflet#default-tiles-layer
 
 NODESHOT_UI_LEAFLET_OPTIONS
 ---------------------------
