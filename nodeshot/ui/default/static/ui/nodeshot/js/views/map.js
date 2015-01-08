@@ -318,7 +318,6 @@
                     showCoverageOnHover: true,
                     zoomToBoundsOnClick: true,
                     removeOutsideVisibleBounds: true,
-                    // TODO: make these configurable
                     disableClusteringAtZoom: Ns.settings.disableClusteringAtZoom,
                     maxClusterRadius: Ns.settings.maxClusterRadius
                 });

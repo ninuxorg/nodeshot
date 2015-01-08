@@ -6,6 +6,7 @@ from leaflet import app_settings as leaflet_settings
 TILESERVER_URL = leaflet_settings['TILES'][0][1]
 MAP_ZOOM = leaflet_settings['DEFAULT_ZOOM']
 MAP_CENTER = list(leaflet_settings['DEFAULT_CENTER'])
+DISABLE_CLUSTERING_AT_ZOOM = getattr(settings, 'NODESHOT_UI_DISABLE_CLUSTERING_AT_ZOOM', 12)
 DATETIME_FORMAT = getattr(settings, 'NODESHOT_UI_DATETIME_FORMAT', 'dd MMMM yyyy, HH:mm')
 DATE_FORMAT = getattr(settings, 'NODESHOT_UI_DATE_FORMAT', 'dd MMMM yyyy')
 ADDRESS_SEARCH_TRIGGERS = [

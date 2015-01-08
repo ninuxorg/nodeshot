@@ -41,6 +41,15 @@ NODESHOT_UI_COMMENTS_ENABLED
 
 Indicates wheter it is possible to leave comments on nodes.
 
+NODESHOT_UI_DISABLE_CLUSTERING_AT_ZOOM
+--------------------------------------
+
+**default**: ``12``
+
+At the specified level of zoom clustering of points on the map is disabled.
+
+Setting ``1`` disables clustering altogether, while setting ``0`` forces clustering at all zoom levels.
+
 NODESHOT_UI_DATETIME_FORMAT
 ---------------------------
 
