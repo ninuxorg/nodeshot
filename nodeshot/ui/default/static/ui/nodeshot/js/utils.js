@@ -238,16 +238,16 @@
     */
     $.createModal = function (opts) {
         var template_html = $('#modal-template').html(),
-        close = function () {
-            $('#tmp-modal').modal('hide');
-        },
-        options = $.extend({
-            message: '',
-            successMessage: 'ok',
-            successAction: function () {},
-            defaultMessage: null,
-            defaultAction: function () {}
-        }, opts);
+            close = function () {
+                $('#tmp-modal').modal('hide');
+            },
+            options = $.extend({
+                message: '',
+                successMessage: 'ok',
+                successAction: function () {},
+                defaultMessage: null,
+                defaultAction: function () {}
+            }, opts);
 
         $('body').append(_.template(template_html)(options));
 
@@ -304,5 +304,73 @@
             url: url,
             data: data
         }).responseJSON;
-    }
+    };
+
+    /**
+     * geocoding and reverse geocoding
+     * using nominatim.openstreetmap.org
+     */
+     $.geocode = function (opts) {
+         var options = $.extend({
+             q: null,
+             // pick the preferred language or default to the language of the browser
+             acceptLanguage: (typeof navigator.languages !== 'undefined' && navigator.languages.length) ? navigator.languages[0] : navigator.language,
+             addressdetails: true,
+             zoom: 18,
+             lat: null,
+             lon: null,
+             dedupe: true,
+             // indicates wether compacting the result, valid only for
+             compact: true
+         }, opts),
+            url = '//nominatim.openstreetmap.org/<r>?format=json',
+            resource = options.q ? 'search' : 'reverse',
+            results,
+            // returns a more compact address string
+            compact = function (result) {
+                return _.compact([
+                    result.address.road,
+                    result.address.house_number,
+                    result.address.village,
+                    result.address.town,
+                    result.address.city,
+                    result.address.postcode,
+                    result.address.country
+                ]).join(', ');
+            };
+        // search address or reverse geocoding
+        url = url.replace('<r>', resource);
+        // convert address to coordinates
+        if (options.q) {
+            url += '&q='+options.q;
+            url += '&zoom='+options.zoom;
+        }
+        // convert coordinates to address
+        else {
+            url += '&lat='+options.lat + '&lon='+options.lon;
+        }
+        // address details?
+        if (options.addressdetails) {
+            url += '&addressdetails=' + options.addressdetails;
+        }
+        // address details?
+        if (options.dedupe) {
+            url += '&dedupe=' + options.dedupe;
+        }
+        // language
+        url += '&accept-language=' + options.acceptLanguage;
+        // perform http request to the webservice in synchronous old fashion
+        results = $.getSyncJSON(url);
+        // if compact & more results (normal geocoding)
+        if (options.compact && options.q && results.length) {
+            results.forEach(function(result){
+                result.display_name = compact(result);
+            });
+        }
+        // else reverse geocoding
+        else if (options.compact && options.lat) {
+            results.display_name = compact(results);
+        }
+        return results;
+    };
 }());

@@ -661,7 +661,8 @@
             'switches': 'input.switch',
             'scrollers': '.scroller',
             'selects': '.selectpicker',
-            'tools': '.tool'
+            'tools': '.tool',
+            'address': '#fn-search-address input'
         },
 
         events: {
@@ -809,38 +810,17 @@
         searchAddress: function (e) {
             e.preventDefault();
             this.removeAddressMarker();
-            var self = this,
-                searchString = $('#fn-search-address input').val(),
-                url = '//nominatim.openstreetmap.org/search?format=json&q=' + searchString;
-            $.ajax({
-                url: url,
-                dataType: 'json',
-                success: function (response) {
-                    // not found
-                    if (_.isEmpty(response)) {
-                        $.createModal({ message: 'Address not found' });
-                    }
-                    // found
-                    else {
-                        // only the first result returned from OSM is displayed on map
-                        var firstPlaceFound = (response[0]),
-                            lat = parseFloat(firstPlaceFound.lat),
-                            lng = parseFloat(firstPlaceFound.lon),
-                            latlng = L.latLng(lat, lng),
-                            map = self.mapView.map;
-                        // put marker on the map
-                        self.addressMarker = L.marker(latlng);
-                        self.addressMarker.addTo(map);
-                        // go to marker and zoom in
-                        map.setView(latlng, 18);
-                        Ns.router.navigate('map/latlng/' + lat + ',' + lng);
-                        // bind for removal
-                        $('#fn-search-address-mask').one('click', function () {
-                            self.removeAddressMarker(1500);  // add a fadeOut
-                        });
-                    }
-                }
-            });
+            // retrieve address
+            var results = $.geocode({ q: this.ui.address.val() });
+            // if found any go to latlng
+            if (results.length) {
+                Ns.router.navigate('map/latlng/' + results[0].lat + ',' + results[0].lon, {trigger: true});
+            }
+            // else display message
+            else {
+                // TODO: i18n message
+                $.createModal({ message: 'Address not found' });
+            }
         },
 
         /*
@@ -1183,27 +1163,8 @@
          * and set it on the add node form
          */
         setAddressFromLatLng: function (latlng) {
-            var self = this,
-                properties,
-                // pick the preferred language or default to the language of the browser
-                lang = (typeof navigator.languages !== 'undefined' && navigator.languages.length) ? navigator.languages[0] : navigator.language,
-                url = '//nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1'
-                    + '&lat=' + latlng.lat
-                    + '&lon=' + latlng.lng
-                    + '&accept-language=' + lang;
-            $.getJSON(url).done(function (json) {
-                // _.compact removes falsy values
-                properties = _.compact([
-                    json.address.road,
-                    json.address.house_number,
-                    json.address.village,
-                    json.address.town,
-                    json.address.city,
-                    json.address.postcode,
-                    json.address.country
-                ]);
-                self.ui.address.val(properties.join(', '));
-            });
+            var addr = $.geocode({ lat: latlng.lat, lon: latlng.lng });
+            this.ui.address.val(addr.display_name);
         }
     });
 })();

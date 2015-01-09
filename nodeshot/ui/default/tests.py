@@ -413,7 +413,8 @@ class DefaultUiTest(TestCase):
         # close panel
         self.browser.find_element_by_css_selector('#fn-search-address-mask').click()
         self.assertFalse(panel.is_displayed())
-        sleep(1.55)
+        self.assertEqual(browser.execute_script('return typeof(Ns.body.currentView.panels.currentView.addressMarker)'), 'object')
+        sleep(4.55)
         self.assertEqual(browser.execute_script('return typeof(Ns.body.currentView.panels.currentView.addressMarker)'), 'undefined')
 
         # test map tools panel
