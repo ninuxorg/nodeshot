@@ -690,6 +690,11 @@ article.center-stage{
     margin-left: 7px
 }
 
+#map .tooltip-inner{
+    padding: 4px 10px !important;
+    background: rgba(0, 0, 0, 0.7);
+}
+
 .modal{ overflow-y: auto }
 .modal-dialog button{ margin: 0 0 0 12px }
 

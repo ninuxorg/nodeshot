@@ -99,7 +99,9 @@
             // populate map as items are added to collection
             'add': 'addGeoModelToMap',
             // remove items from map when models are removed
-            'remove': 'removeGeoModelFromMap'
+            'remove': 'removeGeoModelFromMap',
+            // tooltips
+            'ready': 'initTooltips'
         },
 
         initialize: function (options) {
@@ -389,6 +391,35 @@
                 l = geo.whereCollection({ legend: legend, layer: layer.id }).pluck('leaflet');
                 legend.cluster[method](l);
             });
+        },
+
+        /**
+         * initialize tooltips on leaflet layers
+         */
+        initTooltips: function () {
+            var models = this.collection.models,
+                length = this.collection.length,
+                options = {
+                    container: '#map-js',
+                    delay: { show: 600, hide: 0 }
+                },
+                model,
+                shape;
+            while (length--) {
+                model = models[length].toJSON();
+                shape = $(model.leaflet._container);
+                shape.attr('title', model.name);
+                // bind tooltip to be shown with a bit of delay
+                shape.tooltip(options);
+                // destroy the tooltip when the popup is opened to avoid clashing
+                model.leaflet.on('popupopen', function (e) {
+                    $(e.target._container).tooltip('destroy');
+                });
+                // rebind tooltip when popup is closed
+                model.leaflet.on('popupclose', function (e) {
+                    $(e.target._container).tooltip(options);
+                });
+            }
         },
 
         /*

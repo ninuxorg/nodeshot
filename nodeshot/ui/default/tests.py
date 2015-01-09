@@ -572,7 +572,7 @@ class DefaultUiTest(TestCase):
         browser.find_element_by_css_selector('#map-toolbar .icon-pin-add').click()
 
         # ensure login box is shown
-        sleep(0.25)
+        sleep(0.5)
         self.assertTrue(browser.find_element_by_css_selector('#signin-modal').is_displayed())
 
         # login

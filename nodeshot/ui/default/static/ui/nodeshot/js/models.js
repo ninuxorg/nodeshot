@@ -22,8 +22,10 @@
 
         toLeaflet: function () {
             var options = this.leafletOptions,
-            legend = this.get('legend').toJSON();
-            return L.geoJson(this.toGeoJSON(), {
+                legend = this.get('legend').toJSON(),
+                geojson,
+                layer;
+            geojson = L.geoJson(this.toGeoJSON(), {
                 style: function (feature) {
                     options.fillColor = legend.fill_color;
                     options.stroke = legend.stroke_width > 0;
@@ -36,7 +38,25 @@
                 pointToLayer: function (feature, latlng) {
                     return L.circleMarker(latlng, options);
                 }
-            }).getLayers()[0];  // GeometryCollection objects not supported!
+            });
+            // GeometryCollection objects not supported!
+            layer = geojson.getLayers()[0];
+            // mouse over / out events
+            layer.on({
+                mouseover: function (e) {
+                    var layer = e.target;
+                    layer.setStyle({
+                        fillOpacity: 1
+                    });
+                    if (!L.Browser.ie && !L.Browser.opera) {
+                        layer.bringToFront();
+                    }
+                },
+                mouseout: function (e) {
+                    geojson.resetStyle(e.target);
+                }
+            });
+            return layer;
         },
 
         /*
