@@ -390,12 +390,12 @@ class DefaultUiTest(TestCase):
         # re-enable rome layer
         browser.execute_script('$("#map-control-layer-rome").trigger("click")')
         self.assertEqual(browser.execute_script("return $('#map-js path.marker-potential').length"), 0)
-        self.assertEqual(browser.execute_script("return $('#map-js path.marker-active').length"), 1)
+        self.assertTrue(2 >= browser.execute_script("return $('#map-js path.marker-active').length") >= 1)
         self.assertEqual(browser.execute_script("return $('#map-js .cluster.marker-potential').length"), 0)
         self.assertEqual(browser.execute_script("return $('#map-js .cluster.marker-active').length"), 1)
         browser.find_element_by_css_selector('#legend-item-potential a').click()
         self.assertEqual(browser.execute_script("return $('#map-js path.marker-potential').length"), 1)
-        self.assertEqual(browser.execute_script("return $('#map-js path.marker-active').length"), 1)
+        self.assertTrue(2 >= browser.execute_script("return $('#map-js path.marker-active').length") >= 1)
         self.assertEqual(browser.execute_script("return $('#map-js .cluster.marker-potential').length"), 1)
         self.assertEqual(browser.execute_script("return $('#map-js .cluster.marker-active').length"), 1)
         self.assertEqual(browser.execute_script("return $('#map-control-legend-potential').bootstrapSwitch('state')"), True)
@@ -558,6 +558,7 @@ class DefaultUiTest(TestCase):
         self._hashchange('#map')
         sleep(0.1)
         self.assertNotEqual(browser.execute_script("return $('#map-js path').attr('fill-opacity')"), '0.3')
+        browser.find_element_by_css_selector('#signin-modal .icon-close').click()
 
         # ensure "hidden" elements are visible
         legend = browser.find_element_by_css_selector('#legend-js')
