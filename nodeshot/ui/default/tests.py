@@ -39,9 +39,10 @@ class DefaultUiTest(TestCase):
         WebDriverWait(self.browser, 10).until(ajax_complete, 'Timeout')
 
     def _reset(self):
-        """ reset browser (clear localstorage and go to index) """
+        """ reset and reload browser (clear localstorage and go to index) """
         self._hashchange('#/')
         self.browser.execute_script('localStorage.clear()')
+        self.browser.delete_all_cookies()
         self.browser.refresh()
 
     @classmethod
@@ -56,8 +57,12 @@ class DefaultUiTest(TestCase):
         super(DefaultUiTest, cls).tearDownClass()
 
     def setUp(self):
-        self.browser.execute_script('localStorage.clear()')
-        self.browser.set_window_size(1100, 700)
+        """ reset browser to initial state """
+        browser = self.browser
+        browser.execute_script('localStorage.clear()')
+        browser.delete_all_cookies()
+        browser.execute_script("Ns.db.user.clear(); Ns.db.user.trigger('logout');")
+        browser.set_window_size(1100, 700)
 
     def test_index(self):
         response = self.client.get(reverse('ui:index'))
