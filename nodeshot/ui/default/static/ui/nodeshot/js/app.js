@@ -98,24 +98,20 @@
 
         // node details
         getNode: function (slug) {
-            var node = new Ns.models.Node({ slug: slug });
-            node.fetch().then(function () {
-                Ns.body.show(new Ns.views.node.Detail({
-                    model: node
-                }));
-            });
+            this.getMap();
+            Ns.body.currentView.getNode(slug);
         },
 
         // map view
         getMap: function () {
-            if (typeof Ns.body.currentView === 'undefined' || ! (Ns.body.currentView instanceof Ns.views.map.Layout)) {
+            if (typeof Ns.body.currentView === 'undefined' || !(Ns.body.currentView instanceof Ns.views.map.Layout)) {
                 Ns.body.show(new Ns.views.map.Layout());
             }
             else {
                 Ns.body.currentView.reset();
             }
             // TODO this should be inside view
-            $('#nav-bar a[href="#/map"]').trigger('click').parent().addClass('active');
+            $('#nav-bar a[href="#/map"]').parent().addClass('active');
         },
 
         addNode: function () {

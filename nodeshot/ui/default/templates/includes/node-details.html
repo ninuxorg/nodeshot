@@ -1,201 +1,195 @@
 {% load i18n %}
-<div id="map">
-    <div id="map-js"></div>
-</div>
+<article id="node-details" class="center-stage responsive-padding">
+    <h2>
+        <%= name %>
+        <% if(Ns.settings.votes && relationships){ %>
+        <span class="vote">
+            <a href="#like" class="icon-thumbs-up<%= (relationships.has_already_voted === -1) ? ' fade' : '' %>">
+                <%= relationships.counts.likes %>
+            </a>
+            <a href="#dislike" class="icon-thumbs-down<%= (relationships.has_already_voted === 1) ? ' fade' : '' %>">
+                <%= relationships.counts.dislikes %>
+            </a>
+        </span>
+        <% } %>
+    </h2>
 
-<div id="map-overlay-container">
-    <article id="node-details" class="center-stage responsive-padding">
-        <h2>
-            <%= name %>
-            <% if(Ns.settings.votes && relationships){ %>
-            <span class="vote">
-                <a href="#like" class="icon-thumbs-up<%= (relationships.has_already_voted === -1) ? ' fade' : '' %>">
-                    <%= relationships.counts.likes %>
-                </a>
-                <a href="#dislike" class="icon-thumbs-down<%= (relationships.has_already_voted === 1) ? ' fade' : '' %>">
-                    <%= relationships.counts.dislikes %>
-                </a>
-            </span>
-            <% } %>
-        </h2>
+    <p class="actions">
+        <% if(user) { %>
+            <a href="#/users/<%= user %>"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
+            <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
+        <% } %>
+        <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
+        <% if(Ns.accountMenu.model.get('username') !== undefined){ %>
+            <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
+        <% } %>
+    </p>
 
-        <p class="actions">
-            <% if(user) { %>
-                <a href="#/users/<%= user %>"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
-                <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
-            <% } %>
-            <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
-            <% if(Ns.accountMenu.model.get('username') !== undefined){ %>
-                <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
-            <% } %>
-        </p>
+    <ul class="nav nav-tabs hidden-xs" id="node-menu">
+        <li class="active"><a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'General info' %}</a></li>
+        <!--<li><a href="javascript:$.createModal({message:'not implemented yet'})">Images (4)</a></li>
+        <li><a href="javascript:$.createModal({message:'not implemented yet'})">Devices (3)</a></li>-->
+    </ul>
 
-        <ul class="nav nav-tabs hidden-xs" id="node-menu">
-            <li class="active"><a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'General info' %}</a></li>
-            <!--<li><a href="javascript:$.createModal({message:'not implemented yet'})">Images (4)</a></li>
-            <li><a href="javascript:$.createModal({message:'not implemented yet'})">Devices (3)</a></li>-->
-        </ul>
+    <ul class="nav nav-pills visible-xs" id="node-menu-mobile">
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:$.createModal({message:'not implemented yet'})">
+                {% trans 'General info' %} <span class="caret"></span>
+            </a>
+            <!--<ul class="dropdown-menu">
+                <li><a href="javascript:$.createModal({message:'not implemented yet'})">Images (4)</a></li>
+                <li><a href="javascript:$.createModal({message:'not implemented yet'})">Devices (3)</a></li>
+            </ul> -->
+        </li>
+    </ul>
 
-        <ul class="nav nav-pills visible-xs" id="node-menu-mobile">
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:$.createModal({message:'not implemented yet'})">
-                    {% trans 'General info' %} <span class="caret"></span>
-                </a>
-                <!--<ul class="dropdown-menu">
-                    <li><a href="javascript:$.createModal({message:'not implemented yet'})">Images (4)</a></li>
-                    <li><a href="javascript:$.createModal({message:'not implemented yet'})">Devices (3)</a></li>
-                </ul> -->
-            </li>
-        </ul>
-
-        <div class="row">
-            <div class="col-sm-12 left">
-                <table class="table table-striped left-labels">
-                    <tr>
-                        <td class="left">
-                            {% trans 'Status' %}:
-                        </td>
-                        <td class="right">
-                            <span class="status <%= status %>">
-                                <%= status %>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="left">
-                            {% trans 'Layer' %}:
-                        </td>
-                        <td class="right">
-                            <a href="javascript:$.createModal({message:'not implemented yet'})"><%= layer_name %></a>
-                        </td>
-                    </tr>
-                    <% if(address){ %>
-                    <tr>
-                        <td class="left">
-                            {% trans 'Address' %}:
-                        </td>
-                        <td class="right">
-                            <%= address %>
-                        </td>
-                    </tr>
-                    <% } %>
-                    <% if(elev){ %>
-                    <tr>
-                        <td class="left">
-                            {% trans 'Elevation' %}:
-                        </td>
-                        <td class="right">
-                            <%= elev %> {% trans 'meters' %}
-                        </td>
-                    </tr>
-                    <% } %>
-                    <tr>
-                        <td class="left">
-                            {% trans 'Added' %}:
-                        </td>
-                        <td class="right">
-                            <%= _.formatDate(added) %>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="left">
-                            {% trans 'Updated' %}:
-                        </td>
-                        <td class="right">
-                            <%= _.formatDate(updated) %>
-                        </td>
-                    </tr>
-                    <!--<tr>
-                        <td class="left">
-                            Hotspot:
-                        </td>
-                        <td class="right">
-                            <span class="icon-ok"></span>
-                            <span class="icon-cancel"></span>
-                        </td>
-                    </tr>-->
-                    <% if(Ns.settings.ratings && relationships){ %>
-                    <tr>
-                        <td class="left">
-                            {% trans 'Rating' %}:
-                        </td>
-                        <td class="right" id="js-rating" data-thanks-message="{% trans 'Thanks for rating' %}">
-                            <a href="#" class="rating">
-                                <% _.each(_.numberTo5Stars(relationships.counts.rating_avg / 2), function(value, i){ %>
-                                    <span class="icon-star-<%= value %>"
-                                          data-original-class="icon-star-<%= value %>"
-                                          data-number="<%= i %>"></span>
-                                <% }) %>
-                            </a>
-                            <span class="rating-count">(<a class="hastip" title="{% trans 'number of ratings' %}"><%= relationships.counts.rating_count %></a>)<span>
-                        </td>
-                    </tr>
-                    <% } %>
-                </table>
-                <% if(description){ %>
-                <h3>{% trans 'Description' %}</h3>
-                <%= description %>
+    <div class="row">
+        <div class="col-sm-12 left">
+            <table class="table table-striped left-labels">
+                <tr>
+                    <td class="left">
+                        {% trans 'Status' %}:
+                    </td>
+                    <td class="right">
+                        <span class="status <%= status %>">
+                            <%= status %>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">
+                        {% trans 'Layer' %}:
+                    </td>
+                    <td class="right">
+                        <a href="javascript:$.createModal({message:'not implemented yet'})"><%= layer_name %></a>
+                    </td>
+                </tr>
+                <% if(address){ %>
+                <tr>
+                    <td class="left">
+                        {% trans 'Address' %}:
+                    </td>
+                    <td class="right">
+                        <%= address %>
+                    </td>
+                </tr>
                 <% } %>
-            </div>
-            <!--<div class="col-sm-6 right">
-                <div style="background:#333;min-height:400px;line-height:400px;color:#fff;text-align:center;font-size:18px">
-                    Image gallery coming soon
-                </div>
-            </div>-->
-        </div>
-
-        <% if(Ns.settings.comments && relationships){ %>
-        <div id="comments">
-            <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
-
-            <% if(Ns.db.user.isAuthenticated()){ %>
-            <form action="" class="new-comment" method="post">
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <img class="avatar" src="<%= Ns.db.user.get('avatar') %>" alt="">
-                    </span>
-                    <div class="form-control">
-                        <textarea name="text"
-                                  class="initial"
-                                  placeholder="{% trans 'Join the discussion...' %}"
-                                  rows="1"
-                                  required></textarea>
-                    </div>
-                </div>
-                <div class="submit-row">
-                    <button type="submit" class="btn btn-primary icon-comments">{% trans 'leave comment' %}</button>
-                </div>
-            </form>
-            <% } else { %>
-            <div class="new-comment">
-                <a class="btn btn-primary icon-user" data-toggle="modal" data-target="#signin-modal">
-                    {% trans 'Sign in to comment' %}
-                </a>
-            </div>
-            <% } %>
-
-            <% if(relationships.comments.length > 0){ %>
-                <% _.each(relationships.comments, function(comment, i){ %>
-                    <div class="comment" id="c-<%= i %>">
-                        <a href="#/users/<%= comment.user.username %>">
-                            <img class="avatar" src="<%= comment.user.avatar %>" alt="">
+                <% if(elev){ %>
+                <tr>
+                    <td class="left">
+                        {% trans 'Elevation' %}:
+                    </td>
+                    <td class="right">
+                        <%= elev %> {% trans 'meters' %}
+                    </td>
+                </tr>
+                <% } %>
+                <tr>
+                    <td class="left">
+                        {% trans 'Added' %}:
+                    </td>
+                    <td class="right">
+                        <%= _.formatDate(added) %>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">
+                        {% trans 'Updated' %}:
+                    </td>
+                    <td class="right">
+                        <%= _.formatDate(updated) %>
+                    </td>
+                </tr>
+                <!--<tr>
+                    <td class="left">
+                        Hotspot:
+                    </td>
+                    <td class="right">
+                        <span class="icon-ok"></span>
+                        <span class="icon-cancel"></span>
+                    </td>
+                </tr>-->
+                <% if(Ns.settings.ratings && relationships){ %>
+                <tr>
+                    <td class="left">
+                        {% trans 'Rating' %}:
+                    </td>
+                    <td class="right" id="js-rating" data-thanks-message="{% trans 'Thanks for rating' %}">
+                        <a href="#" class="rating">
+                            <% _.each(_.numberTo5Stars(relationships.counts.rating_avg / 2), function(value, i){ %>
+                                <span class="icon-star-<%= value %>"
+                                      data-original-class="icon-star-<%= value %>"
+                                      data-number="<%= i %>"></span>
+                            <% }) %>
                         </a>
-                        <div class="meta-data">
-                            <a href="#/users/<%= comment.user.username %>">
-                                <%= comment.user.username %>
-                            </a>
-                            <span class="separator">•</span>
-                            <span class="date"><%= $.format.prettyDate(comment.added) %></span>
-                        </div>
-                        <p class="text">
-                            <%= _.nl2br(comment.text) %>
-                        </p>
-                    </div>
-                <% }); %>
+                        <span class="rating-count">(<a class="hastip" title="{% trans 'number of ratings' %}"><%= relationships.counts.rating_count %></a>)<span>
+                    </td>
+                </tr>
+                <% } %>
+            </table>
+            <% if(description){ %>
+            <h3>{% trans 'Description' %}</h3>
+            <%= description %>
             <% } %>
+        </div>
+        <!--<div class="col-sm-6 right">
+            <div style="background:#333;min-height:400px;line-height:400px;color:#fff;text-align:center;font-size:18px">
+                Image gallery coming soon
+            </div>
+        </div>-->
+    </div>
+
+    <% if(Ns.settings.comments && relationships){ %>
+    <div id="comments">
+        <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
+
+        <% if(Ns.db.user.isAuthenticated()){ %>
+        <form action="" class="new-comment" method="post">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <img class="avatar" src="<%= Ns.db.user.get('avatar') %>" alt="">
+                </span>
+                <div class="form-control">
+                    <textarea name="text"
+                              class="initial"
+                              placeholder="{% trans 'Join the discussion...' %}"
+                              rows="1"
+                              required></textarea>
+                </div>
+            </div>
+            <div class="submit-row">
+                <button type="submit" class="btn btn-primary icon-comments">{% trans 'leave comment' %}</button>
+            </div>
+        </form>
+        <% } else { %>
+        <div class="new-comment">
+            <a class="btn btn-primary icon-user" data-toggle="modal" data-target="#signin-modal">
+                {% trans 'Sign in to comment' %}
+            </a>
         </div>
         <% } %>
 
-        <a href="#/close" class="icon-close"></a>
-    </article>
-</div>
+        <% if(relationships.comments.length > 0){ %>
+            <% _.each(relationships.comments, function(comment, i){ %>
+                <div class="comment" id="c-<%= i %>">
+                    <a href="#/users/<%= comment.user.username %>">
+                        <img class="avatar" src="<%= comment.user.avatar %>" alt="">
+                    </a>
+                    <div class="meta-data">
+                        <a href="#/users/<%= comment.user.username %>">
+                            <%= comment.user.username %>
+                        </a>
+                        <span class="separator">•</span>
+                        <span class="date"><%= $.format.prettyDate(comment.added) %></span>
+                    </div>
+                    <p class="text">
+                        <%= _.nl2br(comment.text) %>
+                    </p>
+                </div>
+            <% }); %>
+        <% } %>
+    </div>
+    <% } %>
+
+    <a href="#/close" class="icon-close"></a>
+</article>

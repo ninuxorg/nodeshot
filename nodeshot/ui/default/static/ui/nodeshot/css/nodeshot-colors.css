@@ -956,3 +956,7 @@ a.icon-thumbs-down{
     position: relative;
     bottom: -6px
 }
+
+.details-background, .short-map{
+    background-color: #aba49c;
+}

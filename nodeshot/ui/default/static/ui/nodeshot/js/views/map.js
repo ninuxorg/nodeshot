@@ -10,7 +10,8 @@
             legend: '#legend-js',
             panels: '#map-panels',
             toolbar: '#map-toolbar',
-            add: '#map-add-node-js'
+            add: '#map-add-node-js',
+            details: '#map-details-js'
         },
 
         /**
@@ -40,12 +41,24 @@
             this.add.show(new Ns.views.map.Add({ parent: this }));
         },
 
+        /**
+         * get node details
+         */
+        getNode: function(slug) {
+            var node = new Ns.models.Node({ slug: slug }),
+                self = this;
+            node.fetch().then(function () {
+                self.details.show(new Ns.views.node.Detail({ model: node, parent: self }));
+            });
+        },
+
         /*
          * resets to view initial state
          */
         reset: function () {
             this.content.currentView.closeLeafletPopup();
             this.add.empty();
+            this.details.empty();
         }
 
     }, {  // static methods
@@ -368,7 +381,9 @@
                 },
                 // when popup opens, change the URL fragment
                 popupopen: function (e) {
-                    Ns.router.navigate('map/' + data.slug);
+                    if (Backbone.history.fragment.substr(0, 4) == 'map/') {
+                        Ns.router.navigate('map/' + data.slug);
+                    }
                     // destroy container to avoid the chance that the tooltip
                     // might appear while showing the leaflet popup
                     $(e.target._container).tooltip('destroy');
@@ -966,7 +981,7 @@
         onBeforeDestroy: function () {
             this.closeAddNode();
             // change url fragment but only if we are still on the map
-            if (Backbone.history.fragment.substr(0,3) == 'map'){
+            if (Backbone.history.fragment.substr(0, 3) == 'map'){
                 Ns.router.navigate('map');
             }
         },
@@ -984,7 +999,7 @@
          */
         toggleHidden: function(){
             this.hidden.toggle();
-            this.resizeMap(),
+            this.resizeMap();
             this.toggleLeafletLayers();
         },
 

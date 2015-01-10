@@ -2,13 +2,12 @@
     'use strict';
 
     Ns.views.node.Detail = Marionette.ItemView.extend({
-        name: 'Ns.views.node.Detail',
         tagName: 'div',
-        id: 'map-container',
-        className: 'short-map',
+        id: 'map-overlay-container',
         template: '#node-details-template',
 
         ui: {
+            'nodeDetails': '#node-details',
             'commentTextarea': '.new-comment textarea',
             'commentTextareaContainer': '.new-comment .form-control',
             'submitRow': '.new-comment .submit-row',
@@ -39,36 +38,42 @@
             'change': 'render'
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.parent = options.parent;
+            this.ext = {
+                legend: this.parent.legend.$el,
+                toolbar: this.parent.toolbar.$el,
+                map: this.parent.content.$el,
+                leafletMap: this.parent.content.currentView.map,
+                mapContainer: this.parent.$el,
+                html: $('html'),
+                geo: Ns.db.geo
+            };
+            // elements that must be hidden
+            this.hidden =  $().add(this.ext.legend)
+                              .add(this.ext.toolbar)
+                              .add(this.ext.map.find('.leaflet-control-attribution'));
             // bind to namespaced events
             $(window).on("resize.node-details", _.bind(this.resize, this));
             this.listenTo(Ns.db.user, 'loggedin loggedout', this.render);
-            // trick for background color
-            $('html').css('background-color', '#aba49c');
         },
 
         onShow: function () {
-            var map = $.loadDjangoLeafletMap(),
+            var map = this.ext.leafletMap,
                 geomodel = new Ns.models.Geo(this.model.toJSON()),
                 leaflet = geomodel.toLeaflet(),
                 mapPreferences = localStorage.getObject('map') || Ns.settings.map;
-
-            map.fitBounds(leaflet.getBounds());
-            // add leaflet layer to map
-            map.addLayer(leaflet);
-            // move map up slightly
-            map.panBy([0, 90], {
-                animate: false
-            });
-            // this.osmLayer = new L.tileLayer(Ns.TILESERVER_URL).addTo(map);
-            this.map = map;
+            // hide elements that are not needed
+            this.toggleElements();
+            // fit map view to geographic object
+            map.fitBounds(leaflet.getBounds(), { animate: false });
+            // move map up slightly to conpensate the layout
+            map.panBy([0, 90], { animate: false });
 
             $('body').attr('style', '').css({
                 'overflow-x': 'hidden',
                 'overflow-y': 'auto'
             });
-            this.resizeMap();
-            this.setMinHeight();
 
             // enable tooltips
             $('.hastip').tooltip();
@@ -85,8 +90,22 @@
         onDestroy: function () {
             // unbind the namespaced events
             $(window).off("resize.node-details");
-            // restore background color
-            $('html').attr('style', '');
+            // restore initial state
+            this.toggleElements();
+        },
+
+        /**
+         * hide/show elements that are peculiar to this view
+         */
+        toggleElements: function() {
+            // style needed to display smaller map
+            this.ext.mapContainer.toggleClass('short-map');
+            // trick for uniform background color
+            this.ext.html.toggleClass('details-background');
+            // hide or show elements that are not needed for this view
+            this.hidden.toggle();
+            // resize map
+            this.resize();
         },
 
         /*
@@ -109,16 +128,18 @@
          * set min-heigh css property on map-container div
          */
         setMinHeight: function () {
-            // ensure content fills until the bottom of the window
-            $('#map-container').height($(window).height() - $('header').eq(0).outerHeight());
+            if (this.hidden.eq(0).is(':hidden')){
+                // ensure content fills until the bottom of the window
+                this.ext.mapContainer.height($(window).height() - $('header').eq(0).outerHeight());
 
-            var containerHeight = $('#map-container').outerHeight(),
-                // distance of map-overlay container from top
-                topDistance = parseInt($('#map-overlay-container').css('top')),
-                newMinHeight = containerHeight - topDistance;
+                var containerHeight = this.ext.mapContainer.outerHeight(),
+                    // distance of map-overlay container from top
+                    topDistance = parseInt(this.$el.css('top')),
+                    newMinHeight = containerHeight - topDistance;
 
-            if (newMinHeight > 150) {
-                $('#node-details').css('min-height', newMinHeight);
+                if (newMinHeight > 150) {
+                    this.ui.nodeDetails.css('min-height', newMinHeight);
+                }
             }
         },
 
