@@ -16,7 +16,9 @@
     });
 
     Ns.views.Menu = Marionette.CollectionView.extend({
-        el: '#main-menu-view',
+        id: 'main-menu-view',
+        className: 'nav navbar-nav',
+        tagName: 'ul',
         childView: ItemView,
         emptyView: EmptyView,
 
@@ -26,7 +28,6 @@
             this.listenTo(Ns.db.user, 'loggedin', this.fetch);
             this.listenTo(Ns.db.user, 'loggedout', this.fetch);
             this.listenTo(this.collection, 'sync', this.render);
-            this.render();
         },
 
         /*

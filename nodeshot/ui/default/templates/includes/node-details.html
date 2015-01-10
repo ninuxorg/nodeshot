@@ -12,11 +12,11 @@
 
     <p class="actions">
         <% if(user) { %>
-            <a href="#/users/<%= user %>"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
+            <a href="#users/<%= user %>"><% if(relationships){ %><img src="<%= relationships.user.avatar %>" alt=""><% } %><%= user %></a>
             <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
         <% } %>
         <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
-        <% if(Ns.accountMenu.model.get('username') !== undefined){ %>
+        <% if(Ns.db.user.isAuthenticated()){ %>
             <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
         <% } %>
     </p>

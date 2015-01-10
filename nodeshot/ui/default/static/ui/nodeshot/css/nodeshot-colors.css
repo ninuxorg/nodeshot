@@ -115,21 +115,21 @@ body > header{
 #top-bar a, .breadcrumb a, body a, body a:hover{ color: #fff }
 /*.breadcrumb a{ text-decoration: underline }*/
 
-#top-bar > ul > li > a{
+#main-actions > ul > li > a{
     border-left: 1px solid rgba(255, 255, 255, 0);
     border-right: 1px solid rgba(255, 255, 255, 0);
     margin-left: -1px;
 }
 
-#top-bar > ul > li > a:hover,
-#top-bar > ul > li > a:focus,
-#top-bar li.open a{
+#main-actions > ul > li > a:hover,
+#main-actions > ul > li > a:focus,
+#main-actions li.open a{
     background-color: #df5134;
     border-left: 1px solid rgba(255, 255, 255, 0.3);
     border-right: 1px solid rgba(255, 255, 255, 0.3);
     outline: 0 none;
 }
-#top-bar > ul > li > :active { background-color: #ff866d }
+#main-actions > ul > li > :active { background-color: #ff866d }
 
 #top-bar li ul{
     padding: 0;

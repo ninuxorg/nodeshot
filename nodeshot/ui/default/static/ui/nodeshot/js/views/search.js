@@ -12,7 +12,6 @@
     });
 
     Ns.views.Search = Marionette.CompositeView.extend({
-        el: '#general-search',
         tagName: 'div',
         template: '#search-template',
         childView: ItemView,

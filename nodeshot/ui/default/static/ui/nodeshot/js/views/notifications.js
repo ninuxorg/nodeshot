@@ -18,7 +18,6 @@
     });
 
     Ns.views.Notification = Marionette.CollectionView.extend({
-        el: '#js-notifications-container',
         tagName: 'ul',
         childView: ItemView,
         emptyView: EmptyView,
@@ -28,10 +27,12 @@
         },
 
         initialize: function(){
+            this.collection = new Ns.collections.Notification();
             // listens when user status changes to fetch notifications
             this.listenTo(Ns.db.user, 'change', this.fetch);
             // fetch when collection is synced
             this.listenTo(this.collection, 'reset', this.render);
+            if(Ns.db.user.isAuthenticated()){ this.fetch(); }
         },
 
         onRender: function(){

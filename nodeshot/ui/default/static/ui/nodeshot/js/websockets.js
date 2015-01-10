@@ -3,22 +3,22 @@
         var socket,
         url,
         querystring = '';
-        
+
         if(Ns.db.user.isAuthenticated()){
             querystring = '?user_id='+Ns.db.user.get('id');
         }
-        
+
         url = "ws://"+ __websockets__.DOMAIN + __websockets__.PATH + ":" + __websockets__.PORT + "/" + querystring;
-        
+
         try {
             var socket = new WebSocket(url);
-    
+
             socket.onmessage = function(msg) {
                 try{
                     data = JSON.parse(msg.data);
                     // if we got a notification update the UI
                     if(data.model == 'notification'){
-                        Ns.notifications.fetch({ reset: true })
+                        Ns.notifications.currentView.collection.fetch({ reset: true })
                     }
                 }
                 catch(e){
@@ -27,7 +27,7 @@
                     }
                 }
             }
-            
+
             __websockets__.socket = socket;
         } catch (e) {
             if(typeof(console) !== undefined){
@@ -36,7 +36,7 @@
         }
     },
     user = Ns.db.user;
-    
+
     user.on('change:username', function(){
         // close any previous connection if present
         if(__websockets__.socket){
@@ -47,7 +47,7 @@
             connect();
         }
     });
-    
+
     if(user.isAuthenticated()){
         connect();
     }

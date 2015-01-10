@@ -8,8 +8,9 @@
 
     // auxiliary object that keeps some details about the state of the app
     Ns.state = {
-        currentAjaxRequest: null,
-        autoToggleLoading: true
+        currentAjaxRequest: null,  // needed to cancel an xhr request
+        autoToggleLoading: true,  // indicates wether the loading div should be toggled automatically
+        onNodeClose: 'map'  // when a node-details is closed go back on map
     };
 
     Ns.url = function(resource){
@@ -17,23 +18,19 @@
     };
 
     Ns.addRegions({
+        menu: '#ns-top-nav-links',
+        search: '#general-search',
+        account: '#main-actions',
+        notifications: '#js-notifications-container',
         body: '#body'
     });
 
     // init layout
     Ns.addInitializer(function () {
-        Ns.notifications = new Ns.collections.Notification();
-        Ns.notificationView = new Ns.views.Notification({
-            collection: Ns.notifications
-        }).render();
-
-        Ns.accountMenu = new Ns.views.Account({
-            model: Ns.db.user
-        });
-        Ns.accountMenu.render();
-        Ns.mainMenu = new Ns.views.Menu(); // renders automatically
-        Ns.generalSearch = new Ns.views.Search(); // renders automatically
-        Ns.state.onNodeClose = 'map';  // when a node-details is closed go back on map
+        Ns.notifications.show(new Ns.views.Notification());
+        Ns.account.show(new Ns.views.Account());
+        Ns.menu.show(new Ns.views.Menu());
+        Ns.search.show(new Ns.views.Search());
     });
 
     // init pages

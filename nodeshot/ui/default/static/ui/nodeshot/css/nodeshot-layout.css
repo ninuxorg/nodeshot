@@ -111,8 +111,10 @@
     float: right;
     margin: 0;
     padding: 0;
-    list-style: none outside;
 }
+
+#main-actions ul,
+#main-actions li{ list-style: none outside }
 
 #main-actions li,
 #main-actions li a{
