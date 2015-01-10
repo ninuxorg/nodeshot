@@ -270,13 +270,13 @@
             // if node
             if (typeof this.get('slug') !== 'undefined'){
                 type = 'node';
-                action = '#/nodes/' + this.get('slug');
+                action = '#nodes/' + this.get('slug');
                 name = this.get('name');
             }
             // if address
             else if (typeof this.get('lat') !== 'undefined') {
                 type = 'address';
-                action = '#/map/latlng/' + this.get('lat') + ',' + this.get('lon');
+                action = '#map/latlng/' + this.get('lat') + ',' + this.get('lon');
                 name = this.get('display_name');
             }
             return {

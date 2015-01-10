@@ -771,7 +771,7 @@ class DefaultUiTest(TestCase):
         # go to first result
         self.browser.find_element_by_css_selector('#js-search-results li a').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
-        self.assertIn('#/map/latlng/41.89', self.browser.current_url)
+        self.assertIn('#map/latlng/41.89', self.browser.current_url)
 
     def test_notifications(self):
         # open sign in modal
