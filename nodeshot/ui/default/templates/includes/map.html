@@ -1,0 +1,241 @@
+{% load i18n %}
+<script id="map-layout-template" type="text/template">
+    <aside id="map-toolbar"></aside>
+    <div id="map">
+        <div id="map-js"></div>
+        <div id="legend-js"></div>
+        <div id="map-panels"></div>
+        <div id="add-node-step1" tabindex="-1" role="dialog" aria-labelledby="add-node-step1-label" aria-hidden="true"
+            class="modal-dialog modal-content modal-body modal-x-slim autocenter bottom">
+            <span class="message">{% trans 'Click on the map to indicate the location' %}</span>
+            <button type="button" class="btn btn-default">{% trans 'cancel' %}</button>
+        </div>
+        <div id="add-node-step2" tabindex="-1" role="dialog" aria-labelledby="add-node-step2-label" aria-hidden="true"
+            class="modal-dialog modal-content modal-body modal-x-slim autocenter bottom">
+            <span class="message">{% trans 'Drag to adjust' %}</span>
+            <button type="button" class="btn btn-success">{% trans 'confirm' %}</button>
+            <button type="button" class="btn btn-default">{% trans 'cancel' %}</button>
+        </div>
+    </div>
+    <div id="map-add-node-js" class="map-overlay animate-width content"></div>
+</script>
+
+<script id="map-legend-template" type="text/template">
+    <h5>{% trans 'Legend' %}</h5>
+    <ul>
+        <% _.each(items, function(item){ %>
+        <li id="legend-item-<%= item.slug %>" <% if(!item.visible) { %>class="disabled"<% } %>>
+            <a href="#" data-status="<%= item.slug %>" title="<%= item.description %>">
+                <span class="circle" style="background-color:<%= item.fill_color %>"></span>
+                <%= item.name %>
+            </a>
+            <span class="stats"><%= item.count %></span>
+        </li>
+        <% }) %>
+    </ul>
+    <a class="icon-close" href="#" title="{% trans 'Hide legend' %}"></a>
+</script>
+
+<script id="map-toolbar-template" type="text/template">
+    <a href="#" class="icon-layer-2" data-panel="fn-map-layers" title="{% trans 'Control map data' %}" data-placement="left" data-delay="200"></a>
+    <a href="#" class="icon-pin-add" data-toggle="tooltip" title="Add new node" data-placement="left" data-delay="200"></a>
+    <a href="#" class="icon-search" data-panel="fn-search-address" data-toggle="tooltip" title="Search address" data-placement="left" data-delay="200"></a>
+    <a href="#" id="btn-map-mode" class="icon-3d smaller" title="Toggle 3D view" data-placement="left" data-delay="200"></a>
+    <a href="#" class="icon-tools" data-panel="fn-map-tools" title="Map tools" data-placement="left" data-delay="200"></a>
+    <a href="#" class="icon-config" data-panel="fn-map-preferences" title="Map preferences" data-placement="left" data-delay="200"></a>
+    <a id="btn-legend" href="#" class="icon-list" title="Toggle legend" data-placement="left" data-delay="200"></a>
+</script>
+
+<script id="map-panels-template" type="text/template">
+    <a id="toggle-toolbar" href="#" class="glyphicon glyphicon-chevron-up"></a>
+
+    <div id="fn-search-address" class="side-panel">
+        <form action="">
+            <div class="input-group">
+                <input required type="text" class="form-control input-sm" placeholder="{% trans 'Enter an address' %}">
+                <span class="input-group-btn">
+                    <button class="btn btn-default btn-sm" type="submit">{% trans 'search' %}</button>
+                </span>
+            </div>
+        </form>
+    </div>
+
+    <div id="fn-map-layers" class="side-panel adjust-height">
+        <div class="panel-inner scroller">
+            <h2>{% trans 'Map base' %}</h2>
+            <% _.each(baseLayers, function (baseLayer, i) { %>
+            <p>
+                <span class="custom-radio js-base-layers">
+                    <input type="radio"
+                           name="base-layers"
+                           id="base-layers-<%= i %>"
+                           <% if(baseLayer.checked){ %>checked<% } %>
+                           data-name="<%= baseLayer.name %>" />
+                    <label for="base-layers-<%= i %>"></label>
+                </span>
+                <label for="base-layers-<%= i %>" class="inline h18"><%= baseLayer.name %></label>
+            </p>
+            <% }) %>
+            <div class="line"></div>
+            <h2>{% trans 'Layers' %}</h2>
+            <% _.each(layers, function(layer){ %>
+                <p>
+                    <label for="map-control-layer-<%= layer.slug %>" class="inline">
+                        <%= layer.name %>
+                    </label>
+                    <input type="checkbox" <% if (layer.visible) { %>checked<% } %>
+                           class="switch toggle-layer-data"
+                           id="map-control-layer-<%= layer.slug %>"
+                           data-slug="<%= layer.slug %>">
+                </p>
+            <% }); %>
+            <div class="line"></div>
+            <h2>{% trans 'Legend' %}</h2>
+            <% _.each(legend, function(legend){ %>
+                <p>
+                    <label for="map-control-layer-<%= legend.slug %>" class="inline">
+                        <%= legend.name %>
+                    </label>
+                    <input type="checkbox" <% if (legend.visible) { %>checked<% } %>
+                           class="switch toggle-legend-data"
+                           id="map-control-legend-<%= legend.slug %>"
+                           data-slug="<%= legend.slug %>">
+                </p>
+            <% }); %>
+        </div>
+    </div>
+
+    <div id="fn-map-tools" class="side-panel">
+        <p>
+            <button href="#" class="icon-ruler tool hastip"
+                    data-toggle="tooltip" title="measure distance" data-placement="top" data-delay="300"></button>
+            <button href="#" class="icon-select-area tool hastip"
+                    data-toggle="tooltip" title="measure area" data-placement="top" data-delay="300"></button>
+        </p>
+        <p>
+            <button href="#" class="icon-elevation-profile tool hastip"
+                    data-toggle="tooltip" title="elevation profile" data-placement="bottom" data-delay="300"></button>
+            <button href="#" class="icon-placeholder tool hastip"
+                    data-toggle="tooltip" title="drop placeholder" data-placement="bottom" data-delay="300"></button>
+        </p>
+    </div>
+
+    <div id="fn-map-preferences" class="side-panel adjust-height">
+        <div class="panel-inner scroller">
+            <h2>map preferences</h2>
+            <p>
+                <label for="switch1" class="inline">Cool setting 1</label>
+                <input type="checkbox" checked class="switch" id="switch1">
+            </p>
+            <p>
+                <label for="switch2" class="inline">Cool setting 2</label>
+                <input type="checkbox" checked class="switch" id="switch2">
+            </p>
+            <p>
+                <label for="switch3" class="inline">Advanced thing</label>
+                <input type="checkbox" class="switch" id="switch3">
+            </p>
+            <div class="line"></div>
+            <p>Setting chooser</p>
+            <select class="selectpicker">
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+            </select>
+            <p>Slider</p>
+            <p>
+                <span class="slider">
+                    <input type = "range" min="0" max="100" onchange="rangevalue.value=value"/>
+                    <output id="rangevalue">50</output>
+                </span>
+            </p>
+            <div class="line"></div>
+            <p>
+                <label for="switch4" class="inline">Moaar stuff</label>
+                <input type="checkbox" checked class="switch" id="switch4">
+            </p>
+            <p>
+                <label for="switch5" class="inline">Too advanced</label>
+                <input type="checkbox"  class="switch" id="switch5">
+            </p>
+            <p>
+                <label for="switch6" class="inline">Turn me on</label>
+                <input type="checkbox" class="switch" id="switch6">
+            </p>
+            <div class="line"></div>
+            <p>Is getting very long!</p>
+            <select class="selectpicker">
+                <option>Scroll me down</option>
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+            </select>
+            <div class="line"></div>
+            <p>
+                <label for="switch5" class="inline">Not advanced</label>
+                <input type="checkbox" checked class="switch" id="switch5">
+            </p>
+            <p>
+                <label for="switch6" class="inline">Turn me off</label>
+                <input type="checkbox" checked class="switch" id="switch6">
+            </p>
+        </div>
+    </div>
+</script>
+
+<script id="map-popup-template" type="text/template">
+    <h4><%= name %></h4>
+    <% if(description){ %><%= description %><% } %>
+    <p class="details"><a href="#/nodes/<%= slug %>" class="btn btn-primary">{% trans 'Details' %}</a></p>
+</script>
+
+<script id="map-add-node-template" type="text/template">
+    <h1 class="title">{% trans 'Add new node' %}</h1>
+    <form action="{% url 'api_node_list' %}" id="add-node-form">
+        <ul class="error-list"></ul>
+        <p>
+            <label for="id_name">{% trans 'Name' %}</label>
+            <span class="error-msg"></span>
+            <input name="name" type="text" class="form-control input-sm" placeholder="{% trans 'Enter name (required)' %}" id="id_name">
+        </p>
+        <div>
+            <label>Layer</label>
+            <span class="error-msg"></span>
+
+            <select name="layer" id="id_layer" class="selectpicker" data-live-search="true">
+                <option>{% trans 'Select Layer' %}</option>
+                <% _.each(layers, function (layer) { %>
+                    <% if (layer.new_nodes_allowed) { %>
+                        <option value="<%= layer.slug %>"><%= layer.name %></option>
+                    <% } %>
+                <% }) %>
+            </select>
+        </div>
+        <p>
+            <label for="id_address">{% trans 'Address' %}</label>
+            <span class="error-msg"></span>
+            <input name="address" type="text" class="form-control input-sm" placeholder="{% trans 'Enter address (optional)' %}" id="id_address">
+        </p>
+        <p>
+            <label for="id_elevation">{% trans 'Elevation' %}</label>
+            <span class="error-msg"></span>
+            <input name="elevation" type="text" class="form-control input-sm" placeholder="{% trans 'Enter elevation (optional)' %}" id="id_elevation">
+        </p>
+        <p>
+            <label for="id_description">{% trans 'Description' %}</label>
+            <span class="error-msg"></span>
+            <textarea name="description" class="form-control input-sm" rows="6" id="id_description" placeholder="{% trans 'Enter description (optional)' %}"></textarea>
+        </p>
+        <p>
+            <label for="id_data">{% trans 'Extra data' %}</label>
+            <span class="error-msg"></span>
+            <textarea name="data" class="form-control input-sm" rows="6" id="id_data" placeholder="{% trans 'Enter extra data (optional)' %}"></textarea>
+        </p>
+        <p>
+            <button type="submit" class="btn btn-success">{% trans 'Add node' %}</button>
+            &nbsp;
+            <button type="button" class="btn btn-default">{% trans 'Cancel' %}</button>
+        </p>
+        <input type="hidden" id="id_geometry" name="geometry">
+    </form>
+</script>
