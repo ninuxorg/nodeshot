@@ -206,7 +206,8 @@ class DefaultUiTest(TestCase):
         password.send_keys('tester')
         self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
-        sleep(0.3)
+        sleep(1)
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
         # ensure node with higher ACL is now visible
         self.assertFalse(browser.execute_script("return Ns.db.geo.get('hidden-rome') === undefined"))
 
@@ -462,6 +463,7 @@ class DefaultUiTest(TestCase):
         self.assertTrue(toolbar.is_displayed())
 
     def test_map_legend(self):
+        self._reset()
         self._hashchange('#/map')
         browser = self.browser
         browser.execute_script("%s.setView([41.87403473552959, 12.495403289794922], 12)" % self.LEAFLET_MAP)
@@ -485,19 +487,19 @@ class DefaultUiTest(TestCase):
 
         # ensure it can be closed
         browser.find_element_by_css_selector('#map-legend .icon-close').click()
-        sleep(0.3)
+        sleep(0.4)
         self.assertFalse(legend.is_displayed())
         self.assertNotIn('disabled', button.get_attribute('class'))
 
         # reopen again
         button.click()
-        sleep(0.3)
+        sleep(0.4)
         self.assertIn('disabled', button.get_attribute('class'))
         self.assertTrue(legend.is_displayed())
 
         # ensure preference is mantained when switching pages back and forth
         button.click()
-        sleep(0.3)
+        sleep(0.4)
         self.assertFalse(legend.is_displayed())
         self._hashchange('#/')
         self._hashchange('#/map')
