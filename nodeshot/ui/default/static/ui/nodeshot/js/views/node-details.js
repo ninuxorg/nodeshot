@@ -11,7 +11,9 @@
             'commentTextarea': '.new-comment textarea',
             'commentTextareaContainer': '.new-comment .form-control',
             'submitRow': '.new-comment .submit-row',
-            'stars': '#js-rating a span'
+            'stars': '#js-rating a span',
+            'iconThumbsUp': '.icon-thumbs-up',
+            'iconThumbsDown': '.icon-thumbs-down'
         },
 
         events: {
@@ -47,7 +49,8 @@
                 leafletMap: this.parent.content.currentView.map,
                 mapContainer: this.parent.$el,
                 html: $('html'),
-                geo: Ns.db.geo
+                body: $('body'),
+                signin: $('#signin-modal')
             };
             // elements that must be hidden
             this.hidden =  $().add(this.ext.legend)
@@ -71,15 +74,10 @@
             map.fitBounds(leaflet.getBounds(), { animate: false });
             // move map up slightly to conpensate the layout
             map.panBy([0, 90], { animate: false });
-
-            $('body').attr('style', '').css({
-                'overflow-x': 'hidden',
-                'overflow-y': 'auto'
-            });
-
+            // enable vertical scrolling
+            this.ext.body.css('overflow-x', 'hidden');
             // enable tooltips
-            $('.hastip').tooltip();
-
+            this.$('.hastip').tooltip();
             // store coordinates in preferences
             mapPreferences.lat = leaflet.getBounds().getCenter().lat;
             mapPreferences.lng = leaflet.getBounds().getCenter().lng;
@@ -92,6 +90,8 @@
         onDestroy: function () {
             // unbind the namespaced events
             $(window).off("resize.node-details");
+            // reset scrollbar styles
+            this.ext.body.attr('style', '').scrollTop(0);
             // restore initial state
             this.toggleElements();
         },
@@ -138,7 +138,7 @@
                     // distance of map-overlay container from top
                     topDistance = parseInt(this.$el.css('top')),
                     newMinHeight = containerHeight - topDistance;
-
+                // set min height if necessary
                 if (newMinHeight > 150) {
                     this.ui.nodeDetails.css('min-height', newMinHeight);
                 }
@@ -154,61 +154,36 @@
             window.prompt(text, window.location.href);
         },
 
-        /*
-         * like
-         */
-        like: function(e){
-            e.preventDefault();
-            if(!Ns.db.user.isAuthenticated()){
-                $('#signin-modal').modal('show');
-                return;
-            }
 
-            var relationships = this.model.get('relationships'),
-                backup = relationships.counts.likes,
-                self = this;
-            // increment
-            relationships.counts.likes++;
-            this.model.set('relationships', relationships);
-            $(e.target).text(relationships.counts.likes);
-            $('.icon-thumbs-down').addClass('fade');
-
-            $.post(relationships.votes_url, { vote: 1 })
-            // restore backup in case of error
-            .error(function(http){
-                $(e.target).text(backup);
-                $('.icon-thumbs-down').removeClass('fade');
-                relationships.counts.likes = backup;
-                self.model.set('relationships', relationships);
-                $.createModal({ message: 'error' });
-            });
-        },
+        like: function(e) { this.vote(e, 1); },
+        dislike: function(e) { this.vote(e, -1); },
 
         /*
-         * dislike
+         * like/dislike
          */
-        dislike: function(e){
+        vote: function(e, value){
             e.preventDefault();
             if(!Ns.db.user.isAuthenticated()){
-                $('#signin-modal').modal('show');
+                this.ext.signin.modal('show');
                 return;
             }
-
             var relationships = this.model.get('relationships'),
-                backup = relationships.counts.dislikes,
+                type = value > 0 ? 'likes' : 'dislikes',
+                otherIcon = this.ui['iconThumbs' + (value > 0 ? 'Down' : 'Up')],
+                backup = _.clone(relationships.counts[type]);
                 self = this;
             // increment
-            relationships.counts.dislikes++;
+            relationships.counts[type]++;
             this.model.set('relationships', relationships);
-            $(e.target).text(relationships.counts.dislikes);
-            $('.icon-thumbs-up').addClass('fade');
-
-            $.post(relationships.votes_url, { vote: -1 })
+            $(e.target).text(relationships.counts[type]);
+            otherIcon.addClass('fade');
+            // post vote
+            $.post(relationships.votes_url, { vote: value })
             // rollback in case of error
             .error(function(http){
                 $(e.target).text(backup);
-                $('.icon-thumbs-down').removeClass('fade');
-                relationships.counts.dislikes = backup;
+                otherIcon.removeClass('fade');
+                relationships.counts[type] = backup;
                 self.model.set('relationships', relationships);
                 $.createModal({ message: 'error' });
             });
@@ -262,11 +237,10 @@
          */
         submitComment: function(e){
             e.preventDefault();
-
             var self = this,
                 relationships = this.model.get('relationships'),
-                commentText = this.ui.commentTextarea.val();
-
+                commentText = this.ui.commentTextarea.val(),
+                comments;
             // add comment to UI
             relationships.comments.push(
                 {
@@ -277,13 +251,13 @@
             );
             this.model.set('relationships', relationships);
             this.model.trigger('change');
+            comments = this.$('.comment')
             // scroll to last comment
-            if($('.comment').length){
+            if(comments.length){
                 $('html, body').animate({
-                    scrollTop: $('.comment').last().offset().top
+                    scrollTop: comments.last().offset().top
                 }, 100);
             }
-
             // add comment to DB
             $.post(relationships.comments_url, { text: commentText })
             // rollback in case of error
@@ -326,17 +300,15 @@
         rate: function(e){
             e.preventDefault();
             if(!Ns.db.user.isAuthenticated()){
-                $('#signin-modal').modal('show');
+                this.ext.signin.modal('show');
                 return;
             }
-
             var relationships = this.model.get('relationships'),
                 value = (parseInt($(e.target).attr('data-number')) + 1) * 2,  // (0-index value + 1) * 2
                 self = this;
-
             $.post(relationships.ratings_url, { "value": value })
             .done(function(){
-                $.createModal({ message: $('#js-rating').attr('data-thanks-message') });
+                $.createModal({ message: self.$('#js-rating').attr('data-thanks-message') });
                 self.model.fetch();
             })
             .error(function(xhr){

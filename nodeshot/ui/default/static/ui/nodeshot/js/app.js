@@ -311,10 +311,7 @@
 
     $(window).load(function (e) {
         $('#preloader').fadeOut(255, function () {
-            // clear overflow hidden except if map view
-            if (!$('#map').length) {
-                $('body').removeAttr('style');
-            }
+            $('body').removeAttr('style');
         });
     });
 

@@ -1198,6 +1198,8 @@ img.avatar200{ border-radius: 15% }
     white-space: nowrap;
 }
 
+.vote a:before{ margin-right: 3px !important }
+
 .rating span{
     margin-right: -4px;
     padding-right: 3px;

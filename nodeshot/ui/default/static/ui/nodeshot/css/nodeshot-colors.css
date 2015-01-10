@@ -888,9 +888,9 @@ label.inline{ margin: 0 }
 }
 
 .icon-ok,
-.icon-thumbs-up{ color: #328327 }
+.icon-thumbs-up{ color: #328327 !important }
 .icon-cancel,
-.icon-thumbs-down{ color: #c72c25 }
+.icon-thumbs-down{ color: #c72c25 !important }
 .vote .fade{ opacity: 0.2 }
 
 a.icon-thumbs-up:hover{ color: #139502 }

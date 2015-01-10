@@ -69,6 +69,7 @@
             this.content.currentView.closeLeafletPopup();
             this.add.empty();
             this.details.empty();
+            Ns.views.map.Layout.resizeMap();
         }
 
     }, {  // static methods
@@ -81,7 +82,9 @@
             var overlayContainer = $('#map-overlay-container'),
                 height,
                 selector,
-                width;
+                width,
+                body = $('body');
+            body.css('overflow-x', 'hidden');
             // map
             if (!overlayContainer.length) {
                 height = $(window).height() - $('body > header').height();
@@ -105,6 +108,7 @@
             }
             // set width
             $('#map').width(width);
+            body.attr('style', '');
             // TODO: this is ugly!
             // call leaflet invalidateSize() to download any gray spot
             if (Ns.body.currentView instanceof Ns.views.map.Layout &&
