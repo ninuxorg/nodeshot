@@ -378,10 +378,10 @@
                     // (and no new popup opens)
                     // URL fragment goes back to initial state
                     setTimeout(function () {
-                        if (self.map._popup === null && Backbone.history.fragment != 'map/add') {
+                        if (self.map._popup === null && Backbone.history.fragment.substr(0, 4) == 'map/') {
                             Ns.router.navigate('map');
                         }
-                    }, 200);
+                    }, 100);
                     // rebind tooltip (it has been destroyed in popupopen event)
                     $(e.target._container).tooltip(self.tooltipOptions(data));
                 },
