@@ -41,21 +41,6 @@
             });
             // GeometryCollection objects not supported!
             layer = geojson.getLayers()[0];
-            // mouse over / out events
-            layer.on({
-                mouseover: function (e) {
-                    var layer = e.target;
-                    layer.setStyle({
-                        fillOpacity: 1
-                    });
-                    if (!L.Browser.ie && !L.Browser.opera) {
-                        layer.bringToFront();
-                    }
-                },
-                mouseout: function (e) {
-                    geojson.resetStyle(e.target);
-                }
-            });
             return layer;
         },
 

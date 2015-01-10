@@ -99,9 +99,7 @@
             // populate map as items are added to collection
             'add': 'addGeoModelToMap',
             // remove items from map when models are removed
-            'remove': 'removeGeoModelFromMap',
-            // tooltips
-            'ready': 'initTooltips'
+            'remove': 'removeGeoModelFromMap'
         },
 
         initialize: function (options) {
@@ -333,6 +331,18 @@
         },
 
         /**
+         * returns options for the initialization of tooltip for leaflet layers
+         */
+        tooltipOptions: function(data) {
+            return {
+                container: '#map-js',
+                placement: 'auto top',
+                title: data.name,
+                delay: { show: 600, hide: 0 }
+            }
+        },
+
+        /**
          * adds a geo model to its cluster
          * binds popup
          * called whenever a model is added to the collection
@@ -344,18 +354,42 @@
                 data = model.toJSON();
             // bind leaflet popup
             leafletLayer.bindPopup(this.popUpTemplate(data));
-            // when popup opens, change the URL fragment
-            leafletLayer.on('popupopen', function () {
-                Ns.router.navigate('map/' + data.slug);
-            });
-            // when popup closes (and no new popup opens)
-            // URL fragment goes back to initial state
-            leafletLayer.on('popupclose', function () {
-                setTimeout(function () {
-                    if (self.map._popup === null && Backbone.history.fragment != 'map/add') {
-                        Ns.router.navigate('map');
+            // mouse over / out events
+            leafletLayer.on({
+                mouseover: function (e) {
+                    // opacity to 1
+                    e.target.setStyle({ fillOpacity: 1 });
+                    // bring to front
+                    if (!L.Browser.ie && !L.Browser.opera) {
+                        e.target.bringToFront({ fillOpacity: 1 });
                     }
-                }, 200);
+                },
+                mouseout: function (e) {
+                    e.target.setStyle({ fillOpacity: Ns.settings.leafletOptions.fillOpacity });
+                },
+                // when popup opens, change the URL fragment
+                popupopen: function (e) {
+                    Ns.router.navigate('map/' + data.slug);
+                    // destroy container to avoid the chance that the tooltip
+                    // might appear while showing the leaflet popup
+                    $(e.target._container).tooltip('destroy');
+                },
+                // when popup closes
+                popupclose: function (e) {
+                    // (and no new popup opens)
+                    // URL fragment goes back to initial state
+                    setTimeout(function () {
+                        if (self.map._popup === null && Backbone.history.fragment != 'map/add') {
+                            Ns.router.navigate('map');
+                        }
+                    }, 200);
+                    // rebind tooltip (it has been destroyed in popupopen event)
+                    $(e.target._container).tooltip(self.tooltipOptions(data));
+                },
+                add: function(e){
+                    // create tootlip when leaflet layer is added to the view
+                    $(e.target._container).tooltip(self.tooltipOptions(data));
+                }
             });
             // show on map only if corresponding nodeshot layer is visible
             if(Ns.db.layers.get(data.layer).get('visible')){
@@ -391,35 +425,6 @@
                 l = geo.whereCollection({ legend: legend, layer: layer.id }).pluck('leaflet');
                 legend.cluster[method](l);
             });
-        },
-
-        /**
-         * initialize tooltips on leaflet layers
-         */
-        initTooltips: function () {
-            var models = this.collection.models,
-                length = this.collection.length,
-                options = {
-                    container: '#map-js',
-                    delay: { show: 600, hide: 0 }
-                },
-                model,
-                shape;
-            while (length--) {
-                model = models[length].toJSON();
-                shape = $(model.leaflet._container);
-                shape.attr('title', model.name);
-                // bind tooltip to be shown with a bit of delay
-                shape.tooltip(options);
-                // destroy the tooltip when the popup is opened to avoid clashing
-                model.leaflet.on('popupopen', function (e) {
-                    $(e.target._container).tooltip('destroy');
-                });
-                // rebind tooltip when popup is closed
-                model.leaflet.on('popupclose', function (e) {
-                    $(e.target._container).tooltip(options);
-                });
-            }
         },
 
         /*
