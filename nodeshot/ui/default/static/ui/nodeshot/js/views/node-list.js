@@ -47,7 +47,7 @@
             // bind custom resize event
             $(window).on("resize.nodelist", _.bind(this.adjustFooter, this));
             // tell to NodeDetailView to come back here when closing
-            Ns.onNodeClose = '#/nodes';
+            Ns.state.onNodeClose = 'nodes';
             // mark nodes menu link as active
             $('#nav-bar a[href="#/nodes"]').addClass('active');
         },

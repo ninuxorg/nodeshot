@@ -33,7 +33,7 @@
         Ns.accountMenu.render();
         Ns.mainMenu = new Ns.views.Menu(); // renders automatically
         Ns.generalSearch = new Ns.views.Search(); // renders automatically
-        Ns.onNodeClose = '#/map';  // TODO: de-uglify
+        Ns.state.onNodeClose = 'map';  // when a node-details is closed go back on map
     });
 
     // init pages

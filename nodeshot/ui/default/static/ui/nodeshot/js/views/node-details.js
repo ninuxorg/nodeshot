@@ -74,8 +74,8 @@
             $('.hastip').tooltip();
 
             // store coordinates in preferences
-            mapPreferences.lat = leaflet.getBounds().getCenter().lat
-            mapPreferences.lng = leaflet.getBounds().getCenter().lng
+            mapPreferences.lat = leaflet.getBounds().getCenter().lat;
+            mapPreferences.lng = leaflet.getBounds().getCenter().lng;
             localStorage.setObject('map', mapPreferences);
         },
 
@@ -327,7 +327,7 @@
         goBack: function(e){
             e.preventDefault();
             Ns.router.navigate(
-                Ns.onNodeClose,
+                Ns.state.onNodeClose,
                 { trigger: true }
             )
         }

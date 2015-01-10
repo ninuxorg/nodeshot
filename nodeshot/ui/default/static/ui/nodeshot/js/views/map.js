@@ -111,8 +111,7 @@
             // bind to namespaced events
             $(window).on('resize.map', _.bind(this.resize, this));
             $(window).on('beforeunload.map', _.bind(this.storeMapProperties, this));
-            // TODO: de-uglyfy
-            Ns.onNodeClose = '#/map';
+            Ns.state.onNodeClose = 'map';  // when a node-details is closed go back on map
         },
 
         onShow: function () {
