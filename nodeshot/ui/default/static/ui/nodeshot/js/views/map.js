@@ -45,11 +45,21 @@
          * get node details
          */
         getNode: function(slug) {
-            var node = new Ns.models.Node({ slug: slug }),
+            // fetch from cache or instantiate new model
+            var node = Ns.db.nodeDetails.get(slug) || new Ns.models.Node({ slug: slug }),
                 self = this;
-            node.fetch().then(function () {
-                self.details.show(new Ns.views.node.Detail({ model: node, parent: self }));
-            });
+            // if we got it from cache load it straight away
+            if (node.get('name') !== undefined) {
+                this.showNode(node);
+            }
+            // otherwise fetch from server first
+            else {
+                node.fetch().then(function () { self.showNode(node) });
+            }
+        },
+
+        showNode: function(node) {
+            this.details.show(new Ns.views.node.Detail({ model: node, parent: this }));
         },
 
         /*

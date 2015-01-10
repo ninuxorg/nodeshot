@@ -558,9 +558,10 @@ class DefaultUiTest(TestCase):
         self._hashchange('#/')
         sleep(0.1)
         self._hashchange('#map')
-        sleep(0.1)
+        sleep(0.5)
         self.assertNotEqual(browser.execute_script("return $('#map-js path').attr('fill-opacity')"), '0.3')
         browser.find_element_by_css_selector('#signin-modal .icon-close').click()
+        sleep(0.5)
 
         # ensure "hidden" elements are visible
         legend = browser.find_element_by_css_selector('#legend-js')
@@ -677,10 +678,14 @@ class DefaultUiTest(TestCase):
             self.assertIn(node.name, self.browser.page_source)
 
     def test_node_details(self):
-        self._hashchange('#/nodes/pomezia')
+        # ensure not cached
+        self.assertTrue(self.browser.execute_script('return Ns.db.nodeDetails.get("pomezia") === undefined'))
+        self._hashchange('#nodes/pomezia')
         self.assertTrue(self.browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'map-container'"))
         self.browser.find_element_by_css_selector('#node-details')
         self.assertIn('Pomezia', self.browser.page_source)
+        # ensure cached
+        self.assertFalse(self.browser.execute_script('return Ns.db.nodeDetails.get("pomezia") === undefined'))
 
     def test_user_profile(self):
         self._hashchange('#/users/romano')
