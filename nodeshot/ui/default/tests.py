@@ -120,8 +120,10 @@ class DefaultUiTest(TestCase):
         # ensure the same on a nested menu item
         self.browser.find_element_by_css_selector('#nav-bar a.dropdown-toggle').click()
         self.browser.find_element_by_css_selector("a[href='#/pages/about']").click()
+        sleep(0.1)
         self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
         self.browser.find_element_by_css_selector("a[href='#/pages/about']").click()
+        sleep(0.1)
         self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
 
     def test_map(self):

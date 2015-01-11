@@ -70,15 +70,6 @@
         getPage: function (slug) {
             Ns.page.set('slug', slug);
             Ns.page.fetch();
-
-            var link = $('#nav-bar a[href="#/pages/' + slug + '"]');
-
-            if (link.length && link.parents('.dropdown').length) {
-                link.parents('.dropdown').addClass('active');
-            } else {
-                link.trigger('click');
-                link.parent().addClass('active');
-            }
         },
 
         // node list
@@ -90,7 +81,6 @@
                     collection: nodes
                 }));
             });
-            $('#nav-bar a[href="#/nodes"]').parent().addClass('active');
         },
 
         // node details
@@ -107,8 +97,6 @@
             else {
                 Ns.body.currentView.reset();
             }
-            // TODO this should be inside view
-            $('#nav-bar a[href="#/map"]').parent().addClass('active');
         },
 
         addNode: function () {
@@ -173,17 +161,6 @@
 
     $(document).ready(function ($) {
         Ns.start();
-        // menu
-        $('#nav-bar').delegate('#ns-top-nav-links li a', 'click', function (e) {
-            var a = $(this);
-            // if href doesn't start with javascript
-            if (a.attr('href').substr(0, 10) !== 'javascript') {
-                // if not dropdown and not clicking again on an active link
-                if (!a.hasClass('dropdown-toggle') && !a.parents('li.active').length) {
-                    $('#ns-top-nav-links li.active').removeClass('active');
-                }
-            }
-        });
 
         // login / sign in
         $('#js-signin-form').submit(function (e) {

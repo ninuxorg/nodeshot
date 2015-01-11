@@ -49,7 +49,7 @@
             // tell to NodeDetailView to come back here when closing
             Ns.state.onNodeClose = 'nodes';
             // mark nodes menu link as active
-            $('#nav-bar a[href="#/nodes"]').addClass('active');
+            Ns.menu.currentView.activate('nodes');
         },
 
         onDestroy: function () {

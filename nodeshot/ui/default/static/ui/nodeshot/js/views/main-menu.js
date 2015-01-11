@@ -30,6 +30,26 @@
             this.listenTo(this.collection, 'sync', this.render);
         },
 
+        /**
+         * mark specified link as active
+         */
+        activate: function (part) {
+            var parents,
+                link = this.$('a').filter(function () {
+                    return $(this).attr('href').match(new RegExp('.*' + part));
+                });
+            if (link.length && link.length < 2){
+                this.$('li.active').removeClass('active');
+                parents = link.parents('li');
+                if (parents.length <= 1) {
+                    parents.addClass('active');
+                }
+                else {
+                    parents.filter('.dropdown').addClass('active');
+                }
+            }
+        },
+
         /*
          * fetch collection
          */
