@@ -1,8 +1,7 @@
 (function() {
     'use strict';
 
-    Ns.views.Profile = Marionette.ItemView.extend({
-        name: 'Ns.views.Profile',
+    Ns.views.User = Marionette.ItemView.extend({
         tagName: 'article',
         className: 'center-stage',
         id: 'user-details-container',

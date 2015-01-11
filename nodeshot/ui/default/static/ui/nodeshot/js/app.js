@@ -98,7 +98,7 @@
 
             user.fetch()
             .done(function () {
-                Ns.body.show(new Ns.views.Profile({
+                Ns.body.show(new Ns.views.User({
                     model: user
                 }));
             })
