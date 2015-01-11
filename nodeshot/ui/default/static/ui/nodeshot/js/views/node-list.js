@@ -40,16 +40,20 @@
         },
 
         collectionEvents: {
-            'sync': 'render'
+            'sync': 'show cache'
         },
 
-        initialize: function(){
-            // bind custom resize event
-            $(window).on("resize.nodelist", _.bind(this.adjustFooter, this));
-            // tell to NodeDetailView to come back here when closing
-            Ns.state.onNodeClose = 'nodes';
-            // mark nodes menu link as active
-            Ns.menu.currentView.activate('nodes');
+        initialize: function () {
+            // get cached version or init new
+            this.collection = Ns.db.nodeList || new Ns.collections.Node();
+            // if not cached
+            if (this.collection.isEmpty()) {
+                // fetch from server
+                this.collection.fetch();
+            }
+            else{
+                this.show();
+            }
         },
 
         onDestroy: function () {
@@ -61,16 +65,25 @@
             this.adjustFooter();
         },
 
-        onRender: function(){
+        show: function () { Ns.body.show(this) },
+        cache: function() { Ns.db.nodeList = this.collection },
+
+        onShow: function(){
+            // bind custom resize event
+            $(window).on("resize.nodelist", _.bind(this.adjustFooter, this));
+            // tell to NodeDetailView to come back here when closing
+            Ns.state.onNodeClose = 'nodes';
+            // mark nodes menu link as active
+            Ns.menu.currentView.activate('nodes');
+            // init UI elements
             this.ui.hastip.tooltip();
-            this.ui.selects.selectpicker({
-                style: 'btn-special'
-            });
+            this.ui.selects.selectpicker({ style: 'btn-special' });
+            this.adjustFooter();
         },
 
         serializeData: function(){
             return {
-                'total': this.model.get('total'),
+                'total': this.collection.count,
                 'collection': this.collection
             };
         },
@@ -125,8 +138,7 @@
         },
 
         addNode: function(){
-            Ns.controller.getMap();
-            $('#map-toolbar .icon-pin-add').trigger('click');
+            Ns.router.navigate('map/add', { trigger: true });
         },
 
         /* --- pagination methods --- */

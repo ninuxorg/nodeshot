@@ -4,7 +4,7 @@
         {% trans 'Nodes' %}
     </h2>
     <span class="status pull-left">
-        <%= collection.total %> total
+        <%= total %> total
     </span>
     <% Ns.db.legend.toJSON().forEach(function(legend){ %>
         <span class="status pull-left <%= legend.slug %>"
@@ -18,8 +18,8 @@
 
 <div class="row-ns">
     <form action="" id="js-search" class="input-group width30 marginright">
-            <input type="text" class="form-control" placeholder="{% trans 'Quick search' %}" value="<%= collection.searchTerm %>">
-            <span class="input-group-addon icon-search"></span>
+        <input type="text" class="form-control" placeholder="{% trans 'Quick search' %}" value="<%= collection.searchTerm %>">
+        <span class="input-group-addon icon-search"></span>
     </form>
 
     <div class="dropdown input-group width30 marginright">

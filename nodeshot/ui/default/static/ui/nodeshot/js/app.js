@@ -41,7 +41,7 @@
     Ns.controller = {
         // index
         index: function () {
-            Ns.menu.currentView.openFirst()
+            Ns.menu.currentView.openFirst();
         },
 
         // page details
@@ -51,13 +51,7 @@
 
         // node list
         getNodeList: function () {
-            var nodes = new Ns.collections.Node();
-            nodes.fetch().then(function () {
-                Ns.body.show(new Ns.views.node.List({
-                    model: new Backbone.Model({ collection: nodes }),
-                    collection: nodes
-                }));
-            });
+            new Ns.views.node.List();
         },
 
         // node details
