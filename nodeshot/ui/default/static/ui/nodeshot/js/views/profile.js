@@ -17,6 +17,10 @@
             'change': 'render'
         },
 
+        onShow: function () {
+            Ns.changeTitle(this.model.get('username'));
+        },
+
         /*
         * prompt permalink
         */

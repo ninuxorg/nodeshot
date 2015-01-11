@@ -39,6 +39,7 @@ def index(request):
         'menu': json.render(menu),
         'user': json.render(user),
         # settings
+        'SITE_NAME': ui_settings.settings.SITE_NAME,
         'SITE_URL': ui_settings.settings.SITE_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,

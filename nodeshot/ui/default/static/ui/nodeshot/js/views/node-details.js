@@ -61,6 +61,8 @@
             this.listenTo(Ns.db.user, 'loggedin loggedout', this.render);
             // cache this model for subsequent requests
             Ns.db.nodes.add(this.model);
+            // title
+            Ns.changeTitle(this.model.get('name'));
             // menu element
             Ns.menu.currentView.activate('nodes');
         },

@@ -1,7 +1,7 @@
 <!DOCTYPE html>{% load i18n static leaflet_tags nodeshot_tags %}
 <html>
 <head>
-    <title>Nodeshot</title>
+    <title>{{ SITE_NAME }}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
     <link href="{% static 'ui/lib/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -435,6 +435,7 @@
     <script>
         Ns = new Marionette.Application();
         Ns.settings = {};
+        Ns.settings.siteName = '{{ SITE_NAME }}';
         Ns.settings.map = {
             lat: {{ MAP_CENTER.0 }},
             lng: {{ MAP_CENTER.1 }},
@@ -444,7 +445,6 @@
         Ns.settings.ratings = {{ RATING_ENABLED }};
         Ns.settings.comments = {{ COMMENTS_ENABLED }};
         Ns.settings.api = '{{ SITE_URL }}{% url "api_root_endpoint" %}';
-        // TODO: make these configurable
         Ns.settings.dateTimeFormat = '{{ DATETIME_FORMAT }}';
         Ns.settings.dateFormat = '{{ DATE_FORMAT }}';
         Ns.settings.leafletOptions = {{ LEAFLET_OPTIONS|safe }};

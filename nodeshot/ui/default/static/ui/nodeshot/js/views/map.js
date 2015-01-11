@@ -23,6 +23,7 @@
             this.toolbar.show(new Ns.views.map.Toolbar(options));
             this.panels.show(new Ns.views.map.Panels(options));
             this.legend.show(new Ns.views.map.Legend(options));
+            Ns.changeTitle('Map');  // TODO: i18n
             Ns.menu.currentView.activate('map');
         },
 

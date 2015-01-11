@@ -73,6 +73,8 @@
             $(window).on("resize.nodelist", _.bind(this.adjustFooter, this));
             // tell to NodeDetailView to come back here when closing
             Ns.state.onNodeClose = 'nodes';
+            // title tag
+            Ns.changeTitle('Node list');  // TODO: i18n
             // mark nodes menu link as active
             Ns.menu.currentView.activate('nodes');
             // init UI elements

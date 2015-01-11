@@ -13,9 +13,14 @@
         onNodeClose: 'map'  // when a node-details is closed go back on map
     };
 
-    Ns.url = function(resource){
+    Ns.url = function (resource) {
         return Ns.settings.api + resource;
     };
+
+    Ns.title = $('title');
+    Ns.changeTitle = function (title) {
+        Ns.title.text(title + ' - ' + Ns.settings.siteName);
+    }
 
     Ns.addRegions({
         menu: '#ns-top-nav-links',
