@@ -7,6 +7,19 @@ User Interface
 The default interface is replaceable: if you need a radically different web
 interface you can develop a new one in a separate python package.
 
+=====================
+Change the first page
+=====================
+
+By default the first page opened in the UI is a cms page called "home" which you can customize in the admin site under ``/admin/cms/page/1/``.
+
+In this page you can put any HTML you want: images, graphs, whatever you think it's most suited to explain what your nodeshot instance does to first time visitors.
+
+If you think you don't need this and you prefer to have a different index page, like for example the map view, just go to
+``/admin/cms/menuitem/``, and change the order of the pages so that the first page you prefer comes first.
+
+You might also unpublish or delete the links you don't want others to see, as well as add new links to the menu.
+
 ==================
 Available settings
 ==================
