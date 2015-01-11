@@ -47,7 +47,7 @@
          */
         getNode: function(slug) {
             // fetch from cache or instantiate new model
-            var node = Ns.db.nodeDetails.get(slug) || new Ns.models.Node({ slug: slug }),
+            var node = Ns.db.nodes.get(slug) || new Ns.models.Node({ slug: slug }),
                 self = this;
             // if we got it from cache load it straight away
             if (node.get('name') !== undefined) {

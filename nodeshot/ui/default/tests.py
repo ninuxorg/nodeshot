@@ -681,13 +681,13 @@ class DefaultUiTest(TestCase):
 
     def test_node_details(self):
         # ensure not cached
-        self.assertTrue(self.browser.execute_script('return Ns.db.nodeDetails.get("pomezia") === undefined'))
+        self.assertTrue(self.browser.execute_script('return Ns.db.nodes.get("pomezia") === undefined'))
         self._hashchange('#nodes/pomezia')
         self.assertTrue(self.browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'map-container'"))
         self.browser.find_element_by_css_selector('#node-details')
         self.assertIn('Pomezia', self.browser.page_source)
         # ensure cached
-        self.assertFalse(self.browser.execute_script('return Ns.db.nodeDetails.get("pomezia") === undefined'))
+        self.assertFalse(self.browser.execute_script('return Ns.db.nodes.get("pomezia") === undefined'))
 
     def test_user_profile(self):
         self._hashchange('#/users/romano')

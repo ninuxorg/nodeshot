@@ -473,7 +473,7 @@
         Ns.db.layers = new Ns.collections.Layer({{ layers|safe }});
         Ns.db.user = new Ns.models.User({{ user|safe }});
         Ns.db.geo = new Ns.collections.Geo();  // fetch later
-        Ns.db.nodeDetails = new Ns.collections.Node();  // local node details cache
+        Ns.db.nodes = new Ns.collections.Node();  // local node details cache
     </script>
 
     {% nodeshot_map "map-js" creatediv=False %}

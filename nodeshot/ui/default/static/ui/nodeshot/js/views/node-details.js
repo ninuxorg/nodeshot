@@ -60,7 +60,7 @@
             $(window).on("resize.node-details", _.bind(this.resize, this));
             this.listenTo(Ns.db.user, 'loggedin loggedout', this.render);
             // cache this model for subsequent requests
-            Ns.db.nodeDetails.add(this.model);
+            Ns.db.nodes.add(this.model);
             // menu element
             Ns.menu.currentView.activate('nodes');
         },
