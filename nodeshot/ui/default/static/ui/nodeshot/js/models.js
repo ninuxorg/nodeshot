@@ -196,6 +196,11 @@
         idAttribute: 'slug'
     });
 
+    Ns.collections.Page = Backbone.Collection.extend({
+        url: Ns.url('pages/'),
+        model: Ns.models.Page
+    });
+
     Ns.models.Node = Ns.models.Base.extend({
         urlRoot: Ns.url('nodes/'),
         idAttribute: 'slug',

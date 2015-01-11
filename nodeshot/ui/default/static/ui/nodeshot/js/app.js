@@ -35,26 +35,6 @@
 
     // init pages
     Ns.addInitializer(function () {
-        Ns.page = new Ns.models.Page();
-
-        Ns.page.on('sync', function () {
-            Ns.body.show(new Ns.views.Page({
-                model: Ns.page
-            }));
-        });
-
-        Ns.page.on('error', function (model, http) {
-            if (http.status === 404) {
-                $.createModal({
-                    message: 'the requested page was not found'
-                });
-            } else {
-                $.createModal({
-                    message: 'there was an error while retrieving the page'
-                });
-            }
-        });
-
         Backbone.history.start();
     });
 
@@ -66,8 +46,7 @@
 
         // page details
         getPage: function (slug) {
-            Ns.page.set('slug', slug);
-            Ns.page.fetch();
+            new Ns.views.Page({ slug: slug });
         },
 
         // node list

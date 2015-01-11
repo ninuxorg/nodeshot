@@ -111,6 +111,7 @@ class DefaultUiTest(TestCase):
     def test_home(self):
         self._hashchange('#')
         self.assertEqual(self.browser.find_element_by_css_selector('article.center-stage h1').text, 'Home')
+        self.assertTrue(self.browser.execute_script('return Ns.db.pages.get("home") !== undefined'))
 
     def test_menu_already_active(self):
         self._hashchange('#')
