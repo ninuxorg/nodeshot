@@ -72,6 +72,8 @@
             this.content.currentView.closeLeafletPopup();
             this.add.empty();
             this.details.empty();
+            Ns.changeTitle('Map');  // TODO: i18n
+            Ns.menu.currentView.activate('map');
             Ns.views.map.Layout.resizeMap();
         }
 
