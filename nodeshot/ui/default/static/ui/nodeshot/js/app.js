@@ -94,28 +94,7 @@
 
         // user profile view
         getUser: function (username) {
-            var user = new Ns.models.User({ username: username });
-
-            user.fetch()
-            .done(function () {
-                Ns.body.show(new Ns.views.User({
-                    model: user
-                }));
-            })
-            .error(function (http) {
-                // TODO: D.R.Y.
-                if (http.status === 404) {
-                    $.createModal({
-                        message: 'the requested page was not found'
-                    });
-                } else {
-                    $.createModal({
-                        message: 'there was an error while retrieving the page'
-                    });
-                }
-            });
-
-            $('#nav-bar li').removeClass('active');
+            new Ns.views.User({ username: username });
         }
     };
 

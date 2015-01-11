@@ -13,11 +13,42 @@
         },
 
         modelEvents: {
-            'change': 'render'
+            'sync': 'show cache',
+            'error': 'error'
+        },
+
+        initialize: function (options) {
+            // get cached version or init new
+            this.model = Ns.db.users.get(options.username) || new Ns.models.User();
+            // if not cached
+            if (this.model.isNew()) {
+                // fetch from server
+                this.model.set('username', options.username).fetch();
+            }
+            else{
+                this.show();
+            }
+        },
+
+        show: function () { Ns.body.show(this); },
+        cache: function () { Ns.db.users.add(this.model); },
+        error: function (model, http) {
+            if (http.status === 404) {
+                $.createModal({
+                    // TODO: i18n
+                    message: 'the requested page was not found'
+                });
+            } else {
+                $.createModal({
+                    // TODO: i18n
+                    message: 'there was an error while retrieving the page'
+                });
+            }
         },
 
         onShow: function () {
             Ns.changeTitle(this.model.get('username'));
+            Ns.menu.currentView.deactivate();
         },
 
         /*

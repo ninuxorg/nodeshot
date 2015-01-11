@@ -476,6 +476,7 @@
         Ns.db.nodes = new Ns.collections.Node();  // local node details cache
         Ns.db.nodeList = null;  // local node list cache
         Ns.db.pages = new Ns.collections.Page();  // local page cache
+        Ns.db.users = new Backbone.Collection();  // local user profile cache
     </script>
 
     {% nodeshot_map "map-js" creatediv=False %}

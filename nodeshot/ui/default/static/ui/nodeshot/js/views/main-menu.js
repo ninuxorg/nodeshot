@@ -56,7 +56,7 @@
                     return $(this).attr('href').match(new RegExp('.*' + part));
                 });
             if (link.length && link.length < 2){
-                this.$('li.active').removeClass('active');
+                this.deactivate();
                 parents = link.parents('li');
                 if (parents.length <= 1) {
                     parents.addClass('active');
@@ -65,6 +65,13 @@
                     parents.filter('.dropdown').addClass('active');
                 }
             }
+        },
+
+        /**
+         * Remove any active link
+         */
+        deactivate: function () {
+            this.$('li.active').removeClass('active');
         },
 
         /*
