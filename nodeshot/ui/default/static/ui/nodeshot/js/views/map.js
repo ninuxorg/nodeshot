@@ -46,16 +46,17 @@
          * get node details
          */
         getNode: function(slug) {
-            // fetch from cache or instantiate new model
-            var node = Ns.db.nodes.get(slug) || new Ns.models.Node({ slug: slug }),
+            // get from cache or instantiate new model
+            var node = Ns.db.nodes.get(slug) || new Ns.models.Node(),
                 self = this;
-            // if we got it from cache load it straight away
-            if (node.get('name') !== undefined) {
-                this.showNode(node);
+            // if new model fetch from server
+            if (node.isNew()) {
+                node.set('slug', slug).fetch()
+                    .then(function () { self.showNode(node) });
             }
-            // otherwise fetch from server first
+            // otherwise we got it from cache, so we load it straight away
             else {
-                node.fetch().then(function () { self.showNode(node) });
+                this.showNode(node);
             }
         },
 
