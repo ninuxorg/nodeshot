@@ -22,12 +22,29 @@
         childView: ItemView,
         emptyView: EmptyView,
 
-        initialize: function(){
+        initialize: function () {
             this.collection = Ns.db.menu;
             // re-fetch collection when user logs in or out
             this.listenTo(Ns.db.user, 'loggedin', this.fetch);
             this.listenTo(Ns.db.user, 'loggedout', this.fetch);
             this.listenTo(this.collection, 'sync', this.render);
+        },
+
+        /**
+         * open first link of the menu
+         */
+        openFirst: function () {
+            // get href of first useful link
+            var a, href = this.$('a').filter(function () {
+                a = $(this);
+                if (!a.hasClass('.dropdown-toggle') && a.attr('href').indexOf('javascript:') < 0){
+                    return true;
+                }
+                return false;
+            }).eq(0).attr('href');
+            // replace any initial hash or stuff that might cause problems to BackboneJS
+            href = href.replace(/^#\//, '').replace(/^#/, '');
+            Ns.router.navigate(href, { trigger: true });
         },
 
         /**

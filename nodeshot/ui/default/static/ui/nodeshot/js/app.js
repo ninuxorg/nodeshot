@@ -61,9 +61,7 @@
     Ns.controller = {
         // index
         index: function () {
-            Ns.router.navigate('#pages/home', {
-                trigger: true
-            });
+            Ns.menu.currentView.openFirst()
         },
 
         // page details
