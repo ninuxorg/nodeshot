@@ -28,6 +28,10 @@ Nodeshot
    :target: https://pypi.python.org/pypi/nodeshot
 ------------
 
+.. raw:: html
+
+    <p><iframe src="https://nodeshot.org/github-btn.html?user=ninuxorg&amp;repo=nodeshot&amp;type=watch&amp;count=true&amp;size=large" frameborder="0" scrolling="0" width="140" height="33"></iframe> <iframe src="https://nodeshot.org/github-btn.html?user=ninuxorg&amp;repo=nodeshot&amp;type=fork&amp;count=true&amp;size=large" frameborder="0" scrolling="0" width="140" height="33"></iframe></p>
+
 Nodeshot is an open source platform for **crowdsourcing georeferenced data**.
 
 Its goal it's to provide some robust tools to build a modern customized crowdsourcing web application quickly.
