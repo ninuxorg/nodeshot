@@ -553,6 +553,9 @@
             this.listenTo(Ns.db.layers, 'change:visible', this.count);
         },
 
+        /* layout correction, add 11 pixels of width to compensate for hover effect */
+        onShow: function () { this.$el.width(this.$el.width() + 11); },
+
         onRender: function () {
             // default is true
             if (localStorage.getObject('legendOpen') === false) {
