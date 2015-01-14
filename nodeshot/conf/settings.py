@@ -141,6 +141,10 @@ if 'old_nodeshot' in settings.DATABASES:
         'nodeshot.interop.oldimporter.db.OldNodeshotRouter'
     ]
 
+# ------ FILEBROWSER ------ #
+
+FILEBROWSER_DIRECTORY = ''
+
 # ------ DJANGO CACHE ------ #
 
 if DEBUG:
