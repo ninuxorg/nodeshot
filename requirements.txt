@@ -18,7 +18,7 @@ requests
 
 # better admin
 django-grappelli==2.5.3
-django-filebrowser==3.5.6
+django-filebrowser==3.5.7
 django-leaflet==0.15.2
 
 # RESTful API and API documentation
