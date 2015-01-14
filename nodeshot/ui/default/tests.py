@@ -44,6 +44,7 @@ class DefaultUiTest(TestCase):
         self.browser.execute_script('localStorage.clear()')
         self.browser.delete_all_cookies()
         self.browser.refresh()
+        WebDriverWait(self.browser, 10).until(ajax_complete, 'Timeout')
 
     @classmethod
     def setUpClass(cls):
