@@ -17,39 +17,42 @@ class Rating(UpdateCountsMixin, BaseDate):
     """
     # rating choices from 1 to 10
     RATING_CHOICES = [(n, '%d' % n) for n in range(1, 11)]
-    
+
     node = models.ForeignKey(Node)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     value = models.IntegerField(_('rating value'), choices=RATING_CHOICES)
-    
+
     class Meta:
         app_label = 'participation'
         unique_together = (("node", "user"),)
-    
+
     def __unicode__(self):
-        return _('rating #%d for node %s') % (self.pk, self.node.name)
-    
+        if self.pk:
+            return _('rating #%d for node %s') % (self.pk, self.node.name)
+        else:
+            return _('rating')
+
     def update_count(self):
         """ updates rating count and rating average """
         node_rating_count = self.node.rating_count
         node_rating_count.rating_count = self.node.rating_set.count()
         node_rating_count.rating_avg = self.node.rating_set.aggregate(rate=Avg('value'))['rate']
-        
+
         # if all ratings are deleted the value will be None!
         if node_rating_count.rating_avg is None:
             # set to 0 otherwise we'll get an exception
             node_rating_count.rating_avg = 0
 
         node_rating_count.save()
-    
-    def clean(self , *args, **kwargs):
+
+    def clean(self, *args, **kwargs):
         """
         Check if rating can be inserted for parent node or parent layer
         """
         if not self.pk:
             node = self.node
-            layer= Layer.objects.get(pk=node.layer_id)
-            if  layer.participation_settings.rating_allowed is not True:
-                raise ValidationError  ("Rating not allowed for this layer")
-            if  node.participation_settings.rating_allowed is not True:
-                raise ValidationError  ("Rating not allowed for this node")
+            layer = Layer.objects.get(pk=node.layer_id)
+            if layer.participation_settings.rating_allowed is not True:
+                raise ValidationError("Rating not allowed for this layer")
+            if node.participation_settings.rating_allowed is not True:
+                raise ValidationError("Rating not allowed for this node")
