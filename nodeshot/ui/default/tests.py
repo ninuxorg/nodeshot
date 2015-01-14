@@ -788,6 +788,7 @@ class DefaultUiTest(TestCase):
         self.assertIn('#map/latlng/41.89', self.browser.current_url)
 
     def test_notifications(self):
+        self._reset()
         # open sign in modal
         self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
         sleep(0.2)
