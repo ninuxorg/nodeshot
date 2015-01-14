@@ -43,7 +43,7 @@ django-celery-email
 south
 
 # django-cors-headers
-django-cors-headers==0.13
+django-cors-headers==1.0
 
 # websockets
 tornado
