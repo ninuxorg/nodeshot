@@ -112,7 +112,7 @@ body > header{
     color: #979696;
 }
 
-#top-bar a, .breadcrumb a, body a, body a:hover{ color: #fff }
+#top-bar a, .breadcrumb a, header a, header a:hover{ color: #fff }
 /*.breadcrumb a{ text-decoration: underline }*/
 
 #main-actions > ul > li > a{
