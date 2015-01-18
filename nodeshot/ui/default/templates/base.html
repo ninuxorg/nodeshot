@@ -25,6 +25,14 @@
     <!-- leaflet -->
     {% leaflet_js %}
     {% leaflet_css %}
+    {% if LOGO and LOGO.URL %}
+    <style type="text/css">
+        #top-bar h1 a {
+            background-image: url({{ LOGO.URL }}) !important;
+            {% if LOGO.SIZE %}background-size: {{ LOGO.SIZE }} !important;{% endif %}
+        }
+    </style>
+    {% endif %}
 </head>
 <body style="overflow:hidden">
     <div id="preloader">
@@ -34,7 +42,7 @@
     </div>
     <header>
         <nav id="top-bar">
-            <h1><a href="#">Nodeshot</a></h1>
+            <h1><a href="#">{{ SITE_NAME }}</a></h1>
 
             <div id="general-search"></div>
 

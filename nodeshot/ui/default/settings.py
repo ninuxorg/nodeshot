@@ -35,6 +35,7 @@ ADDRESS_SEARCH_TRIGGERS = [
     'calle '
 ]
 ADDRESS_SEARCH_TRIGGERS = getattr(settings, 'NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS', ADDRESS_SEARCH_TRIGGERS)
+LOGO = getattr(settings, 'NODESHOT_UI_LOGO', None)
 
 if 'nodeshot.community.participation' in settings.INSTALLED_APPS:
     VOTING_ENABLED = getattr(settings, 'NODESHOT_UI_VOTING_ENABLED', True)

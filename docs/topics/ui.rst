@@ -35,6 +35,7 @@ These are the available customizable settings:
  * ``NODESHOT_UI_DATETIME_FORMAT``
  * ``NODESHOT_UI_DATE_FORMAT``
  * ``NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS``
+ * ``NODESHOT_UI_LOGO``
  * ``NODESHOT_UI_VOTING_ENABLED``
  * ``NODESHOT_UI_RATING_ENABLED``
  * ``NODESHOT_UI_COMMENTS_ENABLED``
@@ -156,6 +157,24 @@ NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS
     ]
 
 Special strings that trigger geolocation when searching in the address bar.
+
+NODESHOT_UI_LOGO
+----------------
+
+**default**: ``None``
+
+Use this setting to show a custom logo, example:
+
+.. code-block:: python
+
+    NODESHOT_UI_LOGO = {
+        'URL': 'http://yourdomain.com/static/logo.svg',  # value for css rule background-image
+        'SIZE': '171px',  # value for css rule background-size
+    }
+
+.. note::
+    * the logo **must be in SVG format**.
+    * currently due to a limit in the design of the layout, **logos larger than 171px will be clipped**
 
 NODESHOT_UI_VOTING_ENABLED
 --------------------------
