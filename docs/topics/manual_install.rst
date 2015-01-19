@@ -196,7 +196,7 @@ Setup database and static files (images, css, js):
 
     exit  # go back being non-root
     # will prompt you to create a superuser, proceed!
-    python manage.py syncdb && python manage.py migrate
+    ./manage.py syncdb && ./manage.py migrate --no-initial-data && ./manage.py loaddata initial_data
     # static files (css, js, images)
     python manage.py collectstatic
 
@@ -269,8 +269,8 @@ Create site configuration (replace ``nodeshot.yourdomain.com`` with your domain)
 Paste this configuration and tweak it according to your needs::
 
     server {
-        listen   443; ## listen for ipv4; this line is default and implied
-        #listen   [::]:443 default ipv6only=on; ## listen for ipv6
+        listen 443 ssl;  # ipv4
+        #listen  [::]:443 ssl; # ipv6
 
         root /var/www/nodeshot/public_html;
         index index.html index.htm;
@@ -288,47 +288,37 @@ Paste this configuration and tweak it according to your needs::
         ssl on;
         ssl_certificate ssl/server.crt;
         ssl_certificate_key ssl/server.key;
-
-        ssl_session_timeout 5m;
-
-        ssl_protocols SSLv3 TLSv1;
-        ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
+        # optimizations
+        ssl_session_cache shared:SSL:20m;
+        ssl_session_timeout 10m;
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
         ssl_prefer_server_ciphers on;
+        ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5;
+        add_header Strict-Transport-Security "max-age=31536000";
+        add_header X-Content-Type-Options nosniff;
 
-        location / {
+        location @uwsgi {
             uwsgi_pass 127.0.0.1:3031;
             include uwsgi_params;
             uwsgi_param HTTP_X_FORWARDED_PROTO https;
         }
 
-        location /static/ {
+        location / {
+            try_files /system/maintenance.html $uri @uwsgi;
+        }
+
+        location /static {
             alias /var/www/nodeshot/<myproject>/static/;
         }
 
-        location /media/ {
+        location /media {
             alias /var/www/nodeshot/<myproject>/media/;
         }
-
-        #error_page 404 /404.html;
-
-        # redirect server error pages to the static page /50x.html
-        #
-        #error_page 500 502 503 504 /50x.html;
-        #location = /50x.html {
-        #    root /usr/share/nginx/www;
-        #}
-
-        # deny access to .htaccess files, if Apache's document root
-        # concurs with nginx's one
-        #
-        #location ~ /\.ht {
-        #    deny all;
-        #}
     }
 
     server {
-        listen   80; ## listen for ipv4; this line is default and implied
-        #listen   [::]:80 default ipv6only=on; ## listen for ipv6
+        listen 80;  # ipv4
+        #listen [::]:80;  # ipv6
 
         # Make site accessible from hostanme on port 80
         # change this according to your domain/hostanme
