@@ -286,7 +286,9 @@
                 ready;
             // will be called when all sources have been fetched
             ready = _.after(Ns.db.layers.length, function () {
-                self.collection.set(geo.models);
+                // reload models
+                self.collection.remove(self.collection.models);
+                self.collection.add(geo.models);
                 // cache geo collection
                 Ns.db.geo = self.collection;
                 // trigger ready event

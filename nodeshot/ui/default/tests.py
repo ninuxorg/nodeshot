@@ -219,6 +219,10 @@ class DefaultUiTest(TestCase):
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
         # ensure node with higher ACL is now visible
         self.assertFalse(browser.execute_script("return Ns.db.geo.get('hidden-rome') === undefined"))
+        # ensure data is not duplicated
+        browser.execute_script('%s.setView([41.8879, 12.50621], 13)' % self.LEAFLET_MAP)
+        browser.execute_script('$("#map-control-layer-rome").trigger("click")')
+        self.assertEqual(len(browser.find_elements_by_css_selector('#map-js g')), 0)
 
         # log out
         self.browser.find_element_by_css_selector('#js-username').click()
