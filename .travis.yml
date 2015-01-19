@@ -27,13 +27,14 @@ before_script:
   - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis_topology;"
   - mysql -e 'create database nodeshot_old_ci;'
   - cd tests
-  - python manage.py syncdb --noinput
-  - python manage.py migrate --noinput
-  - python manage.py collectstatic --noinput
+  - ./manage.py syncdb --noinput --no-initial-data
+  - ./manage.py migrate --noinput --no-initial-data
+  - ./manage.py collectstatic --noinput
+  - ./manage.py loaddata initial_data
   # begin temporary workaround for django 1.6 LiveServerTestCase suckness
-  - python manage.py mail_debug &
-  - python manage.py loaddata test_profiles test_layers test_status test_nodes
-  - python manage.py runserver 0.0.0.0:8000 &
+  - ./manage.py mail_debug &
+  - ./manage.py loaddata test_profiles test_layers test_status test_nodes
+  - ./manage.py runserver 0.0.0.0:8000 &
   - sleep 2 # give django server time to bind to sockets
   # end 
 
