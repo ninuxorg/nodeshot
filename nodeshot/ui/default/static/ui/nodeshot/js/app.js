@@ -255,8 +255,6 @@
     });
 
     $(document).ajaxStop(function () {
-        if (Ns.state.autoToggleLoading) {
-            $.toggleLoading('hide');
-        }
+        $.toggleLoading('hide');
     });
 }());

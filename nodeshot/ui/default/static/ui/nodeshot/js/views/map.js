@@ -310,6 +310,7 @@
          * reload map data in the background
          */
         reloadMapData: function () {
+            $.toggleLoading('hide');
             // disable loading indicator while data gets refreshed
             Ns.state.autoToggleLoading = false;
             // fetch data
