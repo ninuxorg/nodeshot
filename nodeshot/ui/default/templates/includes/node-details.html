@@ -41,7 +41,10 @@
 
     <div class="row">
         <div class="col-sm-12 left" id="node-data-js">
-            <table class="table table-striped left-labels">
+            <% if(description){ %>
+                <div class="description"><%= _.nl2br(description) %></div>
+            <% } %>
+            <table class="table table-striped left-labels nomargin">
                 <tr>
                     <td class="left">
                         {% trans 'Status' %}:
@@ -131,10 +134,6 @@
                 </tr>
                 <% } %>
             </table>
-            <% if(description){ %>
-                <h3>{% trans 'Description' %}</h3>
-                <%= _.nl2br(description) %>
-            <% } %>
         </div>
         <!--<div class="col-sm-6 right">
             <div style="background:#333;min-height:400px;line-height:400px;color:#fff;text-align:center;font-size:18px">
