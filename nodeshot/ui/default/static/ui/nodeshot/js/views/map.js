@@ -46,23 +46,35 @@
         /**
          * get node details
          */
-        getNode: function(slug) {
+        getNode: function(slug, edit) {
             // get from cache or instantiate new model
             var node = Ns.db.nodes.get(slug) || new Ns.models.Node(),
-                self = this;
+                method = edit ? 'showEditNode' : 'showNode',
+                self = this,
+                geomodel;
             // if new model fetch from server
             if (node.isNew()) {
-                node.set('slug', slug).fetch()
-                    .then(function () { self.showNode(node) });
+                node.set('slug', slug).fetch().then(function () {
+                    self[method](node);
+                });
             }
             // otherwise we got it from cache, so we load it straight away
             else {
-                this.showNode(node);
+                this[method](node);
             }
+        },
+
+        editNode: function(slug) {
+            this.getNode(slug, true);
         },
 
         showNode: function(node) {
             this.details.show(new Ns.views.node.Detail({ model: node, parent: this }));
+        },
+
+        showEditNode: function(node) {
+            this.details.show(new Ns.views.node.Detail({ model: node, parent: this }));
+            this.details.currentView.edit();
         },
 
         /*
@@ -785,8 +797,7 @@
         onRender: function () {
             this.ui.tools.tooltip();
             // activate switch
-            this.ui.switches.bootstrapSwitch();
-            this.ui.switches.bootstrapSwitch('setSizeClass', 'switch-small');
+            this.ui.switches.bootstrapSwitch().bootstrapSwitch('setSizeClass', 'switch-small');
             // activate scroller
             this.ui.scrollers.scroller({
                 trackMargin: 6

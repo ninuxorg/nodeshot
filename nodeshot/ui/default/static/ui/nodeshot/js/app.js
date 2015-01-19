@@ -10,7 +10,7 @@
     Ns.state = {
         currentAjaxRequest: null,  // needed to cancel an xhr request
         autoToggleLoading: true,  // indicates wether the loading div should be toggled automatically
-        onNodeClose: 'map'  // when a node-details is closed go back on map
+        onNodeClose: 'map',  // when a node-details is closed go back on map
     };
 
     Ns.url = function (resource) {
@@ -65,6 +65,12 @@
             Ns.body.currentView.getNode(slug);
         },
 
+        // edit node
+        editNode: function (slug) {
+            this.getMap();
+            Ns.body.currentView.editNode(slug);
+        },
+
         // map view
         getMap: function () {
             if (typeof Ns.body.currentView === 'undefined' || !(Ns.body.currentView instanceof Ns.views.map.Layout)) {
@@ -110,6 +116,7 @@
             'map/:slug': 'getMapPopup',
             'nodes': 'getNodeList',
             'nodes/:slug': 'getNode',
+            'nodes/:slug/edit': 'editNode',
             'users/:username': 'getUser'
         }
     });

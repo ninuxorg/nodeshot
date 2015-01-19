@@ -17,7 +17,7 @@
         <% } %>
         <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
         <% if(Ns.db.user.isAuthenticated()){ %>
-            <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-edit">{% trans 'edit' %}</a>
+            <a href="#nodes/<%= slug %>/edit" class="icon-edit">{% trans 'edit' %}</a>
         <% } %>
     </p>
 
@@ -40,7 +40,7 @@
     </ul>
 
     <div class="row">
-        <div class="col-sm-12 left">
+        <div class="col-sm-12 left" id="node-data-js">
             <table class="table table-striped left-labels">
                 <tr>
                     <td class="left">
@@ -80,6 +80,23 @@
                     </td>
                 </tr>
                 <% } %>
+                <% _hstore_schema.forEach(function(field){
+                    value = _hstore_data[field.name] %>
+                    <% if(typeof value !== 'undefined' && value !== ''){ %>
+                        <tr>
+                            <td class="left">
+                                <%= field.label %>:
+                            </td>
+                            <td class="right">
+                                <% if (typeof value === 'boolean') { %>
+                                    <span class="icon-<%= value === true ? 'ok' : 'cancel' %>"></span>
+                                <% } else { %>
+                                    <%= value %>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% } %>
+                <% }); %>
                 <tr>
                     <td class="left">
                         {% trans 'Added' %}:
@@ -96,15 +113,6 @@
                         <%= _.formatDate(updated) %>
                     </td>
                 </tr>
-                <!--<tr>
-                    <td class="left">
-                        Hotspot:
-                    </td>
-                    <td class="right">
-                        <span class="icon-ok"></span>
-                        <span class="icon-cancel"></span>
-                    </td>
-                </tr>-->
                 <% if(Ns.settings.ratings && relationships){ %>
                 <tr>
                     <td class="left">
@@ -124,8 +132,8 @@
                 <% } %>
             </table>
             <% if(description){ %>
-            <h3>{% trans 'Description' %}</h3>
-            <%= description %>
+                <h3>{% trans 'Description' %}</h3>
+                <%= _.nl2br(description) %>
             <% } %>
         </div>
         <!--<div class="col-sm-6 right">

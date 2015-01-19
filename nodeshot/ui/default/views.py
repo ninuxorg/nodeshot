@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 
 from rest_framework.renderers import JSONRenderer
@@ -10,7 +11,16 @@ from nodeshot.core.nodes.serializers import StatusListSerializer
 from nodeshot.core.cms.serializers import MenuSerializer
 from nodeshot.community.profiles.serializers import ProfileSerializer
 
+from nodeshot.core.nodes.settings import HSTORE_SCHEMA as NODES_HSTORE_SCHEMA
 from . import settings as ui_settings
+
+
+NODES_HSTORE_SCHEMA = NODES_HSTORE_SCHEMA[:] if NODES_HSTORE_SCHEMA is not None else []
+for field in NODES_HSTORE_SCHEMA:
+    try:
+        field['label'] = field['kwargs']['verbose_name']
+    except KeyError:
+        field['label'] = field['name'].capitalize().replace('_', ' ')
 
 
 def index(request):
@@ -30,25 +40,26 @@ def index(request):
     else:
         user = {}
     # initialize django-rest-framework JSON renderer
-    json = JSONRenderer()
+    json_renderer = JSONRenderer()
     # template context
     context = {
         # preloaded data
-        'layers': json.render(layers),
-        'legend': json.render(status),
-        'menu': json.render(menu),
-        'user': json.render(user),
+        'layers': json_renderer.render(layers),
+        'legend': json_renderer.render(status),
+        'menu': json_renderer.render(menu),
+        'user': json_renderer.render(user),
         # settings
         'SITE_NAME': ui_settings.settings.SITE_NAME,
         'SITE_URL': ui_settings.settings.SITE_URL,
         'MAP_CENTER': ui_settings.MAP_CENTER,
         'MAP_ZOOM': ui_settings.MAP_ZOOM,
-        'LEAFLET_OPTIONS': json.render(ui_settings.LEAFLET_OPTIONS),
+        'LEAFLET_OPTIONS': json.dumps(ui_settings.LEAFLET_OPTIONS),
         'DISABLE_CLUSTERING_AT_ZOOM': ui_settings.DISABLE_CLUSTERING_AT_ZOOM,
         'MAX_CLUSTER_RADIUS': ui_settings.MAX_CLUSTER_RADIUS,
         'DATETIME_FORMAT': ui_settings.DATETIME_FORMAT,
         'DATE_FORMAT': ui_settings.DATE_FORMAT,
         'ADDRESS_SEARCH_TRIGGERS': ui_settings.ADDRESS_SEARCH_TRIGGERS,
+        'LOGO': ui_settings.LOGO,
         # participation settings
         'VOTING_ENABLED': ui_settings.VOTING_ENABLED,
         'RATING_ENABLED': ui_settings.RATING_ENABLED,
@@ -61,6 +72,7 @@ def index(request):
         # websockets settings
         'WEBSOCKETS': ui_settings.WEBSOCKETS,
         # profiles settings
-        'REGISTRATION_OPEN': ui_settings.REGISTRATION_OPEN
+        'REGISTRATION_OPEN': ui_settings.REGISTRATION_OPEN,
+        'NODES_HSTORE_SCHEMA': json.dumps(NODES_HSTORE_SCHEMA if NODES_HSTORE_SCHEMA else [])
     }
     return render(request, 'index.html', context)

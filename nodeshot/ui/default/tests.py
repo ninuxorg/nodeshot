@@ -700,6 +700,32 @@ class DefaultUiTest(TestCase):
         # ensure cached
         self.assertFalse(self.browser.execute_script('return Ns.db.nodes.get("pomezia") === undefined'))
 
+    def test_edit_node(self):
+        # log in as admin
+        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
+        sleep(0.2)
+        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
+        username.clear()
+        username.send_keys('admin')
+        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
+        password.clear()
+        password.send_keys('tester')
+        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
+        sleep(1)
+
+        self._hashchange('#nodes/pomezia/edit')
+        sleep(0.2)
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#node-data-js form')), 1)
+        self.browser.find_element_by_css_selector('#node-data-js form .btn-default').click()
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#node-data-js form')), 0)
+        self.assertIn('nodes/pomezia', self.browser.current_url)
+
+        # log out
+        self.browser.find_element_by_css_selector('#js-username').click()
+        self.browser.find_element_by_css_selector('#js-logout').click()
+        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
+
     def test_user_profile(self):
         self._hashchange('#/users/romano')
         self.assertTrue(self.browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'user-details-container'"))

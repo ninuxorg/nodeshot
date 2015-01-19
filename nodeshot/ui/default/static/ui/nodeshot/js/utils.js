@@ -143,7 +143,14 @@
                 }
             }
             return false;
-        }
+        },
+
+        /**
+         * slugify JS
+         */
+         slugify: function (value) {
+             return value.replace(/\s+/g,'-').replace(/[^a-zA-Z0-9\-]/g,'').toLowerCase();
+         }
     });
 
     /*

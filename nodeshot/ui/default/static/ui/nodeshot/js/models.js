@@ -17,9 +17,20 @@
 
         initialize: function () {
             this.set('legend', Ns.db.legend.get(this.get('status')));
+            this.on('change:geometry', this.setLeaflet);
+            this.setLeaflet();
+        },
+
+        /**
+         * update leaflet object when changing geometry
+         */
+        setLeaflet: function () {
             this.set('leaflet', this.toLeaflet());
         },
 
+        /**
+         * returns leaflet object
+         */
         toLeaflet: function () {
             var options = this.leafletOptions,
                 legend = this.get('legend').toJSON(),
@@ -172,6 +183,14 @@
         },
 
         /**
+         * string representation
+         * used by Backbone.Forms when displaying the list of available layers
+        */
+        toString: function () {
+            return this.get('name');
+        },
+
+        /**
         * remember hidden legend groups
         */
         storeHidden: function (layer, visible) {
@@ -188,7 +207,12 @@
 
     Ns.collections.Layer = Backbone.Collection.extend({
         url: Ns.url('layers/'),
-        model: Ns.models.Layer
+        model: Ns.models.Layer,
+
+        // layers in which users can add new nodes
+        getOpen: function(){
+            return new Ns.collections.Layer(this.where({ new_nodes_allowed: true }));
+        }
     });
 
     Ns.models.Page = Ns.models.Base.extend({
@@ -205,8 +229,73 @@
         urlRoot: Ns.url('nodes/'),
         idAttribute: 'slug',
 
+        schema: {
+            // TODO: i18n
+            name: { type: 'Text', title: 'name', validators: ['required'], editorAttrs: { maxlength: 75 } },
+            layer: { type: 'Select', title: 'layer', validators: ['required'], options: function(callback){ callback(Ns.db.layers.getOpen()) } },
+            geometry: { type: 'Hidden', title: 'geometry', validators: ['required'] },
+            address: { type: 'Text', title: 'address', editorAttrs: { maxlength: 150 } },
+            elev: { type: 'Number', title: 'elevation',  validators: ['number'] },
+            description: { type: 'TextArea', title: 'description' }
+        },
+
         defaults: {
             'relationships': false
+        },
+
+        _additionalSchema: function () {
+            var self = this,
+                typeMapping = {
+                    'CharField': 'Text',
+                    'TextField': 'TextArea',
+                    'BooleanField': 'Checkbox',
+                    'IntegerField': 'Number',
+                    'FloatField': 'Number'
+                },
+                field, validators, options;
+            Ns.settings.nodesHstoreSchema.forEach(function(hstoreField){
+                validators = [];
+                field = { title: hstoreField.label }
+                field.type = typeMapping[hstoreField.class] || 'Text';
+                if (hstoreField.kwargs && hstoreField.kwargs.choices) {
+                    field.type = 'Select';
+                    options = [];
+                    hstoreField.kwargs.choices.forEach(function(choice){
+                        options.push({
+                            val: choice[0],
+                            label: choice[1]
+                        });
+                    });
+                    field.options = options;
+                }
+                if (!hstoreField.kwargs || hstoreField.kwargs.blank === false){
+                    validators.push('required');
+                }
+                if (hstoreField.kwargs && hstoreField.kwargs.max_length){
+                    field.editorAttrs = { maxlength: hstoreField.kwargs.max_length }
+                }
+                if (hstoreField.type === 'Number'){
+                    validators.push('number');
+                }
+                hstoreField.validators = validators;
+                self.schema[hstoreField.name] = field;
+            });
+        },
+
+        initialize: function () {
+            this.on('change:layer', this.setLayerName);
+            this.on('change:geometry', this.setGeometry);
+            this._additionalSchema();
+        },
+
+        setLayerName: function(model, value){
+            this.set('layer_name', Ns.db.layers.get(value).get('name'));
+        },
+
+        setGeometry: function(model, value) {
+            if (typeof value === 'string') {
+                this.set('geometry', JSON.parse(value));
+            }
         }
     });
 

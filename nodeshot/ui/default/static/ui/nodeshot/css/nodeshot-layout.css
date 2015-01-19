@@ -1412,3 +1412,5 @@ td.empty{
 /* --- End Node List --- */
 
 #map-add-node-js > article{ min-width: 300px }
+#body form .form-group{ margin: 0 0 10px !important }
+#body form input[type=checkbox].form-control{ width: auto !important; }

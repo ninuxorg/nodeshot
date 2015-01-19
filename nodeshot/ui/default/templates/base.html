@@ -437,6 +437,8 @@
     <script src="{% static 'ui/lib/js/backbone.min.js' %}"></script>
     <script src="{% static 'ui/lib/js/backbone.marionette.min.js' %}"></script>
     <script src="{% static 'ui/lib/js/backbone.paginator.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone-forms.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone-forms-bootstrap3.js' %}"></script>
     <script src="{% static 'ui/lib/js/jquery.dateFormat.js' %}"></script>
     <script src="{% static 'ui/lib/js/jquery.serializeJSON.js' %}"></script>
     <!-- global settings -->
@@ -459,6 +461,7 @@
         Ns.settings.disableClusteringAtZoom = {{ DISABLE_CLUSTERING_AT_ZOOM }};
         Ns.settings.maxClusterRadius = {{ MAX_CLUSTER_RADIUS }};
         Ns.settings.addressSearchTriggers = {{ ADDRESS_SEARCH_TRIGGERS|safe }};
+        Ns.settings.nodesHstoreSchema = {{ NODES_HSTORE_SCHEMA|safe }};
     </script>
     <!-- nodeshot JS -->
     <script src="{% static 'ui/nodeshot/js/utils.js' %}"></script>
