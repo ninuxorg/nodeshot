@@ -148,12 +148,24 @@ NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS
         ' street',
         ' square',
         ' road',
+        ' avenue',
+        ' lane',
+        'footpath',
         'via ',
         'viale ',
         'piazza ',
         'strada ',
-        'plaza',
-        'calle '
+        'borgo ',
+        'contrada ',
+        'zona ',
+        'fondo ',
+        'vico ',
+        'sentiero ',
+        'plaza ',
+        ' plaza',
+        'calle ',
+        'carrer ',
+        'avenida '
     ]
 
 Special strings that trigger geolocation when searching in the address bar.

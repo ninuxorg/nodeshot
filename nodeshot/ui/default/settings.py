@@ -27,12 +27,23 @@ ADDRESS_SEARCH_TRIGGERS = [
     ' street',
     ' square',
     ' road',
+    ' avenue',
+    ' lane',
+    'footpath',
     'via ',
     'viale ',
     'piazza ',
     'strada ',
-    'plaza',
-    'calle '
+    'borgo ',
+    'contrada ',
+    'zona ',
+    'fondo ',
+    'vico ',
+    'sentiero ',
+    'plaza ',
+    ' plaza',
+    'calle ',
+    'avenida '
 ]
 ADDRESS_SEARCH_TRIGGERS = getattr(settings, 'NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS', ADDRESS_SEARCH_TRIGGERS)
 LOGO = getattr(settings, 'NODESHOT_UI_LOGO', None)
