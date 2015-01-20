@@ -209,9 +209,19 @@
         url: Ns.url('layers/'),
         model: Ns.models.Layer,
 
-        // layers in which users can add new nodes
-        getOpen: function(){
-            return new Ns.collections.Layer(this.where({ new_nodes_allowed: true }));
+        /**
+         * layers shown in edit node
+         * only external layers are hidden
+         */
+        getEditList: function () {
+            return this.whereCollection({ is_external: false });
+        },
+
+        /**
+         * like where but returns collection
+         */
+        whereCollection: function (options) {
+            return new Ns.collections.Layer(this.where(options));
         }
     });
 
@@ -232,7 +242,7 @@
         schema: {
             // TODO: i18n
             name: { type: 'Text', title: 'name', validators: ['required'], editorAttrs: { maxlength: 75 } },
-            layer: { type: 'Select', title: 'layer', validators: ['required'], options: function(callback){ callback(Ns.db.layers.getOpen()) } },
+            layer: { type: 'Select', title: 'layer', validators: ['required'], options: function(callback){ callback(Ns.db.layers.getEditList()) } },
             geometry: { type: 'Hidden', title: 'geometry', validators: ['required'] },
             address: { type: 'Text', title: 'address', editorAttrs: { maxlength: 150 } },
             elev: { type: 'Number', title: 'elevation',  validators: ['number'] },

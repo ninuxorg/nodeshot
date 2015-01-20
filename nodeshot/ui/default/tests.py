@@ -714,9 +714,12 @@ class DefaultUiTest(TestCase):
         WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
         sleep(1)
 
+        # go to edit
         self._hashchange('#nodes/pomezia/edit')
         sleep(0.2)
         self.assertEqual(len(self.browser.find_elements_by_css_selector('#node-data-js form')), 1)
+        self.assertNotIn('vienna', self.browser.execute_script('return $("#node-data-js form select[name=layer]").html()'))
+        # go back to node details
         self.browser.find_element_by_css_selector('#node-data-js form .btn-default').click()
         self.assertEqual(len(self.browser.find_elements_by_css_selector('#node-data-js form')), 0)
         self.assertIn('nodes/pomezia', self.browser.current_url)
