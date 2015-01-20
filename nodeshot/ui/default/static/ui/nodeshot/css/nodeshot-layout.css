@@ -336,6 +336,13 @@ article.center-stage{
 
 /* --- adjustments for medium sizes  --- */
 
+@media screen and (min-width: 767px) and (max-width: 1050px){
+    #general-search{
+        width: 210px;
+        margin-right: 1.8%;
+    }
+}
+
 @media screen and (min-width: 767px) and (max-width: 920px) {
     .center-stage,
     #top-bar,
@@ -349,11 +356,6 @@ article.center-stage{
         padding: 20px 3.2% !important;
     }
 
-    #general-search{
-        width: 210px;
-        margin-right: 1.8%;
-    }
-
     #main-actions a.dropdown-toggle{ min-width: 0 }
 
     .actions a{
@@ -363,7 +365,7 @@ article.center-stage{
 
 /* --- adjustments for small sizes  --- */
 
-@media screen and (max-width: 830px) {
+@media screen and (max-width: 900px) {
     /* hide username */
     #top-bar .text{ display: none }
 }
@@ -390,6 +392,7 @@ article.center-stage{
     #top-bar{
         height: 50px;
         padding-right: 0;
+        background: #e05f45 !important;
     }
 
     #top-bar h1 a{
@@ -494,7 +497,11 @@ article.center-stage{
         border-color: rgba(0,0,0,0.1);
     }
 
+    /* hide map contributions */
     .leaflet-control-attribution{ display: none !important }
+
+    #top-bar h1,  /* hide logo */
+    .hidden-xxs{ display: none }
 }
 
 .overlay{

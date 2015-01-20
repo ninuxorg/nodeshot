@@ -391,11 +391,11 @@
                 <%= layer_name %>
             </a>
         </td>
-        <td>
+        <td class="hidden-xxs">
             <a href="#/users/<%= user %>"><%= user %></a>
         </td>
-        <td><%= _.formatDateTime(added) %></td>
-        <td><%= _.formatDateTime(updated) %></td>
+        <td class="hidden-xs"><%= _.formatDateTime(added) %></td>
+        <td class="hidden-xs"><%= _.formatDateTime(updated) %></td>
     </script>
 
     <script id="node-list-empty-template" type="text/template">

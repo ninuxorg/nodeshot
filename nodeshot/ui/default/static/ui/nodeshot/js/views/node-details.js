@@ -49,6 +49,7 @@
             this.ext = {
                 legend: this.parent.legend.$el,
                 toolbar: this.parent.toolbar.$el,
+                panels: this.parent.panels.$el,
                 map: this.parent.content.$el,
                 leafletMap: this.parent.content.currentView.map,
                 mapContainer: this.parent.$el,
@@ -59,6 +60,7 @@
             // elements that must be hidden
             this.hidden =  $().add(this.ext.legend)
                               .add(this.ext.toolbar)
+                              .add(this.ext.panels)
                               .add(this.ext.map.find('.leaflet-control-attribution'));
             // bind to namespaced events
             $(window).on("resize.node-details", _.bind(this.resize, this));
@@ -77,7 +79,7 @@
                 leaflet = geomodel.get('leaflet'),
                 mapPreferences = localStorage.getObject('map') || Ns.settings.map;
             // hide elements that are not needed
-            this.toggleElements();
+            this.toggleElements(false);
             // fit map view to geographic object
             map.fitBounds(leaflet, { animate: false });
             // move map up slightly to conpensate the layout
@@ -103,19 +105,20 @@
             // reset scrollbar styles
             this.ext.body.attr('style', '').scrollTop(0);
             // restore initial state
-            this.toggleElements();
+            this.toggleElements(true);
         },
 
         /**
          * hide/show elements that are peculiar to this view
          */
-        toggleElements: function() {
+        toggleElements: function(showOrHide) {
             // style needed to display smaller map
-            this.ext.mapContainer.toggleClass('short-map');
+            this.ext.mapContainer.toggleClass('short-map', !showOrHide);
             // trick for uniform background color
-            this.ext.html.toggleClass('details-background');
+            this.ext.html.toggleClass('details-background', !showOrHide);
             // hide or show elements that are not needed for this view
-            this.hidden.toggle();
+            this.hidden.toggle(showOrHide);
+            if (showOrHide === true){ this.ext.toolbar.attr('style', '') }
             // resize map
             this.resize();
         },
