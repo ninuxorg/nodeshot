@@ -29,7 +29,10 @@
     <style type="text/css">
         #top-bar h1 a {
             background-image: url({{ LOGO.URL }}) !important;
-            {% if LOGO.SIZE %}background-size: {{ LOGO.SIZE }} !important;{% endif %}
+            {% if LOGO.SIZE %}
+            background-size: {{ LOGO.SIZE }} !important;
+            width: {{ LOGO.SIZE }} !important;
+            {% endif %}
         }
     </style>
     {% endif %}

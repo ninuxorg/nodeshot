@@ -181,12 +181,12 @@ Use this setting to show a custom logo, example:
 
     NODESHOT_UI_LOGO = {
         'URL': 'http://yourdomain.com/static/logo.svg',  # value for css rule background-image
-        'SIZE': '171px',  # value for css rule background-size
+        'SIZE': '180px',  # value for css rule background-size
     }
 
 .. note::
     * the logo **must be in SVG format**.
-    * currently due to a limit in the design of the layout, **logos larger than 171px will be clipped**
+    * when choosing the size of the logo, mind mobile platforms!
 
 NODESHOT_UI_VOTING_ENABLED
 --------------------------
