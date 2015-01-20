@@ -37,9 +37,9 @@ class LayerListSerializer(geoserializers.GeoModelSerializer, HStoreSerializer):
 
     class Meta:
         model = Layer
-        fields= [
+        fields = [
             'id', 'slug', 'name', 'center', 'area',
-            'nodes_minimum_distance', 'new_nodes_allowed',
+            'nodes_minimum_distance', 'new_nodes_allowed', 'is_external',
             'details', 'nodes', 'geojson'
         ] + ADDITIONAL_LAYER_FIELDS
 
@@ -58,7 +58,7 @@ class GeoLayerListSerializer(geoserializers.GeoFeatureModelSerializer, LayerList
     class Meta:
         model = Layer
         geo_field = 'area'
-        fields= ['id', 'name', 'slug'] + ADDITIONAL_LAYER_FIELDS
+        fields = ['id', 'name', 'slug'] + ADDITIONAL_LAYER_FIELDS
 
 
 class LayerDetailSerializer(LayerListSerializer):
