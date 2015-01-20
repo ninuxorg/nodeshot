@@ -645,7 +645,6 @@ article.center-stage{
 
 #map-legend a{ float: left }
 #map-legend .circle{ margin-right: 5px }
-#map-legend a:hover{ font-weight: bold }
 
 #map-legend.right{
     left: auto;

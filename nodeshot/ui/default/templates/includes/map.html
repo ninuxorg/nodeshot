@@ -27,8 +27,7 @@
         <% _.each(items, function(item){ %>
         <li id="legend-item-<%= item.slug %>" <% if(!item.visible) { %>class="disabled"<% } %>>
             <a href="#" data-status="<%= item.slug %>" title="<%= item.description %>">
-                <span class="circle" style="background-color:<%= item.fill_color %>"></span>
-                <%= item.name %>
+                <span class="circle" style="background-color:<%= item.fill_color %>"></span><span class="text"><%= item.name %></span>
             </a>
             <span class="stats"><%= item.count %></span>
         </li>

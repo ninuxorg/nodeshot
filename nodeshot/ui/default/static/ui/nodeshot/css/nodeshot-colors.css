@@ -433,17 +433,19 @@ input.error, .error input, .error button{
     outline: 0 none
 }
 
+#map-legend.inverse a:hover .text,
+#map-legend.inverse a:focus .text{ text-decoration: underline }
+
 #map-legend.inverse .icon-close:hover,
 .user-dialog .icon-close:hover,
 .inverse .icon-close:focus,
 article .icon-close:hover,
-article .icon-close:focus{
-    color: #000
-}
+article .icon-close:focus{ color: #000 }
 
 #map-legend .stats{ color: #7f7f7f !important; cursor: default }
 
 .disabled{ opacity: 0.4 }
+#map-legend .disabled .text{ text-decoration: none !important }
 
 #map-toolbar a,
 #toggle-toolbar{
