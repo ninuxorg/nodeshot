@@ -33,10 +33,10 @@ before_script:
   - ./manage.py loaddata initial_data
   # begin temporary workaround for django 1.6 LiveServerTestCase suckness
   - ./manage.py mail_debug &
-  - ./manage.py loaddata test_profiles test_layers test_status test_nodes
+  - ./manage.py loaddata test_profiles test_layers test_status test_nodes test_pages
   - ./manage.py runserver 0.0.0.0:8000 &
   - sleep 2 # give django server time to bind to sockets
-  # end 
+  # end
 
 # command to run tests, e.g. python setup.py test
 script:

@@ -1,0 +1,30 @@
+[
+  {
+    "pk": 1,
+    "model": "cms.page",
+    "fields": {
+      "title": "Home",
+      "content": "<p>Put here your homepage text.<\/p><p><a class=\"btn btn-primary\" style=\"text-decoration: none;\" href=\"#/map\">See the map<\/a><\/p>",
+      "access_level": 0,
+      "meta_keywords": "",
+      "meta_description": "",
+      "meta_robots": "index, follow",
+      "slug": "home",
+      "is_published": true
+    }
+  },
+  {
+    "pk": 5,
+    "model": "cms.page",
+    "fields": {
+      "title": "Software credits",
+      "content": "<p>This website is powered by <a href=\"https://github.com/ninuxorg/nodeshot\" target=\"_blank\">Nodeshot<\/a>, an open source web application for management of community-led georeferenced data.<\/p>",
+      "access_level": 0,
+      "meta_keywords": "",
+      "meta_description": "",
+      "meta_robots": "index, follow",
+      "slug": "credits",
+      "is_published": true
+    }
+  }
+]

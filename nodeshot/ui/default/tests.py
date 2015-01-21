@@ -28,7 +28,8 @@ class DefaultUiTest(TestCase):
         'test_layers.json',
         'test_status.json',
         'test_nodes.json',
-        'test_images.json'
+        'test_images.json',
+        'test_pages.json'
     ]
 
     INDEX_URL = '%s%s' % (settings.SITE_URL, reverse('ui:index'))
