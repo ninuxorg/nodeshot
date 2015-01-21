@@ -1,5 +1,8 @@
+from copy import copy
+
 from rest_framework import serializers, pagination
 from rest_framework.reverse import reverse
+from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework_gis import serializers as geoserializers
 
 from nodeshot.core.base.serializers import GeoJSONPaginationSerializer
@@ -26,6 +29,19 @@ __all__ = [
 class NodeDetailSerializer(ExtensibleNodeSerializer):
     """ node detail """
     layer = serializers.SlugRelatedField(slug_field='slug')
+    can_edit = serializers.SerializerMethodField('get_can_edit')
+
+    def get_can_edit(self, obj):
+        """ returns true if user has permission to edit, false otherwise """
+        view = self.context.get('view')
+        request = copy(self.context.get('request'))
+        request._method = 'PUT'
+        try:
+            view.check_object_permissions(request, obj)
+        except (PermissionDenied, NotAuthenticated):
+            return False
+        else:
+            return True
 
     class Meta:
         model = Node
@@ -35,7 +51,7 @@ class NodeDetailSerializer(ExtensibleNodeSerializer):
             'geometry', 'elev', 'address',
             'description',
         ] + ADDITIONAL_NODE_FIELDS + [
-            'added', 'updated', 'relationships'
+            'added', 'updated', 'can_edit', 'relationships'
         ]
 
         read_only_fields = ('added', 'updated')

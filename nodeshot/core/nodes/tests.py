@@ -441,3 +441,24 @@ class APITest(BaseTestCase):
         self.client.login(username='admin', password='tester')
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+
+    def test_node_can_edit(self):
+        url = reverse('api_node_details', args=['fusolab'])
+        # cannot edit
+        response = self.client.get(url)
+        self.assertFalse(response.data['can_edit'])
+        # admin can edit
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(url)
+        self.assertTrue(response.data['can_edit'])
+        self.client.logout()
+        # other user cannot edit
+        self.client.login(username='registered', password='tester')
+        response = self.client.get(url)
+        self.assertFalse(response.data['can_edit'])
+        self.client.logout()
+        # owner can edit
+        self.client.login(username='romano', password='tester')
+        response = self.client.get(url)
+        self.assertTrue(response.data['can_edit'])
+        self.client.logout()
