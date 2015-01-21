@@ -73,8 +73,15 @@
         },
 
         showEditNode: function(node) {
-            this.details.show(new Ns.views.node.Detail({ model: node, parent: this }));
-            this.details.currentView.edit();
+            // ensure is allowed to edit
+            if (node.get('can_edit')) {
+                this.details.show(new Ns.views.node.Detail({ model: node, parent: this }));
+                this.details.currentView.edit();
+            }
+            // otherwise go back to details
+            else {
+                Ns.router.navigate('nodes/' + node.id, { trigger: true });
+            }
         },
 
         /*

@@ -30,16 +30,16 @@
         body: '#body'
     });
 
-    // init layout
+    // main initializers
     Ns.addInitializer(function () {
         Ns.notifications.show(new Ns.views.Notification());
         Ns.account.show(new Ns.views.Account());
         Ns.menu.show(new Ns.views.Menu());
         Ns.search.show(new Ns.views.Search());
-    });
-
-    // init pages
-    Ns.addInitializer(function () {
+        // empty node cache when user logs in / logs out
+        // needed for node can_edit
+        Ns.db.user.on('loggedin loggedout', function(){ Ns.db.nodes.reset() });
+        // init backbone app
         Backbone.history.start();
     });
 
