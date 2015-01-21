@@ -12,7 +12,7 @@ from nodeshot.core.base.utils import Hider
 from .settings import REVERSION_ENABLED
 from .permissions import IsOwnerOrReadOnly
 from .serializers import *
-from .models import *
+from .models import Node, Status, Image
 
 
 if REVERSION_ENABLED:
@@ -184,7 +184,7 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
         # ensure node exists
         self.node = get_queryset_or_404(
             Node.objects.published().accessible_to(request.user),
-            { 'slug': self.kwargs.get('slug', None) }
+            {'slug': self.kwargs.get('slug', None)}
         )
 
         # check permissions on node (for image creation)
@@ -227,7 +227,7 @@ class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         self.node = get_queryset_or_404(
             Node.objects.published().accessible_to(self.request.user),
-            { 'slug': self.kwargs.get('slug', None) }
+            {'slug': self.kwargs.get('slug', None)}
         )
 
         return super(ImageDetail, self).get_queryset().filter(node=self.node)

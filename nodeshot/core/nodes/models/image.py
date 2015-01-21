@@ -20,7 +20,7 @@ class Image(BaseOrderedACL):
 
     class Meta:
         db_table = 'nodes_image'
-        app_label= 'nodes'
+        app_label = 'nodes'
         permissions = (('can_view_image', 'Can view images'),)
         ordering = ['order']
 
@@ -40,4 +40,3 @@ class Image(BaseOrderedACL):
             pass
 
         super(Image, self).delete(*args, **kwargs)
-

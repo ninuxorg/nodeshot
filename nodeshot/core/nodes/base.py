@@ -13,7 +13,6 @@ class ExtensibleNodeSerializer(DynamicRelationshipsMixin, geoserializers.GeoMode
     layer_name = serializers.Field(source='layer.name')
     access_level = serializers.Field(source='get_access_level_display')
     relationships = serializers.SerializerMethodField('get_relationships')
-    
+
     # this is needed to avoid adding stuff to DynamicRelationshipsMixin
     _relationships = {}
-

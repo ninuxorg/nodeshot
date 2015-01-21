@@ -5,7 +5,7 @@ from nodeshot.core.base.admin import BaseGeoAdmin, BaseStackedInline, PublishAct
 from nodeshot.core.base.widgets import AdvancedFileInput
 
 from .settings import settings, REVERSION_ENABLED, DESCRIPTION_HTML
-from .models import *
+from .models import Node, Status, Image
 
 
 # enable django-reversion according to settings

@@ -6,24 +6,18 @@ import os
 import simplejson as json
 
 from django.test import TestCase
-from django.test.client import Client
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.measure import D
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from nodeshot.core.layers.models import Layer
 from nodeshot.core.base.tests import user_fixtures, BaseTestCase
 
-from .models import *
+from .models import Node, Status, Image
 
 
-class ModelsTest(TestCase):
-
+class NodeModelsTest(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -97,7 +91,7 @@ class ModelsTest(TestCase):
         node.is_published = False
         node.save()
         # should be -1
-        self.assertEqual(count-1, Node.objects.published().filter(layer=1).count())
+        self.assertEqual(count - 1, Node.objects.published().filter(layer=1).count())
 
         # Ensure GeoManager distance is available
         pnt = Node.objects.get(slug='pomezia').geometry
@@ -119,7 +113,7 @@ class ModelsTest(TestCase):
         # public, registered and community
         self.assertEqual(10, Node.objects.access_level_up_to('community').count())
 
-        ### --- START CHAINING! WOOOO --- ###
+        # --- START CHAINING! WOOOO --- #
         # 9 because we unpublished one
         self.assertEqual(9, Node.objects.published().access_level_up_to('community').count())
         self.assertEqual(9, Node.objects.access_level_up_to('community').published().count())
@@ -179,7 +173,7 @@ class ModelsTest(TestCase):
         with self.assertRaises(ValueError):
             node.point
 
-        node.geometry = GEOSGeometry(json.dumps({"type":"Polygon","coordinates":[[[12.501493164066,41.990441051094],[12.583890625003,41.957770034531],[12.618222900394,41.912820024702],[12.607923217778,41.877552973685],[12.582088180546,41.82423212474],[12.574148841861,41.813357913568],[12.551532455447,41.799730560554],[12.525053688052,41.795155470656],[12.510505386356,41.793715689492],[12.43308610535,41.803249638226],[12.388883300784,41.813613798573],[12.371030517581,41.870906276755],[12.382016845706,41.898511105474],[12.386136718753,41.912820024702],[12.38064355469,41.926104006681],[12.38064355469,41.955727539561],[12.413602539065,41.974107637675],[12.445188232426,41.983295698272],[12.45617456055,41.981254021593],[12.476773925785,41.985337309484],[12.490506835941,41.985337309484],[12.506986328129,41.990441051094],[12.501493164066,41.990441051094]]]}))
+        node.geometry = GEOSGeometry("""{"type": "Polygon", "coordinates": [[[12.501493164066, 41.990441051094], [12.583890625003, 41.957770034531], [12.618222900394, 41.912820024702], [12.607923217778, 41.877552973685], [12.582088180546, 41.82423212474], [12.574148841861, 41.813357913568], [12.551532455447, 41.799730560554], [12.525053688052, 41.795155470656], [12.510505386356, 41.793715689492], [12.43308610535, 41.803249638226], [12.388883300784, 41.813613798573], [12.371030517581, 41.870906276755], [12.382016845706, 41.898511105474], [12.386136718753, 41.912820024702], [12.38064355469, 41.926104006681], [12.38064355469, 41.955727539561], [12.413602539065, 41.974107637675], [12.445188232426, 41.983295698272], [12.45617456055, 41.981254021593], [12.476773925785, 41.985337309484], [12.490506835941, 41.985337309484], [12.506986328129, 41.990441051094], [12.501493164066, 41.990441051094]]]}""")
         node.point  # must not raise GEOSException
 
     def test_image_manager(self):
@@ -213,10 +207,10 @@ class ModelsTest(TestCase):
         self.assertEqual(node.geometry, point)
 
 
-### ------ API tests ------ ###
+# ------ API tests ------ #
 
 
-class APITest(BaseTestCase):
+class NodesApiTest(BaseTestCase):
 
     fixtures = [
         'initial_data.json',
@@ -262,7 +256,7 @@ class APITest(BaseTestCase):
         url = reverse('api_node_list')
 
         # GET: 200
-        response = self.client.get(url, { "search": "Fusolab" })
+        response = self.client.get(url, {"search": "Fusolab"})
         self.assertEqual(response.data['count'], 1)
 
     def test_delete_node(self):
@@ -316,7 +310,7 @@ class APITest(BaseTestCase):
         self.assertEqual(node.description, 'Fusolab test 2')
 
         # PATCH
-        response = self.client.patch(url, { 'name': 'Patched Fusolab Name' })
+        response = self.client.patch(url, {'name': 'Patched Fusolab Name'})
         self.assertEqual(200, response.status_code)
         node = Node.objects.get(slug='fusolab')
         self.assertEqual(node.name, 'Patched Fusolab Name')
@@ -388,9 +382,9 @@ class APITest(BaseTestCase):
 
         # POST
         # todo
-        login = self.client.login(username='admin', password='tester')
-        good_post_data = { "description": "new image", "order": "" }
-        bad_post_data = { "node": 100, "image": "jpeg99" ,"description" : "new image", "order": "" }
+        self.client.login(username='admin', password='tester')
+        good_post_data = {"description": "new image", "order": ""}
+        bad_post_data = {"node": 100, "image": "jpeg99", "description": "new image", "order": ""}
         url = reverse('api_node_images', args=['fusolab'])
         wrong_url = reverse('api_node_images', args=['idontexist'])
 
