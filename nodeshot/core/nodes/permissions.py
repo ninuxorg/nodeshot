@@ -23,13 +23,16 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             action = 'add'
 
         class_name = obj.__class__.__name__
-
         # if node
         if class_name == 'Node':
             owner = obj.user
+            layer = obj.layer
         # if image
         elif class_name == 'Image':
             owner = obj.node.user
-
+            layer = obj.node.layer
+        # if layer is external, object can't be edited
+        if layer.is_external:
+            return False
         # Instance must have an attribute named `owner`.
         return owner == request.user or request.user.has_perm('nodes.%s_%s' % (action, class_name.lower()))

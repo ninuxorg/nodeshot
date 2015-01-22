@@ -456,3 +456,17 @@ class NodesApiTest(BaseTestCase):
         response = self.client.get(url)
         self.assertTrue(response.data['can_edit'])
         self.client.logout()
+        # external node can't be edited
+        Node.objects.create(**{
+            'name': 'external',
+            'slug': 'external',
+            'layer_id': 4,
+            'geometry': 'POINT (12.9732427 42.638304372)'
+        })
+        self.client.login(username='admin', password='tester')
+        url = reverse('api_node_details', args=['external'])
+        response = self.client.get(url)
+        self.assertFalse(response.data['can_edit'])
+        response = self.client.patch(url, {'name': 'external 2'})
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
