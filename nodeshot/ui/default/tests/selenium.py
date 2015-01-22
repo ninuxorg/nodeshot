@@ -1,8 +1,8 @@
-from time import sleep
+from __future__ import absolute_import
 
+from time import sleep
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.conf import settings
 
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.core.nodes.models import Node
@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 
 
-class DefaultUiTest(TestCase):
+class DefaultUiSeleniumTest(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -26,7 +26,7 @@ class DefaultUiTest(TestCase):
         'test_pages.json'
     ]
 
-    INDEX_URL = '%s%s' % (settings.SITE_URL, reverse('ui:index'))
+    INDEX_URL = '%s%s' % (local_settings.settings.SITE_URL, reverse('ui:index'))
     LEAFLET_MAP = 'Ns.body.currentView.content.currentView.map'
 
     def _wait_until_ajax_complete(self, seconds, message):
@@ -87,12 +87,12 @@ class DefaultUiTest(TestCase):
     def setUpClass(cls):
         cls.browser = webdriver.Firefox()
         cls.browser.get(cls.INDEX_URL)
-        super(DefaultUiTest, cls).setUpClass()
+        super(DefaultUiSeleniumTest, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
         cls.browser.quit()
-        super(DefaultUiTest, cls).tearDownClass()
+        super(DefaultUiSeleniumTest, cls).tearDownClass()
 
     def setUp(self):
         """ reset browser to initial state """
@@ -101,50 +101,6 @@ class DefaultUiTest(TestCase):
         browser.delete_all_cookies()
         browser.execute_script("Ns.db.user.clear(); Ns.db.user.trigger('logout');")
         browser.set_window_size(1100, 700)
-
-    def test_index(self):
-        response = self.client.get(reverse('ui:index'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_social_auth_optional(self):
-        # enable social auth
-        setattr(local_settings, 'SOCIAL_AUTH_ENABLED', True)
-        response = self.client.get(reverse('ui:index'))
-        self.assertContains(response, 'social-buttons')
-        # disable social auth
-        setattr(local_settings, 'SOCIAL_AUTH_ENABLED', False)
-        response = self.client.get(reverse('ui:index'))
-        self.assertNotContains(response, 'social-buttons')
-
-    def test_facebook_optional(self):
-        setattr(local_settings, 'SOCIAL_AUTH_ENABLED', True)
-        setattr(local_settings, 'FACEBOOK_ENABLED', True)
-        response = self.client.get(reverse('ui:index'))
-        self.assertContains(response, 'btn-facebook')
-        setattr(local_settings, 'FACEBOOK_ENABLED', False)
-        response = self.client.get(reverse('ui:index'))
-        self.assertNotContains(response, 'btn-facebook')
-        setattr(local_settings, 'SOCIAL_AUTH_ENABLED', False)
-
-    def test_google_optional(self):
-        setattr(local_settings, 'SOCIAL_AUTH_ENABLED', True)
-        setattr(local_settings, 'GOOGLE_ENABLED', True)
-        response = self.client.get(reverse('ui:index'))
-        self.assertContains(response, 'btn-google')
-        setattr(local_settings, 'GOOGLE_ENABLED', False)
-        response = self.client.get(reverse('ui:index'))
-        self.assertNotContains(response, 'btn-google')
-        setattr(local_settings, 'SOCIAL_AUTH_ENABLED', False)
-
-    def test_github_optional(self):
-        setattr(local_settings, 'SOCIAL_AUTH_ENABLED', True)
-        setattr(local_settings, 'GITHUB_ENABLED', True)
-        response = self.client.get(reverse('ui:index'))
-        self.assertContains(response, 'btn-github')
-        setattr(local_settings, 'GITHUB_ENABLED', False)
-        response = self.client.get(reverse('ui:index'))
-        self.assertNotContains(response, 'btn-github')
-        setattr(local_settings, 'SOCIAL_AUTH_ENABLED', False)
 
     def test_home(self):
         self._hashchange('#')
