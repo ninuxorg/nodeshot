@@ -191,51 +191,6 @@
 
 <script id="map-add-node-template" type="text/template">
     <h1 class="title">{% trans 'Add new node' %}</h1>
-    <form action="{% url 'api_node_list' %}" id="add-node-form">
-        <ul class="error-list"></ul>
-        <p>
-            <label for="id_name">{% trans 'Name' %}</label>
-            <span class="error-msg"></span>
-            <input name="name" type="text" class="form-control input-sm" placeholder="{% trans 'Enter name (required)' %}" id="id_name">
-        </p>
-        <div>
-            <label>Layer</label>
-            <span class="error-msg"></span>
-
-            <select name="layer" id="id_layer" class="selectpicker" data-live-search="true">
-                <option>{% trans 'Select Layer' %}</option>
-                <% _.each(layers, function (layer) { %>
-                    <% if (layer.new_nodes_allowed) { %>
-                        <option value="<%= layer.slug %>"><%= layer.name %></option>
-                    <% } %>
-                <% }) %>
-            </select>
-        </div>
-        <p>
-            <label for="id_address">{% trans 'Address' %}</label>
-            <span class="error-msg"></span>
-            <input name="address" type="text" class="form-control input-sm" placeholder="{% trans 'Enter address (optional)' %}" id="id_address">
-        </p>
-        <p>
-            <label for="id_elevation">{% trans 'Elevation' %}</label>
-            <span class="error-msg"></span>
-            <input name="elevation" type="text" class="form-control input-sm" placeholder="{% trans 'Enter elevation (optional)' %}" id="id_elevation">
-        </p>
-        <p>
-            <label for="id_description">{% trans 'Description' %}</label>
-            <span class="error-msg"></span>
-            <textarea name="description" class="form-control input-sm" rows="6" id="id_description" placeholder="{% trans 'Enter description (optional)' %}"></textarea>
-        </p>
-        <p>
-            <label for="id_data">{% trans 'Extra data' %}</label>
-            <span class="error-msg"></span>
-            <textarea name="data" class="form-control input-sm" rows="6" id="id_data" placeholder="{% trans 'Enter extra data (optional)' %}"></textarea>
-        </p>
-        <p>
-            <button type="submit" class="btn btn-success">{% trans 'Add node' %}</button>
-            &nbsp;
-            <button type="button" class="btn btn-default">{% trans 'Cancel' %}</button>
-        </p>
-        <input type="hidden" id="id_geometry" name="geometry">
-    </form>
+    <ul class="error-list"></ul>
+    <div id="add-node-form-container"></div>
 </script>

@@ -606,13 +606,12 @@ class DefaultUiSeleniumTest(TestCase):
         browser.find_element_by_css_selector('#add-node-step2 .btn-success').click()
         self._wait_until_element_visible('#map-add-node-js', 1, 'add node form not shown in time')
         # add node form
-        browser.find_element_by_css_selector('#add-node-form .btn-success').click()
+        browser.find_element_by_css_selector('#add-node-form-container .btn-success').click()
         self._wait_until_ajax_complete(5, 'timeout')
-        self.assertNotEqual(browser.find_element_by_css_selector('#add-node-form .error-msg').text, '')
         # click on cancel
-        browser.find_element_by_css_selector('#add-node-form .btn-default').click()
+        browser.find_element_by_css_selector('#add-node-form-container .btn-default').click()
         sleep(0.5)  # animation
-        self.assertEqual(len(browser.find_elements_by_css_selector('#add-node-form')), 0)
+        self.assertEqual(len(browser.find_elements_by_css_selector('#add-node-form-container')), 0)
 
         # ensure hidden element reset to initial state
         self.assertTrue(legend.is_displayed())

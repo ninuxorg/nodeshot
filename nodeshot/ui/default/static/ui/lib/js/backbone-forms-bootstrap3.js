@@ -13,7 +13,7 @@
       <% if (submitButton) { %>\
         <p>\
         <button type="submit" class="btn btn-success"><%= submitButton %></button>&nbsp;\
-        <button type="button" class="btn btn-default">cancel</button>\
+        <button type="button" class="btn btn-default">Cancel</button>\
         </p>\
       <% } %>\
     </form>\

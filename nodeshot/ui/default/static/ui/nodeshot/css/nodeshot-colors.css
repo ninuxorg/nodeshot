@@ -409,16 +409,17 @@ body article a:focus,
     color: #404040;
 }
 
-input.error, .error input, .error button{
+input.error, .error input, .error button, .has-error .form-control{
     border: 1px solid #d96352 !important;
     color: #ff0000 !important;
 }
-.error .input-group-
+.error .input-group
 {
     border: 1px solid #d96352;
 }
 .error-msg,
-.error-list li{ color: #ff0000 }
+.error-list li,
+p.has-error{ color: #ff0000 }
 
 #map-legend{
     -webkit-box-shadow: 0px 3px 25px 0px rgba(50, 50, 50, 0.4);

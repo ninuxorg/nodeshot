@@ -210,11 +210,17 @@
         model: Ns.models.Layer,
 
         /**
-         * layers shown in edit node
          * only external layers are hidden
          */
-        getEditList: function () {
+        excludeExternal: function () {
             return this.whereCollection({ is_external: false });
+        },
+
+        /**
+        * external and locked (can't add new nodes) hidden
+        */
+        excludeExternalAndLocked: function () {
+            return this.whereCollection({ is_external: false, new_nodes_allowed: true });
         },
 
         /**
@@ -241,12 +247,23 @@
 
         schema: {
             // TODO: i18n
-            name: { type: 'Text', title: 'name', validators: ['required'], editorAttrs: { maxlength: 75 } },
-            layer: { type: 'Select', title: 'layer', validators: ['required'], options: function(callback){ callback(Ns.db.layers.getEditList()) } },
-            geometry: { type: 'Hidden', title: 'geometry', validators: ['required'] },
-            address: { type: 'Text', title: 'address', editorAttrs: { maxlength: 150 } },
-            elev: { type: 'Number', title: 'elevation',  validators: ['number'] },
-            description: { type: 'TextArea', title: 'description' }
+            name: { type: 'Text', title: 'Name', validators: ['required'], editorAttrs: { maxlength: 75 } },
+            layer: { type: 'Select', title: 'Layer', validators: ['required'],
+                options: function(callback){
+                    // add node
+                    if (typeof(Ns.body.currentView.details.currentView) === 'undefined') {
+                        callback(Ns.db.layers.excludeExternalAndLocked());
+                    }
+                    // edit node
+                    else {
+                        callback(Ns.db.layers.excludeExternal());
+                    }
+                }
+            },
+            geometry: { type: 'Hidden', title: 'Geometry', validators: ['required'] },
+            address: { type: 'Text', title: 'Address', editorAttrs: { maxlength: 150 } },
+            elev: { type: 'Number', title: 'Elevation',  validators: ['number'] },
+            description: { type: 'TextArea', title: 'Description' }
         },
 
         defaults: {

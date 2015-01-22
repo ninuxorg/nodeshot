@@ -367,7 +367,7 @@
                 marker;
             this.form = new Backbone.Form({
                 model: this.model,
-                submitButton: 'save'
+                submitButton: 'Save'
             }).render();
             this.ui.comments.hide();
             this.ui.nodeData.html(this.form.el);
@@ -406,10 +406,9 @@
             // on submit
             this.ui.nodeData.find('form').submit(function(e) {
                 e.preventDefault();
-                if(self.form.validate() === null){
-                    var backup = self.model.toJSON();
-                    // update model
-                    self.model.set(self.form.getValue());
+                var backup = self.model.toJSON(),
+                    errors = self.form.commit();
+                if(!errors){
                     // update geomodel
                     self.geomodel.set(self.model.toJSON());
                     // reset geomodel on map

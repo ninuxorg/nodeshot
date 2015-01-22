@@ -969,14 +969,12 @@
         tagName: 'article',
 
         ui: {
-            'form': '#add-node-form',
-            'select': '#add-node-form select',
-            'address': '#id_address'
+            'formContainer': '#add-node-form-container'
         },
 
         events: {
-            'click #add-node-form .btn-default': 'destroy',
-            'submit #add-node-form': 'submitAddNode'
+            'click #add-node-form-container .btn-default': 'destroy',
+            'submit #add-node-form-container form': 'submitAddNode'
         },
 
         initialize: function (options) {
@@ -1005,7 +1003,6 @@
 
         onShow: function () {
             Ns.router.navigate('map/add');
-            this.ui.select.selectpicker({ style: 'btn-special' });
             // go to step1 when collection is ready
             if (this.ext.geo.length){
                 this.step1();
@@ -1013,6 +1010,14 @@
             else {
                 this.listenToOnce(this.ext.geo, 'ready', this.step1);
             }
+            // dynamic form
+            this.form = new Backbone.Form({
+                model: new Ns.models.Node(),
+                submitButton: 'Add node'
+            }).render();
+            this.ui.formContainer.html(this.form.$el);
+            this.$('input[type=checkbox]').bootstrapSwitch().bootstrapSwitch('setSizeClass', 'switch-small');
+            this.$('select').selectpicker({style: 'btn-special' });
         },
 
         /*
@@ -1114,13 +1119,16 @@
                 // draggable marker
                 marker = L.marker([e.latlng.lat, e.latlng.lng], {draggable: true}).addTo(map);
             // keep a global reference
-            self.newNodeMarker = marker;
+            this.newNodeMarker = marker;
             // set address on form
-            self.setAddressFromLatLng(e.latlng);
+            this.setAddressFromLatLng(e.latlng);
+            this.form.setValue('geometry', JSON.stringify(marker.toGeoJSON()));
+            this.setGeometryFromMarker(marker);
             // update address when moving the marker
             marker.on('dragend', function (event) {
                 latlng = event.target.getLatLng();
                 self.setAddressFromLatLng(latlng);
+                self.setGeometryFromMarker(event.target);
                 map.panTo(latlng);
             });
             // zoom in to marker
@@ -1157,16 +1165,19 @@
         submitAddNode: function (e) {
             e.preventDefault();
             var self = this,
-                form = this.ui.form,
+                form = this.form,
                 geojson = JSON.stringify(this.newNodeMarker.toGeoJSON().geometry),
-                errorList = form.find('.error-list'),
-                node, geo;
-            form.find('.error-msg').text('').hide();
-            form.find('.error').removeClass('error');
+                errorList = this.$('.error-list'),
+                node = form.model,
+                errors = form.commit(),
+                geo;
+            if (errors) {
+                return false;
+            }
+            this.$('.help-block').text('').hide();
+            this.$('.error').removeClass('error');
+            this.$('.has-error').removeClass('has-error');
             errorList.html('').hide();
-            this.$('#id_geometry').val(geojson);
-            node = new Ns.models.Node(form.serializeJSON());
-            // TODO: refactor this to use backbone and automatic validation
             node.save().done(function () {
                 // convert to Geo model
                 node = new Ns.models.Geo(node.toJSON());
@@ -1177,20 +1188,18 @@
                 // open new node popup
                 node.get('leaflet').openPopup();
             }).error(function (http) {
+                // TODO: make this reusable
                 var json = http.responseJSON,
                     key, input, errorContainer;
                 for (key in json) {
-                    input = $('#id_' + key);
+                    input = self.$('input[name=' + key + ']');
                     if (input.length) {
                         input.addClass('error');
-                        if (input.selectpicker) {
-                            input.selectpicker('setStyle');
-                        }
-                        errorContainer = input.parent().find('.error-msg');
-                        if (!errorContainer.length) {
-                            errorContainer = input.parent().parent().find('.error-msg');
-                        }
-                        errorContainer.text(json[key]).fadeIn(255);
+                        errorContainer = input.parents('.form-group').find('.help-block');
+                        errorContainer.text(json[key])
+                                      .removeClass('hidden')
+                                      .addClass('has-error')
+                                      .fadeIn(255);
                     } else {
                         errorList.show();
                         errorList.append('<li>' + json[key] + '</li>');
@@ -1254,7 +1263,14 @@
          */
         setAddressFromLatLng: function (latlng) {
             var addr = $.geocode({ lat: latlng.lat, lon: latlng.lng });
-            this.ui.address.val(addr.display_name);
-        }
+            this.form.setValue('address', addr.display_name);
+        },
+
+        /**
+         * set geometry on model from marker geojson
+         */
+         setGeometryFromMarker: function (marker) {
+             this.form.setValue('geometry', JSON.stringify(marker.toGeoJSON().geometry));
+         }
     });
 })();
