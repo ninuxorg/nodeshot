@@ -9,16 +9,10 @@ from nodeshot.core.nodes.models import Node
 from nodeshot.ui.default import settings as local_settings
 
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
-
-
-def ajax_complete(driver):
-    try:
-        return driver.execute_script("return jQuery.active == 0")
-    except WebDriverException:
-        pass
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
 
 
 class DefaultUiTest(TestCase):
@@ -35,9 +29,22 @@ class DefaultUiTest(TestCase):
     INDEX_URL = '%s%s' % (settings.SITE_URL, reverse('ui:index'))
     LEAFLET_MAP = 'Ns.body.currentView.content.currentView.map'
 
+    def _wait_until_ajax_complete(self, seconds, message):
+        """ waits until all ajax requests are complete """
+        def condition(driver):
+            return driver.execute_script("return jQuery.active === 0")
+        WebDriverWait(self.browser, seconds).until(condition, message)
+
+    def _wait_until_element_visible(self, selector, seconds, message):
+        """ waits until css selector is present and visible """
+        WebDriverWait(self.browser, seconds).until(
+            expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, selector)),
+            message
+        )
+
     def _hashchange(self, hash):
         self.browser.get('%s%s' % (self.INDEX_URL, hash))
-        WebDriverWait(self.browser, 10).until(ajax_complete, 'Timeout')
+        self._wait_until_ajax_complete(10, 'Timeout')
 
     def _reset(self):
         """ reset and reload browser (clear localstorage and go to index) """
@@ -45,7 +52,36 @@ class DefaultUiTest(TestCase):
         self.browser.execute_script('localStorage.clear()')
         self.browser.delete_all_cookies()
         self.browser.refresh()
-        WebDriverWait(self.browser, 10).until(ajax_complete, 'Timeout')
+        self._wait_until_ajax_complete(10, 'Timeout')
+
+    def _login(self, username='admin', password='tester', open_modal=True):
+        if open_modal:
+            # open sign in modal
+            self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
+            self._wait_until_element_visible('#js-signin-form', 3, 'signin modal not visible')
+        # insert credentials
+        username_field = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
+        username_field.clear()
+        username_field.send_keys(username)
+        password_field = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
+        password_field.clear()
+        password_field.send_keys(password)
+        # log in
+        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
+        self._wait_until_ajax_complete(5, 'timeout')
+        self._wait_until_element_visible('#js-username', 3, 'username after login not visible')
+        # check username
+        self.assertEqual(self.browser.find_element_by_css_selector('#js-username').text, 'admin')
+
+    def _logout(self):
+        # open account menu
+        self.browser.find_element_by_css_selector('#js-username').click()
+        # log out
+        self._wait_until_element_visible('#js-logout', 3, '#js-logout not visible')
+        self.browser.find_element_by_css_selector('#js-logout').click()
+        self._wait_until_ajax_complete(5, 'timeout')
+        # ensure UI has gone back to initial state
+        self._wait_until_element_visible('#main-actions a[data-target="#signin-modal"]', 3, 'sign in link not visible after logout')
 
     @classmethod
     def setUpClass(cls):
@@ -124,10 +160,10 @@ class DefaultUiTest(TestCase):
         # ensure the same on a nested menu item
         self.browser.find_element_by_css_selector('#nav-bar a.dropdown-toggle').click()
         self.browser.find_element_by_css_selector("a[href='#/pages/about']").click()
-        sleep(0.1)
+        self._wait_until_ajax_complete(1, 'page timeout')
         self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
         self.browser.find_element_by_css_selector("a[href='#/pages/about']").click()
-        sleep(0.1)
+        self._wait_until_ajax_complete(1, 'page timeout')
         self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
 
     def test_map(self):
@@ -204,32 +240,16 @@ class DefaultUiTest(TestCase):
         self.assertTrue(browser.execute_script('return Ns.db.geo.isEmpty() === false'))
         # ensure node with higher ACL not visible
         self.assertTrue(browser.execute_script("return Ns.db.geo.get('hidden-rome') === undefined"))
-
         # log in as admin
-        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
-        sleep(0.2)
-        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
-        username.clear()
-        username.send_keys('admin')
-        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
-        password.clear()
-        password.send_keys('tester')
-        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
-        sleep(1)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
+        self._login()
         # ensure node with higher ACL is now visible
         self.assertFalse(browser.execute_script("return Ns.db.geo.get('hidden-rome') === undefined"))
         # ensure data is not duplicated
         browser.execute_script('%s.setView([41.8879, 12.50621], 13)' % self.LEAFLET_MAP)
         browser.execute_script('$("#map-control-layer-rome").trigger("click")')
         self.assertEqual(len(browser.find_elements_by_css_selector('#map-js g')), 0)
-
         # log out
-        self.browser.find_element_by_css_selector('#js-username').click()
-        self.browser.find_element_by_css_selector('#js-logout').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
-
+        self._logout()
         # ensure node with higher ACL not visible anymore
         self.assertTrue(browser.execute_script("return Ns.db.geo.get('hidden-rome') === undefined"))
 
@@ -238,30 +258,30 @@ class DefaultUiTest(TestCase):
         self._hashchange('#/map/pomezia')
         browser = self.browser
         # changing url fragment opens popup
-        sleep(0.2)
+        self._wait_until_element_visible('#map-js .leaflet-popup-content-wrapper', 1, 'popup not visible')
         self.assertEqual(len(browser.find_elements_by_css_selector('#map-js .leaflet-popup-content-wrapper')), 1)
         self.assertEqual(browser.find_element_by_css_selector('#map-js .leaflet-popup-content-wrapper h4').text, 'Pomezia')
 
         # refreshing goes back there
         browser.refresh()
-        sleep(0.2)
+        self._wait_until_element_visible('#map-js .leaflet-popup-content-wrapper', 1, 'popup not visible')
         self.assertEqual(len(browser.find_elements_by_css_selector('#map-js .leaflet-popup-content-wrapper')), 1)
         self.assertEqual(browser.find_element_by_css_selector('#map-js .leaflet-popup-content-wrapper h4').text, 'Pomezia')
 
         # changing fragment goes to another element
         self._hashchange('#/map/fusolab')
-        sleep(0.2)
+        self._wait_until_element_visible('#map-js .leaflet-popup-content-wrapper', 1, 'popup not visible')
         self.assertEqual(len(browser.find_elements_by_css_selector('#map-js .leaflet-popup-content-wrapper')), 1)
         self.assertEqual(browser.find_element_by_css_selector('#map-js .leaflet-popup-content-wrapper h4').text, 'Fusolab Rome')
 
         # back button supported
         browser.back()
-        sleep(0.3)
+        self._wait_until_element_visible('#map-js .leaflet-popup-content-wrapper', 1, 'popup not visible')
         self.assertEqual(browser.find_element_by_css_selector('#map-js .leaflet-popup-content-wrapper h4').text, 'Pomezia')
 
         # forward button supported
         browser.forward()
-        sleep(0.3)
+        self._wait_until_element_visible('#map-js .leaflet-popup-content-wrapper', 1, 'popup not visible')
         self.assertEqual(browser.find_element_by_css_selector('#map-js .leaflet-popup-content-wrapper h4').text, 'Fusolab Rome')
 
         # close button changes url fragment to "map"
@@ -426,7 +446,7 @@ class DefaultUiTest(TestCase):
         submit = browser.find_element_by_css_selector('#fn-search-address button')
         input.send_keys('Via Silvio Pellico, Pomezia, Italy')
         submit.click()
-        WebDriverWait(browser, 5).until(ajax_complete, 'Search address timeout')
+        self._wait_until_ajax_complete(5, 'Search address timeout')
         self.assertEqual(browser.execute_script('return typeof(Ns.body.currentView.panels.currentView.addressMarker)'), 'object')
         self.assertEqual(browser.execute_script('return Ns.body.currentView.content.currentView.map.getZoom()'), 18)
         input.clear()
@@ -568,15 +588,14 @@ class DefaultUiTest(TestCase):
         self._hashchange('#map')
         # test for a toggleLeafletLayers() bug
         browser.find_element_by_css_selector('#map-toolbar .icon-pin-add').click()
-        sleep(0.2)
+        self._wait_until_element_visible('#signin-modal', 1, 'signin modal not visible')
         self._hashchange('#/')
-        sleep(0.1)
+        self._wait_until_element_visible('#body article a.btn-primary', 2, 'home not visible')
         self._hashchange('#map')
-        sleep(0.5)
+        self._wait_until_element_visible('#map-js', 5, 'map not visible')
         self.assertNotEqual(browser.execute_script("return $('#map-js path').attr('fill-opacity')"), '0.3')
         browser.find_element_by_css_selector('#signin-modal .icon-close').click()
         sleep(0.5)
-
         # ensure "hidden" elements are visible
         legend = browser.find_element_by_css_selector('#legend-js')
         toolbar = browser.find_element_by_css_selector('#map-toolbar')
@@ -584,26 +603,16 @@ class DefaultUiTest(TestCase):
         self.assertTrue(legend.is_displayed())
         self.assertTrue(toolbar.is_displayed())
         self.assertTrue(cluster.is_displayed())
-
         # click on add node icon
         browser.find_element_by_css_selector('#map-toolbar .icon-pin-add').click()
-
         # ensure login box is shown
-        sleep(0.5)
-        self.assertTrue(browser.find_element_by_css_selector('#signin-modal').is_displayed())
+        self._wait_until_element_visible('#signin-modal', 1, 'signin modal not visible')
 
-        # login
-        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
-        username.clear()
-        username.send_keys('admin')
-        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
-        password.clear()
-        password.send_keys('tester')
-        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
+        # login as admin
+        self._login(open_modal=False)
+        self._wait_until_ajax_complete(5, 'timeout while reloading data after login')
 
         # ensure elements have been hidden
-        sleep(0.3)
         self.assertFalse(legend.is_displayed())
         self.assertFalse(toolbar.is_displayed())
         cluster = browser.find_element_by_css_selector('#map-js .cluster')
@@ -624,7 +633,7 @@ class DefaultUiTest(TestCase):
         # go to step2
         browser.back()
         browser.execute_script("%s.fire('click', { latlng: L.latLng(41.89727804010839, 12.504158020019531) })" % leaflet_map)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search address timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
 
         # cancel step2
         self.browser.find_element_by_css_selector('#add-node-step2 .btn-default').click()
@@ -635,15 +644,14 @@ class DefaultUiTest(TestCase):
         # go again to step2
         browser.find_element_by_css_selector('#map-toolbar .icon-pin-add').click()
         browser.execute_script("%s.fire('click', { latlng: L.latLng(41.89727804010839, 12.504158020019531) })" % leaflet_map)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search address timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
 
         # confirm
         browser.find_element_by_css_selector('#add-node-step2 .btn-success').click()
-        sleep(0.8)  # animation
+        self._wait_until_element_visible('#map-add-node-js', 1, 'add node form not shown in time')
         # add node form
-        self.assertTrue(browser.find_element_by_css_selector('#map-add-node-js').is_displayed())
         browser.find_element_by_css_selector('#add-node-form .btn-success').click()
-        WebDriverWait(browser, 5).until(ajax_complete, 'Submit timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         self.assertNotEqual(browser.find_element_by_css_selector('#add-node-form .error-msg').text, '')
         # click on cancel
         browser.find_element_by_css_selector('#add-node-form .btn-default').click()
@@ -657,7 +665,7 @@ class DefaultUiTest(TestCase):
         # go again to step2
         browser.find_element_by_css_selector('#map-toolbar .icon-pin-add').click()
         browser.execute_script("%s.fire('click', { latlng: L.latLng(41.89727804010839, 12.504158020019531) })" % leaflet_map)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search address timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         # ensure some elements are hidden
         self.assertFalse(legend.is_displayed())
         self.assertFalse(toolbar.is_displayed())
@@ -668,11 +676,7 @@ class DefaultUiTest(TestCase):
         self.assertTrue(toolbar.is_displayed())
 
         # log out
-        self.browser.find_element_by_css_selector('#js-username').click()
-        self.browser.find_element_by_css_selector('#js-logout').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
-        # ensure UI has gone back to initial state
-        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]')
+        self._logout()
 
     def test_map_lat_lng(self):
         LEAFLET_MAP = self.LEAFLET_MAP
@@ -685,7 +689,7 @@ class DefaultUiTest(TestCase):
 
     def test_node_list(self):
         self.browser.find_element_by_css_selector('a[href="#/nodes"]').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Node list timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         self.assertTrue(self.browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'node-list'"))
 
         for node in Node.objects.access_level_up_to('public'):
@@ -702,80 +706,42 @@ class DefaultUiTest(TestCase):
         self.assertFalse(self.browser.execute_script('return Ns.db.nodes.get("pomezia") === undefined'))
 
     def test_edit_node(self):
-        # log in as admin
-        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
-        sleep(0.2)
-        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
-        username.clear()
-        username.send_keys('admin')
-        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
-        password.clear()
-        password.send_keys('tester')
-        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
-        sleep(1)
-
+        # login as admin
+        self._login()
         # go to edit
         self._hashchange('#nodes/pomezia/edit')
-        sleep(0.2)
+        self._wait_until_element_visible('#node-data-js form', 0.5, 'edit node form not shown in time')
         self.assertEqual(len(self.browser.find_elements_by_css_selector('#node-data-js form')), 1)
         self.assertNotIn('vienna', self.browser.execute_script('return $("#node-data-js form select[name=layer]").html()'))
         # go back to node details
         self.browser.find_element_by_css_selector('#node-data-js form .btn-default').click()
         self.assertEqual(len(self.browser.find_elements_by_css_selector('#node-data-js form')), 0)
         self.assertIn('nodes/pomezia', self.browser.current_url)
-
         # log out
-        self.browser.find_element_by_css_selector('#js-username').click()
-        self.browser.find_element_by_css_selector('#js-logout').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
+        self._logout()
 
     def test_user_profile(self):
         self._hashchange('#/users/romano')
         self.assertTrue(self.browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'user-details-container'"))
         self.assertIn('romano', self.browser.page_source)
 
-    def test_login_and_logout(self):
-        # open sign in modal
-        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
-        sleep(0.2)
-        # insert credentials
-        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
-        username.clear()
-        username.send_keys('admin')
-        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
-        password.clear()
-        password.send_keys('tester')
-        # log in
-        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
-        # check username
-        self.assertEqual(self.browser.find_element_by_css_selector('#js-username').text, 'admin')
-        # open account menu
-        self.browser.find_element_by_css_selector('#js-username').click()
-        # log out
-        self.browser.find_element_by_css_selector('#js-logout').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
-        # ensure UI has gone back to initial state
-        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]')
-
     def test_general_search(self):
         self._hashchange('#')
         search = self.browser.find_element_by_css_selector('#general-search-input')
         search.send_keys('RD')
         search.send_keys(Keys.ENTER)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         results = self.browser.find_elements_by_css_selector('#js-search-results li')
         self.assertEqual(len(results), 4)
         search = self.browser.find_element_by_css_selector('#general-search-input')
         search.clear()
         search.send_keys('RDP')
         search.send_keys(Keys.ENTER)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         results = self.browser.find_elements_by_css_selector('#js-search-results li')
         self.assertEqual(len(results), 1)
         self.browser.find_element_by_css_selector('#js-search-results li a').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         self.assertIn('RDP', self.browser.find_element_by_css_selector('#node-details h2').text)
 
     def test_general_search_address(self):
@@ -785,7 +751,7 @@ class DefaultUiTest(TestCase):
         # no results
         search.send_keys('streetnode')
         search.send_keys(Keys.ENTER)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         results = self.browser.find_elements_by_css_selector('#js-search-results li')
         self.assertEqual(len(results), 1)
         self.assertIn('nothing', results[0].text)
@@ -794,7 +760,7 @@ class DefaultUiTest(TestCase):
         # 1 result
         search.send_keys('via Roma, Pomezia')
         search.send_keys(Keys.ENTER)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         results = self.browser.find_elements_by_css_selector('#js-search-results li')
         self.assertEqual(len(results), 1)
         self.assertNotIn('nothing', results[0].text)
@@ -803,7 +769,7 @@ class DefaultUiTest(TestCase):
         # 1 result
         search.send_keys('google street')
         search.send_keys(Keys.ENTER)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Search timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         results = self.browser.find_elements_by_css_selector('#js-search-results li')
         self.assertEqual(len(results), 1)
         self.assertNotIn('nothing', results[0].text)
@@ -812,41 +778,23 @@ class DefaultUiTest(TestCase):
         # 2 results
         search.send_keys('VIA delle zoccolette')
         search.send_keys(Keys.ENTER)
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         results = self.browser.find_elements_by_css_selector('#js-search-results li')
         self.assertEqual(len(results), 2)
         search.clear()
         # go to first result
         self.browser.find_element_by_css_selector('#js-search-results li a').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Go to search result timeout')
+        self._wait_until_ajax_complete(5, 'timeout')
         self.assertIn('#map/latlng/41.89', self.browser.current_url)
 
     def test_notifications(self):
         self._reset()
-        # open sign in modal
-        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]').click()
-        sleep(0.2)
-        # insert credentials
-        username = self.browser.find_element_by_css_selector('#js-signin-form input[name=username]')
-        username.clear()
-        username.send_keys('admin')
-        password = self.browser.find_element_by_css_selector('#js-signin-form input[name=password]')
-        password.clear()
-        password.send_keys('tester')
-        # log in
-        self.browser.find_element_by_css_selector('#js-signin-form button.btn-default').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Login timeout')
-        sleep(0.2)
-
+        # login as admin
+        self._login()
+        self._wait_until_element_visible('#main-actions a.notifications', 1, 'notifications link not visible')
         # open notifications
         self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
-        self.browser.find_element_by_css_selector('#js-notifications-container .empty')
+        self._wait_until_element_visible('#js-notifications-container .empty', 1, 'notifications panel not visible')
         self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
-
-        # open account menu
-        self.browser.find_element_by_css_selector('#js-username').click()
         # log out
-        self.browser.find_element_by_css_selector('#js-logout').click()
-        WebDriverWait(self.browser, 5).until(ajax_complete, 'Logout timeout')
-        # ensure UI has gone back to initial state
-        self.browser.find_element_by_css_selector('#main-actions a[data-target="#signin-modal"]')
+        self._logout()
