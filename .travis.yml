@@ -19,8 +19,8 @@ install:
   - pip install MySQL-python
 
 before_script:
-  - export DISPLAY=:99.0
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
+  # - export DISPLAY=:99.0
+  # - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
   - psql template1 -c 'CREATE EXTENSION hstore;'
   - psql -U postgres -c 'CREATE DATABASE nodeshot_ci;'
   - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis;"
