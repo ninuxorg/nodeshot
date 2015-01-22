@@ -10,6 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ci.settings")
 if __name__ == "__main__":
     args = sys.argv
     args.insert(1, "test")
+    args.insert(2, "--noinput")
     from ci.settings import INSTALLED_APPS
     from django.core.management import execute_from_command_line
 
