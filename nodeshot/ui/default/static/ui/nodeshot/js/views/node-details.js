@@ -389,11 +389,17 @@
 
             // update address when moving the marker
             marker.on('dragend', function (e) {
-                self.form.setValue('geometry', JSON.stringify(e.target.toGeoJSON().geometry));
                 var latlng = e.target.getLatLng();
-                self.form.setValue('address', $.geocode({ lat: latlng.lat, lon: latlng.lng }).display_name);
+                $.geocode({
+                    lat: latlng.lat,
+                    lon: latlng.lng,
+                    callback: function(result){
+                        self.form.setValue('address', result.display_name);
+                    }
+                });
                 self.ext.leafletMap.panTo(latlng, { animate: false });
                 self.ext.leafletMap.panBy([0, 60]);
+                self.form.setValue('geometry', JSON.stringify(e.target.toGeoJSON().geometry));
             });
 
             // reset leaflet layer when changing URl

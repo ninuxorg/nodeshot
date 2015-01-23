@@ -302,17 +302,6 @@
         });
     };
 
-    /*
-    * synchronous $.getJSON
-    */
-    $.getSyncJSON = function (url, data) {
-        return $.ajax({
-            async: false,
-            url: url,
-            data: data
-        }).responseJSON;
-    };
-
     /**
      * geocoding and reverse geocoding
      * using nominatim.openstreetmap.org
@@ -328,11 +317,11 @@
              lon: null,
              dedupe: true,
              // indicates wether compacting the result, valid only for
-             compact: true
+             compact: true,
+             callback: null
          }, opts),
             url = '//nominatim.openstreetmap.org/<r>?format=json',
             resource = options.q ? 'search' : 'reverse',
-            results,
             // returns a more compact address string
             compact = function (result) {
                 return _.compact([
@@ -344,6 +333,19 @@
                     result.address.postcode,
                     result.address.country
                 ]).join(', ');
+            },
+            processResults = function (results) {
+                // if compact & more results (normal geocoding)
+                if (options.compact && options.q && results.length) {
+                    results.forEach(function(result){
+                        result.display_name = compact(result);
+                    });
+                }
+                // else reverse geocoding
+                else if (options.compact && options.lat) {
+                    results.display_name = compact(results);
+                }
+                return results;
             };
         // search address or reverse geocoding
         url = url.replace('<r>', resource);
@@ -366,18 +368,10 @@
         }
         // language
         url += '&accept-language=' + options.acceptLanguage;
-        // perform http request to the webservice in synchronous old fashion
-        results = $.getSyncJSON(url);
-        // if compact & more results (normal geocoding)
-        if (options.compact && options.q && results.length) {
-            results.forEach(function(result){
-                result.display_name = compact(result);
-            });
-        }
-        // else reverse geocoding
-        else if (options.compact && options.lat) {
-            results.display_name = compact(results);
-        }
-        return results;
+        // perform http request to geocoding service
+        $.getJSON(url).done(function(results){
+            // callback
+            if (options.callback) { options.callback(processResults(results)); }
+        });
     };
 }());

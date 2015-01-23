@@ -715,7 +715,7 @@ class DefaultUiSeleniumTest(TestCase):
         # 1 result
         search.send_keys('via Roma, Pomezia')
         search.send_keys(Keys.ENTER)
-        self._wait_until_ajax_complete(5, 'timeout')
+        self._wait_until_element_visible('#js-search-results li a.icon-globe', 10, 'no search address result')
         results = self.browser.find_elements_by_css_selector('#js-search-results li')
         self.assertEqual(len(results), 1)
         self.assertNotIn('nothing', results[0].text)

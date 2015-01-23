@@ -148,12 +148,17 @@
         },
 
         searchAddress: function (q) {
+            var self = this;
             // query must be longer than 10 characters
             if (q.length > 10 && _.containsAny(q, Ns.settings.addressSearchTriggers)) {
-                var addresses = $.geocode({ q: q });
-                addresses = new Ns.collections.Search(addresses);
-                this.collection.add(addresses.models);
-                this.setCache(q, this.collection);
+                $.geocode({
+                    q: q,
+                    callback: function(results){
+                        var addresses = new Ns.collections.Search(results);
+                        self.collection.add(addresses.models);
+                        self.setCache(q, self.collection);
+                    }
+                });
             }
         },
 

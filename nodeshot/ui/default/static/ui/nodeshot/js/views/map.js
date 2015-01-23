@@ -1262,8 +1262,15 @@
          * and set it on the add node form
          */
         setAddressFromLatLng: function (latlng) {
-            var addr = $.geocode({ lat: latlng.lat, lon: latlng.lng });
-            this.form.setValue('address', addr.display_name);
+            var self = this;
+            $.geocode({
+                lat: latlng.lat,
+                lon: latlng.lng,
+                async: true,
+                callback: function(result){
+                    self.form.setValue('address', result.display_name);
+                }
+            });
         },
 
         /**
