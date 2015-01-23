@@ -938,11 +938,6 @@ article.center-stage{
     margin-right: 5px
 }
 
-#fn-search-address{
-    width: 300px;
-    padding: 11px 15px 0
-}
-
 #js-password-strength-message{
     width: 100%;
     display: none;

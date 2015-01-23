@@ -537,13 +537,17 @@
         goToLatLng: function (latlng) {
             latlng = latlng.split(',')
             latlng = L.latLng(latlng[0], latlng[1]);
-            var addressMarker = L.marker(latlng);
-            addressMarker.addTo(this.map);
+            var self = this,
+                marker = L.marker(latlng);
+            marker.addTo(this.map);
             // go to marker and zoom in
             this.map.setView(latlng, 18);
             // fade out marker
-            this.parent.panels.currentView.addressMarker = addressMarker;
-            this.parent.panels.currentView.removeAddressMarker(4000);
+            if (typeof(marker) !== 'undefined') {
+                $([marker._icon, marker._shadow]).fadeOut(4000, function () {
+                    self.map.removeLayer(marker);
+                });
+            }
         }
     });
 
@@ -752,12 +756,10 @@
             'switches': 'input.switch',
             'scrollers': '.scroller',
             'selects': '.selectpicker',
-            'tools': '.tool',
-            'address': '#fn-search-address input'
+            'tools': '.tool'
         },
 
         events: {
-            'submit #fn-search-address form': 'searchAddress',
             'click #fn-map-tools .tool': 'toggleTool',
             'click #toggle-toolbar': 'toggleToolbar',
             'change .js-base-layers input': 'switchBaseLayer',
@@ -891,42 +893,6 @@
          */
         toggleToolbar: function (e) {
             this.toolbarView.toggleToolbar(e);
-        },
-
-        /*
-         * search for an address
-         * put a marker on the map and zoom in
-         */
-        searchAddress: function (e) {
-            e.preventDefault();
-            this.removeAddressMarker();
-            // retrieve address
-            var results = $.geocode({ q: this.ui.address.val() });
-            // if found any go to latlng
-            if (results.length) {
-                Ns.router.navigate('map/latlng/' + results[0].lat + ',' + results[0].lon, {trigger: true});
-            }
-            // else display message
-            else {
-                // TODO: i18n message
-                $.createModal({ message: 'Address not found' });
-            }
-        },
-
-        /*
-         * remove the marker added in searchAddress
-         */
-        removeAddressMarker: function (speed) {
-            // remove istantly by default
-            speed = speed || 0;
-            var marker = this.addressMarker,
-                self = this;
-            if (typeof(marker) !== 'undefined') {
-                $([marker._icon, marker._shadow]).fadeOut(speed, function () {
-                    self.mapView.map.removeLayer(marker);
-                    delete(self.addressMarker);
-                });
-            }
         },
 
         /**
@@ -1266,7 +1232,6 @@
             $.geocode({
                 lat: latlng.lat,
                 lon: latlng.lng,
-                async: true,
                 callback: function(result){
                     self.form.setValue('address', result.display_name);
                 }

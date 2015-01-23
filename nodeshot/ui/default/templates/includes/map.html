@@ -39,7 +39,6 @@
 <script id="map-toolbar-template" type="text/template">
     <a href="#" class="icon-layer-2" data-panel="fn-map-layers" title="{% trans 'Control map data' %}" data-placement="left" data-delay="200"></a>
     <a href="#" class="icon-pin-add" data-toggle="tooltip" title="Add new node" data-placement="left" data-delay="200"></a>
-    <a href="#" class="icon-search" data-panel="fn-search-address" data-toggle="tooltip" title="Search address" data-placement="left" data-delay="200"></a>
     <a href="#" id="btn-map-mode" class="icon-3d smaller" title="Toggle 3D view" data-placement="left" data-delay="200"></a>
     <a href="#" class="icon-tools" data-panel="fn-map-tools" title="Map tools" data-placement="left" data-delay="200"></a>
     <a href="#" class="icon-config" data-panel="fn-map-preferences" title="Map preferences" data-placement="left" data-delay="200"></a>
@@ -48,17 +47,6 @@
 
 <script id="map-panels-template" type="text/template">
     <a id="toggle-toolbar" href="#" class="glyphicon glyphicon-chevron-up"></a>
-
-    <div id="fn-search-address" class="side-panel">
-        <form action="">
-            <div class="input-group">
-                <input required type="text" class="form-control input-sm" placeholder="{% trans 'Enter an address' %}">
-                <span class="input-group-btn">
-                    <button class="btn btn-default btn-sm" type="submit">{% trans 'search' %}</button>
-                </span>
-            </div>
-        </form>
-    </div>
 
     <div id="fn-map-layers" class="side-panel adjust-height">
         <div class="panel-inner scroller">

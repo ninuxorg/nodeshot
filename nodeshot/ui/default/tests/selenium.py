@@ -391,28 +391,6 @@ class DefaultUiSeleniumTest(TestCase):
         self.assertEqual(browser.execute_script("return $('#map-js .cluster.marker-active').length"), 1)
         self.assertEqual(browser.execute_script("return $('#map-control-legend-potential').bootstrapSwitch('state')"), True)
 
-        # open search address panel
-        panel = browser.find_element_by_css_selector('#fn-search-address')
-        button = browser.find_element_by_css_selector('#map-toolbar .icon-search')
-        self.assertFalse(panel.is_displayed())
-        button.click()
-        self.assertTrue(panel.is_displayed())
-        # perform search
-        input = browser.find_element_by_css_selector('#fn-search-address input')
-        submit = browser.find_element_by_css_selector('#fn-search-address button')
-        input.send_keys('Via Silvio Pellico, Pomezia, Italy')
-        submit.click()
-        self._wait_until_ajax_complete(5, 'Search address timeout')
-        self.assertEqual(browser.execute_script('return typeof(Ns.body.currentView.panels.currentView.addressMarker)'), 'object')
-        self.assertEqual(browser.execute_script('return Ns.body.currentView.content.currentView.map.getZoom()'), 18)
-        input.clear()
-        # close panel
-        self.browser.find_element_by_css_selector('#fn-search-address-mask').click()
-        self.assertFalse(panel.is_displayed())
-        self.assertEqual(browser.execute_script('return typeof(Ns.body.currentView.panels.currentView.addressMarker)'), 'object')
-        sleep(4.55)
-        self.assertEqual(browser.execute_script('return typeof(Ns.body.currentView.panels.currentView.addressMarker)'), 'undefined')
-
         # test map tools panel
         panel = browser.find_element_by_css_selector('#fn-map-tools')
         button = browser.find_element_by_css_selector('#map-toolbar .icon-tools')
