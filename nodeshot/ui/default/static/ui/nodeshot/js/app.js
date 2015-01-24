@@ -26,7 +26,7 @@
         menu: '#ns-top-nav-links',
         search: '#general-search',
         account: '#main-actions',
-        notifications: '#js-notifications-container',
+        notifications: '#notifications',
         body: '#body'
     });
 

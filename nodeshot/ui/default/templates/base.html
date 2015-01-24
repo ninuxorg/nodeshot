@@ -46,24 +46,9 @@
     <header>
         <nav id="top-bar">
             <h1><a href="#">{{ SITE_NAME }}</a></h1>
-
             <div id="general-search"></div>
-
             <div id="main-actions"></div>
-
-            <div id="notifications">
-                <span class="arrow"></span>
-                <div class="header">
-                    <div class="left">
-                        {% trans 'Notifications' %}
-                    </div>
-                    <div class="right">
-                        <a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'See all' %}</a> <span>-</span>
-                        <a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'Settings' %}</a>
-                    </div>
-                </div>
-                <div class="scroller" id="js-notifications-container"></div>
-            </div>
+            <div id="notifications"></div>
         </nav>
 
         <nav id="nav-bar" class="navbar navbar-inverse" role="navigation">
@@ -353,6 +338,22 @@
     <script id="page-template" type="text/template">
         <h1><%= title %></h1>
         <%= content %>
+    </script>
+
+    <script id="notifications-template" type="text/template">
+        <span class="arrow"></span>
+        <div class="header">
+            <div class="left">
+                {% trans 'Notifications' %}
+            </div>
+            <!--<div class="right">
+                <a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'See all' %}</a> <span>-</span>
+                <a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'Settings' %}</a>
+            </div>-->
+        </div>
+        <div class="scroller">
+            <ul id="js-notifications-container"></ul>
+        </div>
     </script>
 
     <script id="notification-item-template" type="text/template">
