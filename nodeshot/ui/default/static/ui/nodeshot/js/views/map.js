@@ -107,6 +107,7 @@
                 height,
                 selector,
                 width,
+                setWidth = false,
                 body = $('body');
             body.css('overflow-x', 'hidden');
             // map
@@ -125,13 +126,20 @@
             // take in consideration #map-add-node-js if visible
             if ($('#map-add-node-js').is(':visible')) {
                 width = width - $('#map-add-node-js').outerWidth();
+                setWidth = true;
             }
             // take in consideration map toolbar if visible
             else if ($('#map-toolbar').is(':visible')) {
                 width = width - $('#map-toolbar').outerWidth();
+                setWidth = true;
             }
-            // set width
-            $('#map').width(width);
+            // set width only if map toolbar is showing
+            if (setWidth){
+                $('#map').width(width);
+            }
+            else{
+                $('#map').attr('style', '');
+            }
             body.attr('style', '');
             // TODO: this is ugly!
             // call leaflet invalidateSize() to download any gray spot

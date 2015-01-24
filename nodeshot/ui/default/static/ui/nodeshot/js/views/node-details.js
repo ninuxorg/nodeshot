@@ -61,7 +61,7 @@
             this.hidden =  $().add(this.ext.legend)
                               .add(this.ext.toolbar)
                               .add(this.ext.panels)
-                              .add(this.ext.map.find('.leaflet-control-attribution'));
+                              .add(this.ext.map.find('.leaflet-control-attribution, .leaflet-control-scale-line'));
             // bind to namespaced events
             $(window).on("resize.node-details", _.bind(this.resize, this));
             this.listenTo(Ns.db.user, 'loggedin loggedout', this.render);

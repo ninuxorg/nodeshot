@@ -359,8 +359,10 @@ article.center-stage{
 /* --- adjustments for small sizes  --- */
 
 @media screen and (max-width: 900px) {
-    /* hide username */
+    /* hide text from top bar icons */
     #top-bar .text{ display: none }
+    /* compensate menu */
+    #main-actions ul.dropdown-menu{ width: 190px; left: auto; right: 0 }
 
     #notifications{
         width: 100% !important;
@@ -381,6 +383,13 @@ article.center-stage{
     }
 
     #notifications { top: 50px }
+
+    #main-actions ul.dropdown-menu{
+        left: auto;
+        right: -60px;
+        width: 180px;
+    }
+
     .responsive-padding{
         padding: 20px 2.9% !important;
         margin: 0 !important;
@@ -392,7 +401,7 @@ article.center-stage{
     #top-bar{
         height: 50px;
         padding-right: 0;
-        background: #e05f45 !important;
+        background: #da4a2d !important;
     }
 
     #top-bar h1 a{
@@ -401,20 +410,13 @@ article.center-stage{
         margin: 2px 0 0 0;
     }
 
-    @media screen and (min-width: 0px) and (max-width: 380px){
-        #top-bar h1 a{
-            min-width: 100px;
-            background-size: 100px !important;
-        }
-        .modal.enlarge-on-mobile{
-            background-color: #fff !important;
-        }
+    .modal.enlarge-on-mobile{
+        background-color: rgba(255,255,255,0.90);
+    }
 
-        .modal.enlarge-on-mobile .modal-dialog{
-            top: 0 !important;
-            box-shadow: none;
-            border: 0 none;
-        }
+    .modal.enlarge-on-mobile .modal-dialog{
+        box-shadow: none;
+        border-color: rgba(0,0,0,0.1);
     }
 
     #general-search{
@@ -480,8 +482,13 @@ article.center-stage{
     #toggle-toolbar{ display: block !important }
     .user-dialog .icon-close{ font-size: 18px }
 
-    body > article > h1,
-    body > article h2{ letter-spacing: -3px; word-spacing: -1px }
+    #body > article > h1,
+    #body > article h2{ letter-spacing: -1px; word-spacing: -1px }
+
+    #body article{ text-align: left }
+    #body article,
+    #body article .btn,
+    #body article blockquote{ font-size: 16px }
 
     .avatar200{ float: none !important }
 }
@@ -489,18 +496,38 @@ article.center-stage{
 /* Extra small adjustments */
 @media screen and (min-width: 0px) and (max-width: 580px){
     .modal.enlarge-on-mobile{
-        background-color: rgba(255,255,255,0.90);
+        background-color: #fff !important;
     }
 
     .modal.enlarge-on-mobile .modal-dialog{
+        padding: 25px 25px !important;
+        top: 0 !important;
         box-shadow: none;
-        border-color: rgba(0,0,0,0.1);
+        border: 0 none;
     }
 
-    /* hide map contributions */
-    .leaflet-control-attribution{ display: none !important }
+    .modal.enlarge-on-mobile .form-control,
+    .modal.enlarge-on-mobile .btn  { font-size: 15px }
 
-    #top-bar h1,  /* hide logo */
+    .modal.enlarge-on-mobile p.text,
+    #ns-top-nav-links a{ font-size: 16px !important }
+    #ns-top-nav-links a span{ margin-right: 0.55em }
+
+    .table.left-labels .left, .table.left-labels .right {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .icon-thumbs-up, .icon-thumbs-down { margin-left: 3px !important }
+    #map-overlay-container .row { margin-left: 0; margin-right: 0 }
+    #map-overlay-container .col-sm-12{ padding: 0 }
+    article.responsive-padding { padding-bottom: 1px !important }
+
+    /* hide map contributions */
+    .leaflet-control-attribution,
+    .leaflet-control-scale-line{ display: none !important }
+
+    #top-bar h1,
     .hidden-xxs{ display: none }
 }
 
@@ -557,7 +584,7 @@ article.center-stage{
 
 #map, #map-js{
     position: absolute;
-    width: 90%;
+    width: 100%;
     height: 100%;
 }
 #map-js,
