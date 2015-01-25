@@ -61,7 +61,19 @@ class NodeshotDashboard(Dashboard):
             collapsible=False,
             column=2,
         ))
-        
+
+        if 'nodeshot.ui.default' in settings.INSTALLED_APPS:
+            self.children.append(modules.LinkList(
+                _('Frontend site'),
+                column=3,
+                children=[
+                    {
+                        'title': _('Go to Frontend Site'),
+                        'url': reverse('ui:index'),
+                        'external': False,
+                    },
+                ]
+            ))
         # append another link list module for "support".
         self.children.append(modules.LinkList(
             _('Media Management'),

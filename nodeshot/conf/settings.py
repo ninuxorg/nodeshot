@@ -29,7 +29,7 @@ elif SUBDIR and SUBDIR.endswith('/'):
     SUBDIR = SUBDIR[0:-1]
 
 SITE_URL = '%s://%s%s%s' % (PROTOCOL, settings.DOMAIN, PORT_STRING, SUBDIR)
-SITE_NAME = getattr(settings, 'SITE_NAME', 'Nodeshot instance')
+SITE_NAME = getattr(settings, 'SITE_NAME', 'Nodeshot')
 
 MEDIA_ROOT = '%s/media/' % settings.SITE_ROOT
 
@@ -284,7 +284,7 @@ CELERYBEAT_SCHEDULE = {
 # ------ GRAPPELLI ------ #
 
 if 'grappelli' in INSTALLED_APPS:
-    GRAPPELLI_ADMIN_TITLE = 'Nodeshot Admin'
+    GRAPPELLI_ADMIN_TITLE = '<a href="%s">%s Admin</a>' % (SITE_URL, SITE_NAME)
     GRAPPELLI_INDEX_DASHBOARD = 'nodeshot.dashboard.NodeshotDashboard'
 
 # ------ DEBUG TOOLBAR ------ #
