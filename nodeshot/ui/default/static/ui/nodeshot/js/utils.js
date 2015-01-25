@@ -134,9 +134,9 @@
         * eg: does the string contains any of the words supplied?
         */
         containsAny: function (string, words) {
-            var length = words.length,
-                words = words.reverse(),  // reverse loop
-                string = string.toLowerCase();  // case insensitive
+            var length = words.length;
+            words = words.reverse(),  // reverse loop
+            string = string.toLowerCase();  // case insensitive
             while (length--){
                 if (string.indexOf(words[length]) > -1) {
                     return true;

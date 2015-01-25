@@ -10,7 +10,7 @@
     Ns.state = {
         currentAjaxRequest: null,  // needed to cancel an xhr request
         autoToggleLoading: true,  // indicates wether the loading div should be toggled automatically
-        onNodeClose: 'map',  // when a node-details is closed go back on map
+        onNodeClose: 'map'  // when a node-details is closed go back on map
     };
 
     Ns.url = function (resource) {
@@ -32,10 +32,10 @@
 
     // main initializers
     Ns.addInitializer(function () {
-        Ns.notifications.show(new Ns.views.Notification());
         Ns.account.show(new Ns.views.Account());
         Ns.menu.show(new Ns.views.Menu());
         Ns.search.show(new Ns.views.Search());
+        Ns.notifications.show(new Ns.views.Notification());
         // empty node cache when user logs in / logs out
         // needed for node can_edit
         Ns.db.user.on('loggedin loggedout', function(){ Ns.db.nodes.reset() });
