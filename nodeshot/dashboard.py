@@ -22,38 +22,38 @@ class NodeshotDashboard(Dashboard):
     """
     Custom index dashboard for www.
     """
-    
+
     def init_with_context(self, context):
         site_name = get_admin_site_name(context)
-        
+
         self.children.append(modules.AppList(
             _('Nodeshot Core'),
             collapsible=True,
             column=1,
             models=('nodeshot.core.*',),
         ))
-        
+
         self.children.append(modules.AppList(
             _('Nodeshot Networking'),
             collapsible=True,
             column=1,
             models=('nodeshot.networking.*',),
         ))
-        
+
         self.children.append(modules.AppList(
             _('Nodeshot Community'),
             collapsible=True,
             column=1,
             models=('nodeshot.community.*',),
         ))
-        
+
         self.children.append(modules.AppList(
             _('Administration'),
             collapsible=True,
             column=2,
             models=USER_APPS,
         ))
-        
+
         # append a recent actions module
         self.children.append(modules.RecentActions(
             _('Recent Actions'),
@@ -74,6 +74,25 @@ class NodeshotDashboard(Dashboard):
                     },
                 ]
             ))
+
+        if 'nodeshot.core.api' in settings.INSTALLED_APPS:
+            self.children.append(modules.LinkList(
+                _('API'),
+                column=3,
+                children=[
+                    {
+                        'title': _('Browsable API'),
+                        'url': reverse('api_root_endpoint'),
+                        'external': False,
+                    },
+                    {
+                        'title': _('Swagger API docs'),
+                        'url': reverse('django.swagger.base.view'),
+                        'external': False,
+                    },
+                ]
+            ))
+
         # append another link list module for "support".
         self.children.append(modules.LinkList(
             _('Media Management'),
@@ -81,17 +100,22 @@ class NodeshotDashboard(Dashboard):
             children=[
                 {
                     'title': _('FileBrowser'),
-                    'url': '/admin/filebrowser/browse/',
+                    'url': reverse('filebrowser:fb_browse'),
                     'external': False,
                 },
             ]
         ))
-        
+
         # append another link list module for "support".
         self.children.append(modules.LinkList(
             _('Support'),
             column=3,
             children=[
+                {
+                    'title': _('Nodeshot Documentation'),
+                    'url': 'http://nodeshot.rtfd.org/',
+                    'external': True,
+                },
                 {
                     'title': _('Django Documentation'),
                     'url': 'http://docs.djangoproject.com/',
