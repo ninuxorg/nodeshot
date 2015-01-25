@@ -28,7 +28,9 @@
         events:{
             'keyup input': 'keyupOnSearch',
             'mouseover ul': 'removeArtificialFocus',
-            'click a': 'getResult'
+            'click a': 'getResult',
+            /* mobile adjustments */
+            'click input': 'stopPropagation'
         },
 
         collectionEvents: {
@@ -56,10 +58,12 @@
         initialize: function(){
             this.collection = new Ns.collections.Search();
             this.render();
-            // set max width of dropdown result box on init and on window resize
-            this.setResultsMaxWidth();
             $(window).on('resize.search', _.bind(this.setResultsMaxWidth, this));
+            // cache reference to logo (not part of this view)
+            this.ext = { logo: $('#top-bar h1') }
         },
+
+        onShow: function () { this.setResultsMaxWidth() },
 
         /* --- layout --- */
 
@@ -73,10 +77,16 @@
             this.ui.icon.fadeIn(255);
         },
 
+        /**
+         * determine max width and max height for results dropdown
+         */
         setResultsMaxWidth: function () {
-            // determine max width for results dropdown
-            var maxWidth = $(window).width() - this.ui.input.offset().left - 10;
-            this.ui.results.css('max-width', maxWidth);
+            // width takes the remaining space toward the right minus 10 pixels
+            // height takes 85% of the screen size
+            this.ui.results.css({
+                'max-width': $(window).width() - this.ui.input.offset().left - 10,
+                'max-height': $(window).height() * 0.85
+            });
         },
 
         showResults: function(){
@@ -84,7 +94,7 @@
             // unbind any previously bound custom keydown event
             $(window).off('keydown.search');
             // bind to custom keydown event
-            $(window).on('keydown.search', _.bind(this.keydown, this));
+            $(window).on('keydown.search', _.bind(this.keydownOnWindow, this));
             // show results
             this.ui.results.fadeIn(255);
             // bind click on entire page
@@ -104,7 +114,7 @@
         },
 
         removeArtificialFocus: function(e){
-            $('#js-search-results a.focus').removeClass('focus').trigger('blur');
+            this.$('a.focus').removeClass('focus').trigger('blur');
         },
 
         /* --- user interaction --- */
@@ -112,10 +122,11 @@
         keyupOnSearch: function(e){
             // ENTER
             if (e.keyCode === 13) {
+                this.typing = false;
                 this.search(e.target.value);
             }
             // ESC
-            else if(e.keyCode === 27){
+            else if (e.keyCode === 27) {
                 this.stopSpinning();
                 this.hideResults();
             }
@@ -132,11 +143,10 @@
             }
             // show loading indicator
             this.startSpinning();
-            // reset any previous results
-            this.collection.reset();
             // fetch results in cloned collection so that eventual address results might not be erased
             clone.search(q).done(function(){
-                self.collection.add(clone.models);
+                // set new results and cache
+                self.collection.reset(clone.models);
                 self.setCache(q, self.collection);
                 // hide loading indicator
                 self.stopSpinning();
@@ -162,17 +172,17 @@
             }
         },
 
-        keydown: function(e){
+        keydownOnWindow: function(e){
             if(this.ui.results.is(':hidden')){
-                return
+                return;
             }
             // Must be before down commands because of shift + tab
-            // Page up, Up arrow, Up numpad, Page-up numpad or shift + tab
-            if(_.contains([33, 38, 104, 105], e.keyCode) || (e.shiftKey && e.keyCode === 9)){
+            // Page up, Up arrow or shift + tab
+            if(_.contains([33, 38], e.keyCode) || (e.shiftKey && e.keyCode === 9)){
                 this.moveThroughResults('up', e);
             }
-            // Tab, Page down, Down arrow, Down numpad, Page-down numpad
-            else if(_.contains([9, 34, 40, 98, 99], e.keyCode)){
+            // Tab, Page down or Down arrow
+            else if(_.contains([9, 34, 40], e.keyCode)){
                 this.moveThroughResults('down', e);
             }
             // Home gets first
@@ -232,6 +242,37 @@
                 e.preventDefault();
             }
             this.hideResults();
+        },
+
+        /**
+         * stop click propagation, needed for mobiles
+         */
+        stopPropagation: function (e) {
+            if (Ns.search.$el.hasClass('searching')){
+                e.stopPropagation();
+            }
+        },
+
+        /**
+         * show search input on mobiles
+         */
+        focusSearch: function(e) {
+            e.preventDefault();
+            var a = $(e.target),
+                self = this,
+                focused = a.hasClass('searching'),
+                elements;
+            if (focused === false){
+                e.stopPropagation();
+                elements = $().add(a)
+                              .add(Ns.search.$el)
+                              .add(this.ext.logo)
+                              .addClass('searching');
+                // clicking anywhere else closes the panel
+                $('html').one('click', function () {
+                    elements.removeClass('searching');
+                });
+            }
         }
     });
 })();

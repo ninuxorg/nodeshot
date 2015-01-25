@@ -6,7 +6,8 @@
         template: '#account-menu-template',
         events: {
             'click #js-logout': 'logout',
-            'click .notifications': 'openNotificationsPanel'
+            'click .notifications': 'openNotificationsPanel',
+            'click .icon-search': 'focusSearch'
         },
         // listen to models change and update accordingly
         // used for login/logout rendering
@@ -97,6 +98,13 @@
             if(count > 0){
                 $('#js-notifications-count').html(count).show();
             }
+        },
+
+        /**
+         * calls method of search view
+         */
+        focusSearch: function(e) {
+            Ns.search.currentView.focusSearch(e);
         }
     });
 })();

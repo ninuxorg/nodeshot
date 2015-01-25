@@ -7,6 +7,8 @@
 #top-bar,
 #nav-bar{ padding-left: 4.5%; padding-right: 4.5% }
 
+body{ min-width: 300px }
+
 .responsive-padding{ padding: 25px 40px !important }
 
 #top-bar{
@@ -88,6 +90,8 @@
     font-size: 14px;
     border-right: 0 none;
     border-left: 0 none;
+    overflow-y: auto;
+    max-height: 500px;  /* javascript will tweak this */
 }
 
 #top-bar #general-search a{
@@ -422,10 +426,18 @@ article.center-stage{
     #general-search{
         display: none;
         position: absolute;
-        top:0; left: 25%;
+        top: 0;
+        left: auto;
+        right: 183px;
+        left: 11px;
+        z-index: auto;
         margin: 10px 1.5% 0 0;
     }
+    #general-search.searching{ display: block }
     #general-search-input{ padding: 0px 15px }
+    #general-search .dropdown-menu{ min-width: 100% }
+    #top-bar h1.searching{ display: none }
+    #main-actions .icon-search.searching{ display: none }
 
     #main-actions li a{
         height: 50px;
