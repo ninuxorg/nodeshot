@@ -58,7 +58,7 @@ class ProfileList(ProfileBase):
     serializer_class = ProfileCreateSerializer
 
     # custom
-    serializer_reader_class = ProfileSerializer
+    serializer_reader_class = ProfileOwnSerializer
 
     def get(self, request, *args, **kwargs):
         """ return profile of current user if authenticated otherwise 401 """
@@ -242,7 +242,7 @@ class AccountLogin(generics.GenericAPIView):
 
             return Response({
                 'detail': _(u'Logged in successfully'),
-                'user': ProfileRelationSerializer(
+                'user': ProfileOwnSerializer(
                     serializer.instance,
                     context={ 'request': request }
                 ).data

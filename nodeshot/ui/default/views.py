@@ -9,7 +9,7 @@ from nodeshot.core.cms.models import MenuItem
 from nodeshot.core.layers.serializers import LayerListSerializer
 from nodeshot.core.nodes.serializers import StatusListSerializer
 from nodeshot.core.cms.serializers import MenuSerializer
-from nodeshot.community.profiles.serializers import ProfileSerializer
+from nodeshot.community.profiles.serializers import ProfileOwnSerializer
 
 from nodeshot.core.nodes.settings import HSTORE_SCHEMA as NODES_HSTORE_SCHEMA
 from . import settings as ui_settings
@@ -36,7 +36,7 @@ def index(request):
     menu = MenuSerializer(menu, many=True, context=serializer_context).data
     # initialize user serializer if authenticated
     if request.user.is_authenticated():
-        user = ProfileSerializer(request.user, many=False, context=serializer_context).data
+        user = ProfileOwnSerializer(request.user, many=False, context=serializer_context).data
     else:
         user = {}
     # initialize django-rest-framework JSON renderer

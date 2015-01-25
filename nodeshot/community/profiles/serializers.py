@@ -20,6 +20,7 @@ if EMAIL_CONFIRMATION:
 __all__ = [
     'LoginSerializer',
     'ProfileSerializer',
+    'ProfileOwnSerializer',
     'ProfileCreateSerializer',
     'ProfileRelationSerializer',
     'AccountSerializer',
@@ -132,6 +133,12 @@ class ProfileSerializer(serializers.ModelSerializer):
             'date_joined',
             'last_login'
         )
+
+
+class ProfileOwnSerializer(ProfileSerializer):
+    """ same as ProfileSerializer, with is_staff attribute """
+    pass
+ProfileOwnSerializer.Meta.fields.append('is_staff')
 
 
 class ProfileCreateSerializer(ExtraFieldSerializer):
