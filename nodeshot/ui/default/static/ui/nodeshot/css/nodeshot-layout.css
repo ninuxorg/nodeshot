@@ -245,7 +245,7 @@ body{ min-width: 300px }
     padding: 0;
     margin: 0;
     list-style: none outside;
-    width: 102%;
+    width: 100%;
 }
 
 #notifications li{
@@ -499,7 +499,6 @@ article.center-stage{
 
     #body article{ text-align: left }
     #body article,
-    #body article .btn,
     #body article blockquote{ font-size: 16px }
 
     .avatar200{ float: none !important }
@@ -541,6 +540,20 @@ article.center-stage{
 
     #top-bar h1,
     .hidden-xxs{ display: none }
+
+    #node-list .input-group{ width: 100%; margin: 0 0 10px; float: none }
+    #node-list .icon-plus{
+        display: block;
+        margin: 0 auto;
+        float: none !important;
+    }
+    #node-list h2.pull-left{ float: none !important }
+    #node-list .status.pull-left{ margin-left: 0; margin-right: 2.4% }
+    #node-list table th{ padding: 10px 15px }
+    #node-list table td{ padding: 0 }
+    #node-list td a{ display: block; padding: 10px 15px; text-decoration: none }
+    #node-list td a:hover,
+    #node-list td a:focus{ background: #0a246a; color: #fff }
 }
 
 .overlay{
@@ -1353,7 +1366,6 @@ img.avatar200{ border-radius: 15% }
     height: 32px;
     width: 34px;
 }
-
 .filter-panel{
     width: 100%;
     padding: 5% 7%;

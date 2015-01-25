@@ -384,22 +384,22 @@
 
     <script id="node-list-row-template" type="text/template">
         <td class="name-column">
-            <a href="#/nodes/<%= slug %>">
+            <a href="#nodes/<%= slug %>">
                 <%= name %>
             </a>
         </td>
-        <td class="status-column">
+        <td class="status-column hidden-xxs">
             <span class="status <%= status %>">
                 <%= status %>
             </span>
         </td>
-        <td>
-            <a href="#/layers/<%= layer %>" class="not-implemented">
+        <td class="hidden-xxs">
+            <a href="#layers/<%= layer %>" class="not-implemented">
                 <%= layer_name %>
             </a>
         </td>
-        <td class="hidden-xxs">
-            <a href="#/users/<%= user %>"><%= user %></a>
+        <td class="hidden-xs">
+            <a href="#users/<%= user %>"><%= user %></a>
         </td>
         <td class="hidden-xs"><%= _.formatDateTime(added) %></td>
         <td class="hidden-xs"><%= _.formatDateTime(updated) %></td>

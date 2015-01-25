@@ -793,13 +793,28 @@ input[type="range"]::-webkit-slider-thumb:active {
     border: 0 none;
     width: 28px;
     height: 27px;
-    padding: 4px 0 3px;
+    padding: 0 !important;
     text-align: center;
     border-radius: 0px 3px 3px 0px;
 }
 
+/*.dropdown-toggle .caret:before{
+    font-size: 25px !important;
+    line-height: 17px;
+}
+*/
+
 .btn.dropdown-toggle .caret:before{
-    content: '▾';
+    content: '\25BC';
+    display: block;
+    font-size: 14px !important;
+    line-height: 28px;
+}
+#body .input-sm .caret:before,
+#map-panels .caret:before,
+#node-list footer .caret:before{
+    font-size: 12px !important;
+    line-height: 22px !important;
 }
 
 /* TODO: probably unused */
