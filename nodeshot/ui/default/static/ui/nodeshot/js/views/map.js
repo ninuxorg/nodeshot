@@ -56,6 +56,8 @@
             if (node.isNew()) {
                 node.set('slug', slug).fetch().then(function () {
                     self[method](node);
+                }).fail(function () {
+                    $.createModal({ message: 'not found' });  // TODO: i18n
                 });
             }
             // otherwise we got it from cache, so we load it straight away
