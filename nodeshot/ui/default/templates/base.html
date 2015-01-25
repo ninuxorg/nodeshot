@@ -280,11 +280,18 @@
                         <span class="icon-user"></span>{% trans 'My profile' %}
                     </a>
                 </li>
-                <li>
+                <!--<li>
                     <a href="javascript:$.createModal({message:'not implemented yet'})" id="js-settings">
                         <span class="icon-wrench"></span>{% trans 'Settings' %}
                     </a>
+                </li>-->
+                <% if (is_staff) { %>
+                <li>
+                    <a href="{% url 'admin:index' %}">
+                        <span class="icon-lock"></span>{% trans 'Admin site' %}
+                    </a>
                 </li>
+                <% } %>
                 <li>
                     <a href="#logout" id="js-logout">
                         <span class="icon-off"></span>{% trans 'Logout' %}
