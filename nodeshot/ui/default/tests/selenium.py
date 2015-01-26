@@ -106,7 +106,7 @@ class DefaultUiSeleniumTest(TestCase):
         self._hashchange('#')
         self.assertEqual(self.browser.find_element_by_css_selector('article.center-stage h1').text, 'Home')
         self.assertTrue(self.browser.execute_script('return Ns.db.pages.get("home") !== undefined'))
-        self.assertEqual(self.browser.title, 'Home - Nodeshot instance')
+        self.assertEqual(self.browser.title, 'Home - Nodeshot')
 
     def test_menu_already_active(self):
         self._hashchange('#')
@@ -129,7 +129,7 @@ class DefaultUiSeleniumTest(TestCase):
         LEAFLET_MAP = self.LEAFLET_MAP
 
         # test title
-        self.assertEqual(browser.title, 'Map - Nodeshot instance')
+        self.assertEqual(browser.title, 'Map - Nodeshot')
 
         # basic test
         self.assertTrue(browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'map-container'"))
