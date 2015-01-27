@@ -256,7 +256,7 @@ function openForm(marker) {
             var layer_inserted = $(this).serializeArray()[1]['value']
 
             $.ajax({
-                url: NS_311.__BASEURL__ + 'open311/requests.json/',
+                url: NS_311.__BASEURL__ + 'open311/requests.json',
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -458,7 +458,7 @@ function postComment(nodeID) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: NS_311.__BASEURL__ + 'open311/requests.json/',
+            url: NS_311.__BASEURL__ + 'open311/requests.json',
             data: {
                 "service_code": "comment",
                     "node": nodeID,
@@ -491,7 +491,7 @@ function postVote(nodeID, vote) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: NS_311.__BASEURL__ + 'open311/requests.json/',
+            url: NS_311.__BASEURL__ + 'open311/requests.json',
             data: {
                 "service_code": "vote",
                     "node": nodeID,
@@ -520,7 +520,7 @@ function postRating(nodeID, rating) {
     if (ok == true) {
         $.ajax({
             type: "POST",
-            url: NS_311.__BASEURL__ + 'open311/requests.json/',
+            url: NS_311.__BASEURL__ + 'open311/requests.json',
             data: {
                 "service_code": "rate",
                     "node": nodeID,
