@@ -115,8 +115,6 @@ NODESHOT_UI_MAX_CLUSTER_RADIUS
 
 The maximum radius that a cluster will cover from the central marker (in pixels). Decreasing will make smaller clusters.
 
-Setting ``1`` disables clustering altogether, while setting ``0`` forces clustering at all zoom levels.
-
 NODESHOT_UI_DATETIME_FORMAT
 ---------------------------
 
