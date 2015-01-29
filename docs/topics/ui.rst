@@ -166,7 +166,7 @@ NODESHOT_UI_ADDRESS_SEARCH_TRIGGERS
         'avenida '
     ]
 
-Special strings that trigger geolocation when searching in the address bar.
+Special strings that trigger geolocation when searching in the general search bar.
 
 NODESHOT_UI_LOGO
 ----------------
