@@ -44,6 +44,20 @@
         ga('create', '{{ GOOGLE_ANALYTICS_UA }}', {{ GOOGLE_ANALYTICS_OPTIONS|safe }});
     </script>
     {% endif %}
+    {% if PIWIK_ANALYTICS_DOMAIN and PIWIK_ANALYTICS_SITE_ID %}
+    <script type="text/javascript">
+        var _paq = _paq || [];
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+            var u="//{{ PIWIK_ANALYTICS_DOMAIN }}/";
+            _paq.push(['setTrackerUrl', u+'piwik.php']);
+            _paq.push(['setSiteId', {{ PIWIK_ANALYTICS_SITE_ID }}]);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+        })();
+    </script>
+    {% endif %}
 </head>
 <body style="overflow:hidden">
     <div id="preloader">
@@ -482,6 +496,7 @@
         Ns.settings.addressSearchTriggers = {{ ADDRESS_SEARCH_TRIGGERS|safe }};
         Ns.settings.nodesHstoreSchema = {{ NODES_HSTORE_SCHEMA|safe }};
         Ns.settings.googleAnalytics = {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %};
+        Ns.settings.piwikAnalytics = {% if PIWIK_ANALYTICS_DOMAIN and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %};
     </script>
     <!-- nodeshot JS -->
     <script src="{% static 'ui/nodeshot/js/utils.js' %}"></script>

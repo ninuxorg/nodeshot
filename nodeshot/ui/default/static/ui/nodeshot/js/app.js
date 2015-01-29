@@ -26,11 +26,17 @@
      * web analytics
      */
     Ns.track = function () {
+        var fragment = window.location.hash.substr(1),
+            title = Ns.title.text();
         if (Ns.settings.googleAnalytics) {
             ga('send', 'pageview', {
-                  'page': window.location.hash.substr(1),
-                  'title': Ns.title.text()
+                  'page': fragment,
+                  'title': title
             });
+        }
+        if (Ns.settings.piwikAnalytics) {
+            _paq.push(['setDocumentTitle', title]);
+            _paq.push(['trackPageView', fragment]);
         }
     };
 

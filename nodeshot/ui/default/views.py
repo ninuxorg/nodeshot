@@ -76,6 +76,8 @@ def index(request):
         'NODES_HSTORE_SCHEMA': json.dumps(NODES_HSTORE_SCHEMA if NODES_HSTORE_SCHEMA else []),
         # analytics
         'GOOGLE_ANALYTICS_UA': ui_settings.GOOGLE_ANALYTICS_UA,
-        'GOOGLE_ANALYTICS_OPTIONS': json.dumps(ui_settings.GOOGLE_ANALYTICS_OPTIONS)
+        'GOOGLE_ANALYTICS_OPTIONS': json.dumps(ui_settings.GOOGLE_ANALYTICS_OPTIONS),
+        'PIWIK_ANALYTICS_DOMAIN': ui_settings.PIWIK_ANALYTICS_DOMAIN,
+        'PIWIK_ANALYTICS_SITE_ID': ui_settings.PIWIK_ANALYTICS_SITE_ID
     }
     return render(request, 'index.html', context)
