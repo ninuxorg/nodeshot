@@ -49,6 +49,7 @@
         onShow: function () {
             Ns.changeTitle(this.model.get('username'));
             Ns.menu.currentView.deactivate();
+            Ns.track();
         },
 
         /*

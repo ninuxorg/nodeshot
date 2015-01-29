@@ -25,6 +25,7 @@
             this.legend.show(new Ns.views.map.Legend(options));
             Ns.changeTitle('Map');  // TODO: i18n
             Ns.menu.currentView.activate('map');
+            Ns.track();
         },
 
         /*
@@ -979,6 +980,8 @@
 
         onShow: function () {
             Ns.router.navigate('map/add');
+            Ns.changeTitle('Add node');  // i18n
+            Ns.track();
             // go to step1 when collection is ready
             if (this.ext.geo.length){
                 this.step1();

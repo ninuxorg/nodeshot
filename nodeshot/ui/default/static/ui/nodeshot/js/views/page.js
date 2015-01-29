@@ -42,7 +42,8 @@
 
         onShow: function () {
             Ns.changeTitle(this.model.get('title'));
-            Ns.menu.currentView.activate('pages/'+this.model.get('slug'));
+            Ns.menu.currentView.activate('pages/' + this.model.get('slug'));
+            Ns.track();
         }
     });
 })();

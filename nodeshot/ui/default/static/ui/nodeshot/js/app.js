@@ -20,7 +20,19 @@
     Ns.title = $('title');
     Ns.changeTitle = function (title) {
         Ns.title.text(title + ' - ' + Ns.settings.siteName);
-    }
+    };
+
+    /**
+     * web analytics
+     */
+    Ns.track = function () {
+        if (Ns.settings.googleAnalytics) {
+            ga('send', 'pageview', {
+                  'page': window.location.hash.substr(1),
+                  'title': Ns.title.text()
+            });
+        }
+    };
 
     Ns.addRegions({
         menu: '#ns-top-nav-links',

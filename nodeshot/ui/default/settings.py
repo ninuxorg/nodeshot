@@ -84,3 +84,6 @@ else:
     WEBSOCKETS = False
 
 from nodeshot.community.profiles.settings import REGISTRATION_OPEN  # noqa
+
+GOOGLE_ANALYTICS_UA = getattr(settings, 'NODESHOT_UI_GOOGLE_ANALYTICS_UA', None)
+GOOGLE_ANALYTICS_OPTIONS = getattr(settings, 'NODESHOT_UI_GOOGLE_ANALYTICS_OPTIONS', 'auto')

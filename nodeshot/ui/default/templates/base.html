@@ -35,6 +35,15 @@
         }
     </style>
     {% endif %}
+    {% if GOOGLE_ANALYTICS_UA %}
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', '{{ GOOGLE_ANALYTICS_UA }}', {{ GOOGLE_ANALYTICS_OPTIONS|safe }});
+    </script>
+    {% endif %}
 </head>
 <body style="overflow:hidden">
     <div id="preloader">
@@ -472,6 +481,7 @@
         Ns.settings.maxClusterRadius = {{ MAX_CLUSTER_RADIUS }};
         Ns.settings.addressSearchTriggers = {{ ADDRESS_SEARCH_TRIGGERS|safe }};
         Ns.settings.nodesHstoreSchema = {{ NODES_HSTORE_SCHEMA|safe }};
+        Ns.settings.googleAnalytics = {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %};
     </script>
     <!-- nodeshot JS -->
     <script src="{% static 'ui/nodeshot/js/utils.js' %}"></script>

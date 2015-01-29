@@ -73,6 +73,9 @@ def index(request):
         'WEBSOCKETS': ui_settings.WEBSOCKETS,
         # profiles settings
         'REGISTRATION_OPEN': ui_settings.REGISTRATION_OPEN,
-        'NODES_HSTORE_SCHEMA': json.dumps(NODES_HSTORE_SCHEMA if NODES_HSTORE_SCHEMA else [])
+        'NODES_HSTORE_SCHEMA': json.dumps(NODES_HSTORE_SCHEMA if NODES_HSTORE_SCHEMA else []),
+        # analytics
+        'GOOGLE_ANALYTICS_UA': ui_settings.GOOGLE_ANALYTICS_UA,
+        'GOOGLE_ANALYTICS_OPTIONS': json.dumps(ui_settings.GOOGLE_ANALYTICS_OPTIONS)
     }
     return render(request, 'index.html', context)

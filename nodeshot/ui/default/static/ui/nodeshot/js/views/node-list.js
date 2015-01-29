@@ -81,6 +81,8 @@
             this.ui.hastip.tooltip();
             this.ui.selects.selectpicker({ style: 'btn-special' });
             this.adjustFooter();
+            // analytics
+            Ns.track();
         },
 
         serializeData: function(){

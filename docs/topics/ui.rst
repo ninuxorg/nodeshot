@@ -39,6 +39,8 @@ These are the available customizable settings:
  * ``NODESHOT_UI_VOTING_ENABLED``
  * ``NODESHOT_UI_RATING_ENABLED``
  * ``NODESHOT_UI_COMMENTS_ENABLED``
+ * ``NODESHOT_UI_GOOGLE_ANALYTICS_UA``
+ * ``NODESHOT_UI_GOOGLE_ANALYTICS_OPTIONS``
 
 LEAFLET_CONFIG
 --------------
@@ -206,3 +208,33 @@ NODESHOT_UI_COMMENTS_ENABLED
 **default**: ``True``
 
 Indicates wheter it is possible to leave comments on nodes.
+
+NODESHOT_UI_GOOGLE_ANALYTICS_UA
+-------------------------------
+
+**default**: ``None``
+
+Google Analytics tracking code.
+
+Example:
+
+.. code-block:: python
+
+    NODESHOT_UI_GOOGLE_ANALYTICS_UA = 'UA-XXXXXXXX-3'
+
+NODESHOT_UI_GOOGLE_ANALYTICS_OPTIONS
+------------------------------------
+
+**default**: ``auto``
+
+Google Analytics options that will be passed on initialization.
+
+.. code-block:: python
+
+    NODESHOT_UI_GOOGLE_ANALYTICS_OPTIONS = {
+        'cookieDomain': 'none'
+    }
+
+For more information about the options that can be passed see the relative `Google Analytics Reference`_.
+
+.. _Google Analytics Reference: https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#customizeTracker

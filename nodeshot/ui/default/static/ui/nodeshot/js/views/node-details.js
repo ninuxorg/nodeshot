@@ -71,6 +71,8 @@
             Ns.changeTitle(this.model.get('name'));
             // menu element
             Ns.menu.currentView.activate('nodes');
+            // analytics
+            Ns.track();
         },
 
         onShow: function () {
@@ -365,6 +367,8 @@
                 leaflet = this.geomodel.get('leaflet'),
                 map = this.ext.leafletMap,
                 marker;
+            Ns.changeTitle('Edit ' + this.model.id);  // i18n
+            Ns.track();
             this.form = new Backbone.Form({
                 model: this.model,
                 submitButton: 'Save'
