@@ -1,4 +1,5 @@
 import hashlib
+import copy
 
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate
@@ -137,8 +138,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class ProfileOwnSerializer(ProfileSerializer):
     """ same as ProfileSerializer, with is_staff attribute """
-    pass
-ProfileOwnSerializer.Meta.fields.append('is_staff')
+    class Meta:
+        model = User
+        fields = copy.copy(ProfileSerializer.Meta.fields)
+        fields.append('is_staff')
+        read_only_fields = copy.copy(ProfileSerializer.Meta.read_only_fields)
+        read_only_fields.append('is_staff')
 
 
 class ProfileCreateSerializer(ExtraFieldSerializer):
