@@ -54,8 +54,7 @@ class EmailAddressManager(models.Manager):
         """
         # this is a list rather than a generator because we probably want to
         # do a len() on it right away
-        return [address.user for address in EmailAddress.objects.filter(
-            verified=True, email=email)]
+        return [address.user for address in EmailAddress.objects.filter(verified=True, email=email)]
 
 
 class EmailAddress(models.Model):
@@ -65,24 +64,33 @@ class EmailAddress(models.Model):
     primary = models.BooleanField(default=False)
 
     objects = EmailAddressManager()
-    
+
     def clean(self):
         try:
-            if self.pk and not self.primary and EmailAddress.objects.filter(user=self.user, primary=True).first().pk == self.pk:
+            if self.pk and not self.primary and self.user.email_set.get_primary().pk == self.pk:
                 raise ValidationError(_("You must have at least one primary email address."))
         except IndexError:
             pass
-    
+
     def save(self, *args, **kwargs):
-        # if this is not the only primary email address for this user
-        if self.primary and EmailAddress.objects.filter(user=self.user, primary=True).exclude(pk=self.pk).count() > 0:
+        set_as_primary = False
+        # if primary is True and this is not the only primary email address for this user
+        if self.primary and self.user.email_set.filter(primary=True).exclude(pk=self.pk).count() > 0:
+            set_as_primary = True
+        # if primary is not true but no primary email addresses for this user
+        if not self.primary and self.user.email_set.filter(primary=True).count() < 1:
+            set_as_primary = True
+        # if adding a new primary address from the admin
+        if not self.pk and self.primary:
+            set_as_primary = True
+        super(EmailAddress, self).save(*args, **kwargs)
+        if set_as_primary:
             # ensure there's only 1 primary address
             self.set_as_primary()
-        super(EmailAddress, self).save(*args, **kwargs)
 
     def set_as_primary(self):
-        old_primary = EmailAddress.objects.get_primary(self.user)
-        if old_primary:
+        old_primaries = self.user.email_set.filter(primary=True).exclude(pk=self.pk)
+        for old_primary in old_primaries:
             old_primary.primary = False
             old_primary.save()
         self.primary = True

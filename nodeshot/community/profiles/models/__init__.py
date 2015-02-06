@@ -6,10 +6,15 @@ from ..settings import EMAIL_CONFIRMATION
 from .profile import Profile
 from .social_link import SocialLink
 from .password_reset import PasswordReset
-from .emailconfirmation import *
+from .emailconfirmation import EmailAddress, EmailConfirmation
 
-__all__ = ['Profile', 'SocialLink', 'PasswordReset']
-
+__all__ = [
+    'Profile',
+    'SocialLink',
+    'PasswordReset',
+    'EmailAddress',
+    'EmailConfirmation'
+]
 
 # ------ SIGNALS ------ #
 
@@ -39,6 +44,17 @@ def new_user(sender, **kwargs):
 
 if EMAIL_CONFIRMATION:
     from ..signals import email_confirmed
+
+    @receiver(post_save, sender=Profile)
+    def add_mail_to_user(sender, **kwargs):
+        """
+        Adds email to DB and sends a confirmation mail if PROFILE_EMAL_CONFIRMATION is True
+        """
+        user = kwargs['instance']
+        # sync with EmailAddress model
+        if user.email and user.email_set.filter(email=user.email).count() < 1:
+            user.email_set.add_email(user, email=user.email)
+            user.email_set.last().set_as_primary()
 
     @receiver(email_confirmed, sender=EmailConfirmation)
     def activate_user(sender, email_address, **kwargs):

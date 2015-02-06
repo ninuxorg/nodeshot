@@ -16,7 +16,7 @@ from nodeshot.core.nodes.views import NodeList
 
 from .models import Profile, PasswordReset, SocialLink
 from .serializers import *
-from .permissions import *
+from .permissions import IsProfileOwner, IsNotAuthenticated
 from .settings import settings, EMAIL_CONFIRMATION, REGISTRATION_OPEN
 
 
@@ -63,20 +63,18 @@ class ProfileList(ProfileBase):
     def get(self, request, *args, **kwargs):
         """ return profile of current user if authenticated otherwise 401 """
         serializer = self.serializer_reader_class
-
         if request.user.is_authenticated():
             return Response(serializer(request.user, context=self.get_serializer_context()).data)
         else:
-            return Response({ 'detail': _('Authentication credentials were not provided') }, status=401)
+            return Response({'detail': _('Authentication credentials were not provided')}, status=401)
 
     def post_save(self, obj, created):
         """
         Send email confirmation according to configuration
         """
         super(ProfileList, self).post_save(obj)
-
         if created:
-            obj.add_email()
+            obj.needs_confirmation()
 
 profile_list = ProfileList.as_view()
 
@@ -244,7 +242,7 @@ class AccountLogin(generics.GenericAPIView):
                 'detail': _(u'Logged in successfully'),
                 'user': ProfileOwnSerializer(
                     serializer.instance,
-                    context={ 'request': request }
+                    context={'request': request}
                 ).data
             })
 
@@ -266,7 +264,7 @@ class AccountLogout(APIView):
     def post(self, request, format=None):
         """ clear session """
         logout(request)
-        return Response({ 'detail': _(u'Logged out successfully') })
+        return Response({'detail': _(u'Logged out successfully')})
 
 account_logout = AccountLogout.as_view()
 
@@ -311,7 +309,7 @@ class AccountPassword(generics.GenericAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({ 'detail': _(u'Password successfully changed') })
+            return Response({'detail': _(u'Password successfully changed')})
 
         return Response(serializer.errors, status=400)
 
@@ -371,7 +369,7 @@ class PasswordResetFromKey(generics.GenericAPIView):
             uid_int = base36_to_int(uidb36)
             password_reset_key = PasswordReset.objects.get(user_id=uid_int, temp_key=key, reset=False)
         except (ValueError, PasswordReset.DoesNotExist, AttributeError):
-            return Response({ 'errors': _(u'Key Not Found') }, status=404)
+            return Response({'errors': _(u'Key Not Found')}, status=404)
 
         serializer = ResetPasswordKeySerializer(
             data=request.DATA,
@@ -381,7 +379,7 @@ class PasswordResetFromKey(generics.GenericAPIView):
         # validate
         if serializer.is_valid():
             serializer.save()
-            return Response({ 'detail': _(u'Password successfully changed.') })
+            return Response({'detail': _(u'Password successfully changed.')})
         # in case of errors
         return Response(serializer.errors, status=400)
 
@@ -464,9 +462,9 @@ if EMAIL_CONFIRMATION:
         def delete(self, request, *args, **kwargs):
             """ can't delete if only 1 email address """
             if self.get_object().primary:
-                return Response({ 'error': _("You can't delete your primary address")}, status=400)
+                return Response({'error': _("You can't delete your primary address")}, status=400)
             elif EmailAddress.objects.filter(user=request.user).count() <= 1:
-                return Response({ 'error': _("You can't delete your only email address")}, status=400)
+                return Response({'error': _("You can't delete your only email address")}, status=400)
 
             return self.destroy(request, *args, **kwargs)
 
@@ -485,13 +483,13 @@ if EMAIL_CONFIRMATION:
             try:
                 email_address = EmailAddress.objects.get(user=request.user, pk=kwargs.get('pk', None))
             except EmailAddress.DoesNotExist:
-                return Response({ 'detail': _('Not Found') }, status=404)
+                return Response({'detail': _('Not Found')}, status=404)
 
             if email_address.verified:
-                return Response({ 'error': _('Email address %s already verified' % email_address.email )}, status=400)
+                return Response({'error': _('Email address %s already verified' % email_address.email )}, status=400)
 
             EmailConfirmation.objects.send_confirmation(email_address)
 
-            return Response({ 'detail': _('Email confirmation sent to %s' % email_address.email )})
+            return Response({'detail': _('Email confirmation sent to %s' % email_address.email )})
 
     account_email_resend_confirmation = ResendEmailConfirmation.as_view()

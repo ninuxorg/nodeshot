@@ -97,15 +97,13 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         """
         send_mail(subject, message, from_email, [self.email])
 
-    def add_email(self):
+    def needs_confirmation(self):
         """
-        Add email to DB and sends a confirmation mail if PROFILE_EMAL_CONFIRMATION is True
+        set is_active to False if needs email confirmation
         """
         if EMAIL_CONFIRMATION:
-            from . import EmailAddress
             self.is_active = False
             self.save()
-            EmailAddress.objects.add_email(self, self.email)
             return True
         else:
             return False

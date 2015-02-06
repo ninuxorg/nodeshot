@@ -76,10 +76,6 @@ class UserAdmin(BaseUserAdmin):
     ordering = ['-is_staff', '-date_joined']
     search_fields = ('email', 'username', 'first_name', 'last_name')
     list_filter = ('is_active', 'is_staff', 'is_superuser')
-    
-    if EMAIL_CONFIRMATION:
-        readonly_fields = ['email']
-
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
@@ -113,10 +109,10 @@ if EMAIL_CONFIRMATION:
         search_fields = ('email', 'user__username')
         list_select_related = True
         list_display = ('__unicode__', 'verified', 'primary', 'user')
-    
+
     class EmailConfirmationAdmin(admin.ModelAdmin):
         list_display = ('__unicode__', 'key_expired')
-    
+
     admin.site.register((EmailAddress,), EmailAddressAdmin)
     admin.site.register((EmailConfirmation,), EmailConfirmationAdmin)
 

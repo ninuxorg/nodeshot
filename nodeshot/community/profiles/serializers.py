@@ -36,7 +36,7 @@ __all__ = [
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=User._meta.get_field('username').max_length)
     password = serializers.CharField(max_length=PASSWORD_MAX_LENGTH)
-    remember = serializers.BooleanField(default=True, help_text = _("If checked you will stay logged in for 3 weeks"))
+    remember = serializers.BooleanField(default=True, help_text=_("If checked you will stay logged in for 3 weeks"))
 
     def user_credentials(self, attrs):
         """
@@ -129,11 +129,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         fields += ['social_links_url', 'social_links']
 
-        read_only_fields = (
+        read_only_fields = [
             'username',
             'date_joined',
             'last_login'
-        )
+        ]
 
 
 class ProfileOwnSerializer(ProfileSerializer):
@@ -242,11 +242,11 @@ class ChangePasswordSerializer(serializers.Serializer):
         required=False  # optional because users subscribed from social network won't have a password set
     )
     password1 = serializers.CharField(
-        help_text = _('New Password'),
+        help_text=_('New Password'),
         max_length=PASSWORD_MAX_LENGTH
     )
     password2 = serializers.CharField(
-        help_text = _('New Password (confirmation)'),
+        help_text=_('New Password (confirmation)'),
         max_length=PASSWORD_MAX_LENGTH
     )
 
@@ -281,7 +281,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class ResetPasswordSerializer(serializers.Serializer):
-    email = serializers.EmailField(required = True)
+    email = serializers.EmailField(required=True)
 
     def validate_email(self, attrs, source):
         """ ensure email is in the database """
@@ -305,11 +305,11 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 class ResetPasswordKeySerializer(serializers.Serializer):
     password1 = serializers.CharField(
-        help_text = _('New Password'),
+        help_text=_('New Password'),
         max_length=PASSWORD_MAX_LENGTH
     )
     password2 = serializers.CharField(
-        help_text = _('New Password (confirmation)'),
+        help_text=_('New Password (confirmation)'),
         max_length=PASSWORD_MAX_LENGTH
     )
 
