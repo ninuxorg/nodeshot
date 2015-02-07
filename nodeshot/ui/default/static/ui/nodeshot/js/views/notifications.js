@@ -29,11 +29,16 @@
             this.collection = new Ns.collections.Notification();
             // listens when user status changes to fetch notifications
             this.listenTo(Ns.db.user, 'loggedin', this.fetch);
+            this.listenTo(Ns.db.user, 'loggedin', this.storeExternalReferences);
             // fetch when collection is synced
             this.listenTo(this.collection, 'reset', this.render);
             if (Ns.db.user.isAuthenticated()) { this.fetch(); }
             // setPosition on resize
-            $(window).on("resize.account", _.bind(this.setPosition, this));
+            $(window).on("resize.notifications", _.bind(this.setPosition, this));
+            this.storeExternalReferences();
+        },
+
+        storeExternalReferences: function () {
             // external references
             this.ext = {
                 'regionEl': Ns.notifications.$el,
