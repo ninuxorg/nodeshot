@@ -3,7 +3,8 @@
 
     Ns.views = {
         map: {},
-        node: {}
+        node: {},
+        layer: {}
     };
 
     // auxiliary object that keeps some details about the state of the app
@@ -116,6 +117,11 @@
             Ns.body.currentView.content.currentView.goToLatLng(latlng);
         },
 
+        // layer list
+        getLayerList: function () {
+            new Ns.views.layer.List();
+        },
+
         // user profile view
         getUser: function (username) {
             new Ns.views.User({ username: username });
@@ -140,6 +146,7 @@
             'nodes': 'getNodeList',
             'nodes/:slug': 'getNode',
             'nodes/:slug/edit': 'editNode',
+            'layers': 'getLayerList',
             'users/:username': 'getUser',
             'account/password/reset': 'getPasswordReset'
         }

@@ -186,6 +186,31 @@
         <td colspan="100%" class="empty">{% trans 'nothing found' %}</td>
     </script>
 
+    <script id="layer-list-template" type="text/template">
+        {% include 'includes/layer-list.html' %}
+    </script>
+
+    <script id="layer-list-row-template" type="text/template">
+        <td class="name-column">
+            <a href="#layers/<%= slug %>">
+                <%= name %>
+            </a>
+        </td>
+        <td class="hidden-xxs">
+            <%= organization %>
+        </td>
+        <td class="hidden-xs">
+            <span class="icon-<%= new_nodes_allowed === true ? 'ok' : 'cancel' %>"></span>
+        </td>
+        <td class="hidden-xs">
+            <span class="icon-<%= is_external === true ? 'ok' : 'cancel' %>"></span>
+        </td>
+    </script>
+
+    <script id="layer-list-empty-template" type="text/template">
+        <td colspan="100%" class="empty">{% trans 'nothing found' %}</td>
+    </script>
+
     <script id="user-details-template" type="text/template">
         {% include 'includes/user-details.html' %}
     </script>
@@ -219,6 +244,24 @@
     </script>
 {% endblock %}
 
+{% block jslibs %}
+    <!-- libs -->
+    <script src="{% static 'ui/lib/js/jquery.js' %}"></script>
+    <script src="{% static 'ui/lib/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/bootstrap.switch.js' %}"></script>
+    <script src="{% static 'ui/lib/js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/pwstrength.js' %}"></script>
+    <script src="{% static 'ui/lib/js/scroller.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/leaflet.markercluster.js' %}"></script>
+    <script src="{% static 'ui/lib/js/underscore.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone.marionette.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone.paginator.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone-forms.min.js' %}"></script>
+    <script src="{% static 'ui/lib/js/backbone-forms-bootstrap3.js' %}"></script>
+    <script src="{% static 'ui/lib/js/jquery.dateFormat.js' %}"></script>
+    <script src="{% static 'ui/lib/js/jquery.serializeJSON.js' %}"></script>
+    {% endblock %}
 {% block jssettings %}
     <!-- global settings -->
     <script>
@@ -258,6 +301,7 @@
     <script src="{% static 'ui/nodeshot/js/views/map.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/node-details.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/node-list.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/layer-list.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/user.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/password-reset.js' %}"></script>
     <!-- preloaded data -->

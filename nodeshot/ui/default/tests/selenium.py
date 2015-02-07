@@ -115,10 +115,10 @@ class DefaultUiSeleniumTest(TestCase):
         self.browser.find_element_by_css_selector('#nav-bar li.active a').click()
         # ensure the same on a nested menu item
         self.browser.find_element_by_css_selector('#nav-bar a.dropdown-toggle').click()
-        self.browser.find_element_by_css_selector("a[href='#/pages/about']").click()
+        self.browser.find_element_by_css_selector("a[href='#pages/about']").click()
         self._wait_until_ajax_complete(1, 'page timeout')
         self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
-        self.browser.find_element_by_css_selector("a[href='#/pages/about']").click()
+        self.browser.find_element_by_css_selector("a[href='#pages/about']").click()
         self._wait_until_ajax_complete(1, 'page timeout')
         self.browser.find_element_by_css_selector('#nav-bar li.active a.dropdown-toggle').click()
 
@@ -621,7 +621,7 @@ class DefaultUiSeleniumTest(TestCase):
         self.assertEqual(len(browser.find_elements_by_css_selector('.leaflet-marker-icon.leaflet-zoom-animated.leaflet-clickable')), 1)
 
     def test_node_list(self):
-        self.browser.find_element_by_css_selector('a[href="#/nodes"]').click()
+        self.browser.find_element_by_css_selector('a[href="#nodes"]').click()
         self._wait_until_ajax_complete(5, 'timeout')
         self.assertTrue(self.browser.execute_script("return Ns.body.currentView.$el.attr('id') == 'node-list'"))
 
@@ -737,3 +737,8 @@ class DefaultUiSeleniumTest(TestCase):
         self._wait_until_element_visible('#password-reset-container', 1, 'password reset container not visible')
         self._login()
         self.assertEqual(self.browser.title, 'Home - Nodeshot')
+
+    def test_layers(self):
+        self._hashchange('#layers')
+        self._wait_until_element_visible('#layer-list table', 1, 'layers list not visible')
+        self.assertEqual(self.browser.title, 'Layer list - Nodeshot')

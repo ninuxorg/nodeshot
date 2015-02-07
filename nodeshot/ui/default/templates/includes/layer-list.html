@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="row-ns padding-bottom">
+    <h2 class="pull-left title">
+        {% trans 'Layers' %}
+    </h2>
+</div>
+
+<table class="table table-striped columns">
+    <thead>
+        <tr>
+            <th>{% trans 'Name' %}</th>
+            <th class="hidden-xxs">{% trans 'Organization' %}</th>
+            <th class="hidden-xs">{% trans 'New nodes allowed?' %}</th>
+            <th class="hidden-xs">{% trans 'External?' %}</th>
+        </tr>
+    </thead>
+    <tbody id="js-rows">
+    </tbody>
+</table>
