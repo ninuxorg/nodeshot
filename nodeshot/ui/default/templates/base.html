@@ -1,4 +1,4 @@
-<!DOCTYPE html>{% load i18n static leaflet_tags nodeshot_tags %}
+<!DOCTYPE html>{% load i18n static leaflet_tags %}
 <html>
 <head>
     <title>{{ SITE_NAME }}</title>
@@ -60,22 +60,27 @@
     {% endif %}
 </head>
 <body style="overflow:hidden">
+    {% block preloader %}
     <div id="preloader">
         <p class="inner">
             <span class="icon-loading animate-spin"></span> {% trans 'Loading' %} &hellip;
         </p>
     </div>
+    {% endblock %}
     <header>
         <nav id="top-bar">
             <h1><a href="#">{{ SITE_NAME }}</a></h1>
+            {% block topbar %}
             <div id="general-search"></div>
             <div id="main-actions"></div>
             <div id="notifications"></div>
+            {% endblock %}
         </nav>
-
+        {% block menu %}
         <nav id="nav-bar" class="navbar navbar-inverse" role="navigation">
             <div class="collapse navbar-collapse" id="ns-top-nav-links"></div>
         </nav>
+        {% endblock %}
     </header>
 
     {% block breadcrumb %}
@@ -238,7 +243,7 @@
                 <p><button class="btn btn-default">{% trans 'Sign in' %}</button></p>
             </form>
 
-            <p class="text"><a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'Forgot your password?' %}</a></p>
+            <p class="text"><a href="#account/password/reset">{% trans 'Forgot your password?' %}</a></p>
             {% if REGISTRATION_OPEN %}
             <p class="text">{% trans "Don't have an account yet?" %} <a href="#" id="js-signup-link">{% trans 'Sign up' %}</a></p>
             {% endif %}
@@ -247,217 +252,9 @@
         </div>
     </div>
 
-    <script id="modal-template" type="text/template">
-        <div class="modal fade autocenter" id="tmp-modal" tabindex="-1">
-            <div class="modal-dialog modal-content modal-body modal-slim">
-                <span class="message"><%= message %></span>
-                <% if(successMessage) { %>
-                    <button type="button" class="btn btn-success"><%= successMessage %></button>
-                <% } %>
+    {% block jstemplates %}{% endblock %}
 
-                <% if(defaultMessage) { %>
-                    <button type="button" class="btn btn-default"><%= defaultMessage %></button>
-                <% } %>
-            </div>
-        </div>
-    </script>
-
-    <script id="search-template" type="text/template">
-        <input type="text" id="general-search-input" placeholder="{% trans 'Search for data' %}">
-        <span class="icon-search">&nbsp;</span>
-        <span class="icon-spinner animate-spin"></span>
-        <ul class="dropdown-menu" id="js-search-results"></ul>
-    </script>
-
-    <script id="search-result-template" type="text/template">
-        <a href="<%= action %>" class="<%= icon %>"><%= name %></a>
-    </script>
-
-    <script id="search-empty-template" type="text/template">
-        <a class="empty" href="#">{% trans 'nothing found' %}</a>
-    </script>
-
-    <script id="account-menu-template" type="text/template">
-        <li>
-            <a href="#" class="icon-search">&nbsp;</a>
-        </li>
-        <% if(typeof(username) !== 'undefined'){ %>
-        <li>
-            <a href="#" class="notifications">
-                <span class="icon-globe">&nbsp;</span>
-                &nbsp;
-                <span class="bg" id="js-notifications-count">0</span>
-            </a>
-        </li>
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <span class="icon-user"></span>
-                <span class="text" id="js-username"><%= truncatedUsername %></span>
-                <span class="caret"></span>
-            </a>
-
-            <ul class="dropdown-menu">
-                <li>
-                    <a href="#/users/<%= username %>" id="js-profile">
-                        <span class="icon-user"></span>{% trans 'My profile' %}
-                    </a>
-                </li>
-                <!--<li>
-                    <a href="javascript:$.createModal({message:'not implemented yet'})" id="js-settings">
-                        <span class="icon-wrench"></span>{% trans 'Settings' %}
-                    </a>
-                </li>-->
-                <% if (is_staff) { %>
-                <li>
-                    <a href="{% url 'admin:index' %}">
-                        <span class="icon-lock"></span>{% trans 'Admin site' %}
-                    </a>
-                </li>
-                <% } %>
-                <li>
-                    <a href="#logout" id="js-logout">
-                        <span class="icon-off"></span>{% trans 'Logout' %}
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <% } else { %>
-        {% if REGISTRATION_OPEN %}
-        <li>
-            <a href="#" data-toggle="modal" data-target="#signup-modal">
-                <span class="icon-user-add"></span>
-                <span class="text">{% trans 'Sign up' %}</span>
-            </a>
-        </li>
-        {% endif %}
-        <li>
-            <a href="#" data-toggle="modal" data-target="#signin-modal">
-                <span class="icon-user"></span>
-                <span class="text">{% trans 'Sign in' %}</span>
-            </a>
-        </li>
-        <% } %>
-        <li>
-            <a href="#" id="mobile-nav" class="icon-menu"
-               data-toggle="collapse"
-               data-target="#ns-top-nav-links">&nbsp;</a>
-        </li>
-    </script>
-
-    <script id="main-menu-item-view-template" type="text/template">
-        <a href="<%= url %>"<% if(children.length){ %> class="dropdown-toggle" data-toggle="dropdown"<% } %>>
-            <span class="<%= classes || 'icon-info-circle' %>"></span><%= name %>
-            <% if(children.length){ %><span class="caret"></span><% } %>
-        </a>
-        <% if(children.length){ %>
-        <ul class="dropdown-menu">
-            <% children.forEach(function(child){ %>
-                <li><a href="<%= child.url %>" class="<%= child.classes %>"><%= child.name %></a></li>
-            <% }) %>
-        </ul>
-        <% } %>
-    </script>
-
-    <script id="main-menu-empty-view-template" type="text/template">
-        <a href="#">
-            <span class="icon-info-circle"></span>{% trans 'No menu item yet' %}
-        </a>
-    </script>
-
-    <script id="page-template" type="text/template">
-        <h1><%= title %></h1>
-        <%= content %>
-    </script>
-
-    <script id="notifications-template" type="text/template">
-        <span class="arrow"></span>
-        <div class="header">
-            <div class="left">
-                {% trans 'Notifications' %}
-            </div>
-            <!--<div class="right">
-                <a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'See all' %}</a> <span>-</span>
-                <a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'Settings' %}</a>
-            </div>-->
-        </div>
-        <div class="scroller">
-            <ul id="js-notifications-container"></ul>
-        </div>
-    </script>
-
-    <script id="notification-item-template" type="text/template">
-        <span class="icon-<%= icon %>"></span>
-        <p class="message"><%= text %></p>
-        <p class="time"><%= $.format.prettyDate(added) %></p>
-    </script>
-
-    <script id="notification-empty-template" type="text/template">
-        <p class="empty">{% trans 'Nothing interesting yet!' %}</p>
-    </script>
-
-    {% include 'includes/map.html' %}
-
-    <script id="node-details-template" type="text/template">
-        {% include 'includes/node-details.html' %}
-    </script>
-
-    <script id="node-list-template" type="text/template">
-        {% include 'includes/node-list.html' %}
-    </script>
-
-    <script id="node-list-row-template" type="text/template">
-        <td class="name-column">
-            <a href="#nodes/<%= slug %>">
-                <%= name %>
-            </a>
-        </td>
-        <td class="status-column hidden-xxs">
-            <span class="status <%= status %>">
-                <%= status %>
-            </span>
-        </td>
-        <td class="hidden-xxs">
-            <a href="#layers/<%= layer %>" class="not-implemented">
-                <%= layer_name %>
-            </a>
-        </td>
-        <td class="hidden-xs">
-            <a href="#users/<%= user %>"><%= user %></a>
-        </td>
-        <td class="hidden-xs"><%= _.formatDateTime(added) %></td>
-        <td class="hidden-xs"><%= _.formatDateTime(updated) %></td>
-    </script>
-
-    <script id="node-list-empty-template" type="text/template">
-        <td colspan="100%" class="empty">{% trans 'nothing found' %}</td>
-    </script>
-
-    <script id="user-details-template" type="text/template">
-        {% include 'includes/user-details.html' %}
-    </script>
-
-    <script id="loading-template" type="text/template">
-        <div id="loading" class="overlay loading">
-            <span class="icon-loading animate-spin"></span>
-            <span class="text">{% trans 'Loading' %} &hellip;</span>
-            <a class="icon-close hastip" title="{% trans 'cancel&nbsp;operation' %}"></a>
-        </div>
-    </script>
-
-    <script id="dynamic-css-template" type="text/template">
-        <style>
-        <% Ns.db.legend.toJSON().forEach(function(legend){ %>
-            .status.<%= legend.slug %>, .marker-<%= legend.slug %>{
-                background: <%= legend.fill_color %>;
-                color:<%= legend.text_color %>;
-            }
-            .marker-<%= legend.slug %>{
-                border: <%= legend.stroke_width %>px solid <%= legend.stroke_color %>;
-            }
-        <% }) %>
-        </style>
-    </script>
-
+    {% block jslibs %}
     <!-- libs -->
     <script src="{% static 'ui/lib/js/jquery.js' %}"></script>
     <script src="{% static 'ui/lib/js/bootstrap.min.js' %}"></script>
@@ -474,58 +271,9 @@
     <script src="{% static 'ui/lib/js/backbone-forms-bootstrap3.js' %}"></script>
     <script src="{% static 'ui/lib/js/jquery.dateFormat.js' %}"></script>
     <script src="{% static 'ui/lib/js/jquery.serializeJSON.js' %}"></script>
-    <!-- global settings -->
-    <script>
-        Ns = new Marionette.Application();
-        Ns.settings = {};
-        Ns.settings.siteName = '{{ SITE_NAME }}';
-        Ns.settings.map = {
-            lat: {{ MAP_CENTER.0 }},
-            lng: {{ MAP_CENTER.1 }},
-            zoom: {{ MAP_ZOOM }}
-        };
-        Ns.settings.votes = {{ VOTING_ENABLED }};
-        Ns.settings.ratings = {{ RATING_ENABLED }};
-        Ns.settings.comments = {{ COMMENTS_ENABLED }};
-        Ns.settings.api = '{{ SITE_URL }}{% url "api_root_endpoint" %}';
-        Ns.settings.dateTimeFormat = '{{ DATETIME_FORMAT }}';
-        Ns.settings.dateFormat = '{{ DATE_FORMAT }}';
-        Ns.settings.leafletOptions = {{ LEAFLET_OPTIONS|safe }};
-        Ns.settings.disableClusteringAtZoom = {{ DISABLE_CLUSTERING_AT_ZOOM }};
-        Ns.settings.maxClusterRadius = {{ MAX_CLUSTER_RADIUS }};
-        Ns.settings.addressSearchTriggers = {{ ADDRESS_SEARCH_TRIGGERS|safe }};
-        Ns.settings.nodesHstoreSchema = {{ NODES_HSTORE_SCHEMA|safe }};
-        Ns.settings.googleAnalytics = {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %};
-        Ns.settings.piwikAnalytics = {% if PIWIK_ANALYTICS_DOMAIN and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %};
-    </script>
-    <!-- nodeshot JS -->
-    <script src="{% static 'ui/nodeshot/js/utils.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/app.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/models.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/page.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/search.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/account-menu.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/main-menu.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/notifications.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/map.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/node-details.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/node-list.js' %}"></script>
-    <script src="{% static 'ui/nodeshot/js/views/user.js' %}"></script>
-    <!-- preloaded data -->
-    <script>
-        Ns.db = {};
-        Ns.db.menu = new Ns.collections.Menu({{ menu|safe }});
-        Ns.db.legend = new Ns.collections.Legend({{ legend|safe }});
-        Ns.db.layers = new Ns.collections.Layer({{ layers|safe }});
-        Ns.db.user = new Ns.models.User({{ user|safe }});
-        Ns.db.geo = new Ns.collections.Geo();  // fetch later
-        Ns.db.nodes = new Ns.collections.Node();  // local node details cache
-        Ns.db.nodeList = null;  // local node list cache
-        Ns.db.pages = new Ns.collections.Page();  // local page cache
-        Ns.db.users = new Backbone.Collection();  // local user profile cache
-    </script>
-
-    {% nodeshot_map "map-js" creatediv=False %}
+    {% endblock %}
+    {% block jssettings %}{% endblock %}
+    {% block jsnodeshot %}{% endblock %}
 
     {% if WEBSOCKETS %}
     <!--<script>-->

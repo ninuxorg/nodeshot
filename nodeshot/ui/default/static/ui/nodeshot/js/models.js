@@ -558,4 +558,12 @@
         model: Backbone.Model,
         url: Ns.url('menu/')
     });
+
+    Ns.models.PasswordReset = Ns.models.Base.extend({
+        urlRoot: Ns.url('account/password/reset/'),
+
+        schema: {
+            email: { validators: ['required', 'email'] }
+        }
+    });
 }());

@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     'nodeshot.core.cms',
     'nodeshot.core.websockets',
     'nodeshot.interop.sync',
+    'nodeshot.ui.default',
     'nodeshot.community.participation',
     'nodeshot.community.notifications',
     'nodeshot.community.profiles',
@@ -112,7 +113,6 @@ INSTALLED_APPS = [
     'nodeshot.networking.services',
     'nodeshot.networking.hardware',
     'nodeshot.networking.connectors',
-    'nodeshot.ui.default',
     'nodeshot.interop.open311',
     'nodeshot.ui.open311_demo',
     # 3d parthy django apps

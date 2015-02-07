@@ -731,3 +731,9 @@ class DefaultUiSeleniumTest(TestCase):
         self.browser.find_element_by_css_selector('#main-actions a.notifications').click()
         # log out
         self._logout()
+
+    def test_password_reset(self):
+        self._hashchange('#account/password/reset')
+        self._wait_until_element_visible('#password-reset-container', 1, 'password reset container not visible')
+        self._login()
+        self.assertEqual(self.browser.title, 'Home - Nodeshot')

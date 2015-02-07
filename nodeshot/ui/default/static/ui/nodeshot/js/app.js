@@ -119,6 +119,11 @@
         // user profile view
         getUser: function (username) {
             new Ns.views.User({ username: username });
+        },
+
+        // reset forgotten password
+        getPasswordReset: function () {
+            new Ns.views.PasswordReset();
         }
     };
 
@@ -135,7 +140,8 @@
             'nodes': 'getNodeList',
             'nodes/:slug': 'getNode',
             'nodes/:slug/edit': 'editNode',
-            'users/:username': 'getUser'
+            'users/:username': 'getUser',
+            'account/password/reset': 'getPasswordReset'
         }
     });
 
