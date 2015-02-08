@@ -706,6 +706,7 @@ article.center-stage .row > div { padding-left: 0; padding-right: 0 }
 }
 
 #map-legend a{ float: left }
+#map-legend li{ clear: both }
 #map-legend .circle{ margin-right: 5px }
 
 #map-legend.right{
