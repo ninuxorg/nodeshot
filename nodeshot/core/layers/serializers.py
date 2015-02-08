@@ -67,7 +67,7 @@ class LayerDetailSerializer(LayerListSerializer):
     """
     class Meta:
         model = Layer
-        fields = ['name', 'slug', 'center', 'area', 'is_external',
+        fields = ['name', 'slug', 'center', 'area', 'organization', 'is_external',
                   'nodes_minimum_distance', 'new_nodes_allowed',
                   'description', 'text',
                   'website', 'nodes', 'geojson'] + ADDITIONAL_LAYER_FIELDS

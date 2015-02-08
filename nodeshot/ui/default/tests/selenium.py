@@ -742,3 +742,8 @@ class DefaultUiSeleniumTest(TestCase):
         self._hashchange('#layers')
         self._wait_until_element_visible('#layer-list table', 1, 'layers list not visible')
         self.assertEqual(self.browser.title, 'Layer list - Nodeshot')
+
+    def test_layer_details(self):
+        self._hashchange('#layers/rome')
+        self._wait_until_element_visible('#layer-details table', 1, 'layers details not visible')
+        self.assertEqual(self.browser.title, 'Rome - Nodeshot')

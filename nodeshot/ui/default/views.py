@@ -6,7 +6,7 @@ from rest_framework.renderers import JSONRenderer
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Status
 from nodeshot.core.cms.models import MenuItem
-from nodeshot.core.layers.serializers import LayerListSerializer
+from nodeshot.core.layers.serializers import LayerDetailSerializer
 from nodeshot.core.nodes.serializers import StatusListSerializer
 from nodeshot.core.cms.serializers import MenuSerializer
 from nodeshot.community.profiles.serializers import ProfileOwnSerializer
@@ -31,7 +31,7 @@ def index(request):
     status = Status.objects.all()
     menu = MenuItem.objects.published().filter(parent=None).accessible_to(request.user)
     # initialize serializers
-    layers = LayerListSerializer(layers, many=True, context=serializer_context).data
+    layers = LayerDetailSerializer(layers, many=True, context=serializer_context).data
     status = StatusListSerializer(status, many=True, context=serializer_context).data
     menu = MenuSerializer(menu, many=True, context=serializer_context).data
     # initialize user serializer if authenticated

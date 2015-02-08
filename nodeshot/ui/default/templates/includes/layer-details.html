@@ -1,0 +1,58 @@
+{% load i18n %}
+<article id="layer-details" class="center-stage responsive-padding">
+    <h2><%= name %></h2>
+
+    <p class="actions">
+        <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
+    </p>
+
+    <div class="row padding-bottom">
+        <div class="col-sm-12 left" id="node-data-js">
+            <% if(description){ %>
+                <div class="description padding-bottom"><%= _.nl2br(description) %></div>
+            <% } %>
+            <table class="table table-striped left-labels nomargin">
+                <% if(organization){ %>
+                <tr>
+                    <td class="left">
+                        {% trans 'Organization' %}:
+                    </td>
+                    <td class="right">
+                        <%= organization %>
+                    </td>
+                </tr>
+                <% } %>
+                <% if(website){ %>
+                <tr>
+                    <td class="left">
+                        {% trans 'Website' %}:
+                    </td>
+                    <td class="right">
+                        <%= website %>
+                    </td>
+                </tr>
+                <% } %>
+                <tr>
+                    <td class="left">
+                        {% trans 'New nodes allowed?' %}:
+                    </td>
+                    <td class="right">
+                        <span class="icon-<%= new_nodes_allowed === true ? 'ok' : 'cancel' %>"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="left">
+                        {% trans 'Is external?' %}:
+                    </td>
+                    <td class="right">
+                        <span class="icon-<%= is_external === true ? 'ok' : 'cancel' %>"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <p class="actions">
+        <a href="#layers" class="btn btn-primary">{% trans 'Layer list' %}</a>
+    </p>
+</article>

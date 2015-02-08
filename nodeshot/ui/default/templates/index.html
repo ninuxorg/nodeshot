@@ -171,7 +171,7 @@
             </span>
         </td>
         <td class="hidden-xxs">
-            <a href="#layers/<%= layer %>" class="not-implemented">
+            <a href="#layers/<%= layer %>">
                 <%= layer_name %>
             </a>
         </td>
@@ -184,6 +184,10 @@
 
     <script id="node-list-empty-template" type="text/template">
         <td colspan="100%" class="empty">{% trans 'nothing found' %}</td>
+    </script>
+
+    <script id="layer-details-template" type="text/template">
+        {% include 'includes/layer-details.html' %}
     </script>
 
     <script id="layer-list-template" type="text/template">
@@ -301,6 +305,7 @@
     <script src="{% static 'ui/nodeshot/js/views/map.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/node-details.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/node-list.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/layer-details.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/layer-list.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/user.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/password-reset.js' %}"></script>

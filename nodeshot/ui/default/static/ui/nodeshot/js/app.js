@@ -122,6 +122,11 @@
             new Ns.views.layer.List();
         },
 
+        // get layer details
+        getLayer: function (slug) {
+            new Ns.views.layer.Detail({ slug: slug })
+        },
+
         // user profile view
         getUser: function (username) {
             new Ns.views.User({ username: username });
@@ -147,6 +152,7 @@
             'nodes/:slug': 'getNode',
             'nodes/:slug/edit': 'editNode',
             'layers': 'getLayerList',
+            'layers/:slug': 'getLayer',
             'users/:username': 'getUser',
             'account/password/reset': 'getPasswordReset'
         }
