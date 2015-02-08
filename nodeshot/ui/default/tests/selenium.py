@@ -747,3 +747,4 @@ class DefaultUiSeleniumTest(TestCase):
         self._hashchange('#layers/rome')
         self._wait_until_element_visible('#layer-details table', 1, 'layers details not visible')
         self.assertEqual(self.browser.title, 'Rome - Nodeshot')
+        self.assertTrue(self.browser.execute_script('return Ns.body.currentView.map !== undefined'))

@@ -22,6 +22,43 @@
             Ns.body.show(this);
         },
 
+        onShow: function () {
+            this.map = $.loadDjangoLeafletMap();
+            var area = this.model.get('area'),
+                center = this.model.get('center'),
+                areaIsPoint = area['type'] == 'Point',
+                areaLayer = this.geoJsonToLayer(area, areaIsPoint ? null : 0.3),
+                centerLayer = this.geoJsonToLayer(center);
+            // add area and fit map size according to it
+            this.map.addLayer(areaLayer);
+            // if area is a Point, just center the view but don't zoom
+            if (areaIsPoint) {
+                this.map.setView(centerLayer.getLatLng());
+            }
+            // if area is not a point, use fit bounds
+            else {
+                this.map.fitBounds(areaLayer.getBounds());
+            }
+        },
+
+        /**
+         * takes geojson object as input
+         * returns leaflet layer
+         */
+        geoJsonToLayer: function (geojson, fillOpacity) {
+            var options = _.clone(Ns.settings.leafletOptions);
+            options.fillOpacity = fillOpacity || options.fillOpacity;
+            return L.geoJson(geojson, {
+                style: function (feature) {
+                    return options;
+                },
+                // used only for points
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, options);
+                }
+            }).getLayers()[0];
+        },
+
         /*
          * prompt permalink
          */

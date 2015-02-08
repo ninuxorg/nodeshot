@@ -1,5 +1,5 @@
 {% load i18n %}
-<article id="layer-details" class="center-stage responsive-padding">
+<article id="layer-details" class="center-stage">
     <h2><%= name %></h2>
 
     <p class="actions">
@@ -7,10 +7,15 @@
     </p>
 
     <div class="row padding-bottom">
-        <div class="col-sm-12 left" id="node-data-js">
+        <div class="col-sm-12 left">
             <% if(description){ %>
                 <div class="description padding-bottom"><%= _.nl2br(description) %></div>
             <% } %>
+
+            <div class="padding-bottom">
+                <div id="map-js" class="static-map"></div>
+            </div>
+
             <table class="table table-striped left-labels nomargin">
                 <% if(organization){ %>
                 <tr>

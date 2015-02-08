@@ -291,6 +291,9 @@ article.center-stage{
     margin: 25px 4.5%;
 }
 
+article.center-stage .row { margin-left: 0; margin-right: 0 }
+article.center-stage .row > div { padding-left: 0; padding-right: 0 }
+
 .content{
     padding: 25px 35px;
 }
@@ -1469,3 +1472,10 @@ td.empty{
 #body .input-sm .selectpicker{ font-size: 14px; padding-top: 3px; padding-bottom: 3px }
 #body .input-sm .selectpicker .caret{ line-height: 14px }
 #node-details .description{ margin-bottom: 20px }
+
+#map-js.static-map{
+    position: relative;
+    height: 400px;
+    border: 1px solid #ccc;
+}
+#map-js.static-map a{ font-weight: normal }

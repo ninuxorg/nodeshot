@@ -13,7 +13,7 @@
 
     Ns.models.Geo = Backbone.Model.extend({
         idAttribute: 'slug',
-        leafletOptions: Ns.settings.leafletOptions,
+        leafletOptions: _.clone(Ns.settings.leafletOptions),
 
         initialize: function () {
             this.set('legend', Ns.db.legend.get(this.get('status')));
