@@ -2,7 +2,7 @@
 <article id="node-details" class="center-stage responsive-padding">
     <h2>
         <%= name %>
-        <% if(Ns.settings.votes && relationships){ %>
+        <% if(Ns.settings.votes && relationships && relationships.voting_allowed){ %>
         <span class="vote">
             <a href="#like" class="icon-thumbs-up<%= (relationships.voted === -1) ? ' fade' : '' %>"><%= relationships.counts.likes %></a>
             <a href="#dislike" class="icon-thumbs-down<%= (relationships.voted === 1) ? ' fade' : '' %>"><%= relationships.counts.dislikes %></a>
@@ -116,7 +116,7 @@
                         <%= _.formatDate(updated) %>
                     </td>
                 </tr>
-                <% if(Ns.settings.ratings && relationships){ %>
+                <% if(Ns.settings.ratings && relationships && relationships.rating_allowed){ %>
                 <tr>
                     <td class="left">
                         {% trans 'Rating' %}:
@@ -142,7 +142,7 @@
         </div>-->
     </div>
 
-    <% if(Ns.settings.comments && relationships){ %>
+    <% if(Ns.settings.comments && relationships && relationships.comments_allowed){ %>
     <div id="comments">
         <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
 
