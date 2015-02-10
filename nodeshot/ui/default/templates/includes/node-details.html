@@ -144,7 +144,7 @@
 
     <% if(Ns.settings.comments && relationships && relationships.comments_allowed){ %>
     <div id="comments">
-        <h3><%= relationships.comments.length %> {% trans 'Comments' %}</h3>
+        <h3>{% trans 'Comments' %}</h3>
 
         <% if(Ns.db.user.isAuthenticated()){ %>
         <form action="" class="new-comment" method="post">
@@ -173,15 +173,13 @@
         <% } %>
 
         <% if(relationships.comments.length > 0){ %>
-            <% _.each(relationships.comments, function(comment, i){ %>
+            <% relationships.comments.forEach(function(comment, i){ %>
                 <div class="comment" id="c-<%= i %>">
                     <a href="#/users/<%= comment.user.username %>">
                         <img class="avatar" src="<%= comment.user.avatar %>" alt="">
                     </a>
                     <div class="meta-data">
-                        <a href="#/users/<%= comment.user.username %>">
-                            <%= comment.user.username %>
-                        </a>
+                        <a href="#/users/<%= comment.user.username %>"><%= comment.user.username %></a>
                         <span class="separator">•</span>
                         <span class="date"><%= $.format.prettyDate(comment.added) %></span>
                     </div>
