@@ -4,8 +4,8 @@
         <%= name %>
         <% if(Ns.settings.votes && relationships){ %>
         <span class="vote">
-            <a href="#like" class="icon-thumbs-up<%= (relationships.has_already_voted === -1) ? ' fade' : '' %>"><%= relationships.counts.likes %></a>
-            <a href="#dislike" class="icon-thumbs-down<%= (relationships.has_already_voted === 1) ? ' fade' : '' %>"><%= relationships.counts.dislikes %></a>
+            <a href="#like" class="icon-thumbs-up<%= (relationships.voted === -1) ? ' fade' : '' %>"><%= relationships.counts.likes %></a>
+            <a href="#dislike" class="icon-thumbs-down<%= (relationships.voted === 1) ? ' fade' : '' %>"><%= relationships.counts.dislikes %></a>
         </span>
         <% } %>
     </h2>

@@ -43,7 +43,7 @@ class Layer(BaseDate):
                                         help_text=_('you can specify the users who are mantaining this layer so they will receive emails from the system'))
     # settings
     nodes_minimum_distance = models.IntegerField(default=NODES_MINIMUM_DISTANCE,
-                                                help_text=_('minimum distance between nodes in meters, 0 means there is no minimum distance'))
+                                                 help_text=_('minimum distance between nodes in meters, 0 means there is no minimum distance'))
     new_nodes_allowed = models.BooleanField(_('new nodes allowed'), default=True, help_text=_('indicates whether users can add new nodes to this layer'))
     data = DictionaryField(_('extra data'), schema=HSTORE_SCHEMA, null=True, editable=False)
 
@@ -57,13 +57,13 @@ class Layer(BaseDate):
 
     class Meta:
         db_table = 'layers_layer'
-        app_label= 'layers'
+        app_label = 'layers'
 
     def __unicode__(self):
-        return '%s' % self.name
+        return self.name
 
     def __init__(self, *args, **kwargs):
-        """ Fill __current_is_published """
+        """ Fill _current_is_published """
         super(Layer, self).__init__(*args, **kwargs)
         # set current is_published, but only if it is an existing layer
         if self.pk:
@@ -105,7 +105,7 @@ class Layer(BaseDate):
         # otherwise return point_on_surface or centroid
         try:
             # point_on_surface guarantees that the point is within the geometry
-            return  self.area.point_on_surface
+            return self.area.point_on_surface
         except GEOSException:
             # fall back on centroid which may not be within the geometry
             # for example, a horseshoe shaped polygon
@@ -151,7 +151,7 @@ def nodes_minimum_distance_validation(self):
         minimum_distance = self.layer.nodes_minimum_distance
         # TODO - lower priority: do this check only when coordinates are changing
         near_nodes = Node.objects.exclude(pk=self.id).filter(geometry__distance_lte=(self.geometry, D(m=minimum_distance))).count()
-        if near_nodes > 0 :
+        if near_nodes > 0:
             raise ValidationError(_('Distance between nodes cannot be less than %s meters') % minimum_distance)
 
 

@@ -19,7 +19,6 @@ from node_participation_settings import NodeParticipationSettings
 from node_rating_count import NodeRatingCount
 
 
-
 __all__ = [
     'NodeRatingCount',
     'Comment',
@@ -34,17 +33,17 @@ __all__ = [
 
 if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
     from layer_participation_settings import LayerParticipationSettings
-    
+
     __all__ += ['LayerParticipationSettings']
-    
+
     from nodeshot.core.layers.models import Layer
-    
+
     @property
     def _layer_participation_settings(self):
         """
         Return layer_participation_settings record
         or create it if it does not exist
-        
+
         usage:
         layer = Layer.objects.get(pk=1)
         layer.participation_settings
@@ -55,7 +54,7 @@ if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
             layer_participation_settings = LayerParticipationSettings(layer=self)
             layer_participation_settings.save()
             return layer_participation_settings
-    
+
     Layer.participation_settings = _layer_participation_settings
 
 
@@ -64,12 +63,13 @@ if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
 
 from nodeshot.core.nodes.models import Node
 
+
 @property
 def _node_rating_count(self):
     """
     Return node_rating_count record
     or create it if it does not exist
-    
+
     usage:
     node = Node.objects.get(pk=1)
     node.rating_count
@@ -83,12 +83,13 @@ def _node_rating_count(self):
 
 Node.rating_count = _node_rating_count
 
+
 @property
 def _node_participation_settings(self):
     """
     Return node_participation_settings record
     or create it if it does not exist
-    
+
     usage:
     node = Node.objects.get(pk=1)
     node.participation_settings
@@ -152,8 +153,8 @@ def create_node_rating_counts_settings(sender, **kwargs):
         # create node_rating_count and settings
         # task will be executed in background unless settings.CELERY_ALWAYS_EAGER is True
         # if CELERY_ALWAYS_EAGER is False celery worker must be running otherwise task won't be executed
-        create_related_object.delay(NodeRatingCount, { 'node': node })
-        create_related_object.delay(NodeParticipationSettings, { 'node': node })
+        create_related_object.delay(NodeRatingCount, {'node': node})
+        create_related_object.delay(NodeParticipationSettings, {'node': node})
 
 
 @receiver(post_save, sender=Layer)
@@ -165,5 +166,4 @@ def create_layer_rating_settings(sender, **kwargs):
         # create layer participation settings
         # task will be executed in background unless settings.CELERY_ALWAYS_EAGER is True
         # if CELERY_ALWAYS_EAGER is False celery worker must be running otherwise task won't be executed
-        create_related_object.delay(LayerParticipationSettings, { 'layer': layer })
-
+        create_related_object.delay(LayerParticipationSettings, {'layer': layer})

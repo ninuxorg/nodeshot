@@ -3,7 +3,7 @@ from django.conf import settings
 
 from nodeshot.core.base.admin import BaseTabularInline
 
-from .models import *
+from .models import *  # noqa
 
 
 admin.site.register(Rating)
@@ -16,11 +16,11 @@ admin.site.register(Vote)
 if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
 
     from nodeshot.core.layers.admin import LayerAdmin
-    
+
     class LayerSettingsInline(admin.TabularInline):
         model = LayerParticipationSettings
         extra = 1
-    
+
     LayerAdmin.inlines.append(LayerSettingsInline)
 
 
@@ -36,17 +36,17 @@ class NodeSettingsInline(admin.TabularInline):
 
 class CommentInline(BaseTabularInline):
     model = Comment
-    extra = 1 
+    extra = 1
 
 
 class RatingInline(BaseTabularInline):
     model = Rating
-    extra = 1 
+    extra = 1
 
 
 class VoteInline(BaseTabularInline):
     model = Vote
-    extra = 1 
+    extra = 1
 
 
 additional_inlines = [NodeSettingsInline]
