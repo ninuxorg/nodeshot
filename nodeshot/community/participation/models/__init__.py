@@ -103,6 +103,36 @@ def _node_participation_settings(self):
 Node.participation_settings = _node_participation_settings
 
 
+def _action_allowed(self, action):
+    """
+    participation actions can be disabled on layer level, or disabled on a per node basis
+    """
+    if getattr(self.layer.participation_settings, '{0}_allowed'.format(action)) is False:
+        return False
+    else:
+        return getattr(self.participation_settings, '{0}_allowed'.format(action))
+
+
+@property
+def _voting_allowed(self):
+    return _action_allowed(self, 'voting')
+
+
+@property
+def _rating_allowed(self):
+    return _action_allowed(self, 'rating')
+
+
+@property
+def _comments_allowed(self):
+    return _action_allowed(self, 'comments')
+
+
+Node.voting_allowed = _voting_allowed
+Node.rating_allowed = _rating_allowed
+Node.comments_allowed = _comments_allowed
+
+
 # ------ SIGNALS ------ #
 
 

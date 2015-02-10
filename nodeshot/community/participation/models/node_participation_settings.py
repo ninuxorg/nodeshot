@@ -15,7 +15,7 @@ class NodeParticipationSettings(models.Model):
     comments_allowed = models.BooleanField(_('comments allowed?'), default=True)
 
     def __unicode__(self):
-        return _('Participation settings for node %s' % self.node.name)
+        return self.node.name
 
     class Meta:
         app_label = 'participation'

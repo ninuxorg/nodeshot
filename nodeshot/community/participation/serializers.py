@@ -197,7 +197,8 @@ ExtensibleNodeSerializer.add_relationship(
     lookup_field='slug'
 )
 
-def has_already_voted(obj, request):
+
+def voted(obj, request):
     """
     Determines if current logged-in user has already voted on a node
     returns 1 if user has already liked
@@ -206,14 +207,27 @@ def has_already_voted(obj, request):
     """
     if request.user.is_authenticated():
         v = Vote.objects.filter(node_id=obj.id, user_id=request.user.id)
-        try:
+        if len(v) > 0:
             return v[0].vote
-        except IndexError:
-            pass
     # hasn't voted yet or not authenticated
     return False
 
 ExtensibleNodeSerializer.add_relationship(
     'has_already_voted',
-    function=has_already_voted
+    function=voted
+)
+
+ExtensibleNodeSerializer.add_relationship(
+    'voting_allowed',
+    function=lambda obj, request: obj.voting_allowed
+)
+
+ExtensibleNodeSerializer.add_relationship(
+    'rating_allowed',
+    function=lambda obj, request: obj.rating_allowed
+)
+
+ExtensibleNodeSerializer.add_relationship(
+    'comments_allowed',
+    function=lambda obj, request: obj.comments_allowed
 )
