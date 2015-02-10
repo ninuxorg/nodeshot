@@ -169,13 +169,13 @@ ExtensibleNodeSerializer.add_relationship(
     'comments',
     serializer=CommentRelationSerializer,
     many=True,
-    queryset='obj.comment_set.all()'
+    queryset=lambda obj, request: obj.comment_set.all()
 )
 
 ExtensibleNodeSerializer.add_relationship(
     'counts',
     serializer=ParticipationSerializer,
-    queryset='obj.noderatingcount'
+    queryset=lambda obj, request: obj.noderatingcount
 )
 
 ExtensibleNodeSerializer.add_relationship(

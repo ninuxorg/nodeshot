@@ -19,9 +19,9 @@ class ExtraFieldSerializer(serializers.ModelSerializer):
     """
     ModelSerializer in which non native extra fields can be specified.
     """
-    
+
     _options_class = ExtraFieldSerializerOptions
-    
+
     def restore_object(self, attrs, instance=None):
         """
         Deserialize a dictionary of attributes into an object instance.
@@ -30,9 +30,9 @@ class ExtraFieldSerializer(serializers.ModelSerializer):
         """
         for field in self.opts.non_native_fields:
             attrs.pop(field)
-        
+
         return super(ExtraFieldSerializer, self).restore_object(attrs, instance)
-    
+
     def to_native(self, obj):
         """
         Serialize objects -> primitives.
@@ -42,10 +42,10 @@ class ExtraFieldSerializer(serializers.ModelSerializer):
 
         for field_name, field in self.fields.items():
             if field.read_only and obj is None:
-               continue
+                continue
             field.initialize(parent=self, field_name=field_name)
             key = self.get_field_key(field_name)
-            
+
             # skips to next iteration but permits to show the field in API browser
             try:
                 value = field.field_to_native(obj, field_name)
@@ -54,7 +54,7 @@ class ExtraFieldSerializer(serializers.ModelSerializer):
                     continue
                 else:
                     raise AttributeError(e.message)
-            
+
             method = getattr(self, 'transform_%s' % field_name, None)
             if callable(method):
                 value = method(obj, value)
@@ -69,13 +69,13 @@ class DynamicRelationshipsMixin(object):
     """
     Django Rest Framework Serializer Mixin
     which adds the possibility to dynamically add relationships to a serializer.
-    
+
     To add a relationship, use the class method "add_relationship", this way:
-    
+
     >>> SerializerName.add_relationship('relationship_name', 'view_name', 'lookup_field')
-    
-    for example:    
-    
+
+    for example:
+
     >>> from nodeshot.core.nodes.serializers import NodeDetailSerializer
     >>> NodeDetailSerializer.add_relationship(**{
         'name': 'comments',
@@ -84,7 +84,7 @@ class DynamicRelationshipsMixin(object):
     })
     """
     _relationships = {}
-    
+
     @classmethod
     def add_relationship(_class, name,
                          view_name=None, lookup_field=None,
@@ -127,7 +127,7 @@ class DynamicRelationshipsMixin(object):
             }
         else:
             raise ValueError('missing arguments, either pass view_name and lookup_field or serializer and queryset')
-    
+
     def get_lookup_value(self, obj, string):
         if '.' in string:
             if '()' in string:
@@ -148,12 +148,12 @@ class DynamicRelationshipsMixin(object):
                 return None
         else:
             return getattr(obj, string)
-    
+
     def get_relationships(self, obj):
         request = self.context['request']
         format = self.context['format']
         relationships = {}
-        
+
         # loop over private _relationship attribute
         for key, options in self._relationships.iteritems():
             # if relationship is a link
@@ -167,7 +167,7 @@ class DynamicRelationshipsMixin(object):
                                 format=format)
             # if relationship is a serializer
             elif options['type'] == 'serializer':
-                queryset = eval(options['queryset'])
+                queryset = options['queryset'](obj, request)
                 # get serializer representation
                 value = options['serializer'](instance=queryset,
                                               context=self.context,
@@ -240,7 +240,7 @@ class GeoJSONPaginationSerializerOptions(serializers.SerializerOptions):
 
 class GeoJSONBasePaginationSerializer(serializers.Serializer):
     """
-    A custom class for geojson serializers. 
+    A custom class for geojson serializers.
     """
     _options_class = GeoJSONPaginationSerializerOptions
     results_field = 'features'
@@ -256,7 +256,7 @@ class GeoJSONBasePaginationSerializer(serializers.Serializer):
             context_kwarg = {'context': kwargs['context']}
         else:
             context_kwarg = {}
-            
+
         self.fields[results_field] = object_serializer(source='object_list', **context_kwarg)
 
 
@@ -265,8 +265,7 @@ class GeoJSONPaginationSerializer(GeoJSONBasePaginationSerializer):
     A geoJSON implementation of a pagination serializer.
     """
     type = serializers.SerializerMethodField('get_type')
-    
-    def get_type(self,obj):
+
+    def get_type(self, obj):
         """ returns FeatureCollection type for geojson """
-        
         return "FeatureCollection"

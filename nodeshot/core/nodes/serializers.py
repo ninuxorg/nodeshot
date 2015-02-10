@@ -154,7 +154,7 @@ ExtensibleNodeSerializer.add_relationship(
     'images',
     serializer=ImageRelationSerializer,
     many=True,
-    queryset='obj.image_set.accessible_to(request.user).all()'
+    queryset=lambda obj, request: obj.image_set.accessible_to(request.user).all()
 )
 
 

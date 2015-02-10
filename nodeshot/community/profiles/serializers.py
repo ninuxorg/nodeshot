@@ -191,7 +191,7 @@ from nodeshot.core.nodes.base import ExtensibleNodeSerializer
 ExtensibleNodeSerializer.add_relationship(
     name='user',
     serializer=ProfileRelationSerializer,
-    queryset='obj.user'
+    queryset=lambda obj, request: obj.user
 )
 
 
@@ -363,13 +363,13 @@ if EMAIL_CONFIRMATION:
             fields = ('id', 'email', 'verified', 'primary', 'details', 'resend_confirmation')
             read_only_fields = ('verified', 'primary')
 
-
+    # noqa
     class EmailAddSerializer(serializers.ModelSerializer):
         class Meta:
             model = EmailAddress
             read_only_fields = ('verified', 'primary')
 
-
+    # noqa
     class EmailEditSerializer(EmailSerializer):
         def validate_primary(self, attrs, source):
             """
