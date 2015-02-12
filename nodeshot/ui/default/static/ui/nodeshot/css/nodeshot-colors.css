@@ -798,16 +798,10 @@ input[type="range"]::-webkit-slider-thumb:active {
     border-radius: 0px 3px 3px 0px;
 }
 
-/*.dropdown-toggle .caret:before{
-    font-size: 25px !important;
-    line-height: 17px;
-}
-*/
-
 .btn.dropdown-toggle .caret:before{
     content: '\25BC';
     display: block;
-    font-size: 14px !important;
+    font-size: 13px !important;
     line-height: 28px;
 }
 #body .input-sm .caret:before,
