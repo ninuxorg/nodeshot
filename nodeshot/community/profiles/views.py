@@ -10,12 +10,12 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
-from nodeshot.core.base.mixins import ListSerializerMixin, CustomDataMixin
+from nodeshot.core.base.mixins import CustomDataMixin
 from nodeshot.core.base.utils import Hider
 from nodeshot.core.nodes.views import NodeList
 
 from .models import Profile, PasswordReset, SocialLink
-from .serializers import *
+from .serializers import *  # noqa
 from .permissions import IsProfileOwner, IsNotAuthenticated
 from .settings import settings, EMAIL_CONFIRMATION, REGISTRATION_OPEN
 
@@ -113,8 +113,7 @@ profile_detail = ProfileDetail.as_view()
 
 
 if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
-
-    class UserNodes(ListSerializerMixin, NodeList):
+    class UserNodes(NodeList):
         """
         Retrieve list of nodes of the specified user
 
@@ -131,17 +130,7 @@ if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
                 raise Http404(_('User not found'))
 
             return super(UserNodes, self).get_queryset().filter(user_id=self.user.id)
-
-        def get(self, request, *args, **kwargs):
-            """ Retrieve list of nodes of the specified user """
-            # ListSerializerMixin.list returns a serializer object
-            nodes = self.list(request, *args, **kwargs)
-
-            content = ProfileSerializer(self.user, context=self.get_serializer_context()).data
-            content['nodes'] = nodes.data
-
-            return Response(content)
-
+        # remove post method
         post = Hider()
 
     user_nodes = UserNodes.as_view()
@@ -429,7 +418,7 @@ if EMAIL_CONFIRMATION:
 
     account_email_list = AccountEmailList.as_view()
 
-
+    # noqa
     class AccountEmailDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Get specified email object.
@@ -470,7 +459,7 @@ if EMAIL_CONFIRMATION:
 
     account_email_detail = AccountEmailDetail.as_view()
 
-
+    # noqa
     class ResendEmailConfirmation(APIView):
         """ Resend email confirmation """
         authentication_classes = (TokenAuthentication, SessionAuthentication)
@@ -486,10 +475,10 @@ if EMAIL_CONFIRMATION:
                 return Response({'detail': _('Not Found')}, status=404)
 
             if email_address.verified:
-                return Response({'error': _('Email address %s already verified' % email_address.email )}, status=400)
+                return Response({'error': _('Email address %s already verified' % email_address.email)}, status=400)
 
             EmailConfirmation.objects.send_confirmation(email_address)
 
-            return Response({'detail': _('Email confirmation sent to %s' % email_address.email )})
+            return Response({'detail': _('Email confirmation sent to %s' % email_address.email)})
 
     account_email_resend_confirmation = ResendEmailConfirmation.as_view()
