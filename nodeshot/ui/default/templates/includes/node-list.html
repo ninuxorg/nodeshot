@@ -6,7 +6,8 @@
     <span class="status pull-left">
         <%= total %> total
     </span>
-    <% Ns.db.legend.toJSON().forEach(function(legend){ %>
+    <% Ns.db.legend.toJSON().forEach(function(legend){
+        if (legend.count === '') { return; } %>
         <span class="status pull-left <%= legend.slug %>"
               data-slug="<%= legend.slug %>">
             <%= legend.count %>
