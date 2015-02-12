@@ -597,32 +597,20 @@ class SyncTest(TestCase):
         url = reverse('api_layer_nodes_list', args=[layer.slug])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('nodes', response.data)
-        self.assertIn('name', response.data)
-        self.assertIn('description', response.data)
-        self.assertEqual(type(response.data['nodes']), dict)
-        self.assertEqual(type(response.data['nodes']['results']), list)
-        self.assertEqual(type(response.data['nodes']['results'][0]), dict)
+        self.assertNotIn('nodes', response.data)
+        self.assertNotIn('name', response.data)
+        self.assertNotIn('description', response.data)
+        self.assertEqual(type(response.data['results']), list)
+        self.assertEqual(type(response.data['results'][0]), dict)
 
         # limit pagination to 1
         url = reverse('api_layer_nodes_list', args=[layer.slug])
         response = self.client.get('%s?limit=1&page=2' % url)
-        self.assertEqual(len(response.data['nodes']['results']), 1)
-        self.assertIn(settings.SITE_URL, response.data['nodes']['previous'])
-        self.assertIn(url, response.data['nodes']['previous'])
-        self.assertIn(settings.SITE_URL, response.data['nodes']['next'])
-        self.assertIn(url, response.data['nodes']['next'])
-
-        # layerinfo=false
-        url = reverse('api_layer_nodes_list', args=[layer.slug])
-        response = self.client.get('%s?layerinfo=false' % url)
-        self.assertEqual(response.status_code, 200)
-        self.assertNotIn('nodes', response.data)
-        self.assertNotIn('name', response.data)
-        self.assertNotIn('description', response.data)
-        self.assertEqual(type(response.data), dict)
-        self.assertEqual(type(response.data['results']), list)
-        self.assertEqual(type(response.data['results'][0]), dict)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertIn(settings.SITE_URL, response.data['previous'])
+        self.assertIn(url, response.data['previous'])
+        self.assertIn(settings.SITE_URL, response.data['next'])
+        self.assertIn(url, response.data['next'])
 
         # geojson view
         url = reverse('api_layer_nodes_geojson', args=[layer.slug])
@@ -640,14 +628,6 @@ class SyncTest(TestCase):
         self.assertIn(url, response.data['previous'])
         self.assertIn(settings.SITE_URL, response.data['next'])
         self.assertIn(url, response.data['next'])
-
-        # layerinfo=true in geojson view
-        url = reverse('api_layer_nodes_geojson', args=[layer.slug])
-        response = self.client.get('%s?layerinfo=true' % url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('nodes', response.data)
-        self.assertIn('name', response.data)
-        self.assertIn('description', response.data)
 
     def test_nodeshot_sync_exceptions(self):
         layer = Layer.objects.external()[0]
@@ -672,8 +652,8 @@ class SyncTest(TestCase):
             url = reverse('api_layer_nodes_list', args=[layer.slug])
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
-            self.assertIn('error', response.data['nodes'])
-            self.assertIn('exception', response.data['nodes'])
+            self.assertIn('error', response.data)
+            self.assertIn('exception', response.data)
             # geojson view
             url = reverse('api_layer_nodes_geojson', args=[layer.slug])
             response = self.client.get(url)

@@ -4,14 +4,13 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import generics, permissions, authentication
 from rest_framework.response import Response
 
-from nodeshot.core.base.mixins import ListSerializerMixin
 from nodeshot.core.base.utils import Hider
 from nodeshot.core.nodes.views import NodeList
 from nodeshot.core.nodes.serializers import NodeGeoSerializer
 
 from .settings import REVERSION_ENABLED
 from .models import Layer
-from .serializers import *
+from .serializers import *  # noqa
 
 
 if REVERSION_ENABLED:
@@ -66,7 +65,7 @@ class LayerDetail(LayerDetailBase):
 layer_detail = LayerDetail.as_view()
 
 
-class LayerNodesList(ListSerializerMixin, NodeList):
+class LayerNodesList(NodeList):
     """
     Retrieve list of nodes of the specified layer
 
@@ -74,10 +73,8 @@ class LayerNodesList(ListSerializerMixin, NodeList):
 
      * `search=<word>`: search <word> in name of nodes of specified layer
      * `limit=<n>`: specify number of items per page (defaults to 40)
-     * `layerinfo`: true shows layer description and other info, false doesn't (defaults to true)
     """
     layer = None
-    layer_info_default = True  # show layer info by default
 
     def get_layer(self):
         """ retrieve layer from DB """
@@ -101,23 +98,9 @@ class LayerNodesList(ListSerializerMixin, NodeList):
     def get(self, request, *args, **kwargs):
         """ Retrieve list of nodes of the specified layer """
         self.get_layer()
-
         # get nodes of layer
         nodes = self.get_nodes(request, *args, **kwargs)
-
-        # determine if layer info should be shown
-        layer_info_default = str(self.layer_info_default).lower()  # convert boolean to string ("true" or "false")
-        show_layer_info = (self.request.QUERY_PARAMS.get('layerinfo', layer_info_default) == 'true')  # is the get param true? if not is false
-
-        # if layerinfo GET param is true show info about layer
-        if show_layer_info:
-            content = LayerNodeListSerializer(self.layer, context=self.get_serializer_context()).data
-            content['nodes'] = self.get_nodes(request, *args, **kwargs)
-        # otherwise just output nodes in GeoJSON format
-        else:
-            content = nodes
-
-        return Response(content)
+        return Response(nodes)
 
     post = Hider()
 
@@ -132,11 +115,9 @@ class LayerNodesGeoJSONList(LayerNodesList):
 
      * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (defaults to 40)
-     * `layerinfo`: true shows layer description and other info, false doesn't (defaults to false)
     """
     serializer_class = NodeGeoSerializer
     paginate_by = 0
-    layer_info_default = False  # don't show layer info by default
 
     def get(self, request, *args, **kwargs):
         """ Retrieve list of nodes of the specified layer in GeoJSON format. """
