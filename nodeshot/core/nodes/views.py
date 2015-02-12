@@ -11,7 +11,7 @@ from nodeshot.core.base.utils import Hider
 
 from .settings import REVERSION_ENABLED
 from .permissions import IsOwnerOrReadOnly
-from .serializers import *
+from .serializers import *  # noqa
 from .models import Node, Status, Image
 
 
@@ -51,6 +51,7 @@ class NodeList(NodeListBase):
     Parameters:
 
      * `search=<word>`: search <word> in name, slug, description and address of nodes
+     * `layers=<layer1>,<layer2>`: retrieve nodes of specified layers (comma separated)
      * `limit=<n>`: specify number of items per page (defaults to 50)
 
     ### POST
@@ -78,10 +79,9 @@ class NodeList(NodeListBase):
         # retrieve all nodes which are published and accessible to current user
         # and use joins to retrieve related fields
         queryset = super(NodeList, self).get_queryset().select_related('layer', 'status', 'user')
-
-        # retrieve value of querystring parameter "search"
+        # query string params
         search = self.request.QUERY_PARAMS.get('search', None)
-
+        layers = self.request.QUERY_PARAMS.get('layers', None)
         if search is not None:
             search_query = (
                 Q(name__icontains=search) |
@@ -91,7 +91,9 @@ class NodeList(NodeListBase):
             )
             # add instructions for search to queryset
             queryset = queryset.filter(search_query)
-
+        if layers is not None:
+            # look for nodes that are assigned to the specified layers
+            queryset = queryset.filter(Q(layer__slug__in=layers.split(',')))
         return queryset
 
 node_list = NodeList.as_view()
@@ -125,6 +127,7 @@ class NodeGeoJSONList(NodeList):
     Parameters:
 
      * `search=<word>`: search <word> in name, slug, description and address of nodes
+     * `layers=<layer1>,<layer2>`: retrieve nodes of specified layers
      * `limit=<n>`: specify number of items per page (defaults to 50)
      * `page=<n>`: show page n
     """

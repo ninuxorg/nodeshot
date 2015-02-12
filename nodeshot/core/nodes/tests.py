@@ -259,6 +259,17 @@ class NodesApiTest(BaseTestCase):
         response = self.client.get(url, {"search": "Fusolab"})
         self.assertEqual(response.data['count'], 1)
 
+    def test_node_list_filter_layers(self):
+        url = reverse('api_node_list')
+        response = self.client.get(url, {"layers": "rome"})
+        self.assertEqual(response.data['count'], 4)
+        response = self.client.get(url, {"layers": "viterbo"})
+        self.assertEqual(response.data['count'], 2)
+        response = self.client.get(url, {"layers": "rome,viterbo"})
+        self.assertEqual(response.data['count'], 6)
+        response = self.client.get(url, {"layers": "rome,viterbo,pisa"})
+        self.assertEqual(response.data['count'], 8)
+
     def test_delete_node(self):
         node = Node.objects.first()
         node.delete()
@@ -269,6 +280,17 @@ class NodesApiTest(BaseTestCase):
         # GET: 200
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+
+    def test_node_geojson_list_filter_layers(self):
+        url = reverse('api_node_gejson_list')
+        response = self.client.get(url, {"layers": "rome"})
+        self.assertEqual(len(response.data['features']), 4)
+        response = self.client.get(url, {"layers": "viterbo"})
+        self.assertEqual(len(response.data['features']), 2)
+        response = self.client.get(url, {"layers": "rome,viterbo"})
+        self.assertEqual(len(response.data['features']), 6)
+        response = self.client.get(url, {"layers": "rome,viterbo,pisa"})
+        self.assertEqual(len(response.data['features']), 8)
 
     def test_node_details(self):
         """ test node details """
