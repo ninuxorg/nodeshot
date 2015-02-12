@@ -132,6 +132,18 @@
             new Ns.views.User({ username: username });
         },
 
+        // user nodes
+        getUserNodes: function (username) {
+            new Ns.views.node.List({
+                collection: new Ns.collections.UserNode(null, { username: username }),
+                title: 'Nodes of user: ' + username,
+                addNode: false,
+                activateMenu: false,
+                partialStats: false,
+                cache: false
+            });
+        },
+
         // reset forgotten password
         getPasswordReset: function () {
             new Ns.views.PasswordReset();
@@ -154,6 +166,7 @@
             'layers': 'getLayerList',
             'layers/:slug': 'getLayer',
             'users/:username': 'getUser',
+            'users/:username/nodes': 'getUserNodes',
             'account/password/reset': 'getPasswordReset'
         }
     });

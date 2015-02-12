@@ -43,9 +43,18 @@
             'sync': 'show cache'
         },
 
-        initialize: function () {
-            // get cached version or init new
-            this.collection = Ns.db.nodeList || new Ns.collections.Node();
+        initialize: function (options) {
+            options = $.extend({
+                // get main node list by default, but might also show subsets, like nodes of a user
+                collection: Ns.db.nodeList || new Ns.collections.Node(),  // get cached version or init new
+                addNode: true,
+                partialStats: true,
+                title: 'Node list',  // TODO: i18n
+                activateMenu: true,
+                cache: true
+            }, options);
+            this.collection = options.collection;
+            this.options = options;
             // if not cached
             if (this.collection.isEmpty()) {
                 // fetch from server
@@ -66,7 +75,11 @@
         },
 
         show: function () { Ns.body.show(this) },
-        cache: function() { Ns.db.nodeList = this.collection },
+        cache: function() {
+            if (this.options.cache) {
+                Ns.db.nodeList = this.collection;
+            }
+        },
 
         onShow: function(){
             // bind custom resize event
@@ -74,9 +87,14 @@
             // tell to NodeDetailView to come back here when closing
             Ns.state.onNodeClose = 'nodes';
             // title tag
-            Ns.changeTitle('Node list');  // TODO: i18n
-            // mark nodes menu link as active
-            Ns.menu.currentView.activate('nodes');
+            Ns.changeTitle(this.options.title);
+            if (this.options.activateMenu) {
+                // mark nodes menu link as active
+                Ns.menu.currentView.activate('nodes');
+            }
+            else {
+                Ns.menu.currentView.deactivate();
+            }
             // init UI elements
             this.ui.hastip.tooltip();
             this.ui.selects.selectpicker({ style: 'btn-special' });
@@ -85,10 +103,11 @@
             Ns.track();
         },
 
-        serializeData: function(){
+        serializeData: function () {
             return {
-                'total': this.collection.count,
-                'collection': this.collection
+                total: this.collection.count,
+                collection: this.collection,
+                options: this.options
             };
         },
 

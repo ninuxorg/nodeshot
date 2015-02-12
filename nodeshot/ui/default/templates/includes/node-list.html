@@ -6,14 +6,19 @@
     <span class="status pull-left">
         <%= total %> total
     </span>
-    <% Ns.db.legend.toJSON().forEach(function(legend){
-        if (legend.count === '') { return; } %>
-        <span class="status pull-left <%= legend.slug %>"
-              data-slug="<%= legend.slug %>">
-            <%= legend.count %>
-            <%= legend.name.toLowerCase() %>
-        </span>
-    <% }) %>
+    <%
+    if (options.partialStats) {
+        Ns.db.legend.toJSON().forEach(function(legend){
+            if (legend.count === '') { return; } %>
+            <span class="status pull-left <%= legend.slug %>"
+                  data-slug="<%= legend.slug %>">
+                <%= legend.count %>
+                <%= legend.name.toLowerCase() %>
+            </span>
+            <%
+        });
+    }
+    %>
     <div class="clearfix"></div>
 </div>
 
@@ -79,9 +84,10 @@
         </span>
     </div>
     <% } %>
-
+    
+    <% if (options.addNode) { %>
     <button class="btn btn-light icon-plus pull-right" id="js-add-node">{% trans 'Add node' %}</button>
-
+    <% } %>
     <div class="clearfix"></div>
 </div>
 

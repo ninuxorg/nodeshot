@@ -380,6 +380,19 @@
         }
     });
 
+    /**
+     * Extends Ns.collections.Node to fetch nodes of an user
+     */
+    Ns.collections.UserNode = Ns.collections.Node.extend({
+        initialize: function (models, options) {
+            this.username = options.username;
+        },
+
+        url: function () {
+            return Ns.url('profiles/' + this.username + '/nodes/')
+        }
+    });
+
     Ns.models.SearchResult = Backbone.Model.extend({
         icons: {
             'node': 'pin',

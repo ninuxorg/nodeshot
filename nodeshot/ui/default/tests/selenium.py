@@ -748,3 +748,9 @@ class DefaultUiSeleniumTest(TestCase):
         self._wait_until_element_visible('#layer-details table', 1, 'layers details not visible')
         self.assertEqual(self.browser.title, 'Rome - Nodeshot')
         self.assertTrue(self.browser.execute_script('return Ns.body.currentView.map !== undefined'))
+
+    def test_user_nodes(self):
+        self._hashchange('#users/romano/nodes')
+        self._wait_until_element_visible('#node-list table', 1, 'node list not visible')
+        self.assertEqual(self.browser.title, 'Nodes of user: romano - Nodeshot')
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#js-add-node')), 0)
