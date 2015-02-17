@@ -424,7 +424,9 @@
                 },
                 // when popup opens, change the URL fragment
                 popupopen: function (e) {
-                    if (Backbone.history.fragment.substr(0, 4) == 'map/') {
+                    var fragment = Backbone.history.fragment;
+                    // do this only if in general map view
+                    if (fragment.indexOf('map') >= 0 && fragment.indexOf('nodes') < 0) {
                         Ns.router.navigate('map/' + data.slug);
                     }
                     // destroy container to avoid the chance that the tooltip
@@ -435,8 +437,10 @@
                 popupclose: function (e) {
                     // (and no new popup opens)
                     // URL fragment goes back to initial state
+                    var fragment = Backbone.history.fragment;
                     setTimeout(function () {
-                        if (self.map._popup === null && Backbone.history.fragment.substr(0, 4) == 'map/') {
+                        // do this only if in general map view
+                        if (self.map._popup === null && fragment.indexOf('map') >= 0 && fragment.indexOf('nodes') < 0) {
                             Ns.router.navigate('map');
                         }
                     }, 100);

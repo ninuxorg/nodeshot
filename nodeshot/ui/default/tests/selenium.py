@@ -254,6 +254,19 @@ class DefaultUiSeleniumTest(TestCase):
         self.assertEqual(browser.current_url.split('#')[1], 'map')
         self.assertEqual(len(browser.find_elements_by_css_selector('#map-js .leaflet-popup-content-wrapper')), 0)
 
+        # got to map url, no popups open
+        self._hashchange('#map')
+        self.assertEqual(browser.current_url.split('#')[1], 'map')
+        self.assertEqual(len(browser.find_elements_by_css_selector('#map-js .leaflet-popup-content-wrapper')), 0)
+        # simulate clicking on a popup
+        browser.find_elements_by_css_selector('#map-js g')[0].click()
+        # ensure popup is open
+        self._wait_until_element_visible('#map-js .leaflet-popup-content-wrapper', 1, 'popup not visible')
+        # url must be longer than 4 chars, eg: "map/something"
+        self.assertTrue(len(browser.current_url.split('#')[1]) > 4)
+        # go back
+        self._hashchange('#map')
+
         # does not exist case
         self._hashchange('#/map/wrong')
         sleep(0.25)
