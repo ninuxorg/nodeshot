@@ -80,29 +80,29 @@
 
         // node details
         getNode: function (slug) {
-            this.getMap();
-            Ns.body.currentView.getNode(slug);
+            // load node from API
+            Ns.views.node.Detail.loadNode(slug, function (node) {
+                // show it on map
+                Ns.views.map.Layout.show('showNode', [node]);
+            });
         },
 
         // edit node
         editNode: function (slug) {
-            this.getMap();
-            Ns.body.currentView.editNode(slug);
+            // load node from API
+            Ns.views.node.Detail.loadNode(slug, function (node) {
+                // show it on map
+                Ns.views.map.Layout.show('showEditNode', [node]);
+            });
         },
 
         // map view
         getMap: function () {
-            if (typeof Ns.body.currentView === 'undefined' || !(Ns.body.currentView instanceof Ns.views.map.Layout)) {
-                Ns.body.show(new Ns.views.map.Layout());
-            }
-            else {
-                Ns.body.currentView.reset();
-            }
+            Ns.views.map.Layout.show('loadMap');
         },
 
         addNode: function () {
-            this.getMap();
-            Ns.body.currentView.addNode();
+            Ns.views.map.Layout.show('addNode');
         },
 
         // map node popup

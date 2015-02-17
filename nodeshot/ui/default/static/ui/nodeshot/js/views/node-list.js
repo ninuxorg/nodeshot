@@ -85,7 +85,7 @@
             // bind custom resize event
             $(window).on("resize.nodelist", _.bind(this.adjustFooter, this));
             // tell to NodeDetailView to come back here when closing
-            Ns.state.onNodeClose = 'nodes';
+            Ns.state.onNodeClose = this.collection.username === undefined ? 'nodes' : 'users/' + this.collection.username + '/nodes';
             // title tag
             Ns.changeTitle(this.options.title);
             if (this.options.activateMenu) {

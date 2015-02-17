@@ -298,6 +298,9 @@ article.center-stage .row > div { padding-left: 0; padding-right: 0 }
     padding: 25px 35px;
 }
 
+#map-toolbar{ display: none }
+#map-toolbar.enabled{ display: block }
+
 /* --- TABLETS AND DESKTOPS --- */
 
 @media screen and (min-width: 767px){
@@ -493,7 +496,7 @@ article.center-stage .row > div { padding-left: 0; padding-right: 0 }
 
     #nav-bar .dropdown.open{ z-index: 1 }
 
-    #map-toolbar{ display: none }
+    #map-toolbar.enabled{ display: none }
     #toggle-toolbar{ display: block !important }
     .user-dialog .icon-close{ font-size: 18px }
 

@@ -18,14 +18,18 @@
          * show regions
          */
         onShow: function () {
+            this.content.show(new Ns.views.map.Content({ parent: this }));
+        },
+
+        /**
+         * loads map data
+         */
+        loadMap: function () {
             var options = { parent: this };
-            this.content.show(new Ns.views.map.Content(options));
             this.toolbar.show(new Ns.views.map.Toolbar(options));
             this.panels.show(new Ns.views.map.Panels(options));
             this.legend.show(new Ns.views.map.Legend(options));
-            Ns.changeTitle('Map');  // TODO: i18n
-            Ns.menu.currentView.activate('map');
-            Ns.track();
+            this.content.currentView.initMapData();
         },
 
         /*
@@ -44,33 +48,6 @@
             this.add.show(new Ns.views.map.Add({ parent: this }));
         },
 
-        /**
-         * get node details
-         */
-        getNode: function(slug, edit) {
-            // get from cache or instantiate new model
-            var node = Ns.db.nodes.get(slug) || new Ns.models.Node(),
-                method = edit ? 'showEditNode' : 'showNode',
-                self = this,
-                geomodel;
-            // if new model fetch from server
-            if (node.isNew()) {
-                node.set('slug', slug).fetch().then(function () {
-                    self[method](node);
-                }).fail(function () {
-                    $.createModal({ message: 'not found' });  // TODO: i18n
-                });
-            }
-            // otherwise we got it from cache, so we load it straight away
-            else {
-                this[method](node);
-            }
-        },
-
-        editNode: function(slug) {
-            this.getNode(slug, true);
-        },
-
         showNode: function(node) {
             this.details.show(new Ns.views.node.Detail({ model: node, parent: this }));
         },
@@ -78,7 +55,7 @@
         showEditNode: function(node) {
             // ensure is allowed to edit
             if (node.get('can_edit')) {
-                this.details.show(new Ns.views.node.Detail({ model: node, parent: this }));
+                this.showNode(node);
                 this.details.currentView.edit();
             }
             // otherwise go back to details
@@ -94,12 +71,23 @@
             this.content.currentView.closeLeafletPopup();
             this.add.empty();
             this.details.empty();
-            Ns.changeTitle('Map');  // TODO: i18n
-            Ns.menu.currentView.activate('map');
-            Ns.views.map.Layout.resizeMap();
         }
 
     }, {  // static methods
+
+        show: function (method, args) {
+            var view;
+            if (typeof Ns.body.currentView === 'undefined' || !(Ns.body.currentView instanceof Ns.views.map.Layout)) {
+                view = new Ns.views.map.Layout();
+                Ns.body.show(view);
+            }
+            else {
+                view = Ns.body.currentView;
+                view.reset();
+            }
+            // call method on Layout view is specified
+            if (method) { view[method].apply(view, args); }
+        },
 
         /*
          * Resize page elements so that the leaflet map
@@ -173,13 +161,10 @@
             // bind to namespaced events
             $(window).on('resize.map', _.bind(this.resize, this));
             $(window).on('beforeunload.map', _.bind(this.storeMapProperties, this));
-            Ns.state.onNodeClose = 'map';  // when a node-details is closed go back on map
         },
 
         onShow: function () {
             this.initMap();
-            // load data
-            this.initMapData();
         },
 
         onDestroy: function (e) {
@@ -250,6 +235,8 @@
                 self.baseLayers[baseLayer.name].name = baseLayer.name;
             });
             this.switchBaseLayer(coords.baseLayer);
+            // create (empty) clusters on map (will be filled by addGeoModelToMap)
+            this.createClusters();
         },
 
         /**
@@ -287,8 +274,12 @@
          * loads data from API
          */
         initMapData: function () {
-            // create (empty) clusters on map (will be filled by addGeoModelToMap)
-            this.createClusters();
+            Ns.changeTitle('Map');  // TODO: i18n
+            Ns.menu.currentView.activate('map');
+            Ns.track();
+            Ns.state.onNodeClose = 'map';  // when a node-details is closed go back on map
+            this.parent.toolbar.$el.addClass('enabled');
+            this.resize();
             // load cached data if present
             if (Ns.db.geo.isEmpty() === false) {
                 this.collection.add(Ns.db.geo.models);
@@ -491,6 +482,8 @@
                 l = geo.whereCollection({ legend: legend, layer: layer.id }).pluck('leaflet');
                 legend.cluster[method](l);
             });
+            // needed to recalculate stats on legend
+            this.trigger('layer-toggled');
         },
 
         /*
@@ -587,7 +580,7 @@
             this.legendButton = this.parent.toolbar.currentView.ui.legendButton;
             // display count in legend
             this.listenTo(this.parent.content.currentView.collection, 'ready', this.count);
-            this.listenTo(Ns.db.layers, 'change:visible', this.count);
+            this.listenTo(this.parent.content.currentView, 'layer-toggled', this.count);
         },
 
         onRender: function () {

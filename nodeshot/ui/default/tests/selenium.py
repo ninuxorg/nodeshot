@@ -153,13 +153,13 @@ class DefaultUiSeleniumTest(TestCase):
         browser.execute_script("%s.setView([42.111111, 12.111111], 17)" % LEAFLET_MAP)
         sleep(0.5)
         self._hashchange('#')
-        self.assertEqual(browser.execute_script("return localStorage.getObject('map').lat.toString().substr(0, 8)"), "42.11111")
-        self.assertEqual(browser.execute_script("return localStorage.getObject('map').lng.toString().substr(0, 8)"), "12.11111")
+        self.assertEqual(browser.execute_script("return localStorage.getObject('map').lat.toString().substr(0, 7)"), "42.1111")
+        self.assertEqual(browser.execute_script("return localStorage.getObject('map').lng.toString().substr(0, 7)"), "12.1111")
         self.assertEqual(browser.execute_script("return localStorage.getObject('map').zoom"), 17)
         self._hashchange('#/map')
         self.assertEqual(browser.execute_script("return %s.getZoom()" % LEAFLET_MAP), 17)
-        self.assertEqual(browser.execute_script("return %s.getCenter().lat.toString().substr(0, 8)" % LEAFLET_MAP), "42.11111")
-        self.assertEqual(browser.execute_script("return %s.getCenter().lng.toString().substr(0, 8)" % LEAFLET_MAP), "12.11111")
+        self.assertEqual(browser.execute_script("return %s.getCenter().lat.toString().substr(0, 7)" % LEAFLET_MAP), "42.1111")
+        self.assertEqual(browser.execute_script("return %s.getCenter().lng.toString().substr(0, 7)" % LEAFLET_MAP), "12.1111")
 
         # map is resized when window is resized
         window_size = browser.get_window_size()

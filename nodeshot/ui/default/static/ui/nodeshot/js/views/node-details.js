@@ -53,6 +53,7 @@
                 map: this.parent.content.$el,
                 leafletMap: this.parent.content.currentView.map,
                 mapContainer: this.parent.$el,
+                geoCollection: this.parent.content.currentView.collection,
                 html: $('html'),
                 body: $('body'),
                 signin: $('#signin-modal')
@@ -77,11 +78,19 @@
 
         onShow: function () {
             var map = this.ext.leafletMap,
-                geomodel = Ns.db.geo.get(this.model.id),
-                leaflet = geomodel.get('leaflet'),
-                mapPreferences = localStorage.getObject('map') || Ns.settings.map;
+                mapPreferences = localStorage.getObject('map') || Ns.settings.map,
+                geomodel = this.ext.geoCollection.get(this.model.id),
+                existingGeomodel = Boolean(geomodel),
+                leaflet;
             // hide elements that are not needed
             this.toggleElements(false);
+            // if geomodel not available create a new one on the fly
+            if (!existingGeomodel) {
+                geomodel = new Ns.models.Geo(this.model.toJSON());
+                // adding it to the collection automatically shows it on the map
+                this.ext.geoCollection.add(geomodel);
+            }
+            leaflet = geomodel.get('leaflet');
             // fit map view to geographic object
             map.fitBounds(leaflet, { animate: false });
             // move map up slightly to conpensate the layout
@@ -417,13 +426,14 @@
             this.ui.nodeData.find('form').submit(function(e) {
                 e.preventDefault();
                 var backup = self.model.toJSON(),
-                    errors = self.form.commit();
+                    errors = self.form.commit(),
+                    collection = this.ext.geoCollection;
                 if(!errors){
                     // update geomodel
                     self.geomodel.set(self.model.toJSON());
                     // reset geomodel on map
-                    Ns.db.geo.remove(self.geomodel);
-                    Ns.db.geo.add(self.geomodel);
+                    collection.remove(self.geomodel);
+                    collection.add(self.geomodel);
                     // show different URL
                     Ns.router.navigate('nodes/' + self.model.id, { trigger: true });
                     // save
@@ -444,6 +454,28 @@
             this.ui.nodeData.find('form button.btn-default').click(function(){
                 Ns.router.navigate('nodes/' + self.model.id, { trigger: true });
             });
+        }
+    },
+    // static methods
+    {
+        /**
+         * get node
+         */
+        loadNode: function(slug, callback) {
+            // get from cache or instantiate new model
+            var node = Ns.db.nodes.get(slug) || new Ns.models.Node();
+            // if new model fetch from server
+            if (node.isNew()) {
+                node.set('slug', slug).fetch().then(function () {
+                    callback(node);
+                }).fail(function () {
+                    $.createModal({ message: 'not found' });  // TODO: i18n
+                });
+            }
+            // otherwise we got it from cache, so we load it straight away
+            else {
+                callback(node);
+            }
         }
     });
 })();
