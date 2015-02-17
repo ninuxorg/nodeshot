@@ -657,12 +657,40 @@ class DefaultUiSeleniumTest(TestCase):
         # go to edit
         self._hashchange('#nodes/pomezia/edit')
         self._wait_until_element_visible('#node-data-js form', 0.5, 'edit node form not shown in time')
-        self.assertEqual(len(self.browser.find_elements_by_css_selector('#node-data-js form')), 1)
         self.assertNotIn('vienna', self.browser.execute_script('return $("#node-data-js form select[name=layer]").html()'))
+        # ensure leaflet popup is open
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-popup')), 1)
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-marker-icon')), 1)
+
         # go back to node details
         self.browser.find_element_by_css_selector('#node-data-js form .btn-default').click()
         self.assertEqual(len(self.browser.find_elements_by_css_selector('#node-data-js form')), 0)
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-popup')), 0)
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-marker-icon')), 0)
         self.assertIn('nodes/pomezia', self.browser.current_url)
+
+        # go back to edit mode
+        self.browser.back()
+        self._wait_until_element_visible('#node-data-js form', 0.5, 'edit node form not shown in time')
+        # ensure leaflet popup is open
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-popup')), 1)
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-marker-icon')), 1)
+
+        # forward to node details, temporary marker must disappear
+        self.browser.forward()
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-popup')), 0)
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-marker-icon')), 0)
+
+        # go back to edit mode and click on save
+        self.browser.back()
+        self._wait_until_element_visible('#node-data-js form', 0.5, 'edit node form not shown in time')
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-popup')), 1)
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-marker-icon')), 1)
+        self.browser.find_element_by_css_selector('#node-data-js .btn-success').click()
+        self._wait_until_element_visible('#node-data-js table', 0.5, 'edit node form not shown in time')
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-popup')), 0)
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#map-js .leaflet-marker-icon')), 0)
+
         # log out
         self._logout()
 

@@ -105,18 +105,32 @@
             localStorage.setObject('map', mapPreferences);
             // store geomodel
             this.geomodel = geomodel;
+            this.reset();
         },
 
-        /*
-         * unbind resize event when view is closed
-         */
         onDestroy: function () {
-            // unbind the namespaced events
+            // unbind namespaced events
             $(window).off("resize.node-details");
             // reset scrollbar styles
             this.ext.body.attr('style', '').scrollTop(0);
             // restore initial state
             this.toggleElements(true);
+            // reset markers
+            this.reset();
+        },
+
+        onRender: function () {
+            this.reset();
+        },
+
+        reset: function () {
+            if (!this.geomodel) { return; }
+            var map = this.ext.leafletMap,
+                leaflet = this.geomodel.get('leaflet'),
+                marker = this.editMarker;
+            // reset leaflet layer that might have been hidden while editing
+            if (leaflet && !map.hasLayer(leaflet)) { map.addLayer(leaflet); }
+            if (map.hasLayer(marker)) { map.removeLayer(marker); }
         },
 
         /**
@@ -415,19 +429,15 @@
                 self.form.setValue('geometry', JSON.stringify(e.target.toGeoJSON().geometry));
             });
 
-            // reset leaflet layer when changing URl
-            Ns.router.once('route', function(){
-                // reset leaflet layer that might have been hidden while editing
-                if (!map.hasLayer(self.geomodel.get('leaflet'))) { map.addLayer(self.geomodel.get('leaflet')); }
-                if (map.hasLayer(marker)) { map.removeLayer(marker); }
-            });
+            // store marker for later retrieval
+            this.editMarker = marker;
 
             // on submit
             this.ui.nodeData.find('form').submit(function(e) {
                 e.preventDefault();
                 var backup = self.model.toJSON(),
                     errors = self.form.commit(),
-                    collection = this.ext.geoCollection;
+                    collection = self.ext.geoCollection;
                 if(!errors){
                     // update geomodel
                     self.geomodel.set(self.model.toJSON());
@@ -456,6 +466,7 @@
             });
         }
     },
+
     // static methods
     {
         /**
