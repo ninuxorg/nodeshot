@@ -304,9 +304,11 @@
                 geo = new Ns.collections.Geo(),
                 // will be used to fetch data to merge in geo
                 tmp = geo.clone(),
-                ready;
+                additionalGeoJson = Ns.settings.additionalGeoJsonUrls,
+                ready, fetch;
             // will be called when all sources have been fetched
-            ready = _.after(Ns.db.layers.length, function () {
+            // we need to add 1 to account for the main geojson
+            ready = _.after(additionalGeoJson.length + 1, function () {
                 // reload models
                 self.collection.remove(self.collection.models);
                 self.collection.add(geo.models);
@@ -317,13 +319,19 @@
                 // unbind event
                 self.collection.off('sync', ready);
             });
-            geo.on('sync', ready);
-            // fetch data from API
-            Ns.db.layers.forEach(function (layer) {
-                tmp.fetch({ slug: layer.id }).done(function () {
+            // fetch data and add it to collection
+            fetch = function () {
+                tmp.fetch().done(function () {
                     geo.add(tmp.models);
                     geo.trigger('sync');
                 });
+            };
+            geo.on('sync', ready);
+            // fetch data from API
+            fetch();
+            additionalGeoJson.forEach(function (url) {
+                tmp._url = url;
+                fetch();
             });
         },
 

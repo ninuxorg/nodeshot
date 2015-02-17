@@ -90,3 +90,6 @@ GOOGLE_ANALYTICS_OPTIONS = getattr(settings, 'NODESHOT_UI_GOOGLE_ANALYTICS_OPTIO
 
 PIWIK_ANALYTICS_DOMAIN = getattr(settings, 'NODESHOT_UI_PIWIK_ANALYTICS_DOMAIN', None)
 PIWIK_ANALYTICS_SITE_ID = getattr(settings, 'NODESHOT_UI_PIWIK_ANALYTICS_SITE_ID', None)
+
+# additional geojson sources that are not contained in the main /api/v1/nodes.geojson response
+ADDITIONAL_GEOJSON_URLS = getattr(settings, 'NODESHOT_UI_ADDITIONAL_GEOJSON_URLS', [])

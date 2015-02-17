@@ -290,6 +290,7 @@
         Ns.settings.nodesHstoreSchema = {{ NODES_HSTORE_SCHEMA|safe }};
         Ns.settings.googleAnalytics = {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %};
         Ns.settings.piwikAnalytics = {% if PIWIK_ANALYTICS_DOMAIN and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %};
+        Ns.settings.additionalGeoJsonUrls = {{ ADDITIONAL_GEOJSON_URLS|safe }};
     </script>
 {% endblock %}
 {% block jsnodeshot %}

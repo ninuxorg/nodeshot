@@ -85,20 +85,8 @@
     });
 
     Ns.collections.Geo = Backbone.Collection.extend({
-        _url: Ns.url('layers/:slug/nodes.geojson'),
+        _url: null,
         model: Ns.models.Geo,
-
-        /*
-        * adds slug to object attributes
-        */
-        fetch: function (options) {
-            options = $.extend({
-                slug: this.slug
-            }, options);
-            this.slug = options.slug;
-            // Call Backbone's fetch
-            return Backbone.Collection.prototype.fetch.call(this, options);
-        },
 
         /*
         * like Backbone.Collection.prototype.where but returns collection
@@ -108,10 +96,15 @@
         },
 
         /*
-        * determine url depending on slug attribute
+        * load main geojson by default, but URL might be overridden
         */
         url: function () {
-            return this._url.replace(':slug', this.slug);
+            if (!this._url) {
+                return Ns.url('nodes.geojson');
+            }
+            else {
+                return this._url;
+            }
         },
 
         /*

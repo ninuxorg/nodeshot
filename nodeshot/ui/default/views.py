@@ -78,6 +78,7 @@ def index(request):
         'GOOGLE_ANALYTICS_UA': ui_settings.GOOGLE_ANALYTICS_UA,
         'GOOGLE_ANALYTICS_OPTIONS': json.dumps(ui_settings.GOOGLE_ANALYTICS_OPTIONS),
         'PIWIK_ANALYTICS_DOMAIN': ui_settings.PIWIK_ANALYTICS_DOMAIN,
-        'PIWIK_ANALYTICS_SITE_ID': ui_settings.PIWIK_ANALYTICS_SITE_ID
+        'PIWIK_ANALYTICS_SITE_ID': ui_settings.PIWIK_ANALYTICS_SITE_ID,
+        'ADDITIONAL_GEOJSON_URLS': json.dumps(ui_settings.ADDITIONAL_GEOJSON_URLS)
     }
     return render(request, 'index.html', context)
