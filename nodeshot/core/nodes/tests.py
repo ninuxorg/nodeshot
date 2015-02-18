@@ -492,3 +492,23 @@ class NodesApiTest(BaseTestCase):
         response = self.client.patch(url, {'name': 'external 2'})
         self.assertEqual(response.status_code, 403)
         self.client.logout()
+
+    def test_node_geojson_list_pagination(self):
+        # create more than 50 nodes
+        for n in range(0, 60):
+            Node.objects.create(
+                name='node-%d' % n,
+                slug='node-%d' % n,
+                layer_id=1,
+                geometry='POINT (42.0454 12.%d45342)' % n
+            )
+        url = reverse('api_node_gejson_list')
+        response = self.client.get(url)
+        # ensure all results are returned by default
+        count = Node.objects.published().access_level_up_to('public').count()
+        self.assertEqual(len(response.data['features']), count)
+        # ensure pagination doesn't break geojson format
+        response = self.client.get(url, {'limit': '1'})
+        self.assertIn('type', response.data)
+        self.assertIn('features', response.data)
+        self.assertEqual(len(response.data['features']), 1)
