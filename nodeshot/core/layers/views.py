@@ -114,7 +114,7 @@ class LayerNodesGeoJSONList(LayerNodesList):
     Parameters:
 
      * `search=<word>`: search <word> in name, slug, description and address of nodes
-     * `limit=<n>`: specify number of items per page (defaults to 40)
+     * `limit=<n>`: specify number of items per page (show all by default)
     """
     serializer_class = NodeGeoSerializer
     paginate_by = 0
