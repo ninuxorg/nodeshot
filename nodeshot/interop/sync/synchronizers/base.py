@@ -550,10 +550,10 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         for local_node in layer_nodes_slug_list:
             # if local node not found in external nodes
             if local_node not in processed_slug_list:
-                # store node name to print it later
-                node_name = node.name
                 # retrieve from DB and delete
                 node = Node.objects.get(slug=local_node)
+                # store node name to print it later
+                node_name = node.name
                 node.delete()
                 # then increment count that will be included in message
                 deleted_nodes_count = deleted_nodes_count + 1
