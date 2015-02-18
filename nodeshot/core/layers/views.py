@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from nodeshot.core.base.utils import Hider
 from nodeshot.core.nodes.views import NodeList
-from nodeshot.core.nodes.serializers import NodeGeoSerializer
+from nodeshot.core.nodes.serializers import NodeGeoSerializer, PaginatedGeojsonNodeListSerializer
 
 from .settings import REVERSION_ENABLED
 from .models import Layer
@@ -116,8 +116,10 @@ class LayerNodesGeoJSONList(LayerNodesList):
      * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (show all by default)
     """
-    serializer_class = NodeGeoSerializer
+    pagination_serializer_class = PaginatedGeojsonNodeListSerializer
+    paginate_by_param = 'limit'
     paginate_by = 0
+    serializer_class = NodeGeoSerializer
 
     def get(self, request, *args, **kwargs):
         """ Retrieve list of nodes of the specified layer in GeoJSON format. """

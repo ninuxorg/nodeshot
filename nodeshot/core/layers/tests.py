@@ -337,3 +337,15 @@ class LayerTest(TestCase):
         # GET: 200
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+
+    def test_layer_nodes_geojson_pagination(self):
+        url = reverse('api_layer_nodes_geojson', args=['rome'])
+        # ensure all results returned by default
+        response = self.client.get(url)
+        count = Node.objects.filter(layer__slug='rome').published().access_level_up_to('public').count()
+        self.assertEqual(len(response.data['features']), count)
+        # ensure pagination doesn't break geojson format
+        response = self.client.get(url, {'limit': '1'})
+        self.assertIn('type', response.data)
+        self.assertIn('features', response.data)
+        self.assertEqual(len(response.data['features']), 1)
