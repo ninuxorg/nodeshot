@@ -623,11 +623,7 @@ class SyncTest(TestCase):
         # limit pagination to 1 in geojson view
         url = reverse('api_layer_nodes_geojson', args=[layer.slug])
         response = self.client.get('%s?limit=1&page=2' % url)
-        self.assertEqual(len(response.data['results']), 1)
-        self.assertIn(settings.SITE_URL, response.data['previous'])
-        self.assertIn(url, response.data['previous'])
-        self.assertIn(settings.SITE_URL, response.data['next'])
-        self.assertIn(url, response.data['next'])
+        self.assertEqual(len(response.data['features']), 1)
 
     def test_nodeshot_sync_exceptions(self):
         layer = Layer.objects.external()[0]
