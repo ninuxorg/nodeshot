@@ -49,6 +49,8 @@ class BaseSynchronizer(object):
     def load_config(self, config=None):
         self.config = config or self.layer.external.config
         self.verify_ssl = self.config.get('verify_ssl', True)
+        # ensure correct boolean
+        self.verify_ssl = self.verify_ssl is True or self.verify_ssl == 'True'
 
     def clean(self):
         """ complex ad hoc validation here, will be executed before the external layer is saved """
