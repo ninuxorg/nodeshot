@@ -445,7 +445,7 @@ article .icon-close:focus{ color: #000 }
 
 #map-legend .stats{ color: #7f7f7f !important; cursor: default }
 
-.disabled{ opacity: 0.4 }
+#map-container .disabled{ opacity: 0.4 }
 #map-legend .disabled .text{ text-decoration: none !important }
 
 #map-toolbar a,
@@ -904,6 +904,7 @@ label.inline{ margin: 0 }
 .icon-cancel,
 .icon-thumbs-down{ color: #c72c25 !important }
 .vote .fade{ opacity: 0.2 }
+.vote .disabled{ opacity: 1 !important; cursor: default }
 
 a.icon-thumbs-up:hover{ color: #139502 }
 a.icon-thumbs-down:hover{ color: #e20a00 }

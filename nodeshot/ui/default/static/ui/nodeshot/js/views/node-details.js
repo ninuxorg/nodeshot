@@ -207,22 +207,37 @@
             }
             var relationships = this.model.get('relationships'),
                 type = value > 0 ? 'likes' : 'dislikes',
+                oppositeType = value > 0 ? 'dislikes' : 'likes',
                 otherIcon = this.ui['iconThumbs' + (value > 0 ? 'Down' : 'Up')],
-                backup = _.clone(relationships.counts[type]);
-                self = this;
-            // increment
+                backup = _.clone(relationships),
+                self = this,
+                method = 'post';
+            // increment votes
             relationships.counts[type]++;
+            // voting again with the same value deletes vote
+            if (relationships.voted !== false && relationships.voted === value) {
+                method = 'delete';
+                // subtract 2 because we just added 1 before
+                relationships.counts[type] = relationships.counts[type]-2;
+            }
+            // voting again with a different value must decrease the opposite type of vote
+            else if (relationships.voted !== false && relationships.voted !== value) {
+                relationships.counts[oppositeType]--;
+            }
+            // remember user has voted
+            relationships.voted = value;
+            // set model value
             this.model.set('relationships', relationships);
-            $(e.target).text(relationships.counts[type]);
-            otherIcon.addClass('fade');
-            // post vote
-            $.post(relationships.votes_url, { vote: value })
+            this.render();
+            // send vote
+            $.ajax({
+                url: relationships.votes_url,
+                data: { vote: value },
+                type: method
+            })
             // rollback in case of error
             .error(function(http){
-                $(e.target).text(backup);
-                otherIcon.removeClass('fade');
-                relationships.counts[type] = backup;
-                self.model.set('relationships', relationships);
+                self.model.set('relationships', backup);
                 $.createModal({ message: 'error' });
             });
         },
