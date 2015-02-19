@@ -288,82 +288,104 @@ class ParticipationTests(TestCase):
         node = Node.objects.get(pk=1)
         node_slug = node.slug
         fake_node_slug = "idontexist"
-
         url = reverse('api_node_votes', args=[node_slug])
         wrong_url = reverse('api_node_votes', args=[fake_node_slug])
-
-        # api_node_votes
-
         # GET not allowed -- 405
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
-
-        # POST
         self.client.login(username='admin', password='tester')
         good_post_data = {"vote": "1"}
-
         # wrong slug -- 404
         response = self.client.post(wrong_url, good_post_data)
         self.assertEqual(response.status_code, 404)
-
         # wrong POST data (wrong vote) -- 400
         bad_post_data = {"vote": "3"}
         response = self.client.post(url, bad_post_data)
         self.assertEqual(response.status_code, 400)
-
         # Correct  POST data and correct slug -- 201
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
+        # same result as before even if trying to change node and user
+        response = self.client.post(reverse('api_node_votes', args=['pomezia']), {"node": 100, "vote": "1", "user": 3})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').count(), 1)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').first().vote, 1)
 
-        # POST 400 - repeating the same vote fails because unique_together
-        response = self.client.post(url, good_post_data)
+    def test_votes_api_delete_ok(self):
+        self.client.login(username='admin', password='tester')
+        url = reverse('api_node_votes', args=['pomezia'])
+        # CREATE
+        response = self.client.post(url, {"vote": "1"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').count(), 1)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').first().vote, 1)
+        # DELETE
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').count(), 0)
+
+    def test_votes_api_delete_fail(self):
+        self.client.login(username='admin', password='tester')
+        url = reverse('api_node_votes', args=['pomezia'])
+        # DELETE FAILS
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, 400)
 
-        # POST 400 - repeating the same vote trying to change user and node fails
-        # cos node and user params are ignored, so the system returns 400 because
-        # this user has already voted that node
-        bad_post_data = {"node": 100, "vote": "1", "user": 3}
-        response = self.client.post(url, bad_post_data)
-        self.assertEqual(response.status_code, 400)
+    def test_votes_api_new_vote_changes_old_one(self):
+        self.client.login(username='admin', password='tester')
+        url = reverse('api_node_votes', args=['pomezia'])
+        # 201
+        response = self.client.post(url, {"vote": "1"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').count(), 1)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').first().vote, 1)
+        # POST 201 - repeating the same vote deletes old vote
+        response = self.client.post(url, {"vote": "-1"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').count(), 1)
+        self.assertEqual(Vote.objects.filter(node__slug='pomezia', user__username='admin').first().vote, -1)
 
+    def test_votes_api_post(self):
         # POST 201 - ensure additional post data "user" and "node" are ignored
-        response = self.client.post(reverse('api_node_votes', args=['eigenlab']), bad_post_data)
+        self.client.login(username='admin', password='tester')
+        response = self.client.post(reverse('api_node_votes', args=['eigenlab']), {"vote": "1"})
         self.assertEqual(response.status_code, 201)
         votes_dict = json.loads(response.content)
         self.assertEqual(votes_dict['user'], 1)
         self.assertEqual(votes_dict['node'], 2)
         self.assertEqual(votes_dict['vote'], 1)
 
+    def test_votes_api_not_allowed_on_layer(self):
+        self.client.login(username='admin', password='tester')
         url = reverse('api_node_votes', args=['tulug'])
         node = Node.objects.get(slug='tulug')
-
         # Voting not allowed on layer
         node.layer.participation_settings.voting_allowed = False
         node.layer.participation_settings.save()
-        response = self.client.post(url, good_post_data)
+        response = self.client.post(url, {"vote": "1"})
         self.assertEqual(response.status_code, 400)
         node.layer.participation_settings.voting_allowed = True
         node.layer.participation_settings.save()
-        response = self.client.post(url, good_post_data)
+        response = self.client.post(url, {"vote": "1"})
         self.assertEqual(response.status_code, 201)
 
-        # delete last vote
-        vote = Vote.objects.all().order_by('-id')[0]
-        vote.delete()
-
+    def test_votes_api_not_allowed_on_node(self):
+        self.client.login(username='admin', password='tester')
+        url = reverse('api_node_votes', args=['tulug'])
+        node = Node.objects.get(slug='tulug')
         # Voting not allowed on node
         node.participation_settings.voting_allowed = False
         node.participation_settings.save()
-        response = self.client.post(url, good_post_data)
+        response = self.client.post(url, {"vote": "1"})
         self.assertEqual(response.status_code, 400)
         node.participation_settings.voting_allowed = True
         node.participation_settings.save()
-        response = self.client.post(url, good_post_data)
+        response = self.client.post(url, {"vote": "1"})
         self.assertEqual(response.status_code, 201)
 
+    def test_votes_api_post_not_allowed_by_user(self):
         # User not allowed -- 403
-        self.client.logout()
-        response = self.client.post(url, good_post_data)
+        response = self.client.post(reverse('api_node_votes', args=['tulug']), {"vote": "1"})
         self.assertEqual(response.status_code, 403)
 
     def test_layer_comments_api(self):

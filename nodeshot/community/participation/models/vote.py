@@ -26,13 +26,23 @@ class Vote(UpdateCountsMixin, BaseDate):
 
     class Meta:
         app_label = 'participation'
-        unique_together = (("node", "user"),)
 
     def __unicode__(self):
         if self.pk:
             return _('vote #%d for node %s') % (self.pk, self.node.name)
         else:
             return _('vote')
+
+    def save(self, *args, **kwargs):
+        """
+        ensure users cannot vote multiple times
+        but let users change their votes
+        """
+        if not self.pk:
+            old_votes = Vote.objects.filter(user=self.user, node=self.node)
+            for old_vote in old_votes:
+                old_vote.delete()
+        super(Vote, self).save(*args, **kwargs)
 
     def update_count(self):
         """ updates likes and dislikes count """

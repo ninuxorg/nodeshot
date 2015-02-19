@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from rest_framework import permissions, authentication, generics
+from rest_framework.response import Response
 
 from .models import Rating, Vote, Comment
 from .serializers import *  # noqa
@@ -236,5 +237,17 @@ class NodeVotesList(CustomDataMixin, generics.CreateAPIView):
         self.node = get_queryset_or_404(Node.objects.published(), {'slug': self.kwargs.get('slug', None)})
         # return only comments of current node
         self.queryset = Vote.objects.filter(node_id=self.node.id)
+
+    def delete(self, *args, **kwargs):
+        votes = Vote.objects.filter(node_id=self.node.id, user_id=self.request.user.id)
+        if (len(votes) > 0):
+            for vote in votes:
+                vote.delete()
+            message = _('Vote for this node removed')
+            status = 200
+        else:
+            message = _('User has not voted this node yet')
+            status = 400
+        return Response({'details': message}, status=status)
 
 node_votes = NodeVotesList.as_view()
