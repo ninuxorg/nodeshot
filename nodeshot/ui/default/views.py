@@ -68,6 +68,7 @@ def index(request):
         # map features (TODO: currently unimplemented)
         'MAP_3D_ENABLED': json.dumps(ui_settings.MAP_3D_ENABLED),
         'MAP_TOOLS_ENABLED': json.dumps(ui_settings.MAP_TOOLS_ENABLED),
+        'MAP_PREFERENCES_ENABLED': json.dumps(ui_settings.MAP_PREFERENCES_ENABLED),
         # social auth settings
         'SOCIAL_AUTH_ENABLED': ui_settings.SOCIAL_AUTH_ENABLED,
         'FACEBOOK_ENABLED': ui_settings.FACEBOOK_ENABLED,
@@ -77,12 +78,14 @@ def index(request):
         'WEBSOCKETS': ui_settings.WEBSOCKETS,
         # profiles settings
         'REGISTRATION_OPEN': ui_settings.REGISTRATION_OPEN,
+        # additional node fields
         'NODES_HSTORE_SCHEMA': json.dumps(NODES_HSTORE_SCHEMA if NODES_HSTORE_SCHEMA else []),
         # analytics
         'GOOGLE_ANALYTICS_UA': ui_settings.GOOGLE_ANALYTICS_UA,
         'GOOGLE_ANALYTICS_OPTIONS': json.dumps(ui_settings.GOOGLE_ANALYTICS_OPTIONS),
         'PIWIK_ANALYTICS_DOMAIN': ui_settings.PIWIK_ANALYTICS_DOMAIN,
         'PIWIK_ANALYTICS_SITE_ID': ui_settings.PIWIK_ANALYTICS_SITE_ID,
+        # miscellaneous
         'ADDITIONAL_GEOJSON_URLS': json.dumps(ui_settings.ADDITIONAL_GEOJSON_URLS)
     }
     return render(request, 'index.html', context)
