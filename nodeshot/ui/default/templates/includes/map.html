@@ -39,9 +39,11 @@
 <script id="map-toolbar-template" type="text/template">
     <a href="#" class="icon-layer-2" data-panel="fn-map-layers" title="{% trans 'Control map data' %}" data-placement="left" data-delay="200"></a>
     <a href="#" class="icon-pin-add" data-toggle="tooltip" title="Add new node" data-placement="left" data-delay="200"></a>
-    <a href="#" class="icon-tools" data-panel="fn-map-tools" title="Map tools" data-placement="left" data-delay="200"></a>
     <% if (Ns.settings.map3d) { %>
         <a href="#" id="btn-map-mode" class="icon-3d smaller" title="Toggle 3D view" data-placement="left" data-delay="200"></a>
+    <% } %>
+    <% if (Ns.settings.mapTools) { %>
+        <a href="#" class="icon-tools" data-panel="fn-map-tools" title="Map tools" data-placement="left" data-delay="200"></a>
     <% } %>
     <a href="#" class="icon-config" data-panel="fn-map-preferences" title="Map preferences" data-placement="left" data-delay="200"></a>
     <a id="btn-legend" href="#" class="icon-list" title="Toggle legend" data-placement="left" data-delay="200"></a>
@@ -95,6 +97,7 @@
         </div>
     </div>
 
+    <% if (Ns.settings.mapTools) { %>
     <div id="fn-map-tools" class="side-panel">
         <p>
             <button href="#" class="icon-ruler tool hastip"
@@ -109,6 +112,7 @@
                     data-toggle="tooltip" title="drop placeholder" data-placement="bottom" data-delay="300"></button>
         </p>
     </div>
+    <% } %>
 
     <div id="fn-map-preferences" class="side-panel adjust-height">
         <div class="panel-inner scroller">
