@@ -211,6 +211,13 @@ NODESHOT_UI_COMMENTS_ENABLED
 
 Indicates wheter it is possible to leave comments on nodes.
 
+NODESHOT_UI_CONTACTING_ENABLED
+------------------------------
+
+**default**: ``True``
+
+Indicates wheter it is possible to contact other users.
+
 NODESHOT_UI_GOOGLE_ANALYTICS_UA
 -------------------------------
 

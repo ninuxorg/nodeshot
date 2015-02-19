@@ -64,6 +64,7 @@ def index(request):
         'VOTING_ENABLED': ui_settings.VOTING_ENABLED,
         'RATING_ENABLED': ui_settings.RATING_ENABLED,
         'COMMENTS_ENABLED': ui_settings.COMMENTS_ENABLED,
+        'CONTACTING_ENABLED': ui_settings.CONTACTING_ENABLED,
         # social auth settings
         'SOCIAL_AUTH_ENABLED': ui_settings.SOCIAL_AUTH_ENABLED,
         'FACEBOOK_ENABLED': ui_settings.FACEBOOK_ENABLED,
