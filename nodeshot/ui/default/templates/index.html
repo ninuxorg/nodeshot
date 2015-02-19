@@ -270,28 +270,29 @@
     <!-- global settings -->
     <script>
         Ns = new Marionette.Application();
-        Ns.settings = {};
-        Ns.settings.siteName = '{{ SITE_NAME }}';
-        Ns.settings.map = {
-            lat: {{ MAP_CENTER.0 }},
-            lng: {{ MAP_CENTER.1 }},
-            zoom: {{ MAP_ZOOM }}
+        Ns.settings = {
+            siteName: '{{ SITE_NAME }}',
+            map: {
+                lat: {{ MAP_CENTER.0 }},
+                lng: {{ MAP_CENTER.1 }},
+                zoom: {{ MAP_ZOOM }}
+            },
+            votes: {{ VOTING_ENABLED }},
+            ratings: {{ RATING_ENABLED }},
+            comments: {{ COMMENTS_ENABLED }},
+            contacting: {{ CONTACTING_ENABLED }},
+            api: '{{ SITE_URL }}{% url "api_root_endpoint" %}',
+            dateTimeFormat: '{{ DATETIME_FORMAT }}',
+            dateFormat: '{{ DATE_FORMAT }}',
+            leafletOptions: {{ LEAFLET_OPTIONS|safe }},
+            disableClusteringAtZoom: {{ DISABLE_CLUSTERING_AT_ZOOM }},
+            maxClusterRadius: {{ MAX_CLUSTER_RADIUS }},
+            addressSearchTriggers: {{ ADDRESS_SEARCH_TRIGGERS|safe }},
+            nodesHstoreSchema: {{ NODES_HSTORE_SCHEMA|safe }},
+            googleAnalytics: {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %},
+            piwikAnalytics: {% if PIWIK_ANALYTICS_DOMAIN and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %},
+            additionalGeoJsonUrls: {{ ADDITIONAL_GEOJSON_URLS|safe }}
         };
-        Ns.settings.votes = {{ VOTING_ENABLED }};
-        Ns.settings.ratings = {{ RATING_ENABLED }};
-        Ns.settings.comments = {{ COMMENTS_ENABLED }};
-        Ns.settings.contacting = {{ CONTACTING_ENABLED }};
-        Ns.settings.api = '{{ SITE_URL }}{% url "api_root_endpoint" %}';
-        Ns.settings.dateTimeFormat = '{{ DATETIME_FORMAT }}';
-        Ns.settings.dateFormat = '{{ DATE_FORMAT }}';
-        Ns.settings.leafletOptions = {{ LEAFLET_OPTIONS|safe }};
-        Ns.settings.disableClusteringAtZoom = {{ DISABLE_CLUSTERING_AT_ZOOM }};
-        Ns.settings.maxClusterRadius = {{ MAX_CLUSTER_RADIUS }};
-        Ns.settings.addressSearchTriggers = {{ ADDRESS_SEARCH_TRIGGERS|safe }};
-        Ns.settings.nodesHstoreSchema = {{ NODES_HSTORE_SCHEMA|safe }};
-        Ns.settings.googleAnalytics = {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %};
-        Ns.settings.piwikAnalytics = {% if PIWIK_ANALYTICS_DOMAIN and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %};
-        Ns.settings.additionalGeoJsonUrls = {{ ADDITIONAL_GEOJSON_URLS|safe }};
     </script>
 {% endblock %}
 {% block jsnodeshot %}
@@ -313,16 +314,17 @@
     <script src="{% static 'ui/nodeshot/js/views/password-reset.js' %}"></script>
     <!-- preloaded data -->
     <script>
-        Ns.db = {};
-        Ns.db.menu = new Ns.collections.Menu({{ menu|safe }});
-        Ns.db.legend = new Ns.collections.Legend({{ legend|safe }});
-        Ns.db.layers = new Ns.collections.Layer({{ layers|safe }});
-        Ns.db.user = new Ns.models.User({{ user|safe }});
-        Ns.db.geo = new Ns.collections.Geo();  // fetch later
-        Ns.db.nodes = new Ns.collections.Node();  // local node details cache
-        Ns.db.nodeList = null;  // local node list cache
-        Ns.db.pages = new Ns.collections.Page();  // local page cache
-        Ns.db.users = new Backbone.Collection();  // local user profile cache
+        Ns.db = {
+            menu: new Ns.collections.Menu({{ menu|safe }}),
+            legend: new Ns.collections.Legend({{ legend|safe }}),
+            layers: new Ns.collections.Layer({{ layers|safe }}),
+            user: new Ns.models.User({{ user|safe }}),
+            geo: new Ns.collections.Geo(),   // fetch later
+            nodes: new Ns.collections.Node(),   // local node details cache
+            nodeList: null,   // local node list cache
+            pages: new Ns.collections.Page(),   // local page cache
+            users: new Backbone.Collection()  // local user profile cache
+        };
     </script>
     {% nodeshot_map "map-js" creatediv=False %}
 {% endblock %}
