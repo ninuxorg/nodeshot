@@ -38,17 +38,17 @@
 
 <script id="map-toolbar-template" type="text/template">
     <a href="#" class="icon-layer-2" data-panel="fn-map-layers" title="{% trans 'Control map data' %}" data-placement="left" data-delay="200"></a>
-    <a href="#" class="icon-pin-add" data-toggle="tooltip" title="Add new node" data-placement="left" data-delay="200"></a>
+    <a href="#" class="icon-pin-add" data-toggle="tooltip" title="{% trans 'Add new node' %}" data-placement="left" data-delay="200"></a>
     <% if (Ns.settings.map3d) { %>
-        <a href="#" id="btn-map-mode" class="icon-3d smaller" title="Toggle 3D view" data-placement="left" data-delay="200"></a>
+        <a href="#" id="btn-map-mode" class="icon-3d smaller" title="{% trans 'Toggle 3D view' %}" data-placement="left" data-delay="200"></a>
     <% } %>
     <% if (Ns.settings.mapTools) { %>
-        <a href="#" class="icon-tools" data-panel="fn-map-tools" title="Map tools" data-placement="left" data-delay="200"></a>
+        <a href="#" class="icon-tools" data-panel="fn-map-tools" title="{% trans 'Map tools' %}" data-placement="left" data-delay="200"></a>
     <% } %>
     <% if (Ns.settings.mapPreferences) { %>
-        <a href="#" class="icon-config" data-panel="fn-map-preferences" title="Map preferences" data-placement="left" data-delay="200"></a>
+        <a href="#" class="icon-config" data-panel="fn-map-preferences" title="{% trans 'Map preferences' %}" data-placement="left" data-delay="200"></a>
     <% } %>
-    <a id="btn-legend" href="#" class="icon-list" title="Toggle legend" data-placement="left" data-delay="200"></a>
+    <a id="btn-legend" href="#" class="icon-list" title="{% trans 'Toggle legend' %}" data-placement="left" data-delay="200"></a>
 </script>
 
 <script id="map-panels-template" type="text/template">

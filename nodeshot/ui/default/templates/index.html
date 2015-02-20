@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n static nodeshot_tags %}
+{% load i18n l10n static nodeshot_tags %}
 {% block jstemplates %}
     <script id="modal-template" type="text/template">
         <div class="modal fade autocenter" id="tmp-modal" tabindex="-1">
@@ -273,9 +273,11 @@
         Ns.settings = {
             siteName: '{{ SITE_NAME }}',
             map: {
+                {% localize off %}
                 lat: {{ MAP_CENTER.0 }},
                 lng: {{ MAP_CENTER.1 }},
                 zoom: {{ MAP_ZOOM }}
+                {% endlocalize  %}
             },
             votes: {{ VOTING_ENABLED }},
             ratings: {{ RATING_ENABLED }},
