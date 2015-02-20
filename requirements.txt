@@ -66,3 +66,6 @@ django-debug-toolbar
 
 # monitoring
 raven
+
+# translation
+django-rosetta

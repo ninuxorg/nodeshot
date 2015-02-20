@@ -124,6 +124,7 @@ INSTALLED_APPS = [
     'reversion',
     'corsheaders',
     'social_auth',
+    'rosetta',
     # other utilities
     'django_extensions',
     'debug_toolbar',
@@ -147,20 +148,23 @@ FILEBROWSER_DIRECTORY = ''
 
 # ------ DJANGO CACHE ------ #
 
+CACHES = {
+    'rosetta': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'rosetta'
+    }
+}
+
 if DEBUG:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
+    CACHES['default'] = {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 else:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': '127.0.0.1:6379:1',
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            }
+    CACHES['default'] = {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': '127.0.0.1:6379:1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
 
@@ -382,3 +386,9 @@ LEAFLET_CONFIG = {
     'ATTRIBUTION_PREFIX': '<a href="http://github.com/ninuxorg/nodeshot" target="_blank">Nodeshot</a>',
     'RESET_VIEW': False,
 }
+
+# ------ DJANGO-ROSETTA SETTINGS ------ #
+
+ROSETTA_CACHE_NAME = 'rosetta'
+ROSETTA_MESSAGES_PER_PAGE = 50
+ROSETTA_EXCLUDED_APPLICATIONS = [app for app in INSTALLED_APPS if not app.startswith('nodeshot')]
