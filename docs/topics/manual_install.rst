@@ -198,7 +198,7 @@ Setup database and static files (images, css, js):
     # will prompt you to create a superuser, proceed!
     ./manage.py syncdb && ./manage.py migrate --no-initial-data && ./manage.py loaddata initial_data
     # static files (css, js, images)
-    python manage.py collectstatic
+    ./manage.py collectstatic
 
 If you are installing for **development** there's one last step:
 you just need to **run the django development server** in order to reach the web application:
@@ -207,12 +207,12 @@ you just need to **run the django development server** in order to reach the web
 
     # for development only!
     # listens only on 127.0.0.1
-    python manage.py runserver
+    ./manage.py runserver
     # open browser at http://localhost:8000/admin/
 
     # alternatively, if you need to reach the dev server for other computers
     # on the same LAN, tell it to listen on all the interfaces:
-    python manage.py runserver 0.0.0.0:8000
+    ./manage.py runserver 0.0.0.0:8000
 
 **If you intend to contribute to nodeshot**, be sure to read :doc:`How to contribute to nodeshot <contribute>`.
 
