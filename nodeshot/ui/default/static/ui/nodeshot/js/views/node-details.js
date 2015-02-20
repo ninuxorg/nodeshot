@@ -405,11 +405,11 @@
                 leaflet = this.geomodel.get('leaflet'),
                 map = this.ext.leafletMap,
                 marker;
-            Ns.changeTitle('Edit ' + this.model.id);  // i18n
+            Ns.changeTitle(gettext('Edit') + ' ' + this.model.id);
             Ns.track();
             this.form = new Backbone.Form({
                 model: this.model,
-                submitButton: 'Save'
+                submitButton: gettext('Save')
             }).render();
             this.ui.comments.hide();
             this.ui.nodeData.html(this.form.el);
@@ -425,7 +425,7 @@
             // show draggable marker
             marker = L.marker(leaflet.getLatLng(), { draggable: true });
             map.addLayer(marker);
-            marker.bindPopup('drag to change coordinates').openPopup();  // i18n
+            marker.bindPopup(gettext('drag to change coordinates')).openPopup();
             // move map up slightly to conpensate the layout
             map.panBy([0, -35]);
 
@@ -469,7 +469,7 @@
                             $.createModal({ message: xhr.responseJSON.__all__.join(', ') });
                         }
                         else {
-                            $.createModal({ message: 'error' });  // i18n
+                            $.createModal({ message: gettext('error') });
                         }
                     });
                 }
@@ -495,7 +495,7 @@
                 node.set('slug', slug).fetch().then(function () {
                     callback(node);
                 }).fail(function () {
-                    $.createModal({ message: 'not found' });  // TODO: i18n
+                    $.createModal({ message: gettext('not found') });
                 });
             }
             // otherwise we got it from cache, so we load it straight away

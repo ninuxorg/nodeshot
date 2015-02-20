@@ -1,0 +1,103 @@
+# Nodeshot default UI translation file
+# This file is distributed under the same license as the Nodeshot package.
+# Federico Capoano nemesis at ninux dot org, 2015.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-20 23:50+0100\n"
+"PO-Revision-Date: 2015-02-20 23:31+0020\n"
+"Last-Translator: Admin Admin <admin@admin.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Translated-Using: django-rosetta 0.7.5\n"
+
+#: static/ui/lib/js/backbone-forms-bootstrap3.js:14
+msgid "Cancel"
+msgstr "Annulla"
+
+#: static/ui/nodeshot/js/models.js:242
+msgid "Name"
+msgstr "Nome"
+
+#: static/ui/nodeshot/js/models.js:243
+msgid "Layer"
+msgstr "Layer"
+
+#: static/ui/nodeshot/js/models.js:255
+msgid "Geometry"
+msgstr "Geometria"
+
+#: static/ui/nodeshot/js/models.js:256
+msgid "Address"
+msgstr "Indirizzo"
+
+#: static/ui/nodeshot/js/models.js:257
+msgid "Elevation"
+msgstr "Elevazione"
+
+#: static/ui/nodeshot/js/models.js:258
+msgid "Description"
+msgstr "Descrizione"
+
+#: static/ui/nodeshot/js/views/layer-list.js:30
+msgid "Layer list"
+msgstr "Lista layer"
+
+#: static/ui/nodeshot/js/views/map.js:277
+msgid "Map"
+msgstr "Mappa"
+
+#: static/ui/nodeshot/js/views/map.js:514
+#: static/ui/nodeshot/js/views/node-details.js:498
+msgid "not found"
+msgstr "non trovato"
+
+#: static/ui/nodeshot/js/views/map.js:988
+#: static/ui/nodeshot/js/views/map.js:1000
+msgid "Add node"
+msgstr "Aggiungi nodo"
+
+#: static/ui/nodeshot/js/views/node-details.js:408
+msgid "Edit"
+msgstr "Modifica"
+
+#: static/ui/nodeshot/js/views/node-details.js:412
+msgid "Save"
+msgstr "Salva"
+
+#: static/ui/nodeshot/js/views/node-details.js:428
+msgid "drag to change coordinates"
+msgstr "trascina per cambiare le coordinate"
+
+#: static/ui/nodeshot/js/views/node-details.js:472
+msgid "error"
+msgstr "errore"
+
+#: static/ui/nodeshot/js/views/node-list.js:52
+msgid "Node list"
+msgstr "Lista nodi"
+
+#: static/ui/nodeshot/js/views/page.js:32
+#: static/ui/nodeshot/js/views/user.js:38
+msgid "the requested page was not found"
+msgstr "la pagina richiesta non è stata trovata"
+
+#: static/ui/nodeshot/js/views/page.js:36
+#: static/ui/nodeshot/js/views/user.js:42
+msgid "there was an error while retrieving the page"
+msgstr "c'è stato un errore durante il caricamento della pagina"
+
+#: static/ui/nodeshot/js/views/password-reset.js:25
+msgid "Reset Password"
+msgstr "Ripristina password"
+
+#: static/ui/nodeshot/js/views/password-reset.js:69
+msgid "Check your inbox for the password reset link."
+msgstr ""
+"Controlla la tua posta in arrivo per il link di ripristino della password"

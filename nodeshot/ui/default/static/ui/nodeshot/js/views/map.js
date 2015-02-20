@@ -274,7 +274,7 @@
          * loads data from API
          */
         initMapData: function () {
-            Ns.changeTitle('Map');  // TODO: i18n
+            Ns.changeTitle(gettext('Map'));
             Ns.menu.currentView.activate('map');
             Ns.track();
             Ns.state.onNodeClose = 'map';  // when a node-details is closed go back on map
@@ -511,7 +511,7 @@
                     leafletLayer = this.collection.get(id).get('leaflet');
                 } catch (e) {
                     $.createModal({
-                        message: id + ' not found',  // TODO: i18n
+                        message: id + ' ' + gettext('not found'),
                         onClose: function () {
                             Ns.router.navigate('map');
                         }
@@ -985,7 +985,7 @@
 
         onShow: function () {
             Ns.router.navigate('map/add');
-            Ns.changeTitle('Add node');  // i18n
+            Ns.changeTitle(gettext('Add node'));
             Ns.track();
             // go to step1 when collection is ready
             if (this.ext.geo.length){
@@ -997,7 +997,7 @@
             // dynamic form
             this.form = new Backbone.Form({
                 model: new Ns.models.Node(),
-                submitButton: 'Add node'
+                submitButton: gettext('Add node')
             }).render();
             this.ui.formContainer.html(this.form.$el);
             this.$('input[type=checkbox]').bootstrapSwitch().bootstrapSwitch('setSizeClass', 'switch-small');

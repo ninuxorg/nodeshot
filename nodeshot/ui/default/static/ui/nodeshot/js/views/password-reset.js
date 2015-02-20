@@ -22,7 +22,7 @@
         initialize: function (options) {
             if (Ns.db.user.isAuthenticated() === false) {
                 this.model = new Ns.models.PasswordReset();
-                this.title = 'Reset Password'; // i18n
+                this.title = gettext('Reset Password');
                 // hide signin
                 $('#signin-modal').modal('hide');
                 Ns.body.show(this);
@@ -66,7 +66,7 @@
         },
 
         done: function () {
-            this.ui.form.html('Check your inbox for the password reset link.');  // todo: i18n
+            this.ui.form.html(gettext('Check your inbox for the password reset link.'));
         },
 
         /**

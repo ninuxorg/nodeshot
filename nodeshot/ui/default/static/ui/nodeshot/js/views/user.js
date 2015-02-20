@@ -35,13 +35,11 @@
         error: function (model, http) {
             if (http.status === 404) {
                 $.createModal({
-                    // TODO: i18n
-                    message: 'the requested page was not found'
+                    message: gettext('the requested page was not found')
                 });
             } else {
                 $.createModal({
-                    // TODO: i18n
-                    message: 'there was an error while retrieving the page'
+                    message: gettext('there was an error while retrieving the page')
                 });
             }
         },

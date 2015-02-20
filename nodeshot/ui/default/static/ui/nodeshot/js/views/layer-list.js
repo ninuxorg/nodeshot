@@ -27,7 +27,7 @@
 
         onShow: function(){
             // title tag
-            Ns.changeTitle('Layer list');  // TODO: i18n
+            Ns.changeTitle(gettext('Layer list'));
             // mark nodes menu link as active
             Ns.menu.currentView.activate('layers');
             // analytics

@@ -49,7 +49,7 @@
                 collection: Ns.db.nodeList || new Ns.collections.Node(),  // get cached version or init new
                 addNode: true,
                 partialStats: true,
-                title: 'Node list',  // TODO: i18n
+                title: gettext('Node list'),
                 activateMenu: true,
                 cache: true
             }, options);

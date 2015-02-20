@@ -2,8 +2,6 @@
  * customized for nodeshot
  */
 ;(function(Form) {
-
-
   /**
    * Bootstrap 3 templates
    */
@@ -13,12 +11,11 @@
       <% if (submitButton) { %>\
         <p>\
         <button type="submit" class="btn btn-success"><%= submitButton %></button>&nbsp;\
-        <button type="button" class="btn btn-default">Cancel</button>\
+        <button type="button" class="btn btn-default">' + gettext('Cancel') + '</button>\
         </p>\
       <% } %>\
     </form>\
   ');
-
 
   Form.Fieldset.template = _.template('\
     <fieldset data-fields>\
@@ -27,7 +24,6 @@
       <% } %>\
     </fieldset>\
   ');
-
 
   Form.Field.template = _.template('\
     <div class="form-group field-<%= key %>">\
@@ -40,7 +36,6 @@
         <% if(help) { %><span class="help-block"><%= help %></span><% } %>\
     </div>\
   ');
-
 
   Form.NestedField.template = _.template('\
     <div class="field-<%= key %>">\
@@ -55,16 +50,13 @@
   Form.editors.Base.prototype.className = 'form-control input-sm';
   Form.Field.errorClassName = 'has-error';
 
-
   if (Form.editors.List) {
-
     Form.editors.List.template = _.template('\
       <div class="bbf-list">\
         <ul class="list-unstyled clearfix" data-items></ul>\
         <button type="button" class="btn bbf-add" data-action="add">Add</button>\
       </div>\
     ');
-
 
     Form.editors.List.Item.template = _.template('\
       <li class="clearfix">\
@@ -73,12 +65,8 @@
       </li>\
     ');
 
-
     Form.editors.List.Object.template = Form.editors.List.NestedModel.template = _.template('\
       <div class="bbf-list-modal"><%= summary %></div>\
     ');
-
   }
-
-
 })(Backbone.Form);

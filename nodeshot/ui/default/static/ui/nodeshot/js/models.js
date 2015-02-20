@@ -239,9 +239,8 @@
         idAttribute: 'slug',
 
         schema: {
-            // TODO: i18n
-            name: { type: 'Text', title: 'Name', validators: ['required'], editorAttrs: { maxlength: 75 } },
-            layer: { type: 'Select', title: 'Layer', validators: ['required'],
+            name: { type: 'Text', title: gettext('Name'), validators: ['required'], editorAttrs: { maxlength: 75 } },
+            layer: { type: 'Select', title: gettext('Layer'), validators: ['required'],
                 options: function(callback){
                     // add node
                     if (typeof(Ns.body.currentView.details.currentView) === 'undefined') {
@@ -253,10 +252,10 @@
                     }
                 }
             },
-            geometry: { type: 'Hidden', title: 'Geometry', validators: ['required'] },
-            address: { type: 'Text', title: 'Address', editorAttrs: { maxlength: 150 } },
-            elev: { type: 'Number', title: 'Elevation',  validators: ['number'] },
-            description: { type: 'TextArea', title: 'Description' }
+            geometry: { type: 'Hidden', title: gettext('Geometry'), validators: ['required'] },
+            address: { type: 'Text', title: gettext('Address'), editorAttrs: { maxlength: 150 } },
+            elev: { type: 'Number', title: gettext('Elevation'),  validators: ['number'] },
+            description: { type: 'TextArea', title: gettext('Description') }
         },
 
         defaults: {
