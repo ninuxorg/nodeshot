@@ -41,7 +41,7 @@ These are the available customizable settings:
  * ``NODESHOT_UI_COMMENTS_ENABLED``
  * ``NODESHOT_UI_GOOGLE_ANALYTICS_UA``
  * ``NODESHOT_UI_GOOGLE_ANALYTICS_OPTIONS``
- * ``NODESHOT_UI_PIWIK_ANALYTICS_DOMAIN``
+ * ``NODESHOT_UI_PIWIK_ANALYTICS_BASE_URL``
  * ``NODESHOT_UI_PIWIK_ANALYTICS_SITE_ID``
 
 LEAFLET_CONFIG
@@ -248,20 +248,20 @@ For more information about the options that can be passed see the relative `Goog
 
 .. _Google Analytics Reference: https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#customizeTracker
 
-NODESHOT_UI_PIWIK_ANALYTICS_DOMAIN
-----------------------------------
+NODESHOT_UI_PIWIK_ANALYTICS_BASE_URL
+------------------------------------
 
 **default**: ``None``
 
 Piwik is a fantastic `Open Source Web Analytics`_ tool.
 
-This settings indicates where you installed your own instance.
+This settings indicates where you installed your own piwik instance.
 
 Example:
 
 .. code-block:: python
 
-    NODESHOT_UI_PIWIK_ANALYTICS_DOMAIN = 'analytics.frm.ninux.org'
+    NODESHOT_UI_PIWIK_ANALYTICS_BASE_URL = 'http://analytics.frm.ninux.org'
 
 .. _Open Source Web Analytics: http://piwik.org/
 

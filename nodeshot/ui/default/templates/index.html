@@ -293,7 +293,7 @@
             addressSearchTriggers: {{ ADDRESS_SEARCH_TRIGGERS|safe }},
             nodesHstoreSchema: {{ NODES_HSTORE_SCHEMA|safe }},
             googleAnalytics: {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %},
-            piwikAnalytics: {% if PIWIK_ANALYTICS_DOMAIN and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %},
+            piwikAnalytics: {% if PIWIK_ANALYTICS_BASE_URL and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %},
             additionalGeoJsonUrls: {{ ADDITIONAL_GEOJSON_URLS|safe }}
         };
     </script>

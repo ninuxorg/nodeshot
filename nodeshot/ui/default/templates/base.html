@@ -44,13 +44,13 @@
         ga('create', '{{ GOOGLE_ANALYTICS_UA }}', {{ GOOGLE_ANALYTICS_OPTIONS|safe }});
     </script>
     {% endif %}
-    {% if PIWIK_ANALYTICS_DOMAIN and PIWIK_ANALYTICS_SITE_ID %}
+    {% if PIWIK_ANALYTICS_BASE_URL and PIWIK_ANALYTICS_SITE_ID %}
     <script type="text/javascript">
         var _paq = _paq || [];
         _paq.push(['trackPageView']);
         _paq.push(['enableLinkTracking']);
         (function() {
-            var u="//{{ PIWIK_ANALYTICS_DOMAIN }}/";
+            var u="{{ PIWIK_ANALYTICS_BASE_URL }}/";
             _paq.push(['setTrackerUrl', u+'piwik.php']);
             _paq.push(['setSiteId', {{ PIWIK_ANALYTICS_SITE_ID }}]);
             var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
