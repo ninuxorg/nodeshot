@@ -75,6 +75,20 @@ class NodeshotDashboard(Dashboard):
                 ]
             ))
 
+
+        if 'rosetta' in settings.INSTALLED_APPS:
+            self.children.append(modules.LinkList(
+                _('Translations'),
+                column=3,
+                children=[
+                    {
+                        'title': _('Manage translations'),
+                        'url': reverse('rosetta-home'),
+                        'external': False,
+                    }
+                ]
+            ))
+
         if 'nodeshot.core.api' in settings.INSTALLED_APPS:
             self.children.append(modules.LinkList(
                 _('API'),
