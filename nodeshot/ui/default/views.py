@@ -83,10 +83,11 @@ def index(request):
         # analytics
         'GOOGLE_ANALYTICS_UA': ui_settings.GOOGLE_ANALYTICS_UA,
         'GOOGLE_ANALYTICS_OPTIONS': json.dumps(ui_settings.GOOGLE_ANALYTICS_OPTIONS),
-        'PIWIK_ANALYTICS_BASE_URL': ui_settings.PIWIK_ANALYTICS_BASE_URL
-,
+        'PIWIK_ANALYTICS_BASE_URL': ui_settings.PIWIK_ANALYTICS_BASE_URL,
         'PIWIK_ANALYTICS_SITE_ID': ui_settings.PIWIK_ANALYTICS_SITE_ID,
         # miscellaneous
-        'ADDITIONAL_GEOJSON_URLS': json.dumps(ui_settings.ADDITIONAL_GEOJSON_URLS)
+        'ADDITIONAL_GEOJSON_URLS': json.dumps(ui_settings.ADDITIONAL_GEOJSON_URLS),
+        'PRIVACY_POLICY_LINK': ui_settings.PRIVACY_POLICY_LINK,
+        'TERMS_OF_SERVICE_LINK': ui_settings.TERMS_OF_SERVICE_LINK
     }
     return render(request, 'index.html', context)

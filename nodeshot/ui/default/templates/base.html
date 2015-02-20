@@ -106,7 +106,9 @@
          data-autocenter-coefficient="2.6">
         <div class="modal-dialog modal-content modal-body inverse user-dialog">
 
-            <p class="text">{% trans 'By signing up to this service you agree to our <a href="#/pages/privacy-policy" class="js-dismiss">privacy policy</a>' %}</p>
+            <p class="text">
+                {% blocktrans %}By signing up you declare to have accepted our <a href="{{ PRIVACY_POLICY_LINK }}" class="js-dismiss">privacy&nbsp;policy</a><br />and <a href="{{ TERMS_OF_SERVICE_LINK }}" class="js-dismiss">terms&nbsp;of&nbsp;service</a>.{% endblocktrans %}
+            </p>
 
             {% if SOCIAL_AUTH_ENABLED %}
             <p class="social-buttons">

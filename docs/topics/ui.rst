@@ -43,6 +43,8 @@ These are the available customizable settings:
  * ``NODESHOT_UI_GOOGLE_ANALYTICS_OPTIONS``
  * ``NODESHOT_UI_PIWIK_ANALYTICS_BASE_URL``
  * ``NODESHOT_UI_PIWIK_ANALYTICS_SITE_ID``
+ * ``NODESHOT_UI_PRIVACY_POLICY_LINK``
+ * ``NODESHOT_UI_TERMS_OF_SERVICE_LINK``
 
 LEAFLET_CONFIG
 --------------
@@ -277,3 +279,17 @@ Example:
 .. code-block:: python
 
     NODESHOT_UI_PIWIK_ANALYTICS_SITE_ID = 12
+
+NODESHOT_UI_PRIVACY_POLICY_LINK
+-------------------------------
+
+**default**: ``'#/pages/privacy-policy'``
+
+Link to "Privacy Policy" page.
+
+NODESHOT_UI_TERMS_OF_SERVICE_LINK
+---------------------------------
+
+**default**: ``'#/pages/terms-of-service'``
+
+Link to "Terms of Service" page.
