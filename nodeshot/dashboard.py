@@ -75,6 +75,23 @@ class NodeshotDashboard(Dashboard):
                 ]
             ))
 
+        if 'smuggler' in settings.INSTALLED_APPS:
+            self.children.append(modules.LinkList(
+                _('Backup & Restore data'),
+                column=3,
+                children=[
+                    {
+                        'title': _('Backup data as JSON file'),
+                        'url': reverse('dump-data'),
+                        'external': False,
+                    },
+                    {
+                        'title': _('Restore JSON backup'),
+                        'url': reverse('load-data'),
+                        'external': False,
+                    },
+                ]
+            ))
 
         if 'rosetta' in settings.INSTALLED_APPS:
             self.children.append(modules.LinkList(
