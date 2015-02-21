@@ -15,22 +15,29 @@ __all__ = [
 
 class ResetPasswordForm(forms.Form):
     email = forms.EmailField(
-        label = _("Email"),
-        required = True,
-        widget = forms.TextInput(attrs={"size":"30"})
+        label=_("Email"),
+        required=True,
+        widget=forms.TextInput(attrs={"size": "30"})
     )
 
     def clean_email(self):
         """ ensure email is in the database """
         if EMAIL_CONFIRMATION:
             from .models import EmailAddress
-            condition = EmailAddress.objects.filter(email__iexact=self.cleaned_data["email"], verified=True).count() == 0
+            condition = EmailAddress.objects.filter(
+                email__iexact=self.cleaned_data["email"],
+                verified=True
+            ).count() == 0
         else:
-            condition = User.objects.get(email__iexact=self.cleaned_data["email"], is_active=True).count() == 0
+            condition = User.objects.get(
+                email__iexact=self.cleaned_data["email"],
+                is_active=True
+            ).count() == 0
 
         if condition is True:
-            raise forms.ValidationError(_("Email address not verified for any user account"))
-
+            raise forms.ValidationError(
+                _("Email address not verified for any user account")
+            )
         return self.cleaned_data["email"]
 
     def save(self, **kwargs):
@@ -40,12 +47,12 @@ class ResetPasswordForm(forms.Form):
 
 class ResetPasswordKeyForm(forms.Form):
     password1 = forms.CharField(
-        label = _("New Password"),
-        widget = forms.PasswordInput(render_value=False)
+        label=_("New Password"),
+        widget=forms.PasswordInput(render_value=False)
     )
     password2 = forms.CharField(
-        label = _("New Password (again)"),
-        widget = forms.PasswordInput(render_value=False)
+        label=_("New Password (again)"),
+        widget=forms.PasswordInput(render_value=False)
     )
 
     def __init__(self, *args, **kwargs):

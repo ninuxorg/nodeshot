@@ -42,7 +42,6 @@ class OpenWISPBackend(OAuthBackend):
         }
 
 
-
 class OpenWISPAuth(BaseOAuth2):
     """OpenWISP OAuth2 mechanism"""
     AUTHORIZATION_URL = OPENWISP_AUTHORIZATION_URL

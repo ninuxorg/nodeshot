@@ -60,7 +60,9 @@ def password_reset_from_key(request, uidb36, key, **kwargs):
             password_reset_key_form = form_class(request.POST, user=user, temp_key=key)
             if password_reset_key_form.is_valid():
                 password_reset_key_form.save()
-                messages.add_message(request, messages.SUCCESS,
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
                     ugettext(u"Password successfully changed.")
                 )
                 password_reset_key_form = None
@@ -84,20 +86,21 @@ if EMAIL_CONFIRMATION:
     def confirm_email(request, confirmation_key):
         """ confirm email view """
         confirmation_key = confirmation_key.lower()
-
         # get email confirmation or 404
         email_confirmation = get_object_or_404(EmailConfirmation, key=confirmation_key)
-
         # make primary if no other primary addresses for this user
-        make_primary = EmailAddress.objects.filter(user_id=email_confirmation.email_address.user_id, primary=True).count() <= 0
-
+        make_primary = EmailAddress.objects.filter(
+            user_id=email_confirmation.email_address.user_id,
+            primary=True
+        ).count() <= 0
         # confirm email
-        email_address = EmailConfirmation.objects.confirm_email(confirmation_key, make_primary=make_primary)
-
+        email_address = EmailConfirmation.objects.confirm_email(
+            confirmation_key,
+            make_primary=make_primary
+        )
         # log in the user if not already authenticated
         if not request.user.is_authenticated():
             user = email_address.user
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
-
         return redirect(settings.SITE_URL)

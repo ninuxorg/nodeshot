@@ -16,23 +16,23 @@ class IsProfileOwner(permissions.IsAuthenticated):
         # in edit request restrict permission to profile owner only
         if (request.method in ['PUT', 'PATCH']) and obj is not None:
             model = obj.__class__.__name__
-            
+
             user_id = obj.id
-            
+
             # in case of social link view
             if model == 'SocialLink':
                 user_id = obj.user.id
-            
+
             return request.user.id == user_id
         else:
             return True
-    
+
     def has_permission(self, request, view):
         """ applies to social-link-list """
         if request.method == 'POST':
             user = Profile.objects.only('id', 'username').get(username=view.kwargs['username'])
             return request.user.id == user.id
-        
+
         return True
 
 
