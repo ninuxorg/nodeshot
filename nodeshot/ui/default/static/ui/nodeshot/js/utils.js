@@ -159,13 +159,15 @@
     */
     $.toggleLoading = function (operation) {
         var loading = $('#loading'),
-            dimensions;
+            text_dimensions;
         // create loading div if not already present
         if (!loading.length) {
             $('body').append(_.template($('#loading-template').html()));
             loading = $('#loading');
-            dimensions = loading.getHiddenDimensions();
-            loading.outerWidth(dimensions.width);
+            // get dimensions of "loading" text
+            // might be of different length depending on the language
+            text_dimensions = loading.find('.text').getHiddenDimensions();
+            loading.width(text_dimensions.width + 54);  // manually fine-tuned
             loading.css({
                 left: 0,
                 margin: '0 auto'
