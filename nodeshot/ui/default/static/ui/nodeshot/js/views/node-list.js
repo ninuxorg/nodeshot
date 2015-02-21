@@ -124,7 +124,7 @@
         notImplemented: function(e){
             e.preventDefault();
             e.stopPropagation();
-            $.createModal({ message: 'Not implemented yet' });
+            $.createModal({ message: gettext('not implemented yet') });
         },
 
         search: function(e){

@@ -1,19 +1,19 @@
 # Nodeshot default UI translation file
 # This file is distributed under the same license as the Nodeshot package.
 # Federico Capoano nemesis at ninux dot org, 2015.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-20 23:50+0100\n"
-"PO-Revision-Date: 2015-02-20 23:31+0020\n"
-"Last-Translator: Admin Admin <admin@admin.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2015-02-21 21:25+0100\n"
+"PO-Revision-Date: 2015-02-21 21:28+0050\n"
+"Last-Translator:   <nemesis@ninux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.7.5\n"
 
@@ -57,6 +57,12 @@ msgstr "Mappa"
 #: static/ui/nodeshot/js/views/node-details.js:498
 msgid "not found"
 msgstr "non trovato"
+
+#: static/ui/nodeshot/js/views/map.js:764
+#: static/ui/nodeshot/js/views/map.js:888
+#: static/ui/nodeshot/js/views/node-list.js:127
+msgid "not implemented yet"
+msgstr "non ancora implementato"
 
 #: static/ui/nodeshot/js/views/map.js:988
 #: static/ui/nodeshot/js/views/map.js:1000

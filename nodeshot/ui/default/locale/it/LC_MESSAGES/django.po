@@ -1,15 +1,15 @@
 # Nodeshot default UI translation file
 # This file is distributed under the same license as the Nodeshot package.
 # Federico Capoano nemesis at ninux dot org, 2015.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-20 22:58+0100\n"
-"PO-Revision-Date: 2015-02-20 23:17+0020\n"
-"Last-Translator: Admin Admin <admin@admin.org>\n"
+"POT-Creation-Date: 2015-02-21 21:26+0100\n"
+"PO-Revision-Date: 2015-02-21 21:31+0050\n"
+"Last-Translator:   <nemesis@ninux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -132,10 +132,6 @@ msgstr "Ancora nulla di interessante!"
 msgid "cancel&nbsp;operation"
 msgstr "annnulla&nbsp;operazione"
 
-#: templates/index.html:256
-msgid "Cancel"
-msgstr "Annulla"
-
 #: templates/includes/layer-details.html:6
 #: templates/includes/node-details.html:29
 #: templates/includes/user-details.html:9
@@ -233,6 +229,22 @@ msgstr "Mostra / nascondi legenda"
 #: templates/includes/map.html:59
 msgid "Map base"
 msgstr "Base mappa"
+
+#: templates/includes/map.html:106
+msgid "measure distance"
+msgstr "misura una distanza"
+
+#: templates/includes/map.html:108
+msgid "measure area"
+msgstr "misura un'area"
+
+#: templates/includes/map.html:112
+msgid "elevation profile"
+msgstr "Profilo elevazione"
+
+#: templates/includes/map.html:114
+msgid "drop placeholder"
+msgstr "lascia un segnaposto"
 
 #: templates/includes/map.html:187
 msgid "Details"
@@ -439,3 +451,6 @@ msgstr "Hai cambiato la tua password con successo!"
 #: templates/profiles/password_reset_from_key.html:31
 msgid "Go to the homepage to login"
 msgstr "Vai alla pagina iniziale per accedere"
+
+#~ msgid "Cancel"
+#~ msgstr "Annulla"

@@ -761,7 +761,7 @@
          */
         switchMapMode: function (e) {
             e.preventDefault();
-            $.createModal({message: 'not implemented yet'});
+            $.createModal({message: gettext('not implemented yet')});
         }
     });
 
@@ -885,7 +885,7 @@
          */
         toggleTool: function (e) {
             e.preventDefault();
-            $.createModal({ message: 'not implemented yet' });
+            $.createModal({ message: gettext('not implemented yet') });
             return false;
             //var button = $(e.currentTarget),
             //    active_buttons = $('#fn-map-tools .tool.active');
