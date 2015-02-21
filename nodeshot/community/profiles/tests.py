@@ -651,6 +651,27 @@ class ProfilesTest(TestCase):
         self.assertEqual(user.email_set.count(), 2)
         self.assertEqual(user.email_set.get_primary().email, user.email)
 
+    def test_user_manager_creates_email(self):
+        user = User.objects.create_user(**{
+            'first_name': 'test',
+            'last_name': 'test',
+            'username': 'test',
+            'email': 'test@test.org',
+            'password': 'test'
+        })
+        self.assertEqual(EmailAddress.objects.filter(email=user.email, primary=True).count(), 1)
+        self.assertEqual(EmailAddress.objects.filter(email=user.email).count(), 1)
+        user.delete()
+
+        # ensure no email doesn't cause errors
+        user = User.objects.create_user(**{
+            'first_name': 'test',
+            'last_name': 'test',
+            'username': 'test',
+            'password': 'test'
+        })
+        self.assertEqual(EmailAddress.objects.filter(email=user.email).count(), 0)
+
     def test_add_email_to_new_user(self):
         user = User(**{
             'first_name': 'test',
@@ -665,3 +686,57 @@ class ProfilesTest(TestCase):
         email_address.save()
         self.assertEqual(user.email_set.filter(primary=True).count(), 1)
         self.assertEqual(user.email_set.count(), 1)
+
+    def test_skip_sync_emailaddress(self):
+        user = User(**{
+            'first_name': 'test',
+            'last_name': 'test',
+            'username': 'test',
+            'email': 'test@test.org',
+            'password': 'test'
+        })
+        user.save(sync_emailaddress=False)
+        self.assertEqual(EmailAddress.objects.filter(email=user.email).count(), 0)
+        user.delete()
+
+        # ensure no email doesn't cause errors
+        user = User(**{
+            'first_name': 'test',
+            'last_name': 'test',
+            'username': 'test',
+            'password': 'test'
+        })
+        user.save(sync_emailaddress=False)
+        self.assertEqual(EmailAddress.objects.filter(email=user.email).count(), 0)
+
+    def test_user_manager_skip_sync_emailaddress(self):
+        user = User.objects.create_user(
+            sync_emailaddress=False,
+            **{
+                'first_name': 'test',
+                'last_name': 'test',
+                'username': 'test',
+                'email': 'test@test.org',
+                'password': 'test'
+            }
+        )
+        self.assertEqual(EmailAddress.objects.filter(email=user.email, primary=True).count(), 0)
+        self.assertEqual(EmailAddress.objects.filter(email=user.email).count(), 0)
+        user.delete()
+
+        # ensure no email doesn't cause errors
+        user = User.objects.create_user(
+            sync_emailaddress=False,
+            **{
+                'first_name': 'test',
+                'last_name': 'test',
+                'username': 'test',
+                'password': 'test'
+            }
+        )
+        self.assertEqual(EmailAddress.objects.filter(email=user.email).count(), 0)
+
+    def test_profile_manager_exception(self):
+        with self.assertRaises(ValueError):
+            User.objects.create_user(username=None, first_name='test',
+                                     last_name='test', password='test')
