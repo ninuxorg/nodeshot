@@ -7,6 +7,29 @@ from social_auth.models import UserSocialAuth
 from ..settings import EMAIL_CONFIRMATION
 
 
+def create_user(backend, details, response, uid, username, user=None, *args,
+                **kwargs):
+    """Create user. Depends on get_username pipeline."""
+    if user:
+        return {'user': user}
+    if not username:
+        return None
+
+    # Avoid hitting field max length
+    email = details.get('email')
+    original_email = None
+    if email and UserSocialAuth.email_max_length() < len(email):
+        original_email = email
+        email = ''
+
+    return {
+        'user': UserSocialAuth.create_user(username=username, email=email,
+                                           sync_emailaddress=False),
+        'original_email': original_email,
+        'is_new': True
+    }
+
+
 def load_extra_data(backend, details, response, uid, user, social_user=None,
                     *args, **kwargs):
     """Load extra data from provider and store it on current UserSocialAuth
