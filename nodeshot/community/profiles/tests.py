@@ -28,10 +28,11 @@ class ProfilesTest(TestCase):
     def setUp(self):
         self.client.login(username='registered', password='tester')
         mail.outbox = []
-        # set all email addresses as verified
-        for email_address in EmailAddress.objects.all():
-            email_address.verified = True
-            email_address.save()
+        if EMAIL_CONFIRMATION:
+            # set all email addresses as verified
+            for email_address in EmailAddress.objects.all():
+                email_address.verified = True
+                email_address.save()
 
     def test_new_users_have_default_group(self):
         """ users should have a default group when created """

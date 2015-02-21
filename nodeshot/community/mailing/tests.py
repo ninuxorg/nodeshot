@@ -2,12 +2,15 @@
 nodeshot.community.mailing unit tests
 """
 
+import datetime
+
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.utils.timezone import utc
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
@@ -16,12 +19,13 @@ User = get_user_model()
 from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.base.tests import user_fixtures
+from nodeshot.community.profiles.settings import EMAIL_CONFIRMATION
 
 from .models import Inward, Outward
 from .models.choices import GROUPS, FILTERS
 
-import datetime
-from django.utils.timezone import utc
+if EMAIL_CONFIRMATION:
+    from nodeshot.community.profiles.models import EmailAddress, EmailConfirmation
 
 
 class MailingTest(TestCase):
@@ -49,6 +53,11 @@ class MailingTest(TestCase):
             message = self.message.message,
         )
         mail.outbox = []
+        if EMAIL_CONFIRMATION:
+            # set all email addresses as verified
+            for email_address in EmailAddress.objects.all():
+                email_address.verified = True
+                email_address.save()
 
     def test_inward_model(self):
         """ ensure inward model validation works as expected """
@@ -85,6 +94,7 @@ class MailingTest(TestCase):
         """ ensure contact node api works as expected """
         url = reverse('api_node_contact', args=['fusolab'])
         self.client.login(username='admin', password='tester')
+        mail.outbox = []
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
@@ -98,6 +108,7 @@ class MailingTest(TestCase):
         """ ensure contact user api works as expected """
         url = reverse('api_user_contact', args=['romano'])
         self.client.login(username='admin', password='tester')
+        mail.outbox = []
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
@@ -111,6 +122,7 @@ class MailingTest(TestCase):
         """ ensure contact layer api works as expected """
         url = reverse('api_layer_contact', args=['rome'])
         self.client.login(username='admin', password='tester')
+        mail.outbox = []
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)

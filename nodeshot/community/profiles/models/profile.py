@@ -3,6 +3,7 @@ from django.core import validators
 from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import Group
 
 from nodeshot.core.base.utils import now
 from ..settings import settings, EMAIL_CONFIRMATION, REQUIRED_FIELDS as PROFILE_REQUIRED_FIELDS
@@ -74,11 +75,30 @@ class Profile(AbstractBaseUser, PermissionsMixin):
         return self.username
 
     def save(self, *args, **kwargs):
-        """ ensure instance has usable password when created """
-        if not self.pk and self.has_usable_password() is False:
+        """
+        performs actions on create:
+            * ensure instance has usable password
+            * set default group
+            * keep in sync with email address model
+        """
+        created = self.pk is None
+        # ensure usable password
+        if created and self.has_usable_password() is False:
             self.set_password(self.password)
-
+        # save
         super(Profile, self).save(*args, **kwargs)
+        # add user to default group
+        if created and self.groups.count() < 1:
+            # TODO: make default group configurable in settings
+            try:
+                default_group = Group.objects.get(name='registered')
+                self.groups.add(default_group)
+            except Group.DoesNotExist:
+                pass
+        # sync with EmailAddress model
+        if EMAIL_CONFIRMATION and self.email and self.email_set.filter(email=self.email).count() < 1:
+            self.email_set.add_email(self, email=self.email)
+            self.email_set.last().set_as_primary()
 
     def get_full_name(self):
         """
