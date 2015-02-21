@@ -304,7 +304,7 @@ Paste this configuration and tweak it according to your needs::
         }
 
         location / {
-            try_files /system/maintenance.html $uri @uwsgi;
+            try_files /var/www/nodeshot/maintenance.html $uri @uwsgi;
         }
 
         location /static {
