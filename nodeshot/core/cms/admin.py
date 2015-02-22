@@ -10,6 +10,7 @@ from .models import Page, MenuItem
 
 class PageAdmin(PublishActionsAdminMixin, reversion.VersionAdmin):
     list_display = ('title', 'slug', 'is_published', 'access_level', 'added', 'updated')
+    list_display_links = ('title', 'slug')
     list_filter = ('is_published',)
     prepopulated_fields = { 'slug': ('title',) }
     readonly_fields = ("added", "updated")
