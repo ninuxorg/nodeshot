@@ -834,3 +834,22 @@ class DefaultUiSeleniumTest(TestCase):
         self._wait_until_element_visible('#node-list table', 1, 'node list not visible')
         self.assertEqual(self.browser.title, 'Nodes of user: romano - Nodeshot')
         self.assertEqual(len(self.browser.find_elements_by_css_selector('#js-add-node')), 0)
+
+    def test_signup_error(self):
+        self._hashchange('#')
+        browser = self.browser
+        browser.find_element_by_css_selector('a[data-target="#signup-modal"]').click()
+        sleep(0.5)
+        browser.find_element_by_css_selector('#js-signup-username').send_keys('testing')
+        browser.find_element_by_css_selector('#js-signup-email').send_keys('admin@admin.org')
+        browser.find_element_by_css_selector('#js-signup-password').send_keys('testing')
+        pwd2 = browser.find_element_by_css_selector('#js-signup-password_confirmation')
+        pwd2.send_keys('testing')
+        pwd2.send_keys(Keys.ENTER)
+        self._wait_until_ajax_complete(10, 'Timeout')
+        sleep(1)
+        # ensure loading indicator is not showing anymore
+        self.assertFalse(browser.find_element_by_css_selector('#loading').is_displayed())
+        # ensure one error
+        self.assertEqual(len(browser.find_elements_by_css_selector('.input-group.hastip.error')), 1)
+        self.assertIn('address already exists', browser.find_element_by_css_selector('.tooltip-inner').text)

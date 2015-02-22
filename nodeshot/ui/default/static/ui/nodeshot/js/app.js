@@ -200,7 +200,8 @@
             $.post(Ns.url('profiles/'), data).error(function (http) {
                 // TODO improve
                 // signup validation
-                var json = http.responseJSON;
+                var json = http.responseJSON,
+                    key;
 
                 for (key in json) {
                     var input = $('#js-signup-' + key);
