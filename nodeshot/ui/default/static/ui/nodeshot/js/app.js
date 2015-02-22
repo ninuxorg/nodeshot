@@ -217,9 +217,7 @@
 
             }).done(function (response) {
                 $('#signup-modal').modal('hide');
-                $.createModal({
-                    message: 'sent confirmation mail'
-                });
+                $.createModal({ message: gettext('confirmation mail sent') });
             });
         });
 

@@ -496,9 +496,7 @@
 
             $.post(Ns.url('account/logout/')).error(function () {
                 // TODO: improve!
-                $.createModal({
-                    message: 'problem while logging out'
-                });
+                $.createModal({ message: gettext('problem while logging out') });
             }).done(function () {
                 // trigger custom event
                 self.trigger('loggedout');

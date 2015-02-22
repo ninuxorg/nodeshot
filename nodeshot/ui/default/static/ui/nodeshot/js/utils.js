@@ -252,7 +252,7 @@
             },
             options = $.extend({
                 message: '',
-                successMessage: 'ok',
+                successMessage: gettext('ok'),
                 successAction: function () {},
                 defaultMessage: null,
                 defaultAction: function () {}

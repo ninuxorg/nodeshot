@@ -238,7 +238,7 @@
             // rollback in case of error
             .error(function(http){
                 self.model.set('relationships', backup);
-                $.createModal({ message: 'error' });
+                $.createModal({ message: gettext('error') });
             });
         },
 
@@ -320,7 +320,7 @@
                 self.model.set('relationships', relationships);
                 self.model.trigger('change');
                 // display error
-                $.createModal({ message: 'error' });
+                $.createModal({ message: gettext('error') });
             });
         },
 
