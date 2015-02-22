@@ -256,23 +256,35 @@
                 successAction: function () {},
                 defaultMessage: null,
                 defaultAction: function () {}
-            }, opts);
-
+            }, opts),
+            successButton;
+        // create HTML
         $('body').append(_.template(template_html)(options));
-
+        // store reference to success button
+        successButton = $('#tmp-modal .btn-success');
+        // enter keys == ok
+        $(window).on('keyup.modal', function (e) {
+            if (e.keyCode === 13) {
+                successButton.trigger('click');
+            }
+        });
+        // show modal
         $('#tmp-modal').modal('show');
-
-        $('#tmp-modal .btn-success').one('click', function (e) {
+        // bind click on success
+        successButton.one('click', function (e) {
             close();
             options.successAction();
         });
-
+        // bind click on default action
         $('#tmp-modal .btn-default').one('click', function (e) {
             close();
             options.defaultAction();
         });
-
+        // when modal is hidden
         $('#tmp-modal').one('hidden.bs.modal', function (e) {
+            // unbind keyup event (enter key)
+            $(window).off('keyup.modal');
+            // destroy HTML
             $('#tmp-modal').remove();
         });
     };
