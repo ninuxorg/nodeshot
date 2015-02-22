@@ -20,7 +20,9 @@
 
     Ns.title = $('title');
     Ns.changeTitle = function (title) {
-        Ns.title.text(title + ' - ' + Ns.settings.siteName);
+        // empty prefix if title is empty
+        var prefix = title.trim() !== '' ? title + ' - ' : '';
+        Ns.title.text(prefix + Ns.settings.siteName);
     };
 
     /**
@@ -102,7 +104,8 @@
         },
 
         addNode: function () {
-            Ns.views.map.Layout.show('addNode');
+            this.getMap();
+            Ns.body.currentView.addNode();
         },
 
         // map node popup

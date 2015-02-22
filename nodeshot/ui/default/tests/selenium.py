@@ -624,6 +624,45 @@ class DefaultUiSeleniumTest(TestCase):
         # log out
         self._logout()
 
+    def test_map_add_node_direct_fragment(self):
+        # similar to the previous test but instead of clicking on the add node button
+        # we directly open the URL fragment
+        browser = self.browser
+        self._hashchange('#map/add')
+        self._wait_until_element_visible('#signin-modal', 1, 'signin modal not visible')
+        browser.find_element_by_css_selector('#signin-modal .icon-close').click()
+        sleep(0.5)
+        self._hashchange('#')
+
+        # login as admin
+        self._login()
+        self._wait_until_ajax_complete(5, 'timeout while reloading data after login')
+        self._hashchange('#map/add')
+
+        # ensure elements have been hidden
+        legend = browser.find_element_by_css_selector('#legend-js')
+        toolbar = browser.find_element_by_css_selector('#map-toolbar')
+        cluster = browser.find_element_by_css_selector('#map-js .cluster')
+        self.assertFalse(legend.is_displayed())
+        self.assertFalse(toolbar.is_displayed())
+        self.assertFalse(cluster.is_displayed())
+        # ensure URL has changed
+        self.assertEqual(browser.current_url.split('#')[1], 'map/add')
+
+        # cancel step1
+        self.browser.find_element_by_css_selector('#add-node-step1 button').click()
+        # ensure hidden element reset to initial state
+        self.assertTrue(legend.is_displayed())
+        self.assertTrue(toolbar.is_displayed())
+        cluster = browser.find_element_by_css_selector('#map-js .cluster')
+        self.assertTrue(cluster.is_displayed())
+
+        self.assertEqual(browser.current_url.split('#')[1], 'map')
+
+        # log out
+        self._hashchange('#')
+        self._logout()
+
     def test_map_lat_lng(self):
         LEAFLET_MAP = self.LEAFLET_MAP
         browser = self.browser
