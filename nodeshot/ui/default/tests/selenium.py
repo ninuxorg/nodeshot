@@ -853,3 +853,16 @@ class DefaultUiSeleniumTest(TestCase):
         # ensure one error
         self.assertEqual(len(browser.find_elements_by_css_selector('.input-group.hastip.error')), 1)
         self.assertIn('address already exists', browser.find_element_by_css_selector('.tooltip-inner').text)
+
+    def test_edit_profile(self):
+        # not authenticated goes back to home
+        self._hashchange('#account/profile/edit')
+        self._wait_until_element_visible('#body article.center-stage .btn-primary', 1, 'home page not visible')
+        # login
+        self._login()
+        self._hashchange('#account/profile/edit')
+        self._wait_until_element_visible('#form-container', 1, 'form not shown')
+        self.browser.find_element_by_css_selector('#form-container .btn-success').click()
+        self._wait_until_ajax_complete(5, 'Timeout')
+        self._wait_until_element_visible('article .icon-link', 1, 'profile not shown after save')
+        self.assertEqual(self.browser.find_element_by_css_selector('#user-details-container h1').text, 'admin')

@@ -150,6 +150,11 @@
         // reset forgotten password
         getPasswordReset: function () {
             new Ns.views.PasswordReset();
+        },
+
+        // edit profile
+        getEditUser: function () {
+            new Ns.views.EditUser();
         }
     };
 
@@ -170,7 +175,8 @@
             'layers/:slug': 'getLayer',
             'users/:username': 'getUser',
             'users/:username/nodes': 'getUserNodes',
-            'account/password/reset': 'getPasswordReset'
+            'account/password/reset': 'getPasswordReset',
+            'account/profile/edit': 'getEditUser'
         }
     });
 

@@ -2,6 +2,9 @@
 <h1><%= username %></h1>
 
 <p class="actions">
+    <% if (Ns.db.user.isAuthenticated() && Ns.db.user.get('username') === username) { %>
+        <a href="#account/profile/edit" class="icon-edit">{% trans 'Edit' %}</a>
+    <% } %>
     <% if (Ns.settings.contacting) { %>
         <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
     <% } %>
@@ -11,7 +14,6 @@
 
 <div class="row nomargin">
     <img src="<%= avatar %>?s=200" alt="" class="avatar200">
-
     <div class="col-sm-4 right nopadding">
         <% if(full_name){ %><p><%= full_name %></p><% } %>
         <% if(location){ %><p><%= location %></p><% } %>

@@ -40,7 +40,7 @@
             Ns.track();
             this.form = new Backbone.Form({
                 model: this.model,
-                submitButton: 'Reset Password'
+                submitButton: gettext('Reset Password')
             }).render();
             this.ui.form.html(this.form.$el);
         },
