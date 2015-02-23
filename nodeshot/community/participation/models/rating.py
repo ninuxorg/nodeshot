@@ -24,13 +24,23 @@ class Rating(UpdateCountsMixin, BaseDate):
 
     class Meta:
         app_label = 'participation'
-        unique_together = (("node", "user"),)
 
     def __unicode__(self):
         if self.pk:
             return _('rating #%d for node %s') % (self.pk, self.node.name)
         else:
             return _('rating')
+
+    def save(self, *args, **kwargs):
+        """
+        ensure users cannot rate the same node multiple times
+        but let users change their rating
+        """
+        if not self.pk:
+            old_ratings = Rating.objects.filter(user=self.user, node=self.node)
+            for old_rating in old_ratings:
+                old_rating.delete()
+        super(Rating, self).save(*args, **kwargs)
 
     def update_count(self):
         """ updates rating count and rating average """

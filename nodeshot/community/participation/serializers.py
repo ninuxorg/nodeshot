@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -5,7 +6,7 @@ from rest_framework import serializers, pagination
 
 from nodeshot.core.nodes.models import Node
 from nodeshot.community.profiles.serializers import ProfileRelationSerializer
-from .models import *  # noqa
+from .models import Comment, Vote, Rating, NodeParticipationSettings, NodeRatingCount
 
 
 __all__ = [
@@ -146,19 +147,22 @@ class NodeParticipationSettingsSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug', 'address', 'participation_settings')
 
 
-class LayerSettingsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LayerParticipationSettings
-        fields = ('voting_allowed', 'rating_allowed', 'comments_allowed',)
+if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+    from .models import LayerParticipationSettings
 
+    class LayerSettingsSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = LayerParticipationSettings
+            fields = ('voting_allowed', 'rating_allowed', 'comments_allowed',)
 
-class LayerParticipationSettingsSerializer(serializers.ModelSerializer):
-    """ Layer participation settings"""
-    participation_settings = LayerSettingsSerializer(source='layer_participation_settings')
+    # noqa
+    class LayerParticipationSettingsSerializer(serializers.ModelSerializer):
+        """ Layer participation settings"""
+        participation_settings = LayerSettingsSerializer(source='layer_participation_settings')
 
-    class Meta:
-        model = Node
-        fields = ('name', 'slug', 'participation_settings')
+        class Meta:
+            model = Node
+            fields = ('name', 'slug', 'participation_settings')
 
 
 # ------ Add relationship to ExtensibleNodeSerializer ------ #

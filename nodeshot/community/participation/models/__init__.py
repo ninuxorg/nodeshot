@@ -20,11 +20,11 @@ from node_rating_count import NodeRatingCount
 
 
 __all__ = [
-    'NodeRatingCount',
     'Comment',
     'Vote',
     'Rating',
     'NodeParticipationSettings',
+    'NodeRatingCount',
 ]
 
 
@@ -139,7 +139,6 @@ Node.comments_allowed = _comments_allowed
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from nodeshot.core.nodes.models import Node
 
 from ..tasks import create_related_object
 

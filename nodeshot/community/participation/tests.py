@@ -110,6 +110,22 @@ class ParticipationTests(TestCase):
         self.assertEqual(0, node.rating_count.likes)
         self.assertEqual(0, node.rating_count.dislikes)
 
+    def test_rating_model(self):
+        self.assertEqual(Rating.objects.count(), 0)
+        user = User.objects.first()
+        node = Node.objects.first()
+        r = Rating(user=user, node=node, value=5)
+        r.full_clean()
+        r.save()
+        self.assertEqual(Rating.objects.count(), 1)
+        self.assertEqual(Rating.objects.last().value, 5)
+
+        r = Rating(user=user, node=node, value=2)
+        r.full_clean()
+        r.save()
+        self.assertEqual(Rating.objects.count(), 1)
+        self.assertEqual(Rating.objects.last().value, 2)
+
     def test_node_comment_api(self):
         """
         Comments endpoint should be reachable with GET and return 404 if object is not found.
@@ -235,9 +251,9 @@ class ParticipationTests(TestCase):
         response = self.client.post(url, good_post_data)
         self.assertEqual(response.status_code, 201)
 
-        # POST 400 - user rating again fails because 'value' and 'user' are unique_together
+        # POST 201
         response = self.client.post(url, good_post_data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 201)
 
         # POST 201 - ensure additional post data "user" and "node" are ignored
         # Tested as a different user or 400 would be returned because 'value' and 'user' are unique_together

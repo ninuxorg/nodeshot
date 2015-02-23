@@ -35,7 +35,7 @@ class Vote(UpdateCountsMixin, BaseDate):
 
     def save(self, *args, **kwargs):
         """
-        ensure users cannot vote multiple times
+        ensure users cannot vote the same node multiple times
         but let users change their votes
         """
         if not self.pk:
