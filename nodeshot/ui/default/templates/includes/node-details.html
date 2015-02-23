@@ -33,7 +33,7 @@
     </p>
 
     <ul class="nav nav-tabs hidden-xs" id="node-menu">
-        <li class="active"><a href="javascript:$.createModal({message:'not implemented yet'})">{% trans 'General info' %}</a></li>
+        <li class="active"><a href="javascript:return false;)">{% trans 'General info' %}</a></li>
         <!--<li><a href="javascript:$.createModal({message:'not implemented yet'})">Images (4)</a></li>
         <li><a href="javascript:$.createModal({message:'not implemented yet'})">Devices (3)</a></li>-->
     </ul>
@@ -132,7 +132,7 @@
                     <td class="left">
                         {% trans 'Rating' %}:
                     </td>
-                    <td class="right" id="js-rating" data-thanks-message="{% trans 'Thanks for rating' %}">
+                    <td class="right" id="js-rating">
                         <a href="#" class="rating">
                             <% _.each(_.numberTo5Stars(relationships.counts.rating_avg / 2), function(value, i){ %>
                                 <span class="icon-star-<%= value %>"

@@ -341,7 +341,7 @@
         /*
          * restore stars original status on mouseout
          */
-        mouseOutStar: function(e){
+        mouseOutStar: function(e) {
             _.each(this.ui.stars, function(el, i){
                 $(el).attr('class', $(el).attr('data-original-class'));
             });
@@ -350,9 +350,9 @@
         /*
          * submit rating, only if logged in
          */
-        rate: function(e){
+        rate: function(e) {
             e.preventDefault();
-            if(!Ns.db.user.isAuthenticated()){
+            if(!Ns.db.user.isAuthenticated()) {
                 this.ext.signin.modal('show');
                 return;
             }
@@ -360,13 +360,12 @@
                 value = (parseInt($(e.target).attr('data-number')) + 1) * 2,  // (0-index value + 1) * 2
                 self = this;
             $.post(relationships.ratings_url, { "value": value })
-            .done(function(){
-                $.createModal({ message: self.$('#js-rating').attr('data-thanks-message') });
-                self.model.fetch();
-            })
-            .error(function(xhr){
-                $.createModal({ message: xhr.responseJSON["__all__"] });
-            });
+                .done(function(){
+                    self.model.fetch();
+                })
+                .error(function(xhr){
+                    $.createModal({ message: xhr.responseJSON["__all__"] });
+                });
         },
 
         /*

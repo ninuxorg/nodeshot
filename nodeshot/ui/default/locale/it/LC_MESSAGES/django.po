@@ -1,19 +1,19 @@
 # Nodeshot default UI translation file
 # This file is distributed under the same license as the Nodeshot package.
 # Federico Capoano nemesis at ninux dot org, 2015.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-21 21:26+0100\n"
+"POT-Creation-Date: 2015-02-23 14:55+0100\n"
 "PO-Revision-Date: 2015-02-21 21:31+0050\n"
 "Last-Translator:   <nemesis@ninux.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.7.5\n"
 
@@ -24,16 +24,15 @@ msgstr "Caricamento"
 #: templates/base.html:110
 #, python-format
 msgid ""
-"By signing up you declare to have accepted our <a "
-"href=\"%(PRIVACY_POLICY_LINK)s\" class=\"js-"
-"dismiss\">privacy&nbsp;policy</a><br />and <a "
-"href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-"
-"dismiss\">terms&nbsp;of&nbsp;service</a>."
+"By signing up you declare to have accepted our <a href="
+"\"%(PRIVACY_POLICY_LINK)s\" class=\"js-dismiss\">privacy&nbsp;policy</a><br /"
+">and <a href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-dismiss\">terms&nbsp;"
+"of&nbsp;service</a>."
 msgstr ""
-"Iscrivendoti dichiari di accettare la <a href=\"%(PRIVACY_POLICY_LINK)s\" "
-"class=\"js-dismiss\">privacy&nbsp;policy</a><br />ed i <a "
-"href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-"
-"dismiss\">termini&nbsp;del&nbsp;servizio</a>."
+"Iscrivendoti dichiari di accettare l'<a href=\"%(PRIVACY_POLICY_LINK)s\" "
+"class=\"js-dismiss\">informativa sulla privacy</a><br />ed i <a href="
+"\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-dismiss\">termini&nbsp;del&nbsp;"
+"servizio</a>."
 
 #: templates/base.html:118
 msgid "Sign up with Facebook"
@@ -299,13 +298,9 @@ msgstr "Aggiornato"
 msgid "Rating"
 msgstr "Punteggio"
 
-#: templates/includes/node-details.html:135
-msgid "Thanks for rating"
-msgstr "Grazie!"
-
 #: templates/includes/node-details.html:143
 msgid "number of ratings"
-msgstr "Numero di valutazioni"
+msgstr "numero di valutazioni"
 
 #: templates/includes/node-details.html:158
 msgid "Comments"
