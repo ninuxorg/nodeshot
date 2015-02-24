@@ -155,6 +155,18 @@
         // edit profile
         getEditUser: function () {
             new Ns.views.EditUser();
+        },
+
+        getContactNode: function (slug) {
+            new Ns.views.Contact(null, { type: 'nodes', slug: slug });
+        },
+
+        getContactUser: function (slug) {
+            new Ns.views.Contact(null, { type: 'profiles', slug: slug });
+        },
+
+        getContactLayer: function (slug) {
+            new Ns.views.Contact(null, { type: 'layers', slug: slug });
         }
     };
 
@@ -176,7 +188,10 @@
             'users/:username': 'getUser',
             'users/:username/nodes': 'getUserNodes',
             'account/password/reset': 'getPasswordReset',
-            'account/profile/edit': 'getEditUser'
+            'account/profile/edit': 'getEditUser',
+            'nodes/:slug/contact': 'getContactNode',
+            'users/:slug/contact': 'getContactUser',
+            'layers/:slug/contact': 'getContactLayer'
         }
     });
 

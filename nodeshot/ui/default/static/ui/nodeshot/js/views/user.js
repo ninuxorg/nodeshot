@@ -9,7 +9,8 @@
 
         events: {
             // actions
-            'click .actions .icon-link': 'permalink'
+            'click .actions .icon-link': 'permalink',
+            'click .icon-mail': 'contact'
         },
 
         modelEvents: {
@@ -18,6 +19,8 @@
         },
 
         initialize: function (options) {
+            // listen to login / logout events
+            this.listenTo(Ns.db.user, 'loggedin loggedout', this.render);
             // get cached version or init new
             this.model = Ns.db.users.get(options.username) || new Ns.models.User();
             // if not cached
@@ -57,6 +60,14 @@
             e.preventDefault();
             var text = $(e.target).attr('data-text');
             window.prompt(text, window.location.href);
+        },
+
+        contact: function (e) {
+            if(!Ns.db.user.isAuthenticated()){
+                e.preventDefault();
+                $('#signin-modal').modal('show');
+                return;
+            }
         }
     });
 

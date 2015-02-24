@@ -7,7 +7,8 @@
         template: '#layer-details-template',
 
         events: {
-            'click .icon-link': 'permalink'
+            'click .icon-link': 'permalink',
+            'click .icon-mail': 'contact'
         },
 
         initialize: function (options) {
@@ -66,6 +67,14 @@
             e.preventDefault();
             var text = $(e.target).attr('data-text');
             window.prompt(text, window.location.href);
+        },
+
+        contact: function (e) {
+            if(!Ns.db.user.isAuthenticated()){
+                e.preventDefault();
+                $('#signin-modal').modal('show');
+                return;
+            }
         }
     });
 })();

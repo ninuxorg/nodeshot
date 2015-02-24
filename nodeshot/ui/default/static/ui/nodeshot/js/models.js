@@ -577,4 +577,29 @@
             email: { validators: ['required', 'email'] }
         }
     });
+
+    Ns.models.Contact = Ns.models.Base.extend({
+        urlRoot: Ns.url(':type/:slug/contact/'),
+
+        url: function () {
+            var url = this.urlRoot,
+                type = this.get('type'),
+                slug = this.get('slug');
+            if (type && slug) {
+                url = url.replace(':type', type).replace(':slug', slug);
+            }
+            return url;
+        },
+
+        parentFragment: function () {
+            var type = this.get('type'),
+                type = type === 'profiles' ? 'users' : type,
+                slug = this.get('slug');
+            return type + '/' + slug;
+        },
+
+        schema: {
+            message: { type: 'TextArea', title: gettext('Message'), validators: ['required'] }
+        }
+    });
 }());

@@ -21,6 +21,7 @@
         events: {
             // actions
             'click .icon-link': 'permalink',
+            'click .icon-mail': 'contact',
             // vote
             'click .icon-thumbs-up': 'like',
             'click .icon-thumbs-down': 'dislike',
@@ -192,6 +193,13 @@
             window.prompt(text, window.location.href);
         },
 
+        contact: function (e) {
+            if(!Ns.db.user.isAuthenticated()){
+                e.preventDefault();
+                this.ext.signin.modal('show');
+                return;
+            }
+        },
 
         like: function(e) { this.vote(e, 1); },
         dislike: function(e) { this.vote(e, -1); },

@@ -5,8 +5,8 @@
     <% if (Ns.db.user.isAuthenticated() && Ns.db.user.get('username') === username) { %>
         <a href="#account/profile/edit" class="icon-edit">{% trans 'Edit' %}</a>
     <% } %>
-    <% if (Ns.settings.contacting) { %>
-        <a href="javascript:$.createModal({message:'not implemented yet'})" class="icon-mail">{% trans 'contact' %}</a>
+    <% if (Ns.settings.contacting && Ns.db.user.get('username') !== username) { %>
+        <a href="#users/<%= username %>/contact" class="icon-mail">{% trans 'contact' %}</a>
     <% } %>
     <a href="#users/<%= username %>/nodes" class="icon-nodes">{% trans 'nodes' %}</a>
     <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>

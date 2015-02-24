@@ -3,6 +3,9 @@
     <h2><%= name %></h2>
 
     <p class="actions">
+        <% if (Ns.settings.contacting && has_contact) { %>
+            <a href="#layers/<%= slug %>/contact" class="icon-mail">{% trans 'contact' %}</a>
+        <% } %>
         <a href="#permalink" class="icon-link" data-text="{% trans 'Press CTRL+C to copy' %}">{% trans 'permalink' %}</a>
     </p>
 

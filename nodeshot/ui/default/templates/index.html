@@ -246,6 +246,11 @@
         <% }) %>
         </style>
     </script>
+
+    <script id="contact-success-template" type="text/template">
+        <p>{% trans 'Email sent successfully!' %}</p>
+        <p><a href="#<%= parentFragment %>" class="btn btn-primary">{% trans 'Take me back to' %} <%= slug %></a>
+    </script>
 {% endblock %}
 
 {% block jslibs %}
@@ -318,6 +323,7 @@
     <script src="{% static 'ui/nodeshot/js/views/layer-list.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/user.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/password-reset.js' %}"></script>
+    <script src="{% static 'ui/nodeshot/js/views/contact.js' %}"></script>
     <!-- preloaded data -->
     <script>
         Ns.db = {
