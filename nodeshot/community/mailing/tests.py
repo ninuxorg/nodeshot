@@ -134,6 +134,17 @@ class MailingTest(TestCase):
         response = self.client.post(url, {'message': 'ensure contact user api works as expected'})
         self.assertEqual(response.status_code, 400)
 
+    def test_contact_api_validation_error(self):
+        url = reverse('api_layer_contact', args=['rome'])
+        self.client.login(username='admin', password='tester')
+        mail.outbox = []
+
+        response = self.client.post(url, {'message': 'short'})
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(Inward.objects.count(), 0)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Ensure this value has at least', response.data['message'][0])
+
     def test_no_filter(self):
         """ *** Test no filtering, send to all *** """
         # count users

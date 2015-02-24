@@ -91,7 +91,7 @@ class ContactNode(generics.CreateAPIView):
         try:
             message.full_clean()
         except ValidationError, e:
-            return Response(e.message_dict)
+            return Response(e.message_dict, status=400)
 
         message.save()
 
