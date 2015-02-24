@@ -31,16 +31,20 @@ class LayerListSerializer(geoserializers.GeoModelSerializer, HStoreSerializer):
     nodes = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_list', lookup_field='slug')
     geojson = serializers.HyperlinkedIdentityField(view_name='api_layer_nodes_geojson', lookup_field='slug')
     center = serializers.SerializerMethodField('get_center')
+    has_contact = serializers.SerializerMethodField('get_has_contact')
 
     def get_center(self, obj):
         return json.loads(obj.center.geojson)
+
+    def get_has_contact(self, obj):
+        return bool(obj.email)
 
     class Meta:
         model = Layer
         fields = [
             'id', 'slug', 'name', 'center', 'area', 'organization',
             'nodes_minimum_distance', 'new_nodes_allowed', 'is_external',
-            'details', 'nodes', 'geojson'
+            'has_contact', 'details', 'nodes', 'geojson'
         ] + ADDITIONAL_LAYER_FIELDS
 
 
@@ -69,7 +73,7 @@ class LayerDetailSerializer(LayerListSerializer):
         model = Layer
         fields = ['name', 'slug', 'center', 'area', 'organization', 'is_external',
                   'nodes_minimum_distance', 'new_nodes_allowed',
-                  'description', 'text',
+                  'description', 'text', 'has_contact',
                   'website', 'nodes', 'geojson'] + ADDITIONAL_LAYER_FIELDS
 
 
