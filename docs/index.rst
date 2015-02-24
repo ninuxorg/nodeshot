@@ -80,6 +80,7 @@ Contents
    /topics/profiles
    /topics/participation
    /topics/social_login
+   /topics/mailing
    /topics/websockets
    /topics/synchronizers
    /topics/open311
