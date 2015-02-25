@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-25 18:43+0100\n"
-"PO-Revision-Date: 2015-02-25 18:45+0050\n"
+"POT-Creation-Date: 2015-02-25 19:16+0100\n"
+"PO-Revision-Date: 2015-02-25 19:16+0050\n"
 "Last-Translator: Fede Tester <nemesis@ninux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +21,15 @@ msgstr ""
 msgid "Loading"
 msgstr "Caricamento"
 
-#: templates/base.html:110
+#: templates/base.html:67
+msgid "Warning: javascript disabled!"
+msgstr "Attenzione: javascript disabilitato!"
+
+#: templates/base.html:67
+msgid "This website needs javascript in order to work."
+msgstr "Questo sito ha bisogno di javascript per funzionare correttamente."
+
+#: templates/base.html:111
 #, python-format
 msgid ""
 "By signing up you declare to have accepted our <a "
@@ -35,55 +43,55 @@ msgstr ""
 "href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-"
 "dismiss\">termini&nbsp;del&nbsp;servizio</a>."
 
-#: templates/base.html:118
+#: templates/base.html:119
 msgid "Sign up with Facebook"
 msgstr "Iscriviti con facebook"
 
-#: templates/base.html:126
+#: templates/base.html:127
 msgid "Sign up with Google"
 msgstr "Iscriviti con Google"
 
-#: templates/base.html:134
+#: templates/base.html:135
 msgid "Sign up with Github"
 msgstr "Iscriviti con Github"
 
-#: templates/base.html:142 templates/base.html.py:219
+#: templates/base.html:143 templates/base.html.py:220
 msgid "or"
 msgstr "oppure"
 
-#: templates/base.html:172 templates/base.html.py:250 templates/index.html:82
+#: templates/base.html:173 templates/base.html.py:251 templates/index.html:82
 msgid "Sign up"
 msgstr "Iscriviti"
 
-#: templates/base.html:175
+#: templates/base.html:176
 msgid "Already have an account?"
 msgstr "Hai già un account?"
 
-#: templates/base.html:175 templates/base.html.py:245 templates/index.html:89
+#: templates/base.html:176 templates/base.html.py:246 templates/index.html:89
 msgid "Sign in"
 msgstr "Accedi"
 
-#: templates/base.html:195
+#: templates/base.html:196
 msgid "Sign in with Facebook"
 msgstr "Accedi con Facebook"
 
-#: templates/base.html:203
+#: templates/base.html:204
 msgid "Sign in with Google"
 msgstr "Accedi con Google"
 
-#: templates/base.html:211
+#: templates/base.html:212
 msgid "Sign in with Github"
 msgstr "Accedi con Github"
 
-#: templates/base.html:242
+#: templates/base.html:243
 msgid "Stay signed in"
 msgstr "Resta connesso"
 
-#: templates/base.html:248
+#: templates/base.html:249
 msgid "Forgot your password?"
 msgstr "Hai dimenticato la password?"
 
-#: templates/base.html:250
+#: templates/base.html:251
 msgid "Don't have an account yet?"
 msgstr "Non hai un account?"
 

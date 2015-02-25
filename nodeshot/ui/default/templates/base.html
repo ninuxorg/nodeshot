@@ -63,7 +63,8 @@
     {% block preloader %}
     <div id="preloader">
         <p class="inner">
-            <span class="icon-loading animate-spin"></span> {% trans 'Loading' %} &hellip;
+            <script>document.write('<span class="icon-loading animate-spin"></span> {% trans "Loading" %} &hellip;');</script>
+            <noscript>{% trans 'Warning: javascript disabled!' %}<br>{% trans 'This website needs javascript in order to work.' %}</noscript>
         </p>
     </div>
     {% endblock %}
