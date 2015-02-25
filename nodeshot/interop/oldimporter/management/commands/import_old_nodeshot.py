@@ -6,7 +6,7 @@ from optparse import make_option
 
 from netaddr import ip
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ImproperlyConfigured
@@ -26,19 +26,18 @@ else:
 
 # TODO: this check is useless because nodeshot.core.layer is required as a dependency!
 if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-    from nodeshot.core.layers.models import Layer
     LAYER_APP_INSTALLED = True
 else:
     LAYER_APP_INSTALLED = False
 
 from nodeshot.core.base.utils import pause_disconnectable_signals, resume_disconnectable_signals
 from nodeshot.core.nodes.models import Node, Status
-from nodeshot.networking.net.models import *
+from nodeshot.networking.net.models import *  # noqa
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 from nodeshot.networking.links.models import Link
-from nodeshot.networking.links.models.choices import LINK_STATUS, LINK_TYPES, METRIC_TYPES
+from nodeshot.networking.links.models.choices import LINK_STATUS, LINK_TYPES
 from nodeshot.community.mailing.models import Inward
-from nodeshot.interop.oldimporter.models import *
+from nodeshot.interop.oldimporter.models import *  # noqa
 
 
 class Command(BaseCommand):
@@ -165,7 +164,7 @@ class Command(BaseCommand):
         except KeyboardInterrupt:
             self.message('\n\nOperation cancelled...')
             delete = True
-        except Exception as e:
+        except Exception:
             tb = traceback.format_exc()
             delete = True
             # rollback database transaction
@@ -207,42 +206,42 @@ class Command(BaseCommand):
         for interface in self.saved_interfaces:
             try:
                 interface.delete()
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Got exception while deleting interface %s\n\n%s' % (interface.mac, tb))
 
         for device in self.saved_devices:
             try:
                 device.delete()
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Got exception while deleting device %s\n\n%s' % (device.name, tb))
 
         for routing_protocol in self.routing_protocols_added:
             try:
                 routing_protocol.delete()
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Got exception while deleting routing_protocol %s\n\n%s' % (routing_protocol.name, tb))
 
         for node in self.saved_nodes:
             try:
                 node.delete()
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Got exception while deleting node %s\n\n%s' % (node.name, tb))
 
         for contact in self.saved_contacts:
             try:
                 contact.delete()
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Got exception while deleting contact log entry %s\n\n%s' % (contact.id, tb))
 
         for user in self.saved_users:
             try:
                 user.delete()
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Got exception while deleting user %s\n\n%s' % (user.username, tb))
 
@@ -255,9 +254,9 @@ class Command(BaseCommand):
         """
         valid = {
             "default": "default",
-            "def":     "default",
+            "def": "default",
             "discard": "discard",
-            "dis":     "discard",
+            "dis": "discard",
         }
         question = """Cannot automatically determine layer for node "%s" because there \
 are %d layers available in that area, what do you want to do?\n\n""" % (node.name, len(layers))
@@ -296,7 +295,7 @@ choose (enter the number of) one of the following layers:
         return answer
 
     @classmethod
-    def generate_random_password(cls, size=10, chars=string.ascii_uppercase+string.digits):
+    def generate_random_password(cls, size=10, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
 
     def check_status_mapping(self):
@@ -311,10 +310,10 @@ choose (enter the number of) one of the following layers:
             try:
                 # look up by slug if new_val is string
                 if isinstance(new_val, basestring):
-                    lookup = { 'slug': new_val }
+                    lookup = {'slug': new_val}
                 # lookup by primary key otherwise
                 else:
-                    lookup = { 'pk': new_val }
+                    lookup = {'pk': new_val}
                 status = Status.objects.get(**lookup)
                 self.status_mapping[old_val] = status.id
             except Status.DoesNotExist:
@@ -342,7 +341,7 @@ choose (enter the number of) one of the following layers:
         for node in self.old_nodes:
             email_set.add(node.email)
 
-            if not users_dict.has_key(node.email):
+            if node.email not in users_dict:
                 users_dict[node.email] = {
                     'owner': node.owner
                 }
@@ -421,7 +420,7 @@ choose (enter the number of) one of the following layers:
                 # validate data and save
                 user.full_clean()
                 user.save()
-            except Exception as e:
+            except Exception:
                 # if user already exists use that instance
                 if(User.objects.filter(email=email).count() == 1):
                     user = User.objects.get(email=email)
@@ -445,7 +444,7 @@ choose (enter the number of) one of the following layers:
                     email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
                     email_address.full_clean()
                     email_address.save()
-                except Exception as e:
+                except Exception:
                     tb = traceback.format_exc()
                     self.message('Could not save email address for user %s, got exception:\n\n%s' % (user.username, tb))
 
@@ -523,7 +522,7 @@ choose (enter the number of) one of the following layers:
                 node.save(auto_update=False)
                 saved_nodes.append(node)
                 self.verbose('Saved node %s in layer %s with status %s' % (node.name, node.layer, node.status.name))
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Could not save node %s, got exception:\n\n%s' % (node.name, tb))
 
@@ -560,7 +559,7 @@ choose (enter the number of) one of the following layers:
                 device.save(auto_update=False)
                 saved_devices.append(device)
                 self.verbose('Saved device %s' % device.name)
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Could not save device %s, got exception:\n\n%s' % (device.name, tb))
 
@@ -693,7 +692,7 @@ choose (enter the number of) one of the following layers:
                 interface.save(auto_update=False)
                 saved_interfaces.append(interface)
                 self.verbose('Saved interface %s' % interface.name)
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Could not save interface %s, got exception:\n\n%s' % (interface.mac, tb))
                 continue
@@ -704,7 +703,7 @@ choose (enter the number of) one of the following layers:
                     vap.save()
                     saved_vaps.append(vap)
                     self.verbose('Saved vap %s' % vap.essid or vap.bssid)
-                except Exception as e:
+                except Exception:
                     tb = traceback.format_exc()
                     self.message('Could not save vap %s, got exception:\n\n%s' % (vap.essid or vap.bssid, tb))
 
@@ -714,7 +713,7 @@ choose (enter the number of) one of the following layers:
                     ipv4.save()
                     saved_ipv4.append(ipv4)
                     self.verbose('Saved ipv4 %s' % ipv4.address)
-                except Exception as e:
+                except Exception:
                     tb = traceback.format_exc()
                     self.message('Could not save ipv4 %s, got exception:\n\n%s' % (ipv4.address, tb))
 
@@ -724,7 +723,7 @@ choose (enter the number of) one of the following layers:
                     ipv6.save()
                     saved_ipv6.append(ipv6)
                     self.verbose('Saved ipv6 %s' % ipv6.address)
-                except Exception as e:
+                except Exception:
                     tb = traceback.format_exc()
                     self.message('Could not save ipv6 %s, got exception:\n\n%s' % (ipv6.address, tb))
 
@@ -799,7 +798,7 @@ choose (enter the number of) one of the following layers:
                 link.save()
                 saved_links.append(link)
                 self.verbose('Saved link %s' % link)
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Could not save link %s, got exception:\n\n%s' % (old_link.id, tb))
 
@@ -817,11 +816,17 @@ choose (enter the number of) one of the following layers:
 
         for old_contact in self.old_contacts:
 
+            try:
+                user = User.objects.get(email=old_contact.from_email)
+            except User.DoesNotExist:
+                self.message('Could not find any user with email: %s' % old_contact.from_email)
+
             contact = Inward(**{
                 "id": old_contact.id,
                 "content_type": content_type,
                 "object_id": old_contact.node_id,
-                "status": 1,  # sent
+                "status": 1,  # sent,
+                "user": user,
                 "from_name": old_contact.from_name,
                 "from_email": old_contact.from_email,
                 "message": old_contact.message,
@@ -844,7 +849,7 @@ choose (enter the number of) one of the following layers:
                 contact.save(auto_update=False)
                 saved_contacts.append(contact)
                 self.verbose('Saved contact log entry #%s' % contact.id)
-            except Exception as e:
+            except Exception:
                 tb = traceback.format_exc()
                 self.message('Could not save contact log entry %s, got exception:\n\n%s' % (old_contact.id, tb))
 

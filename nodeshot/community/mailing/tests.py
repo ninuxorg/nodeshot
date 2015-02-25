@@ -5,7 +5,7 @@ nodeshot.community.mailing unit tests
 import datetime
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -63,14 +63,27 @@ class MailingTest(TestCase):
         content_type = ContentType.objects.only('id', 'model').get(model='node')
         message.content_type = content_type
         message.object_id = 1
+        user = User.objects.get(pk=1)
         # ensure validation error
         try:
             message.full_clean()
             self.fail('ValidationError not raised')
         except ValidationError as e:
-            self.assertIn(_('If sender is not specified from_name and from_email must be filled in'), e.messages)
+            self.assertIn(_('If sender is not specified from_name and from_email must be filled in'), e.message_dict['__all__'][0])
+        # ensure validation error
+        try:
+            message.from_email = user.email
+            message.from_name = user.get_full_name()
+            message.full_clean()
+            self.fail('ValidationError not raised')
+        except ValidationError as e:
+            self.assertIn(_('This field cannot be blank'), e.message_dict['user'][0])
+        # ensure no validation error
+        message.full_clean(exclude=['user'])
+        # empty from_name and from_email, we need to ensure they'll filled automatically
+        message.from_name = None
+        message.from_email = None
         # set user
-        user = User.objects.get(pk=1)
         message.user = user
         message.full_clean()
         message.save()

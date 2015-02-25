@@ -45,7 +45,7 @@ class Inward(BaseDate):
     class Meta:
         verbose_name = _('Inward message')
         verbose_name_plural = _('Inward messages')
-        app_label= 'mailing'
+        app_label = 'mailing'
         ordering = ['-status']
 
     def __unicode__(self):
@@ -54,8 +54,7 @@ class Inward(BaseDate):
     def clean(self, *args, **kwargs):
         """ custom validation """
         if not self.user and (not self.from_name or not self.from_email):
-            raise ValidationError(_('If sender is not specified from_name and from_email must be filled in'))
-
+            raise ValidationError(_('If sender is not specified from_name and from_email must be filled in.'))
         # fill name and email
         if self.user:
             self.from_name = self.user.get_full_name()
@@ -87,7 +86,7 @@ class Inward(BaseDate):
             # to
             to,
             # reply-to header
-            headers = {'Reply-To': self.from_email}
+            headers={'Reply-To': self.from_email}
         )
 
         import socket
