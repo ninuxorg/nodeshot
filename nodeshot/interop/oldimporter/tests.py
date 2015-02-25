@@ -7,9 +7,10 @@ from nodeshot.core.layers.models import Layer
 from nodeshot.networking.net.models import Device, Interface, Ip, Vap, Wireless
 from nodeshot.networking.links.models import Link
 from nodeshot.community.profiles.models import Profile as User
+from nodeshot.community.profiles.models import EmailAddress, EmailConfirmation
 from nodeshot.community.mailing.models import Inward
 
-from .models import *
+from .models import *  # noqa
 from . import settings
 
 
@@ -65,6 +66,8 @@ class TestOldImporter(TestCase):
         ip_addresses = Ip.objects.all().order_by('id')
         links = Link.objects.all().order_by('id')
         users = User.objects.all()
+        email_addresses = EmailAddress.objects.all()
+        email_confirmations = EmailConfirmation.objects.all()
         inwards = Inward.objects.all()
 
         self.assertEqual(len(nodes), 4)
@@ -74,6 +77,9 @@ class TestOldImporter(TestCase):
         self.assertEqual(Vap.objects.count(), 2)
         self.assertEqual(len(links), 1)
         self.assertEqual(len(users), 4)
+        self.assertEqual(len(email_addresses), 4)
+        self.assertEqual(len(email_confirmations), 0)
+        self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(len(inwards), 1)
 
         # node1

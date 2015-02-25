@@ -16,19 +16,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from ...settings import settings, STATUS_MAPPING, DEFAULT_LAYER
+from ...settings import STATUS_MAPPING, DEFAULT_LAYER
 
-if 'emailconfirmation' in settings.INSTALLED_APPS:
-    EMAIL_ADDRESS_APP_INSTALLED = True
-    from nodeshot.community.emailconfirmation.models import EmailAddress
-else:
-    EMAIL_ADDRESS_APP_INSTALLED = False
+from nodeshot.community.profiles.settings import EMAIL_CONFIRMATION
 
-# TODO: this check is useless because nodeshot.core.layer is required as a dependency!
-if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-    LAYER_APP_INSTALLED = True
-else:
-    LAYER_APP_INSTALLED = False
+if EMAIL_CONFIRMATION:
+    from nodeshot.community.profiles.models import EmailAddress
 
 from nodeshot.core.base.utils import pause_disconnectable_signals, resume_disconnectable_signals
 from nodeshot.core.nodes.models import Node, Status
@@ -419,7 +412,7 @@ choose (enter the number of) one of the following layers:
             try:
                 # validate data and save
                 user.full_clean()
-                user.save()
+                user.save(sync_emailaddress=False)
             except Exception:
                 # if user already exists use that instance
                 if(User.objects.filter(email=email).count() == 1):
@@ -439,7 +432,7 @@ choose (enter the number of) one of the following layers:
                 self.verbose('Saved user %s (%s) with email <%s>' % (user.username, user.get_full_name(), user.email))
 
             # mark email address as confirmed if feature is enabled
-            if EMAIL_ADDRESS_APP_INSTALLED and EmailAddress.objects.filter(email=user.email).count() is 0:
+            if EMAIL_CONFIRMATION and EmailAddress.objects.filter(email=user.email).count() is 0:
                 try:
                     email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
                     email_address.full_clean()
@@ -479,31 +472,30 @@ choose (enter the number of) one of the following layers:
             node.added = old_node.added
             node.updated = old_node.updated
 
-            if LAYER_APP_INSTALLED:
-                intersecting_layers = node.intersecting_layers
-                # if more than one intersecting layer
-                if len(intersecting_layers) > 1:
-                    # prompt user
-                    answer = self.prompt_layer_selection(node, intersecting_layers)
-                    if isinstance(answer, int):
-                        node.layer_id = answer
-                    elif answer == 'default' and self.default_layer is not False:
-                        node.layer_id = self.default_layer
-                    else:
-                        self.message('Node %s discarded' % node.name)
-                        continue
-                # if one intersecting layer select that
-                elif 2 > len(intersecting_layers) > 0:
-                    node.layer = intersecting_layers[0]
-                # if no intersecting layers
+            intersecting_layers = node.intersecting_layers
+            # if more than one intersecting layer
+            if len(intersecting_layers) > 1:
+                # prompt user
+                answer = self.prompt_layer_selection(node, intersecting_layers)
+                if isinstance(answer, int):
+                    node.layer_id = answer
+                elif answer == 'default' and self.default_layer is not False:
+                    node.layer_id = self.default_layer
                 else:
-                    if self.default_layer is False:
-                        # discard node if no default layer specified
-                        self.message("""Node %s discarded because is not contained
-                                     in any specified layer and no default layer specified""" % node.name)
-                        continue
-                    else:
-                        node.layer_id = self.default_layer
+                    self.message('Node %s discarded' % node.name)
+                    continue
+            # if one intersecting layer select that
+            elif 2 > len(intersecting_layers) > 0:
+                node.layer = intersecting_layers[0]
+            # if no intersecting layers
+            else:
+                if self.default_layer is False:
+                    # discard node if no default layer specified
+                    self.message("""Node %s discarded because is not contained
+                                 in any specified layer and no default layer specified""" % node.name)
+                    continue
+                else:
+                    node.layer_id = self.default_layer
 
             if old_node.postal_code:
                 # additional info
