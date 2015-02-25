@@ -1,7 +1,7 @@
 [
     {
-        "pk": 1, 
-        "model": "oldimporter.oldcontact", 
+        "pk": 1,
+        "model": "oldimporter.oldcontact",
         "fields": {
             "node": 1,
             "from_name": "Tester",

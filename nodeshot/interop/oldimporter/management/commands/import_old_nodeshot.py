@@ -819,6 +819,7 @@ choose (enter the number of) one of the following layers:
             try:
                 user = User.objects.get(email=old_contact.from_email)
             except User.DoesNotExist:
+                user = None
                 self.message('Could not find any user with email: %s' % old_contact.from_email)
 
             contact = Inward(**{
@@ -826,7 +827,6 @@ choose (enter the number of) one of the following layers:
                 "content_type": content_type,
                 "object_id": old_contact.node_id,
                 "status": 1,  # sent,
-                "user": user,
                 "from_name": old_contact.from_name,
                 "from_email": old_contact.from_email,
                 "message": old_contact.message,
@@ -836,6 +836,8 @@ choose (enter the number of) one of the following layers:
                 "added": old_contact.date,
                 "updated": old_contact.date,
             })
+            if user:
+                contact.user = user
 
             # if contact already exists flag it for UPDATE instead of INSERT
             try:
@@ -845,7 +847,7 @@ choose (enter the number of) one of the following layers:
                 pass
 
             try:
-                contact.full_clean()
+                contact.full_clean(exclude=['user'])
                 contact.save(auto_update=False)
                 saved_contacts.append(contact)
                 self.verbose('Saved contact log entry #%s' % contact.id)
