@@ -1,0 +1,11 @@
+{% load i18n %}{% blocktrans %}A "{{ site }}" user would like to get in touch with you.{% endblocktrans %}
+
+{% trans 'Name' %}: {{ sender_name }}
+{% trans 'E-mail' %}: {{ sender_email }}
+
+{% trans 'Message' %}:
+
+{{ message }}
+
+
+{% trans 'You are receiving this email because your account is related to' %} {{ object_type }}: "{{ object_name }}".

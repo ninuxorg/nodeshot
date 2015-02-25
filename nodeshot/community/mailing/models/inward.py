@@ -5,6 +5,7 @@ from django.contrib.contenttypes import generic
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 from nodeshot.core.base.models import BaseDate
 
@@ -76,11 +77,21 @@ class Inward(BaseDate):
         else:
             to = [self.to.email]
 
+        context = {
+            'sender_name': self.from_name,
+            'sender_email': self.from_email,
+            'message': self.message,
+            'site': settings.SITE_NAME,
+            'object_type': self.content_type.name,
+            'object_name': str(self.to)
+        }
+        message = render_to_string('mailing/inward_message.txt', context)
+
         email = EmailMessage(
             # subject
-            _('Contact request from %(sender)s - %(site)s') % {'sender': self.from_name, 'site': settings.SITE_NAME},
+            _('Contact request from %(sender_name)s - %(site)s') % context,
             # message
-            self.message,
+            message,
             # from
             settings.DEFAULT_FROM_EMAIL,
             # to
