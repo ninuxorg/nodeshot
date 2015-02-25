@@ -1483,3 +1483,5 @@ td.empty{
     border: 1px solid #ccc;
 }
 #map-js.static-map a{ font-weight: normal }
+
+.btn .glyphicon { margin-right: .4em }

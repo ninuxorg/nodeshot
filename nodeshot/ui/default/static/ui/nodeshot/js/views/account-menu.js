@@ -1,7 +1,7 @@
 (function(){
     'use strict';
 
-    Ns.views.Account = Marionette.ItemView.extend({
+    Ns.views.AccountMenu = Marionette.ItemView.extend({
         tagName: 'ul',
         template: '#account-menu-template',
         events: {

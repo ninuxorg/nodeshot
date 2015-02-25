@@ -49,18 +49,17 @@
                 <span class="text" id="js-username"><%= truncatedUsername %></span>
                 <span class="caret"></span>
             </a>
-
             <ul class="dropdown-menu">
                 <li>
-                    <a href="#/users/<%= username %>" id="js-profile">
+                    <a href="#users/<%= username %>" id="js-profile">
                         <span class="icon-user"></span>{% trans 'My profile' %}
                     </a>
                 </li>
-                <!--<li>
-                    <a href="javascript:$.createModal({message:'not implemented yet'})" id="js-settings">
-                        <span class="icon-wrench"></span>{% trans 'Settings' %}
+                <li>
+                    <a href="#account" id="js-account">
+                        <span class="icon-config"></span>{% trans 'My account' %}
                     </a>
-                </li>-->
+                </li>
                 <% if (is_staff) { %>
                 <li>
                     <a href="{% url 'admin:index' %}">
@@ -217,6 +216,10 @@
 
     <script id="user-details-template" type="text/template">
         {% include 'includes/user-details.html' %}
+    </script>
+
+    <script id="account-template" type="text/template">
+        {% include 'includes/account.html' %}
     </script>
 
     <script id="form-template" type="text/template">

@@ -426,9 +426,9 @@
         schema: {
             first_name: { type: 'Text', title: gettext('First name'), validators: ['required'], editorAttrs: { maxlength: 30 }},
             last_name: { type: 'Text', title: gettext('Last name'), validators: ['required'], editorAttrs: { maxlength: 30 }},
-            about: { type: 'TextArea', title: gettext('Bio') },
             city: { type: 'Text', title: gettext('City'), editorAttrs: { maxlength: 30 }},
             country: { type: 'Text', title: gettext('Country'), editorAttrs: { maxlength: 30 }},
+            about: { type: 'TextArea', title: gettext('Bio') },
         },
 
         defaults: {

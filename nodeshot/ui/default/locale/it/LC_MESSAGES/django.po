@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-24 16:23+0100\n"
-"PO-Revision-Date: 2015-02-24 16:28+0020\n"
-"Last-Translator: Fede Tester <admin@admin.org>\n"
+"POT-Creation-Date: 2015-02-25 18:43+0100\n"
+"PO-Revision-Date: 2015-02-25 18:45+0050\n"
+"Last-Translator: Fede Tester <nemesis@ninux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.7.5\n"
 
-#: templates/base.html:66 templates/index.html:231
+#: templates/base.html:66 templates/index.html:234
 msgid "Loading"
 msgstr "Caricamento"
 
@@ -51,7 +51,7 @@ msgstr "Iscriviti con Github"
 msgid "or"
 msgstr "oppure"
 
-#: templates/base.html:172 templates/base.html.py:250 templates/index.html:83
+#: templates/base.html:172 templates/base.html.py:250 templates/index.html:82
 msgid "Sign up"
 msgstr "Iscriviti"
 
@@ -59,7 +59,7 @@ msgstr "Iscriviti"
 msgid "Already have an account?"
 msgstr "Hai già un account?"
 
-#: templates/base.html:175 templates/base.html.py:245 templates/index.html:90
+#: templates/base.html:175 templates/base.html.py:245 templates/index.html:89
 msgid "Sign in"
 msgstr "Accedi"
 
@@ -91,54 +91,111 @@ msgstr "Non hai un account?"
 msgid "Search for data"
 msgstr "Cerca dati"
 
-#: templates/index.html:31 templates/index.html.py:186
-#: templates/index.html:215
+#: templates/index.html:31 templates/index.html.py:185
+#: templates/index.html:214
 msgid "nothing found"
 msgstr "nessun risultato trovato"
 
-#: templates/index.html:56
+#: templates/index.html:55
 msgid "My profile"
 msgstr "Il mio profilo"
 
-#: templates/index.html:61 templates/index.html.py:134
-msgid "Settings"
-msgstr "Impostazioni"
+#: templates/index.html:60 templates/includes/account.html:2
+msgid "My account"
+msgstr "Il mio account"
 
-#: templates/index.html:67
+#: templates/index.html:66
 msgid "Admin site"
 msgstr "Admin"
 
-#: templates/index.html:73
+#: templates/index.html:72
 msgid "Logout"
 msgstr "Esci"
 
-#: templates/index.html:117
+#: templates/index.html:116
 msgid "No menu item yet"
 msgstr "Nessun elemento del menu presente"
 
-#: templates/index.html:130
+#: templates/index.html:129
 msgid "Notifications"
 msgstr "Notifiche"
 
-#: templates/index.html:133
+#: templates/index.html:132
 msgid "See all"
 msgstr "Vedi tutte"
 
-#: templates/index.html:149
+#: templates/index.html:133
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: templates/index.html:148
 msgid "Nothing interesting yet!"
 msgstr "Ancora nulla di interessante!"
 
-#: templates/index.html:232
+#: templates/index.html:235
 msgid "cancel&nbsp;operation"
 msgstr "annnulla&nbsp;operazione"
 
-#: templates/index.html:251
+#: templates/index.html:254
 msgid "Email sent successfully!"
 msgstr "Email inviata correttamente!"
 
-#: templates/index.html:252
+#: templates/index.html:255
 msgid "Take me back to"
 msgstr "Riportami a"
+
+#: templates/includes/account.html:4
+msgid "Profile"
+msgstr "Profilo"
+
+#: templates/includes/account.html:7
+msgid "First name"
+msgstr "Nome"
+
+#: templates/includes/account.html:10
+msgid "Last name"
+msgstr "Cognome"
+
+#: templates/includes/account.html:13
+msgid "City"
+msgstr "Città"
+
+#: templates/includes/account.html:16
+msgid "Country"
+msgstr "Stato"
+
+#: templates/includes/account.html:20 templates/includes/user-details.html:27
+msgid "Bio"
+msgstr "Bio"
+
+#: templates/includes/account.html:25
+msgid "Edit"
+msgstr "Modifica"
+
+#: templates/includes/account.html:28
+msgid "View"
+msgstr "Vedi"
+
+#: templates/includes/account.html:38
+msgid ""
+"Avatars are managed through the popular <a href=\"https://gravatar.com\" "
+"target=\"_blank\">gravatar</a> service."
+msgstr ""
+"GLi avatar sono gestiti tramite il famoso servizio <a "
+"href=\"https://gravatar.com\" target=\"_blank\">gravatar</a>."
+
+#: templates/includes/account.html:39
+msgid ""
+"If you don't have one yet, create an account on "
+"<strong>gravatar.com</strong> and associate your current email address to "
+"it."
+msgstr ""
+"Se non ne hai ancora uno, crea un account su <strong>gravatar.com</strong> "
+"associandoci il tuo attuale indirizzo email."
+
+#: templates/includes/account.html:40
+msgid "Edit on gravatar.com"
+msgstr "Modifica su gravatar.com"
 
 #: templates/includes/layer-details.html:7
 #: templates/includes/node-details.html:26
@@ -413,8 +470,8 @@ msgid "Select all"
 msgstr "Seleziona tutti"
 
 #: templates/includes/user-details.html:6
-msgid "Edit"
-msgstr "Modifica"
+msgid "my account"
+msgstr "il mio account"
 
 #: templates/includes/user-details.html:11
 msgid "nodes"
@@ -427,10 +484,6 @@ msgstr "Iscritto il"
 #: templates/includes/user-details.html:21
 msgid "Last seen on"
 msgstr "Ultima volta online il"
-
-#: templates/includes/user-details.html:27
-msgid "Bio"
-msgstr "Bio"
 
 #: templates/includes/user-details.html:34
 msgid "Links"

@@ -91,6 +91,7 @@
             this.username = this.model.get('username');
             if (!this.model.isAuthenticated()) {
                 Ns.menu.currentView.openFirst();
+                delete(this);
                 return;
             }
             this.show();
@@ -155,7 +156,32 @@
         },
 
         back: function () {
-            Ns.router.navigate('users/' + this.username, { trigger: true });
+            Ns.router.navigate('account', { trigger: true });
         },
+    });
+
+    Ns.views.Account = Marionette.ItemView.extend({
+        tagName: 'article',
+        className: 'center-stage',
+        id: 'account-container',
+        template: '#account-template',
+
+        initialize: function (options) {
+            this.model = Ns.db.user;
+            if (!this.model.isAuthenticated()) {
+                Ns.menu.currentView.openFirst();
+                delete(this);
+                return;
+            }
+            this.show();
+        },
+
+        show: function () { Ns.body.show(this); },
+
+        onShow: function () {
+            Ns.changeTitle(gettext('Account'));
+            Ns.menu.currentView.deactivate();
+            Ns.track();
+        }
     });
 }());

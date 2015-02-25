@@ -1,0 +1,42 @@
+{% load i18n %}
+<h1>{% trans 'My account' %}</h1>
+
+<h3>{% trans 'Profile' %}</h3>
+<div class="row nomargin">
+    <% if(first_name){ %>
+        <p><strong>{% trans 'First name' %}:</strong> <%= first_name %></p>
+    <% } %>
+    <% if(last_name){ %>
+        <p><strong>{% trans 'Last name' %}:</strong> <%= last_name %></p>
+    <% } %>
+    <% if(city){ %>
+        <p><strong>{% trans 'City' %}:</strong> <%= city %></p>
+    <% } %>
+    <% if(country){ %>
+        <p><strong>{% trans 'Country' %}:</strong> <%= country %></p>
+    <% } %>
+    <% if(about){ %>
+        <p>
+            <strong>{% trans 'Bio' %}:</strong><br>
+            <%= _.nl2br(about) %>
+        </p>
+    <% } %>
+    <p>
+        <a href="#account/profile/edit" class="btn btn-primary icon-edit">{% trans 'Edit' %}</a>
+        &nbsp;
+        <a href="#users/<%= username %>" class="btn btn-primary">
+            <span class="glyphicon glyphicon-eye-open"></span>{% trans 'View' %}
+        </a>
+    </p>
+</div>
+
+<h3>Gravatar</h3>
+
+<div class="row nomargin">
+    <a href="https://gravatar.com" target="_blank"><img src="<%= avatar %>?s=200" alt="" class="avatar200"></a>
+    <div class="col-sm-6 right nopadding">
+        <p>{% trans 'Avatars are managed through the popular <a href="https://gravatar.com" target="_blank">gravatar</a> service.' %}</p>
+        <p>{% trans "If you don't have one yet, create an account on <strong>gravatar.com</strong> and associate your current email address to it." %}</p>
+        <p><a href="https://gravatar.com" class="btn btn-primary icon-edit" target="_blank">{% trans 'Edit on gravatar.com' %}</a></p>
+    </div>
+</div>

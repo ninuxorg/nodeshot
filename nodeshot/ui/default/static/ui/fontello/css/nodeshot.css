@@ -48,6 +48,9 @@
     /* Uncomment for 3D effect */
     /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
+.btn[class^="icon-"]:before, .btn[class*=" icon-"]:before{
+    margin-left: 0;
+}
 
 .icon-nodes:before { content: '\e801'; } /* '' */
 .icon-plus:before { content: '\e800'; } /* '' */

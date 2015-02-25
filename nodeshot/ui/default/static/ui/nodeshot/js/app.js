@@ -53,7 +53,7 @@
 
     // main initializers
     Ns.addInitializer(function () {
-        Ns.account.show(new Ns.views.Account());
+        Ns.account.show(new Ns.views.AccountMenu());
         Ns.menu.show(new Ns.views.Menu());
         Ns.search.show(new Ns.views.Search());
         Ns.notifications.show(new Ns.views.Notification());
@@ -148,6 +148,11 @@
         },
 
         // reset forgotten password
+        getAccount: function () {
+            new Ns.views.Account();
+        },
+
+        // reset forgotten password
         getPasswordReset: function () {
             new Ns.views.PasswordReset();
         },
@@ -187,6 +192,7 @@
             'layers/:slug': 'getLayer',
             'users/:username': 'getUser',
             'users/:username/nodes': 'getUserNodes',
+            'account': 'getAccount',
             'account/password/reset': 'getPasswordReset',
             'account/profile/edit': 'getEditUser',
             'nodes/:slug/contact': 'getContactNode',

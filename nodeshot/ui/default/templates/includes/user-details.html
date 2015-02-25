@@ -3,7 +3,7 @@
 
 <p class="actions">
     <% if (Ns.db.user.isAuthenticated() && Ns.db.user.get('username') === username) { %>
-        <a href="#account/profile/edit" class="icon-edit">{% trans 'Edit' %}</a>
+        <a href="#account" class="icon-config">{% trans 'my account' %}</a>
     <% } %>
     <% if (Ns.settings.contacting && Ns.db.user.get('username') !== username) { %>
         <a href="#users/<%= username %>/contact" class="icon-mail">{% trans 'contact' %}</a>
@@ -34,7 +34,7 @@
     <h3>{% trans 'Links' %}</h3>
     <% _.each(social_links, function(link){ %>
         <p class="icon-link">
-            <a href="<%= link.url %>" target="_blank"><%= link.url %></a>
+            <a href="<%= link.url %>" target="_blank" title="<%= link.description %>"><%= link.url %></a>
         </p>
     <% }) %>
 </div>
