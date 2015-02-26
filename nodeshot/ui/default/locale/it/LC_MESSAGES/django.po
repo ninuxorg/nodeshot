@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-25 19:16+0100\n"
-"PO-Revision-Date: 2015-02-25 19:16+0050\n"
+"POT-Creation-Date: 2015-02-26 18:09+0100\n"
+"PO-Revision-Date: 2015-02-26 18:10+0020\n"
 "Last-Translator: Fede Tester <nemesis@ninux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.7.5\n"
 
-#: templates/base.html:66 templates/index.html:234
+#: templates/base.html:66 templates/index.html:247
 msgid "Loading"
 msgstr "Caricamento"
 
@@ -140,15 +140,23 @@ msgstr "Impostazioni"
 msgid "Nothing interesting yet!"
 msgstr "Ancora nulla di interessante!"
 
-#: templates/index.html:235
+#: templates/index.html:230
+msgid "Save"
+msgstr "Salva"
+
+#: templates/index.html:233
+msgid "Cancel"
+msgstr "Annulla"
+
+#: templates/index.html:248
 msgid "cancel&nbsp;operation"
 msgstr "annnulla&nbsp;operazione"
 
-#: templates/index.html:254
+#: templates/index.html:267
 msgid "Email sent successfully!"
 msgstr "Email inviata correttamente!"
 
-#: templates/index.html:255
+#: templates/index.html:268
 msgid "Take me back to"
 msgstr "Riportami a"
 
@@ -176,7 +184,7 @@ msgstr "Stato"
 msgid "Bio"
 msgstr "Bio"
 
-#: templates/includes/account.html:25
+#: templates/includes/account.html:25 templates/includes/account.html.py:63
 msgid "Edit"
 msgstr "Modifica"
 
@@ -204,6 +212,34 @@ msgstr ""
 #: templates/includes/account.html:40
 msgid "Edit on gravatar.com"
 msgstr "Modifica su gravatar.com"
+
+#: templates/includes/account.html:44 templates/includes/user-details.html:34
+msgid "Links"
+msgstr "Links"
+
+#: templates/includes/account.html:51
+msgid "url"
+msgstr "url"
+
+#: templates/includes/account.html:52
+msgid "description"
+msgstr "descrizione"
+
+#: templates/includes/account.html:53
+msgid "actions"
+msgstr "azioni"
+
+#: templates/includes/account.html:66
+msgid "Delete"
+msgstr "Elimina"
+
+#: templates/includes/account.html:72
+msgid "No links to show"
+msgstr "Nessun link da mostrare"
+
+#: templates/includes/account.html:80
+msgid "Add"
+msgstr "Aggiungi"
 
 #: templates/includes/layer-details.html:7
 #: templates/includes/node-details.html:26
@@ -493,10 +529,6 @@ msgstr "Iscritto il"
 msgid "Last seen on"
 msgstr "Ultima volta online il"
 
-#: templates/includes/user-details.html:34
-msgid "Links"
-msgstr "Links"
-
 #: templates/profiles/password_reset_from_key.html:7
 msgid "Bad Token"
 msgstr "Token non valido"
@@ -522,5 +554,5 @@ msgstr "Hai cambiato la tua password con successo!"
 msgid "Go to the homepage to login"
 msgstr "Vai alla pagina iniziale per accedere"
 
-#~ msgid "Cancel"
-#~ msgstr "Annulla"
+#~ msgid "No link present yet"
+#~ msgstr "Nessun elemento del menu presente"

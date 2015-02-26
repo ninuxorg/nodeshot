@@ -40,3 +40,44 @@
         <p><a href="https://gravatar.com" class="btn btn-primary icon-edit" target="_blank">{% trans 'Edit on gravatar.com' %}</a></p>
     </div>
 </div>
+
+<h3>{% trans 'Links' %}</h3>
+
+<div id="js-links">
+    <form action="">
+        <table class="table table-striped columns">
+            <thead>
+                <tr>
+                    <th>{% trans 'url' %}</th>
+                    <th>{% trans 'description' %}</th>
+                    <th class="hidden-xxs">{% trans 'actions' %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (social_links.length > 0) { %>
+                    <% _.each(social_links, function(link){ %>
+                        <tr>
+                            <td><%= link.url %></td>
+                            <td><%= link.description %></td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm icon-edit edit" data-cid="<%= link.cid %>">{% trans 'Edit' %}</button>
+                                &nbsp;
+                                <button type="button" class="btn btn-primary btn-sm delete" data-cid="<%= link.cid %>">
+                                    <span class="glyphicon glyphicon-remove"></span>{% trans 'Delete' %}
+                                </button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr><td colspan="4" class="text-center">{% trans 'No links to show' %}</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+    </form>
+    <p>
+        <button type="button" class="btn btn-primary add">
+            <span class="glyphicon glyphicon-plus"></span>
+            {% trans 'Add' %}
+        </button>
+    </p>
+</div>

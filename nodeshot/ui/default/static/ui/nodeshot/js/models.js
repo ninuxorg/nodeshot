@@ -602,4 +602,34 @@
             message: { type: 'TextArea', title: gettext('Message'), validators: ['required'] }
         }
     });
+
+    Ns.models.SocialLink = Ns.models.Base.extend({
+        urlRoot: Ns.url('profiles/:user/social-links/'),
+
+        url: function () {
+            var url = this.urlRoot.replace(':user', Ns.db.user.id);
+            if (!this.isNew()) {
+                url = url + this.id + '/';
+            }
+            return url;
+        },
+
+        defaults: {
+            'url': '',
+            'description': ''
+        },
+
+        toJSON: function () {
+            var json = Backbone.Model.prototype.toJSON.apply(this, arguments);
+            json.cid = this.cid;
+            return json;
+        }
+    });
+
+    Ns.collections.SocialLink = Backbone.Collection.extend({
+        model: Ns.models.SocialLink,
+        url: function () {
+            return Ns.url('profiles/' + Ns.db.user.id + '/social-links/');
+        }
+    });
 }());

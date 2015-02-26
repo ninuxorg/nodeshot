@@ -222,6 +222,19 @@
         {% include 'includes/account.html' %}
     </script>
 
+    <script id="edit-link-template" type="text/template">
+        <td><input type="url" class="form-control input-sm" name="url" value="<%= url %>" required></td>
+        <td><input type="text" class="form-control input-sm" name="description" value="<%= description %>"></td>
+        <td>
+            <button type="submit" class="btn btn-primary btn-sm save">
+                <span class="glyphicon glyphicon-ok"></span>{% trans 'Save' %}
+            </button>
+            <button type="button" class="btn btn-primary btn-sm cancel" data-cid="<%= cid %>">
+                <span class="glyphicon glyphicon-remove"></span>{% trans 'Cancel' %}
+            </button>
+        </td>
+    </script>
+
     <script id="form-template" type="text/template">
         <h1><%= title %></h1>
         <ul class="error-list hidden"></ul>

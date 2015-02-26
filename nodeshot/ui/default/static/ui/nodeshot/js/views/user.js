@@ -166,6 +166,19 @@
         id: 'account-container',
         template: '#account-template',
 
+        ui: {
+            'links': '#js-links'
+        },
+
+        events: {
+            'click #js-links .delete': 'deleteLink',
+            'click #js-links .edit': 'editLink',
+            'click #js-links .add': 'addLink',
+            'submit #js-links form': 'saveLink',
+            'click #js-links .cancel': 'cancelSaveLink',
+            'keydown #js-links input': 'keydownLink'
+        },
+
         initialize: function (options) {
             this.model = Ns.db.user;
             if (!this.model.isAuthenticated()) {
@@ -173,6 +186,10 @@
                 delete(this);
                 return;
             }
+            this.socialLinks = new Ns.collections.SocialLink(this.model.get('social_links'));
+            this.model.set('social_links', this.socialLinks.toJSON());
+            this.listenTo(this.socialLinks, 'add remove sync', this.updateLinks);
+            this.editLinkTemplate = _.template($('#edit-link-template').html());
             this.show();
         },
 
@@ -182,6 +199,60 @@
             Ns.changeTitle(gettext('Account'));
             Ns.menu.currentView.deactivate();
             Ns.track();
+        },
+
+        updateLinks: function () {
+            this.model.set('social_links', this.socialLinks.toJSON());
+            this.render();
+        },
+
+        addLink: function (e) {
+            // add one at time
+            if (this.socialLinks.length === 0 || !this.socialLinks.last().isNew()) {
+                this.socialLinks.add(new Ns.models.SocialLink());
+                this.ui.links.find('tr').last().find('.edit').trigger('click');
+            }
+        },
+
+        editLink: function (e, link) {
+            var cid = $(e.target).attr('data-cid'),
+                tr = $(e.target).parents('tr');
+            link = this.socialLinks.get(cid) || this.socialLinks.last();
+            tr.html(this.editLinkTemplate(link.toJSON()));
+        },
+
+        saveLink: function (e) {
+            e.preventDefault();
+            var form = $(e.target),
+                cid = form.find('button.cancel').attr('data-cid'),
+                link = this.socialLinks.get(cid);
+            link.set(form.serializeJSON());
+            link.save().fail(function(xhr){
+                $.createModal({ message: xhr.responseJSON.__all__.join(', ') });
+            });
+        },
+
+        keydownLink: function (e) {
+            if (e.keyCode === 27) {
+                $(e.target).parents('tr').find('.cancel').trigger('click');
+            }
+        },
+
+        cancelSaveLink: function (e) {
+            var cid = $(e.target).attr('data-cid'),
+                link = this.socialLinks.get(cid);
+            if (link.isNew()) {
+                link.destroy();
+            }
+            else {
+                this.render();
+            }
+        },
+
+        deleteLink: function (e) {
+            var cid = $(e.target).attr('data-cid'),
+                link = this.socialLinks.get(cid);
+            link.destroy();
         }
     });
 }());
