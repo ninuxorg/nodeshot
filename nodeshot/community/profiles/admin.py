@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 
 from django.contrib.auth.forms import UserChangeForm as BaseChangeForm
 from django.contrib.auth.forms import UserCreationForm as BaseCreationForm
@@ -111,7 +112,18 @@ if EMAIL_CONFIRMATION:
         list_display = ('__unicode__', 'verified', 'primary', 'user')
 
     class EmailConfirmationAdmin(admin.ModelAdmin):
-        list_display = ('__unicode__', 'key_expired')
+        list_display = ('__unicode__', 'key_expired', 'created_at')
+        actions = ['resend']
+
+        def resend(self, request, queryset):
+            """
+            Resend confirmation mail
+            """
+            for obj in queryset:
+                EmailConfirmation.objects.send_confirmation(obj.email_address)
+            # show message in the admin
+            messages.info(request, _('Email confirmations sent'), fail_silently=True)
+        resend.short_description = _('Resend confirmation mails')
 
     admin.site.register((EmailAddress,), EmailAddressAdmin)
     admin.site.register((EmailConfirmation,), EmailConfirmationAdmin)
