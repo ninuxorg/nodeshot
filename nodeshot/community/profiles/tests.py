@@ -27,12 +27,14 @@ class ProfilesTest(TestCase):
 
     def setUp(self):
         self.client.login(username='registered', password='tester')
-        mail.outbox = []
         if EMAIL_CONFIRMATION:
+            for user in User.objects.all():
+                user.save()
             # set all email addresses as verified
             for email_address in EmailAddress.objects.all():
                 email_address.verified = True
                 email_address.save()
+        mail.outbox = []
 
     def test_new_users_have_default_group(self):
         """ users should have a default group when created """
@@ -763,3 +765,11 @@ class ProfilesTest(TestCase):
         with self.assertRaises(ValueError):
             User.objects.create_user(username=None, first_name='test',
                                      last_name='test', password='test')
+
+    if EMAIL_CONFIRMATION:
+        def test_email_uniqueness(self):
+            self.assertEqual(EmailAddress.objects.filter(email='admin@admin.org').count(), 1)
+            user = User.objects.get(username='romano')
+            email = EmailAddress(user=user, email='admin@admin.org')
+            with self.assertRaises(ValidationError):
+                email.full_clean()

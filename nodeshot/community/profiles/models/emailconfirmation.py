@@ -59,7 +59,7 @@ class EmailAddressManager(models.Manager):
 
 class EmailAddress(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='email_set')
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     verified = models.BooleanField(default=False)
     primary = models.BooleanField(default=False)
 
