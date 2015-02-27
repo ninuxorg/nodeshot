@@ -235,6 +235,20 @@
         </td>
     </script>
 
+    <script id="edit-email-template" type="text/template">
+        <td><input type="email" class="form-control input-sm" name="email" value="<%= email %>" required></td>
+        <td><span class="icon-<%= verified ? 'ok' : 'cancel' %>"></span></td>
+        <td><span class="icon-<%= primary ? 'ok' : 'cancel' %>"></span></td>
+        <td>
+            <button type="submit" class="btn btn-primary btn-sm save">
+                <span class="glyphicon glyphicon-ok"></span>{% trans 'Save' %}
+            </button>
+            <button type="button" class="btn btn-primary btn-sm cancel" data-cid="<%= cid %>">
+                <span class="glyphicon glyphicon-remove"></span>{% trans 'Cancel' %}
+            </button>
+        </td>
+    </script>
+
     <script id="form-template" type="text/template">
         <h1><%= title %></h1>
         <ul class="error-list hidden"></ul>

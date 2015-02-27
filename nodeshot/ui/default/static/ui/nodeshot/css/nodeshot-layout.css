@@ -1486,3 +1486,5 @@ td.empty{
 
 .btn .glyphicon { margin-right: .4em }
 td.text-center{ text-align: center }
+table.middle tbody td{ vertical-align: middle }
+table td input.form-control { width: 98% }

@@ -167,16 +167,23 @@
         template: '#account-template',
 
         ui: {
-            'links': '#js-links'
+            'links': '#js-links',
+            'emails': '#js-emails'
         },
 
         events: {
-            'click #js-links .delete': 'deleteLink',
-            'click #js-links .edit': 'editLink',
+            'keydown form input': 'keydownOnInput',
             'click #js-links .add': 'addLink',
+            'click #js-links .edit': 'editLink',
             'submit #js-links form': 'saveLink',
             'click #js-links .cancel': 'cancelSaveLink',
-            'keydown #js-links input': 'keydownLink'
+            'click #js-links .delete': 'deleteLink',
+            'click #js-emails .add': 'addEmail',
+            'submit #js-emails form': 'saveEmail',
+            'click #js-emails .cancel': 'cancelSaveEmail',
+            'click #js-emails .delete': 'deleteEmail',
+            'click #js-emails .makeprimary': 'makePrimary',
+            'click #js-emails .resend': 'resendConfirmation'
         },
 
         initialize: function (options) {
@@ -186,10 +193,16 @@
                 delete(this);
                 return;
             }
+            // social links
             this.socialLinks = new Ns.collections.SocialLink(this.model.get('social_links'));
             this.model.set('social_links', this.socialLinks.toJSON());
             this.listenTo(this.socialLinks, 'add remove sync', this.updateLinks);
             this.editLinkTemplate = _.template($('#edit-link-template').html());
+            // email addresses
+            this.emailAddresses = new Ns.collections.EmailAddress(this.model.get('email_addresses'));
+            this.model.set('email_addresses', this.emailAddresses.toJSON());
+            this.listenTo(this.emailAddresses, 'add remove sync', this.updateEmails);
+            this.editEmailTemplate = _.template($('#edit-email-template').html());
             this.show();
         },
 
@@ -232,7 +245,7 @@
             });
         },
 
-        keydownLink: function (e) {
+        keydownOnInput: function (e) {
             if (e.keyCode === 27) {
                 $(e.target).parents('tr').find('.cancel').trigger('click');
             }
@@ -252,7 +265,78 @@
         deleteLink: function (e) {
             var cid = $(e.target).attr('data-cid'),
                 link = this.socialLinks.get(cid);
-            link.destroy();
+            $.createModal({
+                message: gettext('Do you confirm?'),
+                successMessage: gettext('yes'),
+                successAction: function(){
+                    link.destroy();
+                },
+                defaultMessage: gettext('no'),
+            });
+        },
+
+        updateEmails: function () {
+            this.model.set('email_addresses', this.emailAddresses.toJSON());
+            this.render();
+        },
+
+        addEmail: function (e) {
+            // add one at time
+            if (this.emailAddresses.length === 0 || !this.emailAddresses.last().isNew()) {
+                var emailAddress = new Ns.models.EmailAddress(),
+                    html = this.editEmailTemplate(emailAddress.toJSON());
+                this.emailAddresses.add(emailAddress);
+                this.ui.emails.find('tr').last().html(html);
+            }
+        },
+
+        cancelSaveEmail: function (e) {
+            var cid = $(e.target).attr('data-cid'),
+                email = this.emailAddresses.get(cid);
+            if (email.isNew()) {
+                email.destroy();
+            }
+            else {
+                this.render();
+            }
+        },
+
+        saveEmail: function (e) {
+            e.preventDefault();
+            var form = $(e.target),
+                cid = form.find('button.cancel').attr('data-cid'),
+                email = this.emailAddresses.get(cid);
+            email.set(form.serializeJSON());
+            email.save().fail(function(xhr){
+                $.createModal({ message: xhr.responseJSON.__all__.join(', ') });
+            });
+        },
+
+        deleteEmail: function (e) {
+            var cid = $(e.target).attr('data-cid'),
+                email = this.emailAddresses.get(cid);
+            $.createModal({
+                message: gettext('Do you confirm?'),
+                successMessage: gettext('yes'),
+                successAction: function(){
+                    email.destroy();
+                },
+                defaultMessage: gettext('no'),
+            });
+        },
+
+        makePrimary: function (e) {
+            var cid = $(e.target).attr('data-cid'),
+                email = this.emailAddresses.get(cid);
+            email.makePrimary();
+        },
+
+        resendConfirmation: function (e) {
+            var cid = $(e.target).attr('data-cid'),
+                email = this.emailAddresses.get(cid);
+            email.resendConfirmation().done(function(responseJSON){
+                $.createModal({ message: responseJSON.detail });
+            });
         }
     });
 }());

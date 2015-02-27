@@ -114,6 +114,7 @@ class EmailAddress(models.Model):
         return u"%s (%s)" % (self.email, self.user)
 
     class Meta:
+        ordering = ['-primary', 'id']
         app_label = 'profiles'
         verbose_name = _("email address")
         verbose_name_plural = _("email addresses")

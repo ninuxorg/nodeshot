@@ -1,23 +1,23 @@
 # Nodeshot default UI translation file
 # This file is distributed under the same license as the Nodeshot package.
 # Federico Capoano nemesis at ninux dot org, 2015.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-26 18:09+0100\n"
-"PO-Revision-Date: 2015-02-26 18:10+0020\n"
-"Last-Translator: Fede Tester <nemesis@ninux.org>\n"
+"POT-Creation-Date: 2015-02-27 13:12+0100\n"
+"PO-Revision-Date: 2015-02-27 13:04+0020\n"
+"Last-Translator: Federico Capoano\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.7.5\n"
 
-#: templates/base.html:66 templates/index.html:247
+#: templates/base.html:66 templates/index.html:261
 msgid "Loading"
 msgstr "Caricamento"
 
@@ -32,16 +32,15 @@ msgstr "Questo sito ha bisogno di javascript per funzionare correttamente."
 #: templates/base.html:111
 #, python-format
 msgid ""
-"By signing up you declare to have accepted our <a "
-"href=\"%(PRIVACY_POLICY_LINK)s\" class=\"js-"
-"dismiss\">privacy&nbsp;policy</a><br />and <a "
-"href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-"
-"dismiss\">terms&nbsp;of&nbsp;service</a>."
+"By signing up you declare to have accepted our <a href="
+"\"%(PRIVACY_POLICY_LINK)s\" class=\"js-dismiss\">privacy&nbsp;policy</a><br /"
+">and <a href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-dismiss\">terms&nbsp;"
+"of&nbsp;service</a>."
 msgstr ""
 "Iscrivendoti dichiari di accettare l'<a href=\"%(PRIVACY_POLICY_LINK)s\" "
-"class=\"js-dismiss\">informativa sulla privacy</a><br />ed i <a "
-"href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-"
-"dismiss\">termini&nbsp;del&nbsp;servizio</a>."
+"class=\"js-dismiss\">informativa sulla privacy</a><br />ed i <a href="
+"\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-dismiss\">termini&nbsp;del&nbsp;"
+"servizio</a>."
 
 #: templates/base.html:119
 msgid "Sign up with Facebook"
@@ -140,23 +139,23 @@ msgstr "Impostazioni"
 msgid "Nothing interesting yet!"
 msgstr "Ancora nulla di interessante!"
 
-#: templates/index.html:230
+#: templates/index.html:230 templates/index.html.py:244
 msgid "Save"
 msgstr "Salva"
 
-#: templates/index.html:233
+#: templates/index.html:233 templates/index.html.py:247
 msgid "Cancel"
 msgstr "Annulla"
 
-#: templates/index.html:248
+#: templates/index.html:262
 msgid "cancel&nbsp;operation"
 msgstr "annnulla&nbsp;operazione"
 
-#: templates/index.html:267
+#: templates/index.html:281
 msgid "Email sent successfully!"
 msgstr "Email inviata correttamente!"
 
-#: templates/index.html:268
+#: templates/index.html:282
 msgid "Take me back to"
 msgstr "Riportami a"
 
@@ -197,14 +196,13 @@ msgid ""
 "Avatars are managed through the popular <a href=\"https://gravatar.com\" "
 "target=\"_blank\">gravatar</a> service."
 msgstr ""
-"GLi avatar sono gestiti tramite il famoso servizio <a "
-"href=\"https://gravatar.com\" target=\"_blank\">gravatar</a>."
+"GLi avatar sono gestiti tramite il famoso servizio <a href=\"https://"
+"gravatar.com\" target=\"_blank\">gravatar</a>."
 
 #: templates/includes/account.html:39
 msgid ""
-"If you don't have one yet, create an account on "
-"<strong>gravatar.com</strong> and associate your current email address to "
-"it."
+"If you don't have one yet, create an account on <strong>gravatar.com</"
+"strong> and associate your current email address to it."
 msgstr ""
 "Se non ne hai ancora uno, crea un account su <strong>gravatar.com</strong> "
 "associandoci il tuo attuale indirizzo email."
@@ -225,11 +223,11 @@ msgstr "url"
 msgid "description"
 msgstr "descrizione"
 
-#: templates/includes/account.html:53
+#: templates/includes/account.html:53 templates/includes/account.html.py:95
 msgid "actions"
 msgstr "azioni"
 
-#: templates/includes/account.html:66
+#: templates/includes/account.html:66 templates/includes/account.html:108
 msgid "Delete"
 msgstr "Elimina"
 
@@ -237,9 +235,37 @@ msgstr "Elimina"
 msgid "No links to show"
 msgstr "Nessun link da mostrare"
 
-#: templates/includes/account.html:80
+#: templates/includes/account.html:80 templates/includes/account.html:133
 msgid "Add"
 msgstr "Aggiungi"
+
+#: templates/includes/account.html:85
+msgid "Email addresses"
+msgstr "Indirizzi email"
+
+#: templates/includes/account.html:92
+msgid "email address"
+msgstr "indirizzo email"
+
+#: templates/includes/account.html:93
+msgid "verified"
+msgstr "verificato"
+
+#: templates/includes/account.html:94
+msgid "primary"
+msgstr "primario"
+
+#: templates/includes/account.html:113
+msgid "Resend confirmation"
+msgstr "Re-invia conferma"
+
+#: templates/includes/account.html:118
+msgid "Make primary"
+msgstr "Rendi primario"
+
+#: templates/includes/account.html:125
+msgid "No email addresses"
+msgstr "Nessun indirizzo email"
 
 #: templates/includes/layer-details.html:7
 #: templates/includes/node-details.html:26

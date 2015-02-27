@@ -1,15 +1,15 @@
 # Nodeshot default UI translation file
 # This file is distributed under the same license as the Nodeshot package.
 # Federico Capoano nemesis at ninux dot org, 2015.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-25 18:43+0100\n"
-"PO-Revision-Date: 2015-02-25 18:43+0020\n"
-"Last-Translator: Fede Tester <admin@admin.org>\n"
+"POT-Creation-Date: 2015-02-27 13:13+0100\n"
+"PO-Revision-Date: 2015-02-27 13:13+0020\n"
+"Last-Translator: Federico Capoano\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -160,6 +160,21 @@ msgstr ""
 msgid "Edit \""
 msgstr "Modifica"
 
-#: static/ui/nodeshot/js/views/user.js:182
+#: static/ui/nodeshot/js/views/user.js:212
 msgid "Account"
 msgstr "Account"
+
+#: static/ui/nodeshot/js/views/user.js:269
+#: static/ui/nodeshot/js/views/user.js:319
+msgid "Do you confirm?"
+msgstr "Confermi?"
+
+#: static/ui/nodeshot/js/views/user.js:270
+#: static/ui/nodeshot/js/views/user.js:320
+msgid "yes"
+msgstr "sì"
+
+#: static/ui/nodeshot/js/views/user.js:274
+#: static/ui/nodeshot/js/views/user.js:324
+msgid "no"
+msgstr "no"

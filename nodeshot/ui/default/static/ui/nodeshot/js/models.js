@@ -632,4 +632,36 @@
             return Ns.url('profiles/' + Ns.db.user.id + '/social-links/');
         }
     });
+
+    Ns.models.EmailAddress = Ns.models.Base.extend({
+        urlRoot: Ns.url('account/email/'),
+
+        defaults: {
+            'email': '',
+            'verified': false,
+            'primary': false
+        },
+
+        makePrimary: function () {
+            this.collection.each(function(model){
+                model.set('primary', !model.get('primary'))
+            })
+            return this.save();
+        },
+
+        resendConfirmation: function () {
+            return $.post(this.url() + 'resend-confirmation/');
+        },
+
+        toJSON: function () {
+            var json = Backbone.Model.prototype.toJSON.apply(this, arguments);
+            json.cid = this.cid;
+            return json;
+        }
+    });
+
+    Ns.collections.EmailAddress = Backbone.Collection.extend({
+        model: Ns.models.EmailAddress,
+        url: Ns.url('account/email/')
+    });
 }());

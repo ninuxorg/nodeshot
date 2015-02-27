@@ -89,11 +89,6 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     # hstore support
     'django_hstore',
-    # admin site
-    'grappelli.dashboard',
-    'grappelli',
-    'filebrowser',
-    'django.contrib.admin',
     # celery django email backend
     'djcelery_email',
     # nodeshot
@@ -115,6 +110,11 @@ INSTALLED_APPS = [
     'nodeshot.networking.connectors',
     'nodeshot.interop.open311',
     'nodeshot.ui.open311_demo',
+    # admin site
+    'grappelli.dashboard',
+    'grappelli',
+    'filebrowser',
+    'django.contrib.admin',
     # 3d parthy django apps
     'rest_framework',
     'rest_framework_swagger',
@@ -213,7 +213,7 @@ LOGGING = {
         },
         'logfile': {
             'level': 'ERROR',
-            'class':'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'verbose',
             'filename': settings.SITE_ROOT + "/../log/nodeshot.error.log",
             'maxBytes': 10485760,  # 10 MB
@@ -223,8 +223,8 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers':['logfile'],
-            'level':'ERROR',
+            'handlers': ['logfile'],
+            'level': 'ERROR',
             'propagate': True,
         },
         'django.request': {
@@ -370,7 +370,7 @@ if 'social_auth' in INSTALLED_APPS:
 
     LOGIN_URL = '/'
     LOGIN_REDIRECT_URL = '/'
-    LOGIN_ERROR_URL    = '/'
+    LOGIN_ERROR_URL = '/'
 
 # ------ DJANGO-LEAFLET SETTINGS ------ #
 

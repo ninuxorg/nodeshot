@@ -45,12 +45,12 @@
 
 <div id="js-links">
     <form action="">
-        <table class="table table-striped columns">
+        <table class="table table-striped columns middle">
             <thead>
                 <tr>
-                    <th>{% trans 'url' %}</th>
-                    <th>{% trans 'description' %}</th>
-                    <th class="hidden-xxs">{% trans 'actions' %}</th>
+                    <th style="width:50%">{% trans 'url' %}</th>
+                    <th style="width:25%">{% trans 'description' %}</th>
+                    <th style="width:25%">{% trans 'actions' %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -70,6 +70,59 @@
                     <% }) %>
                 <% } else { %>
                     <tr><td colspan="4" class="text-center">{% trans 'No links to show' %}</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+    </form>
+    <p>
+        <button type="button" class="btn btn-primary add">
+            <span class="glyphicon glyphicon-plus"></span>
+            {% trans 'Add' %}
+        </button>
+    </p>
+</div>
+
+<h3>{% trans 'Email addresses' %}</h3>
+
+<div id="js-emails">
+    <form action="">
+        <table class="table table-striped columns middle">
+            <thead>
+                <tr>
+                    <th style="width:40%">{% trans 'email address' %}</th>
+                    <th style="width:15%">{% trans 'verified' %}</th>
+                    <th style="width:15%">{% trans 'primary' %}</th>
+                    <th style="width:30%">{% trans 'actions' %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (email_addresses.length > 0) { %>
+                    <% _.each(email_addresses, function(email){ %>
+                        <tr>
+                            <td><%= email.email %></td>
+                            <td><span class="icon-<%= email.verified ? 'ok' : 'cancel' %>"></span></td>
+                            <td><span class="icon-<%= email.primary ? 'ok' : 'cancel' %>"></span></td>
+                            <td>
+                                <% if (!email.primary) { %>
+                                <button type="button" class="btn btn-primary btn-sm delete" data-cid="<%= email.cid %>">
+                                    <span class="glyphicon glyphicon-remove"></span>{% trans 'Delete' %}
+                                </button>
+                                <% } %>
+                                <% if (!email.verified) { %>
+                                    <button type="button" class="btn btn-primary btn-sm resend" data-cid="<%= email.cid %>">
+                                        <span class="glyphicon glyphicon-repeat"></span>{% trans 'Resend confirmation' %}
+                                    </button>
+                                <% } %>
+                                <% if (email.verified && !email.primary) { %>
+                                    <button type="button" class="btn btn-primary btn-sm makeprimary" data-cid="<%= email.cid %>">
+                                        <span class="glyphicon glyphicon-ok"></span>{% trans 'Make primary' %}
+                                    </button>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr><td colspan="4" class="text-center">{% trans 'No email addresses' %}</td></tr>
                 <% } %>
             </tbody>
         </table>
