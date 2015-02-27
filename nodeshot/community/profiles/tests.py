@@ -264,6 +264,29 @@ class ProfilesTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(405, response.status_code)
 
+    def test_account_password_change_empty_API(self):
+        url = reverse('api_account_password_change')
+        response = self.client.post(url, {
+            "current_password": "",
+            "password1": "",
+            "password2": ""
+        }, HTTP_ACCEPT='text/html')
+        self.assertContains(response, 'current_password', status_code=400)
+
+        response = self.client.post(url, {
+            "current_password": "cc",
+            "password1": "cc",
+            "password2": "cc"
+        }, HTTP_ACCEPT='text/html')
+        self.assertContains(response, 'current_password', status_code=400)
+
+        response = self.client.post(url, {
+            "current_password": "tester",
+            "password1": "changed",
+            "password2": "changed"
+        }, HTTP_ACCEPT='text/html')
+        self.assertContains(response, 'changed', status_code=200)
+
     def test_account_password_reset_API(self):
         url = reverse('api_account_password_reset_request_key')
 

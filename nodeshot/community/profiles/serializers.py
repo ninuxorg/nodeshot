@@ -316,9 +316,8 @@ class ChangePasswordSerializer(serializers.Serializer):
         """
         current password check
         """
-        if self.object.has_usable_password() and not self.object.check_password(attrs.get("current_password")):
+        if self.object and self.object.has_usable_password() and not self.object.check_password(attrs.get("current_password")):
             raise serializers.ValidationError(_('Current password is not correct'))
-
         return attrs
 
     def validate_password2(self, attrs, source):
@@ -338,8 +337,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         if instance is not None:
             instance.change_password(attrs.get('password2'))
             return instance
-
-        return User(**attrs)
+        return None
 
 
 class ResetPasswordSerializer(serializers.Serializer):
