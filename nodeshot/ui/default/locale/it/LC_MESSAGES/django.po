@@ -7,17 +7,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-27 13:12+0100\n"
-"PO-Revision-Date: 2015-02-27 13:04+0020\n"
+"POT-Creation-Date: 2015-02-27 17:28+0100\n"
+"PO-Revision-Date: 2015-02-27 17:34+0020\n"
 "Last-Translator: Federico Capoano\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.7.5\n"
 
-#: templates/base.html:66 templates/index.html:261
+#: templates/base.html:66 templates/index.html:263
 msgid "Loading"
 msgstr "Caricamento"
 
@@ -32,15 +33,16 @@ msgstr "Questo sito ha bisogno di javascript per funzionare correttamente."
 #: templates/base.html:111
 #, python-format
 msgid ""
-"By signing up you declare to have accepted our <a href="
-"\"%(PRIVACY_POLICY_LINK)s\" class=\"js-dismiss\">privacy&nbsp;policy</a><br /"
-">and <a href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-dismiss\">terms&nbsp;"
-"of&nbsp;service</a>."
+"By signing up you declare to have accepted our <a "
+"href=\"%(PRIVACY_POLICY_LINK)s\" class=\"js-"
+"dismiss\">privacy&nbsp;policy</a><br />and <a "
+"href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-"
+"dismiss\">terms&nbsp;of&nbsp;service</a>."
 msgstr ""
 "Iscrivendoti dichiari di accettare l'<a href=\"%(PRIVACY_POLICY_LINK)s\" "
-"class=\"js-dismiss\">informativa sulla privacy</a><br />ed i <a href="
-"\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-dismiss\">termini&nbsp;del&nbsp;"
-"servizio</a>."
+"class=\"js-dismiss\">informativa sulla privacy</a><br />ed i <a "
+"href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-"
+"dismiss\">termini&nbsp;del&nbsp;servizio</a>."
 
 #: templates/base.html:119
 msgid "Sign up with Facebook"
@@ -139,23 +141,23 @@ msgstr "Impostazioni"
 msgid "Nothing interesting yet!"
 msgstr "Ancora nulla di interessante!"
 
-#: templates/index.html:230 templates/index.html.py:244
+#: templates/index.html:230 templates/index.html.py:245
 msgid "Save"
 msgstr "Salva"
 
-#: templates/index.html:233 templates/index.html.py:247
+#: templates/index.html:234 templates/index.html.py:249
 msgid "Cancel"
 msgstr "Annulla"
 
-#: templates/index.html:262
+#: templates/index.html:264
 msgid "cancel&nbsp;operation"
 msgstr "annnulla&nbsp;operazione"
 
-#: templates/index.html:281
+#: templates/index.html:283
 msgid "Email sent successfully!"
 msgstr "Email inviata correttamente!"
 
-#: templates/index.html:282
+#: templates/index.html:284
 msgid "Take me back to"
 msgstr "Riportami a"
 
@@ -183,7 +185,7 @@ msgstr "Stato"
 msgid "Bio"
 msgstr "Bio"
 
-#: templates/includes/account.html:25 templates/includes/account.html.py:63
+#: templates/includes/account.html:25 templates/includes/account.html.py:65
 msgid "Edit"
 msgstr "Modifica"
 
@@ -191,79 +193,84 @@ msgstr "Modifica"
 msgid "View"
 msgstr "Vedi"
 
-#: templates/includes/account.html:38
+#: templates/includes/account.html:31
+msgid "Change password"
+msgstr "Cambia password"
+
+#: templates/includes/account.html:40
 msgid ""
 "Avatars are managed through the popular <a href=\"https://gravatar.com\" "
 "target=\"_blank\">gravatar</a> service."
 msgstr ""
-"GLi avatar sono gestiti tramite il famoso servizio <a href=\"https://"
-"gravatar.com\" target=\"_blank\">gravatar</a>."
+"Gli avatar sono gestiti tramite il famoso servizio <a "
+"href=\"https://gravatar.com\" target=\"_blank\">gravatar</a>."
 
-#: templates/includes/account.html:39
+#: templates/includes/account.html:41
 msgid ""
-"If you don't have one yet, create an account on <strong>gravatar.com</"
-"strong> and associate your current email address to it."
+"If you don't have one yet, create an account on "
+"<strong>gravatar.com</strong> and associate your current email address to "
+"it."
 msgstr ""
 "Se non ne hai ancora uno, crea un account su <strong>gravatar.com</strong> "
 "associandoci il tuo attuale indirizzo email."
 
-#: templates/includes/account.html:40
+#: templates/includes/account.html:42
 msgid "Edit on gravatar.com"
 msgstr "Modifica su gravatar.com"
 
-#: templates/includes/account.html:44 templates/includes/user-details.html:34
+#: templates/includes/account.html:46 templates/includes/user-details.html:34
 msgid "Links"
 msgstr "Links"
 
-#: templates/includes/account.html:51
+#: templates/includes/account.html:53
 msgid "url"
 msgstr "url"
 
-#: templates/includes/account.html:52
+#: templates/includes/account.html:54
 msgid "description"
 msgstr "descrizione"
 
-#: templates/includes/account.html:53 templates/includes/account.html.py:95
+#: templates/includes/account.html:55 templates/includes/account.html.py:97
 msgid "actions"
 msgstr "azioni"
 
-#: templates/includes/account.html:66 templates/includes/account.html:108
+#: templates/includes/account.html:68 templates/includes/account.html:120
 msgid "Delete"
 msgstr "Elimina"
 
-#: templates/includes/account.html:72
+#: templates/includes/account.html:74
 msgid "No links to show"
 msgstr "Nessun link da mostrare"
 
-#: templates/includes/account.html:80 templates/includes/account.html:133
+#: templates/includes/account.html:82 templates/includes/account.html:135
 msgid "Add"
 msgstr "Aggiungi"
 
-#: templates/includes/account.html:85
+#: templates/includes/account.html:87
 msgid "Email addresses"
 msgstr "Indirizzi email"
 
-#: templates/includes/account.html:92
+#: templates/includes/account.html:94
 msgid "email address"
 msgstr "indirizzo email"
 
-#: templates/includes/account.html:93
+#: templates/includes/account.html:95
 msgid "verified"
 msgstr "verificato"
 
-#: templates/includes/account.html:94
+#: templates/includes/account.html:96
 msgid "primary"
 msgstr "primario"
 
-#: templates/includes/account.html:113
+#: templates/includes/account.html:110
 msgid "Resend confirmation"
 msgstr "Re-invia conferma"
 
-#: templates/includes/account.html:118
+#: templates/includes/account.html:115
 msgid "Make primary"
 msgstr "Rendi primario"
 
-#: templates/includes/account.html:125
+#: templates/includes/account.html:127
 msgid "No email addresses"
 msgstr "Nessun indirizzo email"
 

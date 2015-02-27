@@ -664,4 +664,13 @@
         model: Ns.models.EmailAddress,
         url: Ns.url('account/email/')
     });
+
+    Ns.models.AccountPassword = Ns.models.Base.extend({
+        urlRoot: Ns.url('account/password/'),
+        schema: {
+            current_password: { type: 'Password', title: gettext('Current password') },
+            password1: { type: 'Password', title: gettext('New password'), validators: ['required'] },
+            password2: { type: 'Password', title: gettext('New password (confirmation)'), validators: ['required'] }
+        }
+    });
 }());

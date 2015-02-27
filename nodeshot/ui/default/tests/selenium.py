@@ -880,3 +880,17 @@ class DefaultUiSeleniumTest(TestCase):
         self._wait_until_element_visible('#account-container', 1, 'account settings not shown after save')
         self.assertEqual(self.browser.find_element_by_css_selector('#account-container h1').text, 'My account')
         self._logout()
+
+    def test_change_password(self):
+        # not authenticated goes back to home
+        self._hashchange('#account/password/change')
+        self._wait_until_element_visible('#body article.center-stage .btn-primary', 1, 'home page not visible')
+        # login
+        self._login()
+        self._hashchange('#account/password/change')
+        self._wait_until_element_visible('#form-container', 1, 'form not shown')
+        self.assertEqual(self.browser.find_element_by_css_selector('#body article h1').text, 'Change account password')
+        self.browser.find_element_by_css_selector('#form-container .btn-success').click()
+        self._wait_until_ajax_complete(5, 'Timeout')
+        self.assertEqual(len(self.browser.find_elements_by_css_selector('#form-container .has-error')), 2)
+        self._logout()

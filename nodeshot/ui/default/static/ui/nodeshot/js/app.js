@@ -147,9 +147,14 @@
             });
         },
 
-        // reset forgotten password
+        // get account details
         getAccount: function () {
             new Ns.views.Account();
+        },
+
+        // logged in user changes password
+        getAccountPassword: function () {
+            new Ns.views.AccountPassword();
         },
 
         // reset forgotten password
@@ -193,6 +198,7 @@
             'users/:username': 'getUser',
             'users/:username/nodes': 'getUserNodes',
             'account': 'getAccount',
+            'account/password/change': 'getAccountPassword',
             'account/password/reset': 'getPasswordReset',
             'account/profile/edit': 'getEditUser',
             'nodes/:slug/contact': 'getContactNode',

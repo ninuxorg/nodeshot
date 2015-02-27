@@ -27,6 +27,8 @@
         <a href="#users/<%= username %>" class="btn btn-primary">
             <span class="glyphicon glyphicon-eye-open"></span>{% trans 'View' %}
         </a>
+        &nbsp;
+        <a href="#account/password/change" class="btn btn-warning icon-lock">{% trans 'Change password' %}</a>
     </p>
 </div>
 
@@ -62,7 +64,7 @@
                             <td>
                                 <button type="button" class="btn btn-primary btn-sm icon-edit edit" data-cid="<%= link.cid %>">{% trans 'Edit' %}</button>
                                 &nbsp;
-                                <button type="button" class="btn btn-primary btn-sm delete" data-cid="<%= link.cid %>">
+                                <button type="button" class="btn btn-danger btn-sm delete" data-cid="<%= link.cid %>">
                                     <span class="glyphicon glyphicon-remove"></span>{% trans 'Delete' %}
                                 </button>
                             </td>
@@ -103,11 +105,6 @@
                             <td><span class="icon-<%= email.verified ? 'ok' : 'cancel' %>"></span></td>
                             <td><span class="icon-<%= email.primary ? 'ok' : 'cancel' %>"></span></td>
                             <td>
-                                <% if (!email.primary) { %>
-                                <button type="button" class="btn btn-primary btn-sm delete" data-cid="<%= email.cid %>">
-                                    <span class="glyphicon glyphicon-remove"></span>{% trans 'Delete' %}
-                                </button>
-                                <% } %>
                                 <% if (!email.verified) { %>
                                     <button type="button" class="btn btn-primary btn-sm resend" data-cid="<%= email.cid %>">
                                         <span class="glyphicon glyphicon-repeat"></span>{% trans 'Resend confirmation' %}
@@ -117,6 +114,11 @@
                                     <button type="button" class="btn btn-primary btn-sm makeprimary" data-cid="<%= email.cid %>">
                                         <span class="glyphicon glyphicon-ok"></span>{% trans 'Make primary' %}
                                     </button>
+                                <% } %>
+                                <% if (!email.primary) { %>
+                                <button type="button" class="btn btn-danger btn-sm delete" data-cid="<%= email.cid %>">
+                                    <span class="glyphicon glyphicon-remove"></span>{% trans 'Delete' %}
+                                </button>
                                 <% } %>
                             </td>
                         </tr>

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-27 13:13+0100\n"
-"PO-Revision-Date: 2015-02-27 13:13+0020\n"
+"POT-Creation-Date: 2015-02-27 17:28+0100\n"
+"PO-Revision-Date: 2015-02-27 17:43+0020\n"
 "Last-Translator: Federico Capoano\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "Annulla"
 
-#: static/ui/nodeshot/js/app.js:247
+#: static/ui/nodeshot/js/app.js:253
 msgid "confirmation mail sent"
 msgstr "email di conferma inviata"
 
@@ -77,6 +77,18 @@ msgstr "problema durante il logout"
 msgid "Message"
 msgstr "Messaggio"
 
+#: static/ui/nodeshot/js/models.js:671
+msgid "Current password"
+msgstr "Password attuale"
+
+#: static/ui/nodeshot/js/models.js:672
+msgid "New password"
+msgstr "Nuova password"
+
+#: static/ui/nodeshot/js/models.js:673
+msgid "New password (confirmation)"
+msgstr "Nuova password (conferma)"
+
 #: static/ui/nodeshot/js/utils.js:255
 msgid "ok"
 msgstr "ok"
@@ -124,7 +136,7 @@ msgid "Edit"
 msgstr "Modifica"
 
 #: static/ui/nodeshot/js/views/node-details.js:419
-#: static/ui/nodeshot/js/views/user.js:105
+#: static/ui/nodeshot/js/views/user.js:107
 msgid "Save"
 msgstr "Salva"
 
@@ -156,25 +168,29 @@ msgid "Check your inbox for the password reset link."
 msgstr ""
 "Controlla la tua posta in arrivo per il link di ripristino della password"
 
-#: static/ui/nodeshot/js/views/user.js:101
+#: static/ui/nodeshot/js/views/user.js:99
 msgid "Edit \""
 msgstr "Modifica"
 
-#: static/ui/nodeshot/js/views/user.js:212
+#: static/ui/nodeshot/js/views/user.js:217
 msgid "Account"
 msgstr "Account"
 
-#: static/ui/nodeshot/js/views/user.js:269
-#: static/ui/nodeshot/js/views/user.js:319
+#: static/ui/nodeshot/js/views/user.js:278
+#: static/ui/nodeshot/js/views/user.js:328
 msgid "Do you confirm?"
 msgstr "Confermi?"
 
-#: static/ui/nodeshot/js/views/user.js:270
-#: static/ui/nodeshot/js/views/user.js:320
+#: static/ui/nodeshot/js/views/user.js:279
+#: static/ui/nodeshot/js/views/user.js:329
 msgid "yes"
 msgstr "sì"
 
-#: static/ui/nodeshot/js/views/user.js:274
-#: static/ui/nodeshot/js/views/user.js:324
+#: static/ui/nodeshot/js/views/user.js:283
+#: static/ui/nodeshot/js/views/user.js:333
 msgid "no"
 msgstr "no"
+
+#: static/ui/nodeshot/js/views/user.js:365
+msgid "Change account password"
+msgstr "Cambia password"

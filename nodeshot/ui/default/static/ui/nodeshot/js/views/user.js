@@ -19,7 +19,7 @@
         },
 
         initialize: function (options) {
-            // listen to login / logout events
+            // listen to logout events
             this.listenTo(Ns.db.user, 'loggedin loggedout', this.render);
             // get cached version or init new
             this.model = Ns.db.users.get(options.username) || new Ns.models.User();
@@ -94,11 +94,13 @@
                 delete(this);
                 return;
             }
+            // delete view on logout
+            this.listenTo(Ns.db.user, 'loggedout', this.initialize);
+            this.title = gettext('Edit "' + this.username + '"');
             this.show();
         },
 
         show: function () {
-            this.title = gettext('Edit "' + this.username + '"');
             Ns.body.show(this);
             this.form = new Backbone.Form({
                 model: this.model,
@@ -193,10 +195,13 @@
                 delete(this);
                 return;
             }
+            // delete view on logout
+            this.listenTo(Ns.db.user, 'loggedout', this.initialize);
             // social links
             this.socialLinks = new Ns.collections.SocialLink(this.model.get('social_links'));
             this.model.set('social_links', this.socialLinks.toJSON());
             this.listenTo(this.socialLinks, 'add remove sync', this.updateLinks);
+            this.listenTo(this.socialLinks, 'sync', this.cache);
             this.editLinkTemplate = _.template($('#edit-link-template').html());
             // email addresses
             this.emailAddresses = new Ns.collections.EmailAddress(this.model.get('email_addresses'));
@@ -217,6 +222,10 @@
         updateLinks: function () {
             this.model.set('social_links', this.socialLinks.toJSON());
             this.render();
+        },
+
+        cache: function () {
+            Ns.db.users.add(this.model, { merge: true });
         },
 
         addLink: function (e) {
@@ -337,6 +346,24 @@
             email.resendConfirmation().done(function(responseJSON){
                 $.createModal({ message: responseJSON.detail });
             });
+        }
+    });
+
+    Ns.views.AccountPassword = Ns.views.EditUser.extend({
+        id: 'account-container',
+        template: '#form-template',
+
+        initialize: function (options) {
+            this.model = new Ns.models.AccountPassword();
+            if (!Ns.db.user.isAuthenticated()) {
+                Ns.menu.currentView.openFirst();
+                delete(this);
+                return;
+            }
+            // delete view on logout
+            this.listenTo(Ns.db.user, 'loggedout', this.initialize);
+            this.title = gettext('Change account password');
+            this.show();
         }
     });
 }());
