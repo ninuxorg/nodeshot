@@ -1,0 +1,35 @@
+[
+    {
+        "pk": 1,
+        "model": "links.link",
+        "fields": {
+            "status": 2,
+            "updated": "2015-02-28T14:51:03.410Z",
+            "added": "2015-02-28T14:03:32.400Z",
+            "dbm": null,
+            "metric_value": 1,
+            "min_rate": null,
+            "shortcuts": {},
+            "data": {
+                "node_b_name": "Potenziale Viterbo",
+                "node_a_slug": "pomezia",
+                "interface_b_mac": "00:27:22:00:50:72",
+                "node_a_name": "Pomezia",
+                "node_b_slug": "potenziale-viterbo",
+                "interface_a_mac": "00:27:22:00:50:71"
+            },
+            "max_rate": null,
+            "interface_b": 3,
+            "interface_a": 2,
+            "access_level": 0,
+            "noise": null,
+            "metric_type": "etx",
+            "line": "LINESTRING (12.5003117322921753 41.6674060128385761, 12.1132603101296237 42.4212908498151577)",
+            "last_seen": "2015-02-28T14:51:03.410Z",
+            "type": 5,
+            "node_b": 6,
+            "node_a": 7,
+            "first_seen": "2015-02-28T14:51:03.410Z"
+        }
+    }
+]

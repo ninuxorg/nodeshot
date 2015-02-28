@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 
-urlpatterns = patterns('nodeshot.networking.links.views',
+urlpatterns = patterns('nodeshot.networking.links.views',  # noqa
     url(r'^links/$', 'link_list', name='api_link_list'),
     url(r'^links/(?P<pk>[0-9]+)/$', 'link_details', name='api_link_details'),
     # geojson
