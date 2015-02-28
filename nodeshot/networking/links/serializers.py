@@ -14,16 +14,25 @@ __all__ = [
     'PaginatedLinkSerializer',
 ]
 
-  
+
 class LinkListSerializer(gis_serializers.GeoModelSerializer):
     """ location serializer  """
-    
+    layer = serializers.Field('layer_slug')
     quality = serializers.Field(source='quality')
-    details = serializers.HyperlinkedIdentityField(view_name='api_link_details')
-    
+    status = serializers.Field(source='get_status_display')
+    type = serializers.Field(source='get_type_display')
+    node_a_name = serializers.Field(source='node_a_name')
+    node_b_name = serializers.Field(source='node_b_name')
+
     class Meta:
         model = Link
-        fields = ['id', 'line', 'quality', 'details']
+        fields = [
+            'id',
+            'layer',
+            'node_a_name', 'node_b_name',
+            'status', 'type', 'line',
+            'metric_type', 'metric_value',
+        ]
 
 
 class LinkListGeoJSONSerializer(LinkListSerializer, gis_serializers.GeoFeatureModelSerializer):
@@ -34,26 +43,21 @@ class LinkListGeoJSONSerializer(LinkListSerializer, gis_serializers.GeoFeatureMo
 
 
 class LinkDetailSerializer(DynamicRelationshipsMixin, LinkListSerializer):
-    
-    access_level = serializers.Field(source='get_access_level_display')
-    status = serializers.Field(source='get_status_display')
-    type = serializers.Field(source='get_type_display')
-    node_a_name = serializers.Field(source='node_a_name')
-    node_b_name = serializers.Field(source='node_b_name')
     interface_a_mac = serializers.Field(source='interface_a_mac')
     interface_b_mac = serializers.Field(source='interface_b_mac')
     relationships = serializers.SerializerMethodField('get_relationships')
-    
+
     # this is needed to avoid adding stuff to DynamicRelationshipsMixin
     _relationships = {}
 
     class Meta:
         model = Link
         fields = [
-            'id', 
+            'id',
+            'layer',
             'node_a_name', 'node_b_name',
             'interface_a_mac', 'interface_b_mac',
-            'access_level', 'status', 'type', 'line', 
+            'status', 'type', 'line',
             'quality', 'metric_type', 'metric_value',
             'max_rate', 'min_rate', 'dbm', 'noise',
             'first_seen', 'last_seen',
