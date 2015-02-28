@@ -219,12 +219,12 @@
          */
         initMap: function () {
             var self = this,
-                coords = this.rememberMapProperties();
+                memory = this.rememberMapProperties();
             this.resize();
             // init map
             this.map = $.loadDjangoLeafletMap();
-            // remember latest coordinates
-            this.map.setView([coords.lat, coords.lng], coords.zoom, {
+            // remember last coordinates
+            this.map.setView([memory.lat, memory.lng], memory.zoom, {
                 trackResize: true
             });
             // store baseLayers
@@ -234,7 +234,10 @@
                 // keep name reference
                 self.baseLayers[baseLayer.name].name = baseLayer.name;
             });
-            this.switchBaseLayer(coords.baseLayer);
+            // remember preferred baseLayer
+            if (memory.baseLayer) {
+                this.switchBaseLayer(memory.baseLayer);
+            }
             // create (empty) clusters on map (will be filled by addGeoModelToMap)
             this.createClusters();
         },
