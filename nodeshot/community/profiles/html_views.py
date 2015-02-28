@@ -99,7 +99,7 @@ if EMAIL_CONFIRMATION:
             make_primary=make_primary
         )
         # log in the user if not already authenticated
-        if not request.user.is_authenticated():
+        if email_address and not request.user.is_authenticated():
             user = email_address.user
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
