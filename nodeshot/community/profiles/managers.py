@@ -7,7 +7,7 @@ class ProfileManager(UserManager):
     adds support for sync_emailaddress parameter
     """
     def _create_user(self, username, email, password, is_staff,
-                     is_superuser, sync_emailaddress, **extra_fields):
+                     is_superuser, sync_emailaddress=True, **extra_fields):
         """
         Creates and saves a User with the given username, email and password.
         """

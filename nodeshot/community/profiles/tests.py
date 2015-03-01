@@ -766,6 +766,11 @@ class ProfilesTest(TestCase):
             User.objects.create_user(username=None, first_name='test',
                                      last_name='test', password='test')
 
+    def test_create_superuser(self):
+        User.objects.create_superuser('newadmin', '', 'newadmin')
+        user = User.objects.get(username='newadmin')
+        self.assertEqual(user.email_set.count(), 0)
+
     if EMAIL_CONFIRMATION:
         def test_email_uniqueness(self):
             self.assertEqual(EmailAddress.objects.filter(email='admin@admin.org').count(), 1)
