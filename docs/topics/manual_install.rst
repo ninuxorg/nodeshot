@@ -166,7 +166,7 @@ Create the nodeshot settings folder:
     cd nodeshot
     chown -R <user>:www-data .  # set group to www-data
     adduser www-data <user>
-    chmod 775 . log <myproject>  # permit www-data to write logs, pid files and static directory
+    chmod 775 . log <myproject> <myproject>/media # permit www-data to write logs, pid files and static directory
     chmod 750 manage.py <myproject>/*.py  # do not permit www-data to write on python files*
 
 Replace ``<myproject>`` with your project name. **Avoid names which are used by existing python packages (eg: test) and avoid calling it nodeshot (that's already taken by nodeshot itself)**, prefer a short and simple name, for example: **ninux**, **yourcommunity**, **yourdomain**.
