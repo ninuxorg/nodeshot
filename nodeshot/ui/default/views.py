@@ -22,6 +22,12 @@ for field in NODES_HSTORE_SCHEMA:
     except KeyError:
         field['label'] = field['name'].capitalize().replace('_', ' ')
 
+if 'nodeshot.networking.links' in ui_settings.settings.INSTALLED_APPS:
+    LINKS_ENABLED = True
+    from nodeshot.networking.links.utils import links_legend
+else:
+    LINKS_ENABLED = False
+
 
 def index(request):
     # django-rest-framework serializer context
@@ -39,6 +45,9 @@ def index(request):
         user = ProfileOwnSerializer(request.user, many=False, context=serializer_context).data
     else:
         user = {}
+    # add link legend
+    if LINKS_ENABLED:
+        status += links_legend
     # initialize django-rest-framework JSON renderer
     json_renderer = JSONRenderer()
     # template context
@@ -88,6 +97,8 @@ def index(request):
         # miscellaneous
         'ADDITIONAL_GEOJSON_URLS': json.dumps(ui_settings.ADDITIONAL_GEOJSON_URLS),
         'PRIVACY_POLICY_LINK': ui_settings.PRIVACY_POLICY_LINK,
-        'TERMS_OF_SERVICE_LINK': ui_settings.TERMS_OF_SERVICE_LINK
+        'TERMS_OF_SERVICE_LINK': ui_settings.TERMS_OF_SERVICE_LINK,
+        # networking
+        'LINKS_ENABLED': json.dumps(LINKS_ENABLED)
     }
     return render(request, 'index.html', context)

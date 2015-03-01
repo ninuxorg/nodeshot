@@ -181,10 +181,17 @@
     <% } %>
 </script>
 
-<script id="map-popup-template" type="text/template">
+<script id="map-popup-node-template" type="text/template">
     <h4><%= name %></h4>
     <% if(description){ %><%= description %><% } %>
     <p class="details"><a href="#nodes/<%= slug %>" class="btn btn-primary">{% trans 'Details' %}</a></p>
+</script>
+
+<script id="map-popup-link-template" type="text/template">
+    <h4><%= node_a_name %> &laquo;&raquo; <%= node_b_name %></h4>
+    <p><strong>{% trans 'Metric type' %}:</strong> <%= metric_type %></p>
+    <p><strong>{% trans 'Metric value' %}:</strong> <%= metric_value %></p>
+    <p><strong>{% trans 'Layer' %}:</strong> <a href="#layers/<%= layer %>"><%= Ns.db.layers.get(layer) %></a></p>
 </script>
 
 <script id="map-add-node-template" type="text/template">

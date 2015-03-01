@@ -155,7 +155,9 @@
         initialize: function (options) {
             this.parent = options.parent;
             this.collection = new Ns.collections.Geo();
-            this.popUpTemplate = _.template($('#map-popup-template').html());
+            this.popUpNodeTemplate = _.template($('#map-popup-node-template').html());
+            // link tweak
+            this.popUpLinkTemplate = _.template($('#map-popup-link-template').html());
             // reload data when user logs in or out
             this.listenTo(Ns.db.user, 'loggedin loggedout', this.reloadMapData);
             // bind to namespaced events
@@ -336,6 +338,16 @@
                 tmp._url = url;
                 fetch();
             });
+            // begin temporary tweak for links
+            if (Ns.settings.links) {
+                var links = new Ns.collections.Geo();
+                links._url = Ns.url('links.geojson');
+                links.fetch().done(function () {
+                    geo.add(links.models);
+                    geo.trigger('sync');
+                });
+            }
+            // end tweak
         },
 
         /**
@@ -417,9 +429,12 @@
             var self = this,
                 leafletLayer = model.get('leaflet'),
                 legend = model.get('legend'),
-                data = model.toJSON();
+                data = model.toJSON(),
+                layer = Ns.db.layers.get(data.layer),
+                // link tweak
+                template = model._type === 'node' ? this.popUpNodeTemplate : this.popUpLinkTemplate;
             // bind leaflet popup
-            leafletLayer.bindPopup(this.popUpTemplate(data));
+            leafletLayer.bindPopup(template(data));
             // mouse over / out events
             leafletLayer.on({
                 mouseover: function (e) {
@@ -464,7 +479,7 @@
                 }
             });
             // show on map only if corresponding nodeshot layer is visible
-            if(Ns.db.layers.get(data.layer).get('visible')){
+            if (layer && layer.get('visible')) {
                 legend.cluster.addLayer(leafletLayer);
             }
         },

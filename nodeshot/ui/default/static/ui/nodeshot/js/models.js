@@ -15,9 +15,16 @@
         idAttribute: 'slug',
         leafletOptions: _.clone(Ns.settings.leafletOptions),
 
-        initialize: function () {
-            this.set('legend', Ns.db.legend.get(this.get('status')));
+        initialize: function (model, options) {
+            // begin temporary tweak for links
+            var status = this.get('status');
+            this._type = status === 'link' ? 'link' : 'node';
+            // end tweak
+            // set legend
+            this.set('legend', Ns.db.legend.get(status));
+            // update leaflet layer when geometry changes
             this.on('change:geometry', this.setLeaflet);
+            // create leaflet layer
             this.setLeaflet();
         },
 
@@ -33,16 +40,21 @@
          */
         toLeaflet: function () {
             var options = this.leafletOptions,
-                legend = this.get('legend').toJSON(),
+                legend = this.get('legend'),
                 geojson,
                 layer;
+            // avoid exceptions if legend is unavailable
+            if (legend) { legend = legend.toJSON() }
             geojson = L.geoJson(this.toGeoJSON(), {
+                // set leaflet layer style
                 style: function (feature) {
-                    options.fillColor = legend.fill_color;
-                    options.stroke = legend.stroke_width > 0;
-                    options.weight = legend.stroke_width;
-                    options.color = legend.stroke_color;
-                    options.className = 'marker-' + legend.slug;
+                    if (legend) {
+                        options.fillColor = legend.fill_color;
+                        options.stroke = legend.stroke_width > 0;
+                        options.weight = legend.stroke_width;
+                        options.color = legend.stroke_color;
+                        options.className = 'marker-' + legend.slug;
+                    }
                     return options;
                 },
                 // used only for points
@@ -70,12 +82,12 @@
         */
         toGeoJSON: function () {
             var json = this.toJSON(),
-            // prepare main keys
-            geojson = {
-                'type': 'Feature',
-                'id': json.slug,
-                'geometry': json.geometry
-            };
+                // prepare main keys
+                geojson = {
+                    'type': 'Feature',
+                    'id': json.slug || json.id,  // slug or id
+                    'geometry': json.geometry
+                };
             delete(json.geometry);
             // move rest into properties
             geojson.properties = json;
@@ -88,35 +100,38 @@
         _url: null,
         model: Ns.models.Geo,
 
-        /*
-        * like Backbone.Collection.prototype.where but returns collection
-        */
+        /**
+         * like Backbone.Collection.prototype.where but returns collection
+         */
         whereCollection: function (options) {
             return new Ns.collections.Geo(this.where(options));
         },
 
-        /*
-        * load main geojson by default, but URL might be overridden
-        */
+        /**
+         * allow URL to be overridden
+         * load nodes.geojson by default
+         */
         url: function () {
-            if (!this._url) {
-                return Ns.url('nodes.geojson');
-            }
-            else {
-                return this._url;
-            }
+            return this._url || Ns.url('nodes.geojson');
         },
 
-        /*
-        * parse geojson
-        */
+        /**
+         * parse geojson
+         */
         parse: function (response) {
+            // temporary tweak for links
+            if (this._url && this._url === Ns.url('links.geojson')) {
+                _.each(response.features, function (feature) {
+                    feature.properties.status = 'link';
+                });
+            }
+            // end tweak
             return response.features;
         },
 
-        /*
-        * returns a pesudo GeoJSON object (leaflet compatible)
-        */
+        /**
+         * returns a pesudo GeoJSON object (leaflet compatible)
+         */
         toGeoJSON: function () {
             return this.map(function (model) {
                 return model.toGeoJSON();
@@ -428,7 +443,7 @@
             last_name: { type: 'Text', title: gettext('Last name'), validators: ['required'], editorAttrs: { maxlength: 30 }},
             city: { type: 'Text', title: gettext('City'), editorAttrs: { maxlength: 30 }},
             country: { type: 'Text', title: gettext('Country'), editorAttrs: { maxlength: 30 }},
-            about: { type: 'TextArea', title: gettext('Bio') },
+            about: { type: 'TextArea', title: gettext('Bio') }
         },
 
         defaults: {

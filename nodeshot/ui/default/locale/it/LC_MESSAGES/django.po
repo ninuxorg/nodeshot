@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-27 17:28+0100\n"
-"PO-Revision-Date: 2015-02-27 17:34+0020\n"
+"POT-Creation-Date: 2015-03-01 20:52+0100\n"
+"PO-Revision-Date: 2015-03-01 20:52+0020\n"
 "Last-Translator: Federico Capoano\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -354,7 +354,7 @@ msgstr "Nascondi legenda"
 msgid "Control map data"
 msgstr "Controlla i dati della mappa"
 
-#: templates/includes/map.html:41 templates/includes/map.html.py:191
+#: templates/includes/map.html:41 templates/includes/map.html.py:198
 msgid "Add new node"
 msgstr "Aggiungi nuovo nodo"
 
@@ -398,6 +398,19 @@ msgstr "lascia un segnaposto"
 msgid "Details"
 msgstr "Dettagli"
 
+#: templates/includes/map.html:192
+msgid "Metric type"
+msgstr "Tipo metrica"
+
+#: templates/includes/map.html:193
+msgid "Metric value"
+msgstr "Valore metrica"
+
+#: templates/includes/map.html:194 templates/includes/node-details.html:71
+#: templates/includes/node-list.html:38 templates/includes/node-list.html:100
+msgid "Layer"
+msgstr "Layer"
+
 #: templates/includes/node-details.html:31
 msgid "edit"
 msgstr "modifica"
@@ -411,11 +424,6 @@ msgstr "Generale"
 #: templates/includes/node-list.html:48 templates/includes/node-list.html:99
 msgid "Status"
 msgstr "Stato"
-
-#: templates/includes/node-details.html:71
-#: templates/includes/node-list.html:38 templates/includes/node-list.html:100
-msgid "Layer"
-msgstr "Layer"
 
 #: templates/includes/node-details.html:80
 msgid "Address"

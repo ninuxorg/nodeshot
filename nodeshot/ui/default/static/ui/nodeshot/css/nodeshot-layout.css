@@ -1270,13 +1270,14 @@ img.avatar200{ border-radius: 15% }
 .rating-count{ margin-left: 5px }
 .rating-count a{ text-decoration: none; cursor: default; }
 
-.leaflet-popup-content{
+#map .leaflet-popup-content{
+    line-height: 1.5;
     min-width: 120px;
-    max-width: 300px;
+    max-width: 350px;
 }
-.leaflet-popup-content p{ margin: 10px 0 }
-.leaflet-popup-content a.btn{ color: #fff }
-.leaflet-popup-content .details{ text-align: center }
+#map .leaflet-popup-content p{ margin: 10px 0 }
+#map .leaflet-popup-content a.btn{ color: #fff }
+#map .leaflet-popup-content .details{ margin: 15px 0; text-align: center }
 
 .displaynone{ display: none }
 

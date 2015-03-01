@@ -32,7 +32,7 @@ class DefaultUiSeleniumTest(TestCase):
     def _wait_until_ajax_complete(self, seconds, message):
         """ waits until all ajax requests are complete """
         def condition(driver):
-            return driver.execute_script("return jQuery.active === 0")
+            return driver.execute_script("return typeof(jQuery) !== 'undefined' && jQuery.active === 0")
         WebDriverWait(self.browser, seconds).until(condition, message)
 
     def _wait_until_element_visible(self, selector, seconds, message):
@@ -321,7 +321,7 @@ class DefaultUiSeleniumTest(TestCase):
         browser.find_element_by_css_selector('#map-toolbar .icon-layer-2:not(.active)')
         browser.find_element_by_css_selector('#map-toolbar .icon-layer-2').click()
         browser.find_element_by_css_selector('#map-toolbar .icon-layer-2.active')
-        self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-on')), 7)
+        self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-on')), 8)
         self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-off')), 0)
         self.assertTrue(panel.is_displayed())
         # ensure it doesn't close after clicking on it
@@ -353,7 +353,7 @@ class DefaultUiSeleniumTest(TestCase):
         browser.execute_script('$("#map-control-layer-rome").trigger("click")')
         sleep(0.1)
         self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-off')), 1)
-        self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-on')), 6)
+        self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-on')), 7)
         # ensure elements have been hidden
         self.assertEqual(browser.execute_script("return $('#map-js path.marker-potential').length"), 1)
         self.assertEqual(browser.execute_script("return $('#map-js path.marker-active').length"), 1)
@@ -378,7 +378,7 @@ class DefaultUiSeleniumTest(TestCase):
         self._hashchange('#/')
         self._hashchange('#/map')
         self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-off')), 1)
-        self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-on')), 6)
+        self.assertEqual(len(browser.find_elements_by_css_selector('#fn-map-layers .switch-on')), 7)
         self.assertEqual(browser.execute_script("return $('#map-js path.marker-potential').length"), 1)
         self.assertEqual(browser.execute_script("return $('#map-js path.marker-active').length"), 1)
         self.assertEqual(browser.execute_script("return $('#map-js .cluster.marker-potential').length"), 0)
