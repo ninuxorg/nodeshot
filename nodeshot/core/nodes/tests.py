@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import GEOSGeometry
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -310,8 +311,7 @@ class NodesApiTest(BaseTestCase):
         self.client.login(username='pisano', password='tester')
         # PUT: 403 - only owner can edit
         data = {
-            "name": "Fusolab Rome test",
-            "slug": "fusolab",
+            "name": "fusolab",
             "user": "romano",
             "elev": 80.0,
             "address": "",
@@ -328,14 +328,14 @@ class NodesApiTest(BaseTestCase):
         response = self.client.put(url, json.dumps(data), content_type='application/json')
         self.assertEqual(200, response.status_code)
         node = Node.objects.get(slug='fusolab')
-        self.assertEqual(node.name, 'Fusolab Rome test')
+        self.assertEqual(node.name, 'fusolab')
         self.assertEqual(node.description, 'Fusolab test 2')
 
         # PATCH
-        response = self.client.patch(url, {'name': 'Patched Fusolab Name'})
+        response = self.client.patch(url, {'description': 'Patched Fusolab Desc'})
         self.assertEqual(200, response.status_code)
         node = Node.objects.get(slug='fusolab')
-        self.assertEqual(node.name, 'Patched Fusolab Name')
+        self.assertEqual(node.description, 'Patched Fusolab Desc')
         self.client.logout()
 
         # CAN'T GET restricted if not authenticated
@@ -512,3 +512,41 @@ class NodesApiTest(BaseTestCase):
         self.assertIn('type', response.data)
         self.assertIn('features', response.data)
         self.assertEqual(len(response.data['features']), 1)
+
+    def test_node_integrity_error_model(self):
+        node = Node(**{
+            "name": "pomezia",
+            "slug": "",
+            "layer_id": 1,
+            "geometry": 'POINT (12.50094473361969 41.66767450196442)',
+            "elev": 0,
+            "address": "",
+            "description": ""
+        })
+        with self.assertRaises(ValidationError):
+            node.full_clean()
+
+    def test_node_integrity_error_api(self):
+        self.client.login(username='admin', password='tester')
+        url = reverse('api_node_list')
+        json_data = json.dumps({
+            "name": "pomezia",
+            "slug": "",
+            "layer": "rome",
+            "geometry": {"type": "Point", "coordinates": [12.50094473361969, 41.66767450196442]},
+            "elev": 0,
+            "address": "",
+            "description": ""
+        })
+        response = self.client.post(url, json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_slug_changes_automatically(self):
+        # change name 0
+        existing = Node.objects.get(slug='pomezia')
+        existing.name = 'Changed'
+        existing.full_clean()
+        existing.save()
+        # query again to be sure data is up to date
+        existing = Node.objects.get(pk=existing.pk)
+        self.assertEqual(existing.slug, 'changed')

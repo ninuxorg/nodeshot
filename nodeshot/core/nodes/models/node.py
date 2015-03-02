@@ -74,8 +74,15 @@ class Node(BaseAccessLevel):
         if self.pk:
             self._current_status = self.status_id
 
+    def _autofill_slug(self):
+        slugified_name = slugify(self.name)
+        # auto generate slug
+        if not self.slug or self.slug != slugified_name:
+            self.slug = slugified_name
+
     def clean(self, *args, **kwargs):
         """ call extensible validation """
+        self._autofill_slug()
         self.extensible_validation()
 
     def save(self, *args, **kwargs):
@@ -85,26 +92,19 @@ class Node(BaseAccessLevel):
             * intercepts changes to status and fires node_status_changed signal
             * set default status
         """
-        # auto generate slug
-        if not self.slug:
-            self.slug = slugify(self.name)
-
         # geometry collection check
         if isinstance(self.geometry, GeometryCollection) and 0 < len(self.geometry) < 2:
             self.geometry = self.geometry[0]
-
         # if no status specified
         if not self.status and not self.status_id:
             try:
                 self.status = Status.objects.filter(is_default=True)[0]
             except IndexError:
                 pass
-
         super(Node, self).save(*args, **kwargs)
-
         # if status of a node changes
         if (self.status and self._current_status and self.status.id != self._current_status) or\
-            (self.status_id and self._current_status and self.status_id != self._current_status):
+           (self.status_id and self._current_status and self.status_id != self._current_status):
             # send django signal
             node_status_changed.send(
                 sender=self.__class__,
