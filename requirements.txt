@@ -26,7 +26,7 @@ djangorestframework==2.4.4
 drf-extensions==0.2.5
 django-rest-swagger
 markdown
-djangorestframework-gis
+djangorestframework-gis==0.7
 djangorestframework-hstore
 
 # authentication with social networks
