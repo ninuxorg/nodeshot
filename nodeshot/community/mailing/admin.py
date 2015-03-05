@@ -11,11 +11,9 @@ from .models import Inward, Outward
 from .settings import settings, OUTWARD_HTML
 from .tasks import send_outward_mails
 
-import os
-
 
 class InwardAdmin(BaseAdmin):
-    list_display  = ('from_email', 'from_name', 'to',  'status', 'added', 'updated')
+    list_display = ('from_email', 'from_name', 'to', 'status', 'added', 'updated')
     search_fields = ('from_email', 'from_name')
     # define the autocomplete_lookup_fields
     if 'grappelli' in settings.INSTALLED_APPS:
@@ -25,8 +23,8 @@ class InwardAdmin(BaseAdmin):
 
 
 class OutwardAdmin(BaseAdmin):
-    list_display  = ('subject', 'status', 'is_scheduled', 'added', 'updated')
-    list_filter   = ('status', 'is_scheduled')
+    list_display = ('subject', 'status', 'is_scheduled', 'added', 'updated')
+    list_filter = ('status', 'is_scheduled')
     filter_horizontal = ['layers', 'users']
     search_fields = ('subject',)
     actions = ['send']
