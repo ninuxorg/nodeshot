@@ -15,10 +15,13 @@ def get_db():
 
 
 def query(query, params={}, expected_response_code=200,
-          database=settings.INFLUXDB_DATABASE, raw=False):
+          database=None, raw=False):
     """Wrapper around ``InfluxDBClient.query()``."""
     db = get_db()
-    return db.query(query, params, expected_response_code, database, raw)
+    return db.query(query, params,
+                    expected_response_code,
+                    database=database or settings.INFLUXDB_DATABASE,
+                    raw=raw)
 
 
 def create_database():

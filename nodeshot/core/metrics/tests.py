@@ -8,7 +8,8 @@ from nodeshot.core.base.tests import user_fixtures
 from nodeshot.core.base.utils import ago
 
 from . import settings as local_settings
-setattr(local_settings, 'INFLUXDB_DATABASE', 'nodeshot_metrics_test')
+TEST_DATABASE = '{0}_test'.format(local_settings.INFLUXDB_DATABASE)
+setattr(local_settings, 'INFLUXDB_DATABASE', TEST_DATABASE)
 
 from .models import Metric
 from .utils import get_db, query, create_database, create_retention_policies
@@ -28,7 +29,7 @@ class MetricsTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         client = get_db()
-        client.drop_database('nodeshot_metrics_test')
+        client.drop_database(TEST_DATABASE)
 
     def test_metric_model(self):
         metric = Metric(name='test_metric')
@@ -50,57 +51,61 @@ class MetricsTest(TestCase):
         self.assertIn('<influxdb.client.InfluxDBClient object at', str(get_db()))
 
     def test_query(self):
-        databases = query('show databases', database='nodeshot_metrics_test')
+        databases = query('show databases')
         self.assertEqual(type(databases), list)
         databases = [database['name'] for database in databases]
-        self.assertIn('nodeshot_metrics_test', databases)
+        self.assertIn(TEST_DATABASE, databases)
 
     def test_write(self):
-        self.assertEqual(query('show series', database='nodeshot_metrics_test'), {})
+        self.assertEqual(query('show series'), {})
         metric = Metric(name='test_metric')
         metric.related_object = User.objects.first()
         metric.full_clean()
         metric.save()
         metric.write({'value1': 1, 'value2': 'string'})
-        series = query('show series', database='nodeshot_metrics_test')
+        series = query('show series')
         self.assertEqual(series.keys(), ['test_metric'])
         sleep(2)
         sql = "select * from test_metric where content_type = 'user' and object_id = '{0}'".format(metric.object_id)
-        points = query(sql, database='nodeshot_metrics_test')['test_metric']
+        points = query(sql)['test_metric']
         self.assertEqual(len(points), 1)
         # drop series
-        series_id = query('show series', database='nodeshot_metrics_test')['test_metric'][0]['id']
-        query('drop measurement test_metric', database='nodeshot_metrics_test')
+        series_id = query('show series')['test_metric'][0]['id']
+        query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
 
     def test_write_timestamp_string(self):
-        self.assertEqual(query('show series', database='nodeshot_metrics_test'), {})
+        self.assertEqual(query('show series'), {})
         metric = Metric(name='test_metric')
         metric.related_object = User.objects.first()
         metric.full_clean()
         metric.save()
-        metric.write({'value1': 1, 'value2': 'string'}, timestamp='2015-03-06T14:18:12.67057428Z')
+        timestamp_string = '2015-03-06T14:18:12Z'
+        metric.write({'value1': 1, 'value2': 'string'}, timestamp=timestamp_string)
         sleep(2)
         sql = "select * from test_metric where content_type = 'user' and object_id = '{0}'".format(metric.object_id)
-        points = query(sql, database='nodeshot_metrics_test')['test_metric']
+        points = query(sql)['test_metric']
         self.assertEqual(len(points), 1)
+        self.assertEqual(points[0]['time'], timestamp_string)
         # drop series
-        series_id = query('show series', database='nodeshot_metrics_test')['test_metric'][0]['id']
-        query('drop measurement test_metric', database='nodeshot_metrics_test')
+        series_id = query('show series')['test_metric'][0]['id']
+        query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
 
     def test_write_timestamp_datetime(self):
-        self.assertEqual(query('show series', database='nodeshot_metrics_test'), {})
+        self.assertEqual(query('show series'), {})
         metric = Metric(name='test_metric')
         metric.related_object = User.objects.first()
         metric.full_clean()
         metric.save()
-        metric.write({'value1': 1, 'value2': 'string'}, timestamp=ago(days=365))
+        datetime = ago(days=365)
+        metric.write({'value1': 1, 'value2': 'string'}, timestamp=datetime)
         sleep(2)
         sql = "select * from test_metric where content_type = 'user' and object_id = '{0}'".format(metric.object_id)
-        points = query(sql, database='nodeshot_metrics_test')['test_metric']
+        points = query(sql)['test_metric']
         self.assertEqual(len(points), 1)
+        self.assertEqual(points[0]['time'], datetime.strftime('%Y-%m-%dT%H:%M:%SZ'))
         # drop series
-        series_id = query('show series', database='nodeshot_metrics_test')['test_metric'][0]['id']
-        query('drop measurement test_metric', database='nodeshot_metrics_test')
+        series_id = query('show series')['test_metric'][0]['id']
+        query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
