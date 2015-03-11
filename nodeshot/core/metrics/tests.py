@@ -109,3 +109,22 @@ class MetricsTest(TestCase):
         series_id = query('show series')['test_metric'][0]['id']
         query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
+
+    def test_select(self):
+        self.assertEqual(query('show series'), {})
+        metric = Metric(name='test_metric')
+        metric.related_object = User.objects.first()
+        metric.full_clean()
+        metric.save()
+        metric.write({'value1': 1})
+        sleep(0.5)
+        metric.write({'value1': 2})
+        sleep(0.5)
+        metric.write({'value1': 3})
+        sleep(0.5)
+        self.assertEqual(len(metric.select()['test_metric']), 3)
+        self.assertEqual(len(metric.select(limit=1)['test_metric']), 1)
+        # drop series
+        series_id = query('show series')['test_metric'][0]['id']
+        query('drop measurement test_metric')
+        query('drop series {0}'.format(series_id))
