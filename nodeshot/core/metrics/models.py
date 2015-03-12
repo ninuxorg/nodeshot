@@ -11,7 +11,7 @@ from nodeshot.core.base.models import BaseDate
 from nodeshot.core.base.utils import ago
 
 from . import settings as local_settings
-from .utils import get_db, query
+from .utils import query, write
 
 
 class Metric(BaseDate):
@@ -28,10 +28,6 @@ class Metric(BaseDate):
     class Meta:
         unique_together = ('name', 'content_type', 'object_id')
 
-    def __init__(self, *args, **kwargs):
-        self.db = get_db()
-        super(Metric, self).__init__(*args, **kwargs)
-
     def __unicode__(self):
         return self.name
 
@@ -43,22 +39,13 @@ class Metric(BaseDate):
             })
         super(Metric, self).save(*args, **kwargs)
 
-    def write(self, fields, timestamp=None, database=None):
+    def write(self, values, timestamp=None, database=None):
         """ write metric point """
-        if timestamp is not None and isinstance(timestamp, datetime):
-            timestamp = timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
-        return self.db.write({
-            'database': database or local_settings.INFLUXDB_DATABASE,
-            'retentionPolicy': 'policy_{0}'.format(local_settings.DEFAULT_RETENTION_POLICY),
-            'points': [
-                {
-                    'name': self.name,
-                    'tags': self.tags,
-                    'timestamp': timestamp,
-                    'fields': fields
-                }
-            ]
-        })
+        return write(name=self.name,
+                     values=values,
+                     tags=self.tags,
+                     timestamp=timestamp,
+                     database=database)
 
     def select(self, fields=[], since=None, limit=None):
         if fields:

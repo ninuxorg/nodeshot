@@ -63,6 +63,7 @@ class MetricsTest(TestCase):
         metric.full_clean()
         metric.save()
         metric.write({'value1': 1, 'value2': 'string'})
+        sleep(1)
         series = query('show series')
         self.assertEqual(series.keys(), ['test_metric'])
         sleep(2)
