@@ -35,20 +35,20 @@ def write(name, values, tags={}, timestamp=None, database=None):
 
 def write_threaded(name, values, tags={}, timestamp=None, database=None):
     """ Method to be called via threading module. """
-    if timestamp is not None and isinstance(timestamp, datetime):
+    point = {
+        'name': name,
+        'tags': tags,
+        'fields': values
+    }
+    if isinstance(timestamp, datetime):
         timestamp = timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
+    if timestamp:
+        point['timestamp'] = timestamp
     try:
         get_db().write({
             'database': database or settings.INFLUXDB_DATABASE,
             'retentionPolicy': 'policy_{0}'.format(settings.DEFAULT_RETENTION_POLICY),
-            'points': [
-                {
-                    'name': name,
-                    'tags': tags,
-                    'timestamp': timestamp,
-                    'fields': values
-                }
-            ]
+            'points': [point]
         })
     except Exception, e:
         if settings.INFLUXDB_FAIL_SILENTLY:
