@@ -71,7 +71,7 @@ class InfluxDBRequestMiddleware(object):
                 'method': request.method,
                 'module': request._view_module,
                 'view': request._view_name,
-                'referer': referer,
+                'referer': str(referer),
                 'referer_tld': referer_tld_string,
                 'full_path': request.get_full_path(),
                 'path': request.path
@@ -84,4 +84,4 @@ class InfluxDBRequestMiddleware(object):
                 'path': request.path
             }
             # write into db
-            write(name='http.requests', values=values, tags=tags)
+            write(name='http_requests', values=values, tags=tags)
