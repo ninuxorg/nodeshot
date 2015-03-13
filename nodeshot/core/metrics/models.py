@@ -67,3 +67,23 @@ class Metric(BaseDate):
             q = '{0} LIMIT {1}'.format(q, limit)
         # return query
         return query(q)
+
+
+from django.contrib.auth.signals import user_logged_in
+from django.dispatch import receiver
+
+
+@receiver(user_logged_in)  # pragma: no cover
+def user_logged_in_handler(sender, **kwargs):
+    tags = {
+        'path': kwargs['request'].path,
+        'username': kwargs['user'].username,
+    }
+    values = {
+        'value': 1,
+        'path': kwargs['request'].path,
+        'username': kwargs['user'].username,
+        'user_id': kwargs['user'].pk
+    }
+    write('user_logins', values=values, tags=tags)
+
