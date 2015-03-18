@@ -69,12 +69,17 @@ class Metric(BaseDate):
         return query(q)
 
 
+# from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.signals import user_logged_in
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+User = get_user_model()
 
 
-@receiver(user_logged_in)  # pragma: no cover
+@receiver(user_logged_in)
 def user_logged_in_handler(sender, **kwargs):
+    """ collect metrics about user logins """
     tags = {
         'path': kwargs['request'].path,
         'username': kwargs['user'].username,
@@ -87,3 +92,23 @@ def user_logged_in_handler(sender, **kwargs):
     }
     write('user_logins', values=values, tags=tags)
 
+
+@receiver(post_delete, sender=User)
+def user_post_delete_handler(sender, **kwargs):
+    """ collect metrics about users unsubscribing """
+    values = {
+        'variation': -1,
+        'total': User.objects.count(),
+    }
+    write('user_count', values=values, tags={'action': 'deleted'})
+
+
+@receiver(post_save, sender=User)
+def user_post_save_handler(sender, **kwargs):
+    """ collect metrics about new users signing up """
+    if kwargs.get('created'):
+        values = {
+            'variation': 1,
+            'total': User.objects.count(),
+        }
+        write('user_count', values=values, tags={'action': 'created'})
