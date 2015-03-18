@@ -77,8 +77,8 @@ from django.dispatch import receiver
 User = get_user_model()
 
 
-@receiver(user_logged_in)
-def user_logged_in_handler(sender, **kwargs):
+@receiver(user_logged_in, dispatch_uid='user_loggedin')
+def user_loggedin(sender, **kwargs):
     """ collect metrics about user logins """
     tags = {
         'path': kwargs['request'].path,
@@ -93,8 +93,8 @@ def user_logged_in_handler(sender, **kwargs):
     write('user_logins', values=values, tags=tags)
 
 
-@receiver(post_delete, sender=User)
-def user_post_delete_handler(sender, **kwargs):
+@receiver(post_delete, sender=User, dispatch_uid='user_created')
+def user_created(sender, **kwargs):
     """ collect metrics about users unsubscribing """
     values = {
         'variation': -1,
@@ -103,8 +103,8 @@ def user_post_delete_handler(sender, **kwargs):
     write('user_count', values=values, tags={'action': 'deleted'})
 
 
-@receiver(post_save, sender=User)
-def user_post_save_handler(sender, **kwargs):
+@receiver(post_save, sender=User, dispatch_uid='user_deleted')
+def user_deleted(sender, **kwargs):
     """ collect metrics about new users signing up """
     if kwargs.get('created'):
         values = {
