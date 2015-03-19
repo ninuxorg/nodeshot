@@ -3,6 +3,7 @@ from django.conf import settings
 
 
 RETENTION_POLICIES = getattr(settings, 'NODESHOT_METRICS_RETENTION_POLICIES', (
+    ('0d', _('Infinite')),
     ('%sd' % str(365 * 3), _('3 years')),
     ('%sd' % str(365 * 2), _('2 years')),
     ('%sd' % str(365 * 1), _('1 year')),
