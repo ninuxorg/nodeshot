@@ -21,7 +21,7 @@ class Metric(BaseDate):
     tags = JSONField(_('tags'), blank=True, default={})
 
     class Meta:
-        unique_together = ('name', 'content_type', 'object_id')
+        unique_together = ('name', 'tags', 'content_type', 'object_id')
 
     def __unicode__(self):
         return self.name
@@ -91,19 +91,13 @@ def user_loggedin(sender, **kwargs):
 @receiver(post_delete, sender=User, dispatch_uid='user_created')
 def user_created(sender, **kwargs):
     """ collect metrics about users unsubscribing """
-    values = {
-        'variation': -1,
-        'total': User.objects.count(),
-    }
-    write('user_count', values=values, tags={'action': 'deleted'})
+    write('user_variations', {'variation': -1}, tags={'action': 'deleted'})
+    write('user_count', {'total': User.objects.count()})
 
 
 @receiver(post_save, sender=User, dispatch_uid='user_deleted')
 def user_deleted(sender, **kwargs):
     """ collect metrics about new users signing up """
     if kwargs.get('created'):
-        values = {
-            'variation': 1,
-            'total': User.objects.count(),
-        }
-        write('user_count', values=values, tags={'action': 'created'})
+        write('user_variations', {'variation': 1}, tags={'action': 'created'})
+        write('user_count', {'total': User.objects.count()})

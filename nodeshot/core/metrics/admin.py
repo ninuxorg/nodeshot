@@ -16,7 +16,7 @@ class MetricAdmin(BaseAdmin):
     ordering = ('-id',)
 
     def tags_formatted(self, obj):
-        return json.dumps(obj.tags)
+        return json.dumps(obj.tags) if obj.tags else ''
     tags_formatted.short_description = _('tags')
 
     # define the autocomplete_lookup_fields

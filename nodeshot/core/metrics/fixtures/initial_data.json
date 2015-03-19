@@ -1,0 +1,53 @@
+[
+    {
+        "model": "metrics.Metric",
+        "pk": 1,
+        "fields": {
+            "name": "http_requests"
+        }
+    },
+    {
+        "model": "metrics.Metric",
+        "pk": 2,
+        "fields": {
+            "name": "user_logins"
+        }
+    },
+    {
+        "model": "metrics.Metric",
+        "pk": 4,
+        "fields": {
+            "name": "user_count"
+        }
+    },
+    {
+        "model": "metrics.Metric",
+        "pk": 5,
+        "fields": {
+            "name": "user_variations (created)",
+            "tags": { "action": "created" }
+        }
+    },
+    {
+        "model": "metrics.Metric",
+        "pk": 6,
+        "fields": {
+            "name": "user_variations",
+            "tags": { "action": "deleted" }
+        }
+    },
+    {
+        "model": "metrics.Metric",
+        "pk": 7,
+        "fields": {
+            "name": "user_variations"
+        }
+    },
+    {
+        "model": "metrics.Metric",
+        "pk": 8,
+        "fields": {
+            "name": "emails_sent"
+        }
+    }
+]
