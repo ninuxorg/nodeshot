@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.6.10
+Django==1.6.11
 
 # python libraries
 Pillow
