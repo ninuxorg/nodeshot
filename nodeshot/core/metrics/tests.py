@@ -1,3 +1,4 @@
+import json
 from time import sleep
 
 from django.test import TestCase
@@ -57,7 +58,6 @@ class MetricsTest(TestCase):
         self.assertIn(TEST_DATABASE, databases)
 
     def test_write(self):
-        self.assertEqual(query('show series'), {})
         metric = Metric(name='test_metric')
         metric.related_object = User.objects.first()
         metric.full_clean()
@@ -65,7 +65,7 @@ class MetricsTest(TestCase):
         metric.write({'value1': 1, 'value2': 'string'})
         sleep(1)
         series = query('show series')
-        self.assertEqual(series.keys(), ['test_metric'])
+        self.assertIn('test_metric', series.keys())
         sleep(2)
         sql = "select * from test_metric where content_type = 'user' and object_id = '{0}'".format(metric.object_id)
         points = query(sql)['test_metric']
@@ -76,7 +76,6 @@ class MetricsTest(TestCase):
         query('drop series {0}'.format(series_id))
 
     def test_write_timestamp_string(self):
-        self.assertEqual(query('show series'), {})
         metric = Metric(name='test_metric')
         metric.related_object = User.objects.first()
         metric.full_clean()
@@ -94,7 +93,6 @@ class MetricsTest(TestCase):
         query('drop series {0}'.format(series_id))
 
     def test_write_timestamp_datetime(self):
-        self.assertEqual(query('show series'), {})
         metric = Metric(name='test_metric')
         metric.related_object = User.objects.first()
         metric.full_clean()
@@ -112,7 +110,6 @@ class MetricsTest(TestCase):
         query('drop series {0}'.format(series_id))
 
     def test_select(self):
-        self.assertEqual(query('show series'), {})
         metric = Metric(name='test_metric')
         metric.related_object = User.objects.first()
         metric.full_clean()
@@ -125,6 +122,45 @@ class MetricsTest(TestCase):
         sleep(0.5)
         self.assertEqual(len(metric.select()['test_metric']), 3)
         self.assertEqual(len(metric.select(limit=1)['test_metric']), 1)
+        # drop series
+        series_id = query('show series')['test_metric'][0]['id']
+        query('drop measurement test_metric')
+        query('drop series {0}'.format(series_id))
+
+    def test_signal(self):
+        self.assertNotEqual(query('show series'), {})
+
+    def test_metric_details_get(self):
+        metric = Metric(name='test_metric')
+        metric.related_object = User.objects.first()
+        metric.full_clean()
+        metric.save()
+        metric.write({'value1': 1, 'value2': 'string'})
+        sleep(1)
+        response = self.client.get('/api/v1/metrics/{0}/'.format(metric.pk))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, metric.select())
+        # drop series
+        series_id = query('show series')['test_metric'][0]['id']
+        query('drop measurement test_metric')
+        query('drop series {0}'.format(series_id))
+
+    def test_metric_details_post(self):
+        metric = Metric(name='test_metric')
+        metric.related_object = User.objects.first()
+        metric.full_clean()
+        metric.save()
+        metric.write({'value': 1})
+        sleep(1)
+        response = self.client.post('/api/v1/metrics/{0}/'.format(metric.pk))
+        self.assertEqual(response.status_code, 400)
+        response = self.client.post('/api/v1/metrics/{0}/'.format(metric.pk),
+                                    json.dumps({'value': 2}),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertItemsEqual(response.data, {'detail': 'ok'})
+        sleep(1)
+        self.assertEqual(metric.select()['test_metric'][-1]['value'], 2)
         # drop series
         series_id = query('show series')['test_metric'][0]['id']
         query('drop measurement test_metric')
