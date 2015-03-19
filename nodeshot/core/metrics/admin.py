@@ -9,7 +9,7 @@ from .models import Metric
 
 
 class MetricAdmin(BaseAdmin):
-    list_display = ('name', 'tags_formatted', 'retention_policy', 'added', 'updated')
+    list_display = ('name', 'tags_formatted', 'added', 'updated')
     list_filter = ('added', 'updated')
     search_fields = ('name',)
     actions_on_bottom = True

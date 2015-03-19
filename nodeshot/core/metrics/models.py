@@ -10,7 +10,6 @@ from jsonfield import JSONField
 from nodeshot.core.base.models import BaseDate
 from nodeshot.core.base.utils import ago
 
-from . import settings as local_settings
 from .utils import query, write
 
 
@@ -20,10 +19,6 @@ class Metric(BaseDate):
     object_id = models.PositiveIntegerField(blank=True, null=True)
     related_object = generic.GenericForeignKey('content_type', 'object_id')
     tags = JSONField(_('tags'), blank=True, default={})
-    retention_policy = models.CharField(_('retention policy'),
-                                        max_length=32,
-                                        choices=local_settings.RETENTION_POLICIES,
-                                        default=local_settings.DEFAULT_RETENTION_POLICY)
 
     class Meta:
         unique_together = ('name', 'content_type', 'object_id')

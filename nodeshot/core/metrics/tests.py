@@ -13,7 +13,7 @@ TEST_DATABASE = '{0}_test'.format(local_settings.INFLUXDB_DATABASE)
 setattr(local_settings, 'INFLUXDB_DATABASE', TEST_DATABASE)
 
 from .models import Metric
-from .utils import get_db, query, create_database, create_retention_policies
+from .utils import get_db, query, create_database
 
 
 class MetricsTest(TestCase):
@@ -25,7 +25,6 @@ class MetricsTest(TestCase):
     @classmethod
     def setUpClass(cls):
         create_database()
-        create_retention_policies()
 
     @classmethod
     def tearDownClass(cls):
@@ -119,7 +118,7 @@ class MetricsTest(TestCase):
         metric.write({'value1': 2})
         sleep(0.5)
         metric.write({'value1': 3})
-        sleep(0.5)
+        sleep(2)
         self.assertEqual(len(metric.select()['test_metric']), 3)
         self.assertEqual(len(metric.select(limit=1)['test_metric']), 1)
         # drop series
