@@ -151,16 +151,37 @@ class MetricsTest(TestCase):
         metric.full_clean()
         metric.save()
         metric.write({'value': 1})
+        url = '/api/v1/metrics/{0}/'.format(metric.pk)
         sleep(1)
-        response = self.client.post('/api/v1/metrics/{0}/'.format(metric.pk))
+        # post 400
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
-        response = self.client.post('/api/v1/metrics/{0}/'.format(metric.pk),
-                                    json.dumps({'value': 2}),
+        # post application/json
+        response = self.client.post(url, json.dumps({'value': 2}),
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.data, {'detail': 'ok'})
         sleep(1)
         self.assertEqual(metric.select()['test_metric'][-1]['value'], 2)
+        # post application/x-www-form-urlencoded
+        response = self.client.post(url, 'value=3',
+                                    content_type='application/x-www-form-urlencoded')
+        self.assertEqual(response.status_code, 200)
+        self.assertItemsEqual(response.data, {'detail': 'ok'})
+        sleep(1)
+        self.assertEqual(metric.select()['test_metric'][-1]['value'], 3)
+        # post multipart/form-data
+        response = self.client.post(url, {'value': 4})
+        self.assertEqual(response.status_code, 200)
+        self.assertItemsEqual(response.data, {'detail': 'ok'})
+        sleep(1)
+        self.assertEqual(metric.select()['test_metric'][-1]['value'], 4)
+        # post multipart/form-data (float)
+        response = self.client.post(url, {'value': 5.0})
+        self.assertEqual(response.status_code, 200)
+        self.assertItemsEqual(response.data, {'detail': 'ok'})
+        sleep(1)
+        self.assertEqual(metric.select()['test_metric'][-1]['value'], 5.0)
         # drop series
         series_id = query('show series')['test_metric'][0]['id']
         query('drop measurement test_metric')

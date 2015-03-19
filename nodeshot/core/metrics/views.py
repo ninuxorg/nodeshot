@@ -21,5 +21,14 @@ def metric_details(request, pk, format=None):
         if not request.DATA:
             return Response({'detail': 'expected values in POST data or JSON payload'},
                             status=400)
-        metric.write(request.DATA)
+        data = request.DATA.copy()
+        # try converting strings to floats when sending form-data
+        if request.content_type != 'application/json':
+            for key, value in data.items():
+                try:
+                    data[key] = float(value) if '.' in value else int(value)
+                except ValueError:
+                    pass
+        # write
+        metric.write(data)
         return Response({'detail': 'ok'})
