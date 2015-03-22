@@ -99,7 +99,7 @@
         </div>
     </div>
 
-    <% if (Ns.settings.mapTools) { %>
+    {% if MAP_TOOLS_ENABLED %}
     <div id="fn-map-tools" class="side-panel">
         <p>
             <button href="#" class="icon-ruler tool hastip"
@@ -114,9 +114,9 @@
                     data-toggle="tooltip" title="{% trans 'drop placeholder' %}" data-placement="bottom" data-delay="300"></button>
         </p>
     </div>
-    <% } %>
+    {% endif %}
 
-    <% if (Ns.settings.mapPreferences) { %>
+    {% if MAP_PREFERENCES_ENABLED %}
     <div id="fn-map-preferences" class="side-panel adjust-height">
         <div class="panel-inner scroller">
             <h2>map preferences</h2>
@@ -178,7 +178,7 @@
             </p>
         </div>
     </div>
-    <% } %>
+    {% endif %}
 </script>
 
 <script id="map-popup-node-template" type="text/template">
