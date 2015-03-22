@@ -791,12 +791,14 @@
             'scrollers': '.scroller',
             'selects': '.selectpicker',
             'tools': '.tool',
-            'distance': '#fn-map-tools .icon-ruler'
+            'distance': '#fn-map-tools .icon-ruler',
+            'area': '#fn-map-tools .icon-select-area'
         },
 
         events: {
             'click #fn-map-tools .notImplemented': 'toggleToolNotImplemented',
             'click @ui.distance': 'toggleDistance',
+            'click @ui.area': 'toggleArea',
             'click #toggle-toolbar': 'toggleToolbar',
             'change .js-base-layers input': 'switchBaseLayer',
             'switch-change #fn-map-layers .toggle-layer-data': 'toggleLayer',
@@ -813,7 +815,8 @@
             this.populateBaseLayers();
             // init tools
             this.tools = {
-                'distance': new L.Polyline.Measure(this.mapView.map)
+                'distance': new L.Polyline.Measure(this.mapView.map),
+                'area': new L.Polygon.Measure(this.mapView.map)
             };
         },
 
@@ -913,14 +916,13 @@
         /*
          * toggle map tool
          */
-        toggleTool: function (e) {
+        toggleToolButton: function (e) {
             var button = $(e.currentTarget),
                 active_buttons = $('#fn-map-tools .tool.active');
             // if activating a tool
             if (!button.hasClass('active')) {
                 // deactivate any other
-                active_buttons.removeClass('active');
-                active_buttons.tooltip('enable');
+                active_buttons.trigger('click');
                 button.addClass('active');
                 button.tooltip('hide');
                 button.tooltip('disable');
@@ -934,21 +936,29 @@
             }
         },
 
-        toggleDistance: function (e) {
-            var result = this.toggleTool(e),
-                tool = this.tools.distance;
+        toggleDrawTool: function (toolName, e) {
+            var result = this.toggleToolButton(e),
+                tool = this.tools[toolName];
             if (result) {
                 tool.enable();
                 // if tool is disabled with ESC or other ways
                 // sync the nodeshot UI
                 tool.once('disabled', function () {
-                    this.toggleTool(e);
+                    this.toggleToolButton(e);
                 }, this);
             }
             else {
                 tool.off('disabled');
                 tool.disable();
             }
+        },
+
+        toggleDistance: function (e) {
+            this.toggleDrawTool('distance', e);
+        },
+
+        toggleArea: function (e) {
+            this.toggleDrawTool('area', e);
         },
 
         /*
