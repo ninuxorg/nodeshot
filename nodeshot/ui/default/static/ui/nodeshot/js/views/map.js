@@ -790,11 +790,13 @@
             'switches': 'input.switch',
             'scrollers': '.scroller',
             'selects': '.selectpicker',
-            'tools': '.tool'
+            'tools': '.tool',
+            'distance': '#fn-map-tools .icon-ruler'
         },
 
         events: {
-            'click #fn-map-tools .tool': 'toggleTool',
+            'click #fn-map-tools .notImplemented': 'toggleToolNotImplemented',
+            'click @ui.distance': 'toggleDistance',
             'click #toggle-toolbar': 'toggleToolbar',
             'change .js-base-layers input': 'switchBaseLayer',
             'switch-change #fn-map-layers .toggle-layer-data': 'toggleLayer',
@@ -809,6 +811,10 @@
             // listen to legend change event
             this.listenTo(Ns.db.legend, 'change:visible', this.syncLegendSwitch);
             this.populateBaseLayers();
+            // init tools
+            this.tools = {
+                'distance': new L.Polyline.Measure(this.mapView.map)
+            };
         },
 
         // populate this.baseLayers
@@ -898,28 +904,51 @@
             });
         },
 
+        toggleToolNotImplemented: function (e) {
+            e.preventDefault();
+            $.createModal({ message: gettext('not implemented yet') });
+            return false;
+        },
+
         /*
          * toggle map tool
          */
         toggleTool: function (e) {
-            e.preventDefault();
-            $.createModal({ message: gettext('not implemented yet') });
-            return false;
-            //var button = $(e.currentTarget),
-            //    active_buttons = $('#fn-map-tools .tool.active');
-            //// if activating a tool
-            //if (!button.hasClass('active')) {
-            //    // deactivate any other
-            //    active_buttons.removeClass('active');
-            //    active_buttons.tooltip('enable');
-            //    button.addClass('active');
-            //    button.tooltip('hide');
-            //    button.tooltip('disable');
-            //// deactivate
-            //} else {
-            //    button.removeClass('active');
-            //    button.tooltip('enable');
-            //}
+            var button = $(e.currentTarget),
+                active_buttons = $('#fn-map-tools .tool.active');
+            // if activating a tool
+            if (!button.hasClass('active')) {
+                // deactivate any other
+                active_buttons.removeClass('active');
+                active_buttons.tooltip('enable');
+                button.addClass('active');
+                button.tooltip('hide');
+                button.tooltip('disable');
+                return true;
+            // deactivate
+            } else {
+                button.removeClass('active');
+                button.tooltip('enable');
+                button.trigger('blur');
+                return false;
+            }
+        },
+
+        toggleDistance: function (e) {
+            var result = this.toggleTool(e),
+                tool = this.tools.distance;
+            if (result) {
+                tool.enable();
+                // if tool is disabled with ESC or other ways
+                // sync the nodeshot UI
+                tool.once('disabled', function () {
+                    this.toggleTool(e);
+                }, this);
+            }
+            else {
+                tool.off('disabled');
+                tool.disable();
+            }
         },
 
         /*

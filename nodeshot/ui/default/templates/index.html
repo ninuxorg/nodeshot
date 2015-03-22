@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n l10n static nodeshot_tags %}
+{% load i18n l10n static leaflet_tags nodeshot_tags %}
 {% block jstemplates %}
     <script id="modal-template" type="text/template">
         <div class="modal fade autocenter" id="tmp-modal" tabindex="-1">
@@ -294,7 +294,6 @@
     <script src="{% static 'ui/lib/js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'ui/lib/js/pwstrength.js' %}"></script>
     <script src="{% static 'ui/lib/js/scroller.min.js' %}"></script>
-    <script src="{% static 'ui/lib/js/leaflet.markercluster.js' %}"></script>
     <script src="{% static 'ui/lib/js/underscore.min.js' %}"></script>
     <script src="{% static 'ui/lib/js/backbone.min.js' %}"></script>
     <script src="{% static 'ui/lib/js/backbone.marionette.min.js' %}"></script>
@@ -303,7 +302,13 @@
     <script src="{% static 'ui/lib/js/backbone-forms-bootstrap3.js' %}"></script>
     <script src="{% static 'ui/lib/js/jquery.dateFormat.js' %}"></script>
     <script src="{% static 'ui/lib/js/jquery.serializeJSON.js' %}"></script>
-    {% endblock %}
+    {% leaflet_js %}
+    <script src="{% static 'ui/lib/js/leaflet.markercluster.js' %}"></script>
+    {% if MAP_TOOLS_ENABLED %}
+        <script src="{% static 'leaflet/draw/leaflet.draw.js' %}"></script>
+        <script src="{% static 'ui/lib/js/leaflet.measurecontrol-customized.js' %}"></script>
+    {% endif %}
+{% endblock %}
 {% block jssettings %}
     <!-- global settings -->
     <script>

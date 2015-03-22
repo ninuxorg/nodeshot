@@ -102,16 +102,37 @@
     {% if MAP_TOOLS_ENABLED %}
     <div id="fn-map-tools" class="side-panel">
         <p>
-            <button href="#" class="icon-ruler tool hastip"
-                    data-toggle="tooltip" title="{% trans 'measure distance' %}" data-placement="top" data-delay="300"></button>
-            <button href="#" class="icon-select-area tool hastip"
-                    data-toggle="tooltip" title="{% trans 'measure area' %}" data-placement="top" data-delay="300"></button>
+            <button href="#"
+                    class="icon-ruler tool hastip"
+                    title="{% trans 'measure distance' %}"
+                    data-tool="distance"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    data-delay="300">
+            </button>
+            <button href="#"
+                    class="icon-select-area tool hastip notImplemented"
+                    data-toggle="tooltip"
+                    title="{% trans 'measure area' %}"
+                    data-placement="top"
+                    data-delay="300">
+            </button>
         </p>
         <p>
-            <button href="#" class="icon-elevation-profile tool hastip"
-                    data-toggle="tooltip" title="{% trans 'elevation profile' %}" data-placement="bottom" data-delay="300"></button>
-            <button href="#" class="icon-placeholder tool hastip"
-                    data-toggle="tooltip" title="{% trans 'drop placeholder' %}" data-placement="bottom" data-delay="300"></button>
+            <button href="#"
+                    class="icon-elevation-profile tool hastip notImplemented"
+                    title="{% trans 'elevation profile' %}"
+                    data-toggle="tooltip"
+                    data-placement="bottom"
+                    data-delay="300">
+            </button>
+            <button href="#"
+                    class="icon-placeholder tool hastip notImplemented"
+                    data-toggle="tooltip"
+                    title="{% trans 'drop placeholder' %}"
+                    data-placement="bottom"
+                    data-delay="300">
+            </button>
         </p>
     </div>
     {% endif %}

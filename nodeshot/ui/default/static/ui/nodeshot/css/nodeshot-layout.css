@@ -578,6 +578,11 @@ article.center-stage .row > div { padding-left: 0; padding-right: 0 }
     width: 100%;
     height: 100%;
 }
+#fn-map-tools-mask {
+    left: auto;
+    right: 0;
+    width: 60px;
+}
 
 .icon-close{
     position: absolute;
