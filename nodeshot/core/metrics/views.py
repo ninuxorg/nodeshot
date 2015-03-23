@@ -1,7 +1,10 @@
+import json
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from influxdb.client import InfluxDBClientError
 
 from .models import Metric
 
@@ -14,7 +17,10 @@ def metric_details(request, pk, format=None):
     metric = get_object_or_404(Metric, pk=pk)
     # get
     if request.method == 'GET':
-        results = metric.select()
+        try:
+            results = metric.select(q=request.QUERY_PARAMS.get('q', metric.query))
+        except InfluxDBClientError as e:
+            return Response(json.loads(e.content), status=e.code)
         return Response(results)
     # post
     else:
