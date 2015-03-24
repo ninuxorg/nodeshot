@@ -14,6 +14,7 @@ class MetricAdmin(BaseAdmin):
     search_fields = ('name',)
     actions_on_bottom = True
     ordering = ('-id',)
+    change_form_template = 'admin/metric_change_form.html'
 
     def tags_formatted(self, obj):
         return json.dumps(obj.tags) if obj.tags else ''
@@ -24,6 +25,16 @@ class MetricAdmin(BaseAdmin):
         autocomplete_lookup_fields = {
             'generic': [['content_type', 'object_id']],
         }
+
+    class Media:
+        css = {
+            'all': ('metrics/css/nv.d3.min.css',)
+        }
+        js = (
+            'metrics/js/d3.min.js',
+            'metrics/js/nv.d3.min.js',
+            'metrics/js/graphs.js',
+        )
 
 
 admin.site.register(Metric, MetricAdmin)
