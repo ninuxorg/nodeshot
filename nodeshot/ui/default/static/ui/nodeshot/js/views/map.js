@@ -814,10 +814,12 @@
             this.listenTo(Ns.db.legend, 'change:visible', this.syncLegendSwitch);
             this.populateBaseLayers();
             // init tools
-            this.tools = {
-                'distance': new L.Polyline.Measure(this.mapView.map),
-                'area': new L.Polygon.Measure(this.mapView.map)
-            };
+            if (Ns.settings.mapTools) {
+                this.tools = {
+                    'distance': new L.Polyline.Measure(this.mapView.map),
+                    'area': new L.Polygon.Measure(this.mapView.map)
+                };
+            }
         },
 
         // populate this.baseLayers

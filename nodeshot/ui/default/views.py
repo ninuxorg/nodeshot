@@ -75,9 +75,9 @@ def index(request):
         'COMMENTS_ENABLED': ui_settings.COMMENTS_ENABLED,
         'CONTACTING_ENABLED': ui_settings.CONTACTING_ENABLED,
         # map features (TODO: currently unimplemented)
-        'MAP_3D_ENABLED': json.dumps(ui_settings.MAP_3D_ENABLED),
-        'MAP_TOOLS_ENABLED': json.dumps(ui_settings.MAP_TOOLS_ENABLED),
-        'MAP_PREFERENCES_ENABLED': json.dumps(ui_settings.MAP_PREFERENCES_ENABLED),
+        'MAP_3D_ENABLED': ui_settings.MAP_3D_ENABLED,
+        'MAP_TOOLS_ENABLED': ui_settings.MAP_TOOLS_ENABLED,
+        'MAP_PREFERENCES_ENABLED': ui_settings.MAP_PREFERENCES_ENABLED,
         # social auth settings
         'SOCIAL_AUTH_ENABLED': ui_settings.SOCIAL_AUTH_ENABLED,
         'FACEBOOK_ENABLED': ui_settings.FACEBOOK_ENABLED,
@@ -99,6 +99,6 @@ def index(request):
         'PRIVACY_POLICY_LINK': ui_settings.PRIVACY_POLICY_LINK,
         'TERMS_OF_SERVICE_LINK': ui_settings.TERMS_OF_SERVICE_LINK,
         # networking
-        'LINKS_ENABLED': json.dumps(LINKS_ENABLED)
+        'LINKS_ENABLED': LINKS_ENABLED
     }
     return render(request, 'index.html', context)

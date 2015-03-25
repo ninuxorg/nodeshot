@@ -1,4 +1,3 @@
-import json
 from django.conf import settings
 from leaflet import app_settings as leaflet_settings
 
@@ -57,16 +56,10 @@ else:
     RATING_ENABLED = False
     COMMENTS_ENABLED = False
 
-VOTING_ENABLED = json.dumps(VOTING_ENABLED)
-RATING_ENABLED = json.dumps(RATING_ENABLED)
-COMMENTS_ENABLED = json.dumps(COMMENTS_ENABLED)
-
 if 'nodeshot.community.mailing' in settings.INSTALLED_APPS:
     CONTACTING_ENABLED = getattr(settings, 'NODESHOT_UI_CONTACTING_ENABLED', True)
 else:
     CONTACTING_ENABLED = False
-
-CONTACTING_ENABLED = json.dumps(CONTACTING_ENABLED)
 
 if 'social_auth' in settings.INSTALLED_APPS:
     FACEBOOK_ENABLED = bool(settings.FACEBOOK_APP_ID) and bool(settings.FACEBOOK_API_SECRET)  # noqa

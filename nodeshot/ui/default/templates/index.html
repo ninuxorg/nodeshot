@@ -322,13 +322,13 @@
                 zoom: {{ MAP_ZOOM }}
                 {% endlocalize  %}
             },
-            votes: {{ VOTING_ENABLED }},
-            ratings: {{ RATING_ENABLED }},
-            comments: {{ COMMENTS_ENABLED }},
-            contacting: {{ CONTACTING_ENABLED }},
-            map3d: {{ MAP_3D_ENABLED }},
-            mapTools: {{ MAP_TOOLS_ENABLED }},
-            mapPreferences: {{ MAP_PREFERENCES_ENABLED}},
+            votes: {% if VOTING_ENABLED %}true{% else %}false{% endif %},
+            ratings: {% if RATING_ENABLED %}true{% else %}false{% endif %},
+            comments: {% if COMMENTS_ENABLED %}true{% else %}false{% endif %},
+            contacting: {% if CONTACTING_ENABLED %}true{% else %}false{% endif %},
+            map3d: {% if MAP_3D_ENABLED %}true{% else %}false{% endif %},
+            mapTools: {% if MAP_TOOLS_ENABLED %}true{% else %}false{% endif %},
+            mapPreferences: {% if MAP_PREFERENCES_ENABLED %}true{% else %}false{% endif %},
             api: '{{ SITE_URL }}{% url "api_root_endpoint" %}',
             dateTimeFormat: '{{ DATETIME_FORMAT }}',
             dateFormat: '{{ DATE_FORMAT }}',
@@ -340,7 +340,7 @@
             googleAnalytics: {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %},
             piwikAnalytics: {% if PIWIK_ANALYTICS_BASE_URL and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %},
             additionalGeoJsonUrls: {{ ADDITIONAL_GEOJSON_URLS|safe }},
-            links: {{ LINKS_ENABLED }}
+            links: {% if LINKS_ENABLED %}true{% else %}false{% endif %}
         };
     </script>
 {% endblock %}
