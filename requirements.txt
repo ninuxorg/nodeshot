@@ -15,6 +15,7 @@ python-dateutil
 six
 wsgiref
 requests
+jsonfield
 
 # better admin
 django-grappelli==2.5.3
@@ -69,3 +70,7 @@ raven
 
 # translation
 django-rosetta
+
+# metrics
+influxdb
+tld

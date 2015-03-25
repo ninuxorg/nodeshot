@@ -62,6 +62,10 @@
         Ns.db.user.on('loggedin loggedout', function(){ Ns.db.nodes.reset() });
         // init backbone app
         Backbone.history.start();
+        // metrics
+        if (Ns.settings.metrics) {
+            Ns.body.on('show', function(){ Ns.graphs.init() });
+        }
     });
 
     Ns.controller = {
