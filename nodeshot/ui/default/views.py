@@ -99,6 +99,8 @@ def index(request):
         'PRIVACY_POLICY_LINK': ui_settings.PRIVACY_POLICY_LINK,
         'TERMS_OF_SERVICE_LINK': ui_settings.TERMS_OF_SERVICE_LINK,
         # networking
-        'LINKS_ENABLED': json.dumps(LINKS_ENABLED)
+        'LINKS_ENABLED': json.dumps(LINKS_ENABLED),
+        # metrics
+        'METRICS_ENABLED': ui_settings.METRICS_ENABLED
     }
     return render(request, 'index.html', context)

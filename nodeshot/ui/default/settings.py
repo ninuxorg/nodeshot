@@ -107,3 +107,5 @@ MAP_PREFERENCES_ENABLED = getattr(settings, 'NODESHOT_UI_MAP_PREFERENCES_ENABLED
 
 PRIVACY_POLICY_LINK = getattr(settings, 'NODESHOT_UI_PRIVACY_POLICY_LINK', '#/pages/privacy-policy')
 TERMS_OF_SERVICE_LINK = getattr(settings, 'NODESHOT_UI_TERMS_OF_SERVICE_LINK', '#/pages/terms-of-service')
+
+METRICS_ENABLED = 'nodeshot.core.metrics' in settings.INSTALLED_APPS

@@ -107,6 +107,10 @@
             // store geomodel
             this.geomodel = geomodel;
             this.reset();
+            // metrics
+            if (Ns.settings.metrics) {
+                Ns.graphs.init();
+            }
         },
 
         onDestroy: function () {

@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load i18n l10n static nodeshot_tags %}
+{% block extrahead %}
+    {% if METRICS_ENABLED %}
+        <link href="{% static 'metrics/css/nv.d3.min.css' %}" rel="stylesheet">
+    {% endif %}
+{% endblock %}
 {% block jstemplates %}
     <script id="modal-template" type="text/template">
         <div class="modal fade autocenter" id="tmp-modal" tabindex="-1">
@@ -303,6 +308,10 @@
     <script src="{% static 'ui/lib/js/backbone-forms-bootstrap3.js' %}"></script>
     <script src="{% static 'ui/lib/js/jquery.dateFormat.js' %}"></script>
     <script src="{% static 'ui/lib/js/jquery.serializeJSON.js' %}"></script>
+    {% if METRICS_ENABLED %}
+        <script type="text/javascript" src="{% static 'metrics/js/d3.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'metrics/js/nv.d3.min.js' %}"></script>
+    {% endif %}
     {% endblock %}
 {% block jssettings %}
     <!-- global settings -->
@@ -335,7 +344,8 @@
             googleAnalytics: {% if GOOGLE_ANALYTICS_UA %}true{% else %}false{% endif %},
             piwikAnalytics: {% if PIWIK_ANALYTICS_BASE_URL and PIWIK_ANALYTICS_SITE_ID %}true{% else %}false{% endif %},
             additionalGeoJsonUrls: {{ ADDITIONAL_GEOJSON_URLS|safe }},
-            links: {{ LINKS_ENABLED }}
+            links: {{ LINKS_ENABLED }},
+            metrics: {% if METRICS_ENABLED %}true{% else %}false{% endif %}
         };
     </script>
 {% endblock %}
@@ -357,6 +367,9 @@
     <script src="{% static 'ui/nodeshot/js/views/user.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/password-reset.js' %}"></script>
     <script src="{% static 'ui/nodeshot/js/views/contact.js' %}"></script>
+    {% if METRICS_ENABLED %}
+        <script src="{% static 'metrics/js/graphs.js' %}"></script>
+    {% endif %}
     <!-- preloaded data -->
     <script>
         Ns.db = {

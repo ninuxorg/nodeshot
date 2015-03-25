@@ -84,6 +84,24 @@
 
         createFromJson: function (type, selector, json) {
             Ns.graphs[type](selector, Ns.graphs.convertInfluxDbData(json));
+        },
+
+        init: function () {
+            $('.ns-chart').each(function (i, el) {
+                var chartDiv = $(el),
+                    url = chartDiv.attr('data-url'),
+                    type = chartDiv.attr('data-type'),
+                    width = chartDiv.attr('data-width'),
+                    height = chartDiv.attr('data-height');
+                console.log(url);
+                // append svg element
+                chartDiv.append('<svg style="height:'+height+';width:'+width+';margin:0 auto" id="ns-chart-' + i + '"></svg>');
+                // get graph data
+                $.getJSON(url).done(function (json) {
+                    // create graph
+                    Ns.graphs.createFromJson('linear', '#ns-chart-' + i, json);
+                });
+            });
         }
     };
 })();
