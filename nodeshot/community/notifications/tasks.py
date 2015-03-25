@@ -1,10 +1,10 @@
 from celery import task
 
 from django.core import management
-from .settings import settings, TEXTS
+from .settings import TEXTS
 
 
-@task()
+@task
 def purge_notifications():
     """
     deletes old notifications

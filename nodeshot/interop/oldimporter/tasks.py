@@ -2,7 +2,7 @@ from celery import task
 from django.core import management
 
 
-@task()
+@task
 def import_old_nodeshot(*args, **kwargs):
     """
     runs "python manage.py import_old_nodeshot"

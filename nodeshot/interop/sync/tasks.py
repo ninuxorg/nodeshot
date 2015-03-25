@@ -3,7 +3,7 @@ from django.utils.module_loading import import_by_path
 from django.core import management
 
 
-@task()
+@task
 def synchronize_external_layers(*args, **kwargs):
     """
     runs "python manage.py synchronize"

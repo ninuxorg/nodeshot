@@ -4,8 +4,7 @@ ignore-paths:
     - /tests
     - projects
     - static/
-    - nodeshot/statistics
-    - batman
-    - olsr
-    - monitor
-    - planning
+    - migrations/
+    - /nodeshot/core/metrics
+    - /nodeshot/networking/planning/
+    - /nodeshot/core/websockets

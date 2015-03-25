@@ -1,3 +1,5 @@
+from django.http import Http404
+
 from rest_framework import generics, permissions, authentication
 from rest_framework.response import Response
 
@@ -8,9 +10,9 @@ from .serializers import *
 class NotificationList(generics.ListAPIView):
     """
     Retrieve a list of notifications of the current user.
-    
+
     **Available variations through querystring parameters:**
-    
+
      * `action=unread`: default behaviour, retrieve unread notifications and mark them as read
      * `action=unread&read=false`: retrieve unread notifications without marking them as read
      * `action=count`: retrieve count of unread notifications without marking them as read
@@ -25,11 +27,11 @@ class NotificationList(generics.ListAPIView):
     serializer_class = NotificationSerializer
     pagination_serializer_class = PaginatedNotificationSerializer
     queryset = Notification.objects.select_related('from_user')
-    
+
     def get_queryset(self):
         """ filter only notifications of current user """
         return self.queryset.filter(to_user=self.request.user)
-    
+
     def get(self, request, format=None):
         """ get HTTP method """
         action = request.QUERY_PARAMS.get('action', 'unread')
@@ -41,7 +43,7 @@ class NotificationList(generics.ListAPIView):
         notifications = self.get_queryset().filter(to_user=request.user)
         # pass to specific action
         return getattr(self, 'get_%s' % action)(request, notifications, mark_as_read)
-    
+
     def get_unread(self, request, notifications, mark_as_read):
         """ return unread notifications and mark as read (unless read=false param is passed)"""
         notifications = notifications.filter(is_read=False)
@@ -50,12 +52,12 @@ class NotificationList(generics.ListAPIView):
         if mark_as_read:
             notifications.update(is_read=True)
         return Response(data)
-    
+
     def get_count(self, request, notifications, mark_as_read=False):
         """ return count of unread notification """
-        data = { 'count': notifications.filter(is_read=False).count() }
+        data = {'count': notifications.filter(is_read=False).count()}
         return Response(data)
-    
+
     def get_all(self, request, notifications, mark_as_read=False):
         """ return all notifications with pagination """
         notifications = notifications
@@ -72,7 +74,7 @@ class NotificationDetail(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = NotificationSerializer
     queryset = Notification.objects.select_related('from_user')
-    
+
     def get_queryset(self):
         """ filter only notifications of current user """
         return self.queryset.filter(to_user=self.request.user)
@@ -86,19 +88,19 @@ notification_detail = NotificationDetail.as_view()
 class EmailNotificationSettings(generics.RetrieveUpdateAPIView):
     """
     Retrieve Email Notification settings.
-    
+
     ### PUT & PATCH
-    
+
     Edit Email Notification settings.
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = EmailNotificationSettingsSerializer
     model = UserEmailNotificationSettings
-    
+
     def get_queryset(self):
         return self.model.objects.get(user_id=self.request.user.id)
-        
+
     def get_object(self, queryset=None):
         """ get privacy settings of current user """
         try:
@@ -114,9 +116,9 @@ notification_email_settings = EmailNotificationSettings.as_view()
 class WebNotificationSettings(EmailNotificationSettings):
     """
     Retrieve Web Notification settings.
-    
+
     ### PUT & PATCH
-    
+
     Edit Web Notification settings.
     """
     authentication_classes = (authentication.SessionAuthentication,)

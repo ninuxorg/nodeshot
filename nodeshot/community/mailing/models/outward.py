@@ -15,7 +15,7 @@ from nodeshot.core.base.fields import MultiSelectField
 from nodeshot.core.base.utils import now
 from nodeshot.core.nodes.models import Node
 
-from .choices import *
+from .choices import *  # noqa
 from ..settings import settings, OUTWARD_SCHEDULING, OUTWARD_MINLENGTH, OUTWARD_MAXLENGTH, OUTWARD_HTML, OUTWARD_STEP, OUTWARD_DELAY
 
 
@@ -58,7 +58,7 @@ class Outward(BaseDate):
     class Meta:
         verbose_name = _('Outward message')
         verbose_name_plural = _('Outward messages')
-        app_label= 'mailing'
+        app_label = 'mailing'
         ordering = ['status']
 
     def __unicode__(self):
@@ -100,7 +100,7 @@ class Outward(BaseDate):
             # loop over users list
             for user in users:
                 # add email to the recipient list if not already there
-                if not user.email in emails:
+                if user.email not in emails:
                     emails += [user.email]
         else:
             # selected users
@@ -110,7 +110,7 @@ class Outward(BaseDate):
                 # loop over selected users
                 for user in users:
                     # add email to the recipient list if not already there
-                    if not user.email in emails:
+                    if user.email not in emails:
                         emails += [user.email]
 
             # Q is a django object for "complex" filtering queries (not that complex in this case)
@@ -152,16 +152,16 @@ class Outward(BaseDate):
                 # loop over nodes of a layer and get their email
                 for node in nodes:
                     # add email to the recipient list if not already there
-                    if not node.user.email in emails:
+                    if node.user.email not in emails:
                         emails += [node.user.email]
             # else if group filterins is checked but not layers
-            elif FILTERS.get('groups') in self.filters and not FILTERS.get('layers')  in self.filters:
+            elif FILTERS.get('groups') in self.filters and not FILTERS.get('layers') in self.filters:
                 # retrieve only email DB column of all active users
                 users = User.objects.filter(q).only('email')
                 # loop over users list
                 for user in users:
                     # add email to the recipient list if not already there
-                    if not user.email in emails:
+                    if user.email not in emails:
                         emails += [user.email]
         return emails
 
@@ -248,14 +248,14 @@ class Outward(BaseDate):
         """
         Custom validation
         """
-        if self.is_scheduled is 1 and (self.scheduled_date == '' or self.scheduled_date is None\
+        if self.is_scheduled is 1 and (self.scheduled_date == '' or self.scheduled_date is None
                                        or self.scheduled_time == '' or self.scheduled_time is None):
             raise ValidationError(_('If message is scheduled both fields "scheduled date" and "scheduled time" must be specified'))
 
         if self.is_scheduled is 1 and self.scheduled_date < now().date():
             raise ValidationError(_('The scheduled date is set to a past date'))
 
-        if self.is_filtered is 1 and (len(self.filters) < 1 or self.filters == [''] or\
+        if self.is_filtered is 1 and (len(self.filters) < 1 or self.filters == [''] or
                                       self.filters == [u''] or self.filters == '' or self.filters is None):
             raise ValidationError(_('If "recipient filtering" is active one of the filtering options should be selected'))
 
