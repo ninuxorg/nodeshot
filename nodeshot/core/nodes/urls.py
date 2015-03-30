@@ -12,4 +12,7 @@ urlpatterns = patterns('nodeshot.core.nodes.views',  # noqa
 
     # status
     url(r'^status/$', 'status_list', name='api_status_list'),
+
+    # utils
+    url(r'^elevation/$', 'elevation_profile', name='api_elevation_profile'),
 )

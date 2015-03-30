@@ -2,7 +2,7 @@
 Nodes
 *****
 
-``nodeshot.core.nodes`` is the core geographic object of nodeshot.
+``nodeshot.core.nodes`` is the core geographic app of nodeshot.
 
 Nodes have the following features:
 
@@ -13,6 +13,14 @@ Nodes have the following features:
  * can have custom properties by leveraging the ``NODESHOT_NODES_HSTORE_SCHEMA`` setting
 
 Other modules extend the Node object and add several functionalities like comments, votes, ecc.
+
+**Additional features**:
+
+ * Possibility to customize the default node schema by adding custom fields
+ * Set the default status of nodes from admin
+ * Nodes can be published by default or not
+ * Nodes may store descriptions in HTML format
+ * Elevation API, a proxy to Google Elevation API, default URL is at ``/api/v1/elevation/``
 
 ==================
 Available settings
@@ -26,6 +34,8 @@ These are the available customizable settings:
  * ``NODESHOT_NODES_PUBLISHED_DEFAULT``
  * ``NODESHOT_NODES_REVERSION_ENABLED``
  * ``NODESHOT_NODES_HTML_DESCRIPTION``
+ * ``NODESHOT_GOOGLE_ELEVATION_API_KEY``
+ * ``NODESHOT_GOOGLE_ELEVATION_DEFAULT_SAMPLING``
 
 NODESHOT_NODES_HSTORE_SCHEMA
 ----------------------------
@@ -86,3 +96,39 @@ NODESHOT_NODES_HTML_DESCRIPTION
 Indicates whether the **"description"** field of the ``Node`` model allows **HTML** or not.
 
 If ``True`` an **WYSIWYG** editor will be used in the admin site.
+
+NODESHOT_GOOGLE_ELEVATION_API_KEY
+---------------------------------
+
+**default**: ``None``
+
+API key of the `Google Elevation API`_.
+
+This parameter is optional is not strictly required, but it is recommended by Google.
+
+See the `Google Elevation API`_ documentation for more information.
+
+.. _Google Elevation API: https://developers.google.com/maps/documentation/elevation/
+
+NODESHOT_GOOGLE_ELEVATION_DEFAULT_SAMPLING
+------------------------------------------
+
+**default**: ``50``
+
+.. warning::
+    Setting a very low value may cause the reach of the usage limits of the Google Elevation API.
+
+Calculates automatic sampling to get one point every ``x`` meters, where ``x`` is
+the value specified in ``NODESHOT_GOOGLE_ELEVATION_DEFAULT_SAMPLING``.
+
+**A bit more explaination is needed**: when sending sampled path requests to the `Google Elevation API`_
+a ``samples`` parameter is required:
+
+.. note::
+    ``samples`` *(required)* specifies the number of sample points along a path for which to return elevation data.
+    The samples parameter divides the given path into an ordered set of equidistant points along the path.
+
+If no ``samples`` parameter is specified, nodeshot will take care of it automatically,
+ensuring there are enough points to represent a meaningful elevation profile.
+
+The default value is **50 meters**, which will return 20 sample points for each kilometer.

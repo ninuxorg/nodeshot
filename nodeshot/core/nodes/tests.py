@@ -550,3 +550,52 @@ class NodesApiTest(BaseTestCase):
         # query again to be sure data is up to date
         existing = Node.objects.get(pk=existing.pk)
         self.assertEqual(existing.slug, 'changed')
+
+    def test_elevation_api(self):
+        url = reverse('api_elevation_profile')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+        # original response
+        response = self.client.get(url, {
+            'locations': '41.889040454306752,12.525333445447737',
+            'original': 'true'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('results', response.data)
+        self.assertIn('status', response.data)
+        # locations, geojson response - Point
+        response = self.client.get(url, {
+            'locations': '41.889040454306752,12.525333445447737'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Point', response.data['geometry']['type'])
+        self.assertEqual(len(response.data['geometry']['coordinates']), 1)
+        self.assertEqual(len(response.data['geometry']['coordinates'][0]), 3)
+        # locations, geojson response - LineString
+        response = self.client.get(url, {
+            'locations': '41.889040454306752,12.525333445447737|41.889050454306752,12.525335445447737'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('LineString', response.data['geometry']['type'])
+        self.assertEqual(len(response.data['geometry']['coordinates']), 2)
+        self.assertEqual(len(response.data['geometry']['coordinates'][0]), 3)
+        self.assertEqual(len(response.data['geometry']['coordinates'][1]), 3)
+        # path, geojson response - LineString
+        response = self.client.get(url, {
+            'path': '41.889040454306752,12.525333445447737|41.872041927699982,12.582239191900001',
+            'samples': 4
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('LineString', response.data['geometry']['type'])
+        self.assertEqual(len(response.data['geometry']['coordinates']), 4)
+        self.assertEqual(len(response.data['geometry']['coordinates'][0]), 3)
+        self.assertEqual(len(response.data['geometry']['coordinates'][-1]), 3)
+        # path, geojson response - LineString -automatic sampling
+        response = self.client.get(url, {
+            'path': '41.8890404543067518,12.5253334454477372|41.8972185849048984,12.4902286938660296'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('LineString', response.data['geometry']['type'])
+        self.assertEqual(len(response.data['geometry']['coordinates']), 72)
+        self.assertEqual(len(response.data['geometry']['coordinates'][0]), 3)
+        self.assertEqual(len(response.data['geometry']['coordinates'][-1]), 3)
