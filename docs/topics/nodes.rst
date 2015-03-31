@@ -104,7 +104,7 @@ NODESHOT_GOOGLE_ELEVATION_API_KEY
 
 API key of the `Google Elevation API`_.
 
-This parameter is optional is not strictly required, but it is recommended by Google.
+This setting is optional, but registering an API key is recommended by Google.
 
 See the `Google Elevation API`_ documentation for more information.
 
@@ -128,7 +128,7 @@ a ``samples`` parameter is required:
     ``samples`` *(required)* specifies the number of sample points along a path for which to return elevation data.
     The samples parameter divides the given path into an ordered set of equidistant points along the path.
 
-If no ``samples`` parameter is specified, nodeshot will take care of it automatically,
+If no ``samples`` parameter is specified in the HTTP request to the elevation API resource, nodeshot will take care of it automatically,
 ensuring there are enough points to represent a meaningful elevation profile.
 
 The default value is **50 meters**, which will return 20 sample points for each kilometer.
