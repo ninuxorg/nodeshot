@@ -98,7 +98,7 @@
                 // get graph data
                 $.getJSON(url).done(function (json) {
                     // create graph
-                    Ns.graphs.createFromJson('linear', '#ns-chart-' + i, json);
+                    Ns.graphs.createFromJson(type, '#ns-chart-' + i, json);
                 });
             });
         }
