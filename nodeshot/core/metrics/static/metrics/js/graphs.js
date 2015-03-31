@@ -93,7 +93,6 @@
                     type = chartDiv.attr('data-type'),
                     width = chartDiv.attr('data-width'),
                     height = chartDiv.attr('data-height');
-                console.log(url);
                 // append svg element
                 chartDiv.append('<svg style="height:'+height+';width:'+width+';margin:0 auto" id="ns-chart-' + i + '"></svg>');
                 // get graph data
