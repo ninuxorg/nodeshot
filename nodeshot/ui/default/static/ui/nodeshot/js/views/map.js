@@ -792,13 +792,15 @@
             'selects': '.selectpicker',
             'tools': '.tool',
             'distance': '#fn-map-tools .icon-ruler',
-            'area': '#fn-map-tools .icon-select-area'
+            'area': '#fn-map-tools .icon-select-area',
+            'elevation': '#fn-map-tools .icon-elevation-profile'
         },
 
         events: {
             'click #fn-map-tools .notImplemented': 'toggleToolNotImplemented',
             'click @ui.distance': 'toggleDistance',
             'click @ui.area': 'toggleArea',
+            'click @ui.elevation': 'toggleElevation',
             'click #toggle-toolbar': 'toggleToolbar',
             'change .js-base-layers input': 'switchBaseLayer',
             'switch-change #fn-map-layers .toggle-layer-data': 'toggleLayer',
@@ -817,7 +819,8 @@
             if (Ns.settings.mapTools) {
                 this.tools = {
                     'distance': new L.Polyline.Measure(this.mapView.map),
-                    'area': new L.Polygon.Measure(this.mapView.map)
+                    'area': new L.Polygon.Measure(this.mapView.map),
+                    'elevation': new L.Polyline.Elevation(this.mapView.map)
                 };
             }
         },
@@ -925,15 +928,15 @@
             if (!button.hasClass('active')) {
                 // deactivate any other
                 active_buttons.trigger('click');
-                button.addClass('active');
-                button.tooltip('hide');
-                button.tooltip('disable');
+                button.addClass('active')
+                      .tooltip('hide')
+                      .tooltip('disable');
                 return true;
             // deactivate
             } else {
-                button.removeClass('active');
-                button.tooltip('enable');
-                button.trigger('blur');
+                button.removeClass('active')
+                      .tooltip('enable')
+                      .trigger('blur');
                 return false;
             }
         },
@@ -961,6 +964,57 @@
 
         toggleArea: function (e) {
             this.toggleDrawTool('area', e);
+        },
+
+        toggleElevation: function (e) {
+            this.toggleDrawTool('elevation', e);
+        },
+
+        drawElevation: function (geojson) {
+            // local vars
+            var points = [],
+                self = this;
+            // the elevation API expects latitude, longitude, so we have to reverse our coords
+            geojson.geometry.coordinates.forEach(function(point){
+                points.push(point.reverse());
+            });
+            // query the elevation API
+            $.getJSON(Ns.url('elevation/'), {
+                // output is '<lat>,<lng>|<lat>,<lng>|<lat>,<lng'
+                path: points.join('|')
+            }).done(function(geojson){
+                // close tools panel
+                $('.mask').trigger('click');
+                // create control
+                var el = L.control.elevation({
+                        position: 'bottomright',
+                        width: 1020,
+                        height: 299,
+                        margins: {
+                            top: 25,
+                            right: 40,
+                            bottom: 40,
+                            left: 70
+                        },
+                    });
+                el.addTo(self.mapView.map);
+                var geojsonLayer = L.geoJson(geojson, {
+                    onEachFeature: el.addData.bind(el),
+                    style: function () {
+                        return {
+                            color: '#e6a1b3',
+                            opacity: 0.7
+                        }
+                    }
+                }).addTo(self.mapView.map);
+                var close = $('<a href="#" class="icon-close"></a>');
+                $('#map-js .elevation.leaflet-control').append('<a href="#" class="icon-close"></a>');
+                $('#map-js .elevation.leaflet-control .icon-close').one('click', function (e) {
+                    e.preventDefault();
+                    self.mapView.map.removeControl(el);
+                    self.mapView.map.removeLayer(geojsonLayer);
+                })
+            });
         },
 
         /*

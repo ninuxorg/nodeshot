@@ -2,6 +2,10 @@
 {% load i18n l10n static leaflet_tags nodeshot_tags %}
 
 {% block extrahead %}
+    {% if MAP_TOOLS_ENABLED %}
+        <link href="{% static 'leaflet/draw/leaflet.draw.css' %}" rel="stylesheet">
+        <link href="{% static 'ui/lib/css/leaflet.elevation.css' %}" rel="stylesheet">
+    {% endif %}
     {% if METRICS_ENABLED %}
         <link href="{% static 'metrics/css/nv.d3.min.css' %}" rel="stylesheet">
     {% endif %}
@@ -311,12 +315,15 @@
     <script src="{% static 'ui/lib/js/jquery.serializeJSON.js' %}"></script>
     {% leaflet_js %}
     <script src="{% static 'ui/lib/js/leaflet.markercluster.js' %}"></script>
+    {% if METRICS_ENABLED or MAP_TOOLS_ENABLED %}
+        <script type="text/javascript" src="{% static 'metrics/js/d3.min.js' %}"></script>
+    {% endif %}
     {% if MAP_TOOLS_ENABLED %}
         <script src="{% static 'leaflet/draw/leaflet.draw.js' %}"></script>
         <script src="{% static 'ui/lib/js/leaflet.measurecontrol-customized.js' %}"></script>
+        <script src="{% static 'ui/lib/js/leaflet.elevation.js' %}"></script>
     {% endif %}
     {% if METRICS_ENABLED %}
-        <script type="text/javascript" src="{% static 'metrics/js/d3.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'metrics/js/nv.d3.min.js' %}"></script>
     {% endif %}
 {% endblock %}

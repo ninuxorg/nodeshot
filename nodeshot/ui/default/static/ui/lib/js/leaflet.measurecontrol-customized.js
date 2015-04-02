@@ -48,20 +48,46 @@ L.Polyline.Measure = L.Draw.Polyline.extend({
     },
 
     _onClick: function(e) {
-        if (!this._drawing) {
+        if (!this._drawing && e.originalEvent.target.id !== 'btn-elevation-profile') {
             this._removeShape();
             this._startShape();
             return;
         }
+        else if (!this._drawing && e.originalEvent.target.id === 'btn-elevation-profile') {
+            this._elevationProfile();
+        }
     },
 
+    _getTooltipText: function() {
+        var labelText = L.Draw.Polyline.prototype._getTooltipText.call(this),
+            elevLabel,
+            elevButton;
+        if (!this._drawing) {
+            elevLabel = gettext('elevation profile');
+            labelText.text = '<button class="btn btn-default" id="btn-elevation-profile">' + elevLabel + '</button>';
+        }
+        return labelText;
+    },
+
+    _elevationProfile: function () {
+        Ns.body.currentView.panels.currentView.drawElevation(this._poly.toGeoJSON());
+        this.disable();
+    }
+});
+
+L.Polyline.Elevation = L.Polyline.Measure.extend({
     _getTooltipText: function() {
         var labelText = L.Draw.Polyline.prototype._getTooltipText.call(this);
         if (!this._drawing) {
             labelText.text = '';
         }
         return labelText;
-    }
+    },
+
+    _finishShape: function () {
+        L.Polyline.Measure.prototype._finishShape.call(this);
+        this._elevationProfile();
+    },
 });
 
 L.Polygon.Measure = L.Draw.Polygon.extend({

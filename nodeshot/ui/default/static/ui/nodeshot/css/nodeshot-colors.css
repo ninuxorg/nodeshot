@@ -973,3 +973,14 @@ a.icon-thumbs-down{
 .details-background, .short-map{
     background-color: #aba49c;
 }
+
+#map .leaflet-draw-tooltip{
+    padding: 10px 15px;
+    font-size: 14px;
+    line-height: 25px;
+}
+
+#map .leaflet-draw-tooltip .btn{
+    margin-top: 5px;
+    color: #fff
+}
