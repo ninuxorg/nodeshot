@@ -10,6 +10,9 @@ python:
 branches:
   only:
     - master
+    
+before_install:
+  - pip install -U pip
 
 # command to install requirements
 install:
