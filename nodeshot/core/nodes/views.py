@@ -297,8 +297,9 @@ def elevation_profile(request, format=None):
             # length of the path in meters
             length = LineString(*points).length * 100000
             # get 1 point every x meters, where x is defined in ELEVATION_DEFAULT_SAMPLING
-            params['samples'] = int(round(length / ELEVATION_DEFAULT_SAMPLING))
-
+            samples = int(round(length / ELEVATION_DEFAULT_SAMPLING))
+            # use the automatically calculated value as long as it is compatibile with the API usage limits
+            params['samples'] = samples if samples <= 512 else 512
     # send request to Google Elevation API
     response = requests.get(url, params=params)
     data = response.json()
@@ -327,4 +328,3 @@ def elevation_profile(request, format=None):
     # else return original response
     else:
         return Response(data, status=response.status_code)
-
