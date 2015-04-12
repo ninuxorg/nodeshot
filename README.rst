@@ -35,6 +35,15 @@ Documentation_ - `Mailing List`_
 
 **New version in development. Stay tuned**.
 
+See Nodeshot in action
+----------------------
+
+You can see a few running instances at the following URLs:
+
+* https://ninux.nodeshot.org/ (english)
+* https://opendata.publicwifi.it/ (english)
+* https://piemontespot.nodeshot.org/ (italian)
+
 ------------
 
 .. image:: https://raw.githubusercontent.com/ninuxorg/nodeshot/master/docs/topics/images/ui-nodeshot-map.png
