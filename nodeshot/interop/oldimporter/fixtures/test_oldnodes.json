@@ -1,7 +1,7 @@
 [
     {
-        "pk": 1, 
-        "model": "oldimporter.oldnode", 
+        "pk": 1,
+        "model": "oldimporter.oldnode",
         "fields": {
             "name": "oldnode1 rome",
             "slug": "oldnode1-rome",
@@ -14,13 +14,13 @@
             "lng": 12.5390629470348003,
             "alt": 24.5,
             "status": "a",
-            "updated": "2013-06-20T13:36:47.171Z", 
+            "updated": "2013-06-20T13:36:47.171Z",
             "added": "2013-06-14T13:30:29.323Z"
         }
     },
     {
-        "pk": 2, 
-        "model": "oldimporter.oldnode", 
+        "pk": 2,
+        "model": "oldimporter.oldnode",
         "fields": {
             "name": "oldnode2 rome",
             "slug": "oldnode2-rome",
@@ -33,13 +33,13 @@
             "lng": 12.534556835889,
             "alt": 15.5,
             "status": "ah",
-            "updated": "2013-06-19T13:36:47.171Z", 
+            "updated": "2013-06-19T13:36:47.171Z",
             "added": "2013-06-19T13:30:29.323Z"
         }
     },
     {
-        "pk": 3, 
-        "model": "oldimporter.oldnode", 
+        "pk": 3,
+        "model": "oldimporter.oldnode",
         "fields": {
             "name": "oldnode3 pisa",
             "slug": "oldnode3-pisa",
@@ -52,13 +52,13 @@
             "lng": 10.3973981737999992,
             "alt": 10,
             "status": "p",
-            "updated": "2013-06-18T13:36:47.171Z", 
+            "updated": "2013-06-18T13:36:47.171Z",
             "added": "2013-06-18T13:30:29.323Z"
         }
     },
     {
-        "pk": 4, 
-        "model": "oldimporter.oldnode", 
+        "pk": 4,
+        "model": "oldimporter.oldnode",
         "fields": {
             "name": "oldnode4 default",
             "slug": "oldnode4-default",
@@ -71,8 +71,27 @@
             "lng": 10.0,
             "alt": 2,
             "status": "a",
-            "updated": "2013-05-18T13:36:47.171Z", 
+            "updated": "2013-05-18T13:36:47.171Z",
             "added": "2013-05-18T13:30:29.323Z"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "oldimporter.oldnode",
+        "fields": {
+            "name": "another node",
+            "slug": "another-node",
+            "owner": "oldnode1 owner",
+            "description": "oldnode1-description",
+            "postal_code": "00185",
+            "email": "different@address.com",
+            "password": "",
+            "lat": 42.9064152946931969,
+            "lng": 13.5390629470348003,
+            "alt": 22.5,
+            "status": "a",
+            "updated": "2013-06-20T13:36:47.171Z",
+            "added": "2013-06-14T13:30:29.323Z"
         }
     }
 ]

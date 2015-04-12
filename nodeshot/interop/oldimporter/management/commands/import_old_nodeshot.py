@@ -377,14 +377,10 @@ choose (enter the number of) one of the following layers:
                 # try looking by email
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                try:
-                    # try looking by username
-                    user = User.objects.get(username=username)
-                except User.DoesNotExist:
-                    # otherwise init new
-                    user = User()
-                    # generate new password only for new users
-                    user.password = self.generate_random_password()
+                # otherwise init new
+                user = User()
+                # generate new password only for new users
+                user.password = self.generate_random_password()
 
             # we'll create one user for each unique email address we've got
             user.username = username
