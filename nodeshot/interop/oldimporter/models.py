@@ -32,6 +32,7 @@ __all__ = [
     'OldLink',
     'OldStatistic',
     'OldContact',
+    'OldUser'
 ]
 
 
@@ -215,3 +216,37 @@ class OldContact(models.Model):
         verbose_name = _('Contact Log')
         verbose_name_plural = _('Contact Logs')
         db_table = 'nodeshot_contact'
+
+
+# --- users hack --- #
+
+from django.contrib.auth.models import AbstractBaseUser, UserManager
+from django.utils import timezone
+
+
+class OldUser(AbstractBaseUser):
+    username = models.CharField(_('username'), max_length=30, unique=True,
+        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
+                    '@/./+/-/_ characters'))
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    email = models.EmailField(_('email address'), blank=True)
+    is_staff = models.BooleanField(_('staff status'), default=False,
+        help_text=_('Designates whether the user can log into this admin '
+                    'site.'))
+    is_active = models.BooleanField(_('active'), default=True,
+        help_text=_('Designates whether this user should be treated as '
+                    'active. Unselect this instead of deleting accounts.'))
+    is_superuser = models.BooleanField(_('superuser status'), default=False,
+        help_text=_('Designates that this user has all permissions without '
+                    'explicitly assigning them.'))
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    class Meta:
+        app_label = 'oldimporter'
+        db_table = 'auth_user'

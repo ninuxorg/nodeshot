@@ -1,0 +1,32 @@
+[
+    {
+        "pk": 1,
+        "model": "oldimporter.olduser",
+        "fields": {
+            "username": "oldnode1-owner",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab",
+            "first_name": "Oldnode1",
+            "last_name": "Owner",
+            "email": "oldnode1@test.com",
+            "is_staff": true,
+            "is_active": true,
+            "is_superuser": true,
+            "date_joined": "2013-06-18T13:36:47.171Z"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "oldimporter.olduser",
+        "fields": {
+            "username": "randomuser",
+            "password": "md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ac",
+            "first_name": "Random",
+            "last_name": "User",
+            "email": "random@test.com",
+            "is_staff": true,
+            "is_active": true,
+            "is_superuser": false,
+            "date_joined": "2013-05-18T13:36:47.171Z"
+        }
+    }
+]

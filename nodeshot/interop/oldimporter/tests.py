@@ -23,6 +23,7 @@ class TestOldImporter(TestCase):
     ]
 
     mysql_fixtures = [
+        'test_oldusers.json',
         'test_oldnodes.json',
         'test_olddevices.json',
         'test_oldlinks.json',
@@ -76,11 +77,27 @@ class TestOldImporter(TestCase):
         self.assertEqual(len(ip_addresses), 8)
         self.assertEqual(Vap.objects.count(), 2)
         self.assertEqual(len(links), 1)
-        self.assertEqual(len(users), 5)
-        self.assertEqual(len(email_addresses), 5)
+        self.assertEqual(len(users), 6)
+        self.assertEqual(len(email_addresses), 6)
         self.assertEqual(len(email_confirmations), 0)
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(len(inwards), 1)
+
+        # admin check
+        self.assertEqual(User.objects.filter(is_staff=True).count(), 2)
+        self.assertEqual(User.objects.filter(is_superuser=True).count(), 1)
+        superuser = User.objects.filter(is_superuser=True).first()
+        self.assertEqual(superuser.email, 'oldnode1@test.com')
+        self.assertEqual(superuser.is_staff, True)
+        self.assertEqual(superuser.password, 'md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ab')
+        # staff user
+        randomuser = User.objects.get(username='randomuser')
+        self.assertEqual(randomuser.email, 'random@test.com')
+        self.assertEqual(randomuser.is_staff, True)
+        self.assertEqual(randomuser.is_superuser, False)
+        self.assertEqual(randomuser.password, 'md5$C2xwUqHfBz4P$f37f9e6f4f076b1239a5c5dff2c8a2ac')
+        # date joined check
+        self.assertEqual(randomuser.date_joined.strftime('%Y-%m-%dT%H:%M:%S'), '2013-05-18T13:36:47')
 
         # node1
         self.assertEqual(nodes[0].id, 1)
@@ -282,6 +299,8 @@ class TestOldImporter(TestCase):
         ip_addresses = Ip.objects.all().order_by('id')
         links = Link.objects.all().order_by('id')
         users = User.objects.all().order_by('id')
+        email_addresses = EmailAddress.objects.all()
+        email_confirmations = EmailConfirmation.objects.all()
         inwards = Inward.objects.all().order_by('id')
 
         self.assertEqual(len(nodes), 6)
@@ -290,8 +309,14 @@ class TestOldImporter(TestCase):
         self.assertEqual(len(ip_addresses), 10)
         self.assertEqual(Vap.objects.count(), 2)
         self.assertEqual(len(links), 2)
-        self.assertEqual(len(users), 6)
+        self.assertEqual(len(users), 7)
+        self.assertEqual(len(email_addresses), 7)
+        self.assertEqual(len(email_confirmations), 0)
         self.assertEqual(len(inwards), 2)
+
+        # admin check
+        self.assertEqual(User.objects.filter(is_staff=True).count(), 2)
+        self.assertEqual(User.objects.filter(is_superuser=True).count(), 1)
 
         self.assertEqual(nodes[0].user.username, 'oldnode1-owner')
         self.assertEqual(nodes[1].user.username, 'oldnode2-owner')

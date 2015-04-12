@@ -142,6 +142,7 @@ class Command(BaseCommand):
             self.check_status_mapping()
             self.retrieve_nodes()
             self.extract_users()
+            self.import_admins()
             self.import_users()
             self.import_nodes()
             self.import_devices()
@@ -344,11 +345,48 @@ choose (enter the number of) one of the following layers:
 
         self.verbose('%d users extracted' % len(email_set))
 
+    def import_admins(self):
+        """ save admins to local DB """
+        self.message('saving admins into local DB')
+
+        saved_admins = []
+
+        for olduser in OldUser.objects.all():
+            try:
+                user = User.objects.get(username=olduser.username)
+            except User.DoesNotExist:
+                user = User()
+            user.username = olduser.username
+            user.password = olduser.password
+            user.first_name = olduser.first_name
+            user.last_name = olduser.last_name
+            user.email = olduser.email
+            user.is_active = olduser.is_active
+            user.is_staff = olduser.is_staff
+            user.is_superuser = olduser.is_superuser
+            user.date_joined = olduser.date_joined
+            user.full_clean()
+            user.save(sync_emailaddress=False)
+            saved_admins.append(user)
+
+            # mark email address as confirmed if feature is enabled
+            if EMAIL_CONFIRMATION and EmailAddress.objects.filter(email=user.email).count() is 0:
+                try:
+                    email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
+                    email_address.full_clean()
+                    email_address.save()
+                except Exception:
+                    tb = traceback.format_exc()
+                    self.message('Could not save email address for user %s, got exception:\n\n%s' % (user.username, tb))
+
+        self.message('saved %d admins into local DB' % len(saved_admins))
+        self.saved_admins = saved_admins
+
     def import_users(self):
         """ save users to local DB """
         self.message('saving users into local DB')
 
-        saved_users = []
+        saved_users = self.saved_admins
 
         # loop over all extracted unique email addresses
         for email in self.email_set:
@@ -379,15 +417,15 @@ choose (enter the number of) one of the following layers:
             except User.DoesNotExist:
                 # otherwise init new
                 user = User()
+                user.username = username
                 # generate new password only for new users
                 user.password = self.generate_random_password()
+                user.is_active = True
 
             # we'll create one user for each unique email address we've got
-            user.username = username
             user.first_name = first_name.capitalize()
             user.last_name = last_name.capitalize()
             user.email = email
-            user.is_active = True
 
             # extract date joined from old nodes
             # find the oldest node of this user
