@@ -26,42 +26,22 @@ For the **oldimporter** module to work, the following apps must be listed in
 
 By default these apps are included in ``nodeshot.conf.settings`` so you won't need to do anything.
 
-===========
-Preparation
-===========
+========================
+Install database drivers
+========================
 
-Due to some major differences between the old and the new version some manual
-preparation needs to be done.
+Most production installations of old nodeshot versions used MySQL
+(development quick install were done with SQlite).
 
-----------------------------------------
-1. Ensure your old database is reachable
-----------------------------------------
+Because these drivers are not installed by default with the default install
+procedure, you will have to install them now.
 
-In order for the **oldimporter** to work it musts be able to connect to the remote old database.
+For MySQL you can do::
 
-If your old database is MySQL or PostgreSQL you should tweak its configuration to
-allow connections from the IP/hostname where the new version of nodeshot is installed.
+    sudo apt-get install libmysqlclient-dev
 
-If your old database is Sqlite you can just copy the file to the new machine.
-
-----------------
-2. Create Layers
-----------------
-
-Then ensure you have some layers defined in your admin interface.
-Open the browser and go to **/admin/layers/layer** (or follow the links from the
-admin index), if you see any layer defined, you are ready to proceed, if not you
-should create one or more layers.
-
-If you **specify the area of each layer**, the importer will be able to insert the
-old nodes into the right layer. It's a good thing to do it!
-
-If you don't want to lose any node, you should create a **default layer** in which
-the script will automatically put all those old nodes which have coordinates that
-are not comprised in any of your newly created layers.
-
-**If no default layer is specified the nodes which have coordinates not comprised
-in any layer will be discarded.**
+    workon nodeshot  # activate virtualenv
+    pip install MySQL-python
 
 =====================
 Enable in settings.py
@@ -98,22 +78,42 @@ Replace ``<id>`` with the id of your default layer.
 If you followed exactly the instructions in this document you can leave the default
 ``NODESHOT_OLDIMPORTER_STATUS_MAPPING`` setting unchanged.
 
-========================
-Install database drivers
-========================
+===========
+Preparation
+===========
 
-Most production installations of old nodeshot versions used MySQL
-(development quick install were done with SQlite).
+Due to some major differences between the old and the new version some manual
+preparation needs to be done.
 
-Because these drivers are not installed by default with the default install
-procedure, you will have to install them now.
+----------------------------------------
+1. Ensure your old database is reachable
+----------------------------------------
 
-For MySQL you can do::
+In order for the **oldimporter** to work it musts be able to connect to the remote old database.
 
-    sudo apt-get install libmysqlclient-dev
+If your old database is MySQL or PostgreSQL you should tweak its configuration to
+allow connections from the IP/hostname where the new version of nodeshot is installed.
 
-    workon nodeshot  # activate virtualenv
-    pip install MySQL-python
+If your old database is Sqlite you can just copy the file to the new machine.
+
+----------------
+2. Create Layers
+----------------
+
+Then ensure you have some layers defined in your admin interface.
+Open the browser and go to **/admin/layers/layer** (or follow the links from the
+admin index), if you see any layer defined, you are ready to proceed, if not you
+should create one or more layers.
+
+If you **specify the area of each layer**, the importer will be able to insert the
+old nodes into the right layer. It's a good thing to do it!
+
+If you don't want to lose any node, you should create a **default layer** in which
+the script will automatically put all those old nodes which have coordinates that
+are not comprised in any of your newly created layers.
+
+**If no default layer is specified the nodes which have coordinates not comprised
+in any layer will be discarded.**
 
 ===========
 Import data
