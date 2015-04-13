@@ -338,6 +338,10 @@ Test config, ensure it does not fail::
 
     service nginx configtest
 
+Now you can reload nginx server::
+
+    service nginx restart
+
 -----
 uWSGI
 -----
