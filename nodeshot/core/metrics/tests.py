@@ -2,6 +2,7 @@ import json
 from time import sleep
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -185,3 +186,8 @@ class MetricsTest(TestCase):
         series_id = query('show series')['test_metric'][0]['_id']
         query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
+
+    def test_add_admin(self):
+        self.client.login(username='admin', password='tester')
+        response = self.client.get(reverse('admin:metrics_metric_add'))
+        self.assertEqual(response.status_code, 200)

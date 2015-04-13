@@ -12,9 +12,11 @@
         (function($) {
             $(document).ready(function () {
                 $('#grp-content-container').append('<div id="metrics-chart"><svg style="height:400px;width:100%"></svg></div>');
+                {% if object_id %}
                 $.getJSON('{% url "api_metric_details" object_id %}').done(function (json) {
                     Ns.graphs.createFromJson('linear', '#metrics-chart svg', json);
                 });
+                {% endif %}
             });
         })(grp.jQuery);
     </script>
