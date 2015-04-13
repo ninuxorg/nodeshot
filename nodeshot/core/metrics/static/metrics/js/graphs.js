@@ -32,7 +32,11 @@
         convertInfluxDbData: function (json) {
             var data, key, i, len, index,
                 metrics = [],
-                values = {};
+                values = {},
+                graphData = [],
+                colors = [
+                    '#1f77b4', '#2ca02c', '#ff7f0e', '#de5a5e', '#aec7e8'
+                ].reverse();
             // determine numeric data
             for (key in json) {
                 if (json.hasOwnProperty(key)) {
@@ -42,7 +46,8 @@
             }
             // if no data interrupt here
             if (!data) {
-                return;
+                // return empty structure
+                return [];
             }
             // prepare structures that will contain data
 
@@ -65,10 +70,6 @@
                 }
             }
             // prepare final structure for D3
-            var graphData = [],
-                colors = [
-                    '#1f77b4', '#2ca02c', '#ff7f0e', '#de5a5e', '#aec7e8'
-                ].reverse();
             for (index in metrics) {
                 if (colors.length) {
                     key = metrics[index];
