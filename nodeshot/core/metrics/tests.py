@@ -51,7 +51,7 @@ class MetricsTest(TestCase):
         self.assertIn('<influxdb.client.InfluxDBClient object at', str(get_db()))
 
     def test_query(self):
-        databases = query('show databases')
+        databases = query('show databases')['databases']
         self.assertEqual(type(databases), list)
         databases = [database['name'] for database in databases]
         self.assertIn(TEST_DATABASE, databases)
@@ -70,7 +70,7 @@ class MetricsTest(TestCase):
         points = query(sql)['test_metric']
         self.assertEqual(len(points), 1)
         # drop series
-        series_id = query('show series')['test_metric'][0]['id']
+        series_id = query('show series')['test_metric'][0]['_id']
         query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
 
@@ -87,7 +87,7 @@ class MetricsTest(TestCase):
         self.assertEqual(len(points), 1)
         self.assertEqual(points[0]['time'], timestamp_string)
         # drop series
-        series_id = query('show series')['test_metric'][0]['id']
+        series_id = query('show series')['test_metric'][0]['_id']
         query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
 
@@ -104,7 +104,7 @@ class MetricsTest(TestCase):
         self.assertEqual(len(points), 1)
         self.assertEqual(points[0]['time'], datetime.strftime('%Y-%m-%dT%H:%M:%SZ'))
         # drop series
-        series_id = query('show series')['test_metric'][0]['id']
+        series_id = query('show series')['test_metric'][0]['_id']
         query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
 
@@ -122,7 +122,7 @@ class MetricsTest(TestCase):
         self.assertEqual(len(metric.select()['test_metric']), 3)
         self.assertEqual(len(metric.select(limit=1)['test_metric']), 1)
         # drop series
-        series_id = query('show series')['test_metric'][0]['id']
+        series_id = query('show series')['test_metric'][0]['_id']
         query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
 
@@ -140,7 +140,7 @@ class MetricsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, metric.select())
         # drop series
-        series_id = query('show series')['test_metric'][0]['id']
+        series_id = query('show series')['test_metric'][0]['_id']
         query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
 
@@ -182,6 +182,6 @@ class MetricsTest(TestCase):
         sleep(1)
         self.assertEqual(metric.select()['test_metric'][-1]['value'], 5.0)
         # drop series
-        series_id = query('show series')['test_metric'][0]['id']
+        series_id = query('show series')['test_metric'][0]['_id']
         query('drop measurement test_metric')
         query('drop series {0}'.format(series_id))
