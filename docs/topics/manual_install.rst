@@ -332,11 +332,15 @@ Keep replacing ``<myproject>`` with the project name chosen at the beginning.
 
 Create a symbolic link to sites-enabled directory::
 
-    ln -s /etc/nginx/sites-available/nodeshot.yourdomain.com /etc/nginx/sites-enabled/nodeshot.yourdomain.com
+    ln -s /etc/nginx/sites-available/nodeshot.yourdomain.com /etc/nginx/sites-enabled/
 
 Test config, ensure it does not fail::
 
     service nginx configtest
+
+Now you can reload nginx server::
+
+    service nginx restart
 
 -----
 uWSGI
