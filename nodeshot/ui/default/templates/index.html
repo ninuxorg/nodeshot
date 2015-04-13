@@ -316,7 +316,7 @@
     {% leaflet_js %}
     <script src="{% static 'ui/lib/js/leaflet.markercluster.js' %}"></script>
     {% if METRICS_ENABLED or MAP_TOOLS_ENABLED %}
-        <script type="text/javascript" src="{% static 'metrics/js/d3.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'ui/lib/js/d3.min.js' %}"></script>
     {% endif %}
     {% if MAP_TOOLS_ENABLED %}
         <script src="{% static 'leaflet/draw/leaflet.draw.js' %}"></script>
