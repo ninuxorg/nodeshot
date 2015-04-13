@@ -68,13 +68,9 @@ class InfluxDBRequestMiddleware(object):
                 'is_authenticated': is_authenticated,
                 'is_staff': is_staff,
                 'is_superuser': is_superuser,
-                'method': request.method,
-                'module': request._view_module,
-                'view': request._view_name,
                 'referer': str(referer),
                 'referer_tld': referer_tld_string,
-                'full_path': request.get_full_path(),
-                'path': request.path
+                'full_path': request.get_full_path()
             }
             # tags, for fast retrievals
             tags = {

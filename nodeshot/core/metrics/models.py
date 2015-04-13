@@ -8,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 from jsonfield import JSONField
 
 from nodeshot.core.base.models import BaseDate
-from nodeshot.core.base.utils import ago
 
 from .utils import query, write
 
@@ -84,14 +83,12 @@ User = get_user_model()
 def user_loggedin(sender, **kwargs):
     """ collect metrics about user logins """
     tags = {
-        'path': kwargs['request'].path,
+        'user_id': str(kwargs['user'].pk),
         'username': kwargs['user'].username,
     }
     values = {
         'value': 1,
-        'path': kwargs['request'].path,
-        'username': kwargs['user'].username,
-        'user_id': kwargs['user'].pk
+        'path': kwargs['request'].path
     }
     write('user_logins', values=values, tags=tags)
 
