@@ -2,8 +2,6 @@
 nodeshot.networking.links unit tests
 """
 
-import simplejson as json
-
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
@@ -70,7 +68,7 @@ class LinkTest(BaseTestCase):
         l = self.link
         l.type = LINK_TYPES.get('radio')
         l.save()
-        self.assertTrue(l.node_a != None and l.node_b != None, '"from node" and "to node" fields are null')
+        self.assertTrue(l.node_a is not None and l.node_b is not None, '"from node" and "to node" fields are null')
 
     def test_null_interface_and_node_fields(self):
         """ *** It should not be possible to save a link which has void node and interface info  *** """
@@ -137,11 +135,13 @@ class LinkTest(BaseTestCase):
         url = reverse('api_link_list')
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
 
         # GET: 200 - link list geojson
         url = reverse('api_links_geojson_list')
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
+        self.assertEqual(len(response.data['features']), 2)
 
         # GET: 200 - link details
         url = reverse('api_link_details', args=[link.id])
