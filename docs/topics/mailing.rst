@@ -91,3 +91,21 @@ NODESHOT_MAILING_OUTWARD_DELAY
 **default**: ``10``
 
 Number of seconds to wait after one *step* (as explained in ``NODESHOT_MAILING_OUTWARD_STEP``) is completed.
+
+==============================
+Monitoring emails in the shell
+==============================
+
+To manually test email features (e.g. sign up, notifications, contacting other users) without setting up an email server:
+ * keep DEBUG = True in your settings
+ * Run following command in a terminal shell:
+python -m smtpd -n -c DebuggingServer localhost:1025
+
+This way you can monitor detailed logs of outgoing emails in the terminal shell.
+
+
+
+
+
+
+
