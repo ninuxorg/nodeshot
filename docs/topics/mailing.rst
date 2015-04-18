@@ -92,20 +92,21 @@ NODESHOT_MAILING_OUTWARD_DELAY
 
 Number of seconds to wait after one *step* (as explained in ``NODESHOT_MAILING_OUTWARD_STEP``) is completed.
 
-==============================
-Monitoring emails in the shell
-==============================
+=============================
+Debugging emails in the shell
+=============================
 
-To manually test email features (e.g. sign up, notifications, contacting other users) without setting up an email server:
- * keep DEBUG = True in your settings
- * Run following command in a terminal shell:
-python -m smtpd -n -c DebuggingServer localhost:1025
+If you need to test email sending in a development/test environment, you can use a debug SMTP server
+which will print out the outgoing emails on your terminal shell.
 
-This way you can monitor detailed logs of outgoing emails in the terminal shell.
+First of all, ensure ``DEBUG = True`` in your ``settings.py``.
 
+Then run the debug SMTP server with::
 
+    python -m smtpd -n -c DebuggingServer localhost:1025
 
+When in ``DEBUG`` is ``True``, Nodeshot will send emails to the port 1025 by default.
 
-
-
+The email contents and log data will be printed out on your terminal shell, this way
+you'll be able to test email related features without sending any real email.  
 
