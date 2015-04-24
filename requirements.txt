@@ -23,7 +23,7 @@ django-filebrowser==3.5.7
 django-leaflet==0.15.2
 
 # RESTful API and API documentation
-djangorestframework==2.4.4  # rq.filter: >=2.4,<3.0
+djangorestframework==2.4.5  # rq.filter: >=2.4,<3.0
 drf-extensions==0.2.5
 django-rest-swagger
 markdown
