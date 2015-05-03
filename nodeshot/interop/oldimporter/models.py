@@ -67,6 +67,7 @@ class OldNode(models.Model):
         return u'%s' % (self.name)
 
     class Meta:
+        ordering = ['id']
         verbose_name = _('Node')
         verbose_name_plural = _('Nodes')
         db_table = 'nodeshot_node'
@@ -87,6 +88,7 @@ class OldDevice(models.Model):
         return self.name
 
     class Meta:
+        ordering = ['id']
         unique_together = (('node', 'cname'),)
         verbose_name = _('OldDevice')
         verbose_name_plural = _('OldDevices')
@@ -101,6 +103,7 @@ class OldHna(models.Model):
         return u'%s' % (self.route)
 
     class Meta:
+        ordering = ['id']
         verbose_name = _('Hna')
         verbose_name_plural = _('Hna')
         db_table = 'nodeshot_hna'
@@ -135,6 +138,7 @@ class OldInterface(models.Model):
         return value
 
     class Meta:
+        ordering = ['id']
         unique_together = (('device', 'cname'),)
         verbose_name = _('Interface')
         verbose_name_plural = _('Interfaces')
@@ -176,6 +180,7 @@ class OldLink(models.Model):
         return u'%s » %s' % (self.from_interface.device, self.to_interface.device)
 
     class Meta:
+        ordering = ['id']
         verbose_name = _('Link')
         verbose_name_plural = _('Links')
         db_table = 'nodeshot_link'
@@ -193,6 +198,7 @@ class OldStatistic(models.Model):
         return u'%s' % (self.date)
 
     class Meta:
+        ordering = ['id']
         verbose_name = _('Statistic')
         verbose_name_plural = _('Statistics')
         db_table = 'nodeshot_statistic'
@@ -213,6 +219,7 @@ class OldContact(models.Model):
         return _(u'Message from %(from)s to %(to)s') % ({'from':self.from_name, 'to':self.node.name})
 
     class Meta:
+        ordering = ['id']
         verbose_name = _('Contact Log')
         verbose_name_plural = _('Contact Logs')
         db_table = 'nodeshot_contact'
@@ -248,5 +255,6 @@ class OldUser(AbstractBaseUser):
     REQUIRED_FIELDS = ['email']
 
     class Meta:
+        ordering = ['id']
         app_label = 'oldimporter'
         db_table = 'auth_user'
