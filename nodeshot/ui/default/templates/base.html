@@ -270,7 +270,10 @@
     </div>
 
     {% block jstemplates %}{% endblock %}
-    {% block jslibs %}{% endblock %}
+    {% block jslibs %}
+        <script src="{% static 'ui/lib/js/jquery.js' %}"></script>
+        <script src="{% static 'ui/lib/js/bootstrap.min.js' %}"></script>
+    {% endblock %}
     {% block jssettings %}{% endblock %}
     {% block jsnodeshot %}{% endblock %}
 

@@ -298,9 +298,8 @@
 
 {% block jslibs %}
     <!-- libs -->
+    {{ block.super }}
     <script src="{% url 'jsi18n' %}"></script>
-    <script src="{% static 'ui/lib/js/jquery.js' %}"></script>
-    <script src="{% static 'ui/lib/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'ui/lib/js/bootstrap.switch.js' %}"></script>
     <script src="{% static 'ui/lib/js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'ui/lib/js/pwstrength.js' %}"></script>
