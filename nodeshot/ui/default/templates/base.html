@@ -93,8 +93,22 @@
     </ol> -->
     {% endblock %}
 
+    <article class="center-stage">
+        {% for message in messages %}
+        <div {% if message.tags %}
+                class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}"
+             {% else %}
+                class="alert alert-info"
+             {% endif %}
+             id="ns-alert-{{ forloop.counter }}">
+            {{ message }}
+            <a href="javascript:$('#ns-alert-{{ forloop.counter }}').fadeOut(250)" class="icon-close"></a>
+        </div>
+        {% endfor %}
+    </article>
+
     <div id="body">
-    {% block body %}{% endblock %}
+        {% block body %}{% endblock %}
     </div>
 
     {% if REGISTRATION_OPEN %}
