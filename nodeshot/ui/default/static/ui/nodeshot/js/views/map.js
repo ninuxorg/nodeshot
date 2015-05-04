@@ -163,13 +163,15 @@
             // bind to namespaced events
             $(window).on('resize.map', _.bind(this.resize, this));
             $(window).on('beforeunload.map', _.bind(this.storeMapProperties, this));
+            // cleanup eventual alerts
+            $.cleanupAlerts();
         },
 
         onShow: function () {
             this.initMap();
         },
 
-        onDestroy: function (e) {
+        onDestroy: function () {
             // store current coordinates when changing view
             this.storeMapProperties();
             // unbind the namespaced events

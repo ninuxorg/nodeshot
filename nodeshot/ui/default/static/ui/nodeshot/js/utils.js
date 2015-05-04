@@ -388,4 +388,14 @@
             if (options.callback) { options.callback(processResults(results)); }
         });
     };
+
+    /**
+     * cleanup any remaining alerts in layout
+     */
+    $.cleanupAlerts = function () {
+        var div = $('#alerts-container');
+        if (div.length) {
+            div.hide().remove();
+        }
+    };
 }());
