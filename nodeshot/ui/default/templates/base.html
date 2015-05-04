@@ -93,7 +93,8 @@
     </ol> -->
     {% endblock %}
 
-    <article class="center-stage">
+    {% if messages %}
+    <article class="center-stage" id="alerts-container">
         {% for message in messages %}
         <div {% if message.tags %}
                 class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}"
@@ -102,10 +103,11 @@
              {% endif %}
              id="ns-alert-{{ forloop.counter }}">
             {{ message }}
-            <a href="javascript:$('#ns-alert-{{ forloop.counter }}').fadeOut(250)" class="icon-close"></a>
+            <a href="javascript:$('#ns-alert-{{ forloop.counter }}').fadeOut(250, function(){ if(!$('.alert:visible').length){ $('#alerts-container').hide() }});" class="icon-close"></a>
         </div>
         {% endfor %}
     </article>
+    {% endif %}
 
     <div id="body">
         {% block body %}{% endblock %}
