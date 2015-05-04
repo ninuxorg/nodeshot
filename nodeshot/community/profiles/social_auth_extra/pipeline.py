@@ -2,13 +2,16 @@ import requests
 import simplejson as json
 from datetime import datetime
 
+from django.utils.translation import ugettext_lazy as _
+
 from social_auth.models import UserSocialAuth
+from social_auth.exceptions import AuthFailed
 
 from ..settings import EMAIL_CONFIRMATION
 
 
-def create_user(backend, details, response, uid, username, user=None, *args,
-                **kwargs):
+def create_user(backend, details, response, uid, username, user=None,
+                *args, **kwargs):
     """Create user. Depends on get_username pipeline."""
     if user:
         return {'user': user}
@@ -18,6 +21,11 @@ def create_user(backend, details, response, uid, username, user=None, *args,
     # Avoid hitting field max length
     email = details.get('email')
     original_email = None
+
+    if not email:
+        message = _("""your social account needs to have a verified email address in order to proceed.""")
+        raise AuthFailed(backend, message)
+
     if email and UserSocialAuth.email_max_length() < len(email):
         original_email = email
         email = ''
@@ -35,8 +43,7 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
     """Load extra data from provider and store it on current UserSocialAuth
     extra_data field.
     """
-    social_user = social_user or \
-                  UserSocialAuth.get_social_auth(backend.name, uid)
+    social_user = social_user or UserSocialAuth.get_social_auth(backend.name, uid)
 
     if kwargs['is_new'] and EMAIL_CONFIRMATION:
         from ..models import EmailAddress
