@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
@@ -103,4 +104,5 @@ if EMAIL_CONFIRMATION:
             user = email_address.user
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
+        messages.add_message(request, messages.SUCCESS, _('Email address verified successfully.'))
         return redirect(settings.SITE_URL)
