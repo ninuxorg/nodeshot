@@ -148,6 +148,7 @@ class Command(BaseCommand):
             self.import_devices()
             self.import_interfaces()
             self.import_links()
+            self.check_deleted_links()
             self.import_contacts()
 
             self.confirm_operation_completed()
@@ -770,7 +771,6 @@ choose (enter the number of) one of the following layers:
         saved_links = []
 
         for old_link in self.old_links:
-
             skip = False
 
             try:
@@ -808,6 +808,7 @@ choose (enter the number of) one of the following layers:
                 "dbm": old_link.dbm,
                 "min_rate": min(old_bandwidth),
                 "max_rate": max(old_bandwidth),
+                "data": { "imported": "true" }
             })
             # if link already exists flag it for UPDATE instead of INSERT
             try:
@@ -831,17 +832,27 @@ choose (enter the number of) one of the following layers:
         self.message('saved %d links into local DB' % len(saved_links))
         self.saved_links = saved_links
 
+    def check_deleted_links(self):
+        imported_links = Link.objects.filter(data__contains=['imported'])
+        deleted_links = []
+
+        for link in imported_links:
+            if OldLink.objects.filter(pk=link.pk).count() == 0:
+                deleted_links.append(link)
+                link.delete()
+
+        if len(deleted_links) > 0:
+            self.message('deleted %d imported links from local DB' % len(deleted_links))
+        self.deleted_links = deleted_links
+
     def import_contacts(self):
         self.verbose('retrieving contact log from old mysql DB...')
         self.old_contacts = list(OldContact.objects.all())
         self.message('retrieved %d entries from contact log' % len(self.old_contacts))
-
         saved_contacts = []
-
         content_type = ContentType.objects.only('id', 'model').get(app_label='nodes', model='node')
 
         for old_contact in self.old_contacts:
-
             try:
                 user = User.objects.get(email=old_contact.from_email)
             except User.DoesNotExist:

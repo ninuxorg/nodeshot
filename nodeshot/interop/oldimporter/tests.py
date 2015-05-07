@@ -5,7 +5,9 @@ from django.contrib.gis.geos import Point
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
 from nodeshot.networking.net.models import Device, Interface, Ip, Vap, Wireless
+from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 from nodeshot.networking.links.models import Link
+from nodeshot.networking.links.models.choices import LINK_STATUS
 from nodeshot.community.profiles.models import Profile as User
 from nodeshot.community.profiles.models import EmailAddress, EmailConfirmation
 from nodeshot.community.mailing.models import Inward
@@ -369,3 +371,39 @@ class TestOldImporter(TestCase):
         management.call_command('import_old_nodeshot', noinput=True, verbosity=2)
 
         self.assertEqual(Node.objects.filter(name='troublingnode').count(), 1)
+
+    def test_links_deletion(self):
+        for user in User.objects.all():
+            user.delete()
+
+        settings.DEFAULT_LAYER = 5
+        management.call_command('import_old_nodeshot', noinput=True)
+
+        link = Link.objects.first()
+        self.assertIn('imported', link.data)
+
+        # --- delete oldlink --- #
+
+        OldLink.objects.first().delete()
+
+        # --- ensure link is deleted --- #
+
+        management.call_command('import_old_nodeshot', noinput=True)
+        self.assertEqual(Link.objects.count(), 0)
+
+        # --- add not imported link --- #
+
+        i_a = Interface.objects.filter(type=INTERFACE_TYPES['wireless']).first()
+        i_b = Interface.objects.filter(type=INTERFACE_TYPES['wireless']).last()
+        added_link = Link(interface_a=i_a,
+                          interface_b=i_b,
+                          status=LINK_STATUS['active'])
+        added_link.full_clean()
+        added_link.save()
+
+        # --- ensure added_link is not deleted --- #
+
+        management.call_command('import_old_nodeshot', noinput=True)
+        self.assertEqual(Link.objects.count(), 1)
+        check_link = Link.objects.first()
+        self.assertEqual(check_link.pk, added_link.pk)
