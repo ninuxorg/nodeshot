@@ -1,0 +1,583 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-05-07 19:10+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: templates/base.html:66 templates/index.html:274
+msgid "Loading"
+msgstr ""
+
+#: templates/base.html:67
+msgid "Warning: javascript disabled!"
+msgstr ""
+
+#: templates/base.html:67
+msgid "This website needs javascript in order to work."
+msgstr ""
+
+#: templates/base.html:127
+#, python-format
+msgid ""
+"By signing up you declare to have accepted our <a href="
+"\"%(PRIVACY_POLICY_LINK)s\" class=\"js-dismiss\">privacy&nbsp;policy</a><br /"
+">and <a href=\"%(TERMS_OF_SERVICE_LINK)s\" class=\"js-dismiss\">terms&nbsp;"
+"of&nbsp;service</a>."
+msgstr ""
+
+#: templates/base.html:135
+msgid "Sign up with Facebook"
+msgstr ""
+
+#: templates/base.html:143
+msgid "Sign up with Google"
+msgstr ""
+
+#: templates/base.html:151
+msgid "Sign up with Github"
+msgstr ""
+
+#: templates/base.html:159 templates/base.html.py:236
+msgid "or"
+msgstr ""
+
+#: templates/base.html:189 templates/base.html.py:267 templates/index.html:93
+msgid "Sign up"
+msgstr ""
+
+#: templates/base.html:192
+msgid "Already have an account?"
+msgstr ""
+
+#: templates/base.html:192 templates/base.html.py:262 templates/index.html:100
+msgid "Sign in"
+msgstr ""
+
+#: templates/base.html:212
+msgid "Sign in with Facebook"
+msgstr ""
+
+#: templates/base.html:220
+msgid "Sign in with Google"
+msgstr ""
+
+#: templates/base.html:228
+msgid "Sign in with Github"
+msgstr ""
+
+#: templates/base.html:259
+msgid "Stay signed in"
+msgstr ""
+
+#: templates/base.html:265
+msgid "Forgot your password?"
+msgstr ""
+
+#: templates/base.html:267
+msgid "Don't have an account yet?"
+msgstr ""
+
+#: templates/index.html:31
+msgid "Search for data"
+msgstr ""
+
+#: templates/index.html:42 templates/index.html.py:196
+#: templates/index.html:225
+msgid "nothing found"
+msgstr ""
+
+#: templates/index.html:66
+msgid "My profile"
+msgstr ""
+
+#: templates/index.html:71 templates/includes/account.html:2
+msgid "My account"
+msgstr ""
+
+#: templates/index.html:77
+msgid "Admin site"
+msgstr ""
+
+#: templates/index.html:83
+msgid "Logout"
+msgstr ""
+
+#: templates/index.html:127
+msgid "No menu item yet"
+msgstr ""
+
+#: templates/index.html:140
+msgid "Notifications"
+msgstr ""
+
+#: templates/index.html:143
+msgid "See all"
+msgstr ""
+
+#: templates/index.html:144
+msgid "Settings"
+msgstr ""
+
+#: templates/index.html:159
+msgid "Nothing interesting yet!"
+msgstr ""
+
+#: templates/index.html:241 templates/index.html.py:256
+msgid "Save"
+msgstr ""
+
+#: templates/index.html:245 templates/index.html.py:260
+msgid "Cancel"
+msgstr ""
+
+#: templates/index.html:275
+msgid "cancel&nbsp;operation"
+msgstr ""
+
+#: templates/index.html:294
+msgid "Email sent successfully!"
+msgstr ""
+
+#: templates/index.html:295
+msgid "Take me back to"
+msgstr ""
+
+#: templates/includes/account.html:4
+msgid "Profile"
+msgstr ""
+
+#: templates/includes/account.html:7
+msgid "First name"
+msgstr ""
+
+#: templates/includes/account.html:10
+msgid "Last name"
+msgstr ""
+
+#: templates/includes/account.html:13
+msgid "City"
+msgstr ""
+
+#: templates/includes/account.html:16
+msgid "Country"
+msgstr ""
+
+#: templates/includes/account.html:20 templates/includes/user-details.html:27
+msgid "Bio"
+msgstr ""
+
+#: templates/includes/account.html:25 templates/includes/account.html.py:65
+msgid "Edit"
+msgstr ""
+
+#: templates/includes/account.html:28
+msgid "View"
+msgstr ""
+
+#: templates/includes/account.html:31
+msgid "Change password"
+msgstr ""
+
+#: templates/includes/account.html:40
+msgid ""
+"Avatars are managed through the popular <a href=\"https://gravatar.com\" "
+"target=\"_blank\">gravatar</a> service."
+msgstr ""
+
+#: templates/includes/account.html:41
+msgid ""
+"If you don't have one yet, create an account on <strong>gravatar.com</"
+"strong> and associate your current email address to it."
+msgstr ""
+
+#: templates/includes/account.html:42
+msgid "Edit on gravatar.com"
+msgstr ""
+
+#: templates/includes/account.html:46 templates/includes/user-details.html:34
+msgid "Links"
+msgstr ""
+
+#: templates/includes/account.html:53
+msgid "url"
+msgstr ""
+
+#: templates/includes/account.html:54
+msgid "description"
+msgstr ""
+
+#: templates/includes/account.html:55 templates/includes/account.html.py:97
+msgid "actions"
+msgstr ""
+
+#: templates/includes/account.html:68 templates/includes/account.html:120
+msgid "Delete"
+msgstr ""
+
+#: templates/includes/account.html:74
+msgid "No links to show"
+msgstr ""
+
+#: templates/includes/account.html:82 templates/includes/account.html:135
+msgid "Add"
+msgstr ""
+
+#: templates/includes/account.html:87
+msgid "Email addresses"
+msgstr ""
+
+#: templates/includes/account.html:94
+msgid "email address"
+msgstr ""
+
+#: templates/includes/account.html:95
+msgid "verified"
+msgstr ""
+
+#: templates/includes/account.html:96
+msgid "primary"
+msgstr ""
+
+#: templates/includes/account.html:110
+msgid "Resend confirmation"
+msgstr ""
+
+#: templates/includes/account.html:115
+msgid "Make primary"
+msgstr ""
+
+#: templates/includes/account.html:127
+msgid "No email addresses"
+msgstr ""
+
+#: templates/includes/layer-details.html:7
+#: templates/includes/node-details.html:26
+#: templates/includes/user-details.html:9
+msgid "contact"
+msgstr ""
+
+#: templates/includes/layer-details.html:9
+#: templates/includes/node-details.html:29
+#: templates/includes/user-details.html:12
+msgid "Press CTRL+C to copy"
+msgstr ""
+
+#: templates/includes/layer-details.html:9
+#: templates/includes/node-details.html:29
+#: templates/includes/user-details.html:12
+msgid "permalink"
+msgstr ""
+
+#: templates/includes/layer-details.html:26
+#: templates/includes/layer-list.html:12
+msgid "Organization"
+msgstr ""
+
+#: templates/includes/layer-details.html:36
+msgid "Website"
+msgstr ""
+
+#: templates/includes/layer-details.html:45
+#: templates/includes/layer-list.html:13
+msgid "New nodes allowed?"
+msgstr ""
+
+#: templates/includes/layer-details.html:53
+msgid "Is external?"
+msgstr ""
+
+#: templates/includes/layer-details.html:64
+msgid "Layer list"
+msgstr ""
+
+#: templates/includes/layer-list.html:4 templates/includes/map.html:74
+msgid "Layers"
+msgstr ""
+
+#: templates/includes/layer-list.html:11 templates/includes/node-list.html:98
+msgid "Name"
+msgstr ""
+
+#: templates/includes/layer-list.html:14
+msgid "External?"
+msgstr ""
+
+#: templates/includes/map.html:10
+msgid "Click on the map to indicate the location"
+msgstr ""
+
+#: templates/includes/map.html:11 templates/includes/map.html.py:17
+msgid "cancel"
+msgstr ""
+
+#: templates/includes/map.html:15
+msgid "Drag to adjust"
+msgstr ""
+
+#: templates/includes/map.html:16
+msgid "confirm"
+msgstr ""
+
+#: templates/includes/map.html:25 templates/includes/map.html.py:87
+msgid "Legend"
+msgstr ""
+
+#: templates/includes/map.html:36
+msgid "Hide legend"
+msgstr ""
+
+#: templates/includes/map.html:40
+msgid "Control map data"
+msgstr ""
+
+#: templates/includes/map.html:41 templates/includes/map.html.py:218
+msgid "Add new node"
+msgstr ""
+
+#: templates/includes/map.html:43
+msgid "Toggle 3D view"
+msgstr ""
+
+#: templates/includes/map.html:46
+msgid "Map tools"
+msgstr ""
+
+#: templates/includes/map.html:49
+msgid "Map preferences"
+msgstr ""
+
+#: templates/includes/map.html:51
+msgid "Toggle legend"
+msgstr ""
+
+#: templates/includes/map.html:59
+msgid "Map base"
+msgstr ""
+
+#: templates/includes/map.html:107
+msgid "measure distance"
+msgstr ""
+
+#: templates/includes/map.html:114
+msgid "measure area"
+msgstr ""
+
+#: templates/includes/map.html:123
+msgid "elevation profile"
+msgstr ""
+
+#: templates/includes/map.html:131
+msgid "drop placeholder"
+msgstr ""
+
+#: templates/includes/map.html:207
+msgid "Details"
+msgstr ""
+
+#: templates/includes/map.html:212
+msgid "Metric type"
+msgstr ""
+
+#: templates/includes/map.html:213
+msgid "Metric value"
+msgstr ""
+
+#: templates/includes/map.html:214 templates/includes/node-details.html:71
+#: templates/includes/node-list.html:38 templates/includes/node-list.html:100
+msgid "Layer"
+msgstr ""
+
+#: templates/includes/node-details.html:31
+msgid "edit"
+msgstr ""
+
+#: templates/includes/node-details.html:36
+#: templates/includes/node-details.html:44
+msgid "General info"
+msgstr ""
+
+#: templates/includes/node-details.html:61
+#: templates/includes/node-list.html:48 templates/includes/node-list.html:99
+msgid "Status"
+msgstr ""
+
+#: templates/includes/node-details.html:80
+msgid "Address"
+msgstr ""
+
+#: templates/includes/node-details.html:90
+msgid "Elevation"
+msgstr ""
+
+#: templates/includes/node-details.html:93
+msgid "meters"
+msgstr ""
+
+#: templates/includes/node-details.html:116
+msgid "Added"
+msgstr ""
+
+#: templates/includes/node-details.html:124
+#: templates/includes/node-list.html:103
+msgid "Updated"
+msgstr ""
+
+#: templates/includes/node-details.html:133
+msgid "Rating"
+msgstr ""
+
+#: templates/includes/node-details.html:143
+msgid "number of ratings"
+msgstr ""
+
+#: templates/includes/node-details.html:158
+msgid "Comments"
+msgstr ""
+
+#: templates/includes/node-details.html:169
+msgid "Join the discussion..."
+msgstr ""
+
+#: templates/includes/node-details.html:175
+msgid "leave comment"
+msgstr ""
+
+#: templates/includes/node-details.html:181
+msgid "Sign in to comment"
+msgstr ""
+
+#: templates/includes/node-list.html:4
+msgid "Nodes"
+msgstr ""
+
+#: templates/includes/node-list.html:27
+msgid "Quick search"
+msgstr ""
+
+#: templates/includes/node-list.html:33
+msgid "Filter"
+msgstr ""
+
+#: templates/includes/node-list.html:40 templates/includes/node-list.html:50
+msgid "All"
+msgstr ""
+
+#: templates/includes/node-list.html:58 templates/includes/node-list.html:101
+msgid "User"
+msgstr ""
+
+#: templates/includes/node-list.html:60
+msgid "Any user"
+msgstr ""
+
+#: templates/includes/node-list.html:66
+msgid "Created on"
+msgstr ""
+
+#: templates/includes/node-list.html:68
+msgid "Any date"
+msgstr ""
+
+#: templates/includes/node-list.html:69
+msgid "Today"
+msgstr ""
+
+#: templates/includes/node-list.html:70
+msgid "Past 7 days"
+msgstr ""
+
+#: templates/includes/node-list.html:71
+msgid "This month"
+msgstr ""
+
+#: templates/includes/node-list.html:72
+msgid "This year"
+msgstr ""
+
+#: templates/includes/node-list.html:80
+msgid "results"
+msgstr ""
+
+#: templates/includes/node-list.html:83
+msgid "reset filter settings"
+msgstr ""
+
+#: templates/includes/node-list.html:89
+msgid "Add node"
+msgstr ""
+
+#: templates/includes/node-list.html:102
+msgid "Created"
+msgstr ""
+
+#: templates/includes/node-list.html:115
+msgid "previous"
+msgstr ""
+
+#: templates/includes/node-list.html:118
+msgid "next"
+msgstr ""
+
+#: templates/includes/node-list.html:120
+msgid "of"
+msgstr ""
+
+#: templates/includes/node-list.html:134
+msgid "Choose action"
+msgstr ""
+
+#: templates/includes/node-list.html:145
+msgid "Select all"
+msgstr ""
+
+#: templates/includes/user-details.html:6
+msgid "my account"
+msgstr ""
+
+#: templates/includes/user-details.html:11
+msgid "nodes"
+msgstr ""
+
+#: templates/includes/user-details.html:20
+msgid "Joined on"
+msgstr ""
+
+#: templates/includes/user-details.html:21
+msgid "Last seen on"
+msgstr ""
+
+#: templates/profiles/password_reset_from_key.html:7
+msgid "Bad Token"
+msgstr ""
+
+#: templates/profiles/password_reset_from_key.html:7
+#: templates/profiles/password_reset_from_key.html:26
+msgid "Change Password"
+msgstr ""
+
+#: templates/profiles/password_reset_from_key.html:11
+msgid ""
+"The password reset link is invalid, probably because it has already been "
+"used."
+msgstr ""
+
+#: templates/profiles/password_reset_from_key.html:30
+msgid "You successfully changed your password!"
+msgstr ""
+
+#: templates/profiles/password_reset_from_key.html:31
+msgid "Go to the homepage to login"
+msgstr ""
