@@ -145,6 +145,7 @@ class Command(BaseCommand):
             self.import_admins()
             self.import_users()
             self.import_nodes()
+            self.check_deleted_nodes()
             self.import_devices()
             self.import_interfaces()
             self.import_links()
@@ -506,6 +507,7 @@ choose (enter the number of) one of the following layers:
             node.notes = old_node.notes
             node.added = old_node.added
             node.updated = old_node.updated
+            node.data['imported'] = 'true'
 
             intersecting_layers = node.intersecting_layers
             # if more than one intersecting layer
@@ -555,6 +557,24 @@ choose (enter the number of) one of the following layers:
 
         self.message('saved %d nodes into local DB' % len(saved_nodes))
         self.saved_nodes = saved_nodes
+
+    def check_deleted_nodes(self):
+        """ delete imported nodes that are not present in the old database """
+        imported_nodes = Node.objects.filter(data__contains=['imported'])
+        deleted_nodes = []
+
+        for node in imported_nodes:
+            if OldNode.objects.filter(pk=node.pk).count() == 0:
+                user = node.user
+                deleted_nodes.append(node)
+                node.delete()
+                # delete user if there are no other nodes assigned to her
+                if user.node_set.count() == 0:
+                    user.delete()
+
+        if len(deleted_nodes) > 0:
+            self.message('deleted %d imported nodes from local DB' % len(deleted_nodes))
+        self.deleted_nodes = deleted_nodes
 
     def import_devices(self):
         self.verbose('retrieving devices from old mysql DB...')

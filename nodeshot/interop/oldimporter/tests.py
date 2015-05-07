@@ -375,6 +375,41 @@ class TestOldImporter(TestCase):
 
         self.assertEqual(Node.objects.filter(name='troublingnode').count(), 1)
 
+    def test_nodes_deletion(self):
+        for user in User.objects.all():
+            user.delete()
+
+        settings.DEFAULT_LAYER = 5
+        management.call_command('import_old_nodeshot', noinput=True)
+
+        node = Node.objects.get(pk=1)
+        self.assertIn('imported', node.data)
+
+        # --- delete oldnode --- #
+
+        OldNode.objects.get(pk=node.pk).delete()
+
+        # --- ensure node and user are deleted --- #
+
+        management.call_command('import_old_nodeshot', noinput=True)
+        self.assertEqual(Node.objects.filter(pk=node.pk).count(), 0)
+        self.assertEqual(User.objects.filter(email="oldnode1@test.com").count(), 0)
+
+        # --- add not imported node --- #
+
+        added_node = Node(name='added',
+                          slug='added',
+                          layer_id=5,
+                          description='added',
+                          geometry='POINT (12 42)')
+        added_node.full_clean()
+        added_node.save()
+
+        # --- ensure added_node is not deleted --- #
+
+        management.call_command('import_old_nodeshot', noinput=True)
+        self.assertEqual(Node.objects.filter(pk=added_node.pk).count(), 1)
+
     def test_links_deletion(self):
         for user in User.objects.all():
             user.delete()
