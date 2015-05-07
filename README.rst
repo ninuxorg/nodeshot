@@ -17,9 +17,9 @@ Nodeshot
    :alt: Requirements Status
 
 .. image:: https://badge.fury.io/py/nodeshot.png
-   :target: http://badge.fury.io/py/nodeshot
+   :target: https://pypi.python.org/pypi/nodeshot
 
-.. image:: https://pypip.in/d/nodeshot/badge.png
+.. image:: https://img.shields.io/pypi/dm/nodeshot.svg
    :target: https://pypi.python.org/pypi/nodeshot
 
 ------------
