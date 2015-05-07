@@ -22,9 +22,9 @@ Nodeshot
    :alt: Requirements Status
 
 .. image:: https://badge.fury.io/py/nodeshot.png
-   :target: http://badge.fury.io/py/nodeshot
+   :target: https://pypi.python.org/pypi/nodeshot
 
-.. image:: https://pypip.in/d/nodeshot/badge.png
+.. image:: https://img.shields.io/pypi/dm/nodeshot.svg
    :target: https://pypi.python.org/pypi/nodeshot
 ------------
 
@@ -61,6 +61,16 @@ If you have any issue or you want to follow the development of this project you 
 For past activities consult `The Nodeshot Archives`_.
 
 .. _The Nodeshot Archives: http://ml.ninux.org/pipermail/nodeshot/
+
+================
+Online instances
+================
+
+You can see a few running instances at the following URLs:
+
+* https://ninux.nodeshot.org/ (english)
+* https://opendata.publicwifi.it/ (english)
+* https://piemontespot.nodeshot.org/ (italian)
 
 ========
 Contents
