@@ -33,6 +33,9 @@ class TestOldImporter(TestCase):
     ]
 
     def setUp(self):
+        Link.objects.all().delete()
+        OldLink.objects.all().delete()
+        
         for fixture in self.mysql_fixtures:
             management.call_command('loaddata', fixture, database='old_nodeshot')
 
