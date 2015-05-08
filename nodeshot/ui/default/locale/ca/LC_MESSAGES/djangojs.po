@@ -1,200 +1,200 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# 
+# Translators:
+# Eloi Carbó <eloicaso@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: nodeshot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-07 18:50+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2015-05-07 19:09+0200\n"
+"PO-Revision-Date: 2015-05-08 08:53+0000\n"
+"Last-Translator: Eloi Carbó <eloicaso@gmail.com>\n"
+"Language-Team: Catalan (http://www.transifex.com/projects/p/nodeshot/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: static/ui/lib/js/backbone-forms-bootstrap3.js:14
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel·lar"
 
 #: static/ui/lib/js/leaflet.measurecontrol-customized.js:66
 msgid "elevation profile"
-msgstr ""
+msgstr "Perfil de l'alçada"
 
 #: static/ui/nodeshot/js/app.js:257
 msgid "confirmation mail sent"
-msgstr ""
+msgstr "correu de confirmació enviat"
 
 #: static/ui/nodeshot/js/models.js:257
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 #: static/ui/nodeshot/js/models.js:258
 msgid "Layer"
-msgstr ""
+msgstr "Capa"
 
 #: static/ui/nodeshot/js/models.js:270
 msgid "Geometry"
-msgstr ""
+msgstr "Geometria"
 
 #: static/ui/nodeshot/js/models.js:271
 msgid "Address"
-msgstr ""
+msgstr "Direcció"
 
 #: static/ui/nodeshot/js/models.js:272
 msgid "Elevation"
-msgstr ""
+msgstr "Alçada"
 
 #: static/ui/nodeshot/js/models.js:273
 msgid "Description"
-msgstr ""
+msgstr "Descripció"
 
 #: static/ui/nodeshot/js/models.js:442
 msgid "First name"
-msgstr ""
+msgstr "Nom"
 
 #: static/ui/nodeshot/js/models.js:443
 msgid "Last name"
-msgstr ""
+msgstr "Cognoms"
 
 #: static/ui/nodeshot/js/models.js:444
 msgid "City"
-msgstr ""
+msgstr "Ciutat"
 
 #: static/ui/nodeshot/js/models.js:445
 msgid "Country"
-msgstr ""
+msgstr "País"
 
 #: static/ui/nodeshot/js/models.js:446
 msgid "Bio"
-msgstr ""
+msgstr "Sobre mi"
 
 #: static/ui/nodeshot/js/models.js:522
 msgid "problem while logging out"
-msgstr ""
+msgstr "hem trobat un problema al desconnectar"
 
 #: static/ui/nodeshot/js/models.js:617
 msgid "Message"
-msgstr ""
+msgstr "Missatge"
 
 #: static/ui/nodeshot/js/models.js:686
 msgid "Current password"
-msgstr ""
+msgstr "Contrasenya actual"
 
 #: static/ui/nodeshot/js/models.js:687
 msgid "New password"
-msgstr ""
+msgstr "Nova contrasenya"
 
 #: static/ui/nodeshot/js/models.js:688
 msgid "New password (confirmation)"
-msgstr ""
+msgstr "Nova contrasenya (confirmar)"
 
 #: static/ui/nodeshot/js/utils.js:255
 msgid "ok"
-msgstr ""
+msgstr "d'acord"
 
 #: static/ui/nodeshot/js/views/contact.js:22
 msgid "Contact"
-msgstr ""
+msgstr "Contacte"
 
 #: static/ui/nodeshot/js/views/contact.js:38
 msgid "Send"
-msgstr ""
+msgstr "Enviar"
 
 #: static/ui/nodeshot/js/views/layer-list.js:30
 msgid "Layer list"
-msgstr ""
+msgstr "Llista de capes"
 
 #: static/ui/nodeshot/js/views/map.js:284
 msgid "Map"
-msgstr ""
+msgstr "Mapa"
 
 #: static/ui/nodeshot/js/views/map.js:534
 #: static/ui/nodeshot/js/views/node-details.js:509
 msgid "not found"
-msgstr ""
+msgstr "no s'ha pogut trobar"
 
 #: static/ui/nodeshot/js/views/map.js:784
 #: static/ui/nodeshot/js/views/map.js:919
 #: static/ui/nodeshot/js/views/node-list.js:127
 msgid "not implemented yet"
-msgstr ""
+msgstr "no s'ha implementat encara"
 
 #: static/ui/nodeshot/js/views/map.js:1103
 #: static/ui/nodeshot/js/views/map.js:1115
 msgid "Add node"
-msgstr ""
+msgstr "Afegir node"
 
 #: static/ui/nodeshot/js/views/node-details.js:253
 #: static/ui/nodeshot/js/views/node-details.js:335
 #: static/ui/nodeshot/js/views/node-details.js:483
 msgid "error"
-msgstr ""
+msgstr "error"
 
 #: static/ui/nodeshot/js/views/node-details.js:419
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: static/ui/nodeshot/js/views/node-details.js:423
 #: static/ui/nodeshot/js/views/user.js:107
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
 #: static/ui/nodeshot/js/views/node-details.js:439
 msgid "drag to change coordinates"
-msgstr ""
+msgstr "Arrossega per canviar les coordenades"
 
 #: static/ui/nodeshot/js/views/node-list.js:52
 msgid "Node list"
-msgstr ""
+msgstr "Llistat de nodes"
 
 #: static/ui/nodeshot/js/views/page.js:32
 #: static/ui/nodeshot/js/views/user.js:41
 msgid "the requested page was not found"
-msgstr ""
+msgstr "la pàgina sol·licitada no s'ha trobat"
 
 #: static/ui/nodeshot/js/views/page.js:36
 #: static/ui/nodeshot/js/views/user.js:45
 msgid "there was an error while retrieving the page"
-msgstr ""
+msgstr "s'ha produït un error mentres es carregava la pàgina"
 
 #: static/ui/nodeshot/js/views/password-reset.js:25
 #: static/ui/nodeshot/js/views/password-reset.js:43
 msgid "Reset Password"
-msgstr ""
+msgstr "Reinicialitza la contrasenya"
 
 #: static/ui/nodeshot/js/views/password-reset.js:69
 msgid "Check your inbox for the password reset link."
-msgstr ""
+msgstr "Comprova la teva bústia d'entrada per trobar l'enllaç de reinici de la contrasenya"
 
 #: static/ui/nodeshot/js/views/user.js:99
 msgid "Edit \""
-msgstr ""
+msgstr "Editar \""
 
 #: static/ui/nodeshot/js/views/user.js:217
 msgid "Account"
-msgstr ""
+msgstr "Compte"
 
 #: static/ui/nodeshot/js/views/user.js:278
 #: static/ui/nodeshot/js/views/user.js:328
 msgid "Do you confirm?"
-msgstr ""
+msgstr "Ho confirmes?"
 
 #: static/ui/nodeshot/js/views/user.js:279
 #: static/ui/nodeshot/js/views/user.js:329
 msgid "yes"
-msgstr ""
+msgstr "si"
 
 #: static/ui/nodeshot/js/views/user.js:283
 #: static/ui/nodeshot/js/views/user.js:333
 msgid "no"
-msgstr ""
+msgstr "no"
 
 #: static/ui/nodeshot/js/views/user.js:365
 msgid "Change account password"
-msgstr ""
+msgstr "Canviar contrasenya del compte"

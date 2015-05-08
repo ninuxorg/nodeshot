@@ -1,91 +1,97 @@
-# Nodeshot default UI translation file
-# This file is distributed under the same license as the Nodeshot package.
-# Federico Capoano nemesis at ninux dot org, 2015.
-#
-#, fuzzy
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# Federico Capoano <federico.capoano@teletu.it>, 2015
+# Federico Capoano nemesis at ninux dot org, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.0\n"
+"Project-Id-Version: nodeshot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-27 17:28+0100\n"
-"PO-Revision-Date: 2015-02-27 17:43+0020\n"
-"Last-Translator: Federico Capoano\n"
+"POT-Creation-Date: 2015-05-07 19:09+0200\n"
+"PO-Revision-Date: 2015-05-07 17:22+0000\n"
+"Last-Translator: Federico Capoano <federico.capoano@teletu.it>\n"
+"Language-Team: Italian (http://www.transifex.com/projects/p/nodeshot/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
+"Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Translated-Using: django-rosetta 0.7.5\n"
 
 #: static/ui/lib/js/backbone-forms-bootstrap3.js:14
 msgid "Cancel"
 msgstr "Annulla"
 
-#: static/ui/nodeshot/js/app.js:253
+#: static/ui/lib/js/leaflet.measurecontrol-customized.js:66
+msgid "elevation profile"
+msgstr "profilo elevazione"
+
+#: static/ui/nodeshot/js/app.js:257
 msgid "confirmation mail sent"
 msgstr "email di conferma inviata"
 
-#: static/ui/nodeshot/js/models.js:242
+#: static/ui/nodeshot/js/models.js:257
 msgid "Name"
 msgstr "Nome"
 
-#: static/ui/nodeshot/js/models.js:243
+#: static/ui/nodeshot/js/models.js:258
 msgid "Layer"
 msgstr "Layer"
 
-#: static/ui/nodeshot/js/models.js:255
+#: static/ui/nodeshot/js/models.js:270
 msgid "Geometry"
 msgstr "Geometria"
 
-#: static/ui/nodeshot/js/models.js:256
+#: static/ui/nodeshot/js/models.js:271
 msgid "Address"
 msgstr "Indirizzo"
 
-#: static/ui/nodeshot/js/models.js:257
+#: static/ui/nodeshot/js/models.js:272
 msgid "Elevation"
 msgstr "Elevazione"
 
-#: static/ui/nodeshot/js/models.js:258
+#: static/ui/nodeshot/js/models.js:273
 msgid "Description"
 msgstr "Descrizione"
 
-#: static/ui/nodeshot/js/models.js:427
+#: static/ui/nodeshot/js/models.js:442
 msgid "First name"
 msgstr "Nome"
 
-#: static/ui/nodeshot/js/models.js:428
+#: static/ui/nodeshot/js/models.js:443
 msgid "Last name"
 msgstr "Cognome"
 
-#: static/ui/nodeshot/js/models.js:429
+#: static/ui/nodeshot/js/models.js:444
 msgid "City"
 msgstr "Città"
 
-#: static/ui/nodeshot/js/models.js:430
+#: static/ui/nodeshot/js/models.js:445
 msgid "Country"
 msgstr "Stato"
 
-#: static/ui/nodeshot/js/models.js:431
+#: static/ui/nodeshot/js/models.js:446
 msgid "Bio"
 msgstr "Bio"
 
-#: static/ui/nodeshot/js/models.js:507
+#: static/ui/nodeshot/js/models.js:522
 msgid "problem while logging out"
 msgstr "problema durante il logout"
 
-#: static/ui/nodeshot/js/models.js:602
+#: static/ui/nodeshot/js/models.js:617
 msgid "Message"
 msgstr "Messaggio"
 
-#: static/ui/nodeshot/js/models.js:671
+#: static/ui/nodeshot/js/models.js:686
 msgid "Current password"
 msgstr "Password attuale"
 
-#: static/ui/nodeshot/js/models.js:672
+#: static/ui/nodeshot/js/models.js:687
 msgid "New password"
 msgstr "Nuova password"
 
-#: static/ui/nodeshot/js/models.js:673
+#: static/ui/nodeshot/js/models.js:688
 msgid "New password (confirmation)"
 msgstr "Nuova password (conferma)"
 
@@ -105,42 +111,42 @@ msgstr "Invia"
 msgid "Layer list"
 msgstr "Lista layer"
 
-#: static/ui/nodeshot/js/views/map.js:277
+#: static/ui/nodeshot/js/views/map.js:284
 msgid "Map"
 msgstr "Mappa"
 
-#: static/ui/nodeshot/js/views/map.js:514
-#: static/ui/nodeshot/js/views/node-details.js:505
+#: static/ui/nodeshot/js/views/map.js:534
+#: static/ui/nodeshot/js/views/node-details.js:509
 msgid "not found"
 msgstr "non trovato"
 
-#: static/ui/nodeshot/js/views/map.js:764
-#: static/ui/nodeshot/js/views/map.js:888
+#: static/ui/nodeshot/js/views/map.js:784
+#: static/ui/nodeshot/js/views/map.js:919
 #: static/ui/nodeshot/js/views/node-list.js:127
 msgid "not implemented yet"
 msgstr "non ancora implementato"
 
-#: static/ui/nodeshot/js/views/map.js:988
-#: static/ui/nodeshot/js/views/map.js:1000
+#: static/ui/nodeshot/js/views/map.js:1103
+#: static/ui/nodeshot/js/views/map.js:1115
 msgid "Add node"
 msgstr "Aggiungi nodo"
 
-#: static/ui/nodeshot/js/views/node-details.js:249
-#: static/ui/nodeshot/js/views/node-details.js:331
-#: static/ui/nodeshot/js/views/node-details.js:479
+#: static/ui/nodeshot/js/views/node-details.js:253
+#: static/ui/nodeshot/js/views/node-details.js:335
+#: static/ui/nodeshot/js/views/node-details.js:483
 msgid "error"
 msgstr "errore"
 
-#: static/ui/nodeshot/js/views/node-details.js:415
+#: static/ui/nodeshot/js/views/node-details.js:419
 msgid "Edit"
 msgstr "Modifica"
 
-#: static/ui/nodeshot/js/views/node-details.js:419
+#: static/ui/nodeshot/js/views/node-details.js:423
 #: static/ui/nodeshot/js/views/user.js:107
 msgid "Save"
 msgstr "Salva"
 
-#: static/ui/nodeshot/js/views/node-details.js:435
+#: static/ui/nodeshot/js/views/node-details.js:439
 msgid "drag to change coordinates"
 msgstr "trascina per cambiare le coordinate"
 
@@ -165,8 +171,7 @@ msgstr "Ripristina password"
 
 #: static/ui/nodeshot/js/views/password-reset.js:69
 msgid "Check your inbox for the password reset link."
-msgstr ""
-"Controlla la tua posta in arrivo per il link di ripristino della password"
+msgstr "Controlla la tua posta in arrivo per il link di ripristino della password"
 
 #: static/ui/nodeshot/js/views/user.js:99
 msgid "Edit \""
