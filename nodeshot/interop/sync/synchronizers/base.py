@@ -45,6 +45,7 @@ class BaseSynchronizer(object):
         self.layer = layer
         self.verbosity = kwargs.get('verbosity', 1)
         self.load_config()
+        self.message = None
 
     def load_config(self, config=None):
         self.config = config or self.layer.external.config
@@ -323,8 +324,8 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             "elev": "float or none",
             "description": "string or empty string",
             "notes": "string or empty string",
-            "added", "string date representation",
-            "updated", "string date representation",
+            "added": "string date representation",
+            "updated": "string date representation",
         }
         """
         raise NotImplementedError("Not Implemented")
