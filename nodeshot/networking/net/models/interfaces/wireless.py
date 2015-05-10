@@ -21,15 +21,15 @@ class Wireless(Interface):
     output_power = models.IntegerField(_('output power'), null=True, blank=True)
     dbm = models.IntegerField(_('dBm'), null=True, default=None, blank=True)
     noise = models.IntegerField(_('noise'), null=True, default=None, blank=True)
-    
+
     objects = Interface.objects.__class__()
-    
+
     class Meta:
         app_label = 'net'
         db_table = 'net_interface_wireless'
         verbose_name = _('wireless interface')
         verbose_name_plural = _('wireless interfaces')
-    
+
     def save(self, *args, **kwargs):
         """ automatically set Interface.type to wireless """
         self.type = INTERFACE_TYPES.get('wireless')

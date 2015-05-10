@@ -11,11 +11,6 @@
                             <link id="55902" linked_device_id="49621" linked_node_id="55391" linked_interface_id="84467" link_type="wds" link_status="Building"/>
                         </interface>
                     </radio>
-                    <radio id="1" device_id="49635" ssid="TOLOArtzubi-ALBIAldaba" mode="ap" protocol="802.11n" channel="5000" antenna_angle="6" antenna_gain="25" clients_accepted="No" snmp_name="wlan2">
-                        <interface id="84462" type="wds/p2p" mac="00:00:00:00:00:FF" ipv4="172.23.1.113" mask="255.255.255.248">
-                            <link id="55897" linked_device_id="49552" linked_node_id="55356" linked_interface_id="84461" link_type="wds" link_status="Building"/>
-                        </interface>
-                    </radio>
                     <interface id="84460" type="wLan/Lan" mac="00:00:00:00:00:01" ipv4="10.69.24.33" mask="255.255.255.240">
                         <link id="55898" linked_device_id="49637" linked_node_id="55349" linked_interface_id="84463" link_type="cable" link_status="Building"/>
                         <link id="55899" linked_device_id="49638" linked_node_id="55349" linked_interface_id="84464" link_type="cable" link_status="Building"/>

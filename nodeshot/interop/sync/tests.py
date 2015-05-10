@@ -701,10 +701,14 @@ class SyncTest(TestCase):
         self.assertEqual(node.elev, 15)
         self.assertEqual(node.status.slug, 'building')
         self.assertEqual(node.data['cnml_id'], '55349')
-        # check database
+        # check devices
         from nodeshot.networking.net.models import Device
         self.assertIn('12 devices added', output)
         self.assertEqual(Device.objects.filter(node__layer=layer).count(), 12)
+        # check interfaces
+        device = Device.objects.get(data={'cnml_id': 49635})
+        self.assertEqual(device.interface_set.count(), 3)
+        self.assertIn('21 interfaces added', output)
 
         # --- repeat with different XML --- #
 
@@ -727,6 +731,10 @@ class SyncTest(TestCase):
         self.assertIn('3 total local', output)
         self.assertIn('0 devices added', output)
         self.assertIn('2 devices deleted', output)
-        # check database
+        # check devices
         self.assertEqual(nodes.count(), 3)
         self.assertEqual(Device.objects.filter(node__layer=layer).count(), 10)
+        # check interfaces
+        self.assertEqual(device.interface_set.count(), 2)
+        self.assertIn('0 interfaces added', output)
+        self.assertIn('1 interfaces deleted', output)

@@ -14,7 +14,8 @@ except ImportError:
 
 from nodeshot.core.base.utils import check_dependencies
 from nodeshot.core.nodes.models import Node, Status
-from nodeshot.networking.net.models import Device
+from nodeshot.networking.net.models import Device, Interface, Ethernet, Wireless
+from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
 from .base import BaseSynchronizer, GenericGisSynchronizer
 
@@ -156,6 +157,7 @@ class Cnml(GenericGisSynchronizer):
     def save(self):
         self.save_nodes()
         self.save_devices()
+        self.save_interfaces()
 
     def save_nodes(self):
         super(Cnml, self).save()
@@ -174,7 +176,7 @@ class Cnml(GenericGisSynchronizer):
                 device = Device()
                 added = True
             node = Node.objects.get(data={'cnml_id': cnml_device.parentNode.id})
-            device.name = str(cnml_device.title),
+            device.name = cnml_device.title,
             device.node = node
             device.type = cnml_device.type
             try:
@@ -205,4 +207,53 @@ class Cnml(GenericGisSynchronizer):
         """ % (
             len(added_devices),
             len(deleted_devices)
+        )
+
+    def save_interfaces(self):
+        added_interfaces = []
+        deleted_interfaces = []
+        cnml_interfaces = self.cnml.getInterfaces()
+        current_interfaces = Interface.objects.filter(data__contains=['cnml_id'])
+
+        for cnml_interface in cnml_interfaces:
+            if hasattr(cnml_interface.parentRadio, 'parentDevice'):
+                Model = Wireless
+            else:
+                Model = Ethernet
+            try:
+                interface = Model.objects.get(data={'cnml_id':  cnml_interface.id })
+                added = False
+            except Model.DoesNotExist:
+                interface = Model()
+                added = True
+            if Model is Wireless:
+                parent = cnml_interface.parentRadio.parentDevice.id
+            else:
+                parent = cnml_interface.parentRadio.id
+                interface.duplex = 'full'
+                interface.standard = 'fast'
+            device = Device.objects.get(data={'cnml_id': parent})
+            interface.type = INTERFACE_TYPES.get(Model.__name__.lower())
+            interface.device = device
+            interface.data['cnml_id'] = cnml_interface.id
+            interface.full_clean()
+            interface.save()
+
+            if added:
+                added_interfaces.append(interface)
+
+        # delete interfaces that are not in CNML anymore
+        for current_interface in current_interfaces:
+            try:
+                self.cnml.getInterface(int(current_interface.data['cnml_id']))
+            except KeyError:
+                deleted_interfaces.append(current_interface)
+                current_interface.delete()
+
+        self.message += """
+            %s interfaces added
+            %s interfaces deleted
+        """ % (
+            len(added_interfaces),
+            len(deleted_interfaces)
         )

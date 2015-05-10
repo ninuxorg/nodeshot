@@ -21,20 +21,20 @@ class Interface(BaseAccessLevel):
                               help_text=_('Maximum Trasmission Unit'))
     tx_rate = models.IntegerField(_('TX Rate'), null=True, default=None, blank=True)
     rx_rate = models.IntegerField(_('RX Rate'), null=True, default=None, blank=True)
-    
+
     # extra data
     data = DictionaryField(_('extra data'), null=True, blank=True,
                            help_text=_('store extra attributes in JSON string'))
     shortcuts = ReferencesField(null=True, blank=True)
-    
+
     objects = InterfaceManager()
-    
+
     class Meta:
         app_label = 'net'
-    
+
     def __unicode__(self):
         return '%s %s' % (self.get_type_display(), self.mac)
-    
+
     def save(self, *args, **kwargs):
         """
         Custom save method does the following:
@@ -42,15 +42,15 @@ class Interface(BaseAccessLevel):
         """
         if 'node' not in self.shortcuts:
             self.shortcuts['node'] = self.device.node
-        
-        if 'user' not in self.shortcuts:
+
+        if 'user' not in self.shortcuts and self.device.node.user:
             self.shortcuts['user'] = self.device.node.user
-        
+
         if 'layer' not in self.shortcuts and 'nodeshot.core.layers' in settings.INSTALLED_APPS:
             self.shortcuts['layer'] = self.device.node.layer
-        
+
         super(Interface, self).save(*args, **kwargs)
-    
+
     @property
     def owner(self):
         if 'user' not in self.shortcuts:
@@ -58,9 +58,9 @@ class Interface(BaseAccessLevel):
                 self.save()
             else:
                 raise Exception('Instance does not have a device set yet')
-        
+
         return self.shortcuts['user']
-    
+
     @property
     def node(self):
         if 'node' not in self.shortcuts:
@@ -69,7 +69,7 @@ class Interface(BaseAccessLevel):
             else:
                 raise Exception('Instance does not have a device set yet')
         return self.shortcuts['node']
-    
+
     @property
     def layer(self):
         if 'nodeshot.core.layers' not in settings.INSTALLED_APPS:
@@ -80,7 +80,7 @@ class Interface(BaseAccessLevel):
             else:
                 raise Exception('Instance does not have a device set yet')
         return self.shortcuts['layer']
-    
+
     @property
     def ip_addresses(self):
         try:
@@ -89,7 +89,7 @@ class Interface(BaseAccessLevel):
         except AttributeError:
             addresses = ''
         return addresses.replace(' ', '').split(',') if addresses else []
-    
+
     @ip_addresses.setter
     def ip_addresses(self, value):
         """ :param value: a list of ip addresses """
@@ -100,7 +100,7 @@ class Interface(BaseAccessLevel):
             self.data = {}
         # update field
         self.data['ip_addresses'] = ', '.join(value)
-    
+
     if 'grappelli' in settings.INSTALLED_APPS:
         @staticmethod
         def autocomplete_search_fields():
