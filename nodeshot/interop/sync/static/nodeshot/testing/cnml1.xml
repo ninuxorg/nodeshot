@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cnml version="0.1" server_id="1" server_url="http://guifi.net" generated="20130210 0814">
+    <class network_description="detail" mapping="y"/>
+    <network nodes="3" devices="12" ap="7" client="0" services="4" links="7">
+        <zone id="55284" parent_id="44279" title="Tolosa" time_zone="+01 2 2" ntp_servers="10.69.24.10" dns_servers="10.69.24.10" graph_server="55403" created="20130113 0558" updated="20130116 0521" zone_nodes="3" box="-2.119675,43.109381,-2.038136,43.148843" access_points="7" devices="12" services="4" links="7">&amp;nbsp;
+            <node id="55349" title="TOLOArtzubi" lat="43.146330" lon="-2.116230" antenna_elevation="15" status="Building" graph_server="55388" created="20130115 0131" updated="20130117 0534" access_points="2" devices="3" links="2">&amp;nbsp;
+                <device id="49635" title="TOLOArtzubi-RB493" type="radio" status="Building" created="20130117 0429" firmware="RouterOSv5.x" name="Routerboard 600">
+                    <radio id="0" device_id="49635" ssid="VILLAOtelarre-TOLOArtzubi" mode="ap" protocol="802.11n" channel="5000" antenna_angle="6" antenna_gain="25" clients_accepted="No" snmp_name="wlan1">
+                        <interface id="84460" type="wLan/Lan" mac="00:00:00:00:00:01" ipv4="10.69.24.33" mask="255.255.255.240"/>
+                        <interface id="84459" type="wds/p2p" mac="00:00:00:00:00:01" ipv4="172.23.1.122" mask="255.255.255.248">
+                            <link id="55902" linked_device_id="49621" linked_node_id="55391" linked_interface_id="84467" link_type="wds" link_status="Building"/>
+                        </interface>
+                    </radio>
+                    <radio id="1" device_id="49635" ssid="TOLOArtzubi-ALBIAldaba" mode="ap" protocol="802.11n" channel="5000" antenna_angle="6" antenna_gain="25" clients_accepted="No" snmp_name="wlan2">
+                        <interface id="84462" type="wds/p2p" mac="00:00:00:00:00:FF" ipv4="172.23.1.113" mask="255.255.255.248">
+                            <link id="55897" linked_device_id="49552" linked_node_id="55356" linked_interface_id="84461" link_type="wds" link_status="Building"/>
+                        </interface>
+                    </radio>
+                    <interface id="84460" type="wLan/Lan" mac="00:00:00:00:00:01" ipv4="10.69.24.33" mask="255.255.255.240">
+                        <link id="55898" linked_device_id="49637" linked_node_id="55349" linked_interface_id="84463" link_type="cable" link_status="Building"/>
+                        <link id="55899" linked_device_id="49638" linked_node_id="55349" linked_interface_id="84464" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+                <device id="49637" title="TOLOArtzubi-NBR-V" type="radio" status="Building" created="20130117 0437" firmware="AirOsv52" name="AirMaxM5 Bullet/PwBrg/AirGrd/NanoBr">
+                    <interface id="84463" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.24.34" mask="255.255.255.240">
+                        <link id="55898" linked_device_id="49635" linked_node_id="55349" linked_interface_id="84460" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+                <device id="49638" title="TOLOArtzubi-NBR-A" type="radio" status="Building" created="20130117 0437" firmware="AirOsv52" name="AirMaxM5 Bullet/PwBrg/AirGrd/NanoBr">
+                    <interface id="84464" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.24.35" mask="255.255.255.240">
+                        <link id="55899" linked_device_id="49635" linked_node_id="55349" linked_interface_id="84460" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+            </node>
+            <node id="55390" title="TOLONafarroa6" lat="43.134509" lon="-2.075319" antenna_elevation="15" status="Building" created="20130116 0123" updated="20130116 0125" access_points="1" devices="4" links="1" services="4">&amp;nbsp;
+                <device id="49494" title="TOLONafarroa6-RB450" type="radio" status="Building" created="20130116 0125" updated="20130117 0508" firmware="RouterOSv5.x" name="Routerboard 600">INVALID: el rango 172.23.0.168/30 está ocupado y está generando problemas para la creación de los hibridos en la zona. No Borrar.
+                    <radio id="0" device_id="49494" ssid="TOLONafarroa6-IBARIzaskun" mode="ap" protocol="802.11n" channel="5000" antenna_angle="6" antenna_gain="25" clients_accepted="No" snmp_name="wlan1">
+                        <interface id="84179" type="wLan/Lan" mac="00:00:00:00:00:01" ipv4="10.69.24.1" mask="255.255.255.248"/>
+                        <interface id="84178" type="wds/p2p" mac="00:00:00:00:00:01" ipv4="172.23.0.153" mask="255.255.255.248">
+                            <link id="55735" linked_device_id="49501" linked_node_id="55351" linked_interface_id="84192" link_type="wds" link_status="Building"/>
+                        </interface>
+                    </radio>
+                    <interface id="84179" type="wLan/Lan" mac="00:00:00:00:00:01" ipv4="10.69.24.1" mask="255.255.255.248">
+                        <link id="55732" linked_device_id="49498" linked_node_id="55390" linked_interface_id="84185" link_type="cable" link_status="Building"/>
+                    </interface>
+                    <interface id="84246" type="ether1" mac="00:00:00:00:00:00" ipv4="10.69.24.9" mask="255.255.255.248">
+                        <link id="55767" linked_device_id="49523" linked_node_id="55390" linked_interface_id="84248" link_type="cable" link_status="Planned"/>
+                    </interface>
+                    <interface id="84469" type="INVALID" mac="00:00:00:00:00:00" ipv4="172.23.0.169" mask="255.255.255.252">
+                        <link id="55904" linked_device_id="49641" linked_node_id="55390" linked_interface_id="84470" link_type="cable" link_status="Reserved"/>
+                    </interface>
+                </device>
+                <device id="49498" title="TOLONafarroa6-NBR-I" type="radio" status="Building" created="20130116 0143" firmware="AirOsv52" name="AirMaxM5 Bullet/PwBrg/AirGrd/NanoBr">
+                    <interface id="84185" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.24.2" mask="255.255.255.248">
+                        <link id="55732" linked_device_id="49494" linked_node_id="55390" linked_interface_id="84179" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+                <device id="49523" title="TOLONafarroa6-Server" type="server" status="Building" created="20130116 0513">
+                    <interface id="84248" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.24.10" mask="255.255.255.248">
+                        <link id="55767" linked_device_id="49494" linked_node_id="55390" linked_interface_id="84246" link_type="cable" link_status="Planned"/>
+                    </interface>
+                    <service id="55400" title="TOLONafarroa6-PROXY" type="Proxy" status="Building" created="20130116 0515" updated="20130116 0516"/>
+                    <service id="55401" title="TOLONafarroa6-DNS" type="DNS" status="Building" created="20130116 0518" updated="20130116 0652"/>
+                    <service id="55402" title="TOLONafarroa6-NTP" type="NTP" status="Building" created="20130116 0519" updated="20130116 0652"/>
+                    <service id="55403" title="TOLONafarroa6-GRAF" type="SNPgraphs" status="Building" created="20130116 0520" updated="20130116 0653"/>
+                </device>
+                <device id="49641" title="TOLONafarroa6-INVALID" type="server" status="Reserved" created="20130117 0506">
+                    <interface id="84470" type="Lan" mac="00:00:00:00:00:00" ipv4="172.23.0.170" mask="255.255.255.252">
+                        <link id="55904" linked_device_id="49494" linked_node_id="55390" linked_interface_id="84469" link_type="cable" link_status="Reserved"/>
+                    </interface>
+                </device>
+            </node>
+            <node id="55395" title="TOLOOiaun" lat="43.111530" lon="-2.081920" antenna_elevation="15" status="Building" created="20130116 0155" updated="20130116 0720" access_points="4" devices="5" links="4">&amp;nbsp;
+                <device id="49568" title="TOLOOiaun-NBR-T" type="radio" status="Building" created="20130117 1205" firmware="AirOsv52" name="AirMaxM5 Bullet/PwBrg/AirGrd/NanoBr">
+                    <interface id="84328" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.28.5" mask="255.255.255.240">
+                        <link id="55818" linked_device_id="49514" linked_node_id="55395" linked_interface_id="84228" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+                <device id="49514" title="TOLOOiaun-RB493" type="radio" status="Building" created="20130116 0433" updated="20130116 0508" firmware="RouterOSv5.x" name="Routerboard 600">
+                    <radio id="0" device_id="49514" ssid="LEABUdaletxea-TOLOOiaun" mode="ap" protocol="802.11n" channel="5000" antenna_angle="6" antenna_gain="25" clients_accepted="No" snmp_name="wlan1">
+                        <interface id="84228" type="wLan/Lan" mac="00:00:00:00:00:01" ipv4="10.69.28.1" mask="255.255.255.240"/>
+                        <interface id="84227" type="wds/p2p" mac="00:00:00:00:00:01" ipv4="172.23.0.218" mask="255.255.255.248">
+                            <link id="55754" linked_device_id="49497" linked_node_id="55128" linked_interface_id="84188" link_type="wds" link_status="Building"/>
+                        </interface>
+                    </radio>
+                    <radio id="1" device_id="49514" ssid="TOLOOiaun-ORENTanga" mode="ap" protocol="802.11n" channel="5000" antenna_angle="6" antenna_gain="25" clients_accepted="No" snmp_name="wlan2">
+                        <interface id="84273" type="wds/p2p" mac="00:00:00:00:00:FF" ipv4="172.23.0.249" mask="255.255.255.248">
+                            <link id="55789" linked_device_id="49544" linked_node_id="55347" linked_interface_id="84283" link_type="wds" link_status="Building"/>
+                        </interface>
+                    </radio>
+                    <radio id="2" device_id="49514" ssid="TOLOOiaun-ALBIAldaba" mode="ap" protocol="802.11n" channel="5000" antenna_angle="6" antenna_gain="25" clients_accepted="No" snmp_name="wlan3">
+                        <interface id="84274" type="wds/p2p" mac="00:00:00:00:00:FF" ipv4="172.23.1.9" mask="255.255.255.248">
+                            <link id="55797" linked_device_id="49552" linked_node_id="55356" linked_interface_id="84292" link_type="wds" link_status="Building"/>
+                        </interface>
+                    </radio>
+                    <radio id="3" device_id="49514" ssid="ABALTximdoki-TOLOOiaun" mode="ap" protocol="802.11n" channel="5000" antenna_angle="6" antenna_gain="25" clients_accepted="No" snmp_name="wlan4">
+                        <interface id="84319" type="wds/p2p" mac="00:00:00:00:00:FF" ipv4="172.23.0.161" mask="255.255.255.248">
+                            <link id="55817" linked_device_id="49564" linked_node_id="55359" linked_interface_id="84323" link_type="wds" link_status="Building"/>
+                        </interface>
+                    </radio>
+                    <interface id="84228" type="wLan/Lan" mac="00:00:00:00:00:01" ipv4="10.69.28.1" mask="255.255.255.240">
+                        <link id="55763" linked_device_id="49519" linked_node_id="55395" linked_interface_id="84243" link_type="cable" link_status="Building"/>
+                        <link id="55784" linked_device_id="49542" linked_node_id="55395" linked_interface_id="84275" link_type="cable" link_status="Building"/>
+                        <link id="55785" linked_device_id="49543" linked_node_id="55395" linked_interface_id="84276" link_type="cable" link_status="Building"/>
+                        <link id="55818" linked_device_id="49568" linked_node_id="55395" linked_interface_id="84328" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+                <device id="49519" title="TOLOOiaun-NBR-L" type="radio" status="Building" created="20130116 0501" updated="20130116 0508" firmware="AirOsv52" name="AirMaxM5 Bullet/PwBrg/AirGrd/NanoBr">
+                    <interface id="84243" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.28.2" mask="255.255.255.240">
+                        <link id="55763" linked_device_id="49514" linked_node_id="55395" linked_interface_id="84228" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+                <device id="49542" title="TOLOOiaun-NBR-O" type="radio" status="Building" created="20130116 0724" firmware="AirOsv52" name="AirMaxM5 Bullet/PwBrg/AirGrd/NanoBr">
+                    <interface id="84275" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.28.3" mask="255.255.255.240">
+                        <link id="55784" linked_device_id="49514" linked_node_id="55395" linked_interface_id="84228" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+                <device id="49543" title="TOLOOiaun-NBR-A" type="radio" status="Building" created="20130116 0725" firmware="AirOsv52" name="AirMaxM5 Bullet/PwBrg/AirGrd/NanoBr">
+                    <interface id="84276" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.28.4" mask="255.255.255.240">
+                        <link id="55785" linked_device_id="49514" linked_node_id="55395" linked_interface_id="84228" link_type="cable" link_status="Building"/>
+                    </interface>
+                </device>
+            </node>
+        </zone>
+    </network>
+</cnml>

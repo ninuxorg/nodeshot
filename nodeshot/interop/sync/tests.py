@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.gis.geos import Point, GEOSGeometry
 
 from nodeshot.core.layers.models import Layer
-from nodeshot.core.nodes.models import Node
+from nodeshot.core.nodes.models import Node, Status
 from nodeshot.core.base.tests import user_fixtures
 
 from .models import LayerExternal, NodeExternal
@@ -656,3 +656,77 @@ class SyncTest(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn('error', response.data)
             self.assertIn('exception', response.data)
+
+    def test_cnml(self):
+        """ test CNML """
+        layer = Layer.objects.external()[0]
+        layer.new_nodes_allowed = False
+        layer.save()
+        layer = Layer.objects.get(pk=layer.pk)
+
+        url = '%s/cnml1.xml' % TEST_FILES_PATH
+
+        external = LayerExternal(layer=layer)
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Cnml'
+        external._reload_schema()
+        external.config = {"url": url}
+        external.full_clean()
+        external.save()
+
+        output = capture_output(
+            management.call_command,
+            ['sync', 'vienna'],
+            kwargs={'verbosity': 0}
+        )
+
+        from nodeshot.interop.sync.synchronizers import Cnml
+
+        for status in Cnml.STATUS_MAPPING.keys():
+            self.assertEqual(Status.objects.filter(slug=status).count(), 1)
+
+        # ensure following text is in output
+        self.assertIn('3 nodes added', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('3 total external', output)
+        self.assertIn('3 total local', output)
+        # start checking DB too
+        nodes = layer.node_set.all()
+        # ensure all nodes have been imported
+        self.assertEqual(nodes.count(), 3)
+        # check one particular node has the data we expect it to have
+        node = Node.objects.get(name='TOLOArtzubi')
+        self.assertEqual(node.address, '')
+        geometry = GEOSGeometry('POINT (-2.116230 43.146330)')
+        self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
+        self.assertEqual(node.elev, 15)
+        self.assertEqual(node.status.slug, 'building')
+        self.assertEqual(node.data['cnml_id'], '55349')
+        # check database
+        from nodeshot.networking.net.models import Device
+        self.assertIn('12 devices added', output)
+        self.assertEqual(Device.objects.filter(node__layer=layer).count(), 12)
+
+        # --- repeat with different XML --- #
+
+        url = '%s/cnml2.xml' % TEST_FILES_PATH
+        external.config = {"url": url}
+        external.full_clean()
+        external.save()
+
+        output = capture_output(
+            management.call_command,
+            ['sync', 'vienna'],
+            kwargs={'verbosity': 0}
+        )
+
+        # ensure following text is in output
+        self.assertIn('3 nodes unmodified', output)
+        self.assertIn('0 nodes deleted', output)
+        self.assertIn('0 nodes changed', output)
+        self.assertIn('3 total external', output)
+        self.assertIn('3 total local', output)
+        self.assertIn('0 devices added', output)
+        self.assertIn('2 devices deleted', output)
+        # check database
+        self.assertEqual(nodes.count(), 3)
+        self.assertEqual(Device.objects.filter(node__layer=layer).count(), 10)
