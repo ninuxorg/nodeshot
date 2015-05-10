@@ -14,7 +14,7 @@ except ImportError:
 
 from nodeshot.core.base.utils import check_dependencies
 from nodeshot.core.nodes.models import Node, Status
-from nodeshot.networking.net.models import Device, Interface, Ethernet, Wireless
+from nodeshot.networking.net.models import Device, Interface, Ethernet, Wireless, Ip
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
 from .base import BaseSynchronizer, GenericGisSynchronizer
@@ -238,6 +238,18 @@ class Cnml(GenericGisSynchronizer):
             interface.data['cnml_id'] = cnml_interface.id
             interface.full_clean()
             interface.save()
+
+            if cnml_interface.ipv4:
+                # in CNLM interfaces have always only 1 ip
+                try:
+                    ip = Ip.objects.get(address=cnml_interface.ipv4)
+                except Ip.DoesNotExist:
+                    ip = Ip()
+                ip.interface = interface
+                ip.address = cnml_interface.ipv4
+                ip.netmask = cnml_interface.mask
+                ip.full_clean()
+                ip.save()
 
             if added:
                 added_interfaces.append(interface)

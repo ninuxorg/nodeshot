@@ -659,6 +659,8 @@ class SyncTest(TestCase):
 
     def test_cnml(self):
         """ test CNML """
+        from nodeshot.interop.sync.synchronizers import Cnml
+        from nodeshot.networking.net.models import Device, Ip
         layer = Layer.objects.external()[0]
         layer.new_nodes_allowed = False
         layer.save()
@@ -673,13 +675,13 @@ class SyncTest(TestCase):
         external.full_clean()
         external.save()
 
+        ip_count = Ip.objects.count()
+
         output = capture_output(
             management.call_command,
             ['sync', 'vienna'],
             kwargs={'verbosity': 0}
         )
-
-        from nodeshot.interop.sync.synchronizers import Cnml
 
         for status in Cnml.STATUS_MAPPING.keys():
             self.assertEqual(Status.objects.filter(slug=status).count(), 1)
@@ -702,13 +704,13 @@ class SyncTest(TestCase):
         self.assertEqual(node.status.slug, 'building')
         self.assertEqual(node.data['cnml_id'], '55349')
         # check devices
-        from nodeshot.networking.net.models import Device
         self.assertIn('12 devices added', output)
         self.assertEqual(Device.objects.filter(node__layer=layer).count(), 12)
         # check interfaces
         device = Device.objects.get(data={'cnml_id': 49635})
         self.assertEqual(device.interface_set.count(), 3)
         self.assertIn('21 interfaces added', output)
+        self.assertEqual(Ip.objects.count(), ip_count+21)
 
         # --- repeat with different XML --- #
 
@@ -738,3 +740,4 @@ class SyncTest(TestCase):
         self.assertEqual(device.interface_set.count(), 2)
         self.assertIn('0 interfaces added', output)
         self.assertIn('1 interfaces deleted', output)
+        self.assertEqual(Ip.objects.count(), ip_count+18)
