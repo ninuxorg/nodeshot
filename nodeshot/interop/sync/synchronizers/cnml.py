@@ -133,7 +133,7 @@ class Cnml(GenericGisSynchronizer):
         pass
 
     def parse_item(self, item):
-        return {
+        d = {
             "name": item.title,
             "status": CNMLStatus.statusToStr(item.status),
             "address": "",
@@ -144,11 +144,15 @@ class Cnml(GenericGisSynchronizer):
             "description": '<a href="https://guifi.net/node/{0}" target="_blank">guifi.net/node/{0}</a>'.format(item.id),
             "notes": "",
             "added": item.created.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            "updated": item.updated.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            "updated": None,
             "data": {
                 "cnml_id": str(item.id)
             }
         }
+
+        if item.updated:
+            d["updated"] = item.updated.strftime('%Y-%m-%dT%H:%M:%SZ')
+        return d
 
     def save(self):
         self.save_nodes()
