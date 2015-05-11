@@ -70,7 +70,7 @@
                     </interface>
                 </device>
             </node>
-            <node id="55395" title="TOLOOiaun" lat="43.111530" lon="-2.081920" antenna_elevation="15" status="Building" created="20130116 0155" updated="20130116 0720" access_points="4" devices="5" links="4">&amp;nbsp;
+            <node id="55395" title="TOLOOiaun" lat="43.111530" lon="-2.081920" antenna_elevation="15" status="Building" created="20130116 0155" access_points="4" devices="5" links="4">&amp;nbsp;
                 <device id="49568" title="TOLOOiaun-NBR-T" type="radio" status="Building" created="20130117 1205" firmware="AirOsv52" name="AirMaxM5 Bullet/PwBrg/AirGrd/NanoBr">
                     <interface id="84328" type="Lan" mac="00:00:00:00:00:00" ipv4="10.69.28.5" mask="255.255.255.240">
                         <link id="55818" linked_device_id="49514" linked_node_id="55395" linked_interface_id="84228" link_type="cable" link_status="Building"/>
