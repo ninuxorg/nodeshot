@@ -1,10 +1,6 @@
 from __future__ import absolute_import
 
-import pytz
-
 from django.contrib.gis.geos import Point
-
-#from django.utils.translation import ugettext_lazy as _
 
 try:
     from libcnml import CNMLParser
@@ -17,7 +13,7 @@ from nodeshot.core.nodes.models import Node, Status
 from nodeshot.networking.net.models import Device, Interface, Ethernet, Wireless, Ip
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
-from .base import BaseSynchronizer, GenericGisSynchronizer
+from .base import GenericGisSynchronizer
 
 check_dependencies(
     dependencies=[
@@ -170,7 +166,7 @@ class Cnml(GenericGisSynchronizer):
 
         for cnml_device in cnml_devices:
             try:
-                device = Device.objects.get(data={'cnml_id':  cnml_device.id })
+                device = Device.objects.get(data={'cnml_id':  cnml_device.id})
                 added = False
             except Device.DoesNotExist:
                 device = Device()
@@ -221,7 +217,7 @@ class Cnml(GenericGisSynchronizer):
             else:
                 Model = Ethernet
             try:
-                interface = Model.objects.get(data={'cnml_id':  cnml_interface.id })
+                interface = Model.objects.get(data={'cnml_id':  cnml_interface.id})
                 added = False
             except Model.DoesNotExist:
                 interface = Model()
