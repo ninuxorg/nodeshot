@@ -661,6 +661,7 @@ class SyncTest(TestCase):
         """ test CNML """
         from nodeshot.interop.sync.synchronizers import Cnml
         from nodeshot.networking.net.models import Device, Ip
+        from nodeshot.networking.links.models import Link
         layer = Layer.objects.external()[0]
         layer.new_nodes_allowed = False
         layer.save()
@@ -676,6 +677,7 @@ class SyncTest(TestCase):
         external.save()
 
         ip_count = Ip.objects.count()
+        link_count = Link.objects.count()
 
         output = capture_output(
             management.call_command,
@@ -711,6 +713,9 @@ class SyncTest(TestCase):
         self.assertEqual(device.interface_set.count(), 3)
         self.assertIn('21 interfaces added', output)
         self.assertEqual(Ip.objects.count(), ip_count+21)
+        # check links
+        #self.assertIn('16 interfaces added', output)
+        self.assertEqual(Link.objects.count(), link_count+9)
 
         # --- repeat with different XML --- #
 

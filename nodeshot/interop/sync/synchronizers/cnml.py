@@ -11,7 +11,10 @@ except ImportError:
 from nodeshot.core.base.utils import check_dependencies
 from nodeshot.core.nodes.models import Node, Status
 from nodeshot.networking.net.models import Device, Interface, Ethernet, Wireless, Ip
+from nodeshot.networking.links.models import Link
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
+from nodeshot.networking.links.models.choices import LINK_TYPES, LINK_STATUS
+
 
 from .base import GenericGisSynchronizer
 
@@ -108,6 +111,22 @@ class Cnml(GenericGisSynchronizer):
         }
     }
 
+    LINK_TYPE_MAPPING = {
+        'wds': 'ethernet',
+        'ap/client': 'radio',
+        'cable': 'ethernet'
+    }
+
+    LINK_STATUS_MAPPING = {
+        'Planned': 'planned',
+        'Working': 'active',
+        'Building': 'planned',
+        'Testing': 'testing',
+        'Inactive': 'down',
+        'Dropped': 'archived',
+        'Reserved': 'planned',
+    }
+
     def parse(self):
         """ parse data """
         url = self.config.get('url')
@@ -158,6 +177,7 @@ class Cnml(GenericGisSynchronizer):
         self.save_nodes()
         self.save_devices()
         self.save_interfaces()
+        self.save_links()
 
     def save_nodes(self):
         super(Cnml, self).save()
@@ -268,4 +288,77 @@ class Cnml(GenericGisSynchronizer):
         """ % (
             len(added_interfaces),
             len(deleted_interfaces)
+        )
+
+    def save_links(self):
+        added_links = []
+        deleted_links = []
+        cnml_links = self.cnml.getLinks()
+        current_links = Link.objects.filter(data__contains=['cnml_id'])
+        # keep a list of link cnml_id
+        # TODO: hstore seems to not work properly, something is wrong
+        cnml_id_list = []
+        cnml_id_mapping = {}
+        for current_link in current_links:
+            cnml_id_list.append(current_link.data['cnml_id'])
+            cnml_id_mapping[current_link.data['cnml_id']] = current_link.id
+
+        for cnml_link in cnml_links:
+            if str(cnml_link.id) in cnml_id_list:
+                try:
+                    link_id = cnml_id_mapping[str(cnml_link.id)]
+                # probably a link between a node of another zone
+                except KeyError:
+                    continue
+                link = Link.objects.get(id=link_id)
+                added = False
+            else:
+                link = Link()
+                added = True
+            # link between a node which is not of this CNML zone
+            if isinstance(cnml_link.nodeA, int) or isinstance(cnml_link.nodeB, int):
+                continue
+            node_a = Node.objects.get(data={'cnml_id': cnml_link.nodeA.id})
+            node_b = Node.objects.get(data={'cnml_id': cnml_link.nodeB.id})
+            link.node_a = node_a
+            link.node_b = node_b
+            link.type = LINK_TYPES.get(self.LINK_TYPE_MAPPING[cnml_link.type])
+            link.status = LINK_STATUS.get(self.LINK_STATUS_MAPPING[cnml_link.status])
+            # set interface_a and interface_b only if not planned
+            # because there might be inconsistencies in the CNML from guifi.net
+            if link.get_status_display() != 'planned':
+                if cnml_link.interfaceA:
+                    interface_a = Interface.objects.get(data={'cnml_id': cnml_link.interfaceA.id})
+                    link.interface_a = interface_a
+                if cnml_link.interfaceB:
+                    interface_b = Interface.objects.get(data={'cnml_id': cnml_link.interfaceB.id})
+                    link.interface_b = interface_b
+            else:
+                link.interface_a = None
+                link.interface_b = None
+            link.data['cnml_id'] = cnml_link.id
+            try:
+                link.full_clean()
+            except Exception as e:
+                print(e)
+                continue
+            link.save()
+
+            if added:
+                added_links.append(link)
+
+        # delete links that are not in CNML anymore
+        for current_link in current_links:
+            try:
+                self.cnml.getLink(int(current_link.data['cnml_id']))
+            except KeyError:
+                deleted_links.append(current_link)
+                current_link.delete()
+
+        self.message += """
+            %s links added
+            %s links deleted
+        """ % (
+            len(added_links),
+            len(deleted_links)
         )
