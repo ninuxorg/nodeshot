@@ -87,17 +87,18 @@ class Link(BaseAccessLevel):
             4. interface_a and interface_b must differ
             5. interface a and b type must match
         """
-        if self.status != LINK_STATUS.get('planned') and (self.interface_a is None or self.interface_b is None):
-            raise ValidationError(_('fields "from interface" and "to interface" are mandatory in this case'))
+        if self.status != LINK_STATUS.get('planned'):
+            if self.interface_a is None or self.interface_b is None:
+                raise ValidationError(_('fields "from interface" and "to interface" are mandatory in this case'))
+
+            if (self.interface_a_id == self.interface_b_id) or (self.interface_a == self.interface_b):
+                raise ValidationError(_('link cannot have same "from interface" and "to interface"'))
 
         if self.status == LINK_STATUS.get('planned') and (self.node_a is None or self.node_b is None):
             raise ValidationError(_('fields "from node" and "to node" are mandatory for planned links'))
 
         if self.type != LINK_TYPES.get('radio') and (self.dbm is not None or self.noise is not None):
             raise ValidationError(_('Only links of type "radio" can contain "dbm" and "noise" information'))
-
-        if (self.interface_a_id == self.interface_b_id) or (self.interface_a == self.interface_b):
-            raise ValidationError(_('link cannot have same "from interface" and "to interface"'))
 
         if (self.interface_a and self.interface_b) and self.interface_a.type != self.interface_b.type:
             format_tuple = (self.interface_a.get_type_display(), self.interface_b.get_type_display())
@@ -140,8 +141,7 @@ class Link(BaseAccessLevel):
             self.line = LineString(self.node_a.point, self.node_b.point)
 
         # fill properties
-        if self.data is None or self.data.get('node_a_name', None) is None:
-            self.data = self.data or {}  # in case is None init empty dict
+        if self.data.get('node_a_name', None) is None:
             self.data['node_a_name'] = self.node_a.name
             self.data['node_b_name'] = self.node_b.name
 
@@ -149,8 +149,10 @@ class Link(BaseAccessLevel):
             self.data['node_a_slug'] = self.node_a.slug
             self.data['node_b_slug'] = self.node_b.slug
 
-        if self.data.get('interface_a_mac', None) is None or self.data.get('interface_b_mac', None) is None:
+        if self.interface_a and self.data.get('interface_a_mac', None) is None:
             self.data['interface_a_mac'] = self.interface_a.mac
+
+        if self.interface_b and self.data.get('interface_b_mac', None) is None:
             self.data['interface_b_mac'] = self.interface_b.mac
 
         if self.data.get('layer_slug') != self.layer.slug:
@@ -160,37 +162,30 @@ class Link(BaseAccessLevel):
 
     @property
     def node_a_name(self):
-        self.data = self.data or {}
         return self.data.get('node_a_name', None)
 
     @property
     def node_b_name(self):
-        self.data = self.data or {}
         return self.data.get('node_b_name', None)
 
     @property
     def node_a_slug(self):
-        self.data = self.data or {}
         return self.data.get('node_a_slug', None)
 
     @property
     def node_b_slug(self):
-        self.data = self.data or {}
         return self.data.get('node_b_slug', None)
 
     @property
     def interface_a_mac(self):
-        self.data = self.data or {}
         return self.data.get('interface_a_mac', None)
 
     @property
     def interface_b_mac(self):
-        self.data = self.data or {}
         return self.data.get('interface_b_mac', None)
 
     @property
     def layer_slug(self):
-        self.data = self.data or {}
         return self.data.get('layer_slug', None)
 
     @property
