@@ -199,11 +199,17 @@ class Cnml(GenericGisSynchronizer):
             device.name = cnml_device.title,
             device.node = node
             device.type = cnml_device.type
-            try:
-                os, os_version = cnml_device.firmware.split('v')
-            except ValueError:
+            self.verbose('parsing device "%s"' % device.name)
+            if cnml_device.firmware:
+                try:
+                    os, os_version = cnml_device.firmware.split('v')
+                except ValueError:
+                    os = cnml_device.firmware
+                    os_version = ''
+            else:
                 os = cnml_device.firmware
                 os_version = ''
+
             device.os = os
             device.os_version = os_version
             device.data['cnml_id'] = cnml_device.id
