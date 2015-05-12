@@ -39,7 +39,7 @@ class Cnml(GenericGisSynchronizer):
             'order': 0,
             'name': 'Planned',
             'fill_color': '#66ffff',
-            'stroke_color': '#ec7600',
+            'stroke_color': '#000000',
             'stroke_width': 2,
             'text_color': '#000000'
         },
@@ -50,7 +50,7 @@ class Cnml(GenericGisSynchronizer):
             'order': 0,
             'name': 'Working',
             "fill_color": "#33ff00",
-            "stroke_color": "#005e00",
+            'stroke_color': '#000000',
             'stroke_width': 2,
             'text_color': '#000000'
         },
@@ -61,7 +61,7 @@ class Cnml(GenericGisSynchronizer):
             'order': 0,
             'name': 'Testing',
             "fill_color": "#ff9900",
-            "stroke_color": "#007e00",
+            'stroke_color': '#000000',
             'stroke_width': 2,
             'text_color': '#000000'
         },
@@ -72,7 +72,7 @@ class Cnml(GenericGisSynchronizer):
             'order': 0,
             'name': 'Building',
             "fill_color": "#ffff99",
-            "stroke_color": "#003000",
+            'stroke_color': '#000000',
             'stroke_width': 2,
             'text_color': '#000000'
         },
@@ -83,7 +83,7 @@ class Cnml(GenericGisSynchronizer):
             'order': 0,
             'name': 'Reserved',
             "fill_color": "#ffffff",
-            "stroke_color": "#002000",
+            'stroke_color': '#000000',
             'stroke_width': 2,
             'text_color': '#000000'
         },
@@ -94,7 +94,7 @@ class Cnml(GenericGisSynchronizer):
             'order': 0,
             'name': 'Dropped',
             "fill_color": "#ffffff",
-            "stroke_color": "#002000",
+            'stroke_color': '#000000',
             'stroke_width': 2,
             'text_color': '#000000'
         },
@@ -105,7 +105,7 @@ class Cnml(GenericGisSynchronizer):
             'order': 0,
             'name': 'Inactive',
             "fill_color": "#dddddd",
-            "stroke_color": "#001000",
+            'stroke_color': '#000000',
             'stroke_width': 2,
             'text_color': '#000000'
         }
