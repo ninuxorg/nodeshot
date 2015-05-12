@@ -260,7 +260,7 @@ class Cnml(GenericGisSynchronizer):
             interface.save()
 
             if cnml_interface.ipv4:
-                # in CNLM interfaces have always only 1 ip
+                # in CNML interfaces have always only 1 IP
                 try:
                     ip = Ip.objects.get(address=cnml_interface.ipv4)
                 except Ip.DoesNotExist:

@@ -510,7 +510,7 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
                     # indicates that a DB query is necessary
                     changed = True
 
-            if added is True or (node.geometry.equals(item['geometry']) is False\
+            if added or (node.geometry.equals(item['geometry']) is False
                                  and node.geometry.equals_exact(item['geometry']) is False):
                 node.geometry = item['geometry']
                 changed = True
@@ -527,7 +527,7 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             if added or changed:
                 try:
                     node.full_clean()
-                    if node.added is not None and node.updated is not None:
+                    if None not in [node.added, node.updated]:
                         node.save(auto_update=False)
                     else:
                         node.save()

@@ -12,7 +12,7 @@
         "model": "hardware.Manufacturer",
         "pk": 2,
         "fields": {
-            "name": "Mikrotic",
+            "name": "Mikrotik",
             "url": "http://www.mikrotik.com/",
             "image": "manufacturers/mikrotic.png"
         }
