@@ -5,8 +5,10 @@ DEFAULT_SYNCHRONIZERS = [
     ('nodeshot.interop.sync.synchronizers.Nodeshot', 'Nodeshot (RESTful translator)'),
     ('nodeshot.interop.sync.synchronizers.GeoJson', 'GeoJSON (periodic sync)'),
     ('nodeshot.interop.sync.synchronizers.GeoRss', 'GeoRSS (periodic sync)'),
-    ('nodeshot.interop.sync.synchronizers.OpenWisp', 'OpenWisp (periodic sync)'),
-    ('nodeshot.interop.sync.synchronizers.Cnml', 'CNML (periodic sync)')
+    ('nodeshot.interop.sync.synchronizers.OpenWisp', 'OpenWisp (periodic sync)')
 ]
+
+if 'nodeshot.networking.links' in settings.INSTALLED_APPS:
+    DEFAULT_SYNCHRONIZERS.append(('nodeshot.interop.sync.synchronizers.Cnml', 'CNML (periodic sync)'))
 
 SYNCHRONIZERS = DEFAULT_SYNCHRONIZERS + getattr(settings, 'NODESHOT_SYNCHRONIZERS', [])
