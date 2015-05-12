@@ -118,13 +118,13 @@ class Cnml(GenericGisSynchronizer):
     }
 
     LINK_STATUS_MAPPING = {
-        'Planned': 'planned',
-        'Working': 'active',
-        'Building': 'planned',
-        'Testing': 'testing',
-        'Inactive': 'down',
-        'Dropped': 'archived',
-        'Reserved': 'planned',
+        1: 'planned',
+        2: 'active',
+        3: 'testing',
+        4: 'planned',
+        5: 'planned',
+        6: 'archived',
+        7: 'down',
     }
 
     def parse(self):
