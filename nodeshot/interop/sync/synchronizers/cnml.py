@@ -38,10 +38,10 @@ class Cnml(GenericGisSynchronizer):
             'description': 'Planned node',
             'order': 0,
             'name': 'Planned',
-            'fill_color': '#ff8000',
+            'fill_color': '#66ffff',
             'stroke_color': '#ec7600',
             'stroke_width': 2,
-            'text_color': '#ffffff'
+            'text_color': '#000000'
         },
         'working': {
             'is_default': False,
@@ -49,10 +49,10 @@ class Cnml(GenericGisSynchronizer):
             'description': 'Working nodes',
             'order': 0,
             'name': 'Working',
-            "fill_color": "#008000",
+            "fill_color": "#33ff00",
             "stroke_color": "#005e00",
             'stroke_width': 2,
-            'text_color': '#ffffff'
+            'text_color': '#000000'
         },
         'testing': {
             'is_default': False,
@@ -60,10 +60,10 @@ class Cnml(GenericGisSynchronizer):
             'description': 'Nodes in testing',
             'order': 0,
             'name': 'Testing',
-            "fill_color": "#007000",
+            "fill_color": "#ff9900",
             "stroke_color": "#007e00",
             'stroke_width': 2,
-            'text_color': '#ffffff'
+            'text_color': '#000000'
         },
         'building': {
             'is_default': False,
@@ -71,10 +71,10 @@ class Cnml(GenericGisSynchronizer):
             'description': 'Underconstruction nodes',
             'order': 0,
             'name': 'Building',
-            "fill_color": "#003000",
+            "fill_color": "#ffff99",
             "stroke_color": "#003000",
             'stroke_width': 2,
-            'text_color': '#ffffff'
+            'text_color': '#000000'
         },
         'reserved': {
             'is_default': False,
@@ -82,10 +82,10 @@ class Cnml(GenericGisSynchronizer):
             'description': 'Reserved nodes',
             'order': 0,
             'name': 'Reserved',
-            "fill_color": "#002000",
+            "fill_color": "#ffffff",
             "stroke_color": "#002000",
             'stroke_width': 2,
-            'text_color': '#ffffff'
+            'text_color': '#000000'
         },
         'dropped': {
             'is_default': False,
@@ -93,10 +93,10 @@ class Cnml(GenericGisSynchronizer):
             'description': 'Dropped nodes',
             'order': 0,
             'name': 'Dropped',
-            "fill_color": "#002000",
+            "fill_color": "#ffffff",
             "stroke_color": "#002000",
             'stroke_width': 2,
-            'text_color': '#ffffff'
+            'text_color': '#000000'
         },
         'inactive': {
             'is_default': False,
@@ -104,10 +104,10 @@ class Cnml(GenericGisSynchronizer):
             'description': 'Inactive nodes',
             'order': 0,
             'name': 'Inactive',
-            "fill_color": "#001000",
+            "fill_color": "#dddddd",
             "stroke_color": "#001000",
             'stroke_width': 2,
-            'text_color': '#ffffff'
+            'text_color': '#000000'
         }
     }
 
