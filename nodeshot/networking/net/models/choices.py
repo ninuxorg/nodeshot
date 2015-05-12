@@ -16,7 +16,14 @@ ROUTING_PROTOCOLS = (
 
 DEVICE_TYPES = {
     'radio device': 'radio',
+    'adsl': 'ADSL',
+    'cam': 'cam',
+    'phone': 'phone',
+    'cloudy': 'cloudy',
     'server': 'server',
+    'confine': 'confine',
+    'nat': 'nat',
+    'generic': 'generic',
     'router': 'router',
     'switch managed': 'switch',
     'sensor': 'sensor',
