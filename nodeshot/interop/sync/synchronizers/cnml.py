@@ -174,9 +174,13 @@ class Cnml(GenericGisSynchronizer):
         return d
 
     def save(self):
+        self.verbose('PARSING NODES')
         self.save_nodes()
+        self.verbose('PARSING DEVICES')
         self.save_devices()
+        self.verbose('PARSING INTERFACES')
         self.save_interfaces()
+        self.verbose('PARSING LINKS')
         self.save_links()
 
     def save_nodes(self):
@@ -195,11 +199,11 @@ class Cnml(GenericGisSynchronizer):
             except Device.DoesNotExist:
                 device = Device()
                 added = True
+            self.verbose('parsing device "%s" (node: %s)' % (cnml_device.title, cnml_device.parentNode.id))
             node = Node.objects.get(data={'cnml_id': cnml_device.parentNode.id})
             device.name = cnml_device.title,
             device.node = node
             device.type = cnml_device.type
-            self.verbose('parsing device "%s"' % device.name)
             if cnml_device.firmware:
                 try:
                     os, os_version = cnml_device.firmware.split('v')
@@ -242,6 +246,7 @@ class Cnml(GenericGisSynchronizer):
         current_interfaces = Interface.objects.filter(data__contains=['cnml_id'])
 
         for cnml_interface in cnml_interfaces:
+            self.verbose('parsing interface "%s" (%s)' % (cnml_interface.id, cnml_interface.ipv4))
             if hasattr(cnml_interface.parentRadio, 'parentDevice'):
                 Model = Wireless
             else:
@@ -330,6 +335,7 @@ class Cnml(GenericGisSynchronizer):
             link.node_b = node_b
             link.type = LINK_TYPES.get(self.LINK_TYPE_MAPPING[cnml_link.type])
             link.status = LINK_STATUS.get(self.LINK_STATUS_MAPPING[cnml_link.status])
+            self.verbose('parsing link "%s" (%s<-->%s)' % (cnml_link.id, node_a, node_b))
             # set interface_a and interface_b only if not planned
             # because there might be inconsistencies in the CNML from guifi.net
             if link.get_status_display() != 'planned':
