@@ -225,7 +225,9 @@ class Cnml(GenericGisSynchronizer):
                 added_devices.append(device)
 
         # delete devices that are not in CNML anymore
-        for current_device in current_devices:
+        total_n = len(current_devices)
+        for n, current_device in enumerate(current_devices, 1):
+            self.verbose('[%d/%d] deleting old devices' % (n, total_n))
             try:
                 self.cnml.getDevice(int(current_device.data['cnml_id']))
             except KeyError:
@@ -288,7 +290,9 @@ class Cnml(GenericGisSynchronizer):
                 added_interfaces.append(interface)
 
         # delete interfaces that are not in CNML anymore
-        for current_interface in current_interfaces:
+        total_n = len(current_interfaces)
+        for n, current_interface in enumerate(current_interfaces, 1):
+            self.verbose('[%d/%d] deleting old interfaces' % (n, total_n))
             try:
                 self.cnml.getInterface(int(current_interface.data['cnml_id']))
             except KeyError:
@@ -363,7 +367,9 @@ class Cnml(GenericGisSynchronizer):
                 added_links.append(link)
 
         # delete links that are not in CNML anymore
-        for current_link in current_links:
+        total_n = len(current_links)
+        for n, current_link in enumerate(current_links, 1):
+            self.verbose('[%d/%d] deleting old links' % (n, total_n))
             try:
                 self.cnml.getLink(int(current_link.data['cnml_id']))
             except KeyError:
