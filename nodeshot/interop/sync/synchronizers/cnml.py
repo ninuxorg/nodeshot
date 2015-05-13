@@ -192,14 +192,15 @@ class Cnml(GenericGisSynchronizer):
         cnml_devices = self.cnml.getDevices()
         current_devices = Device.objects.filter(data__contains=['cnml_id'])
 
-        for cnml_device in cnml_devices:
+        total_n = len(cnml_devices)
+        for n, cnml_device in enumerate(cnml_devices, 1):
             try:
                 device = Device.objects.get(data={'cnml_id':  cnml_device.id})
                 added = False
             except Device.DoesNotExist:
                 device = Device()
                 added = True
-            self.verbose('parsing device "%s" (node: %s)' % (cnml_device.title, cnml_device.parentNode.id))
+            self.verbose('[%d/%d] parsing device "%s" (node: %s)' % (n, total_n, cnml_device.title, cnml_device.parentNode.id))
             node = Node.objects.get(data={'cnml_id': cnml_device.parentNode.id})
             device.name = cnml_device.title,
             device.node = node
@@ -245,8 +246,9 @@ class Cnml(GenericGisSynchronizer):
         cnml_interfaces = self.cnml.getInterfaces()
         current_interfaces = Interface.objects.filter(data__contains=['cnml_id'])
 
-        for cnml_interface in cnml_interfaces:
-            self.verbose('parsing interface "%s" (%s)' % (cnml_interface.id, cnml_interface.ipv4))
+        total_n = len(cnml_interfaces)
+        for n, cnml_interface in enumerate(cnml_interfaces, 1):
+            self.verbose('[%d/%d] parsing interface "%s" (%s)' % (n, total_n, cnml_interface.id, cnml_interface.ipv4))
             if hasattr(cnml_interface.parentRadio, 'parentDevice'):
                 Model = Wireless
             else:
@@ -314,7 +316,8 @@ class Cnml(GenericGisSynchronizer):
             cnml_id_list.append(current_link.data['cnml_id'])
             cnml_id_mapping[current_link.data['cnml_id']] = current_link.id
 
-        for cnml_link in cnml_links:
+        total_n = len(cnml_links)
+        for n, cnml_link in enumerate(cnml_links, 1):
             if str(cnml_link.id) in cnml_id_list:
                 try:
                     link_id = cnml_id_mapping[str(cnml_link.id)]
@@ -335,7 +338,7 @@ class Cnml(GenericGisSynchronizer):
             link.node_b = node_b
             link.type = LINK_TYPES.get(self.LINK_TYPE_MAPPING[cnml_link.type])
             link.status = LINK_STATUS.get(self.LINK_STATUS_MAPPING[cnml_link.status])
-            self.verbose('parsing link "%s" (%s<-->%s)' % (cnml_link.id, node_a, node_b))
+            self.verbose('[%d/%d] parsing link "%s" (%s<-->%s)' % (n, total_n, cnml_link.id, node_a, node_b))
             # set interface_a and interface_b only if not planned
             # because there might be inconsistencies in the CNML from guifi.net
             if link.get_status_display() != 'planned':
