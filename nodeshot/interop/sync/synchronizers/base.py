@@ -45,7 +45,7 @@ class BaseSynchronizer(object):
         self.layer = layer
         self.verbosity = kwargs.get('verbosity', 1)
         self.load_config()
-        self.message = None
+        self.message = ""
 
     def load_config(self, config=None):
         self.config = config or self.layer.external.config
