@@ -16,6 +16,38 @@ from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
 from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
 
+NETDIFF_PARSERS = getattr(settings, 'NODESHOT_NETDIFF_PARSERS', [
+    ('netdiff.OlsrParser', 'Olsr (jsoninfo)'),
+    ('netdiff.BatmanParser', 'Batman (Alfred)'),
+    ('netdiff.BmxParser', 'Bmx6 (q6m)'),
+    ('netdiff.NetJsonParser', 'Netjson (network-graph)'),
+    ('netdiff.CnmlParser', 'CNML'),
+    ])
+
+
+class Topology(BaseDate):
+    name = models.CharField(_('name'), max_length=75, unique=True)
+    slug = models.SlugField(max_length=75, db_index=True, unique=True, blank=True)
+    backend = models.CharField(_('backend'), max_length=128,
+        choices=NETDIFF_PARSERS,
+        help_text=_('select the netdiff's parser to parse the topology from a routing protocol'))
+    url = models.URLField(_('url'))
+    # TODO: find a way to move this in layers
+    if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
+        # layer might need to be able to be blank, would require custom validation
+        layer = models.ForeignKey('layers.Layer')
+
+    def save(self, *args, **kwargs):
+        """
+        Custom save method does the following things:
+            * converts geometry collections of just 1 item to that item (eg: a collection of 1 Point becomes a Point)
+            * intercepts changes to status and fires node_status_changed signal
+            * set default status
+        """
+        # auto generate slug
+        if not self.slug:
+            self.slug = slugify(self.name)
+
 
 class Link(BaseAccessLevel):
     """
@@ -32,6 +64,26 @@ class Link(BaseAccessLevel):
     interface_b = models.ForeignKey(Interface, verbose_name=_('to interface'),
                                     related_name='link_interface_to', blank=True, null=True,
                                     help_text=_('mandatory except for "planned" links (in planned links you might not have any device installed yet)'))
+
+
+    '''
+    The only network part that we are sure that belong to only one topology is
+    the interface. For example: in the case of a mixed protocol network (L2 and L3).
+    In the same device we could have two different interface that belong to 2
+    different topology drawers
+    '''
+    topology = models.ForeignKey(Topology, verbose_name=_('containing topology'),
+                                    related_name='topology that draw this interface', blank=True, null=True,
+                                    help_text=_('mandatory to draw the link dinamically'))
+
+    '''
+    we need a function to export the interfance in netjson format
+    '''
+
+    def to_netjson(self):
+            return {'source': self.interface_a.address.mac,
+                    'target': self.interface_a.address.mac,
+                    'weight': self.metric_value}
 
     # in "planned" links these two fields are necessary
     # while in all the other status they serve as a shortcut

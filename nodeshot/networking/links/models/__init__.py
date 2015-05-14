@@ -16,11 +16,13 @@ check_dependencies(
 )
 
 
-from .link import Link
+from .link import Link, Topology
 
 
-__all__ = ['Link']
-
+__all__ = [
+    'Link'
+    'Topology'
+]
 
 # ------ Add relationship to NodeDetailSerializer ------ #
 

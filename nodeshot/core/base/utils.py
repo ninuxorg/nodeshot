@@ -31,7 +31,7 @@ class Hider(object):
 def check_dependencies(dependencies, module):
     """
     Ensure dependencies of a module are listed in settings.INSTALLED_APPS
-    
+
     :dependencies string | list: list of dependencies to check
     :module string: string representing the path to the current app
     """
@@ -39,7 +39,7 @@ def check_dependencies(dependencies, module):
         dependencies = [dependencies]
     elif type(dependencies) != list:
         raise TypeError('dependencies argument must be of type list or string')
-    
+
     for dependency in dependencies:
         if dependency not in settings.INSTALLED_APPS:
             raise DependencyError('%s depends on %s, which should be in settings.INSTALLED_APPS' % (module, dependency))
@@ -49,7 +49,7 @@ def choicify(dictionary):
     """
     Converts a readable python dictionary into a django model/form
     choice structure (list of tuples) ordered based on the values of each key
-    
+
     :param dictionary: the dictionary to convert
     """
     # get order of the fields
@@ -68,7 +68,7 @@ def choicify(dictionary):
 def get_key_by_value(dictionary, search_value):
     """
     searchs a value in a dicionary and returns the key of the first occurrence
-    
+
     :param dictionary: dictionary to search in
     :param search_value: value to search for
     """
@@ -112,7 +112,56 @@ def ago(**kwargs):
 def after(date, **kwargs):
     """
     returns the result of the calculation of the date param plus the time (seconds, minutes, hours, days, years) specified
-    
+
     :paramm datetime: datetime object to which add more time
     """
     return date + timedelta(**kwargs)
+
+
+def update_topology():
+    for topology in Topology.objects.all():
+        module = importlib.import_module(topology.backend)
+        parser_class_name = topology.backend.split('.')[-1]
+        classparsr = getattr(module, parser_class_name)
+        njparser = NetJsonParser(to_netjson(topology))
+        parser = classparser(topology.url)
+        graph_diff = diff(njparser, parser)
+        for link in graph_diff['added']:
+            if_a = Interface.objects.get(mac=link[0])
+            if_b = Interface.objects.get(mac=link[1])
+            Link.objects.create(interface_a=if_a, interface_b=if_b, metric_value=link[2]['weight'])
+        for link in graph_diff['removed']:
+            f_a = Interface.objects.get(mac=link[0])
+            if_b = Interface.objects.get(mac=link[1])
+            try:
+                l = Link.objects.get(interface_a=if_a, interface_b=if_b)
+                l.delete()
+            except Link.DoesNotExist:
+                pass
+
+
+def exist_node(node, nodes):
+    for n in nodes:
+        if n.id == node.id:
+            return true
+    return false
+
+
+def to_netjson(topology):
+    nodes = []
+    links = []
+
+    for link in Link.objects.filter(topology=topology):
+        node = {'id': link.inteface_a.mac}
+        if !exist_node(node, nodes):
+            nodes.append(node)
+        links.append(link.to_netjson())
+
+    NetJson = {'type': 'NetworkGraph',
+                'protocol': island.get_protocol_display(),
+                'version': '0',
+                'metric': '0',
+                'router_id': island.url,
+                'nodes': nodes,
+                'links': links}
+    return NetJson
