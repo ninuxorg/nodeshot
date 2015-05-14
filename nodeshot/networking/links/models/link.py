@@ -82,7 +82,7 @@ class Link(BaseAccessLevel):
 
     def to_netjson(self):
             return {'source': self.interface_a.address.mac,
-                    'target': self.interface_a.address.mac,
+                    'target': self.interface_b.address.mac,
                     'weight': self.metric_value}
 
     # in "planned" links these two fields are necessary

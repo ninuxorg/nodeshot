@@ -131,7 +131,7 @@ def update_topology():
             if_b = Interface.objects.get(mac=link[1])
             Link.objects.create(interface_a=if_a, interface_b=if_b, metric_value=link[2]['weight'])
         for link in graph_diff['removed']:
-            f_a = Interface.objects.get(mac=link[0])
+            if_a = Interface.objects.get(mac=link[0])
             if_b = Interface.objects.get(mac=link[1])
             try:
                 l = Link.objects.get(interface_a=if_a, interface_b=if_b)
@@ -140,11 +140,8 @@ def update_topology():
                 pass
 
 
-def exist_node(node, nodes):
-    for n in nodes:
-        if n.id == node.id:
-            return true
-    return false
+def exist_node(id, nodes):
+    return any([node.get('id') == id for node in nodes])
 
 
 def to_netjson(topology):
@@ -153,7 +150,7 @@ def to_netjson(topology):
 
     for link in Link.objects.filter(topology=topology):
         node = {'id': link.inteface_a.mac}
-        if !exist_node(node, nodes):
+        if not exist_node(node, nodes):
             nodes.append(node)
         links.append(link.to_netjson())
 
