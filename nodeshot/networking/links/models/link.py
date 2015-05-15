@@ -14,40 +14,19 @@ from nodeshot.core.layers.models import Layer
 from nodeshot.networking.net.models import Interface
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
-from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
+from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES, NETDIFF_PARSERS, ID_TYPES
 
-NETDIFF_PARSERS = getattr(settings, 'NODESHOT_NETDIFF_PARSERS', [
-    ('netdiff.OlsrParser', 'Olsr (jsoninfo)'),
-    ('netdiff.BatmanParser', 'Batman (Alfred)'),
-    ('netdiff.BmxParser', 'Bmx6 (q6m)'),
-    ('netdiff.NetJsonParser', 'Netjson (network-graph)'),
-    ('netdiff.CnmlParser', 'CNML'),
-    ])
+
 
 
 class Topology(BaseDate):
     name = models.CharField(_('name'), max_length=75, unique=True)
-    slug = models.SlugField(max_length=75, db_index=True, unique=True, blank=True)
     backend = models.CharField(_('backend'), max_length=128,
         choices=NETDIFF_PARSERS,
-        help_text=_('select the netdiff's parser to parse the topology from a routing protocol'))
+        help_text=_('select the netdiff parser to parse the topology from a routing protocol'))
     url = models.URLField(_('url'))
-    # TODO: find a way to move this in layers
-    if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
-        # layer might need to be able to be blank, would require custom validation
-        layer = models.ForeignKey('layers.Layer')
-
-    def save(self, *args, **kwargs):
-        """
-        Custom save method does the following things:
-            * converts geometry collections of just 1 item to that item (eg: a collection of 1 Point becomes a Point)
-            * intercepts changes to status and fires node_status_changed signal
-            * set default status
-        """
-        # auto generate slug
-        if not self.slug:
-            self.slug = slugify(self.name)
-
+    type_id  = models.IntegerField(_('identifier type'), max_length=6,
+                                   choices=choicify(ID_TYPES), blank=True, null=True)
 
 class Link(BaseAccessLevel):
     """
@@ -81,8 +60,14 @@ class Link(BaseAccessLevel):
     '''
 
     def to_netjson(self):
-            return {'source': self.interface_a.address.mac,
-                    'target': self.interface_b.address.mac,
+            if (topology.type_id==1 || topology.type_id==2):
+                '''TODO'''
+            elif topology.type_id == 2:
+                identifier_a = self.inteface_a.mac
+                identifier_b = self.inteface_b.mac
+
+            return {'source': identifier_a,
+                    'target': identifier_b,
                     'weight': self.metric_value}
 
     # in "planned" links these two fields are necessary
