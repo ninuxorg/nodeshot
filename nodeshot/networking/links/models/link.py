@@ -14,8 +14,19 @@ from nodeshot.core.layers.models import Layer
 from nodeshot.networking.net.models import Interface
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
-from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
+from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES, NETDIFF_PARSERS, ID_TYPES
 
+
+
+
+class Topology(BaseDate):
+    name = models.CharField(_('name'), max_length=75, unique=True)
+    backend = models.CharField(_('backend'), max_length=128,
+        choices=NETDIFF_PARSERS,
+        help_text=_('select the netdiff parser to parse the topology from a routing protocol'))
+    url = models.URLField(_('url'))
+    type_id  = models.IntegerField(_('identifier type'), max_length=6,
+                                   choices=choicify(ID_TYPES), blank=True, null=True)
 
 class Link(BaseAccessLevel):
     """
@@ -32,6 +43,32 @@ class Link(BaseAccessLevel):
     interface_b = models.ForeignKey(Interface, verbose_name=_('to interface'),
                                     related_name='link_interface_to', blank=True, null=True,
                                     help_text=_('mandatory except for "planned" links (in planned links you might not have any device installed yet)'))
+
+
+    '''
+    The only network part that we are sure that belong to only one topology is
+    the interface. For example: in the case of a mixed protocol network (L2 and L3).
+    In the same device we could have two different interface that belong to 2
+    different topology drawers
+    '''
+    topology = models.ForeignKey(Topology, verbose_name=_('containing topology'),
+                                    related_name='topology that draw this interface', blank=True, null=True,
+                                    help_text=_('mandatory to draw the link dinamically'))
+
+    '''
+    we need a function to export the interfance in netjson format
+    '''
+
+    def to_netjson(self):
+            if (topology.type_id==1 || topology.type_id==2):
+                '''TODO'''
+            elif topology.type_id == 2:
+                identifier_a = self.inteface_a.mac
+                identifier_b = self.inteface_b.mac
+
+            return {'source': identifier_a,
+                    'target': identifier_b,
+                    'weight': self.metric_value}
 
     # in "planned" links these two fields are necessary
     # while in all the other status they serve as a shortcut

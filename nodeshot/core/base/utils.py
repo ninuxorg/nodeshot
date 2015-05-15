@@ -31,7 +31,7 @@ class Hider(object):
 def check_dependencies(dependencies, module):
     """
     Ensure dependencies of a module are listed in settings.INSTALLED_APPS
-    
+
     :dependencies string | list: list of dependencies to check
     :module string: string representing the path to the current app
     """
@@ -39,7 +39,7 @@ def check_dependencies(dependencies, module):
         dependencies = [dependencies]
     elif type(dependencies) != list:
         raise TypeError('dependencies argument must be of type list or string')
-    
+
     for dependency in dependencies:
         if dependency not in settings.INSTALLED_APPS:
             raise DependencyError('%s depends on %s, which should be in settings.INSTALLED_APPS' % (module, dependency))
@@ -49,7 +49,7 @@ def choicify(dictionary):
     """
     Converts a readable python dictionary into a django model/form
     choice structure (list of tuples) ordered based on the values of each key
-    
+
     :param dictionary: the dictionary to convert
     """
     # get order of the fields
@@ -68,7 +68,7 @@ def choicify(dictionary):
 def get_key_by_value(dictionary, search_value):
     """
     searchs a value in a dicionary and returns the key of the first occurrence
-    
+
     :param dictionary: dictionary to search in
     :param search_value: value to search for
     """
@@ -112,7 +112,7 @@ def ago(**kwargs):
 def after(date, **kwargs):
     """
     returns the result of the calculation of the date param plus the time (seconds, minutes, hours, days, years) specified
-    
+
     :paramm datetime: datetime object to which add more time
     """
     return date + timedelta(**kwargs)
