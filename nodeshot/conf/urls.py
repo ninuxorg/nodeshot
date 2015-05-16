@@ -40,11 +40,11 @@ if settings.DEBUG and settings.SERVE_STATIC:
         url(r'^media/(?P<path>.*)$', 'serve'),
     )
 
-if 'social_auth' in settings.INSTALLED_APPS:
+if 'social.apps.django_app.default' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
-        url(r'', include('social_auth.urls')),
+        url(r'', include('social.apps.django_app.urls', namespace='social')),
     )
-
+    
 if 'grappelli' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         url(r'^grappelli/', include('grappelli.urls')),

@@ -4,8 +4,8 @@ from datetime import datetime
 
 from django.utils.translation import ugettext_lazy as _
 
-from social_auth.models import UserSocialAuth
-from social_auth.exceptions import AuthFailed
+from social.apps.django_app.default.models import UserSocialAuth
+from social.exceptions import AuthFailed
 
 from ..settings import EMAIL_CONFIRMATION
 
@@ -26,7 +26,7 @@ def create_user(backend, details, response, uid, username, user=None,
         message = _("""your social account needs to have a verified email address in order to proceed.""")
         raise AuthFailed(backend, message)
 
-    if email and UserSocialAuth.email_max_length() < len(email):
+    if email and len(email) <= 54:
         original_email = email
         email = ''
 
