@@ -1,7 +1,8 @@
+import reversion
 from django.contrib import admin
 
-from nodeshot.core.base.admin import BaseGeoAdmin
-from .models import Link
+from nodeshot.core.base.admin import BaseAdmin, BaseGeoAdmin
+from .models import Link, Topology
 
 
 class LinkAdmin(BaseGeoAdmin):
@@ -31,4 +32,9 @@ class LinkAdmin(BaseGeoAdmin):
     exclude = ('shortcuts',)
 
 
+class TopologyAdmin(BaseAdmin, reversion.VersionAdmin):
+    list_display = ('name', 'format', 'url')
+
+
 admin.site.register(Link, LinkAdmin)
+admin.site.register(Topology, TopologyAdmin)
