@@ -1,4 +1,5 @@
 from netdiff import diff
+
 links_legend = [
     {
         "name": "Link",
@@ -11,22 +12,20 @@ links_legend = [
     }
 ]
 
-''' must manage L3 routing protocols
-'''
 
 def get_ifs(topology, link):
     if(topology.type_id==1):
-        '''ipv4/6 (any L3 routing protocol)'''
+        """ ipv4/6 (any L3 routing protocol) """
         ip_src = Ip.objects.get(address = link[0])
         ip_dst = Ip.objects.get(address = link[1])
         return ip_src.topology, ip_dst.topology
     elif(topology.type_id==2):
-        '''mac (batman)'''
+        """ mac (batman) """
         if_a = Interface.objects.get(mac = link[0])
         if_b = Interface.objects.get(mac = link[1])
         return if_a, if_b
     else:
-        '''error'''
+        """ error """
         return null, null
 
 
@@ -38,6 +37,7 @@ def update_topology():
         njparser = NetJsonParser(to_netjson(topology))
         parser = classparser(topology.url)
         graph_diff = diff(njparser, parser)
+
         for link in graph_diff['added']:
             if_a, if_b = get_ifs(topology, link)
             Link.objects.create(interface_a=if_a, interface_b=if_b, metric_value=link[2]['weight'])
@@ -59,8 +59,9 @@ def to_netjson(topology):
     links = []
 
     for link in Link.objects.filter(topology=topology):
-        if (topology.type_id==1 || topology.type_id==2):
-            '''TODO'''
+        if (topology.type_id==1 or topology.type_id==2):
+            # TODO
+            pass
         elif topology.type_id == 2:
             identifier_a = link.inteface_a.mac
             identifier_b = link.inteface_b.mac
@@ -82,4 +83,5 @@ def to_netjson(topology):
                 'router_id': island.url,
                 'nodes': nodes,
                 'links': links}
+
     return NetJson

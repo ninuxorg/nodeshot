@@ -15,12 +15,11 @@ check_dependencies(
     module='nodeshot.networking.links'
 )
 
-
-from .link import Link, Topology
-
+from .link import Link
+from .topology import Topology
 
 __all__ = [
-    'Link'
+    'Link',
     'Topology'
 ]
 
