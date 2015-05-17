@@ -174,3 +174,65 @@ class LinkTest(BaseTestCase):
         url = reverse('api_node_links', args=['idontexist'])
         response = self.client.get(url)
         self.assertEquals(response.status_code, 404)
+
+
+import json
+from collections import OrderedDict
+
+from .models import Topology
+
+
+class TopologyTest(BaseTestCase):
+    fixtures = [
+        'initial_data.json',
+        user_fixtures,
+        'test_layers.json',
+        'test_status.json',
+        'test_nodes.json',
+        'test_routing_protocols.json',
+        'test_topology_data.json'
+    ]
+
+    def test_topology_netjson_empty(self):
+        t = Topology.objects.first()
+        graph = t.json()
+        self.assertDictEqual(graph, {
+            'type': 'NetworkGraph',
+            'protocol': 'OLSR',
+            'version': '0.6',
+            'metric': 'ETX',
+            'nodes': [],
+            'links': []
+        })
+
+    def test_topology_netjson_1_link(self):
+        t = Topology.objects.first()
+        link = Link(**{
+            'topology': t,
+            'type': LINK_TYPES['radio'],
+            'status': LINK_STATUS['active'],
+            'interface_a_id': 7,
+            'interface_b_id': 9,
+            'metric_type': 'etx',
+            'metric_value': 1.01
+        })
+        link.full_clean()
+        link.save()
+        graph = t.json()
+        self.assertDictEqual(dict(graph), {
+            'type': 'NetworkGraph',
+            'protocol': 'OLSR',
+            'version': '0.6',
+            'metric': 'ETX',
+            'nodes': [
+                { 'id': '172.16.40.2' },
+                { 'id': '172.16.40.4' }
+            ],
+            'links': [
+                OrderedDict((
+                    ('source', '172.16.40.2'),
+                    ('target', '172.16.40.4'),
+                    ('weight', 1.01)
+                ))
+            ]
+        })

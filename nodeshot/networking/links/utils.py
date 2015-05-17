@@ -1,5 +1,6 @@
 from netdiff import diff
 
+
 links_legend = [
     {
         "name": "Link",
@@ -66,7 +67,6 @@ def to_netjson(topology):
             identifier_a = link.inteface_a.mac
             identifier_b = link.inteface_b.mac
 
-
         node_a = {'id': identifier_a}
         node_b = {'id': identifier_b}
 
@@ -76,12 +76,12 @@ def to_netjson(topology):
             nodes.append(node_b)
         links.append(link.to_netjson())
 
-    NetJson = {'type': 'NetworkGraph',
-                'protocol': island.get_protocol_display(),
-                'version': '0',
-                'metric': '0',
-                'router_id': island.url,
-                'nodes': nodes,
-                'links': links}
-
-    return NetJson
+    return {
+        'type': 'NetworkGraph',
+        'protocol': island.get_protocol_display(),
+        'version': '0',
+        'metric': '0',
+        'router_id': island.url,
+        'nodes': nodes,
+        'links': links
+    }
