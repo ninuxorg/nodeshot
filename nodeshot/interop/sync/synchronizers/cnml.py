@@ -190,7 +190,7 @@ class Cnml(GenericGisSynchronizer):
         added_devices = []
         deleted_devices = []
         cnml_devices = self.cnml.getDevices()
-        current_devices = Device.objects.filter(data__contains=['cnml_id'])
+        current_devices = Device.objects.filter(data__contains=['cnml_id'], node__layer=self.layer)
 
         total_n = len(cnml_devices)
         for n, cnml_device in enumerate(cnml_devices, 1):
@@ -246,7 +246,7 @@ class Cnml(GenericGisSynchronizer):
         added_interfaces = []
         deleted_interfaces = []
         cnml_interfaces = self.cnml.getInterfaces()
-        current_interfaces = Interface.objects.filter(data__contains=['cnml_id'])
+        current_interfaces = Interface.objects.filter(data__contains=['cnml_id'], device__node__layer=self.layer)
 
         total_n = len(cnml_interfaces)
         for n, cnml_interface in enumerate(cnml_interfaces, 1):
@@ -311,7 +311,7 @@ class Cnml(GenericGisSynchronizer):
         added_links = []
         deleted_links = []
         cnml_links = self.cnml.getLinks()
-        current_links = Link.objects.filter(data__contains=['cnml_id'])
+        current_links = Link.objects.filter(data__contains=['cnml_id'], layer=self.layer)
         # keep a list of link cnml_id
         # TODO: hstore seems to not work properly, something is wrong
         cnml_id_list = []
