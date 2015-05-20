@@ -1,4 +1,7 @@
-from netdiff import diff
+from netdiff import diff, NetJsonParser
+from .models import Link, Topology
+from nodeshot.networking.net.models import Interface, Ip
+from importlib import import_module
 
 
 links_legend = [
@@ -15,26 +18,23 @@ links_legend = [
 
 
 def get_ifs(topology, link):
-    if(topology.type_id==1):
-        """ ipv4/6 (any L3 routing protocol) """
-        ip_src = Ip.objects.get(address = link[0])
-        ip_dst = Ip.objects.get(address = link[1])
-        return ip_src.topology, ip_dst.topology
-    elif(topology.type_id==2):
+    if topology.is_layer2:
         """ mac (batman) """
-        if_a = Interface.objects.get(mac = link[0])
-        if_b = Interface.objects.get(mac = link[1])
+        if_a = Interface.objects.get(mac=link[0])
+        if_b = Interface.objects.get(mac=link[1])
         return if_a, if_b
     else:
-        """ error """
-        return null, null
+        """ ipv4/6 (any L3 routing protocol) """
+        ip_src = Ip.objects.get(address=link[0])
+        ip_dst = Ip.objects.get(address=link[1])
+        return ip_src.topology, ip_dst.topology
 
 
 def update_topology():
     for topology in Topology.objects.all():
-        module = importlib.import_module(topology.backend)
-        parser_class_name = topology.backend.split('.')[-1]
-        classparsr = getattr(module, parser_class_name)
+        module = import_module(topology.format.split('.')[0])
+        parser_class_name = topology.format.split('.')[-1]
+        classparser = getattr(module, parser_class_name)
         njparser = NetJsonParser(to_netjson(topology))
         parser = classparser(topology.url)
         graph_diff = diff(njparser, parser)
@@ -60,12 +60,12 @@ def to_netjson(topology):
     links = []
 
     for link in Link.objects.filter(topology=topology):
-        if (topology.type_id==1 or topology.type_id==2):
-            # TODO
-            pass
-        elif topology.type_id == 2:
+        if topology.is_layer2:
             identifier_a = link.inteface_a.mac
             identifier_b = link.inteface_b.mac
+        else:
+            # TODO
+            raise NotImplementedError
 
         node_a = {'id': identifier_a}
         node_b = {'id': identifier_b}
@@ -78,10 +78,10 @@ def to_netjson(topology):
 
     return {
         'type': 'NetworkGraph',
-        'protocol': island.get_protocol_display(),
+        'protocol': 'TODO',
         'version': '0',
         'metric': '0',
-        'router_id': island.url,
+        'router_id': 'TODO',
         'nodes': nodes,
         'links': links
     }
