@@ -65,6 +65,10 @@ Ensure your virtualenv is activated::
 
     workon nodeshot
 
+Go in the tests directory of your nodeshot fork::
+
+    cd /var/www/nodeshot/tests
+
 Each module has its own tests, so if you would like to run the tests
 for ``nodeshot.core.nodes`` you should use::
 
@@ -80,7 +84,7 @@ If you want to test all the modules at once you have start the development serve
 
 and then use::
 
-    python manage.py test nodeshot
+    ./runtests.py
 
 ===========================================
 6. Follow PEP8, Style Guide for Python Code
