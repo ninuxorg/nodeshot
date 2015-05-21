@@ -19,7 +19,7 @@ from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
 from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
 from .topology import Topology
-from ..exceptions import LinkDataNotFound
+from ..exceptions import LinkDataNotFound, LinkNotFound
 
 
 class Link(BaseAccessLevel):
@@ -200,9 +200,27 @@ class Link(BaseAccessLevel):
         q = Q(interface_a=a, interface_b=b) | Q(interface_a=b, interface_b=a)
         link = Link.objects.filter(q).first()
         if link is None:
-            raise Link.DoesNotExist('Link matching query does not exist')
+            raise LinkNotFound('Link matching query does not exist',
+                               interface_a=a,
+                               interface_b=b)
         return link
 
+    @classmethod
+    def find_or_create(cls, link):
+        """
+        Same as `find_from_tuple` but creates the link if it does not exist
+        """
+        try:
+            return cls.find_from_tuple(link)
+        except LinkNotFound as e:
+            pass
+        # create link
+        link = Link(interface_a=e.interface_a,
+                    interface_b=e.interface_b,
+                    status=LINK_STATUS.get('active'))
+        link.full_clean()
+        link.save()
+        return link
 
     @property
     def node_a_name(self):

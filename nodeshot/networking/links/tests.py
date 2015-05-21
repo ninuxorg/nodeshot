@@ -11,7 +11,7 @@ from nodeshot.networking.net.models import Interface
 
 from .models import Link
 from .models.choices import LINK_STATUS, LINK_TYPES
-from .exceptions import LinkDataNotFound
+from .exceptions import LinkDataNotFound, LinkNotFound
 
 
 class LinkTest(BaseTestCase):
@@ -132,8 +132,8 @@ class LinkTest(BaseTestCase):
         self.assertEqual(Link.find_from_tuple(['00:27:22:00:50:71', '00:27:22:00:50:72']).pk, 1)
         self.assertEqual(Link.find_from_tuple(['00:27:22:00:50:72', '00:27:22:00:50:71']).pk, 1)
 
-    def test_link_does_not_exist(self):
-        with self.assertRaises(Link.DoesNotExist):
+    def test_link_not_found(self):
+        with self.assertRaises(LinkNotFound):
             Link.find_from_tuple(['00:27:22:00:50:72', '00:27:22:38:13:E4'])
 
     def test_link_data_not_found(self):
@@ -147,6 +147,20 @@ class LinkTest(BaseTestCase):
     def test_link_find_from_tuple_exception2(self):
         with self.assertRaises(ValueError):
             Link.find_from_tuple(['127.0.0.1', '00:27:22:00:50:71'])
+
+    def test_link_find_or_create(self):
+        # preparation
+        Link.objects.delete()
+        self.assertEqual(Link.objects.count(), 0)
+        # create link
+        link = Link.find_or_create(['172.16.41.42', '172.16.40.22'])
+        self.assertIsInstance(link, Link)
+        self.assertEqual(Link.objects.count(), 1)
+        # second time does not create
+        link2 = Link.find_or_create(['172.16.41.42', '172.16.40.22'])
+        # ensure same object
+        self.assertEqual(link.pk, link2.pk)
+        self.assertEqual(Link.objects.count(), 1)
 
     def test_links_api(self):
         link = self.link
