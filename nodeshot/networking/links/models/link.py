@@ -203,15 +203,3 @@ class Link(BaseAccessLevel):
             return 0
         # PLACEHOLDER
         return 6
-
-    def to_netjson(self):
-        if (topology.type_id==1 or topology.type_id==2):
-            # TODO
-            pass
-        elif topology.type_id == 2:
-            identifier_a = self.inteface_a.mac
-            identifier_b = self.inteface_b.mac
-
-        return {'source': identifier_a,
-                'target': identifier_b,
-                'weight': self.metric_value}
