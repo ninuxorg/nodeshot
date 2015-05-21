@@ -1,6 +1,7 @@
 """
 nodeshot.networking.links unit tests
 """
+from collections import OrderedDict
 
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -9,7 +10,7 @@ from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.networking.net.models import Interface
 
-from .models import Link
+from .models import Link, Topology
 from .models.choices import LINK_STATUS, LINK_TYPES
 from .exceptions import LinkDataNotFound, LinkNotFound
 
@@ -212,12 +213,6 @@ class LinkTest(BaseTestCase):
         self.assertEquals(response.status_code, 404)
 
 
-import json
-from collections import OrderedDict
-
-from .models import Topology
-
-
 class TopologyTest(BaseTestCase):
     fixtures = [
         'initial_data.json',
@@ -261,8 +256,8 @@ class TopologyTest(BaseTestCase):
             'version': '0.6',
             'metric': 'ETX',
             'nodes': [
-                { 'id': '172.16.40.2' },
-                { 'id': '172.16.40.4' }
+                {'id': '172.16.40.2'},
+                {'id': '172.16.40.4'}
             ],
             'links': [
                 OrderedDict((
@@ -272,3 +267,29 @@ class TopologyTest(BaseTestCase):
                 ))
             ]
         })
+
+    def test_update_create(self):
+        t = Topology.objects.first()
+        self.assertEqual(t.link_set.count(), 0)
+        t.update()
+        self.assertEqual(t.link_set.count(), 2)
+
+    def test_update_nothing(self):
+        t = Topology.objects.first()
+        t.update()
+        t.update()
+        self.assertEqual(t.link_set.count(), 2)
+
+    def test_update_removed(self):
+        t = Topology.objects.first()
+        t.update()
+        self.assertEqual(t.link_set.filter(status=LINK_STATUS['active']).count(), 2)
+        t.url = t.url.replace('topology.json', 'topology_2.json')
+        t.save()
+        # ensure 1 link is removed
+        t.update()
+        self.assertEqual(t.link_set.filter(status=LINK_STATUS['active']).count(), 1)
+        self.assertEqual(t.link_set.filter(status=LINK_STATUS['disconnected']).count(), 1)
+        # ensure disconnected one is right
+        link = Link.find_from_tuple(('172.16.40.3', '172.16.40.4'))
+        self.assertEqual(link.status, LINK_STATUS['disconnected'])

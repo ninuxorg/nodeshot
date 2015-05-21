@@ -7,14 +7,6 @@
             "neighborLinkQuality": 0.184,
             "tcEdgeCost": 28334,
             "validityTime": 284572
-        },
-        {
-            "lastHopIP": "172.16.40.3",
-            "destinationIP": "172.16.40.4",
-            "linkQuality": 1.0,
-            "neighborLinkQuality": 1.0,
-            "tcEdgeCost": 1024,
-            "validityTime": 284572
         }
     ],
     "config": {
