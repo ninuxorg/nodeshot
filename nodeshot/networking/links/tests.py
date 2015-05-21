@@ -1,6 +1,3 @@
-"""
-nodeshot.networking.links unit tests
-"""
 from collections import OrderedDict
 
 from django.core.exceptions import ValidationError
@@ -167,24 +164,20 @@ class LinkTest(BaseTestCase):
         link = self.link
         link.save()
         link = Link.objects.find(link.id)
-
         # GET: 200 - link list
         url = reverse('api_link_list')
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 2)
-
         # GET: 200 - link list geojson
         url = reverse('api_links_geojson_list')
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertEqual(len(response.data['features']), 2)
-
         # GET: 200 - link details
         url = reverse('api_link_details', args=[link.id])
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-
         # GET: 200 - link details geojson
         url = reverse('api_links_geojson_details', args=[link.id])
         response = self.client.get(url)
@@ -194,19 +187,16 @@ class LinkTest(BaseTestCase):
         link = self.link
         link.save()
         link = Link.objects.find(link.id)
-
         # GET: 200 - node A
         url = reverse('api_node_links', args=[link.node_a.slug])
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.data), 2)
-
         # GET: 200 - node B
         url = reverse('api_node_links', args=[link.node_b.slug])
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.data), 2)
-
         # GET: 404
         url = reverse('api_node_links', args=['idontexist'])
         response = self.client.get(url)
