@@ -1,0 +1,2 @@
+class LinkDataNotFound(Exception):
+    pass

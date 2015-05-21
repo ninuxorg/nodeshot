@@ -34,5 +34,14 @@
             "address": "2001:4c00:893b:4030::6",
             "netmask": "2001:4c00:893b:fede::0/64"
         }
+    },
+    {
+        "model": "net.Ip",
+        "pk": 5,
+        "fields": {
+            "interface": 3,
+            "address": "172.16.41.42",
+            "netmask": "172.16.40.0/24"
+        }
     }
 ]

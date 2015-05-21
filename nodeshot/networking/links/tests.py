@@ -11,10 +11,10 @@ from nodeshot.networking.net.models import Interface
 
 from .models import Link
 from .models.choices import LINK_STATUS, LINK_TYPES
+from .exceptions import LinkDataNotFound
 
 
 class LinkTest(BaseTestCase):
-
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -125,6 +125,28 @@ class LinkTest(BaseTestCase):
         link.save()
         link = Link.objects.find(link.id)
         self.assertEqual(link.type, LINK_TYPES.get('radio'))
+
+    def test_link_find_from_tuple(self):
+        self.assertEqual(Link.find_from_tuple(['172.16.41.42', '172.16.40.22']).pk, 1)
+        self.assertEqual(Link.find_from_tuple(['172.16.40.22', '172.16.41.42']).pk, 1)
+        self.assertEqual(Link.find_from_tuple(['00:27:22:00:50:71', '00:27:22:00:50:72']).pk, 1)
+        self.assertEqual(Link.find_from_tuple(['00:27:22:00:50:72', '00:27:22:00:50:71']).pk, 1)
+
+    def test_link_does_not_exist(self):
+        with self.assertRaises(Link.DoesNotExist):
+            Link.find_from_tuple(['00:27:22:00:50:72', '00:27:22:38:13:E4'])
+
+    def test_link_data_not_found(self):
+        with self.assertRaises(LinkDataNotFound):
+            Link.find_from_tuple(['00:27:22:00:50:72', 'CC:27:22:00:BB:AA'])
+
+    def test_link_find_from_tuple_exception(self):
+        with self.assertRaises(ValueError):
+            Link.find_from_tuple(['test'])
+
+    def test_link_find_from_tuple_exception2(self):
+        with self.assertRaises(ValueError):
+            Link.find_from_tuple(['127.0.0.1', '00:27:22:00:50:71'])
 
     def test_links_api(self):
         link = self.link

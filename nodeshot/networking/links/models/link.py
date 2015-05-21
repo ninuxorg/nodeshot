@@ -2,8 +2,11 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import LineString
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from django_hstore.fields import DictionaryField, ReferencesField
+
+from netaddr import valid_ipv4, valid_ipv6, valid_mac
 
 from nodeshot.core.base.managers import HStoreGeoAccessLevelManager as LinkManager
 from nodeshot.core.base.models import BaseAccessLevel
@@ -11,11 +14,12 @@ from nodeshot.core.base.utils import choicify
 
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
-from nodeshot.networking.net.models import Interface
+from nodeshot.networking.net.models import Interface, Ip
 from nodeshot.networking.net.models.choices import INTERFACE_TYPES
 
 from .choices import METRIC_TYPES, LINK_STATUS, LINK_TYPES
 from .topology import Topology
+from ..exceptions import LinkDataNotFound
 
 
 class Link(BaseAccessLevel):
@@ -163,6 +167,42 @@ class Link(BaseAccessLevel):
             self.data['layer_slug'] = self.layer.slug
 
         super(Link, self).save(*args, **kwargs)
+
+    @classmethod
+    def find_from_tuple(cls, link):
+        """
+        Find link by providing a tuple with two ip addresses or two mac addresses
+        :param link: tuple with two string elements indicating source and destination (ip or mac addresses)
+        :returns: Link object
+        """
+        try:
+            a = link[0]
+            b = link[1]
+        except IndexError:
+            raise ValueError('Expecting tuple with source and destination')
+        # find interfaces
+        if (valid_ipv4(a) and valid_ipv4(b)) or (valid_ipv6(a) and valid_ipv6(b)):
+            try:
+                a = Ip.objects.get(address=a).interface
+                b = Ip.objects.get(address=b).interface
+            except Ip.DoesNotExist as e:
+                raise LinkDataNotFound(e)
+        elif valid_mac(a) and valid_mac(b):
+            try:
+                a = Interface.objects.get(mac=a)
+                b = Interface.objects.get(mac=b)
+            except Interface.DoesNotExist as e:
+                raise LinkDataNotFound(e)
+        else:
+            raise ValueError('Expecting valid ipv4, ipv6 or mac address')
+        # find link with interfaces
+        # inverse order is also ok
+        q = Q(interface_a=a, interface_b=b) | Q(interface_a=b, interface_b=a)
+        link = Link.objects.filter(q).first()
+        if link is None:
+            raise Link.DoesNotExist('Link matching query does not exist')
+        return link
+
 
     @property
     def node_a_name(self):
