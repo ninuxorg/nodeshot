@@ -46,14 +46,15 @@ def load_extra_data(backend, details, response, uid, user, social_user=None,
     social_user = social_user or UserSocialAuth.get_social_auth(backend.name, uid)
 
     if kwargs['is_new'] and EMAIL_CONFIRMATION:
-        from ..models import EmailAddress
-        emailaddress = EmailAddress(**{
-            'user': user,
-            'email': user.email,
-            'verified': True,
-            'primary': True
-        })
-        emailaddress.save()
+        if user.email:
+            from ..models import EmailAddress
+            emailaddress = EmailAddress(**{
+                'user': user,
+                'email': user.email,
+                'verified': True,
+                'primary': True
+            })
+            emailaddress.save()
 
     if social_user:
         extra_data = backend.extra_data(user, uid, response, details)
