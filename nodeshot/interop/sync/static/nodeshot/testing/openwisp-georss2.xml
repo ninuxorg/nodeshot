@@ -10,6 +10,13 @@
     <description>FreePublicWifi Access Points</description>
     <language>en-us</language>
         <item>
+            <guid>00_15_6D_60_1D_5F</guid>
+            <title>fab94fa5bcf6f7afcc25eb7070f1baea</title>
+            <description>via litoranea</description>
+            <georss:point>41.6944666 12.3642842</georss:point>
+            <updated>0</updated>
+        </item>
+        <item>
           <guid>Lercari2_422013-06-14 11:56:19 +0200</guid>
           <title></title>
               <description>Test WISP</description>

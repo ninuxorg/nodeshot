@@ -248,16 +248,16 @@ class SyncTest(TestCase):
         )
 
         # ensure following text is in output
-        self.assertIn('42 nodes added', output)
+        self.assertIn('43 nodes added', output)
         self.assertIn('0 nodes changed', output)
-        self.assertIn('42 total external', output)
-        self.assertIn('42 total local', output)
+        self.assertIn('43 total external', output)
+        self.assertIn('43 total local', output)
 
         # start checking DB too
         nodes = layer.node_set.all()
 
         # ensure all nodes have been imported
-        self.assertEqual(nodes.count(), 42)
+        self.assertEqual(nodes.count(), 43)
 
         # check one particular node has the data we expect it to have
         node = Node.objects.get(slug='podesta1-ced')
@@ -281,14 +281,14 @@ class SyncTest(TestCase):
         )
 
         # ensure following text is in output
-        self.assertIn('4 nodes unmodified', output)
+        self.assertIn('5 nodes unmodified', output)
         self.assertIn('38 nodes deleted', output)
         self.assertIn('0 nodes changed', output)
-        self.assertIn('4 total external', output)
-        self.assertIn('4 total local', output)
+        self.assertIn('5 total external', output)
+        self.assertIn('5 total local', output)
 
         # ensure all nodes have been imported
-        self.assertEqual(nodes.count(), 4)
+        self.assertEqual(nodes.count(), 5)
 
         # check one particular node has the data we expect it to have
         node = Node.objects.get(slug='lercari2-42')
@@ -712,10 +712,9 @@ class SyncTest(TestCase):
         device = Device.objects.get(data={'cnml_id': 49635})
         self.assertEqual(device.interface_set.count(), 3)
         self.assertIn('21 interfaces added', output)
-        self.assertEqual(Ip.objects.count(), ip_count+21)
+        self.assertEqual(Ip.objects.count(), ip_count + 21)
         # check links
-        #self.assertIn('16 interfaces added', output)
-        self.assertEqual(Link.objects.count(), link_count+9)
+        self.assertEqual(Link.objects.count(), link_count + 9)
 
         # --- repeat with different XML --- #
 
@@ -745,4 +744,4 @@ class SyncTest(TestCase):
         self.assertEqual(device.interface_set.count(), 2)
         self.assertIn('0 interfaces added', output)
         self.assertIn('1 interfaces deleted', output)
-        self.assertEqual(Ip.objects.count(), ip_count+18)
+        self.assertEqual(Ip.objects.count(), ip_count + 18)

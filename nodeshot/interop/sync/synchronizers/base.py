@@ -504,14 +504,14 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
                 # shortcut for value
                 value = item[field.name]
                 # if value is different than what we have
-                if getattr(node, field.name) != value and value is not None:
+                if value is not None and getattr(node, field.name) != value:
                     # set value
                     setattr(node, field.name, value)
                     # indicates that a DB query is necessary
                     changed = True
 
             if added or (node.geometry.equals(item['geometry']) is False
-                                 and node.geometry.equals_exact(item['geometry']) is False):
+                         and node.geometry.equals_exact(item['geometry']) is False):
                 node.geometry = item['geometry']
                 changed = True
 
