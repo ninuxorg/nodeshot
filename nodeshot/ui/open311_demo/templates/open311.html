@@ -36,9 +36,9 @@
 <input id="user" class="span2" type="text" placeholder="Email">
 <input id="password" class="span2" type="password" placeholder="Password">
 <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
-<a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-success">Facebook</a>
-<a href="{% url "socialauth_begin" "google" %}" class="btn btn-success">Google</a>
-<a href="{% url "socialauth_begin" "github" %}" class="btn btn-success">Github</a>
+<a href="{% url "social:begin" "facebook" %}" class="btn btn-success">Facebook</a>
+<a href="{% url "social:begin" "google-oauth2" %}" class="btn btn-success">Google</a>
+<a href="{% url "social:begin" "github" %}" class="btn btn-success">Github</a>
 </script>
 
 	
@@ -274,9 +274,9 @@ Rated <strong><%= rating%>/10 </strong> out of <strong><%= votes %></strong> vot
                          <input id="user" class="span2" type="text" placeholder="Email">
                          <input id="password" class="span2" type="password" placeholder="Password">
                          <button id="loginButton" type="button" onclick=login() class="btn">Sign in</button>
-			 <a href="{% url "socialauth_begin" "facebook" %}" class="btn btn-success">Facebook</a>
-			 <a href="{% url "socialauth_begin" "google" %}" class="btn btn-success">Google</a>
-			 <a href="{% url "socialauth_begin" "github" %}" class="btn btn-success">Github</a>
+			 <a href="{% url "social:begin" "facebook" %}" class="btn btn-success">Facebook</a>
+			 <a href="{% url "social:begin" "google-oauth2" %}" class="btn btn-success">Google</a>
+			 <a href="{% url "social:begin" "github" %}" class="btn btn-success">Github</a>
 			  {% else %}
 			   <span class="userLogged">Hello  {{ user }}  </span>
 			    <button id="logoutButton" type="button" onclick=logout() class="btn">Sign out</button>

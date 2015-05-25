@@ -61,10 +61,10 @@ if 'nodeshot.community.mailing' in settings.INSTALLED_APPS:
 else:
     CONTACTING_ENABLED = False
 
-if 'social_auth' in settings.INSTALLED_APPS:
-    FACEBOOK_ENABLED = bool(settings.FACEBOOK_APP_ID) and bool(settings.FACEBOOK_API_SECRET)  # noqa
-    GOOGLE_ENABLED = bool(settings.GOOGLE_OAUTH2_CLIENT_ID) and bool(settings.GOOGLE_OAUTH2_CLIENT_SECRET)  # noqa
-    GITHUB_ENABLED = bool(settings.GITHUB_APP_ID) and bool(settings.GITHUB_API_SECRET)  # noqa
+if 'social.apps.django_app.default' in settings.INSTALLED_APPS:
+    FACEBOOK_ENABLED = bool(settings.SOCIAL_AUTH_FACEBOOK_KEY) and bool(settings.SOCIAL_AUTH_FACEBOOK_SECRET)  # noqa
+    GOOGLE_ENABLED = bool(settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY) and bool(settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET)  # noqa
+    GITHUB_ENABLED = bool(settings.SOCIAL_AUTH_GITHUB_KEY) and bool(settings.SOCIAL_AUTH_GITHUB_SECRET)  # noqa
     SOCIAL_AUTH_ENABLED = FACEBOOK_ENABLED or GOOGLE_ENABLED or GITHUB_ENABLED  # noqa
 else:
     FACEBOOK_ENABLED = False

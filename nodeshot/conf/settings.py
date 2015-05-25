@@ -77,7 +77,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.media",
     "django.core.context_processors.static",
     "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages"
+    "django.contrib.messages.context_processors.messages",
+    "social.apps.django_app.context_processors.backends",
+    "social.apps.django_app.context_processors.login_redirect",
 )
 
 INSTALLED_APPS = [
@@ -123,7 +125,7 @@ INSTALLED_APPS = [
     'smuggler',
     'reversion',
     'corsheaders',
-    'social_auth',
+    'social.apps.django_app.default',
     'rosetta',
     # other utilities
     'django_extensions',
@@ -320,8 +322,12 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # ------ SOCIAL AUTH SETTINGS ------ #
 
-if 'social_auth' in INSTALLED_APPS:
-    MIDDLEWARE_CLASSES += ('social_auth.middleware.SocialAuthExceptionMiddleware',)
+if 'social.apps.django_app.default' in INSTALLED_APPS:
+    MIDDLEWARE_CLASSES += ('social.apps.django_app.middleware.SocialAuthExceptionMiddleware',)
+
+    SOUTH_MIGRATION_MODULES = {
+        'default': 'social.apps.django_app.default.south_migrations'
+    }
 
     # In Django 1.6, the default session serliazer has been switched to one based on JSON,
     # rather than pickles, to improve security. Django-openid-auth does not support this
@@ -333,44 +339,51 @@ if 'social_auth' in INSTALLED_APPS:
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
         'nodeshot.community.profiles.backends.EmailBackend',
-        'social_auth.backends.facebook.FacebookBackend',
-        'social_auth.backends.google.GoogleOAuth2Backend',
-        'nodeshot.community.profiles.social_auth_extra.github.GithubBackend',
+        'social.backends.facebook.FacebookAppOAuth2',
+        'social.backends.facebook.FacebookOAuth2',
+        'social.backends.github.GithubOAuth2',
+        'social.backends.google.GoogleOAuth',
+        'social.backends.google.GoogleOAuth2',
     )
 
     SOCIAL_AUTH_PIPELINE = (
-        'social_auth.backends.pipeline.social.social_auth_user',
-        'social_auth.backends.pipeline.associate.associate_by_email',
-        'social_auth.backends.pipeline.user.get_username',
-        'nodeshot.community.profiles.social_auth_extra.pipeline.create_user',
-        'social_auth.backends.pipeline.social.associate_user',
+        'social.pipeline.social_auth.social_details',
+        'social.pipeline.social_auth.social_uid',
+        'social.pipeline.social_auth.auth_allowed',
+        'social.pipeline.social_auth.social_user',
+        'social.pipeline.user.get_username',
+        'social.pipeline.social_auth.associate_by_email', 
+        'nodeshot.community.profiles.social_auth_extra.pipeline.create_user', 
+        'social.pipeline.social_auth.associate_user',
         'nodeshot.community.profiles.social_auth_extra.pipeline.load_extra_data',
-        'social_auth.backends.pipeline.user.update_user_details'
+        'social.pipeline.user.user_details',
     )
 
-    SOCIAL_AUTH_ENABLED_BACKENDS = ('facebook', 'google', 'github')
+    # register a new app:
+    SOCIAL_AUTH_FACEBOOK_KEY = ''  # put your app id
+    SOCIAL_AUTH_FACEBOOK_SECRET = ''
+    SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
 
     # register a new app:
-    FACEBOOK_APP_ID = ''  # put your app id
-    FACEBOOK_API_SECRET = ''
-    FACEBOOK_EXTENDED_PERMISSIONS = ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+    SOCIAL_AUTH_GITHUB_KEY = ''
+    SOCIAL_AUTH_GITHUB_SECRET = ''
+    SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 
-    GOOGLE_OAUTH2_CLIENT_ID = ''
-    GOOGLE_OAUTH2_CLIENT_SECRET = ''
-
-    # register a new app:
-    GITHUB_APP_ID = ''
-    GITHUB_API_SECRET = ''
-    GITHUB_EXTENDED_PERMISSIONS = ['user:email']
-
+    SOCIAL_AUTH_URL_NAMESPACE = 'social'
+    SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL
     SOCIAL_AUTH_DEFAULT_USERNAME = 'new_social_auth_user'
     SOCIAL_AUTH_UUID_LENGTH = 3
     SOCIAL_AUTH_SESSION_EXPIRATION = False
     SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
+    SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
+    SOCIAL_AUTH_FORCE_EMAIL_VALIDATION = True
 
-    LOGIN_URL = '/'
-    LOGIN_REDIRECT_URL = '/'
-    LOGIN_ERROR_URL = '/'
+    SOCIAL_AUTH_LOGIN_URL = '/'
+    SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+    SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 
 # ------ DJANGO-LEAFLET SETTINGS ------ #
 

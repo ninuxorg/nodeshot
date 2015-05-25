@@ -102,8 +102,11 @@ class Profile(AbstractBaseUser, PermissionsMixin):
             and self.email_set.filter(email=self.email).count() < 1
         ):
             self.email_set.add_email(self, email=self.email)
-            self.email_set.last().set_as_primary()
-
+            try:
+                self.email_set.last().set_as_primary()
+            except Exception:
+                pass
+            
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
