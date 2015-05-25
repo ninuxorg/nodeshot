@@ -339,10 +339,8 @@ if 'social.apps.django_app.default' in INSTALLED_APPS:
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
         'nodeshot.community.profiles.backends.EmailBackend',
-        'social.backends.facebook.FacebookAppOAuth2',
         'social.backends.facebook.FacebookOAuth2',
         'social.backends.github.GithubOAuth2',
-        'social.backends.google.GoogleOAuth',
         'social.backends.google.GoogleOAuth2',
     )
 
@@ -352,8 +350,8 @@ if 'social.apps.django_app.default' in INSTALLED_APPS:
         'social.pipeline.social_auth.auth_allowed',
         'social.pipeline.social_auth.social_user',
         'social.pipeline.user.get_username',
-        'social.pipeline.social_auth.associate_by_email', 
-        'nodeshot.community.profiles.social_auth_extra.pipeline.create_user', 
+        'social.pipeline.social_auth.associate_by_email',
+        'nodeshot.community.profiles.social_auth_extra.pipeline.create_user',
         'social.pipeline.social_auth.associate_user',
         'nodeshot.community.profiles.social_auth_extra.pipeline.load_extra_data',
         'social.pipeline.user.user_details',

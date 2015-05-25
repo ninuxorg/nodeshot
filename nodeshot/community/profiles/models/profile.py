@@ -98,15 +98,12 @@ class Profile(AbstractBaseUser, PermissionsMixin):
             except Group.DoesNotExist:
                 pass
         # keep in sync with EmailAddress model
-        if (EMAIL_CONFIRMATION and sync_emailaddress and self.email
-            and self.email_set.filter(email=self.email).count() < 1
-        ):
+        if (EMAIL_CONFIRMATION and sync_emailaddress
+                               and self.email
+                               and self.email_set.filter(email=self.email).count() < 1):
             self.email_set.add_email(self, email=self.email)
-            try:
-                self.email_set.last().set_as_primary()
-            except Exception:
-                pass
-            
+            self.email_set.last().set_as_primary()
+
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.

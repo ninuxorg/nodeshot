@@ -44,7 +44,7 @@ if 'social.apps.django_app.default' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         url(r'', include('social.apps.django_app.urls', namespace='social')),
     )
-    
+
 if 'grappelli' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         url(r'^grappelli/', include('grappelli.urls')),
