@@ -25,7 +25,7 @@
 <div class="row-ns">
     <form action="" id="js-search" class="input-group width30 marginright">
         <input type="text" class="form-control" placeholder="{% trans 'Quick search' %}" value="<%= collection.searchTerm %>">
-        <span class="input-group-addon icon-search"></span>
+        <span class="input-group-addon icon-search cursor-pointer" id="js-search-button"></span>
     </form>
 
     <!--<div class="dropdown input-group width30 marginright">
@@ -84,7 +84,7 @@
         </span>
     </div>
     <% } %>
-    
+
     <% if (options.addNode) { %>
     <button class="btn btn-light icon-plus pull-right" id="js-add-node">{% trans 'Add node' %}</button>
     <% } %>

@@ -31,6 +31,7 @@
         events:{
             'click .not-implemented': 'notImplemented',
             'submit #js-search': 'search',
+            'click #js-search-button': 'search',
             'click #js-reset-filter': 'resetFilter',
             'click #js-open-filter-panel': 'openFilterPanel',
             'click #js-add-node': 'addNode',

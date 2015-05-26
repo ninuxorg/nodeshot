@@ -103,3 +103,7 @@
 /* notification icons */
 #notifications .icon-node:before { content: '\e807' }
 #notifications .icon-custom:before { content: '\e81d' }
+
+.cursor-pointer{
+  cursor: pointer;
+}
