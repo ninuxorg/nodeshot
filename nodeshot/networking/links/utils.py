@@ -1,3 +1,9 @@
+import logging
+logger = logging.getLogger()
+
+from .models import Topology
+
+
 links_legend = [
     {
         "name": "Link",
@@ -9,3 +15,11 @@ links_legend = [
         "text_color": "#ffffff",
     }
 ]
+
+
+def update_topology():
+    for topology in Topology.objects.all():
+        try:
+            topology.update()
+        except Exception as e:
+            logger.error(e)
