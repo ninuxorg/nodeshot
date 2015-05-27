@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext as _
 
-from nodeshot.core.layers.admin import  LayerAdmin
+from nodeshot.core.layers.admin import LayerAdmin
 from nodeshot.core.nodes.admin import NodeAdmin
 
 from .models import LayerExternal, NodeExternal

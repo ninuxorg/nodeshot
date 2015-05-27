@@ -120,7 +120,7 @@ class Command(BaseCommand):
             try:
                 instance = Synchronizer(layer, verbosity=self.verbosity)
                 self.stdout.write('Processing layer "%s"\r\n' % layer.slug)
-                messages = instance.process()
+                messages = instance.sync()
             except ImproperlyConfigured, e:
                 self.stdout.write('Validation error: %s\r\n' % e)
                 continue

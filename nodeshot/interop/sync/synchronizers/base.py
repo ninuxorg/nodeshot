@@ -69,7 +69,7 @@ class BaseSynchronizer(object):
         """ anything that should be executed after the import is complete goes here """
         pass
 
-    def process(self):
+    def sync(self):
         """
         This is the method that does everything automatically (at least attempts to).
 
