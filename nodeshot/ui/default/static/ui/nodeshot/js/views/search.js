@@ -27,6 +27,7 @@
 
         events:{
             'keyup input': 'keyupOnSearch',
+            'click @ui.icon': 'clickOnSearch',
             'mouseover ul': 'removeArtificialFocus',
             'click a': 'getResult',
             /* mobile adjustments */
@@ -130,6 +131,11 @@
                 this.stopSpinning();
                 this.hideResults();
             }
+        },
+
+        clickOnSearch: function(e){
+            this.typing = false;
+            this.search(this.ui.input.val());
         },
 
         search: function(q){
