@@ -298,12 +298,13 @@ if __name__ == "__main__":
                 for b in range(0,len(ipsB)):
                     if not found:
                         ipA, ipB = ipsA[a], ipsB[b]
+                        print "Processing: %s <-> %s" % (ipA, ipB)
                         saved_links =  Link.objects.filter(Q(from_interface__ipv4_address=ipA , to_interface__ipv4_address=ipB ) |  Q(from_interface__ipv4_address=ipB , to_interface__ipv4_address=ipA ))
                         if saved_links.count() > 0:
                             # if a link already exists, update
                             l = saved_links[0]
                             if not l.from_interface.draw_link or not l.to_interface.draw_link:
-                                continue
+                                print "no draw_link flag detected"
                             l.etx = etx
                             l.save()
                             old_links[l.id] = True
@@ -325,6 +326,8 @@ if __name__ == "__main__":
                                 found = True
                                 activenodes.add(fi.get().device.node.id)
                                 activenodes.add(to.get().device.node.id)
+                              else:
+                                print "Anomaly: %s vs %s" % (fi, to)
                             elif fi.count() > 1 or to.count() >1:
                                 print "Anomaly: More than one interface for ip address"
                                 print fi, to
