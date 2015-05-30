@@ -1,5 +1,5 @@
 import logging
-logger = logging.getLogger()
+logger = logging.getLogger('nodeshot.networking')
 
 from .models import Topology
 
@@ -21,5 +21,5 @@ def update_topology():
     for topology in Topology.objects.all():
         try:
             topology.update()
-        except Exception as e:
-            logger.error(e)
+        except Exception:
+            logger.exception('Failed to update {}'.format(topology.__repr__()))

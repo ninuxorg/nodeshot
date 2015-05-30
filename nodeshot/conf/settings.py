@@ -200,7 +200,7 @@ LOGGING = {
     },
     'handlers': {
         'sentry': {
-            'level': 'ERROR',
+            'level': 'WARNING',
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
         },
         'console': {
@@ -213,7 +213,7 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        'logfile': {
+        'mainlog': {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'verbose',
@@ -222,26 +222,40 @@ LOGGING = {
             'backupCount': 3,
             'formatter': 'verbose'
         },
+        'networkinglog': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'verbose',
+            'filename': settings.SITE_ROOT + "/../log/networking.log",
+            'maxBytes': 10485760,  # 10 MB
+            'backupCount': 3,
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['logfile'],
+            'handlers': ['mainlog'],
             'level': 'ERROR',
             'propagate': True,
         },
         'django.request': {
-            'handlers': ['mail_admins', 'logfile'],
+            'handlers': ['mail_admins', 'mainlog'],
             'level': 'ERROR',
             'propagate': True,
         },
         '': {
-            'handlers': ['logfile'],
+            'handlers': ['mainlog'],
             'level': 'ERROR',
         },
         'django.db.backends': {
             'level': 'ERROR',
             'handlers': ['console'],
             'propagate': False,
+        },
+        'nodeshot.networking': {
+            'handlers': ['networkinglog'],
+            'level': 'WARNING',
+            'propagate': True,
         },
         'raven': {
             'level': 'DEBUG',

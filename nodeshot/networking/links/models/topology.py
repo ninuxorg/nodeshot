@@ -46,8 +46,8 @@ class Topology(BaseDate):
 
     def diff(self):
         """ shortcut to netdiff.diff """
-        current = NetJsonParser(self.json())
         latest = self.latest
+        current = NetJsonParser(self.json())
         return diff(current, latest)
 
     def json(self):
