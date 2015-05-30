@@ -18,6 +18,10 @@ links_legend = [
 
 
 def update_topology():
+    """
+    updates all the topology
+    sends logs to the "nodeshot.networking" logger
+    """
     for topology in Topology.objects.all():
         try:
             topology.update()
