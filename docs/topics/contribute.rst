@@ -35,56 +35,17 @@ That's where you can work on your changes before pushing them upstream.
 
 .. _Fork the nodeshot repository: https://github.com/ninuxorg/nodeshot/fork
 
-============================
-4. Install nodeshot manually
-============================
+===================================
+4. Install nodeshot for development
+===================================
 
-Follow the procedure described in :doc:`manual_install` until **"Project configuration"**,
-watch out for the instructions to install a **development environment**.
+Follow the procedure described in :doc:`install_development`.
 
 ==============================
 5. Learn how to run unit tests
 ==============================
 
-Now try to run the test suites of the different modules.
-
-.. warning::
-    These instructions should apply to development environments only
-
-Enable user ``nodeshot`` to create and destroy databases::
-
-    ALTER USER nodeshot SUPERUSER;
-
-Install the hstore extension on template1 according to `how to run tests with django-hstore`_.::
-
-    psql template1 -c 'CREATE EXTENSION hstore;'
-
-.. _how to run tests with django-hstore: http://djangonauts.github.io/django-hstore/#_running_tests
-
-Ensure your virtualenv is activated::
-
-    workon nodeshot
-
-Go in the tests directory of your nodeshot fork::
-
-    cd /var/www/nodeshot/tests
-
-Each module has its own tests, so if you would like to run the tests
-for ``nodeshot.core.nodes`` you should use::
-
-    python manage.py test nodeshot.core.nodes
-
-If you want to test more modules at once you can use::
-
-    python manage.py test nodeshot.core.nodes nodeshot.core.layers nodeshot.core.cms
-
-If you want to test all the modules at once you have start the development server::
-
-    python manage.py runserver
-
-and then use::
-
-    ./runtests.py
+Learn how to run unit tests in :ref:`test-env`.
 
 ===========================================
 6. Follow PEP8, Style Guide for Python Code
@@ -120,18 +81,7 @@ that the code you wrote is behaving as expected.
 
 Ensure that all the tests pass and that test coverage is not under 90%.
 
-Ensure your virtualenv is activated::
-
-    workon nodeshot
-
-Install the coverage python package::
-
-    pip install coverage
-
-Run the test coverage utility::
-
-    coverage run --source=nodeshot manage.py test nodeshot
-    coverage report
+More info on :ref:`test-coverage`.
 
 =========================
 10. Document your changes
@@ -140,11 +90,7 @@ Run the test coverage utility::
 If you are adding features to modules or changing the default behaviour
 ensure to document your changes by editing the files in the ``/docs`` folder.
 
-The format used in the docs is **reStructured Text** while the python package used is **python-sphinx**.
-
-`Read more information about Sphinx and reStructured Text`_.
-
-.. _Read more information about Sphinx and reStructured Text: http://sphinx-doc.org/tutorial.html
+Read more about this topic in :ref:`build-the-docs`.
 
 =====================
 11. Open pull request

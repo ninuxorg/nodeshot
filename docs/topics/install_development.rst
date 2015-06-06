@@ -138,9 +138,11 @@ you can setup the development server to listen on all the network interfaces::
 
 Now you can open your browser at http://localhost:8000/ or at http://localhost:8000/admin/.
 
-=============================
-Setup the testing environment
-=============================
+.. _test-env:
+
+=================================
+How to setup the test environment
+=================================
 
 The ``/test`` directory contains a nodeshot project called ``ci`` (stands for continuous integration)
 that is needed to run automated tests (unit tests, functional tests and regression tests).
@@ -184,6 +186,8 @@ You can also test more modules::
 
     python manage.py test nodeshot.core.nodes nodeshot.core.layers nodeshot.core.cms
 
+.. _test-coverage:
+
 Test coverage
 -------------
 
@@ -199,9 +203,11 @@ Calculate test coverage for specific modules::
 
     coverage run --source=nodeshot.core.nodes ./manage.py test nodeshot.core.nodes && coverage report
 
-=======================
-Build the documentation
-=======================
+.. _build-the-docs:
+
+==============================
+How to build the documentation
+==============================
 
 Building the documentation locally is useful for several reasons:
 
@@ -225,6 +231,14 @@ Now build the docs with::
     make html
 
 Quite some html files have been created, you can browse those HTML files in a web browser and it should work.
+
+The format used in the docs is **reStructured Text** while the python package used is **python-sphinx**.
+
+`Read more information about Sphinx and reStructured Text`_.
+
+.. _Read more information about Sphinx and reStructured Text: http://sphinx-doc.org/tutorial.html
+
+.. _contribute-dev:
 
 ==========
 Contribute

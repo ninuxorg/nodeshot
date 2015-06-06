@@ -11,7 +11,7 @@ This section describes how to perform a quick install of Nodeshot on **Ubuntu / 
 
     The most typical would be having the port 80 already in use by Apache.
 
-    In that case, you should consider using the :doc:`manual_install` procedure in order to install according to your needs.
+    In that case, you should consider using the :doc:`install_production_manual` procedure in order to install according to your needs.
 
 =============
 Prerequisites
@@ -48,6 +48,12 @@ eg::
     unzip nodeshot-fabfile.zip
     rm nodeshot-fabfile.zip
     cd nodeshot-fabfile-master
+
+Alternatively you can use git::
+
+    sudo apt-get install git
+    git clone https://github.com/ninuxorg/nodeshot-fabfile.git
+    cd nodeshot-fabfile
 
 ================
 Start installing
