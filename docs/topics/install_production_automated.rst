@@ -1,5 +1,5 @@
 *********************************
-Automated production installation
+Automated Production Installation
 *********************************
 
 This section describes how to perform a quick install of Nodeshot on **Ubuntu / Debian systems**.

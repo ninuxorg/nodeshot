@@ -80,8 +80,8 @@ Contents
    :maxdepth: 2
 
    /topics/install_development
-   /topics/automated_install
-   /topics/manual_install
+   /topics/install_production_automated
+   /topics/install_production_manual
    /topics/contribute
    /topics/admin
    /topics/api
