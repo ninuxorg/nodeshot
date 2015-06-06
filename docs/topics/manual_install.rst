@@ -62,7 +62,7 @@ Install the dependencies (Ubuntu 13 and Debian 7)::
 
     apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev python-gdal libjpeg-dev
 
-If you are using Ubuntu 14 LTS, use this command instead::
+If you are using Ubuntu 14 LTS (or a more recent Debian version), use this command instead::
 
     apt-get install python-software-properties software-properties-common build-essential postgresql postgresql-server-dev-9.3 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev python-gdal libjpeg-dev
 
