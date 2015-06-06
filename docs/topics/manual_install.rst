@@ -138,18 +138,16 @@ Now, if you are installing for **production** you should install nodeshot and it
 
     pip install https://github.com/ninuxorg/nodeshot/tarball/master
 
-Otherwise if you are installing for **development** and you intend to :doc:`contribute to nodeshot <contribute>`, you should install by using git::
+Otherwise if you are installing for **development** and you intend to :doc:`contribute to nodeshot <contribute>`, you should install your own fork::
 
-    # install git if not installed yet
-    apt-get install git-core
+    git clone git@github.com:<YOUR-FORK>/nodeshot.git
+    cd nodeshot
     # be sure to be in the virtualenv
     workon nodeshot
-    # install nodeshot via git
-    pip install -e git+git://github.com/<YOUR-FORK>/nodeshot#egg=nodeshot
+    # install your fork
+    python setup.py develop
 
 Replace ``<YOUR-FORK>`` with your github username (have you `forked nodeshot`_, right?).
-
-You will find the cloned git repository in ``/usr/local/lib/virtualenvs/nodeshot/src/nodeshot``.
 
 .. _forked nodeshot: https://github.com/ninuxorg/nodeshot/fork
 
@@ -183,20 +181,25 @@ Open ``settings.py``::
 
     vim <myproject>/settings.py
 
-And edit the following settings:
+And edit the following settings with your configuration:
 
 * ``DOMAIN`` (domain or ip address)
 * ``DATABASE`` (host, db, user and password)
 
 If you are installing for **development**, you should put **"localhost"** as ``DOMAIN``.
 
-Setup database and static files (images, css, js):
+Now setup the database:
 
 .. code-block:: bash
 
     exit  # go back being non-root
     # will prompt you to create a superuser, proceed!
     ./manage.py syncdb && ./manage.py migrate --no-initial-data && ./manage.py loaddata initial_data
+
+Copy static assets (javascript, css, images):
+
+.. code-block:: bash
+
     # static files (css, js, images)
     ./manage.py collectstatic
 
