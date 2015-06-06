@@ -132,7 +132,7 @@ which will store all our python packages indipendently from the packages install
 
 Update the distribute package::
 
-    pip install -U distribute
+    pip install -U distribute pip wheel
 
 Now, if you are installing for **production** you should install nodeshot and its dependencies with::
 
