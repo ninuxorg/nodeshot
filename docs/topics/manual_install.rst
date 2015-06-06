@@ -1,21 +1,12 @@
-.. _manual-install-label:
-**************
-Manual Install
-**************
+******************************
+Manual Production Installation
+******************************
 
 .. warning::
-    This file describes how to install nodeshot on **Ubuntu Server 13.10**,
-    **Ubuntu Server 14.04 LTS** and **Debian 7**
+    This document describes how to install nodeshot **Ubuntu Server 14.04 LTS** and **Debian 7**
     (other versions of ubuntu and debian should work as well with minor tweaks).
 
-    Other Linux distributions will be good as well but you will have to use the
-    package names according to your distribution package manager.
-
-Other linux distributions will work as well but you will need to find the right
-package names to install for the specific distribution you are using.
-
-If you are installing for a **development environment** you need to follow the
-instructions until the section :ref:`project-configuration`.
+    Other Linux distributions are good as well but the name of some packages may vary.
 
 If you already have the required dependencies installed you can skip to
 :ref:`install-python-packages` and follow until :ref:`project-configuration`.
@@ -58,28 +49,17 @@ First of all I suggest to become ``root`` to avoid typing sudo each time::
 
     sudo -s
 
-Install the dependencies (Ubuntu 13 and Debian 7)::
+First of all, update your apt cache::
 
-    apt-get install python-software-properties software-properties-common build-essential postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev python-gdal libjpeg-dev
+    sudo apt-get update --fix-missing
 
-If you are using Ubuntu 14 LTS (or a more recent Debian version), use this command instead::
+Install development packages::
 
-    apt-get install python-software-properties software-properties-common build-essential postgresql postgresql-server-dev-9.3 postgresql-contrib libxml2-dev python-setuptools python-virtualenv python-dev binutils libproj-dev gdal-bin libpq-dev libgdal1-dev wget checkinstall libjson0-dev python-gdal libjpeg-dev
+    sudo apt-get install python-software-properties software-properties-common build-essential libxml2-dev python-setuptools python-virtualenv python-dev binutils libjson0-dev libjpeg-dev libffi-dev wget git
 
-Download and compile **Postgis 2.1.3**::
+Install postgresql, postgis and geospatial libraries::
 
-    wget http://download.osgeo.org/postgis/source/postgis-2.1.3.tar.gz
-    tar xfvz postgis-2.1.3.tar.gz
-    cd postgis-2.1.3
-    ./configure
-    make
-    checkinstall -y  # if you need to uninstall you can do it  with "dpkg -r postgis"
-    cd ..
-    rm -rf postgis-2.1.3
-
-If on **debian 7** you get an error complaining about the fact that ``/usr/share/postgresql/9.1/contrib/`` does not exist run this command before ``checkinstall -y``::
-
-    mkdir -p '/usr/share/postgresql/9.1/contrib/postgis-2.1'
+    sudo apt-get install postgis* libproj-dev gdal-bin libpq-dev libgdal1-dev python-gdal
 
 .. _create-database:
 
@@ -125,31 +105,18 @@ First of all, install virtualenvwrapper::
     echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bash_profile
     source ~/.bashrc
 
-Create a **python virtual environment**, a self-contained python installation
-which will store all our python packages indipendently from the packages installed systemwide::
+Now you can create a **python virtual environment**, which is a self-contained python installation
+which will contain all the python packages required by nodeshot::
 
     mkvirtualenv nodeshot
 
-Update the distribute package::
+Update the basic python utilities::
 
-    pip install -U distribute pip wheel
+    pip install -U setuptools pip wheel
 
 Now, if you are installing for **production** you should install nodeshot and its dependencies with::
 
     pip install https://github.com/ninuxorg/nodeshot/tarball/master
-
-Otherwise if you are installing for **development** and you intend to :doc:`contribute to nodeshot <contribute>`, you should install your own fork::
-
-    git clone git@github.com:<YOUR-FORK>/nodeshot.git
-    cd nodeshot
-    # be sure to be in the virtualenv
-    workon nodeshot
-    # install your fork
-    python setup.py develop
-
-Replace ``<YOUR-FORK>`` with your github username (have you `forked nodeshot`_, right?).
-
-.. _forked nodeshot: https://github.com/ninuxorg/nodeshot/fork
 
 Now create the directory structure that will contain the project,
 a typical web app is usually installed in ``/var/www/``::
@@ -186,8 +153,6 @@ And edit the following settings with your configuration:
 * ``DOMAIN`` (domain or ip address)
 * ``DATABASE`` (host, db, user and password)
 
-If you are installing for **development**, you should put **"localhost"** as ``DOMAIN``.
-
 Now setup the database:
 
 .. code-block:: bash
@@ -196,28 +161,9 @@ Now setup the database:
     # will prompt you to create a superuser, proceed!
     ./manage.py syncdb && ./manage.py migrate --no-initial-data && ./manage.py loaddata initial_data
 
-Copy static assets (javascript, css, images):
+Copy static assets (javascript, css, images)::
 
-.. code-block:: bash
-
-    # static files (css, js, images)
     ./manage.py collectstatic
-
-If you are installing for **development** there's one last step:
-you just need to **run the django development server** in order to reach the web application:
-
-.. code-block:: bash
-
-    # for development only!
-    # listens only on 127.0.0.1
-    ./manage.py runserver
-    # open browser at http://localhost:8000/admin/
-
-    # alternatively, if you need to reach the dev server for other computers
-    # on the same LAN, tell it to listen on all the interfaces:
-    ./manage.py runserver 0.0.0.0:8000
-
-**If you intend to contribute to nodeshot**, be sure to read :doc:`How to contribute to nodeshot <contribute>`.
 
 .. _production-instructions:
 
@@ -233,9 +179,6 @@ software stack:
 * **Supervisor**: daemon process manager (used to manage uwsgi, celery and celery-beat)
 * **Redis**: in memory key-value store (used as a message broker and cache storage)
 * **Postfix**: SMTP server (send mails to users)
-
-.. note::
-    If you are installing for development you can skip the rest of this chapter.
 
 -----
 Nginx
