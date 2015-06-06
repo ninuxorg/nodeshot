@@ -43,6 +43,8 @@ DATABASES = {
     #}
 }
 
+POSTGIS_VERSION = (2, 1)
+
 # sentry integration
 #RAVEN_CONFIG = {
 #    'dsn': 'https://<api-public-key>:<api-secret-key>@<sentry.host>/<id>?timeout=5&verify_ssl=0',
