@@ -79,6 +79,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   /topics/install_development
    /topics/automated_install
    /topics/manual_install
    /topics/contribute

@@ -1,12 +1,10 @@
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'nodeshot_ci',
-        'USER': 'custom_user',
-        'PASSWORD': 'custom_password',
+        'NAME': 'nodeshot',
+        'USER': 'nodeshot',
+        'PASSWORD': 'your_password',
         'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'PORT': '',
     }
 }
-
-DOMAIN = 'yourcustomhost.com'
