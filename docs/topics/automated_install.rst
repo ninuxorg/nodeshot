@@ -1,6 +1,6 @@
-*****************
-Automated install
-*****************
+*********************************
+Automated production installation
+*********************************
 
 This section describes how to perform a quick install of Nodeshot on **Ubuntu / Debian systems**.
 
@@ -108,63 +108,3 @@ If you need to specify parameters without the need to be prompted do::
 You could also set a different ``root_dir`` with::
 
     fab update:use_defaults=True,root_dir=/custom/path/,project_name=<project_name> -H <remote_host> -u root -p <password>
-
-======================================
-Install on a VM hosted on your machine
-======================================
-
-The above procedure can be also executed on a Virtual Machine following the instructions below.
-
-For this purpose we'll be using `VirtualBox`_  and `Vagrant`_ , a platform for configuring lightweight, reproducible, and portable development environments.
-
-.. _VirtualBox: https://www.virtualbox.org/
-.. _Vagrant: http://www.vagrantup.com/
-
-------------
-Installation
-------------
-Informations on how to install **VirtualBox** and **Vagrant** on different platforms can be found on their respective websites.
-
-On a Ubuntu Linux distribution it's as easy as::
-
-    apt-get install virtualbox
-    apt-get install vagrant
-
--------------
-Configuration
--------------
-
-**VirtualBox**
-
-You will need to add a private virtual network interface, in order to enable communication between your host and the Vagrant VM::
-
-    VBoxManage hostonlyif create
-    VBoxManage hostonlyif ipconfig vboxnet0 --ip <host private ip address. e.g: 192.168.56.1>
-
-**Vagrant**
-
-Configure Vagrant VM network and enable root access on it::
-
-    # Create a directory for your Vagrant VMs
-    mkdir vagrantVM_Dir
-    cd vagrantVM_Dir
-    # Initialize a Ubuntu 12.04 VM ( use hashicorp/precise32 or hashicorp/precise64 depending on your system)
-    vagrant init hashicorp/precise64
-    # Edit Vagrantfile and create a host-only private network which allows host-only access to the machine
-    vim Vagrantfile
-    # Uncomment line 27 and change the IP address according to the one you defined for your host
-    # e.g. config.vm.network "private_network", ip: "192.168.56.2"
-
-    # Start Vagrant
-    vagrant up
-    # ssh into VM and abilitate root login
-    vagrant ssh
-    vagrant@precise64:~$ sudo -i
-    root@precise64:~# passwd root
-    Enter new UNIX password:
-    Retype new UNIX password:
-    passwd: password updated successfully
-
-Once completed the above steps, you can run the Nodeshot install procedure as you would do on a remote host::
-
-    fab install -H <VM ip address> -u root -p password
