@@ -37,3 +37,4 @@ nodeshot.egg-info/
 deploy
 docs/_*
 /manage.py
+/dev
