@@ -32,7 +32,7 @@ djangorestframework-gis==0.7
 djangorestframework-hstore==1.1
 
 # authentication with social networks
-python-social-auth==0.2.9
+python-social-auth==0.2.10
 
 # versionable content
 django-reversion==1.8.2
