@@ -30,6 +30,7 @@ django-rest-swagger
 markdown
 djangorestframework-gis==0.7
 djangorestframework-hstore==1.1
+geojson-elevation==0.1
 
 # authentication with social networks
 python-social-auth==0.2.10

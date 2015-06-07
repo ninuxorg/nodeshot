@@ -257,11 +257,10 @@ status_list = StatusList.as_view()
 
 # --------- Utils ---------#
 
-import requests
-from collections import OrderedDict
-from django.contrib.gis.geos import Point, LineString
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from geojson_elevation.backends.google import elevation
+
 from .settings import ELEVATION_API_KEY, ELEVATION_DEFAULT_SAMPLING
 
 
@@ -276,55 +275,7 @@ def elevation_profile(request, format=None):
     """
     if format is None:
         format = 'json'
-    url = 'https://maps.googleapis.com/maps/api/elevation/{0}'.format(format)
-    params = request.QUERY_PARAMS.copy()
-    original = 'original' in request.QUERY_PARAMS
-    is_path = 'path' in request.QUERY_PARAMS
-    samples = request.QUERY_PARAMS.get('samples')
 
-    # add api key if present
-    if ELEVATION_API_KEY:
-        params['key'] = ELEVATION_API_KEY
-
-    # automatic sampling
-    if is_path and not samples:
-        points = []
-        # convert path in list of Point objects
-        for latlng in request.QUERY_PARAMS['path'].split('|'):
-            latlng = latlng.split(',')
-            points.append(Point(float(latlng[1]), float(latlng[0])))
-        if len(points) > 1:
-            # length of the path in meters
-            length = LineString(*points).length * 100000
-            # get 1 point every x meters, where x is defined in ELEVATION_DEFAULT_SAMPLING
-            samples = int(round(length / ELEVATION_DEFAULT_SAMPLING))
-            # use the automatically calculated value as long as it is compatibile with the API usage limits
-            params['samples'] = samples if samples <= 512 else 512
-    # send request to Google Elevation API
-    response = requests.get(url, params=params)
-    data = response.json()
-
-    # if ok convert to GeoJSON
-    if data['status'] == 'OK' and original is False:
-        # if more than one result use LineString
-        if len(data['results']) > 1:
-            geometry = 'LineString'
-        # else use Point
-        else:
-            geometry = 'Point'
-        # lng, lat, z coordinates
-        coordinates = []
-        for point in data['results']:
-            coordinates.append([point['location']['lng'],
-                                point['location']['lat'],
-                                point['elevation']])
-        return Response(OrderedDict((
-            ('type', 'Feature'),
-            ('geometry', OrderedDict((
-                ('type', geometry),
-                ('coordinates', coordinates)
-            )))
-        )))
-    # else return original response
-    else:
-        return Response(data, status=response.status_code)
+    return Response(elevation(request.QUERY_PARAMS.get('path'),
+                              api_key=ELEVATION_API_KEY,
+                              sampling=ELEVATION_DEFAULT_SAMPLING))
