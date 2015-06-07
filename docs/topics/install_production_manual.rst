@@ -171,7 +171,7 @@ Copy static assets (javascript, css, images)::
 Production instructions
 =======================
 
-In production you will need more reliable instruments, we recommend the following
+In production you will need reliable instruments, we recommend the following
 software stack:
 
 * **Nginx**: main web server
