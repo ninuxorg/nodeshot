@@ -440,11 +440,13 @@
             // mouse over / out events
             leafletLayer.on({
                 mouseover: function (e) {
+                    var l = e.target,
+                        type = l.feature.geometry.type;
                     // opacity to 1
-                    e.target.setStyle({ fillOpacity: 1 });
+                    l.setStyle({ fillOpacity: 1 });
                     // bring to front
-                    if (!L.Browser.ie && !L.Browser.opera) {
-                        e.target.bringToFront({ fillOpacity: 1 });
+                    if (!L.Browser.ie && !L.Browser.opera && type === 'Point') {
+                        l.bringToFront({ fillOpacity: 1 });
                     }
                 },
                 mouseout: function (e) {
@@ -483,6 +485,10 @@
             // show on map only if corresponding nodeshot layer is visible
             if (layer && layer.get('visible')) {
                 legend.cluster.addLayer(leafletLayer);
+                // avoid covering points
+                if (leafletLayer._map && leafletLayer.feature.geometry.type !== 'Point') {
+                    leafletLayer.bringToBack();
+                }
             }
         },
 
