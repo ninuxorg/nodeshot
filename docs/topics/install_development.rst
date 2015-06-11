@@ -217,7 +217,7 @@ Building the documentation locally is useful for several reasons:
 
 So let's **build the docs**!
 
-Install sphins::
+Install sphinx::
 
     workon nodeshot
     pip install sphinx
