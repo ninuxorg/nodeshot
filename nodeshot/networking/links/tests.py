@@ -292,23 +292,42 @@ class TopologyTest(BaseTestCase):
         self.assertEqual(t.link_set.count(), 0)
         t.update()
         self.assertEqual(t.link_set.count(), 2)
+        link = Link.get_link(source='172.16.40.1', target='172.16.40.2')
+        self.assertEqual(link.status, LINK_STATUS['active'])
+        self.assertEqual(link.topology, t)
+        self.assertEqual(link.metric_value, 2.0)
+        link = Link.get_link(source='172.16.40.3', target='172.16.40.4')
+        self.assertEqual(link.status, LINK_STATUS['active'])
+        self.assertEqual(link.topology, t)
+        self.assertEqual(link.metric_value, 1.0)
 
     def test_update_nothing(self):
         t = Topology.objects.first()
         t.update()
         t.update()
         self.assertEqual(t.link_set.count(), 2)
+        link = Link.get_link(source='172.16.40.1', target='172.16.40.2')
+        self.assertEqual(link.status, LINK_STATUS['active'])
+        self.assertEqual(link.topology, t)
+        self.assertEqual(link.metric_value, 2.0)
+        link = Link.get_link(source='172.16.40.3', target='172.16.40.4')
+        self.assertEqual(link.status, LINK_STATUS['active'])
+        self.assertEqual(link.topology, t)
+        self.assertEqual(link.metric_value, 1.0)
 
-    def test_update_removed(self):
+    def test_update_1_removed_1_changed(self):
         t = Topology.objects.first()
         t.update()
-        self.assertEqual(t.link_set.filter(status=LINK_STATUS['active']).count(), 2)
         t.url = t.url.replace('topology.json', 'topology_2.json')
         t.save()
         # ensure 1 link is removed
         t.update()
-        self.assertEqual(t.link_set.filter(status=LINK_STATUS['active']).count(), 1)
-        self.assertEqual(t.link_set.filter(status=LINK_STATUS['disconnected']).count(), 1)
-        # ensure disconnected one is right
-        link = Link.find_from_tuple(('172.16.40.3', '172.16.40.4'))
+        link = Link.get_link(source='172.16.40.3', target='172.16.40.4')
         self.assertEqual(link.status, LINK_STATUS['disconnected'])
+        self.assertEqual(link.topology, t)
+        self.assertEqual(link.metric_value, 1.0)
+        # ensure 1 link has changed
+        link = Link.get_link(source='172.16.40.1', target='172.16.40.2')
+        self.assertEqual(link.status, LINK_STATUS['active'])
+        self.assertEqual(link.topology, t)
+        self.assertEqual(link.metric_value, 1.0)

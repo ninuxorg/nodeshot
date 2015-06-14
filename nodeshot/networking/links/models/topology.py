@@ -9,7 +9,6 @@ from django.utils.module_loading import import_by_path
 
 from nodeshot.core.base.models import BaseDate
 
-from .choices import LINK_STATUS
 from ..settings import PARSERS
 
 
@@ -91,26 +90,18 @@ class Topology(BaseDate):
         from .link import Link  # avoid circular dependency
         diff = self.diff()
 
-        for link_tuple in diff['added']:
-            link = Link.find_or_create(link_tuple)
-            changed = False
-            if link.status != LINK_STATUS.get('active'):
-                link.status = LINK_STATUS.get('active')
-                changed = True
-            if link.topology != self:
-                link.topology = self
-                changed = True
-            if changed:
-                link.save()
+        status = {
+            'added': 'active',
+            'removed': 'disconnected',
+            'changed': 'active'
+        }
 
-        for link_tuple in diff['removed']:
-            link = Link.find_or_create(link_tuple)
-            changed = False
-            if link.status != LINK_STATUS.get('disconnected'):
-                link.status = LINK_STATUS.get('disconnected')
-                changed = True
-            if link.topology != self:
-                link.topology = self
-                changed = True
-            if changed:
-                link.save()
+        for section in ['added', 'removed', 'changed']:
+            if diff[section]:
+                for link_dict in diff[section]['links']:
+                    link = Link.get_or_create(source=link_dict['source'],
+                                              target=link_dict['target'],
+                                              weight=link_dict['weight'],
+                                              topology=self)
+                    link.ensure(status=status[section],
+                                weight=link_dict['weight'])

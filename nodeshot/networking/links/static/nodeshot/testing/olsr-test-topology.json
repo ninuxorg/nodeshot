@@ -5,7 +5,7 @@
             "destinationIP": "172.16.40.2",
             "linkQuality": 0.195,
             "neighborLinkQuality": 0.184,
-            "tcEdgeCost": 28334,
+            "tcEdgeCost": 2048,
             "validityTime": 284572
         },
         {

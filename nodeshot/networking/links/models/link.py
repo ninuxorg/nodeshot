@@ -267,3 +267,19 @@ class Link(BaseAccessLevel):
             return 0
         # PLACEHOLDER
         return 6
+
+    def ensure(self, status, weight):
+        """
+        ensure link properties correspond to the specified ones
+        perform save operation only if necessary
+        """
+        changed = False
+        status_id = LINK_STATUS[status]
+        if self.status != status_id:
+            self.status = status_id
+            changed = True
+        if self.metric_value != weight:
+            self.metric_value = weight
+            changed = True
+        if changed:
+            self.save()
