@@ -3,7 +3,7 @@ from rest_framework_gis import serializers as gis_serializers
 
 from nodeshot.core.base.serializers import DynamicRelationshipsMixin
 
-from .models import *
+from .models import Link
 
 
 __all__ = [

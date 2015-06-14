@@ -7,8 +7,8 @@ from rest_framework import authentication, generics
 from nodeshot.core.base.mixins import ACLMixin
 from nodeshot.core.nodes.models import Node
 
-from .serializers import *
-from .models import *
+from .serializers import *  # noqa
+from .models import Link
 
 
 class LinkList(ACLMixin, generics.ListAPIView):
