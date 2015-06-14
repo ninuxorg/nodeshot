@@ -169,17 +169,17 @@ class Link(BaseAccessLevel):
         super(Link, self).save(*args, **kwargs)
 
     @classmethod
-    def find_from_tuple(cls, link):
+    def get_link(cls, source, target, topology=None):
         """
-        Find link by providing a tuple with two ip addresses or two mac addresses
-        :param link: tuple with two string elements indicating source and destination (ip or mac addresses)
+        Find link between source and target, (or vice versa, order is irrelevant).
+        :param source: ip or mac addresses
+        :param target: ip or mac addresses
+        :param topology: optional topology relation
         :returns: Link object
+        :raises: LinkNotFound
         """
-        try:
-            a = link[0]
-            b = link[1]
-        except IndexError:
-            raise ValueError('Expecting tuple with source and destination')
+        a = source
+        b = target
         # find interfaces
         if (valid_ipv4(a) and valid_ipv4(b)) or (valid_ipv6(a) and valid_ipv6(b)):
             try:
@@ -197,27 +197,33 @@ class Link(BaseAccessLevel):
             raise ValueError('Expecting valid ipv4, ipv6 or mac address')
         # find link with interfaces
         # inverse order is also ok
-        q = Q(interface_a=a, interface_b=b) | Q(interface_a=b, interface_b=a)
+        q = (Q(interface_a=a, interface_b=b) | Q(interface_a=b, interface_b=a))
+        # add topology to lookup
+        if topology:
+            q = q & Q(topology=topology)
         link = Link.objects.filter(q).first()
         if link is None:
             raise LinkNotFound('Link matching query does not exist',
                                interface_a=a,
-                               interface_b=b)
+                               interface_b=b,
+                               topology=topology)
         return link
 
     @classmethod
-    def find_or_create(cls, link):
+    def get_or_create(cls, source, target, weight, topology=None):
         """
-        Same as `find_from_tuple` but creates the link if it does not exist
+        Tries to find a link with get_link, creates a new link if link not found.
         """
         try:
-            return cls.find_from_tuple(link)
+            return cls.get_link(source, target, topology)
         except LinkNotFound as e:
             pass
         # create link
         link = Link(interface_a=e.interface_a,
                     interface_b=e.interface_b,
-                    status=LINK_STATUS.get('active'))
+                    status=LINK_STATUS['active'],
+                    metric_value=weight,
+                    topology=topology)
         link.full_clean()
         link.save()
         return link

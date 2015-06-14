@@ -124,41 +124,70 @@ class LinkTest(BaseTestCase):
         link = Link.objects.find(link.id)
         self.assertEqual(link.type, LINK_TYPES.get('radio'))
 
-    def test_link_find_from_tuple(self):
-        self.assertEqual(Link.find_from_tuple(['172.16.41.42', '172.16.40.22']).pk, 1)
-        self.assertEqual(Link.find_from_tuple(['172.16.40.22', '172.16.41.42']).pk, 1)
-        self.assertEqual(Link.find_from_tuple(['00:27:22:00:50:71', '00:27:22:00:50:72']).pk, 1)
-        self.assertEqual(Link.find_from_tuple(['00:27:22:00:50:72', '00:27:22:00:50:71']).pk, 1)
+    def test_get_link(self):
+        self.assertEqual(Link.get_link(source='172.16.41.42', target='172.16.40.22').pk, 1)
+        self.assertEqual(Link.get_link(source='172.16.40.22', target='172.16.41.42').pk, 1)
+        self.assertEqual(Link.get_link(source='00:27:22:00:50:71', target='00:27:22:00:50:72').pk, 1)
+        self.assertEqual(Link.get_link(source='00:27:22:00:50:72', target='00:27:22:00:50:71').pk, 1)
+
+    def test_get_link_topology_none(self):
+        l = Link.get_link(source='172.16.41.42', target='172.16.40.22')
+        l.topology = Topology.objects.first()
+        l.save()
+        self.assertEqual(Link.get_link(source='172.16.41.42', target='172.16.40.22').pk, 1)
 
     def test_link_not_found(self):
         with self.assertRaises(LinkNotFound):
-            Link.find_from_tuple(['00:27:22:00:50:72', '00:27:22:38:13:E4'])
+            Link.get_link(source='00:27:22:00:50:72', target='00:27:22:38:13:E4')
 
     def test_link_data_not_found(self):
         with self.assertRaises(LinkDataNotFound):
-            Link.find_from_tuple(['00:27:22:00:50:72', 'CC:27:22:00:BB:AA'])
+            Link.get_link(source='00:27:22:00:50:72', target='CC:27:22:00:BB:AA')
 
-    def test_link_find_from_tuple_exception(self):
+    def test_get_link_value_error(self):
         with self.assertRaises(ValueError):
-            Link.find_from_tuple(['test'])
+            Link.get_link(source='127.0.0.1', target='00:27:22:00:50:71')
 
-    def test_link_find_from_tuple_exception2(self):
-        with self.assertRaises(ValueError):
-            Link.find_from_tuple(['127.0.0.1', '00:27:22:00:50:71'])
-
-    def test_link_find_or_create(self):
+    def test_link_get_or_create(self):
         # preparation
         Link.objects.delete()
         self.assertEqual(Link.objects.count(), 0)
         # create link
-        link = Link.find_or_create(['172.16.41.42', '172.16.40.22'])
+        link = Link.get_or_create(source='172.16.41.42', target='172.16.40.22', weight=1.1)
         self.assertIsInstance(link, Link)
         self.assertEqual(Link.objects.count(), 1)
+        self.assertEqual(link.status, LINK_STATUS['active'])
+        self.assertEqual(link.metric_value, 1.1)
         # second time does not create
-        link2 = Link.find_or_create(['172.16.41.42', '172.16.40.22'])
+        link2 = Link.get_or_create(source='172.16.41.42', target='172.16.40.22', weight=1.1)
         # ensure same object
         self.assertEqual(link.pk, link2.pk)
         self.assertEqual(Link.objects.count(), 1)
+
+    def test_link_test_link_get_or_create_with_topology(self):
+        # preparation
+        Link.objects.delete()
+        self.assertEqual(Link.objects.count(), 0)
+        t = Topology.objects.first()
+        # create link
+        link = Link.get_or_create(source='172.16.41.42',
+                                  target='172.16.40.22',
+                                  weight=1.1,
+                                  topology=t)
+        self.assertIsInstance(link, Link)
+        self.assertEqual(Link.objects.count(), 1)
+        self.assertEqual(link.status, LINK_STATUS['active'])
+        self.assertEqual(link.metric_value, 1.1)
+        self.assertEqual(link.topology.id, t.id)
+        # second time does not create
+        link2 = Link.get_or_create(source='172.16.41.42',
+                                   target='172.16.40.22',
+                                   weight=1.1,
+                                   topology=t)
+        # ensure same object
+        self.assertEqual(link.pk, link2.pk)
+        self.assertEqual(Link.objects.count(), 1)
+        self.assertEqual(link.topology.id, t.id)
 
     def test_links_api(self):
         link = self.link

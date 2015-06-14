@@ -16,3 +16,4 @@ class LinkNotFound(LinkException):
     def __init__(self, *args, **kwargs):
         self.interface_a = kwargs.pop('interface_a')
         self.interface_b = kwargs.pop('interface_b')
+        self.topology = kwargs.pop('topology')
