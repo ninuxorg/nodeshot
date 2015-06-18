@@ -1,0 +1,22 @@
+{
+    "name": "swampdragon",
+    "version": "0.4.4",
+    "description": "SwampDragon client",
+    "main": "./src/swampdragon.js",
+    "dependencies": {
+        "browserify-shim": "*"
+    },
+    "browserify": {
+        "transform": ["browserify-shim"]
+    },
+    "browser": {
+        "sockjs": "./vendor/sockjs-0.3.4.js"
+    },
+    "browserify-shim": {
+        "sockjs": "sockjs"
+    },
+    "scripts": {
+        "build": "browserify ./src/swampdragon.js -o ./dist/swampdragon.js -s swampdragon && yuglify ./dist/swampdragon.js",
+        "watch": "watchify ./src/swampdragon.js -o ./dist/swampdragon.js -s swampdragon -d -v"
+    }
+}
