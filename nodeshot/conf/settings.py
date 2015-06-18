@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'social.apps.django_app.default',
     'rosetta',
+    'swampdragon',
     # other utilities
     'django_extensions',
     'debug_toolbar',
@@ -417,3 +418,8 @@ LEAFLET_CONFIG = {
 ROSETTA_CACHE_NAME = 'rosetta'
 ROSETTA_MESSAGES_PER_PAGE = 50
 ROSETTA_EXCLUDED_APPLICATIONS = [app for app in INSTALLED_APPS if not app.startswith('nodeshot')]
+
+# ------ SWAMPDRAGON SETTINGS ------ #
+
+SWAMP_DRAGON_CONNECTION = ('swampdragon.connections.sockjs_connection.DjangoSubscriberConnection', '/data')
+DRAGON_URL = 'http://localhost:9999/'

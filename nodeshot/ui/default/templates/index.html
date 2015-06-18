@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n l10n static leaflet_tags nodeshot_tags %}
+{% load swampdragon_tags %}
 
 {% block extrahead %}
     {% if MAP_TOOLS_ENABLED %}
@@ -325,6 +326,11 @@
     {% if METRICS_ENABLED %}
         <script type="text/javascript" src="{% static 'metrics/js/nv.d3.min.js' %}"></script>
     {% endif %}
+
+    <!-- SwampDragon -->
+    {% swampdragon_settings %}
+    <script type="text/javascript" src="{% static 'ui/swampdragon/js/dist/swampdragon.min.js' %}"></script>
+
 {% endblock %}
 
 {% block jssettings %}
@@ -398,5 +404,8 @@
             users: new Backbone.Collection()  // local user profile cache
         };
     </script>
+
+    <script src="{% static 'ui/nodeshot/js/swampdragon_notifications.js' %}"></script>
     {% nodeshot_map "map-js" creatediv=False %}
+
 {% endblock %}

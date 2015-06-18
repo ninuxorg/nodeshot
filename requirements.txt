@@ -50,6 +50,7 @@ django-cors-headers==1.0
 
 # websockets
 tornado
+SwampDragon==0.4.2.2
 
 # cache
 django-redis

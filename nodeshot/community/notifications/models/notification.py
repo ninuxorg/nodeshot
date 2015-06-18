@@ -6,14 +6,17 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
+from swampdragon.models import SelfPublishModel
+
 from nodeshot.core.base.models import BaseDate
 
+from .serializers import NotificationSerializer
 from ..settings import settings, TEXTS
 
 NOTIFICATION_TYPE_CHOICES = [(key, _(key)) for key,value in TEXTS.iteritems()]
 
 
-class Notification(BaseDate):
+class Notification(SelfPublishModel, BaseDate):
     """
     Notification Model
     """
@@ -31,6 +34,9 @@ class Notification(BaseDate):
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     related_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    # For swampdragon
+    serializer_class = NotificationSerializer
 
     text = models.CharField(_('text'), max_length=120, blank=True)
     is_read = models. BooleanField(_('read?'), default=False)
