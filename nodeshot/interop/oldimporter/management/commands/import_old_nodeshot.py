@@ -16,7 +16,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from ...settings import STATUS_MAPPING, DEFAULT_LAYER
+from ...settings import STATUS_MAPPING, DEFAULT_LAYER, IMPORT_LINKS
 
 from nodeshot.community.profiles.settings import EMAIL_CONFIRMATION
 
@@ -784,6 +784,9 @@ choose (enter the number of) one of the following layers:
         self.saved_ipv6 = saved_ipv6
 
     def import_links(self):
+        if not IMPORT_LINKS:
+            self.message('skpped import_links because NODESHOT_OLDIMPORTER_IMPORT_LINKS is set to False')
+            return
         self.verbose('retrieving links from old mysql DB...')
         self.old_links = list(OldLink.objects.all())
         self.message('retrieved %d links' % len(self.old_links))

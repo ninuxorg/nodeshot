@@ -254,7 +254,7 @@ In this step the script will import all interfaces, ip addresses and other detai
 6. Import links
 ----------------
 
-In this step the script will import all the available links.
+In this step the script will import all the available links unless ``settings.NODESHOT_OLDIMPORTER_IMPORT_LINKS`` is set to ``False``.
 
 -------------------
 7. Import Contacts

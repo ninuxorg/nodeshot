@@ -8,4 +8,7 @@ STATUS_MAPPING = getattr(settings, 'NODESHOT_OLDIMPORTER_STATUS_MAPPING', {
     'p': 'potential',
     'default': 'potential'
 })
+
 DEFAULT_LAYER = getattr(settings, 'NODESHOT_OLDIMPORTER_DEFAULT_LAYER', 1)
+
+IMPORT_LINKS = getattr(settings, 'NODESHOT_OLDIMPORTER_IMPORT_LINKS', True)
