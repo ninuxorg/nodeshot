@@ -16,7 +16,7 @@ six
 wsgiref
 requests
 jsonfield
-netdiff==0.4
+netdiff==0.4.1
 
 # better admin
 django-grappelli==2.5.3

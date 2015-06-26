@@ -249,7 +249,7 @@ class TopologyTest(BaseTestCase):
         self.assertDictEqual(graph, {
             'type': 'NetworkGraph',
             'protocol': 'OLSR',
-            'version': '0.6',
+            'version': '0.8',
             'metric': 'ETX',
             'nodes': [],
             'links': []
@@ -272,7 +272,7 @@ class TopologyTest(BaseTestCase):
         self.assertDictEqual(dict(graph), {
             'type': 'NetworkGraph',
             'protocol': 'OLSR',
-            'version': '0.6',
+            'version': '0.8',
             'metric': 'ETX',
             'nodes': [
                 {'id': '172.16.40.2'},

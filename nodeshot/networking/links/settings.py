@@ -2,7 +2,7 @@ from django.conf import settings
 from datetime import timedelta
 
 DEFAULT_PARSERS = [
-    ('netdiff.OlsrParser', 'OLSR (jsoninfo)'),
+    ('netdiff.OlsrParser', 'OLSRd (txtinfo/jsoninfo)'),
     ('netdiff.BatmanParser', 'batman-advanced (alfred-vis)'),
     ('netdiff.BmxParser', 'BMX6 (q6m)'),
     ('netdiff.NetJsonParser', 'NetJSON NetworkGraph'),
