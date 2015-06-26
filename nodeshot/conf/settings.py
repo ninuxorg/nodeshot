@@ -187,6 +187,9 @@ LOGGING = {
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
+        },
+        'require_sentry_configured': {
+            '()': 'nodeshot.core.base.utils.RequireSentryConfigured'
         }
     },
     'root': {
@@ -202,6 +205,7 @@ LOGGING = {
         'sentry': {
             'level': 'WARNING',
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'filters': ['require_sentry_configured']
         },
         'console': {
             'level': 'DEBUG',

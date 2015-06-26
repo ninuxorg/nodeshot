@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 
 from django.utils.translation import ugettext_lazy as _
@@ -10,6 +11,7 @@ from .exceptions import DependencyError
 
 
 __all__ = [
+    'RequireSentryConfigured',
     'Hider',
     'check_dependencies',
     'choicify',
@@ -18,6 +20,11 @@ __all__ = [
     'now_after',
     'after',
 ]
+
+
+class RequireSentryConfigured(logging.Filter):
+    def filter(self, record):
+        return hasattr(settings, 'RAVEN_CONFIG')
 
 
 class Hider(object):
