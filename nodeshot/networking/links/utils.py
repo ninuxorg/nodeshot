@@ -26,4 +26,6 @@ def update_topology():
         try:
             topology.update()
         except Exception:
-            logger.exception('Failed to update {}'.format(topology.__repr__()))
+            msg = 'Failed to update {}'.format(topology.__repr__())
+            logger.exception(msg)
+            print('{0}, see networking.log for more information'.format(msg))
