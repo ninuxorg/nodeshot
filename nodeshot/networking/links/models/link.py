@@ -175,21 +175,21 @@ class Link(BaseAccessLevel):
         """
         a = source
         b = target
-        # find interfaces
-        if (valid_ipv4(a) and valid_ipv4(b)) or (valid_ipv6(a) and valid_ipv6(b)):
-            try:
-                a = Ip.objects.get(address=a).interface
-                b = Ip.objects.get(address=b).interface
-            except Ip.DoesNotExist as e:
-                raise LinkDataNotFound(e)
-        elif valid_mac(a) and valid_mac(b):
-            try:
-                a = Interface.objects.get(mac=a)
-                b = Interface.objects.get(mac=b)
-            except Interface.DoesNotExist as e:
-                raise LinkDataNotFound(e)
-        else:
+        # ensure parameters are coherent
+        if not (valid_ipv4(a) and valid_ipv4(b)) and not (valid_ipv6(a) and valid_ipv6(b)) and not (valid_mac(a) and valid_mac(b)):
             raise ValueError('Expecting valid ipv4, ipv6 or mac address')
+        # get interfaces
+        a = cls._get_link_interface(a)
+        b = cls._get_link_interface(b)
+        # raise LinkDataNotFound if an interface is not found
+        not_found = []
+        if a is None:
+            not_found.append(source)
+        if b is None:
+            not_found.append(target)
+        if not_found:
+            msg = 'the following interfaces could not be found: {0}'.format(', '.join(not_found))
+            raise LinkDataNotFound(msg)
         # find link with interfaces
         # inverse order is also ok
         q = (Q(interface_a=a, interface_b=b) | Q(interface_a=b, interface_b=a))
@@ -203,6 +203,19 @@ class Link(BaseAccessLevel):
                                interface_b=b,
                                topology=topology)
         return link
+
+    @classmethod
+    def _get_link_interface(self, string_id):
+        if valid_ipv4(string_id) or valid_ipv6(string_id):
+            try:
+                return Ip.objects.get(address=string_id).interface
+            except Ip.DoesNotExist as e:
+                return None
+        else:
+            try:
+                return Interface.objects.get(mac=string_id)
+            except Interface.DoesNotExist as e:
+                return None
 
     @classmethod
     def get_or_create(cls, source, target, weight, topology=None):

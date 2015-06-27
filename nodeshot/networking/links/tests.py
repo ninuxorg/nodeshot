@@ -134,8 +134,21 @@ class LinkTest(BaseTestCase):
             Link.get_link(source='00:27:22:00:50:72', target='00:27:22:38:13:E4')
 
     def test_link_data_not_found(self):
-        with self.assertRaises(LinkDataNotFound):
+        # one interface not found
+        try:
             Link.get_link(source='00:27:22:00:50:72', target='CC:27:22:00:BB:AA')
+        except LinkDataNotFound as e:
+            self.assertIn('CC:27:22:00:BB:AA', str(e))
+        else:
+            self.fail('LinkDataNotFound not raised')
+        # both interfaces not found
+        try:
+            Link.get_link(source='00:27:22:DD:BB:CC', target='CC:27:22:00:BB:AA')
+        except LinkDataNotFound as e:
+            self.assertIn('00:27:22:DD:BB:CC', str(e))
+            self.assertIn('CC:27:22:00:BB:AA', str(e))
+        else:
+            self.fail('LinkDataNotFound not raised')
 
     def test_get_link_value_error(self):
         with self.assertRaises(ValueError):

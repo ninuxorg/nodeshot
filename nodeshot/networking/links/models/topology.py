@@ -1,3 +1,4 @@
+import logging
 from collections import OrderedDict
 
 from netdiff import NetJsonParser
@@ -10,6 +11,9 @@ from django.utils.module_loading import import_by_path
 from nodeshot.core.base.models import BaseDate
 
 from ..settings import PARSERS
+from ..exceptions import LinkDataNotFound
+
+logger = logging.getLogger('nodeshot.networking')
 
 
 class Topology(BaseDate):
@@ -97,11 +101,19 @@ class Topology(BaseDate):
         }
 
         for section in ['added', 'removed', 'changed']:
-            if diff[section]:
-                for link_dict in diff[section]['links']:
+            # section might be empty
+            if not diff[section]:
+                continue
+            for link_dict in diff[section]['links']:
+                try:
                     link = Link.get_or_create(source=link_dict['source'],
                                               target=link_dict['target'],
                                               weight=link_dict['weight'],
                                               topology=self)
-                    link.ensure(status=status[section],
-                                weight=link_dict['weight'])
+                except LinkDataNotFound as e:
+                    msg = 'Exception while updating {0}'.format(self.__repr__())
+                    logger.exception(msg)
+                    print('{0}\n{1}\n'.format(msg, e))
+                    continue
+                link.ensure(status=status[section],
+                            weight=link_dict['weight'])
