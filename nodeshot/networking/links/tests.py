@@ -110,13 +110,6 @@ class LinkTest(BaseTestCase):
         self.assertEqual(link.interface_a_mac, link.interface_a.mac)
         self.assertEqual(link.interface_b_mac, link.interface_b.mac)
 
-    def test_link_interface_type(self):
-        link = self.link
-        link.interface_a = Interface.objects.find(1)  # ethernet, while interface_b is wireless
-
-        with self.assertRaises(ValidationError):
-            link.full_clean()
-
     def test_auto_link_type(self):
         link = self.link
         link.type = None

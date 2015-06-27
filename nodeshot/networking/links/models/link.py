@@ -108,11 +108,6 @@ class Link(BaseAccessLevel):
         if self.type != LINK_TYPES.get('radio') and (self.dbm is not None or self.noise is not None):
             raise ValidationError(_('Only links of type "radio" can contain "dbm" and "noise" information'))
 
-        if (self.interface_a and self.interface_b) and self.interface_a.type != self.interface_b.type:
-            format_tuple = (self.interface_a.get_type_display(), self.interface_b.get_type_display())
-            raise ValidationError(_('link cannot be between of interfaces of different types:\
-                                    interface a is "%s" while b is "%s"') % format_tuple)
-
     def save(self, *args, **kwargs):
         """
         Custom save does the following:
