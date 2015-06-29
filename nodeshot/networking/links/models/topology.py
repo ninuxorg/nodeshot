@@ -45,7 +45,7 @@ class Topology(BaseDate):
 
     @property
     def latest(self):
-        return self.parser(self.url)
+        return self.parser(self.url, timeout=5)
 
     def diff(self):
         """ shortcut to netdiff.diff """
