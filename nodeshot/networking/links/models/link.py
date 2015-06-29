@@ -100,7 +100,8 @@ class Link(BaseAccessLevel):
                 raise ValidationError(_('fields "from interface" and "to interface" are mandatory in this case'))
 
             if (self.interface_a_id == self.interface_b_id) or (self.interface_a == self.interface_b):
-                raise ValidationError(_('link cannot have same "from interface" and "to interface"'))
+                msg = _('link cannot have same "from interface" and "to interface: %s"') % self.interface_a
+                raise ValidationError(msg)
 
         if self.status == LINK_STATUS.get('planned') and (self.node_a is None or self.node_b is None):
             raise ValidationError(_('fields "from node" and "to node" are mandatory for planned links'))
