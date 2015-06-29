@@ -7,6 +7,7 @@ from netdiff import diff
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.module_loading import import_by_path
+from django.core.exceptions import ValidationError
 
 from nodeshot.core.base.models import BaseDate
 
@@ -110,7 +111,7 @@ class Topology(BaseDate):
                                               target=link_dict['target'],
                                               weight=link_dict['weight'],
                                               topology=self)
-                except LinkDataNotFound as e:
+                except (LinkDataNotFound, ValidationError) as e:
                     msg = 'Exception while updating {0}'.format(self.__repr__())
                     logger.exception(msg)
                     print('{0}\n{1}\n'.format(msg, e))
