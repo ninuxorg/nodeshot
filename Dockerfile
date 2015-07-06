@@ -10,5 +10,8 @@ RUN pip install -r requirements.txt
 ADD . /app
 COPY docker/ /app/
 
-RUN mkdir /log 
-CMD python manage.py migrate && python manage.py runserver
+EXPOSE 5000
+
+RUN mkdir /log
+
+CMD echo syncdb migrate runserver | xargs python manage.py

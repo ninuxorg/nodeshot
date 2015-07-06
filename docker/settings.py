@@ -14,8 +14,8 @@ DOMAIN = os.environ['DOMAIN'] if 'DOMAIN' in os.environ else 'localhost'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.environ['DB_NAME'],
-        'USER': os.environ['DB_USER'],
+        'NAME': os.environ['DB_NAME'] if 'DB_NAME' in os.environ else 'nodeshot',
+        'USER': os.environ['DB_USER'] if 'DB_USER' in os.environ else 'root',
         'PASSWORD': os.environ['DB_PASSWORD'] if 'DB_PASSWORD' in os.environ else '',
         'HOST': os.environ['DB_HOST'] if 'DB_HOST' in os.environ else 'localhost',
         'PORT': os.environ['DB_PORT'] if 'DB_PORT' in os.environ else '5432',
