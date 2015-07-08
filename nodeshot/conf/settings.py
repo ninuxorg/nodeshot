@@ -121,7 +121,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'leaflet',
-    'south',
     'smuggler',
     'reversion',
     'corsheaders',
@@ -320,10 +319,10 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # ------ UNIT TESTING SPEED UP ------ #
 
-SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
-SOUTH_TESTS_MIGRATE = False
-
 if 'test' in sys.argv:
+    # workaround
+    MIGRATION_MODULES = {"auth": "django.contrib.auth.no_migrations"}
+
     CELERY_ALWAYS_EAGER = True
 
     PASSWORD_HASHERS = (
@@ -342,10 +341,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 if 'social.apps.django_app.default' in INSTALLED_APPS:
     MIDDLEWARE_CLASSES += ('social.apps.django_app.middleware.SocialAuthExceptionMiddleware',)
-
-    SOUTH_MIGRATION_MODULES = {
-        'default': 'social.apps.django_app.default.south_migrations'
-    }
 
     # In Django 1.6, the default session serliazer has been switched to one based on JSON,
     # rather than pickles, to improve security. Django-openid-auth does not support this
