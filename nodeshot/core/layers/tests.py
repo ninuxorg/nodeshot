@@ -2,7 +2,7 @@
 nodeshot.core.layers unit tests
 """
 
-import simplejson as json
+import json
 
 from django.test import TestCase
 from django.core.exceptions import ValidationError

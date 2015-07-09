@@ -6,7 +6,7 @@ User = get_user_model()
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
-import simplejson as json
+import json
 
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer

@@ -2,7 +2,7 @@
 nodeshot.networking.connectors unit tests
 """
 
-import simplejson as json
+import json
 
 from netengine.backends.ssh import OpenWRT
 from netengine.exceptions import NetEngineError

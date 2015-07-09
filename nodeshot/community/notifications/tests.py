@@ -1,4 +1,4 @@
-import simplejson as json
+import json
 
 from django.test.client import Client
 from django.core.urlresolvers import reverse
@@ -132,8 +132,8 @@ class TestNotification(TestCase):
             })
 
             # ensure all users except node owner have been notified about the node creation
-            self.assertEqual(Notification.objects.count(), all_users.count()-1)
-            self.assertEqual(len(mail.outbox), all_users.count()-1)
+            self.assertEqual(Notification.objects.count(), all_users.count() - 1)
+            self.assertEqual(len(mail.outbox), all_users.count() - 1)
 
             # ensure owner notification object for owner has not been created in DB
             self.assertEqual(Notification.objects.filter(to_user_id=1).count(), 0)
@@ -158,7 +158,7 @@ class TestNotification(TestCase):
             })
 
             # ensure all users except node owner have been notified about the node creation
-            self.assertEqual(Notification.objects.count(), all_users.count()-1)
+            self.assertEqual(Notification.objects.count(), all_users.count() - 1)
             self.assertEqual(len(mail.outbox), 0)
 
             # ensure owner notification object for owner has not been created in DB
@@ -185,7 +185,7 @@ class TestNotification(TestCase):
 
             # ensure all users except node owner have been notified about the node creation
             self.assertEqual(Notification.objects.count(), 0)
-            self.assertEqual(len(mail.outbox), all_users.count()-1)
+            self.assertEqual(len(mail.outbox), all_users.count() - 1)
 
         def test_node_created_to_noone(self):
             # set every user to NOT receive notifications about new nodes
@@ -223,7 +223,7 @@ class TestNotification(TestCase):
             })
 
             # ensure notifications are created
-            self.assertEqual(Notification.objects.count(), all_users.count()-1)
+            self.assertEqual(Notification.objects.count(), all_users.count() - 1)
             # but emails not sent
             self.assertEqual(len(mail.outbox), 0)
 
@@ -335,8 +335,8 @@ class TestNotification(TestCase):
 
             node.delete()
 
-            self.assertEqual(Notification.objects.count(), all_users.count()-1)
-            self.assertEqual(len(mail.outbox), all_users.count()-1)
+            self.assertEqual(Notification.objects.count(), all_users.count() - 1)
+            self.assertEqual(len(mail.outbox), all_users.count() - 1)
 
         def test_node_deleted_all_email_noone_web(self):
             all_users = User.objects.all()
@@ -363,7 +363,7 @@ class TestNotification(TestCase):
             node.delete()
 
             self.assertEqual(Notification.objects.count(), 0)
-            self.assertEqual(len(mail.outbox), all_users.count()-1)
+            self.assertEqual(len(mail.outbox), all_users.count() - 1)
 
         def test_node_deleted_all_web_noone_email(self):
             all_users = User.objects.all()
@@ -389,7 +389,7 @@ class TestNotification(TestCase):
 
             node.delete()
 
-            self.assertEqual(Notification.objects.count(), all_users.count()-1)
+            self.assertEqual(Notification.objects.count(), all_users.count() - 1)
             self.assertEqual(len(mail.outbox), 0)
 
         def test_node_deleted_distance(self):
@@ -537,7 +537,7 @@ class TestNotification(TestCase):
             node.status_id = 3
             node.save()
 
-            self.assertEqual(Notification.objects.filter(type='node_status_changed').count(), all_users.count()-1)
+            self.assertEqual(Notification.objects.filter(type='node_status_changed').count(), all_users.count() - 1)
             self.assertEqual(Notification.objects.filter(type='node_own_status_changed').count(), 1)
             # ensure notification of type "node_own_status_changed" is directed towards owner
             notification = Notification.objects.filter(type='node_own_status_changed').order_by('-id')[0]
@@ -707,12 +707,12 @@ class TestNotification(TestCase):
             })
 
             # test ?action=count
-            response = self.client.get(url, { 'action': 'count' })
+            response = self.client.get(url, {'action': 'count'})
             self.assertContains(response, '{"count": 1}')
 
             # test ?read=false
             # retrieve notifications but do not mark as read
-            response = self.client.get(url, { 'read': 'false' })
+            response = self.client.get(url, {'read': 'false'})
             self.assertEquals(1, len(response.data), 'expected 1 notification')
 
             # test ?read=true
@@ -726,7 +726,7 @@ class TestNotification(TestCase):
             self.assertEqual(Notification.objects.filter(to_user_id=4, is_read=False).count(), 0)
 
             # test action=all
-            response = self.client.get(url, { 'action': 'all' })
+            response = self.client.get(url, {'action': 'all'})
             notifications = response.data
             self.assertEquals(1, len(notifications['results']))
             self.assertContains(response, '"is_read"', msg_prefix="'read' should be a field on its own")
@@ -740,7 +740,7 @@ class TestNotification(TestCase):
                     text=notification_text
                 )
                 n.save()
-            response = self.client.get(url, { 'action': 'all' })
+            response = self.client.get(url, {'action': 'all'})
             notifications = response.data
             self.assertEquals(31, notifications['count'])
             self.assertTrue(notifications['next'] is not None, 'expected a next page')
@@ -750,7 +750,7 @@ class TestNotification(TestCase):
             self.assertTrue(notifications['previous'] is not None, 'expected a previous page')
 
             # test non expected action should default to unread
-            response = self.client.get(url, { 'action': 'doesntexist' })
+            response = self.client.get(url, {'action': 'doesntexist'})
             self.assertEquals(30, len(response.data))
 
         def test_notification_detail_API(self):

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import requests
 from requests.exceptions import RequestException
-import simplejson as json
+import json
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _

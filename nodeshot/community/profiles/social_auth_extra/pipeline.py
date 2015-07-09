@@ -1,5 +1,5 @@
 import requests
-import simplejson as json
+import json
 from datetime import datetime
 
 from django.utils.translation import ugettext_lazy as _

@@ -1,4 +1,4 @@
-import simplejson as json
+import json
 
 from rest_framework import serializers, pagination
 from rest_framework_gis import serializers as geoserializers

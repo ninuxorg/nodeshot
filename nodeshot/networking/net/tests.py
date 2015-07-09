@@ -1,4 +1,4 @@
-import simplejson as json
+import json
 
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core.urlresolvers import reverse
@@ -40,7 +40,7 @@ class TestNet(TestCase):
         ip.save()
         self.assertEquals('ipv6', ip.protocol)
 
-    #def test_interface_data_ip_addresses(self):
+    # def test_interface_data_ip_addresses(self):
     #    ip = Ip.objects.get(pk=1)
     #    ip.save()
     #
@@ -97,7 +97,7 @@ class TestNet(TestCase):
     def test_device_list_search_api(self):
         """ API device list search """
         url = reverse('api_device_list')
-        response = self.client.get(url, { 'search': 'RDP' })
+        response = self.client.get(url, {'search': 'RDP'})
         self.assertEqual(len(response.data['results']), 1)
 
     def test_device_list_api_ACL(self):
@@ -196,7 +196,7 @@ class TestNet(TestCase):
             "name": "device creation test",
             "type": "radio",
             "description": "device creation test",
-            "data": { "is_unittest": "true" }
+            "data": {"is_unittest": "true"}
         }
 
         # unauthenticated can't create
@@ -295,7 +295,7 @@ class TestNet(TestCase):
             "rx_rate": 10000,
             "standard": "fast",
             "duplex": "full",
-            "data": { "status": "active" }
+            "data": {"status": "active"}
         }
         json_data = json.dumps(data)
         eth_count = Ethernet.objects.filter(device_id=2).count()
@@ -317,7 +317,7 @@ class TestNet(TestCase):
         self.client.login(username='romano', password='tester')
         response = self.client.post(url, json_data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(Ethernet.objects.filter(device_id=2).count(), eth_count+1)
+        self.assertEqual(Ethernet.objects.filter(device_id=2).count(), eth_count + 1)
         self.client.logout()
         Ethernet.objects.get(mac='00:27:22:38:13:f4').delete()
 
@@ -325,7 +325,7 @@ class TestNet(TestCase):
         self.client.login(username='admin', password='tester')
         response = self.client.post(url, json_data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(Ethernet.objects.filter(device_id=2).count(), eth_count+1)
+        self.assertEqual(Ethernet.objects.filter(device_id=2).count(), eth_count + 1)
 
     def test_device_ethernet_api_ACL(self):
         """ API device ethernet ACL """
@@ -496,7 +496,7 @@ class TestNet(TestCase):
             "tx_rate": 10000,
             "rx_rate": 10000,
             "standard": "802.11n",
-            "data": { "status": "active" }
+            "data": {"status": "active"}
 
         }
         json_data = json.dumps(data)
@@ -519,7 +519,7 @@ class TestNet(TestCase):
         self.client.login(username='romano', password='tester')
         response = self.client.post(url, json_data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(Wireless.objects.filter(device_id=2).count(), eth_count+1)
+        self.assertEqual(Wireless.objects.filter(device_id=2).count(), eth_count + 1)
         self.client.logout()
         Wireless.objects.get(mac='00:27:22:38:13:c4').delete()
 
@@ -527,7 +527,7 @@ class TestNet(TestCase):
         self.client.login(username='admin', password='tester')
         response = self.client.post(url, json_data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(Wireless.objects.filter(device_id=2).count(), eth_count+1)
+        self.assertEqual(Wireless.objects.filter(device_id=2).count(), eth_count + 1)
 
     def test_wireless_details_api_permissions(self):
         """ wireless details permissions: only owner or admins can alter data """
@@ -663,7 +663,7 @@ class TestNet(TestCase):
         ip.save()
         response = self.client.get(url)
         self.assertEqual(len(response.data), interface.ip_set.access_level_up_to('public').count())
-        self.assertEqual(len(response.data), ip_count-1)
+        self.assertEqual(len(response.data), ip_count - 1)
 
         self.client.login(username='registered', password='tester')
         response = self.client.get(url)

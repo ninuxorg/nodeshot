@@ -1,5 +1,5 @@
 import os
-import simplejson as json
+import json
 
 from django.core.urlresolvers import reverse
 from django.contrib.gis.geos import GEOSGeometry

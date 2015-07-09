@@ -1,5 +1,5 @@
 import time
-import simplejson as json
+import json
 from threading import Thread
 
 import tornado.web

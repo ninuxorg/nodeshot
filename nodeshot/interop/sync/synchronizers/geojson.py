@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import simplejson as json
+import json
 from django.contrib.gis.geos import GEOSGeometry
 from .base import GenericGisSynchronizer
 

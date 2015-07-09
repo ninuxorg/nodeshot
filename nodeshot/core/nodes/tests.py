@@ -3,7 +3,7 @@ nodeshot.core.nodes unit tests
 """
 
 import os
-import simplejson as json
+import json
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
