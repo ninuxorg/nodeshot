@@ -120,6 +120,7 @@ INSTALLED_APPS = [
     # 3d parthy django apps
     'rest_framework',
     'rest_framework_swagger',
+    'netfields',
     'leaflet',
     'smuggler',
     'reversion',

@@ -14,11 +14,10 @@ from nodeshot.core.nodes.models import Node
 from .models import *
 
 
-class NetTest(BaseTestCase):
+class TestNet(BaseTestCase):
     """
     Network Model Tests
     """
-
     fixtures = [
         'initial_data.json',
         user_fixtures,

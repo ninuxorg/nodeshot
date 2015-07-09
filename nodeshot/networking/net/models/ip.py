@@ -10,7 +10,6 @@ from ..managers import NetAccessLevelManager
 from choices import IP_PROTOCOLS
 
 
-
 class Ip(BaseAccessLevel):
     """ IP Address Model """
     interface = models.ForeignKey('net.Interface', verbose_name=_('interface'))
