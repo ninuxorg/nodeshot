@@ -9,8 +9,8 @@ from netengine.exceptions import NetEngineError
 
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 
-from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.networking.net.models import *
 
@@ -20,7 +20,7 @@ from . import settings
 settings.NETENGINE_BACKENDS += [('netengine.backends.Dummy', 'Dummy')]
 
 
-class ConnectorTest(BaseTestCase):
+class ConnectorTest(TestCase):
 
     fixtures = [
         'initial_data.json',

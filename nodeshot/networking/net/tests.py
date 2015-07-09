@@ -4,17 +4,17 @@ from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.core.nodes.models import Node
 
 from .models import *
 
 
-class TestNet(BaseTestCase):
+class TestNet(TestCase):
     """
     Network Model Tests
     """
@@ -124,14 +124,14 @@ class TestNet(BaseTestCase):
         """ device detail permissions: only owner or admins can alter data """
         # non owner can only read
         url = reverse('api_device_details', args=[1])
-        response = self.client.patch(url, { 'description': 'permission test' })
+        response = self.client.patch(url, json.dumps({'description': 'permission test'}), content_type='application/json')
         self.assertEqual(response.status_code, 403)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
 
         # login as non-owner
         self.client.login(username='pisano', password='tester')
-        response = self.client.patch(url, { 'description': 'permission test' })
+        response = self.client.patch(url, json.dumps({'description': 'permission test'}), content_type='application/json')
         self.assertEqual(response.status_code, 403)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
@@ -141,7 +141,7 @@ class TestNet(BaseTestCase):
         self.client.login(username=device.owner.username, password='tester')
 
         # owner can edit
-        response = self.client.patch(url, { 'description': 'permission test' })
+        response = self.client.patch(url, json.dumps({'description': 'permission test'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'permission test')
         # check DB
@@ -151,7 +151,7 @@ class TestNet(BaseTestCase):
         # admin can edit too
         self.client.logout()
         self.client.login(username='admin', password='tester')
-        response = self.client.patch(url, { 'description': 'i am the admin' })
+        response = self.client.patch(url, json.dumps({'description': 'i am the admin'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'i am the admin')
         # check DB
@@ -380,14 +380,14 @@ class TestNet(BaseTestCase):
         """ ethernet details permissions: only owner or admins can alter data """
         # non owner can only read
         url = reverse('api_ethernet_details', args=[1])
-        response = self.client.patch(url, { 'name': 'eth2' })
+        response = self.client.patch(url, json.dumps({'name': 'eth2'}), content_type='application/json')
         self.assertEqual(response.status_code, 403)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
 
         # login as non-owner
         self.client.login(username='pisano', password='tester')
-        response = self.client.patch(url, { 'name': 'eth2' })
+        response = self.client.patch(url, json.dumps({'name': 'eth2'}), content_type='application/json')
         self.assertEqual(response.status_code, 403)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
@@ -397,7 +397,7 @@ class TestNet(BaseTestCase):
         self.client.login(username=ethernet.owner.username, password='tester')
 
         # owner can edit
-        response = self.client.patch(url, { 'name': 'eth2' })
+        response = self.client.patch(url, json.dumps({'name': 'eth2'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'eth2')
         # check DB
@@ -407,7 +407,7 @@ class TestNet(BaseTestCase):
         # admin can edit too
         self.client.logout()
         self.client.login(username='admin', password='tester')
-        response = self.client.patch(url, { 'name': 'admineth2' })
+        response = self.client.patch(url, json.dumps({'name': 'admineth2'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'admineth2')
         # check DB
@@ -533,14 +533,14 @@ class TestNet(BaseTestCase):
         """ wireless details permissions: only owner or admins can alter data """
         # non owner can only read
         url = reverse('api_wireless_details', args=[2])
-        response = self.client.patch(url, { 'name': 'eth2' })
+        response = self.client.patch(url, json.dumps({'name': 'eth2'}), content_type='application/json')
         self.assertEqual(response.status_code, 403)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
 
         # login as non-owner
         self.client.login(username='pisano', password='tester')
-        response = self.client.patch(url, { 'name': 'eth2' })
+        response = self.client.patch(url, json.dumps({'name': 'eth2'}), content_type='application/json')
         self.assertEqual(response.status_code, 403)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
@@ -550,7 +550,7 @@ class TestNet(BaseTestCase):
         self.client.login(username=wireless.owner.username, password='tester')
 
         # owner can edit
-        response = self.client.patch(url, { 'name': 'eth2' })
+        response = self.client.patch(url, json.dumps({'name': 'eth2'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'eth2')
         # check DB
@@ -560,7 +560,7 @@ class TestNet(BaseTestCase):
         # admin can edit too
         self.client.logout()
         self.client.login(username='admin', password='tester')
-        response = self.client.patch(url, { 'name': 'admineth2' })
+        response = self.client.patch(url, json.dumps({'name': 'admineth2'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'admineth2')
         # check DB
@@ -803,29 +803,29 @@ class TestNet(BaseTestCase):
         self.assertIn('http://', response.data['interfaces_links'][1])
 
         # PATCH 403 unauthenticated
-        response = self.client.patch(url, {})
+        response = self.client.patch(url, '{}', content_type='application/json')
         self.assertEqual(response.status_code, 403)
 
         # PATCH 403 logged in as non owner
         self.client.login(username='pisano', password='tester')
-        response = self.client.patch(url, {})
+        response = self.client.patch(url, '{}', content_type='application/json')
         self.assertEqual(response.status_code, 403)
         self.client.logout()
 
         # PATCH 200 logged in as owner
         self.client.login(username=bridge.owner.username, password='tester')
-        response = self.client.patch(url, { 'name': 'brtest' })
+        response = self.client.patch(url, json.dumps({'name': 'brtest'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'brtest')
 
         # PATCH 400 empty interfaces
-        response = self.client.patch(url, json.dumps({ 'interfaces': [] }), content_type='application/json')
+        response = self.client.patch(url, json.dumps({'interfaces': []}), content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.client.logout()
 
         # PATCH 200 by admin
         self.client.login(username='admin', password='tester')
-        response = self.client.patch(url, { 'name': 'admin' })
+        response = self.client.patch(url, json.dumps({'name': 'admin'}), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], 'admin')
 

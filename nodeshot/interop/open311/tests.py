@@ -3,14 +3,15 @@ import simplejson as json
 
 from django.core.urlresolvers import reverse
 from django.contrib.gis.geos import GEOSGeometry
+from django.test import TestCase
 
-from nodeshot.core.base.tests import BaseTestCase, user_fixtures
+from nodeshot.core.base.tests import user_fixtures
 
 from .serializers import *
 from .base import SERVICES
 
 
-class Open311Request(BaseTestCase):
+class Open311Request(TestCase):
 
     fixtures = [
         'initial_data.json',

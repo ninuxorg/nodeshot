@@ -13,12 +13,12 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from nodeshot.core.base.tests import user_fixtures, BaseTestCase
+from nodeshot.core.base.tests import user_fixtures
 
 from .models import Node, Status, Image
 
 
-class NodeModelsTest(TestCase):
+class NodesModelsTest(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -211,7 +211,7 @@ class NodeModelsTest(TestCase):
 # ------ API tests ------ #
 
 
-class NodesApiTest(BaseTestCase):
+class NodesApiTest(TestCase):
 
     fixtures = [
         'initial_data.json',
@@ -332,7 +332,7 @@ class NodesApiTest(BaseTestCase):
         self.assertEqual(node.description, 'Fusolab test 2')
 
         # PATCH
-        response = self.client.patch(url, {'description': 'Patched Fusolab Desc'})
+        response = self.client.patch(url, '{"description": "Patched Fusolab Desc"}', content_type='application/json')
         self.assertEqual(200, response.status_code)
         node = Node.objects.get(slug='fusolab')
         self.assertEqual(node.description, 'Patched Fusolab Desc')
@@ -489,7 +489,7 @@ class NodesApiTest(BaseTestCase):
         url = reverse('api_node_details', args=['external'])
         response = self.client.get(url)
         self.assertFalse(response.data['can_edit'])
-        response = self.client.patch(url, {'name': 'external 2'})
+        response = self.client.patch(url, '{"name": "external 2"}', content_type='application/json')
         self.assertEqual(response.status_code, 403)
         self.client.logout()
 

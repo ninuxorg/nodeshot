@@ -2,13 +2,13 @@ import simplejson as json
 
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 
-from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
 
 
-class ServiceTest(BaseTestCase):
-    
+class ServiceTest(TestCase):
+
     fixtures = [
         'initial_data.json',
         user_fixtures,

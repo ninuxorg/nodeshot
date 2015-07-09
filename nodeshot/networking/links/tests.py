@@ -2,8 +2,8 @@ from collections import OrderedDict
 
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 
-from nodeshot.core.base.tests import BaseTestCase
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.networking.net.models import Interface
 
@@ -12,7 +12,7 @@ from .models.choices import LINK_STATUS, LINK_TYPES
 from .exceptions import LinkDataNotFound, LinkNotFound
 
 
-class LinkTest(BaseTestCase):
+class LinkTest(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -238,7 +238,7 @@ class LinkTest(BaseTestCase):
         self.assertEquals(response.status_code, 404)
 
 
-class TopologyTest(BaseTestCase):
+class TopologyTest(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,

@@ -4,10 +4,11 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.core import mail, management
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from nodeshot.core.base.tests import user_fixtures, BaseTestCase
+from nodeshot.core.base.tests import user_fixtures
 from nodeshot.core.base.utils import ago
 from nodeshot.core.nodes.models import Node
 
@@ -30,7 +31,7 @@ if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
     settings.INSTALLED_APPS = [app for app in settings.INSTALLED_APPS if app != 'nodeshot.core.websockets']
 
 
-class TestNotification(BaseTestCase):
+class TestNotification(TestCase):
     """
     Test Notifications
     """
@@ -811,7 +812,7 @@ class TestNotification(BaseTestCase):
             self.assertContains(response, 'node_deleted')
 
             # PATCH 200
-            response = self.client.patch(url, { "node_own_status_changed": False })
+            response = self.client.patch(url, '{"node_own_status_changed": false}', content_type='application/json')
             self.assertEquals(200, response.status_code)
             # check DB
             user = User.objects.get(username='romano')
@@ -853,7 +854,7 @@ class TestNotification(BaseTestCase):
             self.assertContains(response, 'node_deleted')
 
             # PATCH 200
-            response = self.client.patch(url, { "node_own_status_changed": False })
+            response = self.client.patch(url, '{"node_own_status_changed": false}', content_type='application/json')
             self.assertEquals(200, response.status_code)
             # check DB
             user = User.objects.get(username='romano')
