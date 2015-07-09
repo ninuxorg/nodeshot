@@ -34,7 +34,6 @@ class TestNotification(BaseTestCase):
     """
     Test Notifications
     """
-
     fixtures = [
         'initial_data.json',
         user_fixtures,
