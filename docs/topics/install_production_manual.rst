@@ -328,7 +328,18 @@ Paste this config (keep replacing ``<myproject>`` with the project name chosen a
 Redis
 -----
 
-Install **Redis**, we will use it as a message broker for *Celery* and as a *Cache Storage*::
+**Redis** is used as message broker for *Celery* and as *Cache Storage*.
+
+If you are using **debian 7**, you need to install a more recent version from a third party package maintainer::
+
+    echo "deb http://packages.dotdeb.org wheezy all" > /etc/apt/sources.list.d/dotdeb.list
+    echo "deb-src http://packages.dotdeb.org wheezy all" >> /etc/apt/sources.list.d/dotdeb.list
+    wget http://www.dotdeb.org/dotdeb.gpg
+    apt-key add dotdeb.gpg
+    apt-get update
+    apt-get install redis-server
+
+otherwise you can just run::
 
     apt-get install redis-server
 
