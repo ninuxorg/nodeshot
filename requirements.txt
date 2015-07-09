@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.7.8  # rq.filter: >=1.7,<1.8
+Django==1.7.9  # rq.filter: >=1.7,<1.8
 
 # python libraries
 Pillow
@@ -19,13 +19,13 @@ jsonfield
 netdiff==0.4.3
 
 # better admin
-django-grappelli==2.5.3
 django-filebrowser==3.5.7
-django-leaflet==0.15.2
+django-grappelli==2.6.5
+django-leaflet==0.16.0
 
 # RESTful API and API documentation
 djangorestframework==2.4.5  # rq.filter: >=2.4,<3.0
-drf-extensions==0.2.5
+drf-extensions==0.2.7
 django-rest-swagger
 markdown
 djangorestframework-gis==0.7
@@ -33,20 +33,20 @@ djangorestframework-hstore==1.1
 geojson-elevation==0.1
 
 # authentication with social networks
-python-social-auth==0.2.10
+python-social-auth==0.2.11
 
 # versionable content
-django-reversion==1.8.2
+django-reversion==1.8.7
 
 # asynchronous tasks
-celery==3.1.17
+celery==3.1.18
 django-celery-email
 
 # migrations
 south
 
 # django-cors-headers
-django-cors-headers==1.0
+django-cors-headers==1.1.0
 
 # websockets
 tornado
@@ -55,18 +55,18 @@ tornado
 django-redis
 
 # fixture management
-django-smuggler==0.4.1
+django-smuggler==0.5.0
 
 # networking
 netaddr
-django-netfields==0.2.2
+django-netfields==0.3.1
 netengine==0.1.alpha
 libcnml
 
 # dev utils
 bpython
 django-extensions
-django-debug-toolbar
+django-debug-toolbar==1.3.2
 
 # monitoring
 raven
