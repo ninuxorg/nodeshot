@@ -5,6 +5,6 @@ from nodeshot.core.base.managers import ExtendedManagerMixin, ACLMixin, AccessLe
 class NetAccessLevelManager(NetManager, ExtendedManagerMixin, ACLMixin):
     """ NetManager + AccessLevelManager """
 
-    def get_query_set(self):
+    def get_queryset(self):
         q = NetQuery(self.model, NetWhere)
         return AccessLevelQuerySet(self.model, using=self._db, query=q)

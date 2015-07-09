@@ -18,5 +18,5 @@ class ExternalQueryset(GeoPublishedQuerySet, ExternalMixin):
 class LayerManager(HStoreGeoPublishedManager, ExternalMixin):
     """ extends GeoPublishedManager to add external method """
     
-    def get_query_set(self): 
+    def get_queryset(self): 
         return ExternalQueryset(self.model, using=self._db)
