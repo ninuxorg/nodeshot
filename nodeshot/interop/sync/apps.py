@@ -6,6 +6,7 @@ class AppConfig(BaseConfig):
 
     def ready(self):
         """ patch LayerNodesList view to support external layers """
+        from .models import LayerExternal
         from nodeshot.core.layers.views import LayerNodesList
 
         def get_nodes(self, request, *args, **kwargs):
