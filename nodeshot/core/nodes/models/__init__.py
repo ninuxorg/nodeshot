@@ -19,11 +19,10 @@ from django.core.cache import cache
 from ..signals import node_status_changed
 
 
-@receiver(post_save, sender=Status)
-@receiver(pre_delete, sender=Status)
-@receiver(post_save, sender=Node)
-@receiver(pre_delete, sender=Node)
-@receiver(node_status_changed, sender=Node)
+@receiver(post_save, sender=Status, dispatch_uid='clear_cache_status_saved')
+@receiver(pre_delete, sender=Status, dispatch_uid='clear_cache_status_deleted')
+@receiver(post_save, sender=Node, dispatch_uid='clear_cache_node_saved')
+@receiver(pre_delete, sender=Node, dispatch_uid='clear_cache_node_deleted')
 def clear_cache(sender, **kwargs):
     # clear only cached pages if supported
     if hasattr(cache, 'delete_pattern'):

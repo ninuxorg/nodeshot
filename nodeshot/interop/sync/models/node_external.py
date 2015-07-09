@@ -32,7 +32,7 @@ from django.db.models.signals import pre_delete, post_save
 from ..tasks import push_changes_to_external_layers
 
 
-@receiver(post_save, sender=Node)
+@receiver(post_save, sender=Node, dispatch_uid='sync_external_save')
 def save_external_nodes(sender, **kwargs):
     """ sync by creating nodes in external layers when needed """
     node = kwargs['instance']
@@ -44,7 +44,7 @@ def save_external_nodes(sender, **kwargs):
     push_changes_to_external_layers.delay(node=node, external_layer=node.layer.external, operation=operation)
 
 
-@receiver(pre_delete, sender=Node)
+@receiver(pre_delete, sender=Node, dispatch_uid='sync_external_delete')
 def delete_external_nodes(sender, **kwargs):
     """ sync by deleting nodes from external layers when needed """
     node = kwargs['instance']

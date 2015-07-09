@@ -143,7 +143,7 @@ from django.db.models.signals import post_save
 from ..tasks import create_related_object
 
 
-@receiver(post_save, sender=Node)
+@receiver(post_save, sender=Node, dispatch_uid='create_node_rating_counts_settings')
 def create_node_rating_counts_settings(sender, **kwargs):
     """ create node rating count and settings"""
     created = kwargs['created']
@@ -156,7 +156,7 @@ def create_node_rating_counts_settings(sender, **kwargs):
         create_related_object.delay(NodeParticipationSettings, {'node': node})
 
 
-@receiver(post_save, sender=Layer)
+@receiver(post_save, sender=Layer, dispatch_uid='create_layer_rating_settings')
 def create_layer_rating_settings(sender, **kwargs):
     """ create layer rating settings """
     created = kwargs['created']

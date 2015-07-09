@@ -7,7 +7,7 @@ from .models import UserWebNotificationSettings, UserEmailNotificationSettings
 from .settings import REGISTER
 
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=User, dispatch_uid='notifications_user_created')
 def create_settings(sender, **kwargs):
     """ create user notification settings on user creation """
     created = kwargs['created']

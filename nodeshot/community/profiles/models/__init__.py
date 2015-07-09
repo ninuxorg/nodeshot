@@ -25,7 +25,7 @@ from django.dispatch import receiver
 if EMAIL_CONFIRMATION:
     from ..signals import email_confirmed
 
-    @receiver(email_confirmed, sender=EmailConfirmation)
+    @receiver(email_confirmed, sender=EmailConfirmation, dispatch_uid='profile_email_confirmed')
     def activate_user(sender, email_address, **kwargs):
         """
         activate user when primary email is confirmed

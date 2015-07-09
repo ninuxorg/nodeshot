@@ -23,7 +23,7 @@ def exclude_owner_of_node(node):
 
 # ------ NODE CREATED ------ #
 
-@receiver(post_save, sender=Node)
+@receiver(post_save, sender=Node, dispatch_uid='notify_node_created')
 def node_created_handler(sender, **kwargs):
     """ send notification when a new node is created according to users's settings """
     if kwargs['created']:
@@ -39,7 +39,7 @@ def node_created_handler(sender, **kwargs):
 
 # ------ NODE STATUS CHANGED ------ #
 
-@receiver(node_status_changed)
+@receiver(node_status_changed, sender=Node, dispatch_uid='notify_node_status_changed')
 def node_status_changed_handler(**kwargs):
     """ send notification when the status of a node changes according to users's settings """
     obj = kwargs['instance']
@@ -65,7 +65,7 @@ def node_status_changed_handler(**kwargs):
 
 # ------ NODE DELETED ------ #
 
-@receiver(pre_delete, sender=Node)
+@receiver(pre_delete, sender=Node, dispatch_uid='notify_node_deleted')
 def node_deleted_handler(sender, **kwargs):
     """ send notification when a node is deleted according to users's settings """
     obj = kwargs['instance']

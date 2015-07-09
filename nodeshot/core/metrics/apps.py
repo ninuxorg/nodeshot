@@ -20,7 +20,7 @@ class AppConfig(BaseConfig):
 
         User = get_user_model()
 
-        @receiver(user_logged_in, dispatch_uid='user_loggedin')
+        @receiver(user_logged_in, dispatch_uid='metrics_user_loggedin')
         def user_loggedin(sender, **kwargs):
             """ collect metrics about user logins """
             tags = {
@@ -33,13 +33,13 @@ class AppConfig(BaseConfig):
             }
             write('user_logins', values=values, tags=tags)
 
-        @receiver(post_delete, sender=User, dispatch_uid='user_created')
+        @receiver(post_delete, sender=User, dispatch_uid='metrics_user_created')
         def user_created(sender, **kwargs):
             """ collect metrics about users unsubscribing """
             write('user_variations', {'variation': -1}, tags={'action': 'deleted'})
             write('user_count', {'total': User.objects.count()})
 
-        @receiver(post_save, sender=User, dispatch_uid='user_deleted')
+        @receiver(post_save, sender=User, dispatch_uid='metrics_user_deleted')
         def user_deleted(sender, **kwargs):
             """ collect metrics about new users signing up """
             if kwargs.get('created'):
