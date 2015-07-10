@@ -10,15 +10,16 @@ python:
 branches:
   only:
     - master
-    
+
 before_install:
   - pip install -U pip
 
 # command to install requirements
 install:
+  - pip install -U pip wheel
   - pip install -r requirements.txt
+  - python setup.py develop -q
   - pip install coverage coveralls selenium
-  - python setup.py install
   - pip install MySQL-python
 
 before_script:
