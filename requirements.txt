@@ -20,7 +20,8 @@ netdiff==0.4.3
 
 # better admin
 django-filebrowser==3.5.7
-django-grappelli==2.6.5
+# waiting for https://github.com/sehmaschine/django-filebrowser/issues/273 to be fixed
+#django-grappelli==2.6.5
 django-leaflet==0.16.0
 
 # RESTful API and API documentation
