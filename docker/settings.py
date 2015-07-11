@@ -3,22 +3,22 @@ import os
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
-SECRET_KEY = os.environ['SECRET_KEY'] if 'SECRET_KEY' in os.environ else os.urandom(24)
+SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(24))
 
 ROOT_URLCONF = 'urls' #
 
 
 DEBUG = True if 'DEBUG' in os.environ else False
-DOMAIN = os.environ['DOMAIN'] if 'DOMAIN' in os.environ else 'localhost'
+DOMAIN = os.environ.get('DOMAIN', 'localhost')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.environ['DB_NAME'] if 'DB_NAME' in os.environ else 'nodeshot',
-        'USER': os.environ['DB_USER'] if 'DB_USER' in os.environ else 'root',
-        'PASSWORD': os.environ['DB_PASSWORD'] if 'DB_PASSWORD' in os.environ else '',
-        'HOST': os.environ['DB_HOST'] if 'DB_HOST' in os.environ else 'localhost',
-        'PORT': os.environ['DB_PORT'] if 'DB_PORT' in os.environ else '5432',
+        'NAME': os.environ.get('DB_NAME', 'nodeshot'),
+        'USER': os.environ.get('DB_USER', 'root'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432')
     },
 }
 
@@ -49,18 +49,18 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-EMAIL_HOST = os.environ['EMAIL_HOST'] if 'EMAIL_HOST' in os.environ else 'localhost'
-EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER'] if 'EMAIL_HOST_USER' in os.environ else 'root@localhost'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'root@localhost')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER  # used for error reporting
 
 # social auth
-FACEBOOK_APP_ID = os.environ['FB_APP_ID'] if 'FB_APP_ID' in os.environ else ''
-FACEBOOK_API_SECRET = os.environ['FB_APP_SECRET'] if 'FB_APP_SECRET' in os.environ else ''
-GOOGLE_OAUTH2_CLIENT_ID = os.environ['GOOGLE_CLIENT_ID'] if 'GOOGLE_CLIENT_ID' in os.environ else ''
-GOOGLE_OAUTH2_CLIENT_SECRET = os.environ['GOOGLE_CLIENT_SECRET'] if 'GOOGLE_CLIENT_SECRET' in os.environ else ''
-GITHUB_APP_ID = os.environ['GITHUB_APP_ID'] if 'GITHUB_APP_ID' in os.environ else ''
-GITHUB_API_SECRET = os.environ['GITHUB_API_SECRET'] if 'GITHUB_API_SECRET' in os.environ else ''
+FACEBOOK_APP_ID = os.environ.get('FB_APP_ID', '')
+FACEBOOK_API_SECRET = os.environ.get('FB_APP_SECRET', '')
+GOOGLE_OAUTH2_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+GITHUB_APP_ID = os.environ.get('GITHUB_APP_ID', '')
+GITHUB_API_SECRET = os.environ.get('GITHUB_API_SECRET', '')
 
 #from datetime import timedelta
 #
