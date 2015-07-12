@@ -30,6 +30,9 @@ before_script:
   - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis;"
   - psql -U postgres -d nodeshot_ci -c "CREATE EXTENSION postgis_topology;"
   - mysql -e 'create database nodeshot_old_ci;'
+  # try to avoid mysql has gone away errors
+  - mysql -e "SET GLOBAL wait_timeout = 36000;"
+  - mysql -e "SET GLOBAL max_allowed_packet=134209536;"
   - cd tests
   - ./manage.py syncdb --noinput --no-initial-data
   - ./manage.py migrate --noinput --no-initial-data
