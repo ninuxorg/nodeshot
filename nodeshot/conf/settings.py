@@ -128,11 +128,15 @@ INSTALLED_APPS = [
     'reversion',
     'corsheaders',
     'social.apps.django_app.default',
-    'rosetta',
-    # other utilities
-    'django_extensions',
-    'debug_toolbar',
 ]
+
+# other utilities
+if 'test' not in sys.argv:
+    INSTALLED_APPS += [
+        'rosetta',
+        'django_extensions',
+        'debug_toolbar',
+    ]
 
 AUTH_USER_MODEL = 'profiles.Profile'
 
