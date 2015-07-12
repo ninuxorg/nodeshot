@@ -13,8 +13,20 @@ USE_L10N = True
 
 USE_TZ = True
 
-PROTOCOL = 'http' if DEBUG else 'https'
-PORT = getattr(settings, 'PORT', '8000') if DEBUG else None
+# test with StaticLiveServerTestCase
+if 'test' in sys.argv:
+    DEFAULT_PORT = '8081'
+# development
+elif DEBUG:
+    DEFAULT_PORT = '8000'
+# production
+else:
+    DEFAULT_PORT = '443'
+
+DEFAULT_PROTOCOL = 'http' if DEBUG else 'https'
+
+PORT = getattr(settings, 'PORT', DEFAULT_PORT)
+PROTOCOL = getattr(settings, 'PROTOCOL', DEFAULT_PROTOCOL)
 
 if PORT and str(PORT) not in ['80', '443']:
     PORT_STRING = ':%s' % PORT
@@ -46,16 +58,6 @@ if PROTOCOL == 'https':
     CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     os.environ['HTTPS'] = 'on'
-
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-)
-
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
