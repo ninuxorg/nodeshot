@@ -34,7 +34,7 @@ if 'nodeshot.interop.sync' in settings.INSTALLED_APPS:
         url(r'', include('nodeshot.interop.sync.urls')),
     )
 
-if settings.DEBUG and settings.SERVE_STATIC:
+if settings.SERVE_STATIC:
     urlpatterns += patterns('django.contrib.staticfiles.views',
         url(r'^static/(?P<path>.*)$', 'serve'),
         url(r'^media/(?P<path>.*)$', 'serve'),

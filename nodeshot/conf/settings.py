@@ -4,7 +4,11 @@ from datetime import timedelta
 from django.conf import settings
 
 DEBUG = settings.DEBUG
-SERVE_STATIC = DEBUG
+# needed for LiveServerTestCase
+if 'test' in sys.argv:
+    SERVE_STATIC = True
+else:
+    SERVE_STATIC = DEBUG
 TEMPLATE_DEBUG = DEBUG
 
 USE_I18N = True
@@ -45,11 +49,11 @@ SITE_NAME = getattr(settings, 'SITE_NAME', 'Nodeshot')
 
 MEDIA_ROOT = '%s/media/' % settings.SITE_ROOT
 
-MEDIA_URL = '%s/media/' % SITE_URL
+MEDIA_URL = '/media/'
 
 STATIC_ROOT = '%s/static/' % settings.SITE_ROOT
 
-STATIC_URL = '%s/static/' % SITE_URL
+STATIC_URL = '/static/'
 
 ALLOWED_HOSTS = ['*']
 

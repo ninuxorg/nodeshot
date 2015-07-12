@@ -3,6 +3,7 @@ from collections import OrderedDict
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 from nodeshot.core.base.tests import user_fixtures
 from nodeshot.networking.net.models import Interface
@@ -238,7 +239,7 @@ class LinkTest(TestCase):
         self.assertEquals(response.status_code, 404)
 
 
-class TopologyTest(TestCase):
+class TopologyTest(StaticLiveServerTestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,

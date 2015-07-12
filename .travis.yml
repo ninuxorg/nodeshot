@@ -16,10 +16,10 @@ before_install:
 
 # command to install requirements
 install:
-  - pip install -U pip wheel
+  - pip install -U pip wheel setuptools
   - pip install -r requirements.txt
   - python setup.py develop -q
-  - pip install coverage coveralls selenium
+  - pip install coverage coveralls selenium lxml
   - pip install MySQL-python
 
 before_script:
@@ -33,14 +33,7 @@ before_script:
   - cd tests
   - ./manage.py syncdb --noinput --no-initial-data
   - ./manage.py migrate --noinput --no-initial-data
-  - ./manage.py collectstatic --noinput
   - ./manage.py loaddata initial_data
-  # begin temporary workaround for django 1.6 LiveServerTestCase suckness
-  - ./manage.py mail_debug &
-  - ./manage.py loaddata test_profiles test_layers test_status test_nodes test_pages
-  - ./manage.py runserver 0.0.0.0:8000 &
-  - sleep 2 # give django server time to bind to sockets
-  # end
 
 # command to run tests, e.g. python setup.py test
 script:

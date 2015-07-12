@@ -517,7 +517,7 @@
         "pk":1,
         "model":"links.topology",
         "fields":{
-            "url":"http://127.0.0.1:8000/static/nodeshot/testing/olsr-test-topology.json",
+            "url":"http://127.0.0.1:8081/static/nodeshot/testing/olsr-test-topology.json",
             "updated":"2015-05-16T20:02:52.483Z",
             "added":"2015-05-16T19:33:41.621Z",
             "name":"Rome",

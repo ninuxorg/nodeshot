@@ -2,7 +2,7 @@ import sys
 
 from cStringIO import StringIO
 
-from django.test import TestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import management
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -15,9 +15,6 @@ from nodeshot.core.base.tests import user_fixtures
 from .models import LayerExternal, NodeExternal
 from .settings import settings, SYNCHRONIZERS
 from .tasks import synchronize_external_layers
-
-
-TEST_FILES_PATH = '%snodeshot/testing' % settings.STATIC_URL
 
 
 def capture_output(command, args=[], kwargs={}):
@@ -33,7 +30,7 @@ def capture_output(command, args=[], kwargs={}):
     return output.getvalue()
 
 
-class SyncTest(TestCase):
+class SyncTest(StaticLiveServerTestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -41,6 +38,10 @@ class SyncTest(TestCase):
         'test_status.json',
         'test_nodes.json'
     ]
+
+    @property
+    def STATIC_TEST_URL(self):
+        return '{0}/static/nodeshot/testing'.format(self.live_server_url)
 
     def test_external_layer_representation(self):
         self.assertIn('object', str(LayerExternal()))
@@ -180,7 +181,7 @@ class SyncTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%s/geojson1.json' % TEST_FILES_PATH
+        url = '%s/geojson1.json' % self.STATIC_TEST_URL
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
@@ -237,7 +238,7 @@ class SyncTest(TestCase):
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.OpenWisp'
         external._reload_schema()
-        external.url = '%s/openwisp-georss.xml' % TEST_FILES_PATH
+        external.url = '%s/openwisp-georss.xml' % self.STATIC_TEST_URL
         external.full_clean()
         external.save()
 
@@ -270,7 +271,7 @@ class SyncTest(TestCase):
 
         # --- with the following step we expect some nodes to be deleted --- #
 
-        external.url = '%s/openwisp-georss2.xml' % TEST_FILES_PATH
+        external.url = '%s/openwisp-georss2.xml' % self.STATIC_TEST_URL
         external.full_clean()
         external.save()
 
@@ -309,7 +310,7 @@ class SyncTest(TestCase):
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
         external._reload_schema()
-        external.url = '%s/geojson1.json' % TEST_FILES_PATH
+        external.url = '%s/geojson1.json' % self.STATIC_TEST_URL
         external.full_clean()
         external.save()
 
@@ -353,7 +354,7 @@ class SyncTest(TestCase):
 
         # --- repeat with slightly different input --- #
 
-        external.url = '%s/geojson2.json' % TEST_FILES_PATH
+        external.url = '%s/geojson2.json' % self.STATIC_TEST_URL
         external.full_clean()
         external.save()
 
@@ -382,7 +383,7 @@ class SyncTest(TestCase):
         node.name = 'simplejson'
         node.save()
 
-        url = '%s/geojson1.json' % TEST_FILES_PATH
+        url = '%s/geojson1.json' % self.STATIC_TEST_URL
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
@@ -415,7 +416,7 @@ class SyncTest(TestCase):
         node.name = 'simplejson'
         node.save()
 
-        url = '%s/geojson3.json' % TEST_FILES_PATH
+        url = '%s/geojson3.json' % self.STATIC_TEST_URL
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
@@ -472,7 +473,7 @@ class SyncTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%s/georss-simple.xml' % TEST_FILES_PATH
+        url = '%s/georss-simple.xml' % self.STATIC_TEST_URL
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoRss'
@@ -529,7 +530,7 @@ class SyncTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%s/georss-w3c.xml' % TEST_FILES_PATH
+        url = '%s/georss-w3c.xml' % self.STATIC_TEST_URL
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoRss'
@@ -667,7 +668,7 @@ class SyncTest(TestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%s/cnml1.xml' % TEST_FILES_PATH
+        url = '%s/cnml1.xml' % self.STATIC_TEST_URL
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Cnml'
@@ -718,7 +719,7 @@ class SyncTest(TestCase):
 
         # --- repeat with different XML --- #
 
-        url = '%s/cnml2.xml' % TEST_FILES_PATH
+        url = '%s/cnml2.xml' % self.STATIC_TEST_URL
         external.config = {"url": url}
         external.full_clean()
         external.save()
