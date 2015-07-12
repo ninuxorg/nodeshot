@@ -1,19 +1,12 @@
-"""
-nodeshot.core.api unit tests
-"""
-
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured
 
 
-class ParticipationModelsTest(TestCase):
-    """ Models tests """
-    
+class ApiTest(TestCase):
     fixtures = [
         'initial_data.json',
     ]
-    
+
     def test_root_endpoint(self):
         """
         Root endpoint should be reachable
