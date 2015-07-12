@@ -19,7 +19,7 @@ class Device(BaseAccessLevel):
     name = models.CharField(_('name'), max_length=50)
     node = models.ForeignKey('nodes.Node', verbose_name=_('node'))
     type = models.CharField(_('type'), max_length=50, choices=DEVICE_TYPES_CHOICES)
-    status = models.SmallIntegerField(_('status'), max_length=2, choices=DEVICE_STATUS_CHOICES, default=DEVICE_STATUS.get('unknown'))
+    status = models.SmallIntegerField(_('status'), choices=DEVICE_STATUS_CHOICES, default=DEVICE_STATUS.get('unknown'))
 
     # geographic data
     location = models.PointField(_('location'), blank=True, null=True,

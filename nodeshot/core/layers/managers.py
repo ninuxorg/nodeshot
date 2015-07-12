@@ -4,7 +4,7 @@ from nodeshot.core.base.managers import HStoreGeoPublishedManager
 
 class ExternalMixin(object):
     """ Add method external() to your custom queryset or manager model """
-    
+
     def external(self):
         """ return only external layers """
         return self.filter(is_external=True)
@@ -12,11 +12,11 @@ class ExternalMixin(object):
 
 class ExternalQueryset(GeoPublishedQuerySet, ExternalMixin):
     """ filter external layers """
-    pass
+    name = None
 
 
 class LayerManager(HStoreGeoPublishedManager, ExternalMixin):
     """ extends GeoPublishedManager to add external method """
-    
-    def get_queryset(self): 
+
+    def get_queryset(self):
         return ExternalQueryset(self.model, using=self._db)

@@ -27,7 +27,7 @@ class Link(BaseAccessLevel):
     Link Model
     Designed for both wireless and wired links
     """
-    type = models.SmallIntegerField(_('type'), max_length=10, null=True, blank=True,
+    type = models.SmallIntegerField(_('type'), null=True, blank=True,
                                     choices=choicify(LINK_TYPES), default=LINK_TYPES.get('radio'))
 
     # in most cases these two fields are mandatory, except for "planned" links

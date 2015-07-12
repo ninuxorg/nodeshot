@@ -87,7 +87,7 @@ class NodeLinkList(generics.ListAPIView):
         # check permissions on node (for link creation)
         self.check_object_permissions(request, self.node)
         # return only links of current node
-        self.queryset = Link.objects.select_related('node')\
+        self.queryset = Link.objects.select_related('node_a', 'node_b')\
                                     .accessible_to(self.request.user)\
                                     .filter(Q(node_a_id=self.node.id) |
                                             Q(node_b_id=self.node.id))

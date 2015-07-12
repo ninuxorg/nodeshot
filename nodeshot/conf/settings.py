@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     # celery django email backend
     'djcelery_email',
     # nodeshot
+    'nodeshot.community.profiles',
     'nodeshot.core.api',
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
@@ -107,10 +108,9 @@ INSTALLED_APPS = [
     'nodeshot.core.websockets',
     'nodeshot.interop.sync',
     'nodeshot.ui.default',
+    'nodeshot.community.mailing',
     'nodeshot.community.participation',
     'nodeshot.community.notifications',
-    'nodeshot.community.profiles',
-    'nodeshot.community.mailing',
     'nodeshot.networking.net',
     'nodeshot.networking.links',
     'nodeshot.networking.services',
@@ -139,7 +139,6 @@ if 'test' not in sys.argv:
     INSTALLED_APPS += [
         'rosetta',
         'django_extensions',
-        'debug_toolbar',
     ]
 
 AUTH_USER_MODEL = 'profiles.Profile'
@@ -331,9 +330,6 @@ DEBUG_TOOLBAR_CONFIG = {
 # ------ UNIT TESTING SPEED UP ------ #
 
 if 'test' in sys.argv:
-    # workaround
-    MIGRATION_MODULES = {"auth": "django.contrib.auth.no_migrations"}
-
     CELERY_ALWAYS_EAGER = True
 
     PASSWORD_HASHERS = (

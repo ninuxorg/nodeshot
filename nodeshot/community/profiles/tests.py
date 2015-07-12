@@ -458,8 +458,9 @@ class ProfilesTest(TestCase):
         self.assertEqual(response.status_code, 201)
 
         self.assertEqual(SocialLink.objects.count(), 1)
-
-        url = reverse('api_user_social_links_detail', args=['romano', 1])
+        link = SocialLink.objects.last()
+        self.assertEqual(link.url, 'http://mywebsite.com')
+        url = reverse('api_user_social_links_detail', args=['romano', link.pk])
 
         # GET 200
         response = self.client.get(url)

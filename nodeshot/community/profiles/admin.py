@@ -19,6 +19,7 @@ from .settings import settings, EMAIL_CONFIRMATION
 class UserChangeForm(BaseChangeForm):
     class Meta:
         model = Profile
+        fields = '__all__'
 
 
 class UserCreationForm(BaseCreationForm):
@@ -34,6 +35,7 @@ class UserCreationForm(BaseCreationForm):
 
     class Meta:
         model = Profile
+        fields = '__all__'
 
 
 class AdminPasswordChangeForm(BasePasswordChangeForm):

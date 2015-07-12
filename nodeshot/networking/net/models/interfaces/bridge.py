@@ -24,44 +24,45 @@ class Bridge(Interface):
         super(Bridge, self).save(*args, **kwargs)
 
 
-from django.dispatch import receiver
-from django.db.models.signals import m2m_changed
-
-@receiver(m2m_changed, sender=Bridge.interfaces.through, dispatch_uid='bridge_validation')
-def validate_bridged_interfaces(sender, instance, action, reverse, model, pk_set, **kwargs):
-    """
-    Bridge interface validation constraints:
-        * can't bridge interfaces of different devices
-        * can't bridge self
-        * there must be at least two interfaces bridged
-    """
-    if action != 'pre_add':
-        return
-
-    interfaces = Interface.objects.filter(pk__in=pk_set)
-    device = instance.device
-    device_id = instance.device.id
-    invalid_interfaces = []
-    trying_to_bridge_self = False
-
-    for interface in interfaces:
-        # interfaces must belong to the same device
-        if interface.device_id != device_id:
-            invalid_interfaces.append(interface.mac)
-        # you can't bridge same interface
-        elif interface.id == instance.id:
-            trying_to_bridge_self = True
-
-    # ensure at least two interfaces are present
-    if instance.interfaces.count() < 2 and len(pk_set) < 2:
-        raise ValidationError(_(u'You must bridge at least 2 interfaces'))
-
-    if invalid_interfaces:
-        raise ValidationError(_(u'The interface%s %s %s not belong to device "%s"' % (
-            "s" if len(invalid_interfaces) > 1 else "",
-            ", ".join(invalid_interfaces),
-            "do" if len(invalid_interfaces) > 1 else "does",
-            device.name
-        )))
-    elif trying_to_bridge_self:
-        raise ValidationError(_(u'Cannot bridge interface %s because that is the actual interface you are editing''' % instance.mac))
+# TODO: remove/simplify during refactoring
+#from django.dispatch import receiver
+#from django.db.models.signals import m2m_changed
+#
+#@receiver(m2m_changed, sender=Bridge.interfaces.through, dispatch_uid='bridge_validation')
+#def validate_bridged_interfaces(sender, instance, action, reverse, model, pk_set, **kwargs):
+#    """
+#    Bridge interface validation constraints:
+#        * can't bridge interfaces of different devices
+#        * can't bridge self
+#        * there must be at least two interfaces bridged
+#    """
+#    if action != 'pre_add':
+#        return
+#
+#    interfaces = Interface.objects.filter(pk__in=pk_set)
+#    device = instance.device
+#    device_id = instance.device.id
+#    invalid_interfaces = []
+#    trying_to_bridge_self = False
+#
+#    for interface in interfaces:
+#        # interfaces must belong to the same device
+#        if interface.device_id != device_id:
+#            invalid_interfaces.append(interface.mac)
+#        # you can't bridge same interface
+#        elif interface.id == instance.id:
+#            trying_to_bridge_self = True
+#
+#    # ensure at least two interfaces are present
+#    if instance.interfaces.count() < 2 and len(pk_set) < 2:
+#        raise ValidationError(_(u'You must bridge at least 2 interfaces'))
+#
+#    if invalid_interfaces:
+#        raise ValidationError(_(u'The interface%s %s %s not belong to device "%s"' % (
+#            "s" if len(invalid_interfaces) > 1 else "",
+#            ", ".join(invalid_interfaces),
+#            "do" if len(invalid_interfaces) > 1 else "does",
+#            device.name
+#        )))
+#    elif trying_to_bridge_self:
+#        raise ValidationError(_(u'Cannot bridge interface %s because that is the actual interface you are editing''' % instance.mac))

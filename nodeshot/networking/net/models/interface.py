@@ -14,7 +14,7 @@ from nodeshot.core.base.managers import HStoreAccessLevelManager as InterfaceMan
 class Interface(BaseAccessLevel):
     """ Interface model """
     device = models.ForeignKey('net.Device')
-    type = models.IntegerField(_('type'), max_length=2, choices=INTERFACE_TYPE_CHOICES, blank=True)
+    type = models.IntegerField(_('type'), choices=INTERFACE_TYPE_CHOICES, blank=True)
     name = models.CharField(_('name'), max_length=10, blank=True, null=True)
     mac = MACAddressField(_('mac address'), max_length=17, unique=True, default=None, null=True, blank=True)
     mtu = models.IntegerField(_('MTU'), blank=True, null=True, default=1500,
