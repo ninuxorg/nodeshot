@@ -24,7 +24,7 @@ instructions including :ref:`production-instructions`.
 
 **Required python packages**:
 
-* Django 1.6
+* Django 1.8
 * Django Rest Framework 2.4
 
 A full list is available in the `requirements.txt file`_.
