@@ -28,8 +28,6 @@ POSTGIS_VERSION = (2, 1)
 # do not move this import
 from nodeshot.conf.settings import *
 
-INSTALLED_APPS.remove('debug_toolbar')
-
 # ------ All settings customizations must go here ------ #
 
 
@@ -62,39 +60,6 @@ GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GITHUB_APP_ID = os.environ.get('GITHUB_APP_ID', '')
 GITHUB_API_SECRET = os.environ.get('GITHUB_API_SECRET', '')
 
-#from datetime import timedelta
-#
-#CELERYBEAT_SCHEDULE = {
-#    'synchronize': {
-#        'task': 'nodeshot.interop.sync.tasks.synchronize_external_layers',
-#        'schedule': timedelta(hours=12),
-#    },
-#    # example of how to synchronize one of the layers with a different periodicity
-#    'synchronize': {
-#        'task': 'nodeshot.interop.sync.tasks.synchronize_external_layers',
-#        'schedule': timedelta(minutes=30),
-#        'args': ('layer_slug',)
-#    },
-#    # example of how to synchronize all layers except two layers
-#    'synchronize': {
-#        'task': 'nodeshot.interop.sync.tasks.synchronize_external_layers',
-#        'schedule': timedelta(hours=12),
-#        'kwargs': { 'exclude': 'layer1-slug,layer2-slug' }
-#    }
-#}
-
-import django
-
-if django.VERSION[:2] >= (1, 6):
-    TEST_RUNNER = 'django.test.runner.DiscoverRunner'
-else:
-    try:
-        import discover_runner
-        TEST_RUNNER = "discover_runner.DiscoverRunner"
-    except ImportError:
-        print("To run tests with django <= 1.5 you should install "
-              "django-discover-runner.")
-        sys.exit(-1)
 
 try:
     from local_settings import *
