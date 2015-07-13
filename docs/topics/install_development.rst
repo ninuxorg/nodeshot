@@ -167,24 +167,30 @@ Ensure your virtualenv is activated::
 
     workon nodeshot
 
-Run the development server in the background::
-
-    python manage.py runserver &
-
 Run all the tests with::
 
-    ./runtests.py
+    ./runtests.py --keepdb
+
+The ``keepdb`` option allows to avoid recreating the test database at each run, hence saving precious time.
+
+If you want to speed up tests even more, tweak your local postgresql configuration by setting these values::
+
+    # /etc/postgresql/9.1/main/postgresql.conf
+    # only for development!
+    fsync = off
+    synchronous_commit = off
+    full_page_writes = off
 
 Test specific modules
 ---------------------
 
 Each module has its own tests, so you can test one module at time::
 
-    python manage.py test nodeshot.core.nodes
+    python manage.py test --keepdb nodeshot.core.nodes
 
 You can also test more modules::
 
-    python manage.py test nodeshot.core.nodes nodeshot.core.layers nodeshot.core.cms
+    python manage.py test --keepdb nodeshot.core.nodes nodeshot.core.layers nodeshot.core.cms
 
 .. _test-coverage:
 
@@ -197,11 +203,11 @@ Install coverage package::
 
 Run test coverage and get a textual report::
 
-    coverage run --source=nodeshot runtests.py && coverage report
+    coverage run --source=nodeshot runtests.py --keepdb && coverage report
 
 Calculate test coverage for specific modules::
 
-    coverage run --source=nodeshot.core.nodes ./manage.py test nodeshot.core.nodes && coverage report
+    coverage run --source=nodeshot.core.nodes ./manage.py test --keepdb nodeshot.core.nodes && coverage report
 
 .. _build-the-docs:
 
