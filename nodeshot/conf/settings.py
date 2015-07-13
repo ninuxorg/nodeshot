@@ -63,10 +63,18 @@ if PROTOCOL == 'https':
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     os.environ['HTTPS'] = 'on'
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',  # sentry
-    'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',  # sentry
+SENTRY_ENABLED = bool(getattr(settings, 'RAVEN_CONFIG', {}).get('DNS'))
+
+MIDDLEWARE_CLASSES = ('django.middleware.common.CommonMiddleware',)
+
+# load sentry-related middleware only if needed
+if SENTRY_ENABLED:
+    MIDDLEWARE_CLASSES += (
+        'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
+        'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware'
+    )
+
+MIDDLEWARE_CLASSES += (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -143,7 +151,7 @@ if 'test' not in sys.argv:
 
 AUTH_USER_MODEL = 'profiles.Profile'
 
-if getattr(settings, 'RAVEN_CONFIG', {}):
+if SENTRY_ENABLED:
     INSTALLED_APPS.append('raven.contrib.django.raven_compat')
 
 if 'old_nodeshot' in settings.DATABASES:

@@ -14,7 +14,7 @@ class Celery(celery.Celery):
     thanks to http://stackoverflow.com/questions/27550916/celery-tasks-uncaught-exceptions-not-being-sent-to-sentry
     """
     def on_configure(self):
-        if hasattr(settings, 'RAVEN_CONFIG') and settings.RAVEN_CONFIG['dsn']:
+        if settings.SENTRY_ENABLED:
             import raven
             from raven.contrib.celery import (register_signal,
                                               register_logger_signal)

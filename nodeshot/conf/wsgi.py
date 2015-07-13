@@ -7,7 +7,7 @@ from django.conf import settings
 
 # sentry WSGI handler if configured
 # more info here: http://raven.readthedocs.org/en/latest/config/django.html#wsgi-middleware
-if getattr(settings, 'RAVEN_CONFIG', {}):
+if settings.SENTRY_ENABLED:
     from raven.contrib.django.raven_compat.middleware.wsgi import Sentry
     from django.core.handlers.wsgi import WSGIHandler
     application = Sentry(WSGIHandler())

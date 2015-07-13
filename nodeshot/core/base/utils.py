@@ -24,7 +24,7 @@ __all__ = [
 
 class RequireSentryConfigured(logging.Filter):
     def filter(self, record):
-        return hasattr(settings, 'RAVEN_CONFIG')
+        return settings.SENTRY_ENABLED
 
 
 class Hider(object):
