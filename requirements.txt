@@ -44,9 +44,6 @@ django-reversion==1.8.7
 celery==3.1.18
 django-celery-email
 
-# migrations
-south
-
 # django-cors-headers
 django-cors-headers==1.1.0
 

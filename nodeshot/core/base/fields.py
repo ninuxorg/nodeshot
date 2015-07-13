@@ -13,11 +13,11 @@ from django.conf import settings
 
 class MultiSelectFormField(forms.MultipleChoiceField):
     widget = forms.CheckboxSelectMultiple
- 
+
     def __init__(self, *args, **kwargs):
         self.max_choices = kwargs.pop('max_choices', 0)
         super(MultiSelectFormField, self).__init__(*args, **kwargs)
- 
+
     def clean(self, value):
         if not value and self.required:
             raise forms.ValidationError(self.error_messages['required'])
@@ -26,21 +26,21 @@ class MultiSelectFormField(forms.MultipleChoiceField):
         #             % (apnumber(self.max_choices), pluralize(self.max_choices)))
         return value
 
- 
+
 class MultiSelectField(models.Field):
     __metaclass__ = models.SubfieldBase
- 
+
     def get_internal_type(self):
         return "CharField"
- 
+
     def get_choices_default(self):
         return self.get_choices(include_blank=False)
- 
+
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
         choicedict = dict(field.choices)
         return choicedict.get(value, value)
- 
+
     def formfield(self, **kwargs):
         # don't call super, as that overrides default widget if it has choices
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name),
@@ -58,7 +58,7 @@ class MultiSelectField(models.Field):
             return value
         elif isinstance(value, list):
             return ",".join(value)
- 
+
     def to_python(self, value):
         if value is not None:
             return value if isinstance(value, list) else value.split(',')
@@ -71,7 +71,7 @@ class MultiSelectField(models.Field):
                 choicedict.get(value, value) for value in getattr(self, fieldname)
             ])
             setattr(cls, 'get_%s_display' % self.name, func)
- 
+
     def validate(self, value, model_instance):
         arr_choices = self.get_choices_selected(self.get_choices_default())
         try:
@@ -82,7 +82,7 @@ class MultiSelectField(models.Field):
             if not self.blank:
                 raise exceptions.ValidationError(self.error_messages['invalid_choice'] % value)
         return
- 
+
     def get_choices_selected(self, arr_choices=''):
         if not arr_choices:
             return False
@@ -90,7 +90,7 @@ class MultiSelectField(models.Field):
         for choice_selected in arr_choices:
             list.append(choice_selected[0])
         return list
- 
+
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         return self.get_db_prep_value(value)
@@ -105,7 +105,6 @@ from .widgets import ColorFieldWidget
 RGB_REGEX = re.compile('^#?((?:[0-F]{3}){1,2})$', re.IGNORECASE)
 
 class RGBColorField(models.CharField):
-
     widget = ColorFieldWidget
 
     def __init__(self, *args, **kwargs):
@@ -119,10 +118,3 @@ class RGBColorField(models.CharField):
                        'regex': RGB_REGEX
                        })
         return super(RGBColorField, self).formfield(**kwargs)
-
-
-# needed for South compatibility
-if 'south' in settings.INSTALLED_APPS:
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ["^coop\.utils\.fields\.MultiSelectField"])
-    add_introspection_rules([], ["^nodeshot\.core\.base\.fields\.RGBColorField"])
