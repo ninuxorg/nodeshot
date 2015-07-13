@@ -12,6 +12,10 @@ COPY docker/ /app/
 
 EXPOSE 5000
 
-RUN mkdir /log
+#remove sync in 1.8
+RUN mkdir /log && \
+    python manage.py syncdb --noinput --no-initial-data && \
+    python manage.py migrate --noinput --no-initial-data && \
+    python manage.py loaddata initial_data
 
-CMD python manage.py syncdb && python manage.py migrate && python manage.py runserver
+CMD python manage.py runserver
