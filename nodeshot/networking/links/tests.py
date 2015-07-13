@@ -28,6 +28,7 @@ class LinkTest(TestCase):
     ]
 
     def setUp(self):
+        super(LinkTest, self).setUp()
         l = Link()
         l.interface_a = Interface.objects.find(2)
         l.interface_b = Interface.objects.find(3)
@@ -246,7 +247,6 @@ class TopologyTest(StaticLiveServerTestCase):
         'test_layers.json',
         'test_status.json',
         'test_nodes.json',
-        'test_routing_protocols.json',
         'test_topology_data.json'
     ]
 

@@ -26,6 +26,7 @@ class ProfilesTest(TestCase):
     ]
 
     def setUp(self):
+        super(ProfilesTest, self).setUp()
         self.client.login(username='registered', password='tester')
         if EMAIL_CONFIRMATION:
             for user in User.objects.all():

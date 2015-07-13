@@ -43,6 +43,7 @@ class TestNotification(TestCase):
     ]
 
     def setUp(self):
+        super(TestNotification, self).setUp()
         # empty outbox, emails generated from EmailAddress model in nodeshot.community.profiles
         mail.outbox = []
 

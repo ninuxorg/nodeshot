@@ -37,6 +37,7 @@ class MailingTest(TestCase):
     ]
 
     def setUp(self):
+        super(MailingTest, self).setUp()
         # create outward record
         self.message = Outward.objects.create(
             status=0,

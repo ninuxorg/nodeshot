@@ -171,7 +171,7 @@ Run all the tests with::
 
     ./runtests.py --keepdb
 
-The ``keepdb`` option allows to avoid recreating the test database at each run, hence saving precious time.
+The ``keepdb`` option allows to avoid recreating the test database at each run, **hence saving precious time**.
 
 If you want to speed up tests even more, tweak your local postgresql configuration by setting these values::
 
@@ -208,6 +208,40 @@ Run test coverage and get a textual report::
 Calculate test coverage for specific modules::
 
     coverage run --source=nodeshot.core.nodes ./manage.py test --keepdb nodeshot.core.nodes && coverage report
+
+Measure time spent running tests
+--------------------------------
+
+Automated tests that involve database calls and/or HTTP requests can quickly become slow.
+
+Slow tests mean low productivity, especially if you are used to **Test Driven Development**.
+
+For this reason, if you notice that some tests are slow, you have two additional options to measure test executition times,
+**find out which tests are slow** and refactor them.
+
+Time option
+^^^^^^^^^^^
+
+``--time`` will measure how much time is needed to execute each test class.
+
+Detailed option
+^^^^^^^^^^^^^^^
+
+``--time --detailed`` will measure how much time is needed to execute each test class **and** each single test.
+
+Examples
+^^^^^^^^
+
+Here's a couple of examples::
+
+    # general measurement
+    ./runtests.py --keepdb --time
+
+    # detailed measurement
+    ./runtests.py --keepdb --time --detailed
+
+    # detailed measurement for a specific test class
+    python manage.py test --keepdb --time --detailed nodeshot.core.nodes
 
 .. _build-the-docs:
 
