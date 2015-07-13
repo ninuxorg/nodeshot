@@ -17,9 +17,8 @@ before_install:
 # command to install requirements
 install:
   - pip install -r requirements.txt
+  - pip install -r requirements-test.txt
   - python setup.py develop -q
-  - pip install coverage coveralls selenium lxml
-  - pip install MySQL-python
 
 before_script:
   # - export DISPLAY=:99.0
