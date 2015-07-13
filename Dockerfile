@@ -14,4 +14,4 @@ EXPOSE 5000
 
 RUN mkdir /log
 
-CMD echo syncdb migrate runserver | xargs python manage.py
+CMD python manage.py syncdb && python manage.py migrate && python manage.py runserver
