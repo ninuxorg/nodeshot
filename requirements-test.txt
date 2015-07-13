@@ -3,3 +3,4 @@ coveralls
 selenium
 lxml
 MySQL-python
+responses
