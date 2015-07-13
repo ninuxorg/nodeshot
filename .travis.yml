@@ -35,7 +35,7 @@ before_script:
 
 # command to run tests, e.g. python setup.py test
 script:
-  - coverage run --source=nodeshot runtests.py
+  - coverage run --source=nodeshot runtests.py --keepdb
 
 after_success:
   coveralls
