@@ -65,23 +65,28 @@ if PROTOCOL == 'https':
 
 SENTRY_ENABLED = bool(getattr(settings, 'RAVEN_CONFIG', {}).get('DNS'))
 
-MIDDLEWARE_CLASSES = ('django.middleware.common.CommonMiddleware',)
+MIDDLEWARE_CLASSES = ['django.middleware.common.CommonMiddleware']
 
 # load sentry-related middleware only if needed
 if SENTRY_ENABLED:
-    MIDDLEWARE_CLASSES += (
+    MIDDLEWARE_CLASSES += [
         'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
         'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware'
-    )
+    ]
 
-MIDDLEWARE_CLASSES += (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-)
+__TMP_MIDDLEWARE__ = [
+    ('django.middleware.security.SecurityMiddleware', 'notest'),
+    ('django.contrib.sessions.middleware.SessionMiddleware', 'yestest'),
+    ('django.middleware.csrf.CsrfViewMiddleware', 'notest'),
+    ('django.contrib.auth.middleware.AuthenticationMiddleware', 'yestest'),
+    ('django.contrib.auth.middleware.SessionAuthenticationMiddleware', 'notest'),
+    ('django.contrib.messages.middleware.MessageMiddleware', 'yestest'),
+    ('django.middleware.clickjacking.XFrameOptionsMiddleware', 'notest'),
+    ('corsheaders.middleware.CorsMiddleware', 'notest'),
+]
+
+# no need to load all the middlewares when running tests
+MIDDLEWARE_CLASSES += [entry[0] for entry in __TMP_MIDDLEWARE__ if 'test' not in sys.argv or entry[1] == 'yestest']
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -304,6 +309,7 @@ if DEBUG:
     # more info here: http://docs.celeryproject.org/en/latest/configuration.html#celery-always-eager
     CELERY_ALWAYS_EAGER = True
     CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+    BROKER_BACKEND = 'memory'
 else:
     # in production the default background queue manager is Redis
     BROKER_URL = 'redis://localhost:6379/0'
@@ -342,10 +348,6 @@ if 'test' in sys.argv:
 
     PASSWORD_HASHERS = (
         'django.contrib.auth.hashers.MD5PasswordHasher',
-        'django.contrib.auth.hashers.SHA1PasswordHasher',
-        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-        'django.contrib.auth.hashers.BCryptPasswordHasher',
     )
 
 # ------ CORS-HEADERS SETTINGS ------ #
@@ -355,7 +357,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 # ------ SOCIAL AUTH SETTINGS ------ #
 
 if 'social.apps.django_app.default' in INSTALLED_APPS:
-    MIDDLEWARE_CLASSES += ('social.apps.django_app.middleware.SocialAuthExceptionMiddleware',)
+    if 'test' not in sys.argv:
+        MIDDLEWARE_CLASSES += ('social.apps.django_app.middleware.SocialAuthExceptionMiddleware',)
 
     # In Django 1.6, the default session serliazer has been switched to one based on JSON,
     # rather than pickles, to improve security. Django-openid-auth does not support this
