@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(24))
 ROOT_URLCONF = 'urls' #
 
 
-DEBUG = True
+DEBUG = False
 DOMAIN = os.environ.get('DOMAIN', 'localhost')
 
 DATABASES = {
@@ -30,6 +30,7 @@ from nodeshot.conf.settings import *
 
 # ------ All settings customizations must go here ------ #
 
+SERVE_STATIC = True
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
