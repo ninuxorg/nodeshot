@@ -494,8 +494,8 @@ class NodesApiTest(TestCase):
         self.client.logout()
 
     def test_node_geojson_list_pagination(self):
-        # create more than 50 nodes
-        for n in range(0, 60):
+        # create a few nodes
+        for n in range(0, 5):
             Node.objects.create(
                 name='node-%d' % n,
                 slug='node-%d' % n,
