@@ -159,7 +159,7 @@ Now setup the database:
 
     exit  # go back being non-root
     # will prompt you to create a superuser, proceed!
-    ./manage.py syncdb && ./manage.py migrate --no-initial-data && ./manage.py loaddata initial_data
+    ./manage.py migrate --no-initial-data && ./manage.py loaddata initial_data
 
 Copy static assets (javascript, css, images)::
 

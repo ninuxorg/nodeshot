@@ -125,7 +125,7 @@ Create the database tables and initial data:
 .. code-block:: bash
 
     # will prompt you to create a superuser, proceed!
-    ./manage.py syncdb && ./manage.py migrate --no-initial-data && ./manage.py loaddata initial_data
+    ./manage.py migrate --no-initial-data && ./manage.py loaddata initial_data
 
 Run the development server::
 
