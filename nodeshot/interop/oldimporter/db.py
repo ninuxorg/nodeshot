@@ -25,20 +25,17 @@ class DefaultRouter(object):
         """
         Relations between objects are allowed between nodeshot2 objects only
         """
-        if obj1._meta.app_label != 'oldimporter' and \
-           obj2._meta.app_label != 'oldimporter':
-           return True
+        if obj1._meta.app_label != 'oldimporter' and obj2._meta.app_label != 'oldimporter':
+            return True
         return None
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         """
         Make sure the old_nodeshot app only appears in the 'old_nodeshot' database
         """
         if db != 'old_nodeshot' and model._meta.app_label != 'oldimporter':
             return True
         return None
-    
-    allow_migrate = allow_syncdb
 
 
 class OldNodeshotRouter(object):
@@ -62,17 +59,14 @@ class OldNodeshotRouter(object):
         """
         Relations between objects are allowed between old_nodeshot objects only
         """
-        if obj1._meta.app_label == 'oldimporter' and \
-           obj2._meta.app_label == 'oldimporter':
-           return True
+        if obj1._meta.app_label == 'oldimporter' and obj2._meta.app_label == 'oldimporter':
+            return True
         return None
 
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         """
         Make sure the old_nodeshot app only appears in the 'old_nodeshot' database
         """
         if db != 'old_nodeshot' or model._meta.app_label != 'oldimporter':
             return False
         return True
-    
-    allow_migrate = allow_syncdb
