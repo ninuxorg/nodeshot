@@ -131,9 +131,8 @@ class HttpRetrieverMixin(object):
         """ retrieve data from an HTTP URL """
         # shortcuts for readability
         url = self.config.get('url')
-
-        # do HTTP request and store content
-        self.data = requests.get(url, verify=self.verify_ssl).content
+        # perform HTTP request and store content
+        self.data = requests.get(url, verify=self.verify_ssl, timeout=5).content
 
 
 class XMLParserMixin(object):

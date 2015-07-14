@@ -1,8 +1,9 @@
+import os
+import responses
 import sys
-
 from cStringIO import StringIO
 
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import TestCase
 from django.core import management
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -12,9 +13,9 @@ from nodeshot.core.layers.models import Layer
 from nodeshot.core.nodes.models import Node, Status
 from nodeshot.core.base.tests import user_fixtures
 
-from .models import LayerExternal, NodeExternal
-from .settings import settings, SYNCHRONIZERS
-from .tasks import synchronize_external_layers
+from ..models import LayerExternal, NodeExternal
+from ..settings import settings, SYNCHRONIZERS
+from ..tasks import synchronize_external_layers
 
 
 def capture_output(command, args=[], kwargs={}):
@@ -30,7 +31,11 @@ def capture_output(command, args=[], kwargs={}):
     return output.getvalue()
 
 
-class SyncTest(StaticLiveServerTestCase):
+MOCK_URL_PREFIX = 'http://127.0.0.1/static'
+STATIC_PATH = '{0}/static'.format(os.path.dirname(os.path.abspath(__file__)))
+
+
+class SyncTest(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -39,9 +44,8 @@ class SyncTest(StaticLiveServerTestCase):
         'test_nodes.json'
     ]
 
-    @property
-    def STATIC_TEST_URL(self):
-        return '{0}/static/nodeshot/testing'.format(self.live_server_url)
+    def _load(self, file):
+        return open(os.path.join(STATIC_PATH, file)).read()
 
     def test_external_layer_representation(self):
         self.assertIn('object', str(LayerExternal()))
@@ -175,13 +179,17 @@ class SyncTest(StaticLiveServerTestCase):
             external = LayerExternal.objects.get(pk=external.pk)
             self.assertEqual(external.synchronizer_path, path)
 
+    @responses.activate
     def test_admin_synchronize_action(self):
         layer = Layer.objects.external()[0]
         layer.new_nodes_allowed = False
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%s/geojson1.json' % self.STATIC_TEST_URL
+        url = '%s/geojson1.json' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('geojson1.json'),
+                      content_type='application/json')
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
@@ -228,6 +236,7 @@ class SyncTest(StaticLiveServerTestCase):
         # ensure all nodes have been imported
         self.assertEqual(layer.node_set.count(), 2)
 
+    @responses.activate
     def test_openwisp(self):
         """ test OpenWisp synchronizer """
         layer = Layer.objects.external()[0]
@@ -235,10 +244,15 @@ class SyncTest(StaticLiveServerTestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
+        url = '%s/openwisp-georss.xml' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('openwisp-georss.xml'),
+                      content_type='application/xml')
+
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.OpenWisp'
         external._reload_schema()
-        external.url = '%s/openwisp-georss.xml' % self.STATIC_TEST_URL
+        external.url = '%s/openwisp-georss.xml' % MOCK_URL_PREFIX
         external.full_clean()
         external.save()
 
@@ -271,7 +285,11 @@ class SyncTest(StaticLiveServerTestCase):
 
         # --- with the following step we expect some nodes to be deleted --- #
 
-        external.url = '%s/openwisp-georss2.xml' % self.STATIC_TEST_URL
+        url = '%s/openwisp-georss2.xml' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('openwisp-georss2.xml'),
+                      content_type='application/xml')
+        external.url = url
         external.full_clean()
         external.save()
 
@@ -300,6 +318,7 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertEqual(node.updated.strftime('%Y-%m-%d'), '2013-07-10')
         self.assertEqual(node.added.strftime('%Y-%m-%d'), '2013-06-14')
 
+    @responses.activate
     def test_geojson_sync(self):
         """ test GeoJSON sync """
         layer = Layer.objects.external()[0]
@@ -310,7 +329,11 @@ class SyncTest(StaticLiveServerTestCase):
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
         external._reload_schema()
-        external.url = '%s/geojson1.json' % self.STATIC_TEST_URL
+        url = '%s/geojson1.json' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('geojson1.json'),
+                      content_type='application/json')
+        external.url = url
         external.full_clean()
         external.save()
 
@@ -354,7 +377,11 @@ class SyncTest(StaticLiveServerTestCase):
 
         # --- repeat with slightly different input --- #
 
-        external.url = '%s/geojson2.json' % self.STATIC_TEST_URL
+        url = '%s/geojson2.json' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('geojson2.json'),
+                      content_type='application/json')
+        external.url = url
         external.full_clean()
         external.save()
 
@@ -371,6 +398,7 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertIn('2 total external', output)
         self.assertIn('2 total local', output)
 
+    @responses.activate
     def test_preexisting_name(self):
         """ test preexisting names """
         layer = Layer.objects.external()[0]
@@ -383,7 +411,10 @@ class SyncTest(StaticLiveServerTestCase):
         node.name = 'simplejson'
         node.save()
 
-        url = '%s/geojson1.json' % self.STATIC_TEST_URL
+        url = '%s/geojson1.json' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('geojson1.json'),
+                      content_type='application/json')
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
@@ -404,6 +435,7 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertIn('2 total external', output)
         self.assertIn('2 total local', output)
 
+    @responses.activate
     def test_key_mappings(self):
         """ importing a file with different keys """
         layer = Layer.objects.external()[0]
@@ -416,7 +448,10 @@ class SyncTest(StaticLiveServerTestCase):
         node.name = 'simplejson'
         node.save()
 
-        url = '%s/geojson3.json' % self.STATIC_TEST_URL
+        url = '%s/geojson3.json' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('geojson3.json'),
+                      content_type='application/json')
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoJson'
@@ -466,6 +501,7 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertIn('2 total external', output)
         self.assertIn('2 total local', output)
 
+    @responses.activate
     def test_georss_simple(self):
         """ test GeoRSS simple """
         layer = Layer.objects.external()[0]
@@ -473,7 +509,10 @@ class SyncTest(StaticLiveServerTestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%s/georss-simple.xml' % self.STATIC_TEST_URL
+        url = '%s/georss-simple.xml' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('georss-simple.xml'),
+                      content_type='application/xml')
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoRss'
@@ -523,6 +562,7 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertIn('3 total external', output)
         self.assertIn('3 total local', output)
 
+    @responses.activate
     def test_georss_w3c(self):
         """ test GeoRSS w3c """
         layer = Layer.objects.external()[0]
@@ -530,7 +570,10 @@ class SyncTest(StaticLiveServerTestCase):
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        url = '%s/georss-w3c.xml' % self.STATIC_TEST_URL
+        url = '%s/georss-w3c.xml' % MOCK_URL_PREFIX
+        responses.add(responses.GET, url,
+                      body=self._load('georss-w3c.xml'),
+                      content_type='application/xml')
 
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.GeoRss'
@@ -579,22 +622,29 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertIn('2 total external', output)
         self.assertIn('2 total local', output)
 
+    @responses.activate
     def test_nodeshot_sync(self):
         layer = Layer.objects.external()[0]
         layer.new_nodes_allowed = True
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
+        base_url = 'http://127.0.0.1/api/v1/layers/rome'
+
         external = LayerExternal(layer=layer)
         external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Nodeshot'
         external._reload_schema()
-        external.layer_url = "%s/api/v1/layers/rome/" % settings.SITE_URL
+        external.layer_url = '%s/' % base_url
         external.full_clean()
         external.verify_ssl = False
         external.full_clean()
         external.save()
 
         # standard node list
+        responses.add(responses.GET, '%s/nodes/' % base_url,
+                      body=self._load('nodes.json'),
+                      match_querystring=True,
+                      content_type='application/json')
         url = reverse('api_layer_nodes_list', args=[layer.slug])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -605,6 +655,10 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertEqual(type(response.data['results'][0]), dict)
 
         # limit pagination to 1
+        responses.add(responses.GET, '%s/nodes/?limit=1&page=2' % base_url,
+                      body=self._load('nodes-pagination.json'),
+                      match_querystring=True,
+                      content_type='application/json')
         url = reverse('api_layer_nodes_list', args=[layer.slug])
         response = self.client.get('%s?limit=1&page=2' % url)
         self.assertEqual(len(response.data['results']), 1)
@@ -614,6 +668,10 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertIn(url, response.data['next'])
 
         # geojson view
+        responses.add(responses.GET, '%s/nodes.geojson' % base_url,
+                      body=self._load('nodes.geojson'),
+                      match_querystring=True,
+                      content_type='application/json')
         url = reverse('api_layer_nodes_geojson', args=[layer.slug])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -622,127 +680,158 @@ class SyncTest(StaticLiveServerTestCase):
         self.assertEqual(type(response.data['features'][0]), dict)
 
         # limit pagination to 1 in geojson view
+        responses.add(responses.GET, '%s/nodes.geojson?limit=1&page=2' % base_url,
+                      body=self._load('nodes-pagination.geojson'),
+                      match_querystring=True,
+                      content_type='application/json')
         url = reverse('api_layer_nodes_geojson', args=[layer.slug])
         response = self.client.get('%s?limit=1&page=2' % url)
         self.assertEqual(len(response.data['features']), 1)
 
+    @responses.activate
     def test_nodeshot_sync_exceptions(self):
         layer = Layer.objects.external()[0]
         layer.new_nodes_allowed = True
         layer.save()
         layer = Layer.objects.get(pk=layer.pk)
 
-        external = LayerExternal(layer=layer)
+        base_url = 'http://wrongurl.com/api/v1/layers/wrong'
 
-        for layer_url in [
-            'http://idonotexi.st.com/hey',
-            'https://test.map.ninux.org/api/v1/layers/'
-        ]:
-            external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Nodeshot'
+        external = LayerExternal(layer=layer)
+        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Nodeshot'
+        external._reload_schema()
+        external.layer_url = '%s/' % base_url
+        external.full_clean()
+        external.verify_ssl = False
+        external.full_clean()
+        external.save()
+
+        responses.add(responses.GET, '%s/nodes/' % base_url, body='', status=404)
+        url = reverse('api_layer_nodes_list', args=[layer.slug])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('error', response.data)
+        self.assertIn('exception', response.data)
+        # geojson view
+        responses.add(responses.GET, '%s/nodes.geojson' % base_url, body='', status=404)
+        url = reverse('api_layer_nodes_geojson', args=[layer.slug])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('error', response.data)
+        self.assertIn('exception', response.data)
+
+    # TODO: extract CNML synchronizer in a separate python package
+    if 'nodeshot.networking.links' in settings.INSTALLED_APPS:
+        def test_cnml(self):
+            """ test CNML """
+            # mock urllib
+            class Response(object):
+                def __init__(self, url):
+                    self.filename = url.split('/')[-1]
+
+                def read(self):
+                    return self._load(self.filename)
+            Response._load = self._load
+
+            def mockopen(url):
+                return Response(url)
+
+            import urllib
+            urlopen = urllib.urlopen
+            urllib.urlopen = mockopen
+
+            from nodeshot.interop.sync.synchronizers import Cnml
+            from nodeshot.networking.net.models import Device, Ip
+            from nodeshot.networking.links.models import Link
+            layer = Layer.objects.external()[0]
+            layer.new_nodes_allowed = False
+            layer.save()
+            layer = Layer.objects.get(pk=layer.pk)
+
+            url = '%s/cnml1.xml' % MOCK_URL_PREFIX
+            responses.add(responses.GET, url,
+                          body=self._load('cnml1.xml'),
+                          content_type='application/xml')
+
+            external = LayerExternal(layer=layer)
+            external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Cnml'
             external._reload_schema()
-            external.layer_url = layer_url
-            external.full_clean()
-            external.verify_ssl = False
+            external.config = {"url": url}
             external.full_clean()
             external.save()
 
-            url = reverse('api_layer_nodes_list', args=[layer.slug])
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-            self.assertIn('error', response.data)
-            self.assertIn('exception', response.data)
-            # geojson view
-            url = reverse('api_layer_nodes_geojson', args=[layer.slug])
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-            self.assertIn('error', response.data)
-            self.assertIn('exception', response.data)
+            ip_count = Ip.objects.count()
+            link_count = Link.objects.count()
 
-    def test_cnml(self):
-        """ test CNML """
-        from nodeshot.interop.sync.synchronizers import Cnml
-        from nodeshot.networking.net.models import Device, Ip
-        from nodeshot.networking.links.models import Link
-        layer = Layer.objects.external()[0]
-        layer.new_nodes_allowed = False
-        layer.save()
-        layer = Layer.objects.get(pk=layer.pk)
+            output = capture_output(
+                management.call_command,
+                ['sync', 'vienna'],
+                kwargs={'verbosity': 0}
+            )
 
-        url = '%s/cnml1.xml' % self.STATIC_TEST_URL
+            for status in Cnml.STATUS_MAPPING.keys():
+                self.assertEqual(Status.objects.filter(slug=status).count(), 1)
 
-        external = LayerExternal(layer=layer)
-        external.synchronizer_path = 'nodeshot.interop.sync.synchronizers.Cnml'
-        external._reload_schema()
-        external.config = {"url": url}
-        external.full_clean()
-        external.save()
+            # ensure following text is in output
+            self.assertIn('3 nodes added', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('3 total external', output)
+            self.assertIn('3 total local', output)
+            # start checking DB too
+            nodes = layer.node_set.all()
+            # ensure all nodes have been imported
+            self.assertEqual(nodes.count(), 3)
+            # check one particular node has the data we expect it to have
+            node = Node.objects.get(name='TOLOArtzubi')
+            self.assertEqual(node.address, '')
+            geometry = GEOSGeometry('POINT (-2.116230 43.146330)')
+            self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
+            self.assertEqual(node.elev, 15)
+            self.assertEqual(node.status.slug, 'building')
+            self.assertEqual(node.data['cnml_id'], '55349')
+            # check devices
+            self.assertIn('12 devices added', output)
+            self.assertEqual(Device.objects.filter(node__layer=layer).count(), 12)
+            # check interfaces
+            device = Device.objects.get(data={'cnml_id': 49635})
+            self.assertEqual(device.interface_set.count(), 3)
+            self.assertIn('21 interfaces added', output)
+            self.assertEqual(Ip.objects.count(), ip_count + 21)
+            # check links
+            self.assertEqual(Link.objects.count(), link_count + 9)
 
-        ip_count = Ip.objects.count()
-        link_count = Link.objects.count()
+            # --- repeat with different XML --- #
 
-        output = capture_output(
-            management.call_command,
-            ['sync', 'vienna'],
-            kwargs={'verbosity': 0}
-        )
+            url = '%s/cnml2.xml' % MOCK_URL_PREFIX
+            responses.add(responses.GET, url,
+                          body=self._load('cnml2.xml'),
+                          content_type='application/xml')
+            external.config = {"url": url}
+            external.full_clean()
+            external.save()
 
-        for status in Cnml.STATUS_MAPPING.keys():
-            self.assertEqual(Status.objects.filter(slug=status).count(), 1)
+            output = capture_output(
+                management.call_command,
+                ['sync', 'vienna'],
+                kwargs={'verbosity': 0}
+            )
 
-        # ensure following text is in output
-        self.assertIn('3 nodes added', output)
-        self.assertIn('0 nodes changed', output)
-        self.assertIn('3 total external', output)
-        self.assertIn('3 total local', output)
-        # start checking DB too
-        nodes = layer.node_set.all()
-        # ensure all nodes have been imported
-        self.assertEqual(nodes.count(), 3)
-        # check one particular node has the data we expect it to have
-        node = Node.objects.get(name='TOLOArtzubi')
-        self.assertEqual(node.address, '')
-        geometry = GEOSGeometry('POINT (-2.116230 43.146330)')
-        self.assertTrue(node.geometry.equals_exact(geometry) or node.geometry.equals(geometry))
-        self.assertEqual(node.elev, 15)
-        self.assertEqual(node.status.slug, 'building')
-        self.assertEqual(node.data['cnml_id'], '55349')
-        # check devices
-        self.assertIn('12 devices added', output)
-        self.assertEqual(Device.objects.filter(node__layer=layer).count(), 12)
-        # check interfaces
-        device = Device.objects.get(data={'cnml_id': 49635})
-        self.assertEqual(device.interface_set.count(), 3)
-        self.assertIn('21 interfaces added', output)
-        self.assertEqual(Ip.objects.count(), ip_count + 21)
-        # check links
-        self.assertEqual(Link.objects.count(), link_count + 9)
+            # ensure following text is in output
+            self.assertIn('3 nodes unmodified', output)
+            self.assertIn('0 nodes deleted', output)
+            self.assertIn('0 nodes changed', output)
+            self.assertIn('3 total external', output)
+            self.assertIn('3 total local', output)
+            self.assertIn('0 devices added', output)
+            self.assertIn('2 devices deleted', output)
+            # check devices
+            self.assertEqual(nodes.count(), 3)
+            self.assertEqual(Device.objects.filter(node__layer=layer).count(), 10)
+            # check interfaces
+            self.assertEqual(device.interface_set.count(), 2)
+            self.assertIn('0 interfaces added', output)
+            self.assertIn('1 interfaces deleted', output)
+            self.assertEqual(Ip.objects.count(), ip_count + 18)
 
-        # --- repeat with different XML --- #
-
-        url = '%s/cnml2.xml' % self.STATIC_TEST_URL
-        external.config = {"url": url}
-        external.full_clean()
-        external.save()
-
-        output = capture_output(
-            management.call_command,
-            ['sync', 'vienna'],
-            kwargs={'verbosity': 0}
-        )
-
-        # ensure following text is in output
-        self.assertIn('3 nodes unmodified', output)
-        self.assertIn('0 nodes deleted', output)
-        self.assertIn('0 nodes changed', output)
-        self.assertIn('3 total external', output)
-        self.assertIn('3 total local', output)
-        self.assertIn('0 devices added', output)
-        self.assertIn('2 devices deleted', output)
-        # check devices
-        self.assertEqual(nodes.count(), 3)
-        self.assertEqual(Device.objects.filter(node__layer=layer).count(), 10)
-        # check interfaces
-        self.assertEqual(device.interface_set.count(), 2)
-        self.assertIn('0 interfaces added', output)
-        self.assertIn('1 interfaces deleted', output)
-        self.assertEqual(Ip.objects.count(), ip_count + 18)
+            # restore urllib
+            urllib.urlopen = urlopen
