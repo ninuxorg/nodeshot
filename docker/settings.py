@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(24))
 ROOT_URLCONF = 'urls' #
 
 
-DEBUG = True if 'DEBUG' in os.environ else False
+DEBUG = True
 DOMAIN = os.environ.get('DOMAIN', 'localhost')
 
 DATABASES = {
