@@ -83,14 +83,14 @@ def node_deleted_handler(sender, **kwargs):
 def disconnect():
     """ disconnect signals """
     post_save.disconnect(node_created_handler, sender=Node, dispatch_uid='notify_node_created')
-    node_status_changed.disconnect(node_status_changed_handler, dispatch_uid='notify_node_status_changed')
+    node_status_changed.disconnect(node_status_changed_handler, sender=Node, dispatch_uid='notify_node_status_changed')
     pre_delete.disconnect(node_deleted_handler, sender=Node, dispatch_uid='notify_node_deleted')
 
 
 def reconnect():
     """ reconnect signals """
     post_save.connect(node_created_handler, sender=Node, dispatch_uid='notify_node_created')
-    node_status_changed.connect(node_status_changed_handler, dispatch_uid='notify_node_status_changed')
+    node_status_changed.connect(node_status_changed_handler, sender=Node, dispatch_uid='notify_node_status_changed')
     pre_delete.connect(node_deleted_handler, sender=Node, dispatch_uid='notify_node_deleted')
 
 
@@ -101,4 +101,3 @@ DISCONNECTABLE_SIGNALS.append(
         'reconnect': reconnect
     }
 )
-setattr(settings, 'NODESHOT_DISCONNECTABLE_SIGNALS', DISCONNECTABLE_SIGNALS)
