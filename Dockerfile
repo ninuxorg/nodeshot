@@ -13,6 +13,6 @@ COPY docker/ /app/
 
 EXPOSE 5000
 
-RUN mkdir /log
+RUN mkdir /log && apt-get install -yy redis-server
 
 CMD /app/docker_start.sh
