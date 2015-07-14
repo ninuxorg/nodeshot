@@ -11,7 +11,7 @@ RUN pip install -U pip wheel && pip install -r requirements.txt
 ADD . /app
 COPY docker/ /app/
 
-EXPOSE 5000
+EXPOSE 8000
 
 RUN mkdir /log && apt-get install -yy redis-server
 

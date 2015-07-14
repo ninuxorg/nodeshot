@@ -12,4 +12,4 @@ if [ ! -f /app/first_start ]; then
     touch /app/first_start
 fi
 
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8000
