@@ -35,7 +35,7 @@ MOCK_URL_PREFIX = 'http://127.0.0.1/static'
 STATIC_PATH = '{0}/static'.format(os.path.dirname(os.path.abspath(__file__)))
 
 
-class SyncTest(TestCase):
+class TestSync(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
