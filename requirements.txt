@@ -54,7 +54,7 @@ tornado
 django-redis
 
 # fixture management
-django-smuggler==0.5.0
+django-smuggler==0.6.0
 
 # networking
 netaddr
