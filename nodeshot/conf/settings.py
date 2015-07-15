@@ -331,7 +331,7 @@ CELERYBEAT_SCHEDULE = {
 # ------ GRAPPELLI ------ #
 
 if 'grappelli' in INSTALLED_APPS:
-    GRAPPELLI_ADMIN_TITLE = '<a href="%s">%s Admin</a>' % (SITE_URL, SITE_NAME)
+    GRAPPELLI_ADMIN_TITLE = '{0} Admin'.format(SITE_NAME)
     GRAPPELLI_INDEX_DASHBOARD = 'nodeshot.dashboard.NodeshotDashboard'
 
 # ------ DEBUG TOOLBAR ------ #
