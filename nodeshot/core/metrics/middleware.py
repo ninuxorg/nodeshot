@@ -63,21 +63,18 @@ class InfluxDBRequestMiddleware(object):
                 referer_tld_string = referer_tld.tld
             # data
             values = {
-                'response_time': ms,
+                'ms': ms,
                 'is_ajax': is_ajax,
                 'is_authenticated': is_authenticated,
                 'is_staff': is_staff,
                 'is_superuser': is_superuser,
                 'referer': str(referer),
                 'referer_tld': referer_tld_string,
-                'full_path': request.get_full_path()
-            }
-            # tags, for fast retrievals
-            tags = {
+                'full_path': request.get_full_path(),
                 'method': request.method,
                 'module': request._view_module,
                 'view': request._view_name,
                 'path': request.path
             }
             # write into db
-            write(name='http_requests', values=values, tags=tags)
+            write(name='http_requests', values=values)

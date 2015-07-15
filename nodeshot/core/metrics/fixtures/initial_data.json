@@ -3,29 +3,33 @@
         "model": "metrics.Metric",
         "pk": 1,
         "fields": {
-            "name": "http_requests"
+            "name": "http_requests",
+            "query": "SELECT MEAN(ms) AS hourly_average_response_time FROM http_requests WHERE time > now() - 1d GROUP BY time(1h)"
         }
     },
     {
         "model": "metrics.Metric",
         "pk": 2,
         "fields": {
-            "name": "user_logins"
+            "name": "user_logins",
+            "query": "SELECT COUNT(value) AS daily_logins from user_logins WHERE time > now() - 30d GROUP BY time(1d)"
         }
     },
     {
         "model": "metrics.Metric",
         "pk": 4,
         "fields": {
-            "name": "user_count"
+            "name": "user_count",
+            "query": "SELECT MAX(total) AS total_users from user_count WHERE time > now() - 30d GROUP BY time(1d)"
         }
     },
     {
         "model": "metrics.Metric",
         "pk": 5,
         "fields": {
-            "name": "user_variations (created)",
-            "tags": { "action": "created" }
+            "name": "user_variations",
+            "tags": { "action": "created" },
+            "query": "SELECT SUM(variation) AS new_users from user_variations WHERE action = 'created' AND time > now() - 30d GROUP BY time(1d)"
         }
     },
     {
@@ -33,21 +37,16 @@
         "pk": 6,
         "fields": {
             "name": "user_variations",
-            "tags": { "action": "deleted" }
+            "tags": { "action": "deleted" },
+            "query": "SELECT SUM(variation) AS deleted_users from user_variations WHERE action = 'deleted' AND time > now() - 30d GROUP BY time(1d)"
         }
     },
     {
         "model": "metrics.Metric",
         "pk": 7,
         "fields": {
-            "name": "user_variations"
-        }
-    },
-    {
-        "model": "metrics.Metric",
-        "pk": 8,
-        "fields": {
-            "name": "emails_sent"
+            "name": "emails_sent",
+            "query": "SELECT SUM(value) AS daily_emails from emails_sent WHERE time > now() - 30d GROUP BY time(1d)"
         }
     }
 ]

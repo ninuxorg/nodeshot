@@ -9,7 +9,7 @@ from jsonfield import JSONField
 
 from nodeshot.core.base.models import BaseDate
 
-from .utils import query, write
+from .utils import query, write, write_async
 
 
 class Metric(BaseDate):
@@ -27,6 +27,8 @@ class Metric(BaseDate):
         return self.name
 
     def save(self, *args, **kwargs):
+        if self.tags is None:
+            self.tags = {}
         if self.related_object:
             self.tags.update({
                 'content_type': self.content_type.name,
@@ -36,13 +38,14 @@ class Metric(BaseDate):
             self.query = self.select(sql_only=True)
         super(Metric, self).save(*args, **kwargs)
 
-    def write(self, values, timestamp=None, database=None):
+    def write(self, values, timestamp=None, database=None, async=True):
         """ write metric point """
-        return write(name=self.name,
-                     values=values,
-                     tags=self.tags,
-                     timestamp=timestamp,
-                     database=database)
+        func = write_async if async else write
+        return func(name=self.name,
+                    values=values,
+                    tags=self.tags,
+                    timestamp=timestamp,
+                    database=database)
 
     def select(self, fields=[], since=None, limit=None, q=None, sql_only=False):
         if q is not None and ('DROP' in q or 'DELETE' in q):

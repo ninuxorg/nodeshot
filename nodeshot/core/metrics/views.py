@@ -1,4 +1,3 @@
-import json
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view
@@ -20,8 +19,8 @@ def metric_details(request, pk, format=None):
         try:
             results = metric.select(q=request.QUERY_PARAMS.get('q', metric.query))
         except InfluxDBClientError as e:
-            return Response(json.loads(e.content), status=e.code)
-        return Response(results)
+            return Response({'detail': e.content}, status=e.code)
+        return Response(list(results.get_points(metric.name)))
     # post
     else:
         if not request.DATA:

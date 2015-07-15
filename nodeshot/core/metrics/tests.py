@@ -14,10 +14,10 @@ TEST_DATABASE = '{0}_test'.format(local_settings.INFLUXDB_DATABASE)
 setattr(local_settings, 'INFLUXDB_DATABASE', TEST_DATABASE)
 
 from .models import Metric
-from .utils import get_db, query, create_database
+from .utils import get_db, query, create_database, write, write_async
 
 
-class MetricsTest(TestCase):
+class TestMetrics(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -25,24 +25,28 @@ class MetricsTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(TestMetrics, cls).setUpClass()
         create_database()
 
     @classmethod
     def tearDownClass(cls):
+        super(TestMetrics, cls).tearDownClass()
         client = get_db()
         client.drop_database(TEST_DATABASE)
 
-    def test_metric_model(self):
-        metric = Metric(name='test_metric')
-        metric.full_clean()
-        metric.save()
-        self.assertEqual(str(metric), metric.name)
-
-    def test_metric_tags_from_related_object(self):
-        metric = Metric(name='test_metric')
+    def _create_metric(self, name):
+        metric = Metric(name=name)
         metric.related_object = User.objects.first()
         metric.full_clean()
         metric.save()
+        return metric
+
+    def test_metric_model(self):
+        metric = self._create_metric('test_metric')
+        self.assertEqual(str(metric), metric.name)
+
+    def test_metric_tags_from_related_object(self):
+        metric = self._create_metric('test_metric')
         self.assertItemsEqual(metric.tags, {
             'content_type': metric.content_type.name,
             'object_id': metric.object_id
@@ -52,107 +56,94 @@ class MetricsTest(TestCase):
         self.assertIn('<influxdb.client.InfluxDBClient object at', str(get_db()))
 
     def test_query(self):
-        databases = query('show databases')['databases']
-        self.assertEqual(type(databases), list)
-        databases = [database['name'] for database in databases]
+        from influxdb.resultset import ResultSet
+        databases = query('show databases')
+        self.assertEqual(type(databases), ResultSet)
+        databases = [database['name'] for database in list(databases.get_points())]
         self.assertIn(TEST_DATABASE, databases)
 
     def test_write(self):
-        metric = Metric(name='test_metric')
-        metric.related_object = User.objects.first()
-        metric.full_clean()
-        metric.save()
-        metric.write({'value1': 1, 'value2': 'string'})
-        sleep(1)
-        series = query('show series')
-        self.assertIn('test_metric', series.keys())
-        sleep(2)
-        sql = "select * from test_metric where content_type = 'user' and object_id = '{0}'".format(metric.object_id)
-        points = query(sql)['test_metric']
-        self.assertEqual(len(points), 1)
-        # drop series
-        series_id = query('show series')['test_metric'][0]['_id']
-        query('drop measurement test_metric')
-        query('drop series {0}'.format(series_id))
+        write('prova', dict(prova=2), database='nodeshot_test')
+        measurement = list(query('select * from prova').get_points())[0]
+        self.assertEqual(measurement['prova'], 2)
 
-    def test_write_timestamp_string(self):
-        metric = Metric(name='test_metric')
-        metric.related_object = User.objects.first()
-        metric.full_clean()
-        metric.save()
-        timestamp_string = '2015-03-06T14:18:12Z'
-        metric.write({'value1': 1, 'value2': 'string'}, timestamp=timestamp_string)
-        sleep(2)
-        sql = "select * from test_metric where content_type = 'user' and object_id = '{0}'".format(metric.object_id)
-        points = query(sql)['test_metric']
-        self.assertEqual(len(points), 1)
-        self.assertEqual(points[0]['time'], timestamp_string)
-        # drop series
-        series_id = query('show series')['test_metric'][0]['_id']
-        query('drop measurement test_metric')
-        query('drop series {0}'.format(series_id))
+    def test_model_write_sync(self):
+        metric = self._create_metric('test_metric')
+        metric.write({'value1': 1, 'value2': 'sync'}, async=False)
+        measurement = list(query('select * from test_metric').get_points())[0]
+        self.assertEqual(measurement['value1'], 1)
+        self.assertEqual(measurement['value2'], 'sync')
+
+    def test_model_write_async(self):
+        metric = self._create_metric('test_metric_async')
+        metric.write({'value1': 2, 'value2': 'async'}, async=True)
+        # wait for async operation to complete
+        sleep(0.8)
+        measurement = list(query('select * from test_metric_async').get_points())[0]
+        self.assertEqual(measurement['value1'], 2)
+        self.assertEqual(measurement['value2'], 'async')
+
+    def test_model_write_timestamp(self):
+        metric = self._create_metric('test_metric_time')
+        timestamp = '2015-03-06T14:18:12Z'
+        metric.write({'value1': 3, 'value2': 'time'}, timestamp=timestamp, async=False)
+        measurement = list(query('select * from test_metric_time').get_points())[0]
+        self.assertEqual(measurement['value1'], 3)
+        self.assertEqual(measurement['value2'], 'time')
+        self.assertEqual(measurement['time'], timestamp)
 
     def test_write_timestamp_datetime(self):
-        metric = Metric(name='test_metric')
-        metric.related_object = User.objects.first()
-        metric.full_clean()
-        metric.save()
+        metric = self._create_metric('test_metric_datetime')
         datetime = ago(days=365)
-        metric.write({'value1': 1, 'value2': 'string'}, timestamp=datetime)
-        sleep(2)
-        sql = "select * from test_metric where content_type = 'user' and object_id = '{0}'".format(metric.object_id)
-        points = query(sql)['test_metric']
-        self.assertEqual(len(points), 1)
-        self.assertEqual(points[0]['time'], datetime.strftime('%Y-%m-%dT%H:%M:%SZ'))
-        # drop series
-        series_id = query('show series')['test_metric'][0]['_id']
-        query('drop measurement test_metric')
-        query('drop series {0}'.format(series_id))
+        metric.write({'value1': 4, 'value2': 'datetime'}, timestamp=datetime, async=False)
+        measurement = list(query('select * from test_metric_datetime').get_points())[0]
+        self.assertEqual(measurement['value1'], 4)
+        self.assertEqual(measurement['value2'], 'datetime')
+        self.assertEqual(measurement['time'], datetime.strftime('%Y-%m-%dT%H:%M:%SZ'))
+
+    def test_metrics_user_created(self):
+        points = list(query('select * from user_count').get_points())
+        self.assertEqual(len(points), 8)
+        self.assertEqual(points[-1]['total'], 8)
+        points = list(query('select * from user_variations').get_points())
+        self.assertEqual(len(points), 8)
+        self.assertEqual(points[-1]['variation'], 1)
+
+    def test_metrics_user_deleted(self):
+        User.objects.last().delete()
+        points = list(query('select * from user_count').get_points())
+        self.assertEqual(len(points), 9)
+        self.assertEqual(points[-1]['total'], 7)
+        points = list(query('select * from user_variations').get_points())
+        self.assertEqual(len(points), 9)
+        self.assertEqual(points[-1]['variation'], -1)
+
+    def test_metrics_user_loggedin(self):
+        self.client.login(username='admin', password='tester')
+        rs = query('select * from user_logins')
+        points = list(rs.get_points())
+        self.assertTrue(len(points) in [1, 2])
+        self.assertEqual(points[0]['value'], 1)
 
     def test_select(self):
-        metric = Metric(name='test_metric')
-        metric.related_object = User.objects.first()
-        metric.full_clean()
-        metric.save()
+        metric = self._create_metric('test_select')
         metric.write({'value1': 1})
-        sleep(0.5)
         metric.write({'value1': 2})
-        sleep(0.5)
         metric.write({'value1': 3})
-        sleep(2)
-        self.assertEqual(len(metric.select()['test_metric']), 3)
-        self.assertEqual(len(metric.select(limit=1)['test_metric']), 1)
-        # drop series
-        series_id = query('show series')['test_metric'][0]['_id']
-        query('drop measurement test_metric')
-        query('drop series {0}'.format(series_id))
-
-    def test_signal(self):
-        self.assertNotEqual(query('show series'), {})
+        sleep(0.25)
+        self.assertEqual(len(metric.select().raw['series'][0]['values']), 3)
+        self.assertEqual(len(metric.select(limit=1).raw['series'][0]['values']), 1)
 
     def test_metric_details_get(self):
-        metric = Metric(name='test_metric')
-        metric.related_object = User.objects.first()
-        metric.full_clean()
-        metric.save()
-        metric.write({'value1': 1, 'value2': 'string'})
-        sleep(1)
+        metric = self._create_metric('test_api_details')
+        metric.write({'value1': 99, 'value2': 'details'}, async=False)
         response = self.client.get('/api/v1/metrics/{0}/'.format(metric.pk))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, metric.select())
-        # drop series
-        series_id = query('show series')['test_metric'][0]['_id']
-        query('drop measurement test_metric')
-        query('drop series {0}'.format(series_id))
+        self.assertEqual(response.data, list(metric.select().get_points()))
 
     def test_metric_details_post(self):
-        metric = Metric(name='test_metric')
-        metric.related_object = User.objects.first()
-        metric.full_clean()
-        metric.save()
-        metric.write({'value': 1})
+        metric = self._create_metric('test_api_write')
         url = '/api/v1/metrics/{0}/'.format(metric.pk)
-        sleep(1)
         # post 400
         response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
@@ -161,31 +152,27 @@ class MetricsTest(TestCase):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.data, {'detail': 'ok'})
-        sleep(1)
-        self.assertEqual(metric.select()['test_metric'][-1]['value'], 2)
+        sleep(0.25)
+        self.assertEqual(list(metric.select().get_points())[-1]['value'], 2)
         # post application/x-www-form-urlencoded
         response = self.client.post(url, 'value=3',
                                     content_type='application/x-www-form-urlencoded')
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.data, {'detail': 'ok'})
-        sleep(1)
-        self.assertEqual(metric.select()['test_metric'][-1]['value'], 3)
+        sleep(0.25)
+        self.assertEqual(list(metric.select().get_points())[-1]['value'], 3)
         # post multipart/form-data
         response = self.client.post(url, {'value': 4})
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.data, {'detail': 'ok'})
-        sleep(1)
-        self.assertEqual(metric.select()['test_metric'][-1]['value'], 4)
+        sleep(0.25)
+        self.assertEqual(list(metric.select().get_points())[-1]['value'], 4)
         # post multipart/form-data (float)
         response = self.client.post(url, {'value': 5.0})
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.data, {'detail': 'ok'})
-        sleep(1)
-        self.assertEqual(metric.select()['test_metric'][-1]['value'], 5.0)
-        # drop series
-        series_id = query('show series')['test_metric'][0]['_id']
-        query('drop measurement test_metric')
-        query('drop series {0}'.format(series_id))
+        sleep(0.25)
+        self.assertEqual(list(metric.select().get_points())[-1]['value'], 5.0)
 
     def test_add_admin(self):
         self.client.login(username='admin', password='tester')

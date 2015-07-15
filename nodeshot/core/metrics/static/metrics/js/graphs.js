@@ -29,28 +29,20 @@
         /**
          * converts influxdb data in the format expected by d3
          */
-        convertInfluxDbData: function (json) {
-            var data, key, i, len, index,
+        convertInfluxDbData: function (data) {
+            var key, i, len, index,
                 metrics = [],
                 values = {},
                 graphData = [],
                 colors = [
                     '#1f77b4', '#2ca02c', '#ff7f0e', '#de5a5e', '#aec7e8'
                 ].reverse();
-            // determine numeric data
-            for (key in json) {
-                if (json.hasOwnProperty(key)) {
-                    data = json[key];
-                    break;
-                }
-            }
             // if no data interrupt here
             if (!data) {
                 // return empty structure
                 return [];
             }
             // prepare structures that will contain data
-
             for (key in data[0]) {
                 if (data[0].hasOwnProperty(key) && key !== 'time') {
                     if (typeof(data[0][key]) === 'number' || data[0][key] === null) {
@@ -74,7 +66,7 @@
                 if (colors.length) {
                     key = metrics[index];
                     graphData.push({
-                        'key': key,
+                        'key': key.replace(/_/g, ' '),
                         'color': colors.pop(),
                         'values': values[key]
                     });

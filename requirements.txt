@@ -73,5 +73,5 @@ raven
 django-rosetta
 
 # metrics
-influxdb
+influxdb==2.6.0
 tld
