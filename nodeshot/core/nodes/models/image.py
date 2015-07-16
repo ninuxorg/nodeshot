@@ -14,7 +14,6 @@ class Image(BaseOrderedACL):
     node = models.ForeignKey('nodes.Node', verbose_name=_('node'))
     file = models.ImageField(upload_to='nodes/', verbose_name=_('image'))
     description = models.CharField(_('description'), max_length=255, blank=True, null=True)
-
     # manager
     objects = AccessLevelManager()
 
@@ -38,5 +37,4 @@ class Image(BaseOrderedACL):
         # image does not exist
         except (OSError, IOError):
             pass
-
         super(Image, self).delete(*args, **kwargs)

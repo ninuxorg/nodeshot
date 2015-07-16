@@ -56,7 +56,6 @@ class Status(BaseOrdered):
     def save(self, *args, **kwargs):
         """ intercepts changes to is_default """
         ignore_default_check = kwargs.pop('ignore_default_check', False)
-
         # if making this status the default one
         if self.is_default != self._current_is_default and self.is_default is True:
             # uncheck other default statuses first
@@ -70,6 +69,5 @@ class Status(BaseOrdered):
         if self.__class__.objects.filter(is_default=True).count() == 0 and not ignore_default_check:
             self.is_default = True
             self.save()
-
         # update __current_status
         self._current_is_default = self.is_default

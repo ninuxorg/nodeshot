@@ -4,47 +4,29 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.db.models import Q
 
-from rest_framework import permissions, authentication, generics
+from rest_framework import permissions, authentication, generics, pagination
 
-from nodeshot.core.base.mixins import ACLMixin, CustomDataMixin
 from nodeshot.core.base.utils import Hider
+from nodeshot.core.base.mixins import ACLMixin
+from rest_framework_gis.pagination import GeoJsonPagination
 
-from .settings import REVERSION_ENABLED
 from .permissions import IsOwnerOrReadOnly
 from .serializers import *  # noqa
 from .models import Node, Status, Image
-
-
-if REVERSION_ENABLED:
-    from nodeshot.core.base.mixins import RevisionCreate, RevisionUpdate
-
-    class NodeListBase(ACLMixin, RevisionCreate, generics.ListCreateAPIView):
-        pass
-
-    class NodeDetailBase(ACLMixin, RevisionUpdate, generics.RetrieveUpdateDestroyAPIView):
-        pass
-else:
-    class NodeListBase(ACLMixin, generics.ListCreateAPIView):
-        pass
-
-    class NodeDetailBase(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
-        pass
+from .base import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 
 def get_queryset_or_404(queryset, kwargs):
     """
     Checks if object returned by queryset exists
     """
-    # ensure exists
     try:
-        obj = queryset.get(**kwargs)
+        return queryset.get(**kwargs)
     except Exception:
         raise Http404(_('Not found'))
 
-    return obj
 
-
-class NodeList(NodeListBase):
+class NodeList(ListCreateAPIView):
     """
     Retrieve list of all published nodes.
 
@@ -62,14 +44,14 @@ class NodeList(NodeListBase):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Node.objects.published()
     serializer_class = NodeListSerializer
-    pagination_serializer_class = PaginatedNodeListSerializer
+    pagination_class = pagination.PageNumberPagination
     paginate_by_param = 'limit'
     paginate_by = 50
 
-    def pre_save(self, obj):
-        """ automatically determine user on creation """
-        if not obj.id:
-            obj.user_id = self.request.user.id
+    def perform_create(self, serializer):
+        """ determine user when node is added """
+        if serializer.instance is None:
+            serializer.save(user=self.request.user)
 
     def get_queryset(self):
         """
@@ -78,10 +60,10 @@ class NodeList(NodeListBase):
         """
         # retrieve all nodes which are published and accessible to current user
         # and use joins to retrieve related fields
-        queryset = super(NodeList, self).get_queryset().select_related('layer', 'status', 'user')
+        queryset = super(NodeList, self).get_queryset().select_related('status', 'user', 'layer')
         # query string params
-        search = self.request.QUERY_PARAMS.get('search', None)
-        layers = self.request.QUERY_PARAMS.get('layers', None)
+        search = self.request.query_params.get('search', None)
+        layers = self.request.query_params.get('layers', None)
         if search is not None:
             search_query = (
                 Q(name__icontains=search) |
@@ -99,7 +81,7 @@ class NodeList(NodeListBase):
 node_list = NodeList.as_view()
 
 
-class NodeDetail(NodeDetailBase):
+class NodeDetail(RetrieveUpdateDestroyAPIView):
     """
     Retrieve details of specified node. Node must be published and accessible.
 
@@ -112,15 +94,15 @@ class NodeDetail(NodeDetailBase):
     Edit node. Must be authenticated as owner or admin.
     """
     lookup_field = 'slug'
-    serializer_class = NodeDetailSerializer
+    serializer_class = NodeSerializer
     authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (IsOwnerOrReadOnly, )
-    queryset = Node.objects.published().select_related('user', 'layer')
+    queryset = Node.objects.published().select_related('status', 'user', 'layer')
 
 node_details = NodeDetail.as_view()
 
 
-class NodeGeoJSONList(NodeList):
+class NodeGeoJsonList(NodeList):
     """
     Retrieve list of all published nodes in GeoJSON format.
 
@@ -131,19 +113,19 @@ class NodeGeoJSONList(NodeList):
      * `limit=<n>`: specify number of items per page (show all by default)
      * `page=<n>`: show page n
     """
-    pagination_serializer_class = PaginatedGeojsonNodeListSerializer
+    pagination_class = GeoJsonPagination
     paginate_by_param = 'limit'
     paginate_by = 0
-    serializer_class = NodeGeoSerializer
+    serializer_class = NodeGeoJsonSerializer
     post = Hider()
 
-geojson_list = NodeGeoJSONList.as_view()
+geojson_list = NodeGeoJsonList.as_view()
 
 
 # -------- Images -------- #
 
 
-class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
+class NodeImageList(generics.ListCreateAPIView):
     """
     Retrieve a list of images of the specified node.
     Node must exist and be published.
@@ -166,15 +148,17 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
     Set the content-type as **"multipart-formdata"** and send the file param as a binary stream.
     """
     authentication_classes = (authentication.SessionAuthentication,)
-    serializer_class = ImageListSerializer
-    serializer_custom_class = ImageAddSerializer
+    serializer_class = ImageSerializer
     permission_classes = (IsOwnerOrReadOnly, )
 
-    def get_custom_data(self):
-        """ additional request.DATA """
-        return {
-            'node': self.node.id
-        }
+    def perform_create(self, serializer):
+        serializer.save(node=self.node)
+
+    def get_queryset(self):
+        # return images of current node
+        return Image.objects.filter(node=self.node)\
+                            .accessible_to(self.request.user)\
+                            .select_related('node')
 
     def initial(self, request, *args, **kwargs):
         """
@@ -183,18 +167,13 @@ class NodeImageList(CustomDataMixin, generics.ListCreateAPIView):
             * change queryset to return only images of current node
         """
         super(NodeImageList, self).initial(request, *args, **kwargs)
-
         # ensure node exists
         self.node = get_queryset_or_404(
             Node.objects.published().accessible_to(request.user),
-            {'slug': self.kwargs.get('slug', None)}
+            {'slug': self.kwargs['slug']}
         )
-
         # check permissions on node (for image creation)
         self.check_object_permissions(request, self.node)
-
-        # return only images of current node
-        self.queryset = Image.objects.filter(node_id=self.node.id).accessible_to(self.request.user).select_related('node')
 
 node_images = NodeImageList.as_view()
 
@@ -232,7 +211,6 @@ class ImageDetail(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
             Node.objects.published().accessible_to(self.request.user),
             {'slug': self.kwargs.get('slug', None)}
         )
-
         return super(ImageDetail, self).get_queryset().filter(node=self.node)
 
 node_image_detail = ImageDetail.as_view()
@@ -246,7 +224,7 @@ class StatusList(generics.ListAPIView):
     Retrieve a list of all the available statuses and their relative icons/colors.
     """
     queryset = Status.objects.all()
-    serializer_class = StatusListSerializer
+    serializer_class = StatusSerializer
 
     @method_decorator(cache_page(86400))  # cache for 1 day
     def dispatch(self, *args, **kwargs):
@@ -276,6 +254,6 @@ def elevation_profile(request, format=None):
     if format is None:
         format = 'json'
 
-    return Response(elevation(request.QUERY_PARAMS.get('path'),
+    return Response(elevation(request.query_params.get('path'),
                               api_key=ELEVATION_API_KEY,
                               sampling=ELEVATION_DEFAULT_SAMPLING))

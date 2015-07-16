@@ -10,7 +10,7 @@ from nodeshot.core.base.managers import HStoreGeoAccessLevelPublishedManager as 
 from django_hstore.fields import DictionaryField
 
 from ..settings import settings, PUBLISHED_DEFAULT, HSTORE_SCHEMA
-from ..signals import node_status_changed
+from ..dispatchers import node_status_changed
 from .status import Status
 
 
@@ -126,7 +126,7 @@ class Node(BaseAccessLevel):
             getattr(self, validation_method)()
 
     @classmethod
-    def add_validation_method(class_, method):
+    def add_validation_method(cls, method):
         """
         Extend validation of Node by adding a function to the _additional_validation list.
         The additional validation function will be called by the clean method
@@ -136,10 +136,10 @@ class Node(BaseAccessLevel):
         method_name = method.func_name
 
         # add method name to additional validation method list
-        class_._additional_validation.append(method_name)
+        cls._additional_validation.append(method_name)
 
         # add method to this class
-        setattr(class_, method_name, method)
+        setattr(cls, method_name, method)
 
     @property
     def owner(self):

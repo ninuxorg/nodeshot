@@ -56,7 +56,6 @@ class NodeAdmin(PublishActionsAdminMixin, GeoAdmin):
     ordering = ('-id',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ImageInline]
-
     # django-grappelli usability improvements
     raw_id_fields = ('layer', 'user')
     autocomplete_lookup_fields = {
@@ -75,7 +74,6 @@ class StatusAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'description', 'order', 'is_default')
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ('order', )
-
     change_list_template = 'smuggler/change_list.html'
 
 

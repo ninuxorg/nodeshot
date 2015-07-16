@@ -14,7 +14,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         action = ''
-
         if request.method in ['PUT', 'PATCH']:
             action = 'change'
         elif request.method in ['DELETE']:
