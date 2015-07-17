@@ -39,4 +39,3 @@ script:
 
 after_success:
   coveralls
-archive: true
