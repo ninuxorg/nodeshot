@@ -6,8 +6,8 @@ from nodeshot.core.base.mixins import ACLMixin
 from rest_framework_extensions.cache.decorators import cache_response
 from nodeshot.core.base.cache import cache_by_group
 
-from .serializers import *
-from .models import *
+from .serializers import *  # noqa
+from .models import Page, MenuItem
 
 
 class PageList(ACLMixin, generics.ListAPIView):
@@ -32,6 +32,7 @@ class PageDetail(ACLMixin, generics.RetrieveAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     queryset = Page.objects.published()
     serializer_class = PageDetailSerializer
+    lookup_field = 'slug'
 
     @cache_response(86400, key_func=cache_by_group)
     def get(self, request, *args, **kwargs):

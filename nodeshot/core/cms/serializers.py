@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import *
+from .models import Page, MenuItem
 
 
 __all__ = [
@@ -14,7 +14,8 @@ class PageListSerializer(serializers.ModelSerializer):
     """
     Page List Serializer
     """
-    details = serializers.HyperlinkedIdentityField(view_name='api_page_detail', lookup_field='slug')
+    details = serializers.HyperlinkedIdentityField(view_name='api_page_detail',
+                                                   lookup_field='slug')
 
     class Meta:
         model = Page
@@ -45,7 +46,7 @@ class MenuSerializer(serializers.ModelSerializer):
     """
     Menu Serializer
     """
-    children = serializers.SerializerMethodField('get_children')
+    children = serializers.SerializerMethodField()
 
     def get_children(self, obj):
         user = self.context['request'].user
