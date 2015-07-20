@@ -11,7 +11,7 @@ from nodeshot.core.nodes.models import Node
 
 from ..settings import settings, NODES_MINIMUM_DISTANCE, HSTORE_SCHEMA
 from ..managers import LayerManager
-from ..signals import layer_is_published_changed
+from ..dispatchers import layer_is_published_changed
 
 
 class Layer(BaseDate):

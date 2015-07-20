@@ -1,35 +1,20 @@
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import generics, permissions, authentication
+from rest_framework import permissions, authentication, pagination
 from rest_framework.response import Response
+from rest_framework_gis.pagination import GeoJsonPagination
 
 from nodeshot.core.base.utils import Hider
-from nodeshot.core.nodes.views import NodeList
-from nodeshot.core.nodes.serializers import NodeGeoSerializer, PaginatedGeojsonNodeListSerializer
+from nodeshot.core.nodes.views import NodeList, NodeGeoJsonList
+from nodeshot.core.nodes.serializers import NodeGeoJsonSerializer
 
-from .settings import REVERSION_ENABLED
 from .models import Layer
 from .serializers import *  # noqa
+from .base import ListCreateAPIView, RetrieveUpdateAPIView
 
 
-if REVERSION_ENABLED:
-    from nodeshot.core.base.mixins import RevisionCreate, RevisionUpdate
-
-    class LayerListBase(RevisionCreate, generics.ListCreateAPIView):
-        pass
-
-    class LayerDetailBase(RevisionUpdate, generics.RetrieveUpdateAPIView):
-        pass
-else:
-    class LayerListBase(generics.ListCreateAPIView):
-        pass
-
-    class LayerDetailBase(generics.RetrieveUpdateAPIView):
-        pass
-
-
-class LayerList(LayerListBase):
+class LayerList(ListCreateAPIView):
     """
     Retrieve list of all layers.
 
@@ -41,14 +26,14 @@ class LayerList(LayerListBase):
     permission_classes = (permissions.DjangoModelPermissionsOrAnonReadOnly, )
     authentication_classes = (authentication.SessionAuthentication,)
     serializer_class = LayerListSerializer
-    pagination_serializer_class = PaginatedLayerListSerializer
+    pagination_serializer = pagination.PageNumberPagination
     paginate_by_param = 'limit'
-    paginate_by = None
+    paginate_by = 0
 
 layer_list = LayerList.as_view()
 
 
-class LayerDetail(LayerDetailBase):
+class LayerDetail(RetrieveUpdateAPIView):
     """
     Retrieve details of specified layer.
 
@@ -65,15 +50,7 @@ class LayerDetail(LayerDetailBase):
 layer_detail = LayerDetail.as_view()
 
 
-class LayerNodesList(NodeList):
-    """
-    Retrieve list of nodes of the specified layer
-
-    Parameters:
-
-     * `search=<word>`: search <word> in name of nodes of specified layer
-     * `limit=<n>`: specify number of items per page (defaults to 40)
-    """
+class LayerNodeListMixin(object):
     layer = None
 
     def get_layer(self):
@@ -88,7 +65,7 @@ class LayerNodesList(NodeList):
     def get_queryset(self):
         """ extend parent class queryset by filtering nodes of the specified layer """
         self.get_layer()
-        return super(LayerNodesList, self).get_queryset().filter(layer_id=self.layer.id)
+        return super(LayerNodeListMixin, self).get_queryset().filter(layer_id=self.layer.id)
 
     def get_nodes(self, request, *args, **kwargs):
         """ this method might be overridden by other modules (eg: nodeshot.interop.sync) """
@@ -104,43 +81,38 @@ class LayerNodesList(NodeList):
 
     post = Hider()
 
+
+class LayerNodesList(LayerNodeListMixin, NodeList):
+    """
+    Retrieve list of nodes of the specified layer
+
+    Parameters:
+
+     * `search=<word>`: search <word> in name of nodes of specified layer
+     * `limit=<n>`: specify number of items per page (defaults to 40)
+    """
+    pass
+
 nodes_list = LayerNodesList.as_view()
 
 
-class LayerNodesGeoJSONList(LayerNodesList):
+class LayerNodesGeoJsonList(LayerNodeListMixin, NodeGeoJsonList):
     """
-    Retrieve list of nodes of the specified layer in GeoJSON format.
+    Retrieve list of nodes of the specified layer in GeoJson format.
 
     Parameters:
 
      * `search=<word>`: search <word> in name, slug, description and address of nodes
      * `limit=<n>`: specify number of items per page (show all by default)
     """
-    pagination_serializer_class = PaginatedGeojsonNodeListSerializer
+    pagination_serializer = GeoJsonPagination
     paginate_by_param = 'limit'
     paginate_by = 0
-    serializer_class = NodeGeoSerializer
+    serializer_class = NodeGeoJsonSerializer
 
     def get(self, request, *args, **kwargs):
         """ Retrieve list of nodes of the specified layer in GeoJSON format. """
         # overwritten just to tweak the docstring for auto documentation purposes
-        return super(LayerNodesGeoJSONList, self).get(request, *args, **kwargs)
+        return super(LayerNodesGeoJsonList, self).get(request, *args, **kwargs)
 
-nodes_geojson_list = LayerNodesGeoJSONList.as_view()
-
-
-class LayerGeoJSONList(generics.ListAPIView):
-    """
-    Retrieve list of layers in GeoJSON format.
-    Parameters:
-
-     * `limit=<n>`: specify number of items per page (defaults to 40)
-     * `page=<n>`: show page n
-    """
-    pagination_serializer_class = PaginatedGeojsonLayerListSerializer
-    paginate_by_param = 'limit'
-    paginate_by = 40
-    serializer_class = GeoLayerListSerializer
-    queryset = Layer.objects.published().exclude(area__isnull=True)
-
-layers_geojson_list = LayerGeoJSONList.as_view()
+nodes_geojson_list = LayerNodesGeoJsonList.as_view()

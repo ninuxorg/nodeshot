@@ -1,7 +1,3 @@
-"""
-nodeshot.core.layers unit tests
-"""
-
 import json
 
 from django.test import TestCase
@@ -16,7 +12,7 @@ from nodeshot.core.nodes.models import Node  # test additional validation added 
 from .models import Layer
 
 
-class LayerTest(TestCase):
+class TestLayerModel(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -31,7 +27,6 @@ class LayerTest(TestCase):
         layers_count = Layer.objects.all().count()
         published_layers_count = Layer.objects.published().count()
         self.assertEquals(published_layers_count, layers_count)
-
         # after unpublishing one layer we should get 1 less layer in total
         l = Layer.objects.get(pk=1)
         l.is_published = False
@@ -39,10 +34,8 @@ class LayerTest(TestCase):
         layers_count = Layer.objects.all().count()
         published_layers_count = Layer.objects.published().count()
         self.assertEquals(published_layers_count, layers_count - 1)
-
         # external() method
         self.assertEquals(Layer.objects.external().count(), Layer.objects.filter(is_external=True).count())
-
         # mix external and published
         count = Layer.objects.filter(is_external=True, is_published=True).count()
         self.assertEquals(Layer.objects.external().published().count(), count)
@@ -53,7 +46,6 @@ class LayerTest(TestCase):
         layer.new_nodes_allowed = False
         layer.full_clean()
         layer.save()
-
         # ensure changing an existing node works
         node = layer.node_set.all()[0]
         node.name = 'changed'
@@ -62,7 +54,6 @@ class LayerTest(TestCase):
         # re-get from DB, just to be sure
         node = Node.objects.get(pk=node.pk)
         self.assertEqual(node.name, 'changed')
-
         # ensure new node cannot be added
         node = Node(**{
             'name': 'test new node',
@@ -72,10 +63,9 @@ class LayerTest(TestCase):
         })
         with self.assertRaises(ValidationError):
             node.full_clean()
-
         try:
             node.full_clean()
-            assert()
+            self.fail()
         except ValidationError as e:
             self.assertIn(_('New nodes are not allowed for this layer'), e.messages)
 
@@ -83,7 +73,6 @@ class LayerTest(TestCase):
         """ ensure minimum distance settings works as expected """
         layer = Layer.objects.get(slug='rome')
         node = layer.node_set.all()[0]
-
         # creating node with same coordinates should not be an issue
         new_node = Node(**{
             'name': 'new_node',
@@ -96,90 +85,12 @@ class LayerTest(TestCase):
 
         layer.nodes_minimum_distance = 100
         layer.save()
-
         try:
             new_node.full_clean()
         except ValidationError as e:
             self.assertIn(_('Distance between nodes cannot be less than %s meters') % layer.nodes_minimum_distance, e.messages)
             return
-
         self.assertTrue(False, 'validation not working as expected')
-
-    def test_layers_api(self, *args, **kwargs):
-        """
-        Layers endpoint should be reachable and return 404 if layer is not found.
-        """
-        layer = Layer.objects.get(pk=1)
-        layer_slug = layer.slug
-        fake_layer_slug = "idontexist"
-
-        # api_layer list
-        response = self.client.get(reverse('api_layer_list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('"is_external": false', response.content)
-
-        # api's expecting slug in request,test with existing and fake slug
-        # api_layer_detail
-        response = self.client.get(reverse('api_layer_detail', args=[layer_slug]))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_detail', args=[fake_layer_slug]))
-        self.assertEqual(response.status_code, 404)
-
-        # api_layer_nodes
-        response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_nodes_list', args=[fake_layer_slug]))
-        self.assertEqual(response.status_code, 404)
-
-        # api_layer_nodes_geojson
-        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api_layer_nodes_geojson', args=[fake_layer_slug]))
-        self.assertEqual(response.status_code, 404)
-
-    def test_layers_api_results(self, *args, **kwargs):
-        """
-        layers resources should return the expected number of objects
-        """
-        layer = Layer.objects.get(pk=1)
-        layer_count = Layer.objects.all().count()
-        layer_slug = layer.slug
-
-        # api_layer list
-        response = self.client.get(reverse('api_layer_list'))
-        api_layer_count = len(response.data)
-        self.assertEqual(api_layer_count, layer_count)
-
-        # api_layer_nodes_list
-        response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]))
-        layer_public_nodes_count = Node.objects.filter(layer=layer).published().access_level_up_to('public').count()
-        self.assertEqual(response.data['count'], layer_public_nodes_count)
-        self.assertEqual(len(response.data['results']), layer_public_nodes_count)
-
-        # api_layer_nodes_geojson
-        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]))
-        self.assertEqual(len(response.data['features']), layer_public_nodes_count)
-
-    def test_layers_api_post(self):
-        layer_count = Layer.objects.all().count()
-        # POST to create, 400
-        self.client.login(username='registered', password='tester')
-        data = {
-            "name": "test",
-            "slug": "test",
-            "center": "POINT (38.1154075128999921 12.5107643007999929)",
-            "area": "POINT (38.1154075128999921 12.5107643007999929)"
-        }
-        response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(layer_count, Layer.objects.all().count())
-
-        # POST to create 200
-        self.client.logout()
-        self.client.login(username='admin', password='tester')
-        response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(Layer.objects.all().count(), layer_count + 1)
 
     def test_unpublish_layer_should_unpublish_nodes(self):
         layer = Layer.objects.first()
@@ -237,12 +148,124 @@ class LayerTest(TestCase):
         layer.save()
         new_node.full_clean()
 
+    def test_layer_center(self):
+        l = Layer.objects.first()
+        self.assertIsInstance(l.center, Point)
+        self.assertEqual(l.center, l.area)
+        l.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
+        l.save()
+        self.assertIsInstance(l.center, Point)
+        self.assertNotEqual(l.center, l.area)
+        l.area = None
+        self.assertIsNone(l.center)
+
+class TestLayerApi(TestCase):
+    fixtures = [
+        'initial_data.json',
+        user_fixtures,
+        'test_layers.json',
+        'test_status.json',
+        'test_nodes.json'
+    ]
+
+    def test_layers_api(self, *args, **kwargs):
+        """
+        Layers endpoint should be reachable and return 404 if layer is not found.
+        """
+        layer = Layer.objects.get(pk=1)
+        layer_slug = layer.slug
+        fake_layer_slug = "idontexist"
+        # api_layer list
+        response = self.client.get(reverse('api_layer_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('"is_external":false', response.content)
+        # api's expecting slug in request,test with existing and fake slug
+        # api_layer_detail
+        response = self.client.get(reverse('api_layer_detail', args=[layer_slug]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api_layer_detail', args=[fake_layer_slug]))
+        self.assertEqual(response.status_code, 404)
+        # api_layer_nodes
+        response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api_layer_nodes_list', args=[fake_layer_slug]))
+        self.assertEqual(response.status_code, 404)
+        # api_layer_nodes_geojson
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[fake_layer_slug]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_layers_api_results(self, *args, **kwargs):
+        """
+        layers resources should return the expected number of objects
+        """
+        layer = Layer.objects.get(pk=1)
+        layer_count = Layer.objects.all().count()
+        layer_slug = layer.slug
+        # api_layer list
+        response = self.client.get(reverse('api_layer_list'))
+        api_layer_count = len(response.data)
+        self.assertEqual(api_layer_count, layer_count)
+        # api_layer_nodes_list
+        response = self.client.get(reverse('api_layer_nodes_list', args=[layer_slug]))
+        layer_public_nodes_count = Node.objects.filter(layer=layer).published().access_level_up_to('public').count()
+        self.assertEqual(response.data['count'], layer_public_nodes_count)
+        self.assertEqual(len(response.data['results']), layer_public_nodes_count)
+        # api_layer_nodes_geojson
+        response = self.client.get(reverse('api_layer_nodes_geojson', args=[layer_slug]))
+        self.assertEqual(len(response.data['features']), layer_public_nodes_count)
+
+    def test_layers_api_post(self):
+        layer_count = Layer.objects.all().count()
+        # POST to create, 400
+        self.client.login(username='registered', password='tester')
+        data = {
+            "name": "test",
+            "slug": "test",
+            "center": "POINT (38.1154075128999921 12.5107643007999929)",
+            "area": "POINT (38.1154075128999921 12.5107643007999929)"
+        }
+        response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(layer_count, Layer.objects.all().count())
+        # POST to create 200
+        self.client.logout()
+        self.client.login(username='admin', password='tester')
+        response = self.client.post(reverse('api_layer_list'), json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Layer.objects.all().count(), layer_count + 1)
+
+    def test_external_layer_nodes_geojson(self):
+        """ test node geojson list """
+        url = reverse('api_layer_nodes_geojson', args=['vienna'])
+        # GET: 200
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_external_layer_nodes(self):
+        """ test node geojson list """
+        url = reverse('api_layer_nodes_list', args=['vienna'])
+        # GET: 200
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_layer_nodes_geojson_pagination(self):
+        url = reverse('api_layer_nodes_geojson', args=['rome'])
+        # ensure all results returned by default
+        response = self.client.get(url)
+        count = Node.objects.filter(layer__slug='rome').published().access_level_up_to('public').count()
+        self.assertEqual(len(response.data['features']), count)
+        # ensure pagination doesn't break geojson format
+        response = self.client.get(url, {'limit': '1'})
+        self.assertIn('type', response.data)
+        self.assertIn('features', response.data)
+        self.assertEqual(len(response.data['features']), 1)
+
     def test_node_geometry_distance_and_area(self):
         """ test minimum distance check between nodes """
         self.client.login(username='admin', password='tester')
-
         url = reverse('api_node_list')
-
         json_data = {
             "layer": "rome",
             "name": "test_distance",
@@ -312,40 +335,3 @@ class LayerTest(TestCase):
 
         # delete new nodes just added before
         n.delete()
-
-    def test_layer_center(self):
-        l = Layer.objects.first()
-        self.assertIsInstance(l.center, Point)
-        self.assertEqual(l.center, l.area)
-        l.area = GEOSGeometry('POLYGON ((12.19 41.92, 12.58 42.17, 12.82 41.86, 12.43 41.64, 12.43 41.65, 12.19 41.92))')
-        l.save()
-        self.assertIsInstance(l.center, Point)
-        self.assertNotEqual(l.center, l.area)
-        l.area = None
-        self.assertIsNone(l.center)
-
-    def test_external_layer_nodes_geojson(self):
-        """ test node geojson list """
-        url = reverse('api_layer_nodes_geojson', args=['vienna'])
-        # GET: 200
-        response = self.client.get(url)
-        self.assertEqual(200, response.status_code)
-
-    def test_external_layer_nodes(self):
-        """ test node geojson list """
-        url = reverse('api_layer_nodes_list', args=['vienna'])
-        # GET: 200
-        response = self.client.get(url)
-        self.assertEqual(200, response.status_code)
-
-    def test_layer_nodes_geojson_pagination(self):
-        url = reverse('api_layer_nodes_geojson', args=['rome'])
-        # ensure all results returned by default
-        response = self.client.get(url)
-        count = Node.objects.filter(layer__slug='rome').published().access_level_up_to('public').count()
-        self.assertEqual(len(response.data['features']), count)
-        # ensure pagination doesn't break geojson format
-        response = self.client.get(url, {'limit': '1'})
-        self.assertIn('type', response.data)
-        self.assertIn('features', response.data)
-        self.assertEqual(len(response.data['features']), 1)
