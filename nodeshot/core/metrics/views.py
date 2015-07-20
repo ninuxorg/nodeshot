@@ -17,16 +17,16 @@ def metric_details(request, pk, format=None):
     # get
     if request.method == 'GET':
         try:
-            results = metric.select(q=request.QUERY_PARAMS.get('q', metric.query))
+            results = metric.select(q=request.query_params.get('q', metric.query))
         except InfluxDBClientError as e:
             return Response({'detail': e.content}, status=e.code)
         return Response(list(results.get_points(metric.name)))
     # post
     else:
-        if not request.DATA:
+        if not request.data:
             return Response({'detail': 'expected values in POST data or JSON payload'},
                             status=400)
-        data = request.DATA.copy()
+        data = request.data.copy()
         # try converting strings to floats when sending form-data
         if request.content_type != 'application/json':
             for key, value in data.items():
