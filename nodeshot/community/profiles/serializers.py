@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from nodeshot.core.base.serializers import ExtraFieldSerializer, HyperlinkedField
+from nodeshot.core.base.serializers import ModelValidationSerializer, HyperlinkedField
 from .models import Profile as User, PasswordReset, SocialLink
 from .settings import settings, EMAIL_CONFIRMATION
 
@@ -18,75 +18,57 @@ if EMAIL_CONFIRMATION:
     from .models import EmailAddress
 
 
-__all__ = [
-    'LoginSerializer',
-    'ProfileSerializer',
-    'ProfileOwnSerializer',
-    'ProfileCreateSerializer',
-    'ProfileRelationSerializer',
-    'AccountSerializer',
-    'ChangePasswordSerializer',
-    'ResetPasswordSerializer',
-    'ResetPasswordKeySerializer',
-    'SocialLinkSerializer',
-    'SocialLinkAddSerializer'
-]
+__all__ = ['LoginSerializer',
+           'ProfileSerializer',
+           'ProfileOwnSerializer',
+           'ProfileCreateSerializer',
+           'ProfileRelationSerializer',
+           'AccountSerializer',
+           'ChangePasswordSerializer',
+           'ResetPasswordSerializer',
+           'ResetPasswordKeySerializer',
+           'SocialLinkSerializer']
+
 
 # email addresses
 if EMAIL_CONFIRMATION:
-    __all__ += [
-        'EmailSerializer',
-        'EmailAddSerializer',
-        'EmailEditSerializer'
-    ]
+    __all__ += ['EmailSerializer', 'EmailEditSerializer']
 
-    class EmailSerializer(serializers.ModelSerializer):
-        details = serializers.HyperlinkedIdentityField(lookup_field='pk', view_name='api_account_email_detail')
-        resend_confirmation = serializers.SerializerMethodField('get_resend_confirmation')
+    class EmailSerializer(ModelValidationSerializer):
+        details = serializers.HyperlinkedIdentityField(lookup_field='pk',
+                                                       view_name='api_account_email_detail')
+        resend_confirmation = serializers.SerializerMethodField()
 
         def get_resend_confirmation(self, obj):
             """ return resend_confirmation url """
             if obj.verified:
                 return False
-            request = self.context.get('request', None)
-            format = self.context.get('format', None)
             return reverse('api_account_email_resend_confirmation',
-                           args=[obj.pk], request=request, format=format)
+                           request=self.context.get('request'),
+                           format=self.context.get('format'),
+                           args=[obj.pk])
 
         class Meta:
             model = EmailAddress
-            fields = ('id', 'email', 'verified', 'primary', 'details', 'resend_confirmation')
-            read_only_fields = ('verified', 'primary')
-
-    # noqa
-    class EmailAddSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = EmailAddress
+            fields = ('id', 'email', 'verified', 'primary',
+                      'details', 'resend_confirmation')
             read_only_fields = ('verified', 'primary')
 
     # noqa
     class EmailEditSerializer(EmailSerializer):
-        def validate_primary(self, attrs, source):
-            """
-            primary field validation
-            """
-            primary = attrs[source]
-            verified = self.object.verified
-
-            if primary is True and verified is False:
+        def validate_primary(self, primary):
+            if primary and not self.instance.verified:
                 raise serializers.ValidationError(_('Email address cannot be made primary if it is not verified first'))
-
-            if primary is False and verified is True:
-                primary_addresses = EmailAddress.objects.filter(user=self.object.user, primary=True)
-
-                if primary_addresses.count() == 1 and primary_addresses[0].pk == self.object.pk:
+            if not primary and self.instance.verified:
+                primary_addresses = EmailAddress.objects.filter(user=self.instance.user, primary=True)
+                if primary_addresses.count() == 1 and primary_addresses[0].pk == self.instance.pk:
                     raise serializers.ValidationError(_('You must have at least one primary address.'))
-
-            return attrs
+            return primary
 
         class Meta:
             model = EmailAddress
-            fields = ('id', 'email', 'verified', 'primary', 'resend_confirmation')
+            fields = ('id', 'email', 'verified',
+                      'primary', 'resend_confirmation')
             read_only_fields = ('verified', 'email')
 
 
@@ -119,44 +101,44 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
-class SocialLinkSerializer(serializers.ModelSerializer):
-    user = serializers.Field(source='user.username')
-    details = serializers.SerializerMethodField('get_detail_url')
+class SocialLinkSerializer(ModelValidationSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    details = serializers.SerializerMethodField()
 
-    def get_detail_url(self, obj):
+    def get_details(self, obj):
         """ return detail url """
-        request = self.context.get('request', None)
-        format = self.context.get('format', None)
-        args = [obj.user.username, obj.pk]
-        return reverse('api_user_social_links_detail', args=args, request=request, format=format)
+        return reverse('api_user_social_links_detail',
+                       args=[obj.user.username, obj.pk],
+                       request=self.context.get('request'),
+                       format=self.context.get('format'))
 
     class Meta:
         model = SocialLink
-        fields = ('id', 'user', 'url', 'description', 'added', 'updated', 'details')
+        fields = ('id', 'user', 'url', 'description',
+                  'added', 'updated', 'details')
         read_only_fields = ('added', 'updated',)
 
 
-class SocialLinkAddSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SocialLink
-        read_only_fields = ('added', 'updated', )
-
-
-class ProfileSerializer(serializers.ModelSerializer):
+class ProfileSerializer(ModelValidationSerializer):
     """ Profile Serializer for visualization """
-    details = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_profile_detail')
-    avatar = serializers.SerializerMethodField('get_avatar')
-    full_name = serializers.SerializerMethodField('get_full_name')
-    location = serializers.SerializerMethodField('get_location')
-    social_links_url = serializers.HyperlinkedIdentityField(lookup_field='username', view_name='api_user_social_links_list')
-    social_links = SocialLinkSerializer(source='sociallink_set', many=True, read_only=True)
+    avatar = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    details = serializers.HyperlinkedIdentityField(lookup_field='username',
+                                                   view_name='api_profile_detail')
+    social_links_url = serializers.HyperlinkedIdentityField(lookup_field='username',
+                                                            view_name='api_user_social_links_list')
+    social_links = SocialLinkSerializer(source='sociallink_set',
+                                        many=True,
+                                        read_only=True)
 
     if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
-        nodes = serializers.HyperlinkedIdentityField(view_name='api_user_nodes', lookup_field='username')
+        nodes = serializers.HyperlinkedIdentityField(view_name='api_user_nodes',
+                                                     lookup_field='username')
 
     def get_avatar(self, obj):
         """ avatar from gravatar.com """
-        return 'https://www.gravatar.com/avatar/%s' % hashlib.md5(obj.email).hexdigest()
+        return 'https://www.gravatar.com/avatar/{0}'.format(hashlib.md5(obj.email).hexdigest())
 
     def get_full_name(self, obj):
         """ user's full name """
@@ -173,13 +155,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
-            'details', 'id',
-            'username', 'full_name', 'first_name', 'last_name',
-            'about', 'gender', 'birth_date', 'address', 'city',
-            'country', 'location',
-            'date_joined', 'last_login', 'avatar',
-        ]
+        fields = ['details', 'id', 'username',
+                  'full_name', 'first_name', 'last_name',
+                  'about', 'gender', 'birth_date',
+                  'address', 'city', 'country',
+                  'location', 'date_joined',
+                  'last_login', 'avatar']
 
         if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
             fields.append('nodes')
@@ -194,7 +175,10 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ProfileOwnSerializer(ProfileSerializer):
-    """ same as ProfileSerializer, with is_staff attribute """
+    """
+    same as ProfileSerializer, with is_staff attribute
+    used only to display the user's own information to herself
+    """
     if EMAIL_CONFIRMATION:
         email_addresses = EmailSerializer(source='email_set', many=True, read_only=True)
 
@@ -208,80 +192,52 @@ class ProfileOwnSerializer(ProfileSerializer):
         read_only_fields.append('is_staff')
 
 
-class ProfileCreateSerializer(ExtraFieldSerializer):
+class ProfileCreateSerializer(ModelValidationSerializer):
     """ Profile Serializer for User Creation """
-    password_confirmation = serializers.CharField(label=_('password_confirmation'),
-                                                  max_length=PASSWORD_MAX_LENGTH)
-    email = serializers.CharField(source='email', required='email' in User.REQUIRED_FIELDS)
+    password_confirmation = serializers.CharField(label=_('Password confirmation'),
+                                                  max_length=PASSWORD_MAX_LENGTH,
+                                                  write_only=True)
 
-    def validate_password_confirmation(self, attrs, source):
-        """
-        password_confirmation check
-        """
-        password_confirmation = attrs[source]
-        password = attrs['password']
-
-        if password_confirmation != password:
+    def validate_password_confirmation(self, value):
+        """ password_confirmation check """
+        if value != self.initial_data['password']:
             raise serializers.ValidationError(_('Password confirmation mismatch'))
+        return value
 
-        return attrs
+    def validate(self, data):
+        data.pop('password_confirmation')
+        return super(ModelValidationSerializer, self).validate(data)
 
     class Meta:
         model = User
-        fields = (
-            'id',
-            # required
-            'username', 'email', 'password', 'password_confirmation',
-            # optional
-            'first_name', 'last_name', 'about', 'gender',
-            'birth_date', 'address', 'city', 'country'
-        )
-        non_native_fields = ('password_confirmation', )
+        fields = ('username', 'email', 'password', 'password_confirmation',  # required
+                  # optional
+                  'id', 'first_name', 'last_name', 'about', 'gender',
+                  'birth_date', 'address', 'city', 'country')
 
 
 class ProfileRelationSerializer(ProfileSerializer):
     """ Profile Serializer used for linking """
     class Meta:
         model = User
-        fields = ('id', 'username', 'full_name', 'city', 'country', 'avatar', 'details')
-
-
-# ------ Add user info to ExtensibleNodeSerializer ------ #
-
-from nodeshot.core.nodes.base import ExtensibleNodeSerializer
-
-ExtensibleNodeSerializer.add_relationship(
-    name='user',
-    serializer=ProfileRelationSerializer,
-    queryset=lambda obj, request: obj.user
-)
+        fields = ('id', 'username', 'full_name',
+                  'city', 'country', 'avatar', 'details')
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    """ Account serializer """
-    profile = serializers.HyperlinkedIdentityField(
-        lookup_field='username',
-        view_name='api_profile_detail'
-    )
-    social_links = serializers.HyperlinkedIdentityField(
-        lookup_field='username',
-        view_name='api_user_social_links_list'
-    )
-    change_password = HyperlinkedField(
-        view_name='api_account_password_change'
-    )
-    logout = HyperlinkedField(view_name='api_account_logout')
+    profile = serializers.HyperlinkedIdentityField(view_name='api_profile_detail',
+                                                   lookup_field='username')
+    social_links = serializers.HyperlinkedIdentityField(view_name='api_user_social_links_list',
+                                                        lookup_field='username')
+    change_password = HyperlinkedField('api_account_password_change')
+    logout = HyperlinkedField('api_account_logout')
 
     if EMAIL_CONFIRMATION:
-        email_addresses = HyperlinkedField(view_name='api_account_email_list')
+        email_addresses = HyperlinkedField('api_account_email_list')
 
     if NOTIFICATIONS_INSTALLED:
-        web_notification_settings = HyperlinkedField(
-            view_name='api_notification_web_settings'
-        )
-        email_notification_settings = HyperlinkedField(
-            view_name='api_notification_email_settings'
-        )
+        web_notification_settings = HyperlinkedField('api_notification_web_settings')
+        email_notification_settings = HyperlinkedField('api_notification_email_settings')
 
     class Meta:
         model = User
@@ -295,103 +251,71 @@ class AccountSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
-    """
-    Change password serializer
-    """
-    current_password = serializers.CharField(
-        help_text=_('Current Password'),
-        max_length=PASSWORD_MAX_LENGTH,
-        required=False  # optional because users subscribed from social network won't have a password set
-    )
-    password1 = serializers.CharField(
-        help_text=_('New Password'),
-        max_length=PASSWORD_MAX_LENGTH
-    )
-    password2 = serializers.CharField(
-        help_text=_('New Password (confirmation)'),
-        max_length=PASSWORD_MAX_LENGTH
-    )
+    current_password = serializers.CharField(help_text=_('Current Password'),
+                                             max_length=PASSWORD_MAX_LENGTH,
+                                             # optional because users subscribed
+                                             # from socials won't have a password set
+                                             required=False)
+    password1 = serializers.CharField(help_text=_('New Password'),
+                                      max_length=PASSWORD_MAX_LENGTH)
+    password2 = serializers.CharField(help_text=_('New Password (confirmation)'),
+                                      max_length=PASSWORD_MAX_LENGTH)
 
-    def validate_current_password(self, attrs, source):
-        """
-        current password check
-        """
-        if self.object and self.object.has_usable_password() and not self.object.check_password(attrs.get("current_password")):
+    def validate_current_password(self, value):
+        """ current password check """
+        if self.instance and self.instance.has_usable_password() and not self.instance.check_password(value):
             raise serializers.ValidationError(_('Current password is not correct'))
-        return attrs
+        return value
 
-    def validate_password2(self, attrs, source):
-        """
-        password_confirmation check
-        """
-        password_confirmation = attrs[source]
-        password = attrs['password1']
-
-        if password_confirmation != password:
+    def validate_password2(self, value):
+        """ password_confirmation check """
+        if value != self.initial_data['password1']:
             raise serializers.ValidationError(_('Password confirmation mismatch'))
+        return value
 
-        return attrs
-
-    def restore_object(self, attrs, instance=None):
+    def update(self, instance, validated_data):
         """ change password """
-        if instance is not None:
-            instance.change_password(attrs.get('password2'))
-            return instance
-        return None
+        instance.change_password(validated_data.get('password2'))
+        return instance
 
 
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
-    def validate_email(self, attrs, source):
+    def validate_email(self, value):
         """ ensure email is in the database """
         if EMAIL_CONFIRMATION:
-            condition = EmailAddress.objects.filter(email__iexact=attrs["email"], verified=True).count() == 0
+            queryset = EmailAddress.objects.filter(email__iexact=value, verified=True)
         else:
-            condition = User.objects.get(email__iexact=attrs["email"], is_active=True).count() == 0
-
-        if condition is True:
+            queryset = User.objects.get(email__iexact=value, is_active=True).count() == 0
+        if queryset.count() < 1:
             raise serializers.ValidationError(_("Email address not found"))
+        return queryset.first().email
 
-        return attrs
-
-    def restore_object(self, attrs, instance=None):
+    def create(self, validated_data):
         """ create password reset for user """
-        password_reset = PasswordReset.objects.create_for_user(attrs["email"])
-        password_reset.email = attrs["email"]
-
-        return password_reset
+        return PasswordReset.objects.create_for_user(validated_data["email"])
 
 
 class ResetPasswordKeySerializer(serializers.Serializer):
-    password1 = serializers.CharField(
-        help_text=_('New Password'),
-        max_length=PASSWORD_MAX_LENGTH
-    )
-    password2 = serializers.CharField(
-        help_text=_('New Password (confirmation)'),
-        max_length=PASSWORD_MAX_LENGTH
-    )
+    password1 = serializers.CharField(help_text=_('New Password'),
+                                      max_length=PASSWORD_MAX_LENGTH)
+    password2 = serializers.CharField(help_text=_('New Password (confirmation)'),
+                                      max_length=PASSWORD_MAX_LENGTH)
 
-    def validate_password2(self, attrs, source):
-        """
-        password2 check
-        """
-        password_confirmation = attrs[source]
-        password = attrs['password1']
-
-        if password_confirmation != password:
+    def validate_password2(self, value):
+        """ ensure password confirmation is correct """
+        if value != self.initial_data['password1']:
             raise serializers.ValidationError(_('Password confirmation mismatch'))
+        return value
 
-        return attrs
-
-    def restore_object(self, attrs, instance):
+    def update(self, instance, validated_data):
         """ change password """
-        user = instance.user
-        user.set_password(attrs["password1"])
-        user.save()
+        instance.user.set_password(validated_data["password1"])
+        instance.user.full_clean()
+        instance.user.save()
         # mark password reset object as reset
         instance.reset = True
+        instance.full_clean()
         instance.save()
-
         return instance

@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from .settings import EMAIL_CONFIRMATION
 
 
-urlpatterns = patterns('nodeshot.community.profiles.views',
+urlpatterns = patterns('nodeshot.community.profiles.views',  # noqa
     url(r'^profiles/$', 'profile_list', name='api_profile_list'),
     url(r'^profiles/(?P<username>[-.\w]+)/$', 'profile_detail', name='api_profile_detail'),
     url(r'^profiles/(?P<username>[-.\w]+)/nodes/$', 'user_nodes', name='api_user_nodes'),
@@ -21,7 +21,7 @@ urlpatterns = patterns('nodeshot.community.profiles.views',
 
 # email addresses
 if EMAIL_CONFIRMATION:
-    urlpatterns += patterns('nodeshot.community.profiles.views',
+    urlpatterns += patterns('nodeshot.community.profiles.views',  # noqa
         url(r'^account/email/$', 'account_email_list', name='api_account_email_list'),
         url(r'^account/email/(?P<pk>[0-9]+)/$', 'account_email_detail', name='api_account_email_detail'),
         url(r'^account/email/(?P<pk>[0-9]+)/resend-confirmation/$', 'account_email_resend_confirmation', name='api_account_email_resend_confirmation'),

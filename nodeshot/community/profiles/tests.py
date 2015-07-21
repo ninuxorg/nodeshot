@@ -17,7 +17,7 @@ from .models import Profile as User
 from .models import PasswordReset, SocialLink
 
 
-class ProfilesTest(TestCase):
+class TestProfiles(TestCase):
     fixtures = [
         'initial_data.json',
         'test_profiles.json',
@@ -26,7 +26,7 @@ class ProfilesTest(TestCase):
     ]
 
     def setUp(self):
-        super(ProfilesTest, self).setUp()
+        super(TestProfiles, self).setUp()
         self.client.login(username='registered', password='tester')
         if EMAIL_CONFIRMATION:
             for user in User.objects.all():
@@ -41,7 +41,6 @@ class ProfilesTest(TestCase):
         """ users should have a default group when created """
         # ensure owner of node fusolab has at least one group
         self.assertEqual(User.objects.get(username='romano').groups.count(), 1)
-
         # create new user and check if it has any group
         new_user = User(username='new_user_test', email='new_user@testing.com', password='tester', is_active=True)
         new_user.save()
@@ -65,16 +64,13 @@ class ProfilesTest(TestCase):
         """ test new user creation through the API """
         url = reverse('api_profile_list')
         un_auth_client = Client()
-
         # GET 401
         response = un_auth_client.get(url)
         self.assertEqual(401, response.status_code)
-
         # GET 200
         response = self.client.get(url)
         self.assertContains(response, 'username')
         self.assertNotContains(response, 'password_confirmation')
-
         # POST 400: missing required field
         self.client.logout()
         new_user = {
@@ -197,7 +193,6 @@ class ProfilesTest(TestCase):
 
     def test_account_detail_API(self):
         url = reverse('api_account_detail')
-
         un_auth_client = Client()
 
         # GET 401
@@ -211,7 +206,6 @@ class ProfilesTest(TestCase):
 
     def test_account_password_change_API(self):
         url = reverse('api_account_password_change')
-
         un_auth_client = Client()
 
         # GET 401
@@ -225,7 +219,6 @@ class ProfilesTest(TestCase):
         # POST 400: wrong current password
         new_password = {}
         response = self.client.post(url, new_password)
-        self.assertContains(response, 'current_password', status_code=400)
         self.assertContains(response, 'password1', status_code=400)
         self.assertContains(response, 'password2', status_code=400)
 
@@ -483,131 +476,16 @@ class ProfilesTest(TestCase):
     if 'nodeshot.core.nodes' in settings.INSTALLED_APPS:
         def test_user_nodes(self):
             url = reverse('api_user_nodes', args=['romano'])
-
             response = self.client.get(url)
             self.assertEqual(200, response.status_code)
-
             response = self.client.post(url)
             self.assertEqual(405, response.status_code)
-
-    if EMAIL_CONFIRMATION:
-        def test_account_email_api(self):
-            list_url = reverse('api_account_email_list')
-
-            # GET 401 - unauthorized because not authenticated
-            c = Client()
-            response = c.get(list_url)
-            self.assertEqual(401, response.status_code)
-
-            # GET 200
-            response = self.client.get(list_url)
-            self.assertEqual(200, response.status_code)
-
-            # POST 400 - wrong input data
-            response = self.client.post(list_url)
-            self.assertEqual(400, response.status_code)
-
-            # POST 201
-            user = User.objects.get(username='registered')
-            email_addresses_count = EmailAddress.objects.filter(user=user).count()
-            response = self.client.post(list_url, {'email': 'testing@test.com'})
-            self.assertEqual(201, response.status_code)
-            self.assertEqual(EmailAddress.objects.filter(user=user).count(), email_addresses_count + 1)
-            # ensure is not verified nor primary
-            email_address = EmailAddress.objects.filter(user=user).order_by('-id')[0]
-            self.assertFalse(email_address.primary)
-            self.assertFalse(email_address.verified)
-            # ensure email has been sent
-            self.assertEqual(len(mail.outbox), 1)
-            # get email confirmation object
-            email_confirmation = EmailConfirmation.objects.filter(email_address=email_address)[0]
-
-            detail_url = reverse('api_account_email_detail', args=[email_address.pk])
-
-            # GET detail 200
-            response = self.client.get(detail_url)
-            self.assertEqual(200, response.status_code)
-            self.assertNotEqual(response.data['resend_confirmation'], False)
-
-            # PUT 400 - can't make primary an unverified email address
-            response = self.client.put(detail_url, data=json.dumps({'primary': True}), content_type='application/json')
-            self.assertContains(response, _('Email address cannot be made primary if it is not verified first'), status_code=400)
-
-            # POST resend confirmation
-            resend_confirmation_url = reverse('api_account_email_resend_confirmation', args=[email_address.pk])
-            response = self.client.post(resend_confirmation_url)
-            self.assertEqual(200, response.status_code)
-            # ensure email has been sent
-            self.assertEqual(len(mail.outbox), 2)
-            # get email confirmation object
-            email_confirmation = EmailConfirmation.objects.filter(email_address=email_address).order_by('-id')[0]
-
-            # verify email
-            confirmation_url = reverse('emailconfirmation_confirm_email', args=[email_confirmation.key])
-            response = self.client.get(confirmation_url)
-            self.assertEqual(response.status_code, 302)
-
-            # ensure verified and not primary (user already had a primary address)
-            email_address = EmailAddress.objects.get(user=user, email='testing@test.com')
-            self.assertFalse(email_address.primary)
-            self.assertTrue(email_address.verified)
-
-            # try to resend confirmation, should return error
-            resend_confirmation_url = reverse('api_account_email_resend_confirmation', args=[email_address.pk])
-            response = self.client.post(resend_confirmation_url)
-            self.assertEqual(400, response.status_code)
-
-            # DELETE 204 - delete the other email address
-            detail_url = reverse('api_account_email_detail', args=[email_address.pk])
-            response = self.client.delete(detail_url)
-            self.assertEqual(response.status_code, 204)
-            self.assertEqual(EmailAddress.objects.filter(user=user, email='testing@test.com').count(), 0)
-
-            primary = email_address.user.email_set.get_primary()
-            detail_url = reverse('api_account_email_detail', args=[primary.pk])
-            # PUT 400 - can't unprimary
-            response = self.client.put(detail_url, data=json.dumps({'primary': False}), content_type='application/json')
-            self.assertContains(response, _('You must have at least one primary address.'), status_code=400)
-
-            # DELETE 400 - can't delete because only 1 address
-            response = self.client.delete(detail_url)
-            self.assertEqual(response.status_code, 400)
-
-            # add a new email address
-            response = self.client.post(list_url, {'email': 'mynewemailaddress@test.com'})
-            self.assertEqual(201, response.status_code)
-            self.assertEqual(len(mail.outbox), 3)
-
-            # verify new email
-            email_address = EmailAddress.objects.get(user=user, email='mynewemailaddress@test.com')
-            email_confirmation = EmailConfirmation.objects.filter(email_address=email_address).order_by('-id')[0]
-            confirmation_url = reverse('emailconfirmation_confirm_email', args=[email_confirmation.key])
-            response = self.client.get(confirmation_url)
-            self.assertEqual(response.status_code, 302)
-
-            # ensure is verified but not primary
-            email_address = EmailAddress.objects.get(user=user, email='mynewemailaddress@test.com')
-            self.assertFalse(email_address.primary)
-            self.assertTrue(email_address.verified)
-
-            detail_url = reverse('api_account_email_detail', args=[email_address.pk])
-
-            # PUT 200 - make primary and ensure other one is not primary anymore
-            response = self.client.put(detail_url, data=json.dumps({'primary': True}), content_type='application/json')
-            self.assertEqual(response.status_code, 200)
-            # ensure is primary
-            email_address = EmailAddress.objects.get(user=user, email='mynewemailaddress@test.com')
-            self.assertTrue(email_address.primary)
-            # ensure previous one is primary
-            email_address = EmailAddress.objects.get(user=user, email='registered@registered.org')
-            self.assertFalse(email_address.primary)
 
     def test_password_confirmation_field_in_html(self):
         url = reverse('api_profile_list')
         response = self.client.get(url, HTTP_ACCEPT='text/html')
-
-        self.assertContains(response, 'password:</label>')
-        self.assertContains(response, 'password_confirmation:</label>')
+        self.assertContains(response, 'Password</label>')
+        self.assertContains(response, 'Password confirmation</label>')
 
     def test_delete_user(self):
         User.objects.all().delete()
@@ -773,7 +651,136 @@ class ProfilesTest(TestCase):
         user = User.objects.get(username='newadmin')
         self.assertEqual(user.email_set.count(), 0)
 
-    if EMAIL_CONFIRMATION:
+
+if EMAIL_CONFIRMATION:
+    class TestEmailConfirmation(TestCase):
+        ACCOUNT_EMAIL_LIST_URL = reverse('api_account_email_list')
+        fixtures = [
+            'initial_data.json',
+            'test_profiles.json',
+            'test_layers.json',
+            'test_status.json',
+        ]
+
+        def setUp(self):
+            super(TestEmailConfirmation, self).setUp()
+            self.client.login(username='registered', password='tester')
+            if EMAIL_CONFIRMATION:
+                for user in User.objects.all():
+                    user.save()
+                # set all email addresses as verified
+                for email_address in EmailAddress.objects.all():
+                    email_address.verified = True
+                    email_address.save()
+            mail.outbox = []
+            # attributes
+            self.email_address = EmailAddress.objects.filter(user__username='registered').first()
+            self.detail_url = reverse('api_account_email_detail', args=[self.email_address.pk])
+
+        def _create_email(self, **kwargs):
+            email_address = EmailAddress(user=self.email_address.user,
+                                         email=kwargs.get('email', 'new-email@address.com'),
+                                         verified=kwargs.get('verified', False),
+                                         primary=kwargs.get('primary', False))
+            email_address.full_clean()
+            email_address.save()
+            return email_address
+
+        def test_account_email_api_401(self):
+            # GET 401 - unauthorized because not authenticated
+            c = Client()
+            response = c.get(self.ACCOUNT_EMAIL_LIST_URL)
+            self.assertEqual(response.status_code, 401)
+
+        def test_account_email_api_200(self):
+            response = self.client.get(self.ACCOUNT_EMAIL_LIST_URL)
+            self.assertEqual(response.status_code, 200)
+
+        def test_account_email_api_post_400(self):
+            # POST 400 - wrong input data
+            response = self.client.post(self.ACCOUNT_EMAIL_LIST_URL)
+            self.assertEqual(response.status_code, 400)
+
+        def test_account_email_api_post_201(self):
+            # POST 201
+            user = User.objects.get(username='registered')
+            email_addresses_count = EmailAddress.objects.filter(user=user).count()
+            response = self.client.post(self.ACCOUNT_EMAIL_LIST_URL, {'email': 'testing@test.com'})
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(EmailAddress.objects.filter(user=user, email='testing@test.com').count(), 1)
+            # ensure is not verified nor primary
+            email_address = EmailAddress.objects.filter(user=user).order_by('-id')[0]
+            self.assertFalse(email_address.primary)
+            self.assertFalse(email_address.verified)
+            # ensure email has been sent
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual(EmailConfirmation.objects.filter(email_address=email_address).count(), 1)
+
+        def test_account_email_api_detail(self):
+            response = self.client.get(self.detail_url)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['resend_confirmation'], False)
+
+        def test_resend_confirmation_attribute(self):
+            email_address = self._create_email()
+            response = self.client.get(reverse('api_account_email_detail', args=[email_address.pk]))
+            self.assertNotEqual(response.data['resend_confirmation'], False)
+            self.assertEqual(response.status_code, 200)
+
+        def test_resend_confirmation_400(self):
+            email_address = self._create_email(verified=True, primary=True)
+            response = self.client.post(reverse('api_account_email_resend_confirmation',
+                                                args=[email_address.pk]))
+            self.assertEqual(response.status_code, 400)
+
+        def test_email_address_set_primary_400(self):
+            email_address = self._create_email()
+            response = self.client.patch(reverse('api_account_email_detail', args=[email_address.pk]),
+                                         data='{"primary": true}',
+                                         content_type='application/json')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.data['primary'][0], 'Email address cannot be made primary if it is not verified first')
+
+        def test_resend_confrimation_and_verify(self):
+            email_address = self._create_email()
+            count = EmailConfirmation.objects.filter(email_address=email_address).count()
+            # POST resend confirmation
+            resend_confirmation_url = reverse('api_account_email_resend_confirmation', args=[email_address.pk])
+            response = self.client.post(resend_confirmation_url)
+            self.assertEqual(response.status_code, 200)
+            # ensure email has been sent
+            self.assertEqual(len(mail.outbox), 1)
+            # get email confirmation object
+            self.assertEqual(EmailConfirmation.objects.filter(email_address=email_address).count(), count + 1)
+            # verify email
+            confirmation_url = reverse('emailconfirmation_confirm_email',
+                                       args=[EmailConfirmation.objects.last().key])
+            response = self.client.get(confirmation_url)
+            self.assertEqual(response.status_code, 302)
+            # ensure verified and not primary (user already had a primary address)
+            email_address.refresh_from_db()
+            self.assertFalse(email_address.primary)
+            self.assertTrue(email_address.verified)
+
+        def test_delete_email_address(self):
+            email_address = self._create_email(verified=True, primary=True)
+            response = self.client.delete(reverse('api_account_email_detail',
+                                                  args=[self.email_address.pk]))
+            self.assertEqual(response.status_code, 204)
+            self.assertEqual(EmailAddress.objects.filter(email='testing@test.com').count(), 0)
+
+        def test_delete_email_address_400(self):
+            response = self.client.delete(self.detail_url)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.data['detail'], "You can't delete your primary address")
+
+        def test_unprimary_email_address_400(self):
+            response = self.client.put(self.detail_url,
+                                       data='{"primary": false}',
+                                       content_type='application/json')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.data['primary'][0], 'You must have at least one primary address.')
+
         def test_email_uniqueness(self):
             self.assertEqual(EmailAddress.objects.filter(email='admin@admin.org').count(), 1)
             user = User.objects.get(username='romano')

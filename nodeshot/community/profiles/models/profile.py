@@ -99,8 +99,8 @@ class Profile(AbstractBaseUser, PermissionsMixin):
                 pass
         # keep in sync with EmailAddress model
         if (EMAIL_CONFIRMATION and sync_emailaddress
-                               and self.email
-                               and self.email_set.filter(email=self.email).count() < 1):
+                               and self.email  # noqa
+                               and self.email_set.filter(email=self.email).count() < 1):  # noqa
             self.email_set.add_email(self, email=self.email)
             self.email_set.last().set_as_primary()
 
