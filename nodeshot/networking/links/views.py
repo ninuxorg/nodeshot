@@ -2,7 +2,7 @@ from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
-from rest_framework import authentication, generics
+from rest_framework import authentication, generics, pagination
 
 from nodeshot.core.base.mixins import ACLMixin
 from nodeshot.core.nodes.models import Node
@@ -23,7 +23,7 @@ class LinkList(ACLMixin, generics.ListAPIView):
     authentication_classes = (authentication.SessionAuthentication,)
     queryset = Link.objects.all()
     serializer_class = LinkListSerializer
-    pagination_serializer_class = PaginatedLinkSerializer
+    pagination_class = pagination.PageNumberPagination
     paginate_by_param = 'limit'
     paginate_by = 40
 

@@ -1,4 +1,4 @@
-from rest_framework import pagination, serializers
+from rest_framework import serializers
 from rest_framework_gis import serializers as gis_serializers
 
 from nodeshot.core.base.serializers import DynamicRelationshipsMixin
@@ -11,18 +11,13 @@ __all__ = [
     'LinkDetailSerializer',
     'LinkListGeoJSONSerializer',
     'LinkDetailGeoJSONSerializer',
-    'PaginatedLinkSerializer',
 ]
 
 
-class LinkListSerializer(gis_serializers.GeoModelSerializer):
-    """ location serializer  """
-    layer = serializers.Field('layer_slug')
-    quality = serializers.Field(source='quality')
-    status = serializers.Field(source='get_status_display')
-    type = serializers.Field(source='get_type_display')
-    node_a_name = serializers.Field(source='node_a_name')
-    node_b_name = serializers.Field(source='node_b_name')
+class LinkListSerializer(serializers.ModelSerializer):
+    layer = serializers.SlugRelatedField(slug_field='slug', read_only=True)
+    status = serializers.ReadOnlyField(source='get_status_display')
+    type = serializers.ReadOnlyField(source='get_type_display')
 
     class Meta:
         model = Link
@@ -43,9 +38,7 @@ class LinkListGeoJSONSerializer(LinkListSerializer, gis_serializers.GeoFeatureMo
 
 
 class LinkDetailSerializer(DynamicRelationshipsMixin, LinkListSerializer):
-    interface_a_mac = serializers.Field(source='interface_a_mac')
-    interface_b_mac = serializers.Field(source='interface_b_mac')
-    relationships = serializers.SerializerMethodField('get_relationships')
+    relationships = serializers.SerializerMethodField()
 
     # this is needed to avoid adding stuff to DynamicRelationshipsMixin
     _relationships = {}
@@ -77,13 +70,9 @@ LinkDetailSerializer.add_relationship(
 )
 
 
-class LinkDetailGeoJSONSerializer(LinkDetailSerializer, gis_serializers.GeoFeatureModelSerializer):
+class LinkDetailGeoJSONSerializer(LinkDetailSerializer,
+                                  gis_serializers.GeoFeatureModelSerializer):
     class Meta:
         model = Link
         geo_field = 'line'
         fields = LinkDetailSerializer.Meta.fields[:]
-
-
-class PaginatedLinkSerializer(pagination.PaginationSerializer):
-    class Meta:
-        object_serializer_class = LinkListSerializer
