@@ -3,10 +3,9 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from nodeshot.core.nodes.signals import node_status_changed
+from nodeshot.core.nodes.dispatchers import node_status_changed
 from nodeshot.core.nodes.models import Node
 
-from ..settings import settings
 from ..models import Notification
 from ..tasks import create_notifications
 

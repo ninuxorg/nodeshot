@@ -1,10 +1,11 @@
 from django.http import Http404
 
 from rest_framework import generics, permissions, authentication
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from .models import *
-from .serializers import *
+from .models import *  # noqa
+from .serializers import *  # noqa
 
 
 class NotificationList(generics.ListAPIView):
@@ -25,7 +26,7 @@ class NotificationList(generics.ListAPIView):
     paginate_by = 30
     paginate_by_param = 'limit'
     serializer_class = NotificationSerializer
-    pagination_serializer_class = PaginatedNotificationSerializer
+    pagination_class = PageNumberPagination
     queryset = Notification.objects.select_related('from_user')
 
     def get_queryset(self):
@@ -34,33 +35,36 @@ class NotificationList(generics.ListAPIView):
 
     def get(self, request, format=None):
         """ get HTTP method """
-        action = request.QUERY_PARAMS.get('action', 'unread')
+        action = request.query_params.get('action', 'unread')
         # action can be only "unread" (default), "count" and "all"
         action = action if action == 'count' or action == 'all' else 'unread'
         # mark as read parameter, defaults to true
-        mark_as_read = request.QUERY_PARAMS.get('read', 'true') == 'true'
+        mark_as_read = request.query_params.get('read', 'true') == 'true'
         # queryset
         notifications = self.get_queryset().filter(to_user=request.user)
         # pass to specific action
         return getattr(self, 'get_%s' % action)(request, notifications, mark_as_read)
 
     def get_unread(self, request, notifications, mark_as_read):
-        """ return unread notifications and mark as read (unless read=false param is passed)"""
+        """
+        return unread notifications and mark as read
+        (unless read=false param is passed)
+        """
         notifications = notifications.filter(is_read=False)
-        data = UnreadNotificationSerializer(notifications, many=True).data
-        # if True mark retrieve unread notifications as read (default behaviour)
+        serializer = UnreadNotificationSerializer(list(notifications),  # evaluate queryset
+                                                  many=True,
+                                                  context=self.get_serializer_context())
+        # retrieve unread notifications as read (default behaviour)
         if mark_as_read:
             notifications.update(is_read=True)
-        return Response(data)
+        return Response(serializer.data)
 
     def get_count(self, request, notifications, mark_as_read=False):
         """ return count of unread notification """
-        data = {'count': notifications.filter(is_read=False).count()}
-        return Response(data)
+        return Response({'count': notifications.filter(is_read=False).count()})
 
     def get_all(self, request, notifications, mark_as_read=False):
         """ return all notifications with pagination """
-        notifications = notifications
         return self.list(request, notifications)
 
 notification_list = NotificationList.as_view()

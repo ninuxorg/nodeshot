@@ -5,4 +5,4 @@ class AppConfig(BaseConfig):
     name = 'nodeshot.community.notifications'
 
     def ready(self):
-        from . import signals
+        from . import signals  # noqa

@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext as __
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse, NoReverseMatch
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
@@ -10,7 +9,7 @@ from nodeshot.core.base.models import BaseDate
 
 from ..settings import settings, TEXTS
 
-NOTIFICATION_TYPE_CHOICES = [(key, _(key)) for key,value in TEXTS.iteritems()]
+NOTIFICATION_TYPE_CHOICES = [(key, _(key)) for key, value in TEXTS.iteritems()]
 
 
 class Notification(BaseDate):
@@ -116,7 +115,7 @@ class Notification(BaseDate):
                 km = value * 1000
                 queryset = Model.objects.filter(**{
                     "user_id": self.to_user_id,
-                    geo_field+"__distance_lte": (geo_value, km)
+                    geo_field + "__distance_lte": (geo_value, km)
                 })
                 # if user has related object in a distance range less than or equal to
                 # his prefered range (specified in number of km), return True and send the notification

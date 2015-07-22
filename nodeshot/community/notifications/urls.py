@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-urlpatterns = patterns('nodeshot.community.notifications.views',
+urlpatterns = patterns('nodeshot.community.notifications.views',  # noqa
     url(r'^account/notifications/$', 'notification_list', name='api_notification_list'),
     url(r'^account/notifications/(?P<pk>[0-9]+)/$', 'notification_detail', name='api_notification_detail'),
 

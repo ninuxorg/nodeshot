@@ -16,25 +16,8 @@ from .models import *
 from .settings import settings, DEFAULT_DISTANCE, DEFAULT_BOOLEAN, REGISTER
 from .tasks import purge_notifications
 
-# TODO: cleanup this mess
-# remove websockets from installed apps and disconnect signals
-if 'nodeshot.core.websockets' in settings.INSTALLED_APPS:
-    from importlib import import_module
-    from nodeshot.core.websockets import settings as websocket_settings
-
-    for module in websocket_settings.REGISTER:
-        module = import_module(module)
-        module.disconnect()
-
-    setattr(websocket_settings, 'REGISTER', [])
-
-    settings.INSTALLED_APPS = [app for app in settings.INSTALLED_APPS if app != 'nodeshot.core.websockets']
-
 
 class TestNotification(TestCase):
-    """
-    Test Notifications
-    """
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -709,7 +692,7 @@ class TestNotification(TestCase):
 
             # test ?action=count
             response = self.client.get(url, {'action': 'count'})
-            self.assertContains(response, '{"count": 1}')
+            self.assertContains(response, '{"count":1}')
 
             # test ?read=false
             # retrieve notifications but do not mark as read

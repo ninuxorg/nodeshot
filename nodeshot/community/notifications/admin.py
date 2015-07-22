@@ -1,7 +1,7 @@
 from django.contrib import admin
 from nodeshot.core.base.admin import BaseAdmin
 
-from .models import *
+from .models import *  # noqa
 from .settings import settings
 
 

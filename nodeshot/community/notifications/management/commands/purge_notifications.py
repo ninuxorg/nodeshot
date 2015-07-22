@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from nodeshot.community.notifications.models import Notification
 from nodeshot.core.base.utils import ago
 
-from ...settings import settings, DELETE_OLD
+from ...settings import DELETE_OLD
 
 
 class Command(BaseCommand):
