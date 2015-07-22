@@ -1,12 +1,9 @@
-"""
-Unit tests for participation app
-"""
-from django.contrib.auth import get_user_model
-User = get_user_model()
+import json
+
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-
-import json
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 from nodeshot.core.nodes.models import Node
 from nodeshot.core.layers.models import Layer
@@ -15,9 +12,7 @@ from nodeshot.core.base.tests import user_fixtures
 from .models import Comment, Rating, Vote
 
 
-class ParticipationTests(TestCase):
-    """ Models tests """
-
+class TestParticipationModels(TestCase):
     fixtures = [
         'initial_data.json',
         user_fixtures,
@@ -126,6 +121,65 @@ class ParticipationTests(TestCase):
         self.assertEqual(Rating.objects.count(), 1)
         self.assertEqual(Rating.objects.last().value, 2)
 
+    def test_voting_allowed(self):
+        node = Node.objects.last()
+        self.assertTrue(node.voting_allowed)
+        # disable voting on layer
+        node.layer.participation_settings.voting_allowed = False
+        node.layer.participation_settings.save()
+        self.assertFalse(node.voting_allowed)
+        # re-enable on layer
+        node.layer.participation_settings.voting_allowed = True
+        node.layer.participation_settings.save()
+        self.assertTrue(node.voting_allowed)
+        # disable on node
+        node.participation_settings.voting_allowed = False
+        node.participation_settings.save()
+        self.assertFalse(node.voting_allowed)
+
+    def test_rating_allowed(self):
+        node = Node.objects.last()
+        self.assertTrue(node.rating_allowed)
+        # disable rating on layer
+        node.layer.participation_settings.rating_allowed = False
+        node.layer.participation_settings.save()
+        self.assertFalse(node.rating_allowed)
+        # re-enable on layer
+        node.layer.participation_settings.rating_allowed = True
+        node.layer.participation_settings.save()
+        self.assertTrue(node.rating_allowed)
+        # disable on node
+        node.participation_settings.rating_allowed = False
+        node.participation_settings.save()
+        self.assertFalse(node.rating_allowed)
+
+    def test_comments_allowed(self):
+        node = Node.objects.last()
+        self.assertTrue(node.comments_allowed)
+        # disable comments on layer
+        node.layer.participation_settings.comments_allowed = False
+        node.layer.participation_settings.save()
+        self.assertFalse(node.comments_allowed)
+        # re-enable on layer
+        node.layer.participation_settings.comments_allowed = True
+        node.layer.participation_settings.save()
+        self.assertTrue(node.comments_allowed)
+        # disable on node
+        node.participation_settings.comments_allowed = False
+        node.participation_settings.save()
+        self.assertFalse(node.comments_allowed)
+
+
+class TestParticipationApi(TestCase):
+    fixtures = [
+        'initial_data.json',
+        user_fixtures,
+        'test_layers.json',
+        'test_status.json',
+        'test_nodes.json',
+        'test_images.json'
+    ]
+
     def test_node_comment_api(self):
         """
         Comments endpoint should be reachable with GET and return 404 if object is not found.
@@ -142,10 +196,7 @@ class ParticipationTests(TestCase):
         url2 = reverse('api_node_comments', args=[node2_slug])
         wrong_url = reverse('api_node_comments', args=[fake_node_slug])
 
-        # api_node_comments
-
         # GET
-
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -176,10 +227,9 @@ class ParticipationTests(TestCase):
         # POST 201 - ensure additional post data "user" and "node" are ignored
         response = self.client.post(url, bad_post_data)
         self.assertEqual(response.status_code, 201)
-        comment_dict = json.loads(response.content)
-        self.assertEqual(comment_dict['user'], 1)
-        self.assertEqual(comment_dict['node'], 1)
-        self.assertEqual(comment_dict['text'], "test_comment_bad")
+        self.assertEqual(response.data['username'], 'admin')
+        self.assertEqual(response.data['node'], 'Fusolab')
+        self.assertEqual(response.data['text'], "test_comment_bad")
 
         # POSTing a comment for node2
         response = self.client.post(url2, good_post_data)
@@ -227,10 +277,7 @@ class ParticipationTests(TestCase):
         url = reverse('api_node_ratings', args=[node_slug])
         wrong_url = reverse('api_node_ratings', args=[fake_node_slug])
 
-        # api_node_ratings
-
         # GET not allowed -- 405
-
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
 
@@ -261,10 +308,9 @@ class ParticipationTests(TestCase):
         bad_post_data = {"node": 100, "value": "10", "user": 2}
         response = self.client.post(url, bad_post_data)
         self.assertEqual(response.status_code, 201)
-        ratings_dict = json.loads(response.content)
-        self.assertEqual(ratings_dict['user'], 4)
-        self.assertEqual(ratings_dict['node'], 1)
-        self.assertEqual(ratings_dict['value'], 10)
+        self.assertEqual(response.data['username'], 'romano')
+        self.assertEqual(response.data['node'], 'Fusolab')
+        self.assertEqual(response.data['value'], 10)
 
         # Rating not allowed on layer
         # Tested as a different user or 400 would be returned because 'value' and 'user' are unique_together
@@ -366,10 +412,9 @@ class ParticipationTests(TestCase):
         self.client.login(username='admin', password='tester')
         response = self.client.post(reverse('api_node_votes', args=['eigenlab']), {"vote": "1"})
         self.assertEqual(response.status_code, 201)
-        votes_dict = json.loads(response.content)
-        self.assertEqual(votes_dict['user'], 1)
-        self.assertEqual(votes_dict['node'], 2)
-        self.assertEqual(votes_dict['vote'], 1)
+        self.assertEqual(response.data['username'], 'admin')
+        self.assertEqual(response.data['node'], 'EigenLab')
+        self.assertEqual(response.data['vote'], 1)
 
     def test_votes_api_not_allowed_on_layer(self):
         self.client.login(username='admin', password='tester')
@@ -404,86 +449,6 @@ class ParticipationTests(TestCase):
         response = self.client.post(reverse('api_node_votes', args=['tulug']), {"vote": "1"})
         self.assertEqual(response.status_code, 403)
 
-    def test_layer_comments_api(self):
-        """
-        Layer comments endpoint should be reachable only with GET and return 404 if object is not found.
-        """
-        layer = Layer.objects.get(pk=1)
-        layer_slug = layer.slug
-        fake_layer_slug = "idontexist"
-        url = reverse('api_layer_nodes_comments', args=[layer_slug])
-        wrong_url = reverse('api_layer_nodes_comments', args=[fake_layer_slug])
-
-        # api_layer_nodes_comments
-
-        # GET
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(wrong_url)
-        self.assertEqual(response.status_code, 404)
-
-        # POST not allowed -- 405
-        self.client.login(username='admin', password='tester')
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 405)
-
-    def test_layer_participation_api(self):
-        """
-        Layer participation endpoint should be reachable only with GET and return 404 if object is not found.
-        """
-        layer = Layer.objects.get(pk=1)
-        layer_slug = layer.slug
-        fake_layer_slug = "idontexist"
-        url = reverse('api_layer_nodes_participation', args=[layer_slug])
-        wrong_url = reverse('api_layer_nodes_participation', args=[fake_layer_slug])
-
-        # api_layer_nodes_participation
-
-        # GET
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(wrong_url)
-        self.assertEqual(response.status_code, 404)
-
-        # POST not allowed -- 405
-        self.client.login(username='admin', password='tester')
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 405)
-
-    def test_node_participation_api(self):
-        """
-        Participation endpoint should be reachable only with GET and return 404 if object is not found.
-        """
-        node = Node.objects.get(pk=1)
-        node_slug = node.slug
-        fake_node_slug = "idontexist"
-        url = reverse('api_node_participation', args=[node_slug])
-        wrong_url = reverse('api_node_participation', args=[fake_node_slug])
-
-        # api_node_participation
-
-        # GET
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        participation_dict = json.loads(response.content)
-        likes_count = node.noderatingcount.likes
-        dislikes_count = node.noderatingcount.dislikes
-        comment_count = node.noderatingcount.comment_count
-        rating_count = node.noderatingcount.rating_count
-        rating_avg = node.noderatingcount.rating_avg
-        self.assertEqual(participation_dict['participation']['likes'], likes_count)
-        self.assertEqual(participation_dict['participation']['dislikes'], dislikes_count)
-        self.assertEqual(participation_dict['participation']['comment_count'], comment_count)
-        self.assertEqual(participation_dict['participation']['rating_count'], rating_count)
-        self.assertEqual(participation_dict['participation']['rating_avg'], rating_avg)
-        response = self.client.get(wrong_url)
-        self.assertEqual(response.status_code, 404)
-
-        # POST not allowed -- 405
-        self.client.login(username='admin', password='tester')
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 405)
-
     def test_voted_on_node(self):
         node = Node.objects.get(pk=1)
         url = reverse('api_node_details', args=[node.slug])
@@ -508,51 +473,3 @@ class ParticipationTests(TestCase):
         v = Vote.objects.create(node_id=node.id, user_id=1, vote=-1)
         response = self.client.get(url)
         self.assertEqual(response.data['relationships']['voted'], -1)
-
-    def test_voting_allowed(self):
-        node = Node.objects.last()
-        self.assertTrue(node.voting_allowed)
-        # disable voting on layer
-        node.layer.participation_settings.voting_allowed = False
-        node.layer.participation_settings.save()
-        self.assertFalse(node.voting_allowed)
-        # re-enable on layer
-        node.layer.participation_settings.voting_allowed = True
-        node.layer.participation_settings.save()
-        self.assertTrue(node.voting_allowed)
-        # disable on node
-        node.participation_settings.voting_allowed = False
-        node.participation_settings.save()
-        self.assertFalse(node.voting_allowed)
-
-    def test_rating_allowed(self):
-        node = Node.objects.last()
-        self.assertTrue(node.rating_allowed)
-        # disable rating on layer
-        node.layer.participation_settings.rating_allowed = False
-        node.layer.participation_settings.save()
-        self.assertFalse(node.rating_allowed)
-        # re-enable on layer
-        node.layer.participation_settings.rating_allowed = True
-        node.layer.participation_settings.save()
-        self.assertTrue(node.rating_allowed)
-        # disable on node
-        node.participation_settings.rating_allowed = False
-        node.participation_settings.save()
-        self.assertFalse(node.rating_allowed)
-
-    def test_comments_allowed(self):
-        node = Node.objects.last()
-        self.assertTrue(node.comments_allowed)
-        # disable comments on layer
-        node.layer.participation_settings.comments_allowed = False
-        node.layer.participation_settings.save()
-        self.assertFalse(node.comments_allowed)
-        # re-enable on layer
-        node.layer.participation_settings.comments_allowed = True
-        node.layer.participation_settings.save()
-        self.assertTrue(node.comments_allowed)
-        # disable on node
-        node.participation_settings.comments_allowed = False
-        node.participation_settings.save()
-        self.assertFalse(node.comments_allowed)

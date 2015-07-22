@@ -14,10 +14,10 @@ class NodeRatingCount(models.Model):
     rating_count = models.IntegerField(default=0)
     rating_avg = models.FloatField(default=0.0)
     comment_count = models.IntegerField(default=0)
-    
+
     def __unicode__(self):
         return self.node.name
-    
+
     class Meta:
         app_label = 'participation'
         db_table = 'participation_node_counts'

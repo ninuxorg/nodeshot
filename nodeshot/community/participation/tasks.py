@@ -1,9 +1,6 @@
 from celery import task
 
 
-# ------ Asynchronous tasks ------ #
-
-
 @task
 def create_related_object(model, kwargs):
     """

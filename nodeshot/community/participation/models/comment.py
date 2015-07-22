@@ -29,20 +29,18 @@ class Comment(UpdateCountsMixin, BaseDate):
         node_rating_count.comment_count = self.node.comment_set.count()
         node_rating_count.save()
 
-    def clean(self , *args, **kwargs):
+    def clean(self, *args, **kwargs):
         """
         Check if comments can be inserted for parent node or parent layer
         """
         # check done only for new nodes!
         if not self.pk:
             node = self.node
-
             # ensure comments for this node are allowed
-            if  node.participation_settings.comments_allowed is False:
+            if node.participation_settings.comments_allowed is False:
                 raise ValidationError("Comments not allowed for this node")
-
             # ensure comments for this layer are allowed
             if 'nodeshot.core.layers' in settings.INSTALLED_APPS:
                 layer = node.layer
-                if  layer.participation_settings.comments_allowed is False:
+                if layer.participation_settings.comments_allowed is False:
                     raise ValidationError("Comments not allowed for this layer")
