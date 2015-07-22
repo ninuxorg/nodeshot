@@ -215,13 +215,13 @@ class Open311Request(TestCase):
 
     def test_get_service_request(self):
         # GET request detail
-        response = self.client.get(reverse('api_service_request_detail', args=['node','1']))
+        response = self.client.get(reverse('api_service_request_detail', args=['node', '1']))
         self.assertEqual(response.status_code, 200)
         # Wrong service code
-        response = self.client.get(reverse('api_service_request_detail', args=['wrong','1']))
+        response = self.client.get(reverse('api_service_request_detail', args=['wrong', '1']))
         self.assertEqual(response.status_code, 404)
         # Not existing request
-        response = self.client.get(reverse('api_service_request_detail', args=['node','100']))
+        response = self.client.get(reverse('api_service_request_detail', args=['node', '100']))
         self.assertEqual(response.status_code, 404)
 
     def test_get_service_requests(self):
@@ -303,8 +303,3 @@ class Open311Request(TestCase):
         RatingRequestListSerializer().data
         NodeRequestListSerializer().data
         NodeRequestDetailSerializer().data
-
-    def test_open311_UI(self):
-        """ ensure open311 UI can be reached"""
-        response = self.client.get(reverse('open311_demo:open311'))
-        self.assertEqual(response.status_code, 200)

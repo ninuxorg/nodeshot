@@ -90,11 +90,10 @@ service_definition_detail = ServiceDefinitionDetail.as_view()
 
 def create_output_data(data):
     # convert received geometry to Point
-    geom = fromstr(data['geometry']).centroid
+    geom = fromstr(str(data['geometry'])).centroid
     del data['geometry']
     data['long'] = geom[0]
     data['lat'] = geom[1]
-
     # get status from model and converts it into the mapped status type (open/closed)
     status_id = data['status']
     status = get_object_or_404(Status, pk=status_id)
@@ -108,14 +107,14 @@ def create_output_data(data):
                                        % status.slug)
         else:
             data['status'] = 'closed'
-
     return data
 
 
 class ServiceRequestList(generics.ListCreateAPIView):
     """
     ### GET
-    ###Retrieve list of service requests.
+
+    Retrieve list of service requests.
 
     Required parameters:
 
@@ -140,7 +139,7 @@ class ServiceRequestList(generics.ListCreateAPIView):
     model = Node
 
     def get_serializer(self, instance=None, data=None,
-                       files=None, many=False, partial=False):
+                       many=False, partial=False):
         """
         Return the serializer instance that should be used for validating and
         deserializing input, and for serializing output.
@@ -152,19 +151,17 @@ class ServiceRequestList(generics.ListCreateAPIView):
             'rate': RatingRequestListSerializer,
         }
         context = self.get_serializer_context()
-        service_code = context['request'].QUERY_PARAMS.get('service_code', 'node')
+        service_code = context['request'].query_params.get('service_code', 'node')
 
         if service_code not in serializers.keys():
             serializer_class = self.get_serializer_class()
         else:
             serializer_class = serializers[service_code]
 
-        return serializer_class(instance, data=data, files=files,
-                                many=many, partial=partial, context=context)
+        return serializer_class(instance, many=many, partial=partial, context=context)
 
     def get_custom_data(self):
-        """ additional request.DATA """
-
+        """ additional request.data """
         return {
             'user': self.request.user.id
         }
@@ -231,45 +228,11 @@ class ServiceRequestList(generics.ListCreateAPIView):
         if status is not None:
             q_list = [Q(status__slug__exact = s) for s in STATUSES[status]]
             self.queryset = self.queryset.filter(reduce(operator.or_, q_list))
-
-        # init right serializer
-        kwargs['service_code'] = service_code
-
         return self.list(request, *args, **kwargs)
 
-    def list(self, request, *args, **kwargs):
-        self.object_list = self.filter_queryset(self.get_queryset())
-        service_code = kwargs['service_code']
-
-        # Default is to allow empty querysets.  This can be altered by setting
-        # `.allow_empty = False`, to raise 404 errors on empty querysets.
-        if not self.allow_empty and not self.object_list:
-            class_name = self.__class__.__name__
-            error_msg = self.empty_error % {'class_name': class_name}
-            raise Http404(error_msg)
-
-        # Switch between paginated or standard style responses
-        page = self.paginate_queryset(self.object_list)
-
-        if page is not None:
-            serializer = self.get_pagination_serializer(page)
-        else:
-            serializer = self.get_serializer(self.object_list, many=True)
-
-        data = serializer.data
-
-        if service_code == 'node':
-            for item in data:
-                item = create_output_data(item)
-        else:
-            pass
-
-        return Response(data)
-
     def post(self, request, *args, **kwargs):
-        """ Post a service request ( requires authentication) """
-
-        service_code = request.POST['service_code']
+        """ Post a service request (requires authentication) """
+        service_code = request.data['service_code']
 
         if service_code not in SERVICES.keys():
             return Response({ 'detail': _('Service not found') }, status=404)
@@ -286,16 +249,16 @@ class ServiceRequestList(generics.ListCreateAPIView):
         kwargs['serializer'] = serializers[service_code]
 
         user=self.get_custom_data()
-        request.UPDATED = request.POST.copy()
+        request.UPDATED = request.data.copy()
         request.UPDATED['user'] = user['user']
         if service_code == 'node':
             for checkPOSTdata in ('layer','name','lat','long'):
                 # Check if mandatory parameters key exists
-                if checkPOSTdata not in request.POST.keys():
+                if checkPOSTdata not in request.data.keys():
                     return Response({ 'detail': _('Mandatory parameter not found') }, status=400)
                 else:
                     # Check if mandatory parameters values have been inserted
-                    if not request.POST[checkPOSTdata] :
+                    if not request.data[checkPOSTdata] :
                         return Response({ 'detail': _('Mandatory parameter not found') }, status=400)
             # Get layer id
             layer = Layer.objects.get(slug=request.UPDATED['layer'])
@@ -311,27 +274,25 @@ class ServiceRequestList(generics.ListCreateAPIView):
         return self.create(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-
-        serializer = kwargs['serializer']( data=request.UPDATED, files=request.FILES)
-        service_code= kwargs['service_code']
+        serializer = kwargs['serializer'](data=request.UPDATED)
+        service_code = kwargs['service_code']
         if serializer.is_valid():
-            self.pre_save(serializer.object)
-            self.object = serializer.save(force_insert=True)
-            self.post_save(self.object, created=True,
-                           files=request.FILES,
-                           service_code=service_code
-                           )
+            serializer.save()
+            self.object = serializer.instance
+            self.upload_images(serializer.instance, request.data, service_code)
             headers = self.get_success_headers(serializer.data)
             response_311 = service_code + '-' + str(self.object.id)
-            return Response(response_311, status=status.HTTP_201_CREATED,
+            return Response(response_311,
+                            status=status.HTTP_201_CREATED,
                             headers=headers)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def post_save(self,obj, created, files, service_code):
+    def upload_images(self, obj, files, service_code):
         if service_code == 'node' and files:
-            for file,image_file in files.iteritems():
+            for key, image_file in files.iteritems():
                 image=Image(node=obj, file=image_file)
+                image.full_clean()
                 image.save()
 
 service_request_list = ServiceRequestList.as_view()
@@ -339,8 +300,7 @@ service_request_list = ServiceRequestList.as_view()
 
 class ServiceRequestDetail(generics.RetrieveAPIView):
     """ Retrieve the details of a service request """
-
-    serializer_class= NodeRequestDetailSerializer
+    serializer_class = NodeRequestDetailSerializer
 
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
