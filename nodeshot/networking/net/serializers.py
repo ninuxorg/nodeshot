@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import pagination, serializers
 from rest_framework.reverse import reverse
 from rest_framework_gis import serializers as gis_serializers
+from nodeshot.core.base.serializers import ModelValidationSerializer
 
 from .models import *
 from .models.choices import INTERFACE_TYPES
@@ -17,8 +18,6 @@ __all__ = [
     'DeviceDetailSerializer',
     'DeviceAddSerializer',
     'NodeDeviceListSerializer',
-    'PaginatedDeviceSerializer',
-    'PaginatedNodeDeviceSerializer',
 
     'EthernetSerializer',
     'EthernetDetailSerializer',
@@ -51,12 +50,11 @@ __all__ = [
 # ------ DEVICES ------ #
 
 
-class DeviceListSerializer(gis_serializers.GeoModelSerializer):
+class DeviceListSerializer(ModelValidationSerializer):
     """ location geo serializer  """
-
-    node = serializers.Field(source='node.slug')
-    type = serializers.WritableField(source='get_type_display', label=_('type'))
-    status = serializers.Field(source='get_status_display')
+    node = serializers.ReadOnlyField(source='node.slug')
+    type = serializers.ReadOnlyField(source='get_type_display', label=_('type'))
+    status = serializers.ReadOnlyField(source='get_status_display')
     details = serializers.HyperlinkedIdentityField(view_name='api_device_details')
 
     class Meta:
@@ -69,30 +67,33 @@ class DeviceListSerializer(gis_serializers.GeoModelSerializer):
             'added', 'updated', 'details'
         ]
         read_only_fields = [
-            'first_seen', 'last_seen',
+            'first_seen', 'last_seen', 'routing_protocols',
             'added', 'updated'
         ]
 
 
 class DeviceDetailSerializer(DeviceListSerializer):
+    access_level = serializers.ReadOnlyField(source='get_access_level_display')
+    routing_protocols = serializers.PrimaryKeyRelatedField(many=True,
+                                                           read_only=True)
+    routing_protocols_named = serializers.SlugRelatedField(source='routing_protocols',
+                                                           slug_field='name',
+                                                           many=True,
+                                                           read_only=True)
 
-    access_level = serializers.Field(source='get_access_level_display')
-
-    routing_protocols_named = serializers.RelatedField(source='routing_protocols', many=True)
-
-    ethernet = serializers.SerializerMethodField('get_ethernet_interfaces')
+    ethernet = serializers.SerializerMethodField()
     ethernet_url = serializers.HyperlinkedIdentityField(view_name='api_device_ethernet')
 
-    wireless = serializers.SerializerMethodField('get_wireless_interfaces')
+    wireless = serializers.SerializerMethodField()
     wireless_url = serializers.HyperlinkedIdentityField(view_name='api_device_wireless')
 
-    bridge = serializers.SerializerMethodField('get_bridge_interfaces')
+    bridge = serializers.SerializerMethodField()
     bridge_url = serializers.HyperlinkedIdentityField(view_name='api_device_bridge')
 
-    tunnel = serializers.SerializerMethodField('get_tunnel_interfaces')
+    tunnel = serializers.SerializerMethodField()
     tunnel_url = serializers.HyperlinkedIdentityField(view_name='api_device_tunnel')
 
-    vlan = serializers.SerializerMethodField('get_vlan_interfaces')
+    vlan = serializers.SerializerMethodField()
     vlan_url = serializers.HyperlinkedIdentityField(view_name='api_device_vlan')
 
     data = HStoreField(
@@ -101,27 +102,27 @@ class DeviceDetailSerializer(DeviceListSerializer):
         help_text=_('store extra attributes in JSON string')
     )
 
-    def get_ethernet_interfaces(self, obj):
+    def get_ethernet(self, obj):
         user = self.context['request'].user
         interfaces = Ethernet.objects.filter(device=obj.id).accessible_to(user)
         return EthernetSerializer(interfaces, many=True, context=self.context).data
 
-    def get_wireless_interfaces(self, obj):
+    def get_wireless(self, obj):
         user = self.context['request'].user
         interfaces = Wireless.objects.filter(device=obj.id).accessible_to(user)
         return WirelessSerializer(interfaces, many=True, context=self.context).data
 
-    def get_bridge_interfaces(self, obj):
+    def get_bridge(self, obj):
         user = self.context['request'].user
         interfaces = Bridge.objects.filter(device=obj.id).accessible_to(user)
         return BridgeSerializer(interfaces, many=True, context=self.context).data
 
-    def get_tunnel_interfaces(self, obj):
+    def get_tunnel(self, obj):
         user = self.context['request'].user
         interfaces = Tunnel.objects.filter(device=obj.id).accessible_to(user)
         return TunnelSerializer(interfaces, many=True, context=self.context).data
 
-    def get_vlan_interfaces(self, obj):
+    def get_vlan(self, obj):
         user = self.context['request'].user
         interfaces = Vlan.objects.filter(device=obj.id).accessible_to(user)
         return VlanSerializer(interfaces, many=True, context=self.context).data
@@ -147,7 +148,7 @@ class DeviceDetailSerializer(DeviceListSerializer):
 
         fields = primary_fields + secondary_fields
         read_only_fields = [
-            'added', 'updated',
+            'added', 'updated', 'routing_protocols',
             'first_seen', 'last_seen',
         ]
 
@@ -161,34 +162,21 @@ class NodeDeviceListSerializer(DeviceDetailSerializer):
 
 class DeviceAddSerializer(NodeDeviceListSerializer):
     """ Serializer for Device Creation """
-    node = serializers.WritableField(source='node_id')
-    type = serializers.WritableField(source='type')
+    node = serializers.Field(source='node_id')
+    type = serializers.Field(source='type')
     details = serializers.HyperlinkedIdentityField(view_name='api_device_details')
-
-
-class PaginatedDeviceSerializer(pagination.PaginationSerializer):
-    class Meta:
-        object_serializer_class = DeviceListSerializer
-
-
-class PaginatedNodeDeviceSerializer(pagination.PaginationSerializer):
-    class Meta:
-        object_serializer_class = NodeDeviceListSerializer
 
 
 # ------ INTERFACES ------ #
 
 
-class InterfaceSerializer(serializers.ModelSerializer):
+class InterfaceSerializer(ModelValidationSerializer):
     """ Base Interface Serializer Class """
-    access_level = serializers.Field(source='get_access_level_display')
+    access_level = serializers.ReadOnlyField(source='get_access_level_display')
     mac = MacAddressField(label=_('mac address'))
-    type = serializers.Field(source='get_type_display', label=_('type'))
+    type = serializers.ReadOnlyField(source='get_type_display', label=_('type'))
 
-    tx_rate = serializers.Field()
-    rx_rate = serializers.Field()
-
-    ip = serializers.SerializerMethodField('get_ip_addresses')
+    ip = serializers.SerializerMethodField()
     ip_url = serializers.HyperlinkedIdentityField(view_name='api_interface_ip')
 
     data = HStoreField(
@@ -197,7 +185,7 @@ class InterfaceSerializer(serializers.ModelSerializer):
         help_text=_('store extra attributes in JSON string')
     )
 
-    def get_ip_addresses(self, obj):
+    def get_ip(self, obj):
         user = self.context['request'].user
         interfaces = Ip.objects.filter(interface=obj.id).accessible_to(user)
         return IpSerializer(interfaces, many=True, context=self.context).data
@@ -272,9 +260,8 @@ class WirelessAddSerializer(WirelessSerializer):
 #from .models.interfaces.bridge import validate_bridged_interfaces
 
 class BridgeSerializer(InterfaceSerializer):
-
-    interfaces = serializers.PrimaryKeyRelatedField(many=True, required=True)
-    interfaces_links = serializers.SerializerMethodField('get_interfaces_links')
+    interfaces = serializers.PrimaryKeyRelatedField(many=True, required=True, queryset=Interface.objects.all())
+    interfaces_links = serializers.SerializerMethodField()
 
     def get_interfaces_links(self, obj):
         user = self.context['request'].user
@@ -296,48 +283,49 @@ class BridgeSerializer(InterfaceSerializer):
 
         return links
 
-    def validate(self, attrs):
-        """ perform many2many validation """
-        interfaces = attrs.get('interfaces', [])
-        created = False
-
-        # redundant but necessary
-        if(len(interfaces) < 2 and not self.partial) or \
-          (self.partial and 'interfaces' in attrs and len(interfaces) < 2):  # this line adds support for partial udpates with PATCH method
-            raise ValidationError(_(u'You must bridge at least 2 interfaces'))
-
-        # when creating a new interface self.object is None
-        if not self.object:
-            created = True
-            self.object = Bridge(
-                device_id=attrs['device'].id,
-                name=attrs['name'],
-                mac=attrs['mac']
-            )
-            self.object.full_clean()
-            self.object.save()
-
-        # validate many2many
-        #try:
-        #    validate_bridged_interfaces(
-        #        sender=self.object.interfaces,
-        #        instance=self.object,
-        #        action="pre_add",
-        #        reverse=False,
-        #        model=self.object.interfaces.model,
-        #        pk_set=[interface.id for interface in interfaces]
-        #    )
-        #except ValidationError as e:
-        #    # delete object first if validation error raised and then raise again
-        #    if created:
-        #        self.object.delete()
-        #    raise ValidationError(e.messages[0])
-
-        # delete any created object that was needed for validation only
-        if created:
-            self.object.delete()
-
-        return attrs
+    # def validate(self, attrs):
+    #     """ perform many2many validation """
+    #     interfaces = attrs.get('interfaces', [])
+    #     created = False
+    #
+    #     # redundant but necessary
+    #     if(len(interfaces) < 2 and not self.partial) or \
+    #       (self.partial and 'interfaces' in attrs and len(interfaces) < 2):  # this line adds support for partial udpates with PATCH method
+    #         raise ValidationError(_(u'You must bridge at least 2 interfaces'))
+    #
+    #     # when creating a new interface self.object is None
+    #     if not self.instance:
+    #         attrs['device'] = self.context['view'].device
+    #         created = True
+    #         self.instance = Bridge(
+    #             device_id=attrs['device'].id,
+    #             name=attrs['name'],
+    #             mac=attrs['mac']
+    #         )
+    #         self.instance.full_clean()
+    #         self.instance.save()
+    #
+    #     # validate many2many
+    #     #try:
+    #     #    validate_bridged_interfaces(
+    #     #        sender=self.object.interfaces,
+    #     #        instance=self.object,
+    #     #        action="pre_add",
+    #     #        reverse=False,
+    #     #        model=self.object.interfaces.model,
+    #     #        pk_set=[interface.id for interface in interfaces]
+    #     #    )
+    #     #except ValidationError as e:
+    #     #    # delete object first if validation error raised and then raise again
+    #     #    if created:
+    #     #        self.object.delete()
+    #     #    raise ValidationError(e.messages[0])
+    #
+    #     # delete any created object that was needed for validation only
+    #     if created:
+    #         self.instance.delete()
+    #
+    #     return attrs
 
     class Meta:
         model = Bridge
@@ -410,7 +398,7 @@ class VlanAddSerializer(VlanSerializer):
 # ------ IP ADDRESS ------ #
 
 
-class IpSerializer(serializers.ModelSerializer):
+class IpSerializer(ModelValidationSerializer):
     address = IPAddressField()
     netmask = IPNetworkField()
 
