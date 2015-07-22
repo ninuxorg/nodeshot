@@ -13,14 +13,3 @@ __all__ = [
     'Inward',
     'Outward',
 ]
-
-
-# ------ Add relationship to ExtensibleNodeSerializer ------ #
-
-from nodeshot.core.nodes.serializers import ExtensibleNodeSerializer
-
-ExtensibleNodeSerializer.add_relationship(**{
-    'name': 'contact',
-    'view_name': 'api_node_contact',
-    'lookup_field': 'slug'
-})
