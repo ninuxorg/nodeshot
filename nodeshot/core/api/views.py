@@ -20,7 +20,6 @@ def root_endpoint(request, format=None):
             is_urlconf_module = True
         else:
             is_urlconf_module = False
-            
         # if url is really a urlmodule
         if is_urlconf_module:
             # loop over urls of that module
@@ -38,5 +37,4 @@ def root_endpoint(request, format=None):
                 # urls of object details will fail silently (eg: /nodes/<slug>/)
                 except NoReverseMatch:
                     pass
-
     return Response(endpoints)

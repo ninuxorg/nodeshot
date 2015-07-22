@@ -31,7 +31,7 @@ drf-extensions==0.2.7
 django-rest-swagger
 markdown
 djangorestframework-gis==0.9.3
-djangorestframework-hstore==1.2
+djangorestframework-hstore==1.3
 geojson-elevation==0.1
 
 # authentication with social networks
@@ -46,9 +46,6 @@ django-celery-email
 
 # django-cors-headers
 django-cors-headers==1.1.0
-
-# websockets
-tornado
 
 # cache
 django-redis

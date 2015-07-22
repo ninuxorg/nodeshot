@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import requests
 from xml.dom import minidom
-from dateutil import parser as DateParser
+from dateutil import parser
 
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -381,11 +381,11 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
 
         # convert dates to python datetime
         try:
-            item['added'] = DateParser.parse(item['added'])
+            item['added'] = parser.parse(item['added'])
         except Exception as e:
             print "Exception while parsing 'added' date: %s" % e
         try:
-            item['updated'] = DateParser.parse(item['updated'])
+            item['updated'] = parser.parse(item['updated'])
         except Exception as e:
             print "Exception while parsing 'updated' date: %s" % e
 

@@ -118,7 +118,6 @@ INSTALLED_APPS = [
     'nodeshot.core.layers',
     'nodeshot.core.nodes',
     'nodeshot.core.cms',
-    'nodeshot.core.websockets',
     'nodeshot.interop.sync',
     'nodeshot.ui.default',
     'nodeshot.community.mailing',
@@ -126,11 +125,9 @@ INSTALLED_APPS = [
     'nodeshot.community.notifications',
     'nodeshot.networking.net',
     'nodeshot.networking.links',
-    'nodeshot.networking.services',
     'nodeshot.networking.hardware',
     'nodeshot.networking.connectors',
     'nodeshot.interop.open311',
-    'nodeshot.ui.open311_demo',
     # admin site
     'grappelli.dashboard',
     'grappelli',
@@ -138,6 +135,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     # 3d parthy django apps
     'rest_framework',
+    'rest_framework_gis',
     'rest_framework_swagger',
     'netfields',
     'leaflet',
@@ -154,7 +152,10 @@ if 'test' not in sys.argv:
         'django_extensions',
     ]
 
-AUTH_USER_MODEL = 'profiles.Profile'
+if 'nodeshot.community.profiles' in INSTALLED_APPS:
+    AUTH_USER_MODEL = 'profiles.Profile'
+else:
+    AUTH_USER_MODEL = 'auth.User'
 
 if SENTRY_ENABLED:
     INSTALLED_APPS.append('raven.contrib.django.raven_compat')
@@ -334,13 +335,6 @@ if 'grappelli' in INSTALLED_APPS:
     GRAPPELLI_ADMIN_TITLE = '{0} Admin'.format(SITE_NAME)
     GRAPPELLI_INDEX_DASHBOARD = 'nodeshot.dashboard.NodeshotDashboard'
 
-# ------ DEBUG TOOLBAR ------ #
-
-INTERNAL_IPS = ('127.0.0.1', '::1',)  # ip addresses where you want to show the debug toolbar here
-DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False,
-}
-
 # ------ UNIT TESTING SPEED UP ------ #
 
 if 'test' in sys.argv:
@@ -360,20 +354,15 @@ if 'social.apps.django_app.default' in INSTALLED_APPS:
     if 'test' not in sys.argv:
         MIDDLEWARE_CLASSES += ('social.apps.django_app.middleware.SocialAuthExceptionMiddleware',)
 
-    # In Django 1.6, the default session serliazer has been switched to one based on JSON,
-    # rather than pickles, to improve security. Django-openid-auth does not support this
-    # because it attemps to store content that is not JSON serializable in sessions.
-    # See https://docs.djangoproject.com/en/dev/releases/1.6/#default-session-serialization-switched-to-json
-    # for details on the Django 1.6 change.
-    SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
-        'nodeshot.community.profiles.backends.EmailBackend',
         'social.backends.facebook.FacebookOAuth2',
         'social.backends.github.GithubOAuth2',
         'social.backends.google.GoogleOAuth2',
-    )
+    ]
+
+    if 'nodeshot.community.profiles' in INSTALLED_APPS:
+        AUTHENTICATION_BACKENDS.insert(1, 'nodeshot.community.profiles.backends.EmailBackend')
 
     SOCIAL_AUTH_PIPELINE = (
         'social.pipeline.social_auth.social_details',

@@ -113,12 +113,12 @@ class Command(BaseCommand):
                 continue
 
             # retrieve class
-            Synchronizer = import_by_path(synchronizer_path)
-            self.stdout.write('imported module %s\r\n' % Synchronizer.__name__)
+            synchronizer = import_by_path(synchronizer_path)
+            self.stdout.write('imported module %s\r\n' % synchronizer.__name__)
 
             # try running
             try:
-                instance = Synchronizer(layer, verbosity=self.verbosity)
+                instance = synchronizer(layer, verbosity=self.verbosity)
                 self.stdout.write('Processing layer "%s"\r\n' % layer.slug)
                 messages = instance.sync()
             except ImproperlyConfigured, e:
