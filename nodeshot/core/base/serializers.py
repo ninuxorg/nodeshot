@@ -1,68 +1,23 @@
 from django.core.urlresolvers import NoReverseMatch
 
 from rest_framework import serializers
-from rest_framework.fields import Field
 from rest_framework.reverse import reverse
+from rest_framework.response import Response
 
 
-class ExtraFieldSerializerOptions(serializers.ModelSerializerOptions):
-    """
-    Meta class options for ExtraFieldSerializerOptions
-    """
-    def __init__(self, meta):
-        super(ExtraFieldSerializerOptions, self).__init__(meta)
-        self.non_native_fields = getattr(meta, 'non_native_fields', ())
-
-
-# TODO: rename / remove
-class ExtraFieldSerializer(serializers.ModelSerializer):
-    """
-    ModelSerializer in which non native extra fields can be specified.
-    """
-
-    _options_class = ExtraFieldSerializerOptions
-
-    def restore_object(self, attrs, instance=None):
-        """
-        Deserialize a dictionary of attributes into an object instance.
-        You should override this method to control how deserialized objects
-        are instantiated.
-        """
-        for field in self.opts.non_native_fields:
-            attrs.pop(field)
-
-        return super(ExtraFieldSerializer, self).restore_object(attrs, instance)
-
-    def to_native(self, obj):
-        """
-        Serialize objects -> primitives.
-        """
-        ret = self._dict_class()
-        ret.fields = self._dict_class()
-
-        for field_name, field in self.fields.items():
-            if field.read_only and obj is None:
-                continue
-            field.initialize(parent=self, field_name=field_name)
-            key = self.get_field_key(field_name)
-
-            # skips to next iteration but permits to show the field in API browser
-            try:
-                value = field.field_to_native(obj, field_name)
-            except AttributeError as e:
-                if field_name in self.opts.non_native_fields:
-                    continue
-                else:
-                    raise AttributeError(e.message)
-
-            method = getattr(self, 'transform_%s' % field_name, None)
-            if callable(method):
-                value = method(obj, value)
-            if not getattr(field, 'write_only', False):
-                ret[key] = value
-            ret.fields[key] = self.augment_field(field, field_name, key, value)
-
-        return ret
+class ModelValidationSerializer(serializers.ModelSerializer):
+    """ calls clean method of model automatically """
+    def validate(self, data):
+        # if instance hasn't been created yet
+        if not self.instance:
+            instance = self.Meta.model(**data)
+            instance.clean()
+        # if modifying an existing instance
+        else:
+            for key, value in data.items():
+                setattr(self.instance, key, value)
+            self.instance.clean()
+        return data
 
 
 class DynamicRelationshipsMixin(object):
@@ -153,7 +108,6 @@ class DynamicRelationshipsMixin(object):
         request = self.context['request']
         format = self.context['format']
         relationships = {}
-
         # loop over private _relationship attribute
         for key, options in self._relationships.iteritems():
             # if relationship is a link
@@ -181,91 +135,18 @@ class DynamicRelationshipsMixin(object):
         return relationships
 
 
-class HyperlinkedField(Field):
+class HyperlinkedField(serializers.RelatedField):
     """
-    Represents the instance, or a property on the instance, using hyperlinking.
+    shortcut for reversing urls in serializers
     """
-    read_only = True
-
-    def __init__(self, *args, **kwargs):
-        self.view_name = kwargs.pop('view_name', None)
-        # Optionally the format of the target hyperlink may be specified
-        self.format = kwargs.pop('format', None)
-        # Optionally specify arguments
-        self.view_args = kwargs.pop('view_args', None)
-
+    def __init__(self, view_name, *args, **kwargs):
+        kwargs['read_only'] = True
+        kwargs['source'] = '*'
+        self.view_name = view_name
         super(HyperlinkedField, self).__init__(*args, **kwargs)
 
-    def field_to_native(self, obj, field_name):
-        request = self.context.get('request', None)
-        format = self.context.get('format', None)
-        view_name = self.view_name
-
-        # By default use whatever format is given for the current context
-        # unless the target is a different type to the source.
-        if format and self.format and self.format != format:
-            format = self.format
-
-        try:
-            return reverse(view_name, args=self.view_args, request=request, format=format)
-        except NoReverseMatch:
-            pass
-
-        raise Exception('Could not resolve URL for field using view name "%s"' % view_name)
-
-
-class GeoJSONDefaultObjectSerializer(serializers.Field):
-    """
-    If no object serializer is specified, then this serializer will be applied
-    as the default.
-    """
-
-    def __init__(self, source=None, context=None):
-        # Note: Swallow context kwarg - only required for eg. ModelSerializer.
-        super(GeoJSONDefaultObjectSerializer, self).__init__(source=source)
-
-
-class GeoJSONPaginationSerializerOptions(serializers.SerializerOptions):
-    """
-    An object that stores the options that may be provided to a
-    pagination serializer by using the inner `Meta` class.
-
-    Accessible on the instance as `serializer.opts`.
-    """
-    def __init__(self, meta):
-        super(GeoJSONPaginationSerializerOptions, self).__init__(meta)
-        self.object_serializer_class = getattr(meta, 'object_serializer_class',
-                                               GeoJSONDefaultObjectSerializer)
-
-
-class GeoJSONBasePaginationSerializer(serializers.Serializer):
-    """
-    A custom class for geojson serializers.
-    """
-    _options_class = GeoJSONPaginationSerializerOptions
-    results_field = 'features'
-
-    def __init__(self, *args, **kwargs):
-        """
-        Override init to add in the object serializer field on-the-fly.
-        """
-        super(GeoJSONBasePaginationSerializer, self).__init__(*args, **kwargs)
-        results_field = self.results_field
-        object_serializer = self.opts.object_serializer_class
-        if 'context' in kwargs:
-            context_kwarg = {'context': kwargs['context']}
-        else:
-            context_kwarg = {}
-
-        self.fields[results_field] = object_serializer(source='object_list', **context_kwarg)
-
-
-class GeoJSONPaginationSerializer(GeoJSONBasePaginationSerializer):
-    """
-    A geoJSON implementation of a pagination serializer.
-    """
-    type = serializers.SerializerMethodField('get_type')
-
-    def get_type(self, obj):
-        """ returns FeatureCollection type for geojson """
-        return "FeatureCollection"
+    def to_representation(self, value):
+        return reverse(self.view_name,
+                       args=self.context['view'].kwargs,
+                       request=self.context['request'],
+                       format=self.context['format'])
