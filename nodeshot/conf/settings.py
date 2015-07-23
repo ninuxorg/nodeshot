@@ -47,12 +47,9 @@ elif SUBDIR and SUBDIR.endswith('/'):
 SITE_URL = '%s://%s%s%s' % (PROTOCOL, settings.DOMAIN, PORT_STRING, SUBDIR)
 SITE_NAME = getattr(settings, 'SITE_NAME', 'Nodeshot')
 
-MEDIA_ROOT = '%s/media/' % settings.SITE_ROOT
-
+MEDIA_ROOT = os.path.join(settings.SITE_ROOT, 'media/')
+STATIC_ROOT = os.path.join(settings.SITE_ROOT, 'static/')
 MEDIA_URL = '/media/'
-
-STATIC_ROOT = '%s/static/' % settings.SITE_ROOT
-
 STATIC_URL = '/static/'
 
 ALLOWED_HOSTS = ['*']

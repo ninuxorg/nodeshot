@@ -2,10 +2,6 @@ from django.conf.urls import patterns, include, url
 from django.conf import settings
 from django.contrib import admin
 
-from filebrowser.sites import site
-
-from nodeshot.community.profiles.settings import EMAIL_CONFIRMATION
-
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -19,6 +15,7 @@ if 'smuggler' in settings.INSTALLED_APPS:
     ) + urlpatterns
 
 if 'filebrowser' in settings.INSTALLED_APPS:
+    from filebrowser.sites import site
     urlpatterns += patterns('',
         url(r'^admin/filebrowser/', include(site.urls)),
     )
@@ -35,10 +32,10 @@ if 'nodeshot.interop.sync' in settings.INSTALLED_APPS:
     )
 
 if settings.SERVE_STATIC:
-    urlpatterns += patterns('django.contrib.staticfiles.views',
-        url(r'^static/(?P<path>.*)$', 'serve'),
-        url(r'^media/(?P<path>.*)$', 'serve'),
-    )
+    from django.conf.urls.static import static
+    urlpatterns += patterns(url(r'^static/(?P<path>.*)$',
+                            'django.contrib.staticfiles.views.serve'))
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if 'social.apps.django_app.default' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
@@ -62,14 +59,15 @@ if 'nodeshot.community.profiles' in settings.INSTALLED_APPS:
             name='account_password_reset_from_key'),
     )
 
-if 'nodeshot.community.profiles' in settings.INSTALLED_APPS and EMAIL_CONFIRMATION:
-    urlpatterns += patterns('',
-        url(r'^confirm_email/(\w+)/$',
-            'nodeshot.community.profiles.html_views.confirm_email',
-            name='emailconfirmation_confirm_email'),
-    )
+    from nodeshot.community.profiles.settings import EMAIL_CONFIRMATION
 
-# include 'nodeshot.core.api.urls'
+    if EMAIL_CONFIRMATION:
+        urlpatterns += patterns('',
+            url(r'^confirm_email/(\w+)/$',
+                'nodeshot.community.profiles.html_views.confirm_email',
+                name='emailconfirmation_confirm_email'),
+        )
+
 if 'nodeshot.core.api' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         url(r'', include('nodeshot.core.api.urls')),
