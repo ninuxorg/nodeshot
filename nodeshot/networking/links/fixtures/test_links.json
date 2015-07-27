@@ -18,6 +18,7 @@
                 "node_b_slug": "potenziale-viterbo",
                 "interface_a_mac": "00:27:22:00:50:71"
             },
+            "layer": 1,
             "max_rate": null,
             "interface_b": 3,
             "interface_a": 2,
