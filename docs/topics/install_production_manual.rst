@@ -53,13 +53,13 @@ First of all, update your apt cache::
 
     sudo apt-get update --fix-missing
 
-Install development packages::
+Install dependencies::
 
-    sudo apt-get install python-software-properties software-properties-common build-essential libxml2-dev python-setuptools python-virtualenv python-dev binutils libjson0-dev libjpeg-dev libffi-dev wget git
+    sudo apt-get install python-software-properties software-properties-common build-essential libxml2-dev python-setuptools python-virtualenv python-dev binutils libjson0-dev libjpeg-dev libffi-dev libpq-dev
 
 Install postgresql, postgis and geospatial libraries::
 
-    sudo apt-get install postgis* libproj-dev gdal-bin libpq-dev libgdal1-dev python-gdal
+    sudo apt-get install postgis* libproj-dev gdal-bin libgdal1-dev python-gdal
 
 .. _create-database:
 
