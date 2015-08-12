@@ -96,7 +96,7 @@ class LoginSerializer(serializers.Serializer):
             else:
                 raise serializers.ValidationError(_("This account is currently inactive."))
         else:
-            error = _("Ivalid login credentials.")
+            error = _("Invalid login credentials.")
             raise serializers.ValidationError(error)
         return attrs
 
