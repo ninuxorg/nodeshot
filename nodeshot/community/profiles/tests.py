@@ -376,7 +376,7 @@ class TestProfiles(TestCase):
 
         # POST 400 invalid credentials
         response = self.client.post(url, {"username": "wrong", "password": "wrong"})
-        self.assertContains(response, 'Ivalid login credentials', status_code=400)
+        self.assertContains(response, 'Invalid login credentials', status_code=400)
 
         # POST 400 missing credentials
         response = self.client.post(url)
