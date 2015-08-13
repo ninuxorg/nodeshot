@@ -4,11 +4,11 @@ from .models import Inward
 
 
 __all__ = [
-    'InwardMessageSerializer',
+    'InwardSerializer',
 ]
 
 
-class InwardMessageSerializer(serializers.ModelSerializer):
+class InwardSerializer(serializers.ModelSerializer):
     """ status icons """
     
     class Meta:

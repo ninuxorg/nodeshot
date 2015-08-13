@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from nodeshot.core.nodes.models import Node
 
 from .models import Inward
+from .serializers import InwardSerializer
 from .settings import settings, INWARD_REQUIRE_AUTH
 
 
