@@ -16,11 +16,12 @@ def get_db():
     )
 
 
-def query(query, params={}, expected_response_code=200, database=None):
+def query(query, params={}, epoch=None,
+          expected_response_code=200, database=None):
     """Wrapper around ``InfluxDBClient.query()``."""
     db = get_db()
     database = database or settings.INFLUXDB_DATABASE
-    return db.query(query, params, expected_response_code, database=database)
+    return db.query(query, params, epoch, expected_response_code, database=database)
 
 
 def write_async(name, values, tags={}, timestamp=None, database=None):
@@ -42,10 +43,8 @@ def write(name, values, tags={}, timestamp=None, database=None):
     if timestamp:
         point['time'] = timestamp
     try:
-        get_db().write({
-            'database': database or settings.INFLUXDB_DATABASE,
-            'points': [point]
-        })
+        get_db().write({'points': [point]},
+                       {'db': database or settings.INFLUXDB_DATABASE})
     except Exception, e:
         if settings.INFLUXDB_FAIL_SILENTLY:
             pass

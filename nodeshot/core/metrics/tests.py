@@ -168,11 +168,11 @@ class TestMetrics(TestCase):
         sleep(0.25)
         self.assertEqual(list(metric.select().get_points())[-1]['value'], 4)
         # post multipart/form-data (float)
-        response = self.client.post(url, {'value': 5.0})
+        response = self.client.post(url, {'value_float': 5.0})
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.data, {'detail': 'ok'})
         sleep(0.25)
-        self.assertEqual(list(metric.select().get_points())[-1]['value'], 5.0)
+        self.assertEqual(list(metric.select().get_points())[-1]['value_float'], 5.0)
 
     def test_add_admin(self):
         self.client.login(username='admin', password='tester')
