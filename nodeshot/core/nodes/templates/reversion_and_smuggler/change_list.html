@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load i18n %}
+{% load i18n admin_urls %}
 
 {% block object-tools-items %}
     {% if user.is_superuser %}
@@ -13,7 +13,7 @@
         </li>
     {% endif %}
     {% if not is_popup and has_add_permission and has_change_permission %}
-        <li><a href="recover" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
+        <li><a href="{% url opts|admin_urlname:'recoverlist' %}" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
     {% endif %}
     <li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="grp-add-link grp-state-focus">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
 {% endblock %}
