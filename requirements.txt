@@ -19,9 +19,8 @@ jsonfield
 netdiff==0.4.3
 
 # better admin
-django-filebrowser==3.5.7
-# waiting for https://github.com/sehmaschine/django-filebrowser/issues/273 to be fixed
-#django-grappelli==2.6.5
+django-grappelli==2.7.1
+django-filebrowser==3.6.1
 django-leaflet==0.16.0
 django-hstore==1.4
 
