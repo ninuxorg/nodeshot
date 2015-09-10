@@ -75,7 +75,7 @@ class Topology(BaseDate):
             links.append(OrderedDict((
                 ('source', source),
                 ('target', destination),
-                ('weight', link.metric_value)
+                ('cost', link.metric_value)
             )))
 
         return OrderedDict((
@@ -109,7 +109,7 @@ class Topology(BaseDate):
                 try:
                     link = Link.get_or_create(source=link_dict['source'],
                                               target=link_dict['target'],
-                                              weight=link_dict['weight'],
+                                              cost=link_dict['cost'],
                                               topology=self)
                 except (LinkDataNotFound, ValidationError) as e:
                     msg = 'Exception while updating {0}'.format(self.__repr__())
@@ -117,4 +117,4 @@ class Topology(BaseDate):
                     print('{0}\n{1}\n'.format(msg, e))
                     continue
                 link.ensure(status=status[section],
-                            weight=link_dict['weight'])
+                            cost=link_dict['cost'])

@@ -63,7 +63,7 @@ class TopologyTest(TestCase):
                 OrderedDict((
                     ('source', '172.16.40.2'),
                     ('target', '172.16.40.4'),
-                    ('weight', 1.01)
+                    ('cost', 1.01)
                 ))
             ]
         })

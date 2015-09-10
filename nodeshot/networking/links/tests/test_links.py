@@ -158,13 +158,13 @@ class LinkTest(TestCase):
         Link.objects.delete()
         self.assertEqual(Link.objects.count(), 0)
         # create link
-        link = Link.get_or_create(source='172.16.41.42', target='172.16.40.22', weight=1.1)
+        link = Link.get_or_create(source='172.16.41.42', target='172.16.40.22', cost=1.1)
         self.assertIsInstance(link, Link)
         self.assertEqual(Link.objects.count(), 1)
         self.assertEqual(link.status, LINK_STATUS['active'])
         self.assertEqual(link.metric_value, 1.1)
         # second time does not create
-        link2 = Link.get_or_create(source='172.16.41.42', target='172.16.40.22', weight=1.1)
+        link2 = Link.get_or_create(source='172.16.41.42', target='172.16.40.22', cost=1.1)
         # ensure same object
         self.assertEqual(link.pk, link2.pk)
         self.assertEqual(Link.objects.count(), 1)
@@ -177,7 +177,7 @@ class LinkTest(TestCase):
         # create link
         link = Link.get_or_create(source='172.16.41.42',
                                   target='172.16.40.22',
-                                  weight=1.1,
+                                  cost=1.1,
                                   topology=t)
         self.assertIsInstance(link, Link)
         self.assertEqual(Link.objects.count(), 1)
@@ -187,7 +187,7 @@ class LinkTest(TestCase):
         # second time does not create
         link2 = Link.get_or_create(source='172.16.41.42',
                                    target='172.16.40.22',
-                                   weight=1.1,
+                                   cost=1.1,
                                    topology=t)
         # ensure same object
         self.assertEqual(link.pk, link2.pk)

@@ -219,7 +219,7 @@ class Link(BaseAccessLevel):
                 return None
 
     @classmethod
-    def get_or_create(cls, source, target, weight, topology=None):
+    def get_or_create(cls, source, target, cost, topology=None):
         """
         Tries to find a link with get_link, creates a new link if link not found.
         """
@@ -231,7 +231,7 @@ class Link(BaseAccessLevel):
         link = Link(interface_a=e.interface_a,
                     interface_b=e.interface_b,
                     status=LINK_STATUS['active'],
-                    metric_value=weight,
+                    metric_value=cost,
                     topology=topology)
         link.full_clean()
         link.save()
@@ -277,7 +277,7 @@ class Link(BaseAccessLevel):
         # PLACEHOLDER
         return 6
 
-    def ensure(self, status, weight):
+    def ensure(self, status, cost):
         """
         ensure link properties correspond to the specified ones
         perform save operation only if necessary
@@ -287,8 +287,8 @@ class Link(BaseAccessLevel):
         if self.status != status_id:
             self.status = status_id
             changed = True
-        if self.metric_value != weight:
-            self.metric_value = weight
+        if self.metric_value != cost:
+            self.metric_value = cost
             changed = True
         if changed:
             self.save()
