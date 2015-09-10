@@ -16,7 +16,7 @@ class ACLMixin(object):
 
         Model must implement AccessLevelManager!
         """
-        return self.queryset.accessible_to(user=self.request.user)
+        return self.queryset.all().accessible_to(user=self.request.user)
 
 
 class RevisionUpdate(object):

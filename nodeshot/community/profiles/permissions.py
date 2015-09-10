@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import permissions
 from .models import Profile
 
@@ -12,6 +13,8 @@ class IsProfileOwner(permissions.IsAuthenticated):
     """
     Restrict edit to owners only
     """
+    message = _("Operation not allowed for insufficient permissions")
+
     def has_object_permission(self, request, view, obj=None):
         # in edit request restrict permission to profile owner only
         if (request.method in ['PUT', 'PATCH']) and obj is not None:
@@ -40,6 +43,8 @@ class IsNotAuthenticated(permissions.IsAuthenticated):
     """
     Restrict access only to unauthenticated users.
     """
+    message = _("You must not be authenticated to perform this operation")
+
     def has_permission(self, request, view, obj=None):
         if request.user and request.user.is_authenticated():
             return False

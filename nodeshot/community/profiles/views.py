@@ -225,9 +225,6 @@ class AccountLogin(generics.GenericAPIView):
             })
         return Response(serializer.errors, status=400)
 
-    def permission_denied(self, request):
-        raise exceptions.PermissionDenied(_("You are already authenticated"))
-
 account_login = AccountLogin.as_view()
 
 
@@ -317,9 +314,6 @@ class PasswordResetRequestKey(generics.GenericAPIView):
         # in case of errors
         return Response(serializer.errors, status=400)
 
-    def permission_denied(self, request):
-        raise exceptions.PermissionDenied(_("You can't reset your password if you are already authenticated"))
-
 account_password_reset_request_key = PasswordResetRequestKey.as_view()
 
 
@@ -357,9 +351,6 @@ class PasswordResetFromKey(generics.GenericAPIView):
             return Response({'detail': _(u'Password successfully changed.')})
         # in case of errors
         return Response(serializer.errors, status=400)
-
-    def permission_denied(self, request):
-        raise exceptions.PermissionDenied(_("You can't reset your password if you are already authenticated"))
 
 account_password_reset_from_key = PasswordResetFromKey.as_view()
 
