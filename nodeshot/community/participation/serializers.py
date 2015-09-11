@@ -39,7 +39,7 @@ class CommentSerializer(AutoNodeMixin, ModelValidationSerializer):
 
 class CommentRelationSerializer(serializers.ModelSerializer):
     """ display user info """
-    user = ProfileRelationSerializer(source='user')
+    user = ProfileRelationSerializer()
 
     class Meta:
         model = Comment
