@@ -7,7 +7,6 @@ from dateutil import parser
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
-User = get_user_model()
 
 from nodeshot.core.base.utils import pause_disconnectable_signals, resume_disconnectable_signals
 from nodeshot.core.nodes.models import Node, Status
@@ -364,6 +363,7 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         if not item['is_published']:
             item['is_published'] = ''
 
+        User = get_user_model()
         # get user or None
         try:
             item['user'] = User.objects.get(username=item['user'])
