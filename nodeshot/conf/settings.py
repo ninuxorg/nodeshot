@@ -60,7 +60,7 @@ if PROTOCOL == 'https':
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     os.environ['HTTPS'] = 'on'
 
-SENTRY_ENABLED = bool(getattr(settings, 'RAVEN_CONFIG', {}).get('DNS'))
+SENTRY_ENABLED = bool(getattr(settings, 'RAVEN_CONFIG', {}).get('dsn'))
 
 MIDDLEWARE_CLASSES = ['django.middleware.common.CommonMiddleware']
 
