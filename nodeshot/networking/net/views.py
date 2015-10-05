@@ -351,6 +351,8 @@ def whois_list(request, format=None):
         })
     # layer2 results
     for interface in Interface.objects.select_related().all():
+        if interface.mac is None:
+            continue
         user = interface.device.node.user
         device = interface.device
         results.append({
