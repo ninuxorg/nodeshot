@@ -23,5 +23,6 @@ urlpatterns = patterns('nodeshot.networking.net.views',
     url(r'^ip/(?P<pk>[0-9]+)/$', 'ip_details', name='api_ip_details'),
 
     # whois
-    url(r'^whois/(?P<address>[:\.\w\d]+)/$', 'whois', name='api_whois'),
+    url(r'^whois/$', 'whois_list', name='api_whois_list'),
+    url(r'^whois/(?P<address>[:\.\w\d]+)/$', 'whois_detail', name='api_whois_detail'),
 )

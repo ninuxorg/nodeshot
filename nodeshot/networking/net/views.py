@@ -332,7 +332,39 @@ from netaddr import IPAddress, EUI, AddrFormatError
 
 
 @api_view(('GET',))
-def whois(request, address, format=None):
+def whois_list(request, format=None):
+    """
+    Retrieve basic whois information related to a layer2 or layer3 network address.
+    """
+    results = []
+    # layer3 results
+    for ip in Ip.objects.select_related().all():
+        interface = ip.interface
+        user = interface.device.node.user
+        device = interface.device
+        results.append({
+            'address': str(ip.address),
+            'user': user.username,
+            'name': user.get_full_name(),
+            'device': device.name,
+            'node': device.node.name
+        })
+    # layer2 results
+    for interface in Interface.objects.select_related().all():
+        user = interface.device.node.user
+        device = interface.device
+        results.append({
+            'address': str(interface.mac).replace('-', ':'),
+            'user': user.username,
+            'name': user.get_full_name(),
+            'device': device.name,
+            'node': device.node.name
+        })
+    return Response(results)
+
+
+@api_view(('GET',))
+def whois_detail(request, address, format=None):
     """
     Retrieve basic whois information related to a layer2 or layer3 network address.
     """
