@@ -829,3 +829,45 @@ class TestNet(TestCase):
     #     self.assertEqual(response.data['name'], 'admin')
 
     # TODO: write tests for vlan, tunnel, vap
+
+    def test_whois_ipv4(self):
+        response = self.client.get('/api/v1/whois/172.16.40.31/')
+        self.assertEqual(response.data, {
+            'address': '172.16.40.31',
+            'user': 'romano',
+            'name': 'romano romano',
+            'device': 'AGPomeziaRDP',
+            'node': 'Pomezia'
+        })
+
+    def test_whois_ipv6(self):
+        response = self.client.get('/api/v1/whois/2001:4c00:893b:fede::3/')
+        self.assertEqual(response.data, {
+            'address': '2001:4c00:893b:fede::3',
+            'user': 'romano',
+            'name': 'romano romano',
+            'device': 'AGPomeziaRDP',
+            'node': 'Pomezia'
+        })
+
+    def test_whois_mac_address(self):
+        response = self.client.get('/api/v1/whois/00:27:22:38:13:e4/')
+        self.assertEqual(response.data, {
+            'address': '00:27:22:38:13:e4',
+            'user': 'romano',
+            'name': 'romano romano',
+            'device': 'AGPomeziaRDP',
+            'node': 'Pomezia'
+        })
+
+    def test_whois_invalid_address(self):
+        response = self.client.get('/api/v1/whois/10.0.0.99.99.99/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_whois_404_layer3_address(self):
+        response = self.client.get('/api/v1/whois/10.0.0.99/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_whois_404_layer2_address(self):
+        response = self.client.get('/api/v1/whois/00:00:bb:00:00:aa/')
+        self.assertEqual(response.status_code, 404)

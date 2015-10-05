@@ -322,3 +322,50 @@ class IpDetails(ACLMixin, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = IpDetailSerializer
 
 ip_details = IpDetails.as_view()
+
+
+# ---------- whois ------------ #
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from netaddr import IPAddress, EUI, AddrFormatError
+
+
+@api_view(('GET',))
+def whois(request, address, format=None):
+    """
+    Retrieve basic whois information related to a layer2 or layer3 network address.
+    """
+    address_obj = None
+    try:
+        address_obj = IPAddress(address)
+    except AddrFormatError:
+        try:
+            address_obj = EUI(address)
+        except AddrFormatError:
+            pass
+    if not address_obj:
+        return Response({'detail': 'invalid address'}, status=400)
+    elif isinstance(address_obj, IPAddress):
+        try:
+            ip = Ip.objects.get(address=address)
+        except Ip.DoesNotExist:
+            return Response({'detail': 'address not found'}, status=404)
+        else:
+            interface = ip.interface
+    else:
+        try:
+            interface = Interface.objects.get(mac=address)
+        except Interface.DoesNotExist:
+            return Response({'detail': 'address not found'}, status=404)
+    # prepare response
+    user = interface.device.node.user
+    device = interface.device
+    data = {
+        'address': address,
+        'user': user.username,
+        'name': user.get_full_name(),
+        'device': device.name,
+        'node': device.node.name
+    }
+    return Response(data)
