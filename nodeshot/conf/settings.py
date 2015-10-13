@@ -130,7 +130,7 @@ INSTALLED_APPS = [
     'grappelli',
     'filebrowser',
     'django.contrib.admin',
-    # 3d parthy django apps
+    # 3d party django apps
     'rest_framework',
     'rest_framework_gis',
     'rest_framework_swagger',
