@@ -355,7 +355,7 @@ choose (enter the number of) one of the following layers:
 
         for olduser in OldUser.objects.all():
             try:
-                user = User.objects.get(username=olduser.username)
+                user = User.objects.get(Q(username=olduser.username) | Q(email=olduser.email))
             except User.DoesNotExist:
                 user = User()
             user.username = olduser.username
@@ -455,12 +455,12 @@ choose (enter the number of) one of the following layers:
                     user = User.objects.get(email=email)
                 # otherwise report error
                 else:
-                    user = None
                     tb = traceback.format_exc()
                     self.message('Could not save user %s, got exception:\n\n%s' % (user.username, tb))
+                    continue
 
             # if we got a user to add
-            if user is not None:
+            if user:
                 # store id
                 self.users_dict[email]['id'] = user.id
                 # append to saved users
