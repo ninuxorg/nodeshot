@@ -609,6 +609,7 @@ choose (enter the number of) one of the following layers:
             except Exception:
                 tb = traceback.format_exc()
                 self.message('Could not save device %s, got exception:\n\n%s' % (device.name, tb))
+                continue
 
             try:
                 routing_protocol = RoutingProtocol.objects.filter(name__icontains=old_device.routing_protocol)[0]
