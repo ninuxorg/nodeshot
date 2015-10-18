@@ -258,17 +258,17 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['mainlog'],
+            'handlers': ['mainlog', 'sentry'],
             'level': 'ERROR',
             'propagate': True,
         },
         'django.request': {
-            'handlers': ['mail_admins', 'mainlog'],
+            'handlers': ['mail_admins', 'mainlog', 'sentry'],
             'level': 'ERROR',
             'propagate': True,
         },
         '': {
-            'handlers': ['mainlog'],
+            'handlers': ['mainlog', 'sentry'],
             'level': 'ERROR',
         },
         'django.db.backends': {
