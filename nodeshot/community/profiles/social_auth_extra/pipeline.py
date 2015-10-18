@@ -69,11 +69,11 @@ def load_extra_data(backend, details, response, uid, user, social_user=None, *ar
             response = json.loads(requests.get('https://graph.facebook.com/%s?access_token=%s' % (extra_data['id'], extra_data['access_token'])).content)
             try:
                 user.city, user.country = response.get('hometown').get('name').split(', ')
-            except AttributeError:
+            except (AttributeError, TypeError):
                 pass
             try:
                 user.birth_date = datetime.strptime(response.get('birthday'), '%m/%d/%Y').date()
-            except AttributeError:
+            except (AttributeError, TypeError):
                 pass
             user.save()
         return {'social_user': social_user}
