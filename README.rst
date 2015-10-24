@@ -2,21 +2,21 @@
 Nodeshot
 ========
 
-.. image:: https://travis-ci.org/ninuxorg/nodeshot.png
+.. image:: https://travis-ci.org/ninuxorg/nodeshot.svg
    :target: https://travis-ci.org/ninuxorg/nodeshot
 
-.. image:: https://coveralls.io/repos/ninuxorg/nodeshot/badge.png
+.. image:: https://coveralls.io/repos/ninuxorg/nodeshot/badge.svg
   :target: https://coveralls.io/r/ninuxorg/nodeshot
 
-.. image:: https://landscape.io/github/ninuxorg/nodeshot/master/landscape.png
+.. image:: https://landscape.io/github/ninuxorg/nodeshot/master/landscape.svg
    :target: https://landscape.io/github/ninuxorg/nodeshot/master
    :alt: Code Health
 
-.. image:: https://requires.io/github/ninuxorg/nodeshot/requirements.png?branch=master
+.. image:: https://requires.io/github/ninuxorg/nodeshot/requirements.svg?branch=master
    :target: https://requires.io/github/ninuxorg/nodeshot/requirements/?branch=master
    :alt: Requirements Status
 
-.. image:: https://badge.fury.io/py/nodeshot.png
+.. image:: https://badge.fury.io/py/nodeshot.svg
    :target: https://pypi.python.org/pypi/nodeshot
 
 .. image:: https://img.shields.io/pypi/dm/nodeshot.svg
