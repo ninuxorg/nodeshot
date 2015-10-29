@@ -358,6 +358,9 @@ choose (enter the number of) one of the following layers:
                 user = User.objects.get(Q(username=olduser.username) | Q(email=olduser.email))
             except User.DoesNotExist:
                 user = User()
+            except User.MultipleObjectsReturned:
+                continue
+            
             user.username = olduser.username
             user.password = olduser.password
             user.first_name = olduser.first_name
