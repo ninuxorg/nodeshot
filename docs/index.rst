@@ -13,10 +13,6 @@ Nodeshot
 .. image:: https://coveralls.io/repos/ninuxorg/nodeshot/badge.svg
   :target: https://coveralls.io/r/ninuxorg/nodeshot
 
-.. image:: https://landscape.io/github/ninuxorg/nodeshot/master/landscape.svg
-   :target: https://landscape.io/github/ninuxorg/nodeshot/master
-   :alt: Code Health
-
 .. image:: https://requires.io/github/ninuxorg/nodeshot/requirements.svg?branch=master
    :target: https://requires.io/github/ninuxorg/nodeshot/requirements/?branch=master
    :alt: Requirements Status
