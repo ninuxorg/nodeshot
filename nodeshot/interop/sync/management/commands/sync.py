@@ -29,7 +29,6 @@ class Command(BaseCommand):
         """
         Retrieve specified layers or all external layers if no layer specified.
         """
-
         # init empty Q object
         queryset = Q()
 
@@ -37,7 +36,6 @@ class Command(BaseCommand):
         if len(args) < 1:
             # cache queryset
             all_layers = Layer.objects.published().external()
-
             # check if there is any layer to exclude
             if options['exclude']:
                 # convert comma separated string in python list, ignore spaces
@@ -52,20 +50,16 @@ class Command(BaseCommand):
         # otherwise loop over args and retrieve each specified layer
         for layer_slug in args:
             queryset = queryset | Q(slug=layer_slug)
-
             # verify existence
             try:
                 # retrieve layer
                 layer = Layer.objects.get(slug=layer_slug)
-
                 # raise exception if layer is not external
                 if not layer.is_external:
                     raise CommandError('Layer "%s" is not an external layer\n\r' % layer_slug)
-
                 # raise exception if layer is not published
                 if not layer.is_published:
                     raise CommandError('Layer "%s" is not published. Why are you trying to work on an unpublished layer?\n\r' % layer_slug)
-
             # raise exception if one of the layer looked for doesn't exist
             except Layer.DoesNotExist:
                 raise CommandError('Layer "%s" does not exist\n\r' % layer_slug)
@@ -81,10 +75,8 @@ class Command(BaseCommand):
         """ execute sync command """
         # store verbosity level in instance attribute for later use
         self.verbosity = int(options.get('verbosity'))
-
         # blank line
         self.stdout.write('\r\n')
-
         # retrieve layers
         layers = self.retrieve_layers(*args, **options)
 
