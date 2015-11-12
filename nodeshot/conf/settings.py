@@ -213,10 +213,6 @@ LOGGING = {
             '()': 'nodeshot.core.base.utils.RequireSentryConfigured'
         }
     },
-    'root': {
-        'level': 'WARNING',
-        'handlers': ['sentry'],
-    },
     'formatters': {
         'verbose': {
             'format': '\n\n[%(levelname)s %(asctime)s] module: %(module)s, process: %(process)d, thread: %(thread)d\n%(message)s'
@@ -257,25 +253,14 @@ LOGGING = {
             'formatter': 'verbose'
         },
     },
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['mainlog', 'mail_admins', 'sentry'],
+    },
     'loggers': {
         'django': {
-            'handlers': ['mainlog', 'sentry'],
             'level': 'ERROR',
             'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['mail_admins', 'mainlog', 'sentry'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        '': {
-            'handlers': ['mainlog', 'sentry'],
-            'level': 'ERROR',
-        },
-        'django.db.backends': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': False,
         },
         'nodeshot.networking': {
             'handlers': ['networkinglog'],
