@@ -78,6 +78,7 @@ EMAIL_HOST = 'localhost'
 EMAIL_HOST_USER = 'root@localhost'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER  # used for error reporting
+EMAIL_SUBJECT_PREFIX = '[Nodeshot] '
 
 LEAFLET_CONFIG.update({
     'DEFAULT_CENTER': (49.06775, 30.62011),

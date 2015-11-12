@@ -51,6 +51,7 @@ MEDIA_ROOT = os.path.join(settings.SITE_ROOT, 'media/')
 STATIC_ROOT = os.path.join(settings.SITE_ROOT, 'static/')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
+EMAIL_SUBJECT_PREFIX = '[Nodeshot] '
 
 ALLOWED_HOSTS = ['*']
 
