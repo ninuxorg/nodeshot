@@ -29,7 +29,7 @@ djangorestframework==3.2.3  # rq.filter: >=3.2,<4.0
 drf-extensions==0.2.7
 django-rest-swagger
 markdown
-djangorestframework-gis==0.9.4
+djangorestframework-gis==0.9.6
 djangorestframework-hstore==1.3
 geojson-elevation==0.1
 
