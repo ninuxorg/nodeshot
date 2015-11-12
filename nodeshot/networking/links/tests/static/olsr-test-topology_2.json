@@ -9,6 +9,7 @@
             "validityTime": 284572
         }
     ],
+    "mid": [],
     "config": {
         "olsrPort":698,
         "debugLevel":0,
