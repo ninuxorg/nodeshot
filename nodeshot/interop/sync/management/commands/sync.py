@@ -1,3 +1,5 @@
+from logging import exception
+
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db.models import Q
@@ -113,8 +115,12 @@ class Command(BaseCommand):
                 instance = synchronizer(layer, verbosity=self.verbosity)
                 self.stdout.write('Processing layer "%s"\r\n' % layer.slug)
                 messages = instance.sync()
-            except ImproperlyConfigured, e:
+            except ImproperlyConfigured as e:
                 self.stdout.write('Validation error: %s\r\n' % e)
+                continue
+            except Exception as e:
+                self.stdout.write('Got Exception: %s\r\n' % e)
+                exception(e)
                 continue
 
             for message in messages:
