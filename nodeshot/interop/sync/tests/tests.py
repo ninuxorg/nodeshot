@@ -298,10 +298,11 @@ class TestSync(TestCase):
             ['sync', 'vienna'],
             kwargs={'verbosity': 0}
         )
-
+        
         # ensure following text is in output
-        self.assertIn('5 nodes unmodified', output)
-        self.assertIn('38 nodes deleted', output)
+        self.assertIn('4 nodes unmodified', output)
+        self.assertIn('39 nodes deleted', output)
+        self.assertIn('1 nodes added', output)
         self.assertIn('0 nodes changed', output)
         self.assertIn('5 total external', output)
         self.assertIn('5 total local', output)
@@ -317,6 +318,9 @@ class TestSync(TestCase):
         self.assertTrue(node.geometry.equals(point))
         self.assertEqual(node.updated.strftime('%Y-%m-%d'), '2013-07-10')
         self.assertEqual(node.added.strftime('%Y-%m-%d'), '2013-06-14')
+        # check another one
+        node = Node.objects.get(slug='240201')
+        self.assertEqual(node.name, '240201')
 
     @responses.activate
     def test_geojson_sync(self):

@@ -31,11 +31,15 @@
           <updated>2013-07-10 14:59:04 +0200</updated>
         </item>
         <item>
-          <guid>Cervetto_22013-06-27 10:56:19 +0200</guid>
+          <guid>2402012015-02-20 12:39:32 +0100</guid>
           <title></title>
-              <description>Test WISP</description>
-              <georss:point>44.4316 8.89204</georss:point>
-          <updated>2013-07-10 15:01:11 +0200</updated>
+          <category></category>
+          <description>riviera marconi 53 - Loreo</description>
+          <georss:lat>45.0623048436449</georss:lat>
+          <georss:long>12.1888833227539</georss:long>
+          <pubDate>2015-02-20 12:39:32 +0100</pubDate>
+          <updated>2015-11-12 13:45:04 +0100</updated>
+          2015-02-20 12:39:32 +0100
         </item>
         <item>
           <guid>SantaTecla2013-06-28 09:58:26 +0200</guid>
