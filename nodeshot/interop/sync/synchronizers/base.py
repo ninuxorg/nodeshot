@@ -130,8 +130,9 @@ class HttpRetrieverMixin(object):
         """ retrieve data from an HTTP URL """
         # shortcuts for readability
         url = self.config.get('url')
+        timeout = self.config.get('timeout')
         # perform HTTP request and store content
-        self.data = requests.get(url, verify=self.verify_ssl, timeout=5).content
+        self.data = requests.get(url, verify=self.verify_ssl, timeout=timeout).content
 
 
 class XMLParserMixin(object):
@@ -174,6 +175,14 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             'kwargs': {
                 'max_length': 128,
                 'help_text': _('URL containing geographical data')
+            }
+        },
+        {
+            'name': 'timeout',
+            'class': 'IntegerField',
+            'kwargs': {
+                'default': 10,
+                'help_text': _('Number of seconds after which the request expires')
             }
         },
         {
