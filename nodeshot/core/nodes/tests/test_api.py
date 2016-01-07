@@ -334,3 +334,12 @@ class TestApi(TestCase):
         self.assertEqual(len(response.data['geometry']['coordinates']), 72)
         self.assertEqual(len(response.data['geometry']['coordinates'][0]), 3)
         self.assertEqual(len(response.data['geometry']['coordinates'][-1]), 3)
+
+    def test_elevation_api_none_path(self):
+        """
+        See #267
+        https://github.com/ninuxorg/nodeshot/issues/267
+        """
+        url = reverse('api_elevation_profile')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)

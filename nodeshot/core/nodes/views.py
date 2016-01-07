@@ -254,6 +254,10 @@ def elevation_profile(request, format=None):
     if format is None:
         format = 'json'
 
-    return Response(elevation(request.query_params.get('path'),
+    path = request.query_params.get('path')
+    if not path:
+        return Response({'detail': _('missing required path argument')}, status=400)
+
+    return Response(elevation(path,
                               api_key=ELEVATION_API_KEY,
                               sampling=ELEVATION_DEFAULT_SAMPLING))
