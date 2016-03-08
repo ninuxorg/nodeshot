@@ -426,10 +426,11 @@ if __name__ == "__main__":
                     if not l.from_interface.draw_link or not l.to_interface.draw_link:
                         continue
                     # if a link already exists, just update
-                    l.etx = cost
                     old_links[l.id] = True
-                    l.save()
-                    print "Updated etx to %s for link %s" % (cost, l)
+                    if cost != l.etx:
+                        l.etx = cost
+                        l.save()
+                        print "Updated etx to %s for link %s" % (cost, l)
                 elif link_count > 1:
                     print "Anomaly: 2 links retrieved."
                 elif link_count < 1:
