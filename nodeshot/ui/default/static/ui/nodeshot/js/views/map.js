@@ -996,6 +996,7 @@
                 // create control
                 var el = L.control.elevation({
                         position: 'bottomright',
+                        theme: "steelblue-theme",
                         width: 1020,
                         height: 299,
                         margins: {
