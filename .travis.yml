@@ -11,10 +11,6 @@ services:
 python:
   - "2.7"
 
-branches:
-  only:
-    - master
-
 install:
   - pip install -U pip wheel setuptools
   # command to install requirements
