@@ -17,11 +17,6 @@ Nodeshot
    :target: https://requires.io/github/ninuxorg/nodeshot/requirements/?branch=master
    :alt: Requirements Status
 
-.. image:: https://badge.fury.io/py/nodeshot.svg
-   :target: https://pypi.python.org/pypi/nodeshot
-
-.. image:: https://img.shields.io/pypi/dm/nodeshot.svg
-   :target: https://pypi.python.org/pypi/nodeshot
 ------------
 
 .. raw:: html
