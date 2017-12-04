@@ -130,7 +130,7 @@ class HttpRetrieverMixin(object):
         """ retrieve data from an HTTP URL """
         # shortcuts for readability
         url = self.config.get('url')
-        timeout = float(self.config.get('timeout'))
+        timeout = float(self.config.get('timeout', 10))
         # perform HTTP request and store content
         self.data = requests.get(url, verify=self.verify_ssl, timeout=timeout).content
 
