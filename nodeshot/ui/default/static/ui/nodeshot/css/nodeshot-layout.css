@@ -47,6 +47,7 @@ body{ min-width: 300px }
     background-color: #fff;
 }
 
+#general-search div,
 #general-search-input{
     border: 0 none;
     float: left;
