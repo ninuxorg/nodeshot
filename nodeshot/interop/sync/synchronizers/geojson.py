@@ -12,6 +12,8 @@ class GeoJson(GenericGisSynchronizer):
         """ parse geojson and ensure is collection """
         try:
             self.parsed_data = json.loads(self.data)
+        except UnicodeError as e:
+            self.parsed_data = json.loads(self.data.decode('latin1'))
         except Exception as e:
             raise Exception('Error while converting response from JSON to python. %s' % e)
 
@@ -21,6 +23,7 @@ class GeoJson(GenericGisSynchronizer):
         self.parsed_data = self.parsed_data['features']
 
     def parse_item(self, item):
+        item.setdefault('properties', {})
         result = {
             "name": item['properties'].pop(self.keys['name'], ''),
             "status": item['properties'].pop(self.keys['status'], None),

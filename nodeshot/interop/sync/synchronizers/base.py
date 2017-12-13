@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import logging
 import requests
 from xml.dom import minidom
 from dateutil import parser
@@ -11,6 +12,7 @@ from django.contrib.auth import get_user_model
 from nodeshot.core.base.utils import pause_disconnectable_signals, resume_disconnectable_signals
 from nodeshot.core.nodes.models import Node, Status
 
+logger = logging.getLogger(__name__)
 
 __all__ = [
     # classes
@@ -350,6 +352,8 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         # name is required
         if not item['name']:
             raise Exception('Expected property %s not found in item %s.' % (self.keys['name'], item))
+        elif len(item['name']) > 75:
+            item['name'] = item['name'][:75]
 
         if not item['status']:
             item['status'] = self.default_status
@@ -359,8 +363,12 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
             item['status'] = Status.objects.get(slug__iexact=item['status'])
         except Status.DoesNotExist:
             try:
-                item['status'] = Status.objects.filter(is_default=True)[0]
-            except IndexError:
+                item['status'] = Status.objects.create(name=item['status'],
+                                                       slug=slugify(item['status']),
+                                                       description=item['status'],
+                                                       is_default=False)
+            except Exception as e:
+                logger.exception(e)
                 item['status'] = None
 
         # slugify slug
@@ -388,15 +396,17 @@ class GenericGisSynchronizer(HttpRetrieverMixin, BaseSynchronizer):
         if not item['notes']:
             item['notes'] = ''
 
-        # convert dates to python datetime
-        try:
-            item['added'] = parser.parse(item['added'])
-        except Exception as e:
-            print "Exception while parsing 'added' date: %s" % e
-        try:
-            item['updated'] = parser.parse(item['updated'])
-        except Exception as e:
-            print "Exception while parsing 'updated' date: %s" % e
+        if item['added']:
+            # convert dates to python datetime
+            try:
+                item['added'] = parser.parse(item['added'])
+            except Exception as e:
+                print "Exception while parsing 'added' date: %s" % e
+        if item['updated']:
+            try:
+                item['updated'] = parser.parse(item['updated'])
+            except Exception as e:
+                print "Exception while parsing 'updated' date: %s" % e
 
         result = {
             "name": item['name'],
