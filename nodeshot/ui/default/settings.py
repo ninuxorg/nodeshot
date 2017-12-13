@@ -94,6 +94,7 @@ PIWIK_ANALYTICS_SITE_ID = getattr(settings, 'NODESHOT_UI_PIWIK_ANALYTICS_SITE_ID
 # additional geojson sources that are not contained in the main /api/v1/nodes.geojson response
 ADDITIONAL_GEOJSON_URLS = getattr(settings, 'NODESHOT_UI_ADDITIONAL_GEOJSON_URLS', [])
 
+ADD_NODES_ENABLED = getattr(settings, 'NODESHOT_UI_ADD_NODES_ENABLED', True)
 MAP_3D_ENABLED = getattr(settings, 'NODESHOT_UI_MAP_3D_ENABLED', True)
 MAP_TOOLS_ENABLED = getattr(settings, 'NODESHOT_UI_MAP_TOOLS_ENABLED', True)
 MAP_PREFERENCES_ENABLED = getattr(settings, 'NODESHOT_UI_MAP_PREFERENCES_ENABLED', True)

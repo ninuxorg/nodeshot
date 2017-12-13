@@ -38,7 +38,9 @@
 
 <script id="map-toolbar-template" type="text/template">
     <a href="#" class="icon-layer-2" data-panel="fn-map-layers" title="{% trans 'Control map data' %}" data-placement="left" data-delay="200"></a>
-    <a href="#" class="icon-pin-add" data-toggle="tooltip" title="{% trans 'Add new node' %}" data-placement="left" data-delay="200"></a>
+    <% if (Ns.settings.addNodeEnabled) { %>
+        <a href="#" class="icon-pin-add" data-toggle="tooltip" title="{% trans 'Add new node' %}" data-placement="left" data-delay="200"></a>
+    <% } %>
     <% if (Ns.settings.map3d) { %>
         <a href="#" id="btn-map-mode" class="icon-3d smaller" title="{% trans 'Toggle 3D view' %}" data-placement="left" data-delay="200"></a>
     <% } %>

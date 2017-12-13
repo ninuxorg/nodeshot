@@ -340,6 +340,7 @@
                 zoom: {{ MAP_ZOOM }}
                 {% endlocalize  %}
             },
+            addNodeEnabled: {% if ADD_NODES_ENABLED %}true{% else %}false{% endif %},
             votes: {% if VOTING_ENABLED %}true{% else %}false{% endif %},
             ratings: {% if RATING_ENABLED %}true{% else %}false{% endif %},
             comments: {% if COMMENTS_ENABLED %}true{% else %}false{% endif %},
