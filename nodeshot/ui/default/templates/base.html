@@ -23,6 +23,9 @@
     <![endif]-->
     <!-- leaflet -->
     {% leaflet_css %}
+    {% if CUSTOM_CSS %}
+        <link href="{{ CUSTOM_CSS }}" rel="stylesheet">
+    {% endif %}
     {% if LOGO and LOGO.URL %}
     <style type="text/css">
         #top-bar h1 a {

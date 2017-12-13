@@ -69,6 +69,7 @@ def index(request):
         'DATE_FORMAT': ui_settings.DATE_FORMAT,
         'ADDRESS_SEARCH_TRIGGERS': ui_settings.ADDRESS_SEARCH_TRIGGERS,
         'LOGO': ui_settings.LOGO,
+        'CUSTOM_CSS': ui_settings.CUSTOM_CSS,
         'ADD_NODES_ENABLED': ui_settings.ADD_NODES_ENABLED,
         # participation settings
         'VOTING_ENABLED': ui_settings.VOTING_ENABLED,
