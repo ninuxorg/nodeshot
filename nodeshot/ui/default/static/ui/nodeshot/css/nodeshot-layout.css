@@ -310,7 +310,9 @@ article.center-stage .row > div { padding-left: 0; padding-right: 0 }
         height: 30px;
         margin: 19px 3.5% 0 0;
     }
-    #general-search-input{ padding: 0px 15px; }
+    #general-search-input{
+        padding: 0px 15px;
+    }
 
     #main-actions li a{
         height: 70px;
@@ -509,6 +511,10 @@ article.center-stage .row > div { padding-left: 0; padding-right: 0 }
     #body article blockquote{ font-size: 16px }
 
     .avatar200{ float: none !important }
+
+    #general-search-input{
+        height: auto;
+    }
 }
 
 /* Extra small adjustments */
