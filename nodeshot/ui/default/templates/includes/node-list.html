@@ -84,10 +84,11 @@
         </span>
     </div>
     <% } %>
-
+    {% if REGISTRATION_OPEN %}
     <% if (options.addNode) { %>
     <button class="btn btn-light icon-plus pull-right" id="js-add-node">{% trans 'Add node' %}</button>
     <% } %>
+    {% endif %}
     <div class="clearfix"></div>
 </div>
 
