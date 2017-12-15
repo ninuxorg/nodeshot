@@ -712,6 +712,9 @@ article.center-stage .row > div { padding-left: 0; padding-right: 0 }
     bottom: 14px;
     padding: 12px 15px 10px;
     min-width: 120px;
+    /* scroll if too long */
+    max-height: 85%;
+    overflow-y: auto;
 }
 
 #map-legend a{ float: left }
