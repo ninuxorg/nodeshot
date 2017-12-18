@@ -480,6 +480,10 @@
                 add: function(e){
                     // create tootlip when leaflet layer is added to the view
                     $(e.target._container).tooltip(self.tooltipOptions(data));
+                },
+                remove: function(e){
+                    // ensure tooltip is removed when layer is removed from map
+                    $(e.target._container).tooltip('destroy');
                 }
             });
             // show on map only if corresponding nodeshot layer is visible
