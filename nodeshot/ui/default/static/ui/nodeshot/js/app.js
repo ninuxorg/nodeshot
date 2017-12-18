@@ -119,9 +119,9 @@
         },
 
         // map node popup
-        getMapLatLng: function (latlng) {
+        getMapLatLng: function (latlng, zoom) {
             this.getMap();
-            Ns.body.currentView.content.currentView.goToLatLng(latlng);
+            Ns.body.currentView.content.currentView.goToLatLng(latlng, zoom);
         },
 
         // layer list
@@ -193,6 +193,7 @@
             'map': 'getMap',
             'map/add': 'addNode',
             'map/latlng/:latlng': 'getMapLatLng',
+            'map/latlng/:latlng/:zoom': 'getMapLatLng',
             'map/:slug': 'getMapPopup',
             'nodes': 'getNodeList',
             'nodes/:slug': 'getNode',

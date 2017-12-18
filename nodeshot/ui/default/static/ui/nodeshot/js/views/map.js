@@ -580,16 +580,20 @@
         /*
          * Go to specified latitude and longitude
          */
-        goToLatLng: function (latlng) {
+        goToLatLng: function (latlng, zoom) {
             latlng = latlng.split(',')
             latlng = L.latLng(latlng[0], latlng[1]);
             var self = this,
                 marker = L.marker(latlng);
-            marker.addTo(this.map);
+            // used in search address feature
+            if (!zoom) {
+                marker.addTo(this.map);
+                zoom = 18;
+            }
             // go to marker and zoom in
-            this.map.setView(latlng, 18);
+            this.map.setView(latlng, zoom);
             // fade out marker
-            if (typeof(marker) !== 'undefined') {
+            if (typeof(marker) !== 'undefined' && this.map.hasLayer(marker)) {
                 $([marker._icon, marker._shadow]).fadeOut(4000, function () {
                     self.map.removeLayer(marker);
                 });
