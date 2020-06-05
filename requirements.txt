@@ -4,7 +4,7 @@
 # run pip install -r requirements
 
 psycopg2
-Django==1.8.18  # rq.filter: >=1.8,<1.9
+Django==1.11.29  # rq.filter: >=1.8,<1.9
 
 # python libraries
 Pillow
